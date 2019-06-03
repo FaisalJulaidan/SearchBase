@@ -121,12 +121,13 @@ def update(id, name, desc, active, acceptApplications, acceptanceScore, rejectAp
         autoPilot_callback: Callback = getByID(id, companyID)
         if not autoPilot_callback.Success: return autoPilot_callback
         autoPilot = autoPilot_callback.Data
+        autoPilot_temp = autoPilot_callback.Data
 
         # Update the autoPilot
         autoPilot.Name = name
         autoPilot.Description = desc
         autoPilot.Active = active
-        autoPilot.AcceptApplication = acceptApplications
+        autoPilot.AcceptApplications = acceptApplications
         autoPilot.AcceptanceScore = acceptanceScore
         autoPilot.RejectApplications = rejectApplications
         autoPilot.RejectionScore = rejectionScore
@@ -134,7 +135,7 @@ def update(id, name, desc, active, acceptApplications, acceptanceScore, rejectAp
 
         # TODO OpenTimeSlots & Appointments Feature
         # Update the openTimeSlots
-        for (oldSlot, newSlot) in zip(AutoPilot.OpenTimeSlots, openTimeSlots):
+        for (oldSlot, newSlot) in zip(autoPilot_temp.OpenTimeSlots, openTimeSlots):
             if oldSlot.Day == newSlot['day']:
                 oldSlot.Active = newSlot['active']
                 oldSlot.From = time(newSlot['from'][0], newSlot['from'][1])

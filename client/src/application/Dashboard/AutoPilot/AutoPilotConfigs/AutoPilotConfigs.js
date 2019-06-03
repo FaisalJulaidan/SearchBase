@@ -23,8 +23,8 @@ class AutoPilotConfigs extends React.Component {
         acceptApplications: false,
         SendCandidatesAppointments: false,
 
-        acceptanceScore: 0,
-        rejectionScore: 0
+        acceptanceScore: null,
+        rejectionScore: null
     };
 
     componentDidMount() {
@@ -32,8 +32,13 @@ class AutoPilotConfigs extends React.Component {
             return history.push('/dashboard/auto_pilot');
 
         const /**@type AutoPilot*/ autoPilot = this.props.location.state?.autoPilot || {};
-        this.changeScore(autoPilot.AcceptanceScore * 100, 'acceptanceScore');
-        this.changeScore(autoPilot.RejectionScore * 100, 'rejectionScore')
+        this.setState({
+            rejectApplications: autoPilot.RejectApplications,
+            acceptApplications: autoPilot.AcceptApplications,
+            SendCandidatesAppointments: autoPilot.SendCandidatesAppointments,
+            acceptanceScore: autoPilot.AcceptanceScore * 100,
+            rejectionScore: autoPilot.RejectionScore * 100
+        })
     }
 
     onRejectChange = (checked) => this.setState({rejectApplications: checked});
@@ -53,7 +58,7 @@ class AutoPilotConfigs extends React.Component {
                 day: i,
                 from: [timeSlots[i].from.hours(), timeSlots[i].from.minutes()],
                 to: [timeSlots[i].to.hours(), timeSlots[i].to.minutes()],
-                duration: TimeSlotsRef.current.state.duration,
+                duration: +TimeSlotsRef.current.state.duration.split('min')[0],
                 active: timeSlots[i].active
             })
         }
@@ -66,12 +71,12 @@ class AutoPilotConfigs extends React.Component {
             rejectApplications: state.rejectApplications,
             acceptanceScore: state.acceptanceScore / 100,
             rejectionScore: state.rejectionScore / 100,
-            SendCandidatesAppointments: state.SendCandidatesAppointments,
+            sendCandidatesAppointments: state.SendCandidatesAppointments,
 
             openTimeSlots: weekDays
         };
 
-        console.log(autoPilot)
+        console.log(payload)
         store.dispatch(autoPilotActions.updateAutoPilot(autoPilot.ID, payload));
     });
 
@@ -133,37 +138,41 @@ class AutoPilotConfigs extends React.Component {
                                 )}
                             </FormItem>
 
+
                             <Form.Item label="Auto Reject Applicants "
                                        extra="Select the percentage to auto reject the applicants">
                                 {getFieldDecorator('rejectApplications', {
                                     valuePropName: 'checked',
-                                    initialValue: autoPilot.RejectApplications
                                 })(
                                     <>
-                                        <Switch onChange={this.onRejectChange} style={{marginRight: 15}}/>
+                                        <Switch onChange={this.onRejectChange} style={{marginRight: 15}}
+                                                defaultChecked={autoPilot.RejectApplications}/>
                                         Less Than
                                         <InputNumber min={1} max={100}
                                                      onChange={value => this.changeScore(value, 'rejectionScore')}
                                                      formatter={value => `${value}%`}
-                                                     value={this.state.rejectionScore}
+                                                     key={this.state.acceptanceScore ? 'notLoadedYet' : 'loaded'}
+                                                     defaultValue={this.state.rejectionScore}
                                                      style={{marginLeft: 15}}
                                                      disabled={!this.state.rejectApplications}/>
                                     </>
                                 )}
                             </Form.Item>
 
+                            {console.log(this.state.acceptanceScore)}
                             <FormItem label="Auto Accept Applicants "
                                       extra="Select the percentage to auto accept the applicants">
                                 {getFieldDecorator('acceptApplications', {
                                     valuePropName: 'checked',
-                                    initialValue: autoPilot.AcceptApplications,
                                 })(
                                     <>
-                                        <Switch onChange={this.onAcceptChange} style={{marginRight: 15}}/>
+                                        <Switch onChange={this.onAcceptChange} style={{marginRight: 15}}
+                                                defaultChecked={autoPilot.AcceptApplications}/>
                                         Greater Than
-                                        <InputNumber min={1} max={100}
-                                                     onChange={value => this.changeScore(value, 'acceptApplications')}
-                                                     value={this.state.acceptanceScore}
+                                        <InputNumber min={0} max={100}
+                                                     onChange={value => this.changeScore(value, 'acceptanceScore')}
+                                                     defaultValue={this.state.acceptanceScore}
+                                                     key={this.state.acceptanceScore ? 'notLoadedYet' : 'loaded'}
                                                      formatter={value => `${value}%`}
                                                      style={{marginLeft: 15}}
                                                      disabled={!this.state.acceptApplications}/>

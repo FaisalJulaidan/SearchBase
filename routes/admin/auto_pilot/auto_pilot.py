@@ -50,7 +50,7 @@ def auto_pilot(autoPilotID):
                     data.get('acceptanceScore'),
                     data.get('rejectApplications'),
                     data.get('rejectionScore'),
-                    data.get('SendCandidatesAppointments'),
+                    data.get('sendCandidatesAppointments'),
                     data.get('openTimeSlots'), # TODO OpenTimeSlots & Appointments Feature
                     user['companyID'])
         if not callback.Success:

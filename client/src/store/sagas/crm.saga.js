@@ -77,17 +77,12 @@ function* disconnectCrm({disconnectedCRMID}) {
 }
 
 function* exportRecruiterValueReport({connectedCRM_Type}) {
-    let msg = "Could not fetch the export data";
     try {
-        loadingMessage('Exporting recruiter information from ' + connectedCRM_Type.Name, 0);
         const res = yield http.post(`/crm/recruiter_value_report`, {crm_type: connectedCRM_Type.Name});
-        destroyMessage();
-        successMessage(res.data?.msg || msg);
         yield put(crmActions.exportRecruiterValueReportSuccess(res.data.data));
     } catch (error) {
         let data = error.response?.data;
-        errorMessage(data.msg || msg);
-        yield put(crmActions.exportRecruiterValueReportFailure(data.msg || msg));
+        yield put(crmActions.exportRecruiterValueReportFailure(data.msg || "An error has occurred"));
         if (!data.msg) errorHandler(error)
     }
 }

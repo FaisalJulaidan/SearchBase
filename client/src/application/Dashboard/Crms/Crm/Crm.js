@@ -9,6 +9,7 @@ import {BullhornFeatures, BullhornFormItems, BullhornHeader} from "./CrmForms/Bu
 import VincereFormItems from "./CrmForms/Vincere";
 import {connect} from 'react-redux';
 import {crmActions} from "store/actions";
+import {CSVLink} from "react-csv";
 
 const TabPane = Tabs.TabPane;
 const {Title} = Typography;
@@ -20,7 +21,9 @@ class Crm extends React.Component {
 
     componentWillMount() {
         if (!this.props.location.state)
-            return history.push('/dashboard/crmlist')
+            return history.push('/dashboard/crmlist');
+        const /** @type {CRM}*/crm = this.props.location.state?.crm || {};
+        this.props.dispatch(crmActions.exportRecruiterValueReport({Name: crm.type}))
     }
 
     componentWillReceiveProps(nextProps) {
@@ -37,7 +40,7 @@ class Crm extends React.Component {
             crm.ID = nextProps.CRMsList[index].ID;
         }
         if(nextProps.exportData){
-            crm.exportData = nextProps.exportData
+            crm.exportData = nextProps.exportData;
         }
     }
 
@@ -70,12 +73,6 @@ class Crm extends React.Component {
     disconnectCRM = () => {
         const /** @type {CRM}*/crm = this.props.location.state?.crm || {};
         this.props.dispatch(crmActions.disconnectCrm({ID: crm.ID}))
-    };
-
-    exportRecruiterValueReport = () => {
-        const /** @type {CRM}*/crm = this.props.location.state?.crm || {};
-        console.log("crm.exportData", crm.exportData)
-        this.props.dispatch(crmActions.exportRecruiterValueReport({Name: crm.type}))
     };
 
     render() {
@@ -113,11 +110,12 @@ class Crm extends React.Component {
                         <Breadcrumb.Item>{crm.type}</Breadcrumb.Item>
                     </Breadcrumb>
 
-                    {crm.type === "Bullhorn" ? <><br/><Button
-                        type="primary" icon="solution"
-                        onClick={this.exportRecruiterValueReport}>
-                        Export Recruiter-Value Data
-                    </Button></> : <></>}
+                    {crm.type === "Bullhorn" ? <><br/>
+                        <Button className={styles.Panel_Header_Button} type="primary" icon="download"
+                                loading={crm.exportData===undefined}>
+                            <CSVLink filename={"Recruiter Pipeline Report.csv"} data={crm.exportData || []}
+                                     style={{color:"white"}}> Recruiter Pipeline Report</CSVLink>
+                        </Button></> : <></>}
 
                     <br/>
 

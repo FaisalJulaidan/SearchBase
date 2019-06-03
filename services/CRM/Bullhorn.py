@@ -2,6 +2,7 @@ import base64
 import json
 import logging
 import urllib.parse
+from datetime import datetime
 
 import requests
 from sqlalchemy import and_
@@ -9,7 +10,8 @@ from sqlalchemy import and_
 from enums import DataType as DT
 from models import Callback, Conversation, db, CRM, StoredFile
 from services import databases_services, stored_file_services
-from datetime import datetime
+
+
 # login requires: username, password
 
 
@@ -568,7 +570,7 @@ def produceRecruiterValueReport(crm: CRM, companyID) -> Callback:
         return_body.sort(key=extractName, reverse=True)
 
         def getTotalPipeline(result, previousUser):
-            if len(result.keys()) > 1:
+            if len(result.keys()) > 0:
                 totalPipeline = 0
                 for pRecord in result[previousUser]:
                     totalPipeline += float(pRecord[-1])
@@ -576,15 +578,16 @@ def produceRecruiterValueReport(crm: CRM, companyID) -> Callback:
                                              totalPipeline])
             return result
 
-        result = {"start": [["User Assigned", "Date Added", "Title", "Client Corporation", "Salary", "Fee Arrangement",
-                             "Pipeline Value"]]}
+        titles = ["User Assigned", "Date Added", "Title", "Client Corporation", "Salary", "Fee Arrangement",
+                            "Pipeline Value"]
 
+        data = {}
         previousUser = None
         for record in return_body:
-            tempRecord = result.get(record["owner"]["firstName"] + " " + record["owner"]["lastName"])
+            tempRecord = data.get(record["owner"]["firstName"] + " " + record["owner"]["lastName"])
             if not tempRecord:
                 tempRecord = []
-                result = getTotalPipeline(result, previousUser)
+                data = getTotalPipeline(data, previousUser)
 
             tempRecord.append([
                 record["owner"]["firstName"] + " " + record["owner"]["lastName"],
@@ -592,15 +595,25 @@ def produceRecruiterValueReport(crm: CRM, companyID) -> Callback:
                 record["title"],
                 record["clientCorporation"].get("name"),
                 record["salary"],
-                str(record["feeArrangement"]) + "%",
-                float(record["salary"]) * float(record["feeArrangement"]) / 100
+                str(float(record["feeArrangement"])*100) + "%",
+                float(record["salary"]) * float(record["feeArrangement"])
             ])
             previousUser = record["owner"]["firstName"] + " " + record["owner"]["lastName"]
 
-            result[previousUser] = tempRecord
+            data[previousUser] = tempRecord
+        data = getTotalPipeline(data, previousUser)
+        
+        nestedList = [titles]
 
-        result = getTotalPipeline(result, previousUser)
-        return Callback(True, "Report information has been retrieved", result)
+        totalPipelineValue = 0
+        for key, value in data.items():
+            for csvLine in value:
+                nestedList.append(csvLine)
+            totalPipelineValue += float(value[-1][-1])
+
+        nestedList = [["", "", "", "", "", "Overall Total Pipeline Value", totalPipelineValue]] + nestedList
+
+        return Callback(True, "Report information has been retrieved", nestedList)
 
     except Exception as exc:
         logging.error("CRM.Bullhorn.produceRecruiterValueReport() ERROR: " + str(exc))

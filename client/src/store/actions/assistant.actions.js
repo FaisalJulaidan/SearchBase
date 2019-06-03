@@ -29,9 +29,10 @@ const addAssistant = (newAssistant) => {
     };
 };
 
-const addAssistantSuccess = (successMsg) => {
+const addAssistantSuccess = (newAssistant, successMsg) => {
     return {
         type: actionTypes.ADD_ASSISTANT_SUCCESS,
+        newAssistant,
         successMsg
     };
 };
@@ -43,7 +44,7 @@ const addAssistantFailure = (error) => {
     };
 };
 
-const updateAssistant = ({assistantID, updatedSettings}) => {
+const updateAssistant = (assistantID, updatedSettings) => {
     return {
         type: actionTypes.UPDATE_ASSISTANT_REQUEST,
         assistantID,
@@ -51,9 +52,11 @@ const updateAssistant = ({assistantID, updatedSettings}) => {
     };
 };
 
-const updateAssistantSuccess = (successMsg) => {
+const updateAssistantSuccess = (assistantID, updatedAssistant, successMsg) => {
     return {
         type: actionTypes.UPDATE_ASSISTANT_SUCCESS,
+        assistantID,
+        updatedAssistant,
         successMsg
     };
 };
@@ -64,7 +67,6 @@ const updateAssistantFailure = (error) => {
         error
     };
 };
-
 
 
 const deleteAssistant = (assistantID) => {
@@ -226,6 +228,52 @@ const deleteLogoFailure = (error) => {
 };
 
 
+const selectAutoPilot = (assistantID, autoPilotID) => {
+    return {
+        type: actionTypes.SELECT_AUTO_PILOT_REQUEST,
+        assistantID,
+        autoPilotID
+    };
+};
+
+const selectAutoPilotSuccess = (assistantID, autoPilotID) => {
+    return {
+        type: actionTypes.SELECT_AUTO_PILOT_SUCCESS,
+        assistantID,
+        autoPilotID
+    };
+};
+
+const selectAutoPilotFailure = (error) => {
+    return {
+        type: actionTypes.SELECT_AUTO_PILOT_FAILURE,
+        error
+    };
+};
+
+const disconnectAutoPilot = (assistantID, autoPilotID) => {
+    return {
+        type: actionTypes.DISCONNECT_AUTO_PILOT_REQUEST,
+        assistantID,
+        autoPilotID
+    };
+};
+
+const disconnectAutoPilotSuccess = (assistantID, autoPilotID) => {
+    return {
+        type: actionTypes.DISCONNECT_AUTO_PILOT_SUCCESS,
+        assistantID,
+        autoPilotID
+    };
+};
+
+const disconnectAutoPilotFailure = (error) => {
+    return {
+        type: actionTypes.DISCONNECT_AUTO_PILOT_FAILURE,
+        error
+    };
+};
+
 
 
 export const assistantActions = {
@@ -268,6 +316,16 @@ export const assistantActions = {
     deleteLogo,
     deleteLogoSuccess,
     deleteLogoFailure,
+
+    selectAutoPilot,
+    selectAutoPilotSuccess,
+    selectAutoPilotFailure,
+
+    disconnectAutoPilot,
+    disconnectAutoPilotSuccess,
+    disconnectAutoPilotFailure,
+
+
 
 
 

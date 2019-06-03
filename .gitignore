@@ -188,6 +188,7 @@ celerybeat-schedule.*
 
 # Environments
 .env
+.env.*
 .venv
 env/
 venv/
@@ -538,3 +539,4 @@ virtual
 venv
 /Development.db-journal
 #static/react_app/*
+package-lock

@@ -7,6 +7,7 @@ import {conversationActions} from "store/actions";
 import connect from "react-redux/es/connect/connect";
 import Header from "components/Header/Header";
 import {CSVLink} from "react-csv";
+import AutomationModal from "./AutomationModal/AutomationModal";
 
 const confirm = Modal.confirm;
 
@@ -20,7 +21,8 @@ class Conversations extends React.Component {
         viewModal: false,
         destroyModal: false,
         downloadData: [],
-        ConversationsRefreshed: true
+        ConversationsRefreshed: true,
+        visibleAutomation: false
     };
 
 
@@ -138,7 +140,7 @@ class Conversations extends React.Component {
             // Conversations Page Base Table
             dataRecord = [record["ID"], record["UserType"], this.findUserName(record["Data"]["keywordsByDataType"],
                 record["UserType"] ), record["QuestionsAnswered"], record["SolutionsReturned"],
-                record["TimeSpent"], record["DateTime"], record["Score"] * 100 + "%", record["Status"]];
+                record["TimeSpent"], record["DateTime"], record["Score"] * 100 + "%", record["ApplicationStatus"]];
 
             // Conversation Questions and Answers   ex. "What is your name? : Bob House (Name)"
             recordData = record["Data"]["collectedData"];
@@ -208,17 +210,25 @@ class Conversations extends React.Component {
         return <Badge status="processing" text={text}/>;
     };
 
+    showAutomationModal = () => this.setState({visibleAutomation: true});
+
+    handleAutomationOk = e => {
+        this.setState({visibleAutomation: false,});
+    };
+
+    handleAutomationCancel = e => this.setState({visibleAutomation: false});
+
+
     render() {
         const {assistant} = this.props.location.state;
         const {conversations, options} = this.props;
 
         if(this.state.ConversationsRefreshed){this.populateDownloadData(conversations)}
 
-        const columns = [{
+        const columns = [
+            {
             title: '#',
-            dataIndex: 'ID',
-            key: 'ID',
-            render: (text, record, index) => (<p>{record.ID}</p>),
+            render: (text, record, index) => (<p>{index + 1}</p>),
 
         }, {
             title: 'User Type',
@@ -281,9 +291,9 @@ class Conversations extends React.Component {
             }
 
         }, {
-            title: 'Status',
-            dataIndex: 'Status',
-            key: 'Status',
+            title: 'Application Status',
+            dataIndex: 'ApplicationStatus',
+            key: 'ApplicationStatus',
             // filters: [
             //     {text: 'Completed', value: 'Completed'},
             //     {text: 'Incomplete', value: 'Incomplete'},
@@ -318,7 +328,7 @@ class Conversations extends React.Component {
 
                 return (
                     <Popover placement="top" title="Change status?" content={content} trigger="hover">
-                        {this.buildStatusBadge(record.Status)}
+                        {this.buildStatusBadge(record.ApplicationStatus)}
                     </Popover>
                 )
             },
@@ -357,7 +367,6 @@ class Conversations extends React.Component {
             ),
         }];
 
-
         return (
             <div style={{height: '100%'}}>
                 <Header display={assistant.Name}/>
@@ -369,6 +378,12 @@ class Conversations extends React.Component {
                         </div>
 
                         <div>
+
+                            <Button className={styles.Panel_Header_Button} type="primary" icon="apartment"
+                                    onClick={() => this.showAutomationModal()}
+                                    loading={this.props.isLoading}>
+                                Automation
+                            </Button>
 
                             <Button className={styles.Panel_Header_Button} type="primary" icon="sync"
                                     onClick={this.refreshConversations} loading={this.props.isLoading}>
@@ -394,6 +409,7 @@ class Conversations extends React.Component {
 
                     <div className={styles.Panel_Body}>
                         <Table columns={columns}
+                               rowKey={record => record.ID}
                                dataSource={conversations.conversationsList}
                                onChange={this.handleFilter}
                                loading={this.props.isLoading}
@@ -412,10 +428,14 @@ class Conversations extends React.Component {
                                                                    deleteConversation={this.deleteConversation}
                                                                    updateStatus={this.updateStatus}
                                                                    isUpdatingStatus={this.props.isUpdatingStatus}
-                                                                   buildStatusBadge={this.buildStatusBadge}
-
-                            />
+                                                                   buildStatusBadge={this.buildStatusBadge}/>
                         }
+
+
+                        <AutomationModal assistant={assistant}
+                                         visible={this.state.visibleAutomation}
+                                         handleOk={this.handleAutomationOk}
+                                         handleCancel={this.handleAutomationCancel}/>
                     </div>
                 </div>
             </div>

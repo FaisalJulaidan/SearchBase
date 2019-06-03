@@ -3,10 +3,14 @@ import {put, takeEvery, takeLatest, all} from 'redux-saga/effects'
 import {databaseActions, flowActions} from "../actions";
 import {http, successMessage, loadingMessage, errorMessage} from "helpers";
 
+const promiseFn = (flag) => {
+    if (flag) return new Promise(resolve => resolve());
+    else      return new Promise((r, reject) => reject());
+};
+
 
 function* getDatabasesList() {
     try {
-        loadingMessage('Loading databases list');
         const res = yield http.get(`/databases`);
         yield put(databaseActions.getDatabasesListSuccess(res.data.data));
     } catch (error) {
@@ -23,16 +27,16 @@ function* watchGetDatabaseList() {
 
 // ==================================================================
 
-function* fetchDatabase({databaseID, pageNumber}) {
+function* fetchDatabase({databaseID, pageNumber, meta}) {
     try {
         loadingMessage('Loading database...', 0);
         const res = yield http.get(`/databases/${databaseID}/page/${pageNumber ? pageNumber : 1}`);
-        yield put(databaseActions.fetchDatabaseSuccess(res.data.msg, res.data.data));
+        yield put({...databaseActions.fetchDatabaseSuccess(res.data.msg, res.data.data), meta});
         successMessage('Database loaded');
     } catch (error) {
         console.log(error);
         const msg = "Couldn't load database's content";
-        yield put(databaseActions.fetchDatabaseFailure(msg));
+        yield put({...databaseActions.fetchDatabaseFailure(msg), meta});
         errorMessage(msg);
 
     }

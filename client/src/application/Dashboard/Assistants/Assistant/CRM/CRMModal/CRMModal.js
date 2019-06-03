@@ -42,7 +42,7 @@ class CRMModal extends React.Component {
                            CRM</Button>,
                        <Button key="submit" type="primary"
                                onClick={() => this.props.handleSave(this.state.selectedCRM)}>Save</Button>,
-                       <Button key="reset" type="danger" onClick={this.resetSelectedCRM}>Reset</Button>,
+                       <Button key="reset" type="danger" onClick={this.resetSelectedCRM}>Reset All</Button>,
                    ]}
             >
 

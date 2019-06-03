@@ -7,7 +7,6 @@ import styles from "./Integration.module.less"
 import ReactDOMServer from 'react-dom/server'
 import {hasher} from "helpers";
 import {SwatchesPicker} from 'react-color';
-import LogoUploader from "./LogoUploader/LogoUploader";
 import {connect} from 'react-redux';
 
 const {TextArea} = Input;
@@ -178,11 +177,6 @@ class Integration extends React.Component {
                         </div>
 
                         <div className={styles.Panel_Body}>
-
-                            <Row type="flex" justify="center">
-                                <LogoUploader assistant={this.state.assistant}/>
-                            </Row>
-
 
                             <Row type="flex" justify="center">
                                 <Col>

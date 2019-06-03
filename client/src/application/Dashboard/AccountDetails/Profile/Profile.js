@@ -6,6 +6,7 @@ import styles from "./Profile.module.less"
 import ProfileDetails from "./profileComponents/ProfileDetails/ProfileDetails";
 import DataSettings from "./profileComponents/DataSettings/DataSettings";
 import ChangePassword from "./profileComponents/ChangePassword/ChangePassword";
+import LogoUploader from "./profileComponents/LogoUploader/LogoUploader";
 
 import {profileActions} from "../../../../store/actions/profile.actions";
 const TabPane = Tabs.TabPane;
@@ -24,14 +25,18 @@ class Profile extends React.Component {
         this.props.dispatch(profileActions.changePassword(values.oldPassword, values.newPassword));
     };
 
+    uploadLogo = async (file) => {
+        this.props.dispatch(profileActions.uploadLogo(file));
+    };
+
+    deleteLogo = () => this.props.dispatch(profileActions.deleteLogo());
+
 
     componentWillMount() {
-        console.log("HEEHHEHEHEHEEH");
         this.props.dispatch(profileActions.getProfile());
     }
 
     render() {
-
         return (
             <div style={{height: '100%'}}>
                 <div className={styles.Panel}>
@@ -54,6 +59,11 @@ class Profile extends React.Component {
 
                             <TabPane tab={"Change Password"} key={"3"}>
                                 <ChangePassword savePassword={this.savePassword}/>
+                            </TabPane>
+                            <TabPane tab={"Company Logo"} key={"4"}>
+                                <LogoUploader profileData={this.props.profileData}
+                                              uploadLogo={this.uploadLogo}
+                                              deleteLogo={this.deleteLogo}/>
                             </TabPane>
                         </Tabs>
                     </div>

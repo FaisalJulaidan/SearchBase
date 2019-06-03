@@ -13,6 +13,12 @@ CORS(chatbot_router)
 
 
 
+@chatbot_router.route("/widgets/<path:path>", methods=['GET'])
+@helpers.gzipped
+def get_widget(path):
+    if request.method == "GET":
+        return send_from_directory('static/widgets/', path)
+
 @chatbot_router.route("/assistant/<string:assistantIDAsHash>/chatbot_direct_link", methods=['GET'])
 def chatbot_direct_link(assistantIDAsHash):
     if request.method == "GET":
@@ -41,7 +47,9 @@ def chatbot(assistantIDAsHash):
         # Notify company about the new chatbot session
         mail_services.notifyNewConversation(assistantIDAsHash)
 
-        return helpers.jsonResponse(True, 200, "Collected data is successfully processed", {'sessionID': callback.Data.ID})
+        return helpers.jsonResponse(True, 200,
+                                    "Collected data is successfully processed",
+                                    {'sessionID': callback.Data.ID})
 
 
 @chatbot_router.route("/assistant/<string:assistantHashID>/chatbot/solutions", methods=['POST'])
@@ -58,13 +66,6 @@ def getSolutions_forChatbot(assistantHashID):
                 return helpers.jsonResponse(False, 400, callback.Message)
             return helpers.jsonResponse(True, 200, "Solutions list is here!", callback.Data)
         return helpers.jsonResponse(True, 200, "show top is 0", [])
-
-
-@chatbot_router.route("/widgets/<path:path>", methods=['GET'])
-@helpers.gzipped
-def get_widget(path):
-    if request.method == "GET":
-        return send_from_directory('static/widgets/', path)
 
 
 @chatbot_router.route("/assistant/<string:assistantIDAsHash>/session/<int:sessionID>/file", methods=['POST'])
@@ -91,7 +92,10 @@ def chatbot_upload_files(assistantIDAsHash, sessionID):
                            secure_filename(file.filename).rsplit('.', 1)[1].lower()
 
                 # Upload file to DigitalOcean Space
-                upload_callback : Callback = stored_file_services.uploadFile(file, filename, '/user_files', True)
+                upload_callback : Callback = stored_file_services.uploadFile(file,
+                                                                             filename,
+                                                                             stored_file_services.USER_FILES_PATH,
+                                                                             True)
 
                 if not upload_callback.Success:
                     filename = 'fileCorrupted'

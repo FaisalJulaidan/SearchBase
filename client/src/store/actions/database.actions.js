@@ -50,6 +50,7 @@ const uploadDatabaseFailure = (error) => {
 const fetchDatabase = (databaseID, pageNumber) => {
     return {
         type: actionTypes.FETCH_DATABASE_REQUEST,
+        meta: {thunk: true},
         databaseID,
         pageNumber
     }
@@ -59,7 +60,8 @@ const fetchDatabaseSuccess = (successMessage, fetchedDatabase) => {
     return {
         type: actionTypes.FETCH_DATABASE_SUCCESS,
         successMessage,
-        fetchedDatabase
+        fetchedDatabase,
+
     }
 };
 

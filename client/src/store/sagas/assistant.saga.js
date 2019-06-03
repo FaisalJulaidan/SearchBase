@@ -1,7 +1,7 @@
 import {all, put, takeEvery, takeLatest} from 'redux-saga/effects'
 import * as actionTypes from '../actions/actionTypes';
 import {assistantActions, crmActions, flowActions} from "../actions";
-import {destroyMessage, errorHandler, errorMessage, flow, http, loadingMessage, successMessage} from "helpers";
+import {errorHandler, errorMessage, flow, http, loadingMessage, successMessage} from "helpers";
 import * as Sentry from '@sentry/browser';
 
 function* fetchAssistants() {
@@ -12,22 +12,20 @@ function* fetchAssistants() {
         if (!res.data?.data)
             throw Error(`Can't fetch assistants`);
 
-        yield put(assistantActions.fetchAssistantsSuccess(res.data?.data));
+        yield put(assistantActions.fetchAssistantsSuccess(res.data?.data.assistants));
     } catch (error) {
         console.error(error);
         const msg = "Couldn't load assistants";
         yield put(assistantActions.fetchAssistantsFailure(msg));
         errorMessage(msg);
     }
-
 }
 
 function* addAssistant({type, newAssistant}) {
     try {
         loadingMessage('Creating assistant...', 0);
         const res = yield http.post(`/assistants`, newAssistant);
-        yield put(assistantActions.addAssistantSuccess(res.data?.msg));
-        yield put(assistantActions.fetchAssistants());
+        yield put(assistantActions.addAssistantSuccess(res.data?.data, res.data?.msg));
         successMessage('Assistant added!');
 
     } catch (error) {
@@ -41,15 +39,13 @@ function* addAssistant({type, newAssistant}) {
 function* updateAssistant({assistantID, updatedSettings}) {
     try {
         const res = yield http.put(`assistant/${assistantID}`, updatedSettings);
-        yield put(assistantActions.updateAssistantSuccess(res.data?.msg));
-        yield put(assistantActions.fetchAssistants());
+        yield put(assistantActions.updateAssistantSuccess(assistantID, res.data?.data, res.data?.msg));
         successMessage('Assistant updated!');
     } catch (error) {
         console.error(error);
         const msg = "Couldn't update assistant";
         yield put(assistantActions.updateAssistantFailure(msg));
         errorMessage(msg);
-
     }
 }
 
@@ -149,48 +145,42 @@ function* resetAssistantCRM({assistantID}) {
     }
 }
 
-function* uploadLogo({assistantID, file}) {
-    const defaultMsg = "Can't upload logo";
+
+function* selectAutoPilot({assistantID, autoPilotID}) {
     try {
-        loadingMessage('Uploading logo', 0);
-        const res = yield http.post(`/assistant/${assistantID}/logo`, file);
-        destroyMessage();
-        successMessage(res.data?.msg || defaultMsg);
-        yield put(assistantActions.fetchAssistants());
-        yield put(assistantActions.uploadLogoSuccess(new Date().getTime()));
+        const res = yield http.post(`/assistant/${assistantID}/auto_pilot`, {AutoPilotID: autoPilotID});
+        successMessage(res.data?.msg || 'Selected Auto Pilot Successfuly');
+        yield put(assistantActions.selectAutoPilotSuccess(assistantID, autoPilotID));
     } catch (error) {
+        const defaultMsg = "CHANGE THIS";
         let data = error.response?.data;
         errorMessage(data.msg || defaultMsg);
-        yield put(assistantActions.uploadLogoFailure(data.msg || defaultMsg));
+        yield put(assistantActions.selectAutoPilotFailure(data.msg || defaultMsg));
         if (!data.msg) errorHandler(error)
     }
 }
 
-function* deleteLogo({assistantID}) {
-    const defaultMsg = "Can't delete logo";
+function* disconnectAutoPilot({assistantID, autoPilotID}) {
     try {
-        loadingMessage('Deleting logo', 0);
-        const res = yield http.delete(`/assistant/${assistantID}/logo`);
-        destroyMessage();
-        successMessage(res.data?.msg || defaultMsg);
-        yield put(assistantActions.fetchAssistants());
-        yield put(assistantActions.deleteLogoSuccess(new Date().getTime()));
+        const res = yield http.delete(`/assistant/${assistantID}/auto_pilot`, {AutoPilotID: autoPilotID});
+        successMessage(res.data?.msg || "Disconnected from auto pilot successfuly");
+        yield put(assistantActions.disconnectAutoPilotSuccess(assistantID, autoPilotID));
     } catch (error) {
+        const defaultMsg = "CHANGE THIS";
         let data = error.response?.data;
         errorMessage(data.msg || defaultMsg);
-        yield put(assistantActions.deleteLogoFailure(data.msg || defaultMsg));
+        yield put(assistantActions.disconnectAutoPilotFailure(data.msg || defaultMsg));
         if (!data.msg) errorHandler(error)
     }
 }
 
-
-function* watchDeleteLogo() {
-    yield takeEvery(actionTypes.DELETE_LOGO_REQUEST, deleteLogo)
+function* watchDisconnectAutoPilot() {
+    yield takeEvery(actionTypes.DISCONNECT_AUTO_PILOT_REQUEST, disconnectAutoPilot)
 }
 
 
-function* watchUploadLogo() {
-    yield takeEvery(actionTypes.UPLOAD_LOGO_REQUEST, uploadLogo)
+function* watchSelectAutoPilot() {
+    yield takeEvery(actionTypes.SELECT_AUTO_PILOT_REQUEST, selectAutoPilot)
 }
 
 
@@ -237,7 +227,9 @@ export function* assistantSaga() {
         watchUpdateStatus(),
         watchSelectAssistantCrm(),
         watchResetAssistantCrm(),
-        watchUploadLogo(),
-        watchDeleteLogo()
+        watchSelectAutoPilot(),
+        watchDisconnectAutoPilot()
+
+
     ])
 }

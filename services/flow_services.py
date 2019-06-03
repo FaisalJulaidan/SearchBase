@@ -11,7 +11,7 @@ import logging, enums
 def getChatbot(assistantHashID) -> Callback:
     try:
 
-        callback: Callback = assistant_services.getAssistantByHashID(assistantHashID)
+        callback: Callback = assistant_services.getByHashID(assistantHashID)
         if not callback.Success:
             return Callback(False, "Assistant not found!")
         assistant = helpers.getDictFromSQLAlchemyObj(callback.Data)

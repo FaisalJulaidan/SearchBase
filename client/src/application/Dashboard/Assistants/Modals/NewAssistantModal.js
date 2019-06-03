@@ -67,10 +67,10 @@ class NewAssistantModal extends Component {
                 width={800}
                 title="Create New Assistant"
                 visible={this.props.visible}
-                onCancel={this.props.hideModal}
+                onCancel={this.props.hideUploadModal}
                 destroyOnClose={true}
                 footer={[
-                    <Button key="cancel" onClick={this.props.hideModal}>Cancel</Button>,
+                    <Button key="cancel" onClick={this.props.hideUploadModal}>Cancel</Button>,
                     <Button key="submit" type="primary" onClick={this.handleAdd}>
                         Add
                     </Button>,
@@ -96,8 +96,7 @@ class NewAssistantModal extends Component {
                         {...formItemLayout}>
                         {getFieldDecorator('welcomeMessage', {
                             rules: [{
-                                required: true,
-                                message: 'Please input your welcome message',
+                                required: true, message: 'Please input your welcome message',
                             }],
                         })(
                             <Input placeholder="Ex: Hey there, Welcome visitor"/>

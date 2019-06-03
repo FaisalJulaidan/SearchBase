@@ -2,7 +2,7 @@ from sqlathanor import FlaskBaseModel, initialize_flask_sqlathanor
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import Enum, event, types
 from sqlalchemy.ext import mutable
-from datetime import datetime
+from datetime import datetime, timedelta
 import os
 import json
 import enums
@@ -12,8 +12,6 @@ from sqlalchemy.engine import Engine
 from sqlite3 import Connection as SQLite3Connection
 from sqlalchemy_utils import EncryptedType
 from sqlalchemy_utils.types.encrypted.encrypted_type import AesEngine
-
-
 
 db = SQLAlchemy(model_class=FlaskBaseModel)
 db = initialize_flask_sqlathanor(db)
@@ -55,15 +53,17 @@ class Company(db.Model):
     ID = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
     Name = db.Column(db.String(80), nullable=False)
     URL = db.Column(db.String(250), nullable=False)
+    LogoPath = db.Column(db.String(64), nullable=True)
     StripeID = db.Column(db.String(68), unique=True, nullable=False, )
     SubID = db.Column(db.String(68), unique=True, default=None)
 
     # Relationships:
-    Users = db.relationship('User', back_populates='Company', cascade="all, delete, delete-orphan")
-    Assistants = db.relationship('Assistant', back_populates='Company', cascade="all, delete, delete-orphan")
-    Databases = db.relationship('Database', back_populates='Company', cascade="all, delete, delete-orphan")
-    Roles = db.relationship('Role', back_populates='Company', cascade="all, delete, delete-orphan")
-    CRM = db.relationship('CRM', back_populates='Company', cascade="all, delete, delete-orphan")
+    Users = db.relationship('User', back_populates='Company')
+    Assistants = db.relationship('Assistant', back_populates='Company')
+    Databases = db.relationship('Database', back_populates='Company')
+    Roles = db.relationship('Role', back_populates='Company')
+    CRMs = db.relationship('CRM', back_populates='Company')
+    AutoPilots = db.relationship('AutoPilot', back_populates='Company')
 
     def __repr__(self):
         return '<Company {}>'.format(self.Name)
@@ -100,7 +100,6 @@ class User(db.Model):
     Role = db.relationship('Role', back_populates='Users')
 
 
-
     # __table_args__ = (db.UniqueConstraint('Email', name='uix1_user'),)
 
     def __repr__(self):
@@ -108,6 +107,7 @@ class User(db.Model):
 
 
 class Role(db.Model):
+
     ID = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
     Name = db.Column(db.String(64))
     EditChatbots = db.Column(db.Boolean(), nullable=False, default=False)
@@ -128,7 +128,9 @@ class Role(db.Model):
         return '<Role {}>'.format(self.Name)
 
 
+
 class Assistant(db.Model):
+
     ID = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
     Name = db.Column(db.String(128), nullable=False)
     Flow = db.Column(MagicJSON, nullable=True)
@@ -136,21 +138,26 @@ class Assistant(db.Model):
     TopBarText = db.Column(db.String(64), nullable=False)
     SecondsUntilPopup = db.Column(db.Float, nullable=False, default=0.0)
 
-    MailEnabled = db.Column(db.Boolean, nullable=False, default=False)
+    MailEnabled = db.Column(db.Boolean(), nullable=False, default=False)
     MailPeriod = db.Column(db.Integer, nullable=False, default=12)
     Active = db.Column(db.Boolean(), nullable=False, default=True)
-    LogoName = db.Column(db.String(64), nullable=True)
     Config = db.Column(MagicJSON, nullable=True)
 
     # Relationships:
-    CompanyID = db.Column(db.Integer, db.ForeignKey('company.ID', ondelete='cascade'), nullable=False, )
+    #  - Bidirectional
+    CompanyID = db.Column(db.Integer, db.ForeignKey('company.ID', ondelete='cascade'), nullable=False)
     Company = db.relationship('Company', back_populates='Assistants')
 
     CRMID = db.Column(db.Integer, db.ForeignKey('CRM.ID'))
     CRM = db.relationship('CRM', back_populates='Assistants')
 
+    AutoPilotID = db.Column(db.Integer, db.ForeignKey('auto_pilot.ID'))
+    AutoPilot = db.relationship("AutoPilot", back_populates="Assistants")
+
+    # - Many to one
     Statistics = db.relationship('Statistics', back_populates='Assistant')
     Conversations = db.relationship('Conversation', back_populates='Assistant')
+    Appointments = db.relationship('Appointment', back_populates='Assistant')
 
     # Constraints:
     # cannot have two assistants with the same name under one company
@@ -160,14 +167,116 @@ class Assistant(db.Model):
         return '<Assistant {}>'.format(self.Name)
 
 
+class Conversation(db.Model):
+
+    ID = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
+    Data = db.Column(MagicJSON, nullable=False)
+    DateTime = db.Column(db.DateTime(), nullable=False, default=datetime.now)
+    TimeSpent = db.Column(db.Integer, nullable=False, default=0)
+    SolutionsReturned = db.Column(db.Integer, nullable=False, default=0)
+    QuestionsAnswered = db.Column(db.Integer, nullable=False, default=0)
+    UserType = db.Column(Enum(enums.UserType), nullable=False)
+
+    Completed = db.Column(db.Boolean, nullable=False, default=True)
+    ApplicationStatus = db.Column(Enum(enums.ApplicationStatus), nullable=False, default=enums.ApplicationStatus.Pending)
+    Score = db.Column(db.Float(), nullable=False)
+    AppointmentEmailSentAt = db.Column(db.DateTime(), default=None)
+
+    AutoPilotStatus = db.Column(db.Boolean, nullable=False, default=False)
+    AutoPilotResponse = db.Column(db.String(250), nullable=True)
+
+    CRMSynced = db.Column(db.Boolean, nullable=False, default=False)
+    CRMResponse = db.Column(db.String(250), nullable=True)
+
+    # Relationships:
+    AssistantID = db.Column(db.Integer, db.ForeignKey('assistant.ID', ondelete='cascade'), nullable=False)
+    Assistant = db.relationship('Assistant', back_populates='Conversations')
+
+    StoredFile = db.relationship('StoredFile', uselist=False, back_populates='Conversation')
+    Appointment = db.relationship('Appointment', uselist=False, back_populates='Conversation')
+
+    def __repr__(self):
+        return '<Conversation {}>'.format(self.Data)
+
+
+class AutoPilot(db.Model):
+
+    ID = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
+    Name = db.Column(db.String(128), nullable=False)
+    Description = db.Column(db.String(260), nullable=True)
+    Active = db.Column(db.Boolean, nullable=False, default=True)
+    AcceptApplications = db.Column(db.Boolean, nullable=False, default=False)
+    AcceptanceScore = db.Column(db.Float(), nullable=False, default=1)
+    RejectApplications = db.Column(db.Boolean, nullable=False, default=False)
+    RejectionScore = db.Column(db.Float(), nullable=False, default=0.05)
+    SendCandidatesAppointments = db.Column(db.Boolean, nullable=False, default=False)
+
+    # Relationships:
+    CompanyID = db.Column(db.Integer, db.ForeignKey('company.ID', ondelete='cascade'), nullable=False)
+    Company = db.relationship('Company', back_populates='AutoPilots')
+
+    Assistants = db.relationship('Assistant', back_populates='AutoPilot')
+    OpenTimeSlots = db.relationship('OpenTimeSlot', back_populates='AutoPilot')
+
+    # Constraints:
+    # cannot have two auto pilot with the same name under one company
+    __table_args__ = (db.UniqueConstraint('CompanyID', 'Name', name='uix1_auto_pilot'),)
+
+    def __repr__(self):
+        return '<AutoPilot {}>'.format(self.ID)
+
+
+class OpenTimeSlot(db.Model):
+
+    ID = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
+    Day = db.Column(db.Integer, nullable=False)
+    From = db.Column(types.TIME, nullable=False)
+    To = db.Column(types.TIME, nullable=False)
+    Duration = db.Column(db.Integer, nullable=False)
+    Active = db.Column(db.Boolean, nullable=False, default=False)
+
+    # Relationships:
+    AutoPilotID = db.Column(db.Integer, db.ForeignKey('auto_pilot.ID', ondelete='cascade'), nullable=False)
+    AutoPilot = db.relationship('AutoPilot', back_populates='OpenTimeSlots')
+
+    # Constraints:
+    __table_args__ = (
+        db.CheckConstraint(db.and_(Day >= 0, Day <= 6)), # 0 = Monday, 6 = Sunday
+        db.CheckConstraint(From < To),
+        db.CheckConstraint(db.and_(Duration > 0, Duration <= 60)),
+        db.UniqueConstraint('Day','AutoPilotID', name='uix1_open_time_slot'),
+    )
+
+    def __repr__(self):
+        return '<OpenTimeSlot {}>'.format(self.Day)
+
+
+class Appointment(db.Model):
+
+    ID = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
+    DateTime = db.Column(db.DateTime(), nullable=False, default=datetime.now)
+
+    # Relationships:
+    AssistantID = db.Column(db.Integer, db.ForeignKey('assistant.ID', ondelete='cascade'), nullable=False)
+    Assistant = db.relationship('Assistant', back_populates='Appointments')
+
+    ConversationID = db.Column(db.Integer, db.ForeignKey('conversation.ID', ondelete='cascade'), nullable=False)
+    Conversation = db.relationship('Conversation', back_populates='Appointment')
+
+
+    # Constraints:
+    __table_args__ = (db.UniqueConstraint('AssistantID', 'DateTime', name='uix1_appointment'),)
+
+
 class CRM(db.Model):
+
     ID = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
     Type = db.Column(Enum(enums.CRM), nullable=True)
     Auth = db.Column(EncryptedType(JsonEncodedDict, os.environ['SECRET_KEY_DB'], AesEngine, 'pkcs5'), nullable=True)
 
     # Relationships:
     CompanyID = db.Column(db.Integer, db.ForeignKey('company.ID', ondelete='cascade'), nullable=False)
-    Company = db.relationship('Company', back_populates='CRM')
+    Company = db.relationship('Company', back_populates='CRMs')
 
     Assistants = db.relationship('Assistant', back_populates='CRM')
 
@@ -222,34 +331,9 @@ class Newsletter(db.Model):
         return '<Newsletters {}>'.format(self.Email)
 
 
-class Conversation(db.Model):
-    ID = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
-    Data = db.Column(MagicJSON, nullable=False)
-    DateTime = db.Column(db.DateTime(), nullable=False, default=datetime.now)
-    TimeSpent = db.Column(db.Integer, nullable=False, default=0)
-    SolutionsReturned = db.Column(db.Integer, nullable=False, default=0)
-    QuestionsAnswered = db.Column(db.Integer, nullable=False, default=0)
-    UserType = db.Column(Enum(enums.UserType), nullable=False)
-    Completed = db.Column(db.Boolean, nullable=False, default=True)
-    Status = db.Column(Enum(enums.ConversationStatus), nullable=False, default=enums.ConversationStatus.Pending)
-    Score = db.Column(db.Float(), nullable=False)
-
-
-    CRMSynced = db.Column(db.Boolean, nullable=False, default=False)
-    CRMResponse = db.Column(db.String(250), nullable=True)
-
-    # Relationships:
-    AssistantID = db.Column(db.Integer, db.ForeignKey('assistant.ID', ondelete='cascade'), nullable=False)
-    Assistant = db.relationship('Assistant', back_populates='Conversations')
-
-    StoredFile = db.relationship('StoredFile', uselist=False, back_populates='Conversation')
-
-    def __repr__(self):
-        return '<Conversation {}>'.format(self.Data)
-
-
 # Stored files for conversation
 class StoredFile(db.Model):
+
     ID = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
     FilePath = db.Column(db.String(250), nullable=True, default=None)
 
@@ -262,6 +346,7 @@ class StoredFile(db.Model):
 
 
 class Database(db.Model):
+
     ID = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
     Name = db.Column(db.String(64), nullable=False)
     Type = db.Column(Enum(enums.DatabaseType), nullable=False)
@@ -327,6 +412,37 @@ class Job(db.Model):
     def __repr__(self):
         return '<Job {}>'.format(self.JobTitle)
 
+# class Task(db.Model):
+#
+#     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+#
+#     ApschedulerJobID1 = db.Column(db.VARCHAR(200), db.ForeignKey('apscheduler_jobs.id'), nullable=True, unique=True)
+#     ApschedulerJob1 = db.relationship('ApschedulerJobs', foreign_keys=[ApschedulerJobID1], back_populates='ApschedulerJoba')
+#
+#     ApschedulerJobID2 = db.Column(db.VARCHAR(200), db.ForeignKey('apscheduler_jobs.id'), nullable=True, unique=True)
+#     ApschedulerJob2 = db.relationship('ApschedulerJobs', foreign_keys=[ApschedulerJobID2], back_populates='ApschedulerJobb')
+#
+#     def __repr__(self):
+#         return '<Task {}>'.format(self.ApschedulerJobID)
+#
+#
+# # a hidden table was made by APScheduler being redefined to be able use foreign keys
+# class ApschedulerJobs(db.Model):
+#
+#     __table_args__ = {
+#         'mysql_engine': 'InnoDB',
+#         'mysql_charset': 'utf8'
+#     }
+#
+#     id = db.Column(db.VARCHAR(200), primary_key=True)
+#     next_run_time = db.Column(db.REAL)
+#     job_state = db.Column(db.BLOB)
+#
+#     ApschedulerJoba = db.relationship('Task', back_populates='ApschedulerJob1', cascade="all, delete, delete-orphan")
+#     ApschedulerJobb = db.relationship('Task', back_populates='ApschedulerJob2', cascade="all, delete, delete-orphan")
+
+
+
 
 # =================== Triggers ============================
 
@@ -336,6 +452,7 @@ class Job(db.Model):
 # @event.listens_for(Assistant, 'before_insert')
 # def receive_after_insert(mapper, connection, target):
 #     print("before_insert")
+#     print(mapper)
 #     print(target) # prints Assistant
 
 # @event.listens_for(Conversation, 'before_delete')

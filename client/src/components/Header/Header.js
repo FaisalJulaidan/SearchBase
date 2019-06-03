@@ -3,7 +3,7 @@ import React, {Component} from 'react';
 import styles from "./Header.module.less";
 import {Button} from "antd";
 import PropTypes from 'prop-types';
-
+import {history} from "helpers";
 
 class Header extends Component {
     static contextTypes = {
@@ -25,7 +25,7 @@ class Header extends Component {
                         <div style={{display: '-webkit-inline-box'}}>
                             {
                                 showBackButton ?
-                                    <Button onClick={this.context.router.history.goBack}
+                                    <Button onClick={history.goBack}
                                             type="primary" icon="left" shape="circle"
                                             size={"small"}/>
                                     : null

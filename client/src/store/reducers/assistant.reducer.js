@@ -5,6 +5,9 @@ import {deepClone} from "helpers";
 const initialState = {assistantList: [], isLoading: false, errorMsg: null, isUpdatingFlow: false};
 
 export const assistant = (state = initialState, action) => {
+    let assistantsCopy;
+    let index;
+
     switch (action.type) {
         case actionTypes.FETCH_ASSISTANTS_REQUEST:
             return updateObject(state, {
@@ -14,7 +17,7 @@ export const assistant = (state = initialState, action) => {
             });
         case actionTypes.FETCH_ASSISTANTS_SUCCESS:
             return updateObject(state, {
-                assistantList: action.assistantList.assistants,
+                assistantList: action.assistantList,
                 isLoading: false
             });
         case actionTypes.FETCH_ASSISTANTS_FAILURE:
@@ -31,9 +34,11 @@ export const assistant = (state = initialState, action) => {
                 isAdding: true
             });
         case actionTypes.ADD_ASSISTANT_SUCCESS:
+
             return updateObject(state, {
                 successMsg: action.successMsg,
-                isAdding: false
+                isAdding: false,
+                assistantList: state.assistantList.concat(action.newAssistant)
             });
         case actionTypes.ADD_ASSISTANT_FAILURE:
             return updateObject(state, {
@@ -43,15 +48,20 @@ export const assistant = (state = initialState, action) => {
 
         // Update
         case actionTypes.UPDATE_ASSISTANT_REQUEST:
+
             return updateObject(state, {
                 successMsg: null,
                 errorMsg: null,
                 isLoading: true
             });
         case actionTypes.UPDATE_ASSISTANT_SUCCESS:
+            assistantsCopy = state.assistantList
+                .map(a => a.ID === action.assistantID ? {...action.updatedAssistant}: a);
+
             return updateObject(state, {
                 successMsg: action.successMsg,
-                isLoading: false
+                isLoading: false,
+                assistantList: assistantsCopy
             });
         case actionTypes.UPDATE_ASSISTANT_FAILURE:
             return updateObject(state, {
@@ -138,7 +148,6 @@ export const assistant = (state = initialState, action) => {
                 errorMsg: action.error
             });
 
-
         case actionTypes.RESET_ASSISTANT_CRM_REQUEST:
             return updateObject(state, {
                 errorMsg: null,
@@ -150,28 +159,39 @@ export const assistant = (state = initialState, action) => {
                 errorMsg: action.error
             });
 
-        case actionTypes.UPLOAD_LOGO_REQUEST:
+        case actionTypes.SELECT_AUTO_PILOT_REQUEST:
             return updateObject(state, {
                 errorMsg: null,
             });
-        case actionTypes.UPLOAD_LOGO_SUCCESS:
+        case actionTypes.SELECT_AUTO_PILOT_SUCCESS:
+
+            assistantsCopy = deepClone(state.assistantList);
+            index = assistantsCopy.findIndex(x => x.ID === action.assistantID);
+            assistantsCopy[index].AutoPilotID = action.autoPilotID;
+
             return updateObject(state, {
-                successMsg: action.msg
+                assistantList: assistantsCopy
             });
-        case actionTypes.UPLOAD_LOGO_FAILURE:
+        case actionTypes.SELECT_AUTO_PILOT_FAILURE:
             return updateObject(state, {
-                errorMsg: action.error
+                errorMsg: action.error,
             });
 
-        case actionTypes.DELETE_LOGO_REQUEST:
+
+        case actionTypes.DISCONNECT_AUTO_PILOT_REQUEST:
             return updateObject(state, {
                 errorMsg: null,
             });
-        case actionTypes.DELETE_LOGO_SUCCESS:
+        case actionTypes.DISCONNECT_AUTO_PILOT_SUCCESS:
+
+            assistantsCopy = deepClone(state.assistantList);
+            index = assistantsCopy.findIndex(x => x.ID === action.assistantID);
+            assistantsCopy[index].AutoPilotID = null;
+
             return updateObject(state, {
-                successMsg: action.msg
+                assistantList: assistantsCopy
             });
-        case actionTypes.DELETE_LOGO_FAILURE:
+        case actionTypes.DISCONNECT_AUTO_PILOT_FAILURE:
             return updateObject(state, {
                 errorMsg: action.error
             });

@@ -8,9 +8,6 @@ function* fetchAnalytics({assistantID}) {
     try {
         const res = yield http.get(`/assistant/${assistantID}/analytics`);
 
-        if (!res.data?.data)
-            throw Error(`Can't fetch analytics`);
-
         yield put(analyticsActions.fetchAnalyticsSuccess(res.data?.data));
     } catch (error) {
         console.error(error);

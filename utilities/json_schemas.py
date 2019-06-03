@@ -118,7 +118,7 @@ UserInput = {
         "afterMessage": {"type": "string"},
         "keywords": {"type": "array", "items": {"type": "string"}},
     },
-    "required": ["text", "action", "afterMessage", "blockToGoID", "keywords"],
+    "required": ["text", "action", "afterMessage", "blockToGoID"], #, "keywords"
     "additionalProperties": False
 }
 

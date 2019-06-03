@@ -1,3 +1,4 @@
+import logging
 from datetime import datetime, timedelta
 from typing import List
 
@@ -5,12 +6,11 @@ from jsonschema import validate
 from sqlalchemy.sql import and_
 from sqlalchemy.sql import desc
 
+from enums import UserType, ApplicationStatus
 from models import db, Callback, Conversation, Assistant
-from services import assistant_services, stored_file_services, databases_services, auto_pilot_services
+from services import assistant_services, stored_file_services, auto_pilot_services
 from services.CRM import crm_services
 from utilities import json_schemas, helpers
-from enums import DatabaseType, UserType, ApplicationStatus
-import logging
 
 
 # Process chatbot conversation data
@@ -44,13 +44,14 @@ def processConversation(assistantHashID, data: dict) -> Callback:
 
         # collectedData is an array, and timeSpent is in seconds.
         conversation = Conversation(Data=conversationData,
-                                      TimeSpent=data['timeSpent'],
-                                      Completed=data['isSessionCompleted'],  # isSessionCompleted -> isConversationCompleted
-                                      SolutionsReturned=data['solutionsReturned'],
-                                      QuestionsAnswered=len(collectedData),
-                                      UserType=UserType[data['userType'].replace(" ", "")],
-                                      Score=data['score'],
-                                      Assistant=assistant)
+                                    TimeSpent=data['timeSpent'],
+                                    Completed=data['isSessionCompleted'],
+                                    # isSessionCompleted -> isConversationCompleted
+                                    SolutionsReturned=data['solutionsReturned'],
+                                    QuestionsAnswered=len(collectedData),
+                                    UserType=UserType[data['userType'].replace(" ", "")],
+                                    Score=data['score'],
+                                    Assistant=assistant)
 
         # AutoPilot Operations
         if assistant.AutoPilot:

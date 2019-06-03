@@ -56,7 +56,7 @@ const fetchDatabase = (databaseID, pageNumber) => {
     }
 };
 
-const fetchDatabaseSuccess = (successMessage, fetchedDatabase, meta) => {
+const fetchDatabaseSuccess = (successMessage, fetchedDatabase) => {
     return {
         type: actionTypes.FETCH_DATABASE_SUCCESS,
         successMessage,
@@ -65,7 +65,7 @@ const fetchDatabaseSuccess = (successMessage, fetchedDatabase, meta) => {
     }
 };
 
-const fetchDatabaseFailure = (error, meta) => {
+const fetchDatabaseFailure = (error) => {
     return {
         type: actionTypes.FETCH_DATABASE_FAILURE,
         error

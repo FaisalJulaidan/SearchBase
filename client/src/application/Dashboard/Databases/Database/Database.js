@@ -33,7 +33,7 @@ class Database extends React.Component {
                 currentPage:this.props.database?.databaseContent?.currentPage || 1,
                 records: this.props.database?.databaseContent?.records || [],
             })
-        })
+        }).catch(() => history.push(`/dashboard/databases`))
     };
 
 

@@ -113,16 +113,24 @@ class Analytics extends React.Component {
         return (analytics.reduce((a, i) => a + parseInt(i.Score), 0) / analytics.length ).toFixed(2)
     }
 
+    candidateClientSplit(){
+        const {analytics} = this.props.analytics
+        return {clients: analytics.filter(a=> a.UserType==="Client").length,
+            candidates: analytics.filter(a=> a.UserType==="Candidate").length}
+    }
+
+
     render() {
         const {analytics} = this.props.analytics
         const {split} = this.state;
-        let data, tsc, userapplications, averageScore // timespentchatting = tsc
+        let data, tsc, userapplications, averageScore, clientCandidate // timespentchatting = tsc
         if(!this.props.analytics.isLoading){
             data = this.dateFormatting(split).map(t =>
                 ({time: t.format(splits[this.state.split].render), chats: analytics.filter(a => moment(a.DateTime).isSame(t, splits[split].compare)).length}))
             tsc = this.timeSpentChatting()
             userapplications = this.userApplications()
             averageScore = this.averageScore()
+            clientCandidate = this.candidateClientSplit()
             // maybe move timespent to onload to save resources , no need to constantly recalculate? idk
         }
         const cols = {
@@ -250,7 +258,7 @@ class Analytics extends React.Component {
                                 </div>
                             </div>
                         </div>
-                        <div style={{height: 'calc(25% - 5px)'}}>
+                        <div style={{height: 'calc(25% - 5px)', marginBottom: 5}}>
                             <div className={styles.Panel}>
                                 <div className={styles.Panel_Header}>
                                     <h3>
@@ -266,6 +274,30 @@ class Analytics extends React.Component {
                                                 <Statistic value={averageScore}/>
                                             </Col>
                                         </Row>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                        <div style={{height: 'calc(25% - 5px)'}}>
+                            <div className={styles.Panel}>
+                                <div className={styles.Panel_Header}>
+                                    <h3>
+                                        <Icon type="team" style={{color: "#9254de"}}/> Clients Candidate split
+                                    </h3>
+                                </div>
+
+                                <div className={styles.Panel_Body}>
+                                    {!clientCandidate ?
+                                        <Spin/> :
+                                        <Row gutter={16}>
+                                            <Col span={8}>
+                                                <Statistic title="Clients" value={clientCandidate.clients}/>
+                                            </Col>
+                                            <Col span={8}>
+                                                <Statistic title="Candidates" value={clientCandidate.candidates}/>
+                                            </Col>
+                                        </Row>
+
                                     }
                                 </div>
                             </div>

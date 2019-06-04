@@ -13,7 +13,7 @@ import moment from 'moment';
 const splits = {
         yearly: {format:"YYYY", render: 'MMM', compare: "month"},
         monthly: {format:"MMM", render:"D", compare: "days"},
-        daily: {format: "ddd", render: "HH", compare: "hour"}, hourly: "HH"}
+        daily: {format: "ddd", render: "HH", compare: "hour"}}
 
 const visitData = [];
 const beginDay = new Date().getTime();
@@ -50,14 +50,9 @@ class Analytics extends React.Component {
     }
     changeSplit(split){
         const {analytics} = this.props.analytics
-        console.log(analytics)
         if(split !== this.state.split){
-
-            this.setState({split}, () => {this.reloadChart()})
+            this.setState({split})
         }
-    }
-    reloadChart(){
-
     }
 
     dateFormatting(split) {
@@ -123,9 +118,9 @@ class Analytics extends React.Component {
 
                                 <div className={styles.Panel_Body}
                                      ref={chartDiv => this.chartDiv = chartDiv}>
-                                    <Button onClick={() => this.changeSplit('yearly')} type="primary">Yearly</Button>
-                                    <Button onClick={() => this.changeSplit('monthly')}>Monthly</Button>
-                                    <Button onClick={() => this.changeSplit('daily')}>Daily</Button>
+                                    <Button onClick={() => this.changeSplit('yearly')} type={split==="yearly" ? "primary" : null}>Yearly</Button>
+                                    <Button onClick={() => this.changeSplit('monthly')} type={split==="monthly" ? "primary" : null}>Monthly</Button>
+                                    <Button onClick={() => this.changeSplit('daily')} type={split==="daily" ? "primary" : null}>Daily</Button>
                                     <div className={styles.Date_Selector}>
                                         <Icon type="caret-left" onClick={() => {this.iterator(-1)}} />
                                         <h1>{moment(this.state.curDate).format(splits[this.state.split].format)}</h1>

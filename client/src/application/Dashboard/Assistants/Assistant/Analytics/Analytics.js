@@ -107,16 +107,22 @@ class Analytics extends React.Component {
                 pending: analytics.filter(a=> a.Status==="Pending").length,
                 rejected: analytics.filter(a=> a.Status==="Rejected").length,}
     }
+
+    averageScore(){
+        const {analytics} = this.props.analytics
+        return (analytics.reduce((a, i) => a + parseInt(i.Score), 0) / analytics.length ).toFixed(2)
+    }
+
     render() {
         const {analytics} = this.props.analytics
         const {split} = this.state;
-        let data, tsc, userapplications // timespentchatting = tsc
+        let data, tsc, userapplications, averageScore // timespentchatting = tsc
         if(!this.props.analytics.isLoading){
             data = this.dateFormatting(split).map(t =>
                 ({time: t.format(splits[this.state.split].render), chats: analytics.filter(a => moment(a.DateTime).isSame(t, splits[split].compare)).length}))
             tsc = this.timeSpentChatting()
             userapplications = this.userApplications()
-            console.log(this.userApplications())
+            averageScore = this.averageScore()
             // maybe move timespent to onload to save resources , no need to constantly recalculate? idk
         }
         const cols = {
@@ -213,7 +219,7 @@ class Analytics extends React.Component {
                             </div>
                         </div>
 
-                        <div style={{height: 'calc(25% - 10px)'}}>
+                        <div style={{height: 'calc(25% - 10px)', marginBottom: 5}}>
                             <div className={styles.Panel}>
                                     <div className={styles.Panel_Header}>
                                         <h3>
@@ -244,6 +250,27 @@ class Analytics extends React.Component {
                                 </div>
                             </div>
                         </div>
+                        <div style={{height: 'calc(25% - 5px)'}}>
+                            <div className={styles.Panel}>
+                                <div className={styles.Panel_Header}>
+                                    <h3>
+                                        <Icon type="team" style={{color: "#9254de"}}/> Average Score
+                                    </h3>
+                                </div>
+
+                                <div className={styles.Panel_Body}>
+                                        {!averageScore ?
+                                        <Spin/> :
+                                        <Row gutter={16}>
+                                            <Col span={16}>
+                                                <Statistic value={averageScore}/>
+                                            </Col>
+                                        </Row>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+
                     </div>
                 </div>
             </div>

@@ -24,7 +24,8 @@ def getAnalytics(assistantID, startDate=datetime.now() - timedelta(days=365), en
         monthlyUses = db.session.query(Conversation.ID,
                                     Conversation.DateTime,
                                     Conversation.TimeSpent,
-                                    Conversation.Status)\
+                                    Conversation.Status,
+                                    Conversation.Score)\
                                 .filter(between(Conversation.DateTime, startDate, endDate))\
                                 .filter(Conversation.AssistantID == assistantID) \
                                 .all()

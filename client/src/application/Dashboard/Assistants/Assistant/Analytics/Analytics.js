@@ -100,14 +100,23 @@ class Analytics extends React.Component {
 
         return {current, previous}
     }
+
+    userApplications(){
+        const {analytics} = this.props.analytics
+        return {accepted: analytics.filter(a=> a.Status==="Accepted").length,
+                pending: analytics.filter(a=> a.Status==="Pending").length,
+                rejected: analytics.filter(a=> a.Status==="Rejected").length,}
+    }
     render() {
         const {analytics} = this.props.analytics
         const {split} = this.state;
-        let data, tsc // timespentchatting = tsc
+        let data, tsc, userapplications // timespentchatting = tsc
         if(!this.props.analytics.isLoading){
             data = this.dateFormatting(split).map(t =>
                 ({time: t.format(splits[this.state.split].render), chats: analytics.filter(a => moment(a.DateTime).isSame(t, splits[split].compare)).length}))
             tsc = this.timeSpentChatting()
+            userapplications = this.userApplications()
+            console.log(this.userApplications())
             // maybe move timespent to onload to save resources , no need to constantly recalculate? idk
         }
         const cols = {
@@ -180,17 +189,26 @@ class Analytics extends React.Component {
                                 </div>
 
                                 <div className={styles.Panel_Body}>
-                                    <Row gutter={16}>
-                                        <Col span={8}>
-                                            <Statistic title="Accepted" value={93} prefix={<Icon type="check-circle" theme="twoTone" twoToneColor="#2ecc71" />} />
-                                        </Col>
-                                        <Col span={8}>
-                                            <Statistic title="Denied" value={1128} prefix={<Icon type="close-circle" theme="twoTone" twoToneColor="#e74c3c" />} />
-                                        </Col>
-                                        <Col span={8}>
-                                            <Statistic title="Pending" value={93} prefix={<Icon type="minus-circle" theme="twoTone" twoToneColor="#f1c40f" />} />
-                                        </Col>
-                                    </Row>
+                                    {!userapplications ?
+                                        <Spin/> :
+                                        <Row gutter={16}>
+                                            <Col span={8}>
+                                                <Statistic title="Accepted" value={userapplications.accepted}
+                                                           prefix={<Icon type="check-circle" theme="twoTone"
+                                                                         twoToneColor="#2ecc71"/>}/>
+                                            </Col>
+                                            <Col span={8}>
+                                                <Statistic title="Pending" value={userapplications.pending}
+                                                           prefix={<Icon type="minus-circle" theme="twoTone"
+                                                                         twoToneColor="#f1c40f"/>}/>
+                                            </Col>
+                                            <Col span={8}>
+                                                <Statistic title="Rejected" value={userapplications.rejected}
+                                                           prefix={<Icon type="close-circle" theme="twoTone"
+                                                                         twoToneColor="#e74c3c"/>}/>
+                                            </Col>
+                                        </Row>
+                                    }
                                 </div>
                             </div>
                         </div>

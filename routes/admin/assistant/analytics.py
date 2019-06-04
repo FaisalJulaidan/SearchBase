@@ -11,7 +11,7 @@ analytics_router: Blueprint = Blueprint('analytics_router', __name__, template_f
 # @helpers.validAssistant
 def admin_analytics_data(assistantID):
     if request.method == "GET":
-        callback: Callback = analytics_services.getAnalytics(request, assistantID)
+        callback: Callback = analytics_services.getAnalytics(assistantID)
         if not callback.Success:
             return helpers.jsonResponse(False, 400, 'Failed to gather analytics')
         return helpers.jsonResponse(True, 200, callback.Message, callback.Data)

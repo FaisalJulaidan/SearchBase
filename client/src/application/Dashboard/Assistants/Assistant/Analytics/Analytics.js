@@ -10,7 +10,10 @@ import {Icon, Spin, Button} from 'antd';
 
 import moment from 'moment';
 
-const splits = {yearly: "YYYY", monthly: "MMM", daily: "ddd", hourly: "HH"}
+const splits = {
+        yearly: {format:"YYYY", render: 'MMM', compare: "month"},
+        monthly: {format:"MMM", render:"D", compare: "days"},
+        daily: {format: "ddd", render: "HH", compare: "hour"}, hourly: "HH"}
 
 const visitData = [];
 const beginDay = new Date().getTime();
@@ -28,9 +31,11 @@ class Analytics extends React.Component {
         super(props)
         this.state = {
             height: 100,
-            split: "yearly"
+            split: "yearly",
+            curDate: moment()
         };
         this.changeSplit = this.changeSplit.bind(this)
+        this.iterator = this.iterator.bind(this)
     }
 
     chartDiv;
@@ -40,24 +45,56 @@ class Analytics extends React.Component {
         this.setState({height});
     }
     componentWillMount(){
-        this.refreshData()
+        const {assistant} = this.props.location.state;
+        this.props.dispatch(analyticsActions.fetchAnalytics(assistant.ID))
     }
     changeSplit(split){
+        const {analytics} = this.props.analytics
+        console.log(analytics)
         if(split !== this.state.split){
-            this.setState({split}, () => {this.refreshData()})
+
+            this.setState({split}, () => {this.reloadChart()})
         }
     }
-    refreshData(){
-        const {assistant} = this.props.location.state;
-        this.props.dispatch(analyticsActions.fetchAnalytics(assistant.ID, this.state.split))
+    reloadChart(){
+
     }
 
+    dateFormatting(split) {
+        switch(split){
+            case "yearly":
+                return new Array(12).fill(1).map((i, x) => {return moment(this.state.curDate).set('month', x)});
+                break;
+            case "monthly":
+                return new Array(moment(this.state.curDate).daysInMonth()).fill(1).map((i, x) => {return moment(this.state.curDate).set('date', x+1 )});
+                break;
+            case "daily":
+                return new Array(24).fill(1).map((i, x) => {return moment(this.state.curDate).set('hour', x)})
+                break;
+        }
+    }
+    iterator(change){
+        switch(this.state.split){
+            case "yearly":
+                this.setState({curDate: this.state.curDate.set('year', this.state.curDate.get('year')+change)})
+                break;
+            case "monthly":
+                this.setState({curDate: this.state.curDate.set('month', this.state.curDate.get('month')+change)})
+                break;
+            case "daily":
+                this.setState(({curDate: this.state.curDate.set('day', this.state.curDate.get('day') + change)}))
+                break;
+        }
+    }
 
 
     render() {
         const {analytics} = this.props.analytics
         const {split} = this.state;
-        const data = this.props.analytics.isLoading ? null : analytics.map(a => ({time: moment(a.DateTime).format(splits[this.state.split]) , chats: a.count}));
+        let data = this.props.analytics.isLoading
+                    ? null
+                    : this.dateFormatting(split).map(t =>
+                        ({time: t.format(splits[this.state.split].render), chats: analytics.filter(a => moment(a.DateTime).isSame(t, splits[split].compare)).length}))
         const cols = {
             chats: {
                 min: 0
@@ -66,7 +103,7 @@ class Analytics extends React.Component {
                 range: [0, 1]
             }
         };
-
+        console.log(data)
         return (
             <div style={{height: '100%'}}>
                 <div style={{padding: '0 5px'}}>
@@ -80,7 +117,7 @@ class Analytics extends React.Component {
                         <div className={styles.Panel}>
                                 <div className={styles.Panel_Header}>
                                     <h3>
-                                        <Icon type="fund" theme="twoTone" twoToneColor={"#9254de"}/> Monthly Records
+                                        <Icon type="fund" theme="twoTone" twoToneColor={"#9254de"}/> Chats
                                     </h3>
                                 </div>
 
@@ -89,7 +126,12 @@ class Analytics extends React.Component {
                                     <Button onClick={() => this.changeSplit('yearly')} type="primary">Yearly</Button>
                                     <Button onClick={() => this.changeSplit('monthly')}>Monthly</Button>
                                     <Button onClick={() => this.changeSplit('daily')}>Daily</Button>
-                                    <Button onClick={() => this.changeSplit('hourly')}>Hourly</Button>
+                                    <div className={styles.Date_Selector}>
+                                        <Icon type="caret-left" onClick={() => {this.iterator(-1)}} />
+                                        <h1>{moment(this.state.curDate).format(splits[this.state.split].format)}</h1>
+                                        <Icon type="caret-right" onClick={() => {this.iterator(1)}}/>
+                                    </div>
+
                                     <Chart height={500} data={data} scale={cols} forceFit>
                                         <Axis name="time    " />
                                         <Axis name="chats" />

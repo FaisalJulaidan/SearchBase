@@ -1,11 +1,10 @@
 import * as actionTypes from './actionTypes';
 
 
-const fetchAnalytics = (assistantID, split="yearly") => {
+const fetchAnalytics = (assistantID, split="yearly", date) => {
     return {
         type: actionTypes.FETCH_ANALYTICS_REQUEST,
-        assistantID,
-        split
+        assistantID
     };
 };
 

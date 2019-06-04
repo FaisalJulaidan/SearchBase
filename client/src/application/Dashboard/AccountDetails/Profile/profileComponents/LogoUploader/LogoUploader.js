@@ -92,7 +92,7 @@ class LogoUploader extends Component {
                     </Dragger>
 
                     {
-                        profileData?.company.LogoPath ?
+                        profileData?.company?.LogoPath ?
                             <div>
                                 <h3>The current logo</h3>
                                 <Card hoverable

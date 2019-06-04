@@ -77,7 +77,7 @@ def run_tasks():
 
 
 print("Run the server...")
-if os.environ['FLASK_ENV'] == 'production':
+if os.environ['FLASK_ENV'] in ['production', 'staging']:
     # Server Setup
     app.config.from_object('config.ProductionConfig')
     url = os.environ['SQLALCHEMY_DATABASE_URI']
@@ -93,7 +93,9 @@ if os.environ['FLASK_ENV'] == 'production':
         db.create_all()
         helpers.seed()
 
+    # Check if staging what to do
     # scheduler.start()
+
     print('Production mode running...')
 
 elif os.environ['FLASK_ENV'] == 'development':
@@ -112,13 +114,10 @@ elif os.environ['FLASK_ENV'] == 'development':
         db.create_all()
         helpers.gen_dummy_data()
 
-    # auto_pilot_services.__sendAcceptanceLetterEmail()
-
     print('Development mode running...')
 
 else:
-    print("Please set FLASK_ENV first to either 'production' or 'development' in .env file")
-
+    raise Exception("Please set FLASK_ENV first to either 'production', 'development', or 'staging' in .env file")
 
 # Run the migration if in .env, MIGRATION = yes
 if os.environ['MIGRATION'] == 'yes':

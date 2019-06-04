@@ -220,7 +220,6 @@ def __parseAutoPilot(autoPilot: AutoPilot) -> dict:
         "OpenTimeSlots": helpers.getListFromSQLAlchemyList(autoPilot.OpenTimeSlots)
     }
 
-
 def __getApplicationResult(score, autoPilot: AutoPilot) -> ApplicationStatus:
     result = ApplicationStatus.Pending
     if autoPilot.AcceptApplications and (score > autoPilot.AcceptanceScore):
@@ -228,11 +227,6 @@ def __getApplicationResult(score, autoPilot: AutoPilot) -> ApplicationStatus:
     if autoPilot.RejectApplications and (score < autoPilot.RejectionScore):
         result = ApplicationStatus.Rejected
     return result
-
-
-def __sendAcceptanceLetterEmail(receiverEmail, userName, companyName, logoPath) -> Callback:
-    return mail_services.send_email(receiverEmail, 'Acceptance Letter', '/emails/acceptance_letter.html',
-                             companyName=companyName, logoPath=logoPath, userName=userName)
 
 
 def __sendAppointmentEmail(conversation: Conversation, autoPilot):

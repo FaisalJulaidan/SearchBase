@@ -29,7 +29,6 @@ const ViewBox = (props) => {
 
 
             <div className={styles.Body} onClick={() => props.onClick()}>
-
                 <div className={styles.Icon}
                      style={{top: props.iconTop,
                             right: props.iconRight,
@@ -62,11 +61,8 @@ const ViewBox = (props) => {
                     {props.text}
                 </Paragraph>
             </div>
-
-
         </div>
     )
-
 };
 
 ViewBox.propTypes = {

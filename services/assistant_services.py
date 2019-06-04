@@ -93,14 +93,14 @@ def getByName(name) -> Callback:
 
 def getAll(companyID) -> Callback:
     try:
-        if companyID:
-            # Get result and check if None then raise exception
-            result = db.session.query(Assistant).filter(Assistant.CompanyID == companyID).all()
-            print(result)
-            if len(result) == 0:
-                return Callback(True,"No assistants  to be retrieved.", [])
+        if not companyID: raise Exception
+        # Get result and check if None then raise exception
+        result = db.session.query(Assistant).filter(Assistant.CompanyID == companyID).all()
 
-            return Callback(True, "Got all assistants  successfully.", result)
+        if len(result) == 0:
+            return Callback(True,"No assistants  to be retrieved.", [])
+
+        return Callback(True, "Got all assistants  successfully.", result)
 
     except Exception as exc:
         print(exc)
@@ -158,7 +158,7 @@ def update(id, name, message, topBarText, secondsUntilPopup, mailEnabled, mailPe
 def updateStatus(assistantID, newStatus, companyID):
     try:
 
-        if not newStatus: raise Exception("Please provide the new status")
+        if newStatus is None: raise Exception("Please provide the new status")
         db.session.query(Assistant).filter(and_(Assistant.ID == assistantID, Assistant.CompanyID == companyID)) \
             .update({"Active": newStatus})
 

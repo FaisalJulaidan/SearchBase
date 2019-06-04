@@ -45,12 +45,11 @@ def processConversation(assistantHashID, data: dict) -> Callback:
         # collectedData is an array, and timeSpent is in seconds.
         conversation = Conversation(Data=conversationData,
                                     TimeSpent=data['timeSpent'],
-                                    Completed=data['isSessionCompleted'],
-                                    # isSessionCompleted -> isConversationCompleted
+                                    Completed=data['isConversationCompleted'],
                                     SolutionsReturned=data['solutionsReturned'],
                                     QuestionsAnswered=len(collectedData),
                                     UserType=UserType[data['userType'].replace(" ", "")],
-                                    Score=data['score'],
+                                    Score=round(data['score'], 2),
                                     Assistant=assistant)
 
         # AutoPilot Operations
@@ -59,6 +58,8 @@ def processConversation(assistantHashID, data: dict) -> Callback:
             if ap_callback.Success:
                 conversation.AutoPilotStatus = True
                 conversation.ApplicationStatus = ap_callback.Data['applicationStatus']
+                conversation.AcceptanceEmailSentAt = ap_callback.Data['acceptanceEmailSentAt']
+                conversation.RejectionEmailSentAt = ap_callback.Data['rejectionEmailSentAt']
                 # conversation.AppointmentEmailSentAt = ap_callback.Data['appointmentEmailSentAt']
             conversation.AutoPilotResponse = ap_callback.Message
 

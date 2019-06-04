@@ -41,7 +41,7 @@ class Assistant extends Component {
         return (
             <>
                 <Card loading={this.props.isLoading}
-                      style={{width: 500, margin: 15, float: 'left', height: 369}}
+                      style={{width: 460, margin: 15, float: 'left', height: 369}}
                       cover={
                           <img alt="example"
                                height={150}
@@ -49,7 +49,13 @@ class Assistant extends Component {
                                src={covers[Math.floor(Math.random() * covers.length)]}/>
                       }
                       title={assistant.Name}
-                      extra={<Switch loading={isStatusChanging} checked={assistant.Active} onChange={this.onActiveChanged}/>}
+                      extra={<Switch loading={isStatusChanging}
+                                     checked={assistant.Active}
+                                     onChange={this.onActiveChanged}
+                                     checkedChildren="On"
+                                     unCheckedChildren="Off"
+                      />
+                      }
                       actions={[]}
                       className={'assistant'}>
 

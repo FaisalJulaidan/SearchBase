@@ -26,7 +26,7 @@ const Profile = lazy(() => import('./AccountDetails/Profile/Profile'));
 const Billing = lazy(() => import('./AccountDetails/Billing/Billing'));
 const UsersManagement = lazy(() => import('./AccountDetails/UsersManagement/UsersManagement'));
 const Documentation = lazy(() => import('./Documentation/Documentation'));
-const Integration = lazy(() => import('./Assistants/Assistant/Conversations/Conversations'));
+const Integration = lazy(() => import('./Assistants/Assistant/Integration/Integration'));
 const Conversations = lazy(() => import('./Assistants/Assistant/Conversations/Conversations'));
 const Calendar = lazy(() => import('./Calendar/Calendar'));
 const AutoPilot = lazy(() => import('./AutoPilot/AutoPilot'));
@@ -105,7 +105,6 @@ class Dashboard extends Component {
                     </Menu.Item>
                 </Menu>
             );
-
             userInfo = (
                 <Dropdown overlay={userInfoMenu} overlayStyle={{width: '255px'}}>
                     {avatar}
@@ -166,9 +165,9 @@ class Dashboard extends Component {
                             <span>Assistants</span>
                         </Menu.Item>
 
-                        <Menu.Item key="databases">
-                            <Icon type="database"/>
-                            <span>Databases</span>
+                        <Menu.Item key="auto_pilot">
+                            <Icon type="clock-circle"/>
+                            <span>Auto Pilot</span>
                         </Menu.Item>
 
                         <Menu.Item key="crmlist">
@@ -176,14 +175,14 @@ class Dashboard extends Component {
                             <span>CRMs List</span>
                         </Menu.Item>
 
+                        <Menu.Item key="databases">
+                            <Icon type="database"/>
+                            <span>Databases</span>
+                        </Menu.Item>
+
                         <Menu.Item key="calendar">
                             <Icon type="calendar"/>
                             <span>Calendar</span>
-                        </Menu.Item>
-
-                        <Menu.Item key="auto_pilot">
-                            <Icon type="api"/>
-                            <span>Auto Pilot</span>
                         </Menu.Item>
 
                         <Divider/>
@@ -251,13 +250,10 @@ class Dashboard extends Component {
                                         <Switch location={location} style={{height: '100%'}}>
 
                                             <Route path={`${match.path}/assistants/:id/script`} component={Flow}/>
-                                            <Route path={`${match.path}/assistants/:id/integration`}
-                                                   component={Integration}/>
+                                            <Route path={`${match.path}/assistants/:id/integration`} component={Integration}/>
                                             <Route path={`${match.path}/assistants/:id/conversations`} component={Conversations}/>
-                                            <Route path={`${match.path}/assistants/:id/analytics`}
-                                                   component={Analytics}/>
-                                            <Route path={`${match.path}/assistants/:id/CRMIntegration`}
-                                                   component={AssistantCRM}/>
+                                            <Route path={`${match.path}/assistants/:id/analytics`} component={Analytics}/>
+                                            <Route path={`${match.path}/assistants/:id/CRMIntegration`} component={AssistantCRM}/>
                                             <Route path={`${match.path}/assistants`} component={Assistants} exact/>
 
                                             <Route path={`${match.path}/crmlist`} component={Crms} exact/>

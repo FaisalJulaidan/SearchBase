@@ -48,8 +48,10 @@ def auto_pilot(autoPilotID):
                     data.get('active'),
                     data.get('acceptApplications'),
                     data.get('acceptanceScore'),
+                    data.get('sendAcceptanceEmail'),
                     data.get('rejectApplications'),
                     data.get('rejectionScore'),
+                    data.get('sendRejectionEmail'),
                     data.get('sendCandidatesAppointments'),
                     data.get('openTimeSlots'), # TODO OpenTimeSlots & Appointments Feature
                     user['companyID'])

@@ -7,7 +7,6 @@ import {conversationActions} from "store/actions";
 import connect from "react-redux/es/connect/connect";
 import Header from "components/Header/Header";
 import {CSVLink} from "react-csv";
-import AutomationModal from "./AutomationModal/AutomationModal";
 
 const confirm = Modal.confirm;
 
@@ -210,14 +209,6 @@ class Conversations extends React.Component {
         return <Badge status="processing" text={text}/>;
     };
 
-    showAutomationModal = () => this.setState({visibleAutomation: true});
-
-    handleAutomationOk = e => {
-        this.setState({visibleAutomation: false,});
-    };
-
-    handleAutomationCancel = e => this.setState({visibleAutomation: false});
-
 
     render() {
         const {assistant} = this.props.location.state;
@@ -379,12 +370,6 @@ class Conversations extends React.Component {
 
                         <div>
 
-                            <Button className={styles.Panel_Header_Button} type="primary" icon="apartment"
-                                    onClick={() => this.showAutomationModal()}
-                                    loading={this.props.isLoading}>
-                                Automation
-                            </Button>
-
                             <Button className={styles.Panel_Header_Button} type="primary" icon="sync"
                                     onClick={this.refreshConversations} loading={this.props.isLoading}>
                                 Refresh
@@ -431,11 +416,6 @@ class Conversations extends React.Component {
                                                                    buildStatusBadge={this.buildStatusBadge}/>
                         }
 
-
-                        <AutomationModal assistant={assistant}
-                                         visible={this.state.visibleAutomation}
-                                         handleOk={this.handleAutomationOk}
-                                         handleCancel={this.handleAutomationCancel}/>
                     </div>
                 </div>
             </div>

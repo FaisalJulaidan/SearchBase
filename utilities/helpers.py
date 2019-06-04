@@ -389,6 +389,7 @@ def isValidEmail(email: str) -> bool:
 # Convert a SQLAlchemy object to a single dict
 def getDictFromSQLAlchemyObj(obj):
     d = {}
+    print(obj)
     for attr in obj.__table__.columns:
         key = attr.name
         if key not in ['Password']:
@@ -408,6 +409,25 @@ def getDictFromSQLAlchemyObj(obj):
     if hasattr(obj, "FilePath"):
         d["FilePath"] = obj.FilePath
     return d
+
+
+"""Used when you want to only gather specific data from a table (columns)"""
+"""Provide a list of keys (e.g ['id', 'name']) and the list of tuples"""
+"""provided by sqlalchemy when querying for specific columns"""
+"""this func will work for enums aswell."""
+
+def getDictFromLimitedQuery(list, tuplel):
+    d = []
+    for item in tuplel:
+        dict = {}
+        for idx, i in enumerate(item):
+            if isinstance(i, Enum):
+                dict[list[idx]] = i.value
+            else:
+                dict[list[idx]] = i
+        d.append(dict)
+    return d
+
 
 
 # Convert a SQLAlchemy list of objects to a list of dicts

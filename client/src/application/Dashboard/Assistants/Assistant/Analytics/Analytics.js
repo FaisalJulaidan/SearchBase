@@ -87,6 +87,7 @@ class Analytics extends React.Component {
         let compareTo = moment()
         // Filters the analytics array so that it gets only the current time (year/month etc) then accumulates all the
         // total timespent values, and divides by the length of the array to get the average, also rounds to 2 digits
+
         let timeSpent = ["year", "month", "day"]
         let current = timeSpent.map(t =>
             analytics.filter(a => moment(a.DateTime).isSame(compareTo, t))
@@ -96,6 +97,7 @@ class Analytics extends React.Component {
             analytics.filter(a => moment(a.DateTime).isSame(compareTo.clone().subtract(1, t), t))
                 .reduce((a, n, i, ba) => (a + parseInt(n.TimeSpent)) / (ba.length - 1 == i ? ba.length : 1), 0)
                 .toFixed(2))
+
         return {current, previous}
     }
     render() {
@@ -106,7 +108,7 @@ class Analytics extends React.Component {
             data = this.dateFormatting(split).map(t =>
                 ({time: t.format(splits[this.state.split].render), chats: analytics.filter(a => moment(a.DateTime).isSame(t, splits[split].compare)).length}))
             tsc = this.timeSpentChatting()
-            // maybe move timespent ot onload to save resources , no need to constantly recalculate? idk
+            // maybe move timespent to onload to save resources , no need to constantly recalculate? idk
         }
         const cols = {
             chats: {

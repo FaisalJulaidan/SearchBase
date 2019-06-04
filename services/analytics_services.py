@@ -21,13 +21,13 @@ def getAnalytics(assistantID, startDate=datetime.now() - timedelta(days=365), en
     try:
 
         # Conversation.Status) \
-        monthlyUses = db.session    .query(Conversation.ID,
-                                   Conversation.DateTime,
-                                   Conversation.TimeSpent)\
+        monthlyUses = db.session.query(Conversation.ID,
+                                    Conversation.DateTime,
+                                    Conversation.TimeSpent,
+                                    Conversation.Status)\
                                 .filter(between(Conversation.DateTime, startDate, endDate))\
                                 .filter(Conversation.AssistantID == assistantID) \
                                 .all()
-
         return Callback(True, 'Analytics successfully gathered', monthlyUses)
     except Exception as e:
         print(e)

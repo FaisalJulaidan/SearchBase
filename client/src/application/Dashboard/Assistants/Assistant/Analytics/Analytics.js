@@ -6,7 +6,7 @@ import {Chart, Axis, Tooltip, Geom } from "bizcharts";
 import {analyticsActions} from "store/actions";
 import {connect} from 'react-redux';
 import NumberInfo from 'ant-design-pro/lib/NumberInfo';
-import {Icon, Spin, Button} from 'antd';
+import {Icon, Spin, Button, Row, Col, Statistic} from 'antd';
 
 import moment from 'moment';
 
@@ -82,14 +82,32 @@ class Analytics extends React.Component {
         }
     }
 
-
+    timeSpentChatting() {
+        const {analytics} = this.props.analytics
+        let compareTo = moment()
+        // Filters the analytics array so that it gets only the current time (year/month etc) then accumulates all the
+        // total timespent values, and divides by the length of the array to get the average, also rounds to 2 digits
+        let timeSpent = ["year", "month", "day"]
+        let current = timeSpent.map(t =>
+            analytics.filter(a => moment(a.DateTime).isSame(compareTo, t))
+                .reduce((a, n, i, ba) => (a + parseInt(n.TimeSpent)) / (ba.length - 1 == i ? ba.length : 1), 0)
+                .toFixed(2))
+        let previous = timeSpent.map(t =>
+            analytics.filter(a => moment(a.DateTime).isSame(compareTo.clone().subtract(1, t), t))
+                .reduce((a, n, i, ba) => (a + parseInt(n.TimeSpent)) / (ba.length - 1 == i ? ba.length : 1), 0)
+                .toFixed(2))
+        return {current, previous}
+    }
     render() {
         const {analytics} = this.props.analytics
         const {split} = this.state;
-        let data = this.props.analytics.isLoading
-                    ? null
-                    : this.dateFormatting(split).map(t =>
-                        ({time: t.format(splits[this.state.split].render), chats: analytics.filter(a => moment(a.DateTime).isSame(t, splits[split].compare)).length}))
+        let data, tsc // timespentchatting = tsc
+        if(!this.props.analytics.isLoading){
+            data = this.dateFormatting(split).map(t =>
+                ({time: t.format(splits[this.state.split].render), chats: analytics.filter(a => moment(a.DateTime).isSame(t, splits[split].compare)).length}))
+            tsc = this.timeSpentChatting()
+            // maybe move timespent ot onload to save resources , no need to constantly recalculate? idk
+        }
         const cols = {
             chats: {
                 min: 0
@@ -98,7 +116,6 @@ class Analytics extends React.Component {
                 range: [0, 1]
             }
         };
-        console.log(data)
         return (
             <div style={{height: '100%'}}>
                 <div style={{padding: '0 5px'}}>
@@ -152,44 +169,59 @@ class Analytics extends React.Component {
                     </div>
 
                     <div style={{height: '100%', width: '30%', margin: 5}}>
-                        <div style={{height: 'calc(50% - 5px)', marginBottom: 5}}>
+                        <div style={{height: 'calc(25% - 5px)', marginBottom: 5}}>
                             <div className={styles.Panel}>
-                                <Spin size="large" tip="Coming Soon">
-                                    <div className={styles.Panel_Header}>
-                                        <h3>
-                                            <Icon type="team" style={{color: "#9254de"}}/> Total Users
-                                        </h3>
-                                    </div>
+                                <div className={styles.Panel_Header}>
+                                    <h3>
+                                        <Icon type="team" style={{color: "#9254de"}}/> User Applications
+                                    </h3>
+                                </div>
 
-                                    <div className={styles.Panel_Body}>
-                                        <NumberInfo
-                                            subTitle={<span>All Users</span>}
-                                            total={123.0}
-                                            subtitle={<span>The total users number used this assistant</span>}
-                                        />
-                                    </div>
-                                </Spin>
+                                <div className={styles.Panel_Body}>
+                                    <Row gutter={16}>
+                                        <Col span={8}>
+                                            <Statistic title="Accepted" value={93} prefix={<Icon type="check-circle" theme="twoTone" twoToneColor="#2ecc71" />} />
+                                        </Col>
+                                        <Col span={8}>
+                                            <Statistic title="Denied" value={1128} prefix={<Icon type="close-circle" theme="twoTone" twoToneColor="#e74c3c" />} />
+                                        </Col>
+                                        <Col span={8}>
+                                            <Statistic title="Pending" value={93} prefix={<Icon type="minus-circle" theme="twoTone" twoToneColor="#f1c40f" />} />
+                                        </Col>
+                                    </Row>
+                                </div>
                             </div>
                         </div>
 
-                        <div style={{height: 'calc(50% - 10px)'}}>
+                        <div style={{height: 'calc(25% - 10px)'}}>
                             <div className={styles.Panel}>
-                                <Spin size="large" tip="Coming Soon">
                                     <div className={styles.Panel_Header}>
                                         <h3>
-                                            <Icon type="eye" theme="twoTone" twoToneColor="#9254de"/> Total Visits
+                                            <Icon type="eye" theme="twoTone" twoToneColor="#9254de"/> Time spent chatting
                                         </h3>
                                     </div>
 
-                                    <div className={styles.Panel_Body}>
-                                        <NumberInfo
-                                            subTitle={<span>Visits this week</span>}
-                                            total={12321.0}
-                                            status="up"
-                                            subTotal={17.1}
-                                        />
-                                    </div>
-                                </Spin>
+                                <div className={styles.Panel_Body}>
+                                    {!tsc ?
+                                    <Spin /> :
+                                    <Row gutter={16}>
+                                        <Col span={8}>
+                                            <Statistic title="Yearly average"
+                                                       value={tsc.current[0]}
+                                                       suffix={<Icon type={tsc.current[0] > tsc.previous[0] ? "caret-up" : "caret-down"} />} />
+                                        </Col>
+                                        <Col span={8}>
+                                            <Statistic title="Monthly average"
+                                                       value={tsc.current[1]}
+                                                       suffix={<Icon type={tsc.current[1] > tsc.previous[1] ? "caret-up" : "caret-down"} />} />
+                                        </Col>
+                                        <Col span={8}>
+                                            <Statistic title="Daily average"
+                                                       value={tsc.current[2]}
+                                                       suffix={<Icon type={tsc.current[2] > tsc.previous[2] ? "caret-up" : "caret-down"} />} />
+                                        </Col>
+                                    </Row> }
+                                </div>
                             </div>
                         </div>
                     </div>

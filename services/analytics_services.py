@@ -16,11 +16,17 @@ def getAnalytics(assistantID, startDate=datetime.now() - timedelta(days=365), en
     """ startDate defaults to a year ago, and the end date defaults to now, gathering all data for the past year """
     """ currently only gathers amount of conversations held """
 
+    #need to fiugre out whether the start and end dates will affect the whole page, or just the chart hmm
+
     try:
-        monthlyUses = db.session    .query(Conversation.ID, Conversation.DateTime, Conversation.TimeSpent)\
-                                    .filter(between(Conversation.DateTime, startDate, endDate))\
-                                    .filter(Conversation.AssistantID == assistantID) \
-                                    .all()
+
+        # Conversation.Status) \
+        monthlyUses = db.session    .query(Conversation.ID,
+                                   Conversation.DateTime,
+                                   Conversation.TimeSpent)\
+                                .filter(between(Conversation.DateTime, startDate, endDate))\
+                                .filter(Conversation.AssistantID == assistantID) \
+                                .all()
 
         return Callback(True, 'Analytics successfully gathered', monthlyUses)
     except Exception as e:

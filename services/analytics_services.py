@@ -14,29 +14,13 @@ from models import db, Callback, Conversation
 def getAnalytics(assistantID, startDate=datetime.now() - timedelta(days=365), endDate=datetime.now()):
     """ Gets analytics for the provided assistant """
     """ startDate defaults to a year ago, and the end date defaults to now, gathering all data for the past year """
-    """ currently only gathers amount of conversations held, split up by month """
-
-    # split = request.args.get("split") if request.args.get("split") != None else "monthly"
-
-    # splitTypes = {
-    #     'yearly': '%Y-%m',
-    #     'monthly': '%Y-%m %D',
-    #     'daily': '%Y-%m %D %l',
-    # }
-
-    # print(parser.parse(request.args.get('date')))
+    """ currently only gathers amount of conversations held """
 
     try:
-        # if split not in splitTypes:
-        #     raise Exception("Supplied splitter {} is not allowed".format(split))
-
-        #.query(func.count(Conversation.ID).label('count'), func.min(Conversation.DateTime).label('DateTime'))\
         monthlyUses = db.session    .query(Conversation.ID, Conversation.DateTime, Conversation.TimeSpent)\
                                     .filter(between(Conversation.DateTime, startDate, endDate))\
                                     .filter(Conversation.AssistantID == assistantID) \
                                     .all()
-                                    # .group_by(func.date_format(Conversation.DateTime, splitTypes[split]))\
-                                    # .order_by(func.date_format(Conversation.DateTime, splitTypes[split]))
 
         return Callback(True, 'Analytics successfully gathered', monthlyUses)
     except Exception as e:

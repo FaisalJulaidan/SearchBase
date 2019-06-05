@@ -11,7 +11,7 @@ from models import db, Callback, Conversation
 
 #fix datetime
 
-def getAnalytics(assistantID, startDate=datetime.now() - timedelta(days=365), endDate=datetime.now()):
+def getAnalytics(assistant, startDate=datetime.now() - timedelta(days=365), endDate=datetime.now()):
     """ Gets analytics for the provided assistant """
     """ startDate defaults to a year ago, and the end date defaults to now, gathering all data for the past year """
     """ currently only gathers amount of conversations held """
@@ -26,7 +26,7 @@ def getAnalytics(assistantID, startDate=datetime.now() - timedelta(days=365), en
                                     Conversation.Score,
                                     Conversation.UserType)\
                                 .filter(between(Conversation.DateTime, startDate, endDate))\
-                                .filter(Conversation.AssistantID == assistantID) \
+                                .filter(Conversation.AssistantID == assistant.ID) \
                                 .all()
         return Callback(True, 'Analytics successfully gathered', monthlyUses)
     except Exception as e:

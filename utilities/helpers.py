@@ -493,6 +493,6 @@ def validAssistant(func):
         if not callback.Success:
             return jsonResponse(False, 404, "Assistant not found.", None)
         assistant: Assistant = callback.Data
-        func(assistant)
+        return func(assistant)
     return wrapperValidAssistant
 

@@ -2,7 +2,7 @@ import * as actionTypes from '../actions/actionTypes';
 import {updateObject} from '../utility';
 // import {deepClone} from "helpers";
 
-const initialState = {analytics: {}, isLoading: true, errorMsg: null};
+const initialState = {analytics: [], isLoading: true, errorMsg: null};
 
 export const analytics = (state = initialState, action) => {
     switch (action.type) {

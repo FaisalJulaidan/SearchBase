@@ -13,7 +13,7 @@ import moment from 'moment';
 const splits = {
         yearly: {format:"YYYY", render: 'MMM', compare: "month"},
         monthly: {format:"MMM", render:"D", compare: "days"},
-        daily: {format: "ddd", render: "HH", compare: "hour"}}
+        daily: {format: "ddd", render: "HH", compare: "hour"}};
 
 const visitData = [];
 const beginDay = new Date().getTime();
@@ -122,10 +122,10 @@ class Analytics extends React.Component {
 
     render() {
         const {analytics} = this.props.analytics
-        console.log(this.props)
+        // console.log(this.props)
         const {split} = this.state;
         let data, tsc, userapplications, averageScore, clientCandidate // timespentchatting = tsc
-        if(!this.props.analytics.isLoading && analytics.length === 0){
+        if(!this.props.analytics.isLoading && analytics){
             data = this.dateFormatting(split).map(t =>
                 ({time: t.format(splits[this.state.split].render), chats: analytics.filter(a => moment(a.DateTime).isSame(t, splits[split].compare)).length}))
             tsc = this.timeSpentChatting()

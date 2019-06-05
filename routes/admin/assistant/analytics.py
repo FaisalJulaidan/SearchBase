@@ -7,12 +7,12 @@ from flask_jwt_extended import jwt_required, get_jwt_identity
 analytics_router: Blueprint = Blueprint('analytics_router', __name__, template_folder="../../templates")
 
 @analytics_router.route("/assistant/<assistantID>/analytics", methods=['GET'])
-# @jwt_required
-# @helpers.validAssistant
-def admin_analytics_data(assistantID):
+@jwt_required
+@helpers.validAssistant
+def admin_analytics_data(assistant):
     if request.method == "GET":
         result = []
-        callback: Callback = analytics_services.getAnalytics(assistantID)
+        callback: Callback = analytics_services.getAnalytics(assistant.ID)
         if not callback.Success:
             return helpers.jsonResponse(False, 400, 'Failed to gather analytics')
         try:

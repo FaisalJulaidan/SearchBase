@@ -125,7 +125,7 @@ class Analytics extends React.Component {
         console.log(this.props)
         const {split} = this.state;
         let data, tsc, userapplications, averageScore, clientCandidate // timespentchatting = tsc
-        if(!this.props.analytics.isLoading && Object.entries(analytics).length !== 0){
+        if(!this.props.analytics.isLoading && analytics.length === 0){
             data = this.dateFormatting(split).map(t =>
                 ({time: t.format(splits[this.state.split].render), chats: analytics.filter(a => moment(a.DateTime).isSame(t, splits[split].compare)).length}))
             tsc = this.timeSpentChatting()

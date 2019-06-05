@@ -8,7 +8,7 @@ export const analytics = (state = initialState, action) => {
     switch (action.type) {
         case actionTypes.FETCH_ANALYTICS_REQUEST:
             return updateObject(state, {
-                analytics: {},
+                analytics: [],
                 isLoading: true,
             });
         case actionTypes.FETCH_ANALYTICS_SUCCESS:
@@ -18,7 +18,7 @@ export const analytics = (state = initialState, action) => {
             });
         case actionTypes.FETCH_ANALYTICS_FAILURE:
             return updateObject(state, {
-                assistantList: {},
+                assistantList: [],
                 isLoading: false,
                 errorMsg: action.error
             });

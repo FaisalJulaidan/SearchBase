@@ -495,3 +495,4 @@ def validAssistant(func):
         assistant: Assistant = callback.Data
         func(assistant)
     return wrapperValidAssistant
+

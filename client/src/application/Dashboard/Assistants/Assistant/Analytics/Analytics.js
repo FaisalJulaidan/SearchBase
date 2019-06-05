@@ -241,18 +241,21 @@ class Analytics extends React.Component {
                                     <Row gutter={16}>
                                         <Col span={8}>
                                             <Statistic title="Yearly average"
-                                                       value={tsc.current[0]}
-                                                       suffix={<Icon type={tsc.current[0] > tsc.previous[0] ? "caret-up" : "caret-down"} />} />
+                                                       value={(Math.floor(tsc.current[0]/60)) + "m" }
+                                                       suffix={Math.floor(tsc.current[0] % 60) + "s"}
+                                                       prefix={<Icon type={tsc.current[0] > tsc.previous[0] ? "caret-up" : "caret-down"} />} />
                                         </Col>
                                         <Col span={8}>
                                             <Statistic title="Monthly average"
-                                                       value={tsc.current[1]}
-                                                       suffix={<Icon type={tsc.current[1] > tsc.previous[1] ? "caret-up" : "caret-down"} />} />
+                                                       value={(Math.floor(tsc.current[1]/60)) + "m" }
+                                                       suffix={Math.floor(tsc.current[1] % 60) + "s"}
+                                                       prefix={<Icon type={tsc.current[1] > tsc.previous[1] ? "caret-up" : "caret-down"} />} />
                                         </Col>
                                         <Col span={8}>
                                             <Statistic title="Daily average"
-                                                       value={tsc.current[2]}
-                                                       suffix={<Icon type={tsc.current[2] > tsc.previous[2] ? "caret-up" : "caret-down"} />} />
+                                                       value={(Math.floor(tsc.current[2]/60)) + "m" }
+                                                       suffix={Math.floor(tsc.current[2] % 60) + "s"}
+                                                       prefix={<Icon type={tsc.current[2] > tsc.previous[2] ? "caret-up" : "caret-down"} />} />
                                         </Col>
                                     </Row> }
                                 </div>

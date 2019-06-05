@@ -88,10 +88,13 @@ def getAllJobs(assistant: Assistant):
         return Greenhouse.getAllJobs(assistant.CRM.Auth)
 
 
-def produceRecruitmentValueReport(companyID, crmName):
+def produceRecruiterValueReport(companyID, crmName):
+    crm_callback: Callback = getCRMByType(crmName, companyID)
+    if not crm_callback.Success:
+        return Callback(False, "CRM not found")
     # Check CRM type
     if crmName == CRM.Bullhorn.name:
-        return Bullhorn.produceRecruitmentValueReport(companyID)
+        return Bullhorn.produceRecruiterValueReport(crm_callback.Data, companyID)
 
 
 # Connect to a new CRM
@@ -217,6 +220,7 @@ def disconnect(crm_id, company_id) -> Callback:
     except Exception as exc:
         logging.error("CRM_services.disconnect(): " + str(exc))
         db.session.rollback()
+        return Callback(False, "CRM disconnection failed.")
 
 
 # get crm with id and company_id

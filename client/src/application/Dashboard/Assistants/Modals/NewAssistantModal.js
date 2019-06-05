@@ -96,8 +96,7 @@ class NewAssistantModal extends Component {
                         {...formItemLayout}>
                         {getFieldDecorator('welcomeMessage', {
                             rules: [{
-                                required: true,
-                                message: 'Please input your welcome message',
+                                required: true, message: 'Please input your welcome message',
                             }],
                         })(
                             <Input placeholder="Ex: Hey there, Welcome visitor"/>

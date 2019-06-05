@@ -2,6 +2,7 @@ import base64
 import json
 import logging
 import urllib.parse
+from datetime import datetime
 
 import requests
 from sqlalchemy import and_
@@ -9,6 +10,8 @@ from sqlalchemy import and_
 from enums import DataType as DT
 from models import Callback, Conversation, db, CRM, StoredFile
 from services import databases_services, stored_file_services
+
+
 # login requires: username, password
 
 
@@ -148,8 +151,6 @@ def sendQuery(auth, query, method, body, companyID, optionalParams=None):
 
         # test the BhRestToken (rest_token)
         r = sendRequest(url, method, headers, json.dumps(body))
-        print(r.status_code)
-        print(r.text)
         if r.status_code == 401:  # wrong rest token
             callback: Callback = retrieveRestToken(auth, companyID)
             if callback.Success:
@@ -492,6 +493,7 @@ def checkFilter(keywords, filter, string, query):
 
 def searchJobsCustomQuery(auth, companyID, query, fields=None) -> Callback:
     try:
+
         if not fields:
             fields = "fields=id,title,publicDescription,address,employmentType,salary,skills,yearsRequired,startDate,dateEnd"
 
@@ -551,24 +553,68 @@ def getAllJobs(auth, companyID, fields=None) -> Callback:
         return Callback(False, str(exc))
 
 
-def produceRecruitmentValueReport(companyID) -> Callback:
+def produceRecruiterValueReport(crm: CRM, companyID) -> Callback:
     try:
-        crm = db.session.query(CRM) \
-            .filter(and_(CRM.CompanyID == companyID, CRM.Type == "Bullhorn")).first()
-        if not crm:
-            raise Exception("CRM not found")
 
         getJobs_callback: Callback = searchJobsCustomQuery(
             crm.Auth, companyID,
-            "query=employmentType:\"permanent\" AND status:\"accepting candidates\""
-            "fields=dateAdded,title,clientCorporation,salary,feeArrangement")
+            "query=employmentType:\"permanent\" AND status:\"accepting candidates\"",
+            "fields=dateAdded,title,clientCorporation,salary,feeArrangement,owner")
         if not getJobs_callback.Success:
             raise Exception("Jobs could not be retrieved")
 
-        return_body = getJobs_callback.Data
+        def extractName(json):
+            return int(json["owner"]["id"])
 
-        return Callback(True, "Report information has been retrieved", return_body)
+        return_body = getJobs_callback.Data["data"]
+        return_body.sort(key=extractName, reverse=True)
+
+        def getTotalPipeline(result, previousUser):
+            if len(result.keys()) > 0:
+                totalPipeline = 0
+                for pRecord in result[previousUser]:
+                    totalPipeline += float(pRecord[-1])
+                result[previousUser].append(["", "", "", "", "", previousUser + " Total Pipeline Value",
+                                             totalPipeline])
+            return result
+
+        titles = ["User Assigned", "Date Added", "Title", "Client Corporation", "Salary", "Fee Arrangement",
+                            "Pipeline Value"]
+
+        data = {}
+        previousUser = None
+        for record in return_body:
+            tempRecord = data.get(record["owner"]["firstName"] + " " + record["owner"]["lastName"])
+            if not tempRecord:
+                tempRecord = []
+                data = getTotalPipeline(data, previousUser)
+
+            tempRecord.append([
+                record["owner"]["firstName"] + " " + record["owner"]["lastName"],
+                datetime.fromtimestamp(int(str(record["dateAdded"])[:-3])),
+                record["title"],
+                record["clientCorporation"].get("name"),
+                record["salary"],
+                str(float(record["feeArrangement"])*100) + "%",
+                float(record["salary"]) * float(record["feeArrangement"])
+            ])
+            previousUser = record["owner"]["firstName"] + " " + record["owner"]["lastName"]
+
+            data[previousUser] = tempRecord
+        data = getTotalPipeline(data, previousUser)
+
+        nestedList = [titles]
+
+        totalPipelineValue = 0
+        for key, value in data.items():
+            for csvLine in value:
+                nestedList.append(csvLine)
+            totalPipelineValue += float(value[-1][-1])
+
+        nestedList = [["", "", "", "", "", "Overall Total Pipeline Value", totalPipelineValue]] + nestedList
+
+        return Callback(True, "Report information has been retrieved", nestedList)
 
     except Exception as exc:
-        logging.error("CRM.Bullhorn.getAllJobs() ERROR: " + str(exc))
-        return Callback(False, str(exc))
+        logging.error("CRM.Bullhorn.produceRecruiterValueReport() ERROR: " + str(exc))
+        return Callback(False, "Error in creating report")

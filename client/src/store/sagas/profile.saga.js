@@ -1,9 +1,7 @@
-import {put, takeLatest, all} from 'redux-saga/effects'
+import {put, takeLatest, all, takeEvery} from 'redux-saga/effects'
 import * as actionTypes from '../actions/actionTypes';
 import {profileActions} from "../actions";
-import {http, updateUsername} from "helpers";
-import {loadingMessage, errorMessage, successMessage} from "helpers/alert";
-
+import {http, updateUsername, errorMessage, successMessage, loadingMessage} from "helpers";
 
 
 function* getProfileData() {
@@ -21,7 +19,6 @@ function* getProfileData() {
         yield put(profileActions.getProfileFailure(msg));
         errorMessage(msg);
     }
-
 }
 
 function* saveProfileData(action) {
@@ -70,6 +67,43 @@ function* changePassword({newPassword, oldPassword}) {
     }
 }
 
+function* uploadLogo({file}) {
+    try {
+        loadingMessage('Uploading logo', 0);
+        const res = yield http.post(`/company/logo`, file);
+        yield successMessage('Logo uploaded');
+        yield put(profileActions.uploadLogoSuccess(res.data?.data));
+
+    } catch (error) {
+        console.log(error);
+        const msg = "Couldn't upload logo";
+        errorMessage(msg);
+        yield put(profileActions.uploadLogoFailure(msg));
+    }
+}
+
+function* deleteLogo() {
+    try {
+        loadingMessage('Deleting logo', 0);
+        const res = yield http.delete(`/company/logo`);
+        successMessage('Logo deleted');
+        yield put(profileActions.deleteLogoSuccess());
+
+    } catch (error) {
+        console.log(error);
+        const msg = "Can't delete logo";
+        errorMessage(msg);
+        yield put(profileActions.deleteLogoFailure(msg));
+    }
+}
+
+function* watchUploadLogo() {
+    yield takeEvery(actionTypes.UPLOAD_LOGO_REQUEST, uploadLogo)
+}
+
+function* watchDeleteLogo() {
+    yield takeEvery(actionTypes.DELETE_LOGO_REQUEST, deleteLogo)
+}
 
 function* watchProfileRequests(){
     yield takeLatest(actionTypes.GET_PROFILE_REQUEST, getProfileData)
@@ -93,5 +127,7 @@ export function* profileSaga() {
         watchProfileUpdates(),
         watchDataSettingsUpdates(),
         watchChangePassword(),
+        watchUploadLogo(),
+        watchDeleteLogo(),
     ])
 }

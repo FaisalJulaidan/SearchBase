@@ -11,7 +11,7 @@ import logging, enums
 def getChatbot(assistantHashID) -> Callback:
     try:
 
-        callback: Callback = assistant_services.getAssistantByHashID(assistantHashID)
+        callback: Callback = assistant_services.getByHashID(assistantHashID)
         if not callback.Success:
             return Callback(False, "Assistant not found!")
         assistant = helpers.getDictFromSQLAlchemyObj(callback.Data)
@@ -120,7 +120,7 @@ def isValidBlock(block: dict, blockType: str):
 
 # This function will be used to replace all enum.name to enums.value
 # flow is passed by reference so no need to return  a new one
-def parseFlow (flow: dict):
+def parseFlow(flow: dict):
     try:
         for group in flow['groups']:
             for block in group['blocks']:

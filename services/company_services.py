@@ -1,5 +1,9 @@
-from models import db, Callback, Company, User, Role
+from models import db, Callback, Company, User
+from services import stored_file_services
+from utilities import helpers
+from werkzeug.utils import secure_filename
 import logging , stripe
+
 
 
 def create(name, url, ownerEmail) -> Company or None:
@@ -47,18 +51,7 @@ def getByID(id) -> Company or None:
                         'Company with ID ' + str(id) + ' does not exist')
 
 
-def getAll() -> list or None:
-    try:
-        return db.session.query(Company)
-    except Exception as exc:
-        logging.error("company_service.getAll(): " + str(exc))
-        db.session.rollback()
-        return None
-
-
-
 def removeByName(name) -> bool:
-
     try:
         db.session.query(Company).filter(Company.Name == name).delete()
         db.session.commit()
@@ -99,7 +92,6 @@ def getByCompanyID(id) -> Callback:
         return Callback(False, 'Company could not be retrieved')
 
 
-
 def getByStripeID(id) -> Callback:
     try:
         # Get result and check if None then raise exception
@@ -128,3 +120,59 @@ def updateCompany(companyName, companyID):
         logging.error("company_service.updateCompany(): " + str(exc))
         db.session.rollback()
         return Callback(False, "Company cold not be updated")
+
+# ----- Logo Operations ----- #
+def uploadLogo(file, companyID):
+    try:
+
+        company: Company = getByCompanyID(companyID).Data
+        if not company: raise Exception
+
+        # Generate unique name: hash_sessionIDEncrypted.extension
+        filename = helpers.encode_id(companyID) + '.' + \
+                   secure_filename(file.filename).rsplit('.', 1)[1].lower()
+        company.LogoPath = filename
+
+        # Upload file to cloud Space
+        upload_callback : Callback = stored_file_services.uploadFile(file,
+                                                                     filename,
+                                                                     stored_file_services.COMPANY_LOGOS_PATH,
+                                                                     public=True)
+        if not upload_callback.Success:
+            raise Exception(upload_callback.Message)
+
+        db.session.commit()
+
+        return Callback(True, 'Logo uploaded successfully.', filename)
+
+    except Exception as exc:
+        print("company_service.uploadLogo(): ", exc)
+        logging.error("company_service.uploadLogo(): " + str(exc))
+        db.session.rollback()
+        return Callback(False, 'Error in uploading logo.')
+
+
+def deleteLogo(companyID):
+    try:
+
+        company: Company = getByCompanyID(companyID).Data
+        if not company: raise Exception
+
+
+        logoPath = company.LogoPath
+        if not logoPath: return Callback(False, 'No logo to delete')
+
+        # Delete file from cloud Space and reference from database
+        company.LogoPath = None
+        delete_callback : Callback = stored_file_services.deleteFile(logoPath,
+                                                                     stored_file_services.COMPANY_LOGOS_PATH)
+        if not delete_callback.Success:
+            raise Exception(delete_callback.Message)
+
+        db.session.commit()
+        return Callback(True, 'Logo deleted successfully.')
+
+    except Exception as exc:
+        logging.error("company_service.deleteLogo(): " + str(exc))
+        db.session.rollback()
+        return Callback(False, 'Error in deleting logo.')

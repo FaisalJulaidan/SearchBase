@@ -1,0 +1,43 @@
+.Title {
+  padding-top: 10px;
+  display: flex;
+}
+
+.Table{
+  width: 100%;
+}
+.Details {
+  width: calc(100% - 95px);
+}
+
+.Details h1,
+.DetailsWithAvatar h2 {
+  margin-bottom: 0;
+}
+
+.Details > div,
+.DetailsWithAvatar > div {
+  font-size: 17px;
+}
+
+.Body {
+  display: flex;
+  display: -webkit-flex; /* Safari 8 */
+  flex-wrap: wrap;
+  -webkit-flex-wrap: wrap; /* Safari 8 */
+
+  justify-content: center;
+  -webkit-justify-content: center; /* Safari 8 */
+}
+
+.CheckBox {
+  float: left;
+  line-height: 2.4;
+  margin-right: 20px;
+}
+
+.BlurContent {
+  -webkit-filter: url(#svg-blur);
+  filter: url(#svg-blur);
+  pointer-events: none;
+}

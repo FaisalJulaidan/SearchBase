@@ -129,13 +129,13 @@ const createSaga = (sagaName, actionName) => {
     return `COPY AND PASTE THIS IN .saga.js file:
     
     function* ${placeholder_camel}(payload) {
-        const defaultMsg = "CHANGE THIS";
         try {
             // TODO: CHANGE THE HTTP TYPE & API NAME & PAYLOAD 
             const res = yield http.post('TODO', {});
-            successMessage(res.data?.msg || defaultMsg);
+            successMessage(res.data?.msg || CHANGE THIS);
             yield put(${actionFile}.${placeholder_camel}Success());
         } catch (error) {
+            const defaultMsg = "CHANGE THIS";
             let data = error.response?.data;
             errorMessage(data.msg || defaultMsg);
             yield put(${actionFile}.${placeholder_camel}Failure(data.msg || defaultMsg));

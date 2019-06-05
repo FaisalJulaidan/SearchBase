@@ -5,7 +5,6 @@ import {Button} from "antd";
 import PropTypes from 'prop-types';
 import {history} from "helpers";
 
-
 class Header extends Component {
     static contextTypes = {
         router: PropTypes.object

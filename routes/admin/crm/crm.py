@@ -89,8 +89,8 @@ def recruiter_value_report():
 
     if request.method == "POST":
         print("json: ", request.json)
-        data_callback: Callback = crm_services.produceRecruitmentValueReport(user.get("companyID"),
-                                                                             request.json.get("crm_name"))
+        data_callback: Callback = crm_services.produceRecruiterValueReport(user.get("companyID"),
+                                                                           request.json.get("crm_type"))
         if not data_callback.Success:
             return helpers.jsonResponse(False, 400, data_callback.Message)
 

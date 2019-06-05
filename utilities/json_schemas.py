@@ -27,13 +27,15 @@ conversation = {
             "required": ["blockID", "questionText", "dataType", "input", "keywords"],
             "additionalProperties": False
         }},
-        "keywordsByDataType": {"type": "object", "items": {"type": "object"}},
+        "keywordsByDataType": {"type": "object", "items": {"type": "array"}},
         "selectedSolutions": {"type": "array", "items": {
             "type": "object",
             "properties":{
                 "data": {"type": "object"},
                 "databaseType": {"enum": [e.name for e in enums.DatabaseType]},
             },
+            "required": ["data", "databaseType"],
+            "additionalProperties": False
         }},
     },
     "required": ["collectedData", "keywordsByDataType", "selectedSolutions"],
@@ -116,7 +118,7 @@ UserInput = {
         "afterMessage": {"type": "string"},
         "keywords": {"type": "array", "items": {"type": "string"}},
     },
-    "required": ["text", "action", "afterMessage", "blockToGoID", "keywords"],
+    "required": ["text", "action", "afterMessage", "blockToGoID"], #, "keywords"
     "additionalProperties": False
 }
 

@@ -85,6 +85,47 @@ const changePasswordFailure = (error) => {
     }
 };
 
+const uploadLogo = (file) => {
+    return {
+        type: actionTypes.UPLOAD_LOGO_REQUEST,
+        file
+    };
+};
+
+const uploadLogoSuccess = (UpdatedLogoPath) => {
+    return {
+        type: actionTypes.UPLOAD_LOGO_SUCCESS,
+        UpdatedLogoPath
+    };
+};
+
+const uploadLogoFailure = (error) => {
+    return {
+        type: actionTypes.UPLOAD_LOGO_FAILURE,
+        error
+    };
+};
+
+const deleteLogo = () => {
+    return {
+        type: actionTypes.DELETE_LOGO_REQUEST,
+    };
+};
+
+const deleteLogoSuccess = (msg) => {
+    return {
+        type: actionTypes.DELETE_LOGO_SUCCESS,
+        msg
+    };
+};
+
+const deleteLogoFailure = (error) => {
+    return {
+        type: actionTypes.DELETE_LOGO_FAILURE,
+        error
+    };
+};
+
 export const profileActions = {
     getProfile,
     getProfileSuccess,
@@ -99,4 +140,12 @@ export const profileActions = {
     changePassword,
     changePasswordSuccess,
     changePasswordFailure,
+
+    uploadLogo,
+    uploadLogoSuccess,
+    uploadLogoFailure,
+
+    deleteLogo,
+    deleteLogoSuccess,
+    deleteLogoFailure,
 };

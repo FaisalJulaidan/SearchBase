@@ -1,7 +1,7 @@
 import React from 'react'
 import {history} from "helpers";
 import NoHeaderPanel from 'components/NoHeaderPanel/NoHeaderPanel'
-import {Avatar, Breadcrumb, Form, Modal, Tabs, Typography} from 'antd';
+import {Avatar, Breadcrumb, Button, Form, Modal, Tabs, Typography} from 'antd';
 import styles from './Crm.module.less'
 import 'types/CRM_Types';
 import {AdaptFeatures, AdaptFormItems, AdaptHeader} from "./CrmForms/Adapt";
@@ -9,6 +9,7 @@ import {BullhornFeatures, BullhornFormItems, BullhornHeader} from "./CrmForms/Bu
 import VincereFormItems from "./CrmForms/Vincere";
 import {connect} from 'react-redux';
 import {crmActions} from "store/actions";
+import {CSVLink} from "react-csv";
 
 const TabPane = Tabs.TabPane;
 const {Title} = Typography;
@@ -20,7 +21,9 @@ class Crm extends React.Component {
 
     componentWillMount() {
         if (!this.props.location.state)
-            return history.push('/dashboard/crmlist')
+            return history.push('/dashboard/crmlist');
+        const /** @type {CRM}*/crm = this.props.location.state?.crm || {};
+        this.props.dispatch(crmActions.exportRecruiterValueReport({Name: crm.type}))
     }
 
     componentWillReceiveProps(nextProps) {
@@ -34,7 +37,10 @@ class Crm extends React.Component {
             // if there is a crm, check if it is failed or connected
             // and add the ID
             crm.status = nextProps.CRMsList[index].Status ? "CONNECTED" : "FAILED";
-            crm.ID = nextProps.CRMsList[index].ID
+            crm.ID = nextProps.CRMsList[index].ID;
+        }
+        if(nextProps.exportData){
+            crm.exportData = nextProps.exportData;
         }
     }
 
@@ -103,6 +109,13 @@ class Crm extends React.Component {
                         </Breadcrumb.Item>
                         <Breadcrumb.Item>{crm.type}</Breadcrumb.Item>
                     </Breadcrumb>
+
+                    {crm.type === "Bullhorn" ? <><br/>
+                        <Button className={styles.Panel_Header_Button} type="primary" icon="download"
+                                loading={crm.exportData===undefined}>
+                            <CSVLink filename={"Recruiter Pipeline Report.csv"} data={crm.exportData || []}
+                                     style={{color:"white"}}> Recruiter Pipeline Report</CSVLink>
+                        </Button></> : <></>}
 
                     <br/>
 
@@ -187,6 +200,8 @@ function mapStateToProps(state) {
         isConnecting: state.crm.isConnecting,
         isTesting: state.crm.isTesting,
         isDisconnecting: state.crm.isDisconnecting,
+        isLoading: state.crm.isLoading,
+        exportData: state.crm.exportData
     };
 }
 

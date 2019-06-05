@@ -3,12 +3,10 @@ import {Button, Card, Col, Row, Switch} from 'antd';
 import {Link} from "react-router-dom";
 import AssistantSettings from "./AssistantSettings/AssistantSettings";
 import CRM from "./CRM/CRM";
+import SelectAutoPilotModal from "./SelectAutoPilotModal/SelectAutoPilotModal";
 import './Assistant.less';
 import AuroraBlink from "components/AuroraBlink/AuroraBlink";
 import {getLink} from "helpers";
-
-const {Meta} = Card;
-
 
 const covers = [
     // 'https://42f2671d685f51e10fc6-b9fcecea3e50b3b59bdc28dead054ebc.ssl.cf5.rackcdn.com/illustrations/voice_control_ofo1.svg',
@@ -22,7 +20,8 @@ class Assistant extends Component {
 
     state = {
         assistantSettingsVisible: false,
-        CRMVisible: false
+        CRMVisible: false,
+        selectAutoPilotModalVisible: false
     };
 
 
@@ -32,6 +31,9 @@ class Assistant extends Component {
     showCRMModal = () => this.setState({CRMVisible: true});
     hideCRMModal = () => this.setState({CRMVisible: false});
 
+    showSelectAutoPilotModal = () => this.setState({selectAutoPilotModalVisible: true});
+    hideSelectAutoPilotModal = () => this.setState({selectAutoPilotModalVisible: false});
+
     onActiveChanged = checked => this.props.activateHandler(checked, this.props.assistant.ID);
 
     render() {
@@ -39,7 +41,7 @@ class Assistant extends Component {
         return (
             <>
                 <Card loading={this.props.isLoading}
-                      style={{width: 500, margin: 15, float: 'left', height: 321}}
+                      style={{width: 460, margin: 15, float: 'left', height: 369}}
                       cover={
                           <img alt="example"
                                height={150}
@@ -47,7 +49,13 @@ class Assistant extends Component {
                                src={covers[Math.floor(Math.random() * covers.length)]}/>
                       }
                       title={assistant.Name}
-                      extra={<Switch loading={isStatusChanging} checked={assistant.Active} onChange={this.onActiveChanged}/>}
+                      extra={<Switch loading={isStatusChanging}
+                                     checked={assistant.Active}
+                                     onChange={this.onActiveChanged}
+                                     checkedChildren="On"
+                                     unCheckedChildren="Off"
+                      />
+                      }
                       actions={[]}
                       className={'assistant'}>
 
@@ -109,6 +117,15 @@ class Assistant extends Component {
                             </Link>
                         </Col>
                     </Row>
+
+                    <Row type={'flex'} justify={'center'} gutter={8}>
+                        <Col span={24}>
+                            <Button block icon={'api'}
+                                    onClick={this.showSelectAutoPilotModal}
+                            >Connect Auto Pilot</Button>
+                        </Col>
+
+                    </Row>
                 </Card>
 
                 <AssistantSettings assistant={assistant}
@@ -120,6 +137,11 @@ class Assistant extends Component {
                      CRMsList={this.props.CRMsList}
                      hideModal={this.hideCRMModal}
                      visible={this.state.CRMVisible}/>
+
+                <SelectAutoPilotModal
+                    assistant={assistant}
+                    hideModal={this.hideSelectAutoPilotModal}
+                    selectAutoPilotModalVisible={this.state.selectAutoPilotModalVisible}/>
 
             </>
         )

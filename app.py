@@ -12,16 +12,13 @@ from services.auth_services import jwt
 from utilities import helpers, tasks
 from flask_babel import Babel
 
-from services.scheduler_services import scheduler
 # Import all routers to register them as blueprints
 from routes.admin.routers import profile_router, analytics_router, sub_router, \
     conversation_router, users_router, flow_router, assistant_router,\
-    database_router, options_router, crm_router
-
+    database_router, options_router, crm_router, auto_pilot_router
 from routes.public.routers import public_router, resetPassword_router, chatbot_router, auth_router
 
 app = Flask(__name__, static_folder='static')
-
 
 # Register Routes:
 app.register_blueprint(assistant_router, url_prefix='/api')
@@ -37,6 +34,7 @@ app.register_blueprint(users_router, url_prefix='/api')
 app.register_blueprint(chatbot_router, url_prefix='/api')
 app.register_blueprint(auth_router, url_prefix='/api')
 app.register_blueprint(database_router, url_prefix='/api')
+app.register_blueprint(auto_pilot_router, url_prefix='/api')
 app.register_blueprint(options_router, url_prefix='/api')
 
 
@@ -79,7 +77,7 @@ def run_tasks():
 
 
 print("Run the server...")
-if os.environ['FLASK_ENV'] == 'production':
+if os.environ['FLASK_ENV'] in ['production', 'staging']:
     # Server Setup
     app.config.from_object('config.ProductionConfig')
     url = os.environ['SQLALCHEMY_DATABASE_URI']
@@ -95,7 +93,9 @@ if os.environ['FLASK_ENV'] == 'production':
         db.create_all()
         helpers.seed()
 
+    # Check if staging what to do
     # scheduler.start()
+
     print('Production mode running...')
 
 elif os.environ['FLASK_ENV'] == 'development':
@@ -114,12 +114,10 @@ elif os.environ['FLASK_ENV'] == 'development':
         db.create_all()
         helpers.gen_dummy_data()
 
-    # scheduler.start()
     print('Development mode running...')
 
 else:
-    print("Please set FLASK_ENV first to either 'production' or 'development' in .env file")
-
+    raise Exception("Please set FLASK_ENV first to either 'production', 'development', or 'staging' in .env file")
 
 # Run the migration if in .env, MIGRATION = yes
 if os.environ['MIGRATION'] == 'yes':

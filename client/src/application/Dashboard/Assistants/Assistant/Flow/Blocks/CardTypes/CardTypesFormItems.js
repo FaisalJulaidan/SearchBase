@@ -379,15 +379,12 @@ export const DatabaseTypeFormItem = ({FormItem, block, getFieldDecorator, layout
     </FormItem>
 );
 
-// TODO: add edit record
 export const ScoreFormItem = ({FormItem, layout, block, getFieldDecorator}) => (
     <FormItem label="Score Weight" {...layout}
               extra="Score to be used for ranking candidates">
         {
             getFieldDecorator('scoreWeight', {
-                // initialValue: block.Content.databaseType ?
-                //     options.databases.types.find(type => type === block.Content.databaseType)
-                //     : undefined,
+                initialValue: block.Content.score,
                 rules: [{
                     required: true,
                     message: "Please select score "

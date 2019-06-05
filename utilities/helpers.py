@@ -1,29 +1,30 @@
 from flask import json, after_this_request, request
-from models import db, Role, Company, Assistant, Plan, Conversation, Database, Candidate, Job, CRM
-from services import user_services, flow_services
-from datetime import datetime, timedelta
+from models import db, Role, Company, Assistant, Plan, Conversation, Database, Candidate, Job, CRM,\
+    OpenTimeSlot, AutoPilot, Appointment, Callback
+from services import user_services, flow_services, auto_pilot_services, assistant_services
+from datetime import datetime, timedelta, time
 from enum import Enum
 from hashids import Hashids
 from config import BaseConfig
 from io import BytesIO
 from itsdangerous import URLSafeTimedSerializer
 from cryptography.fernet import Fernet
+from sqlalchemy_utils import Currency
 from jsonschema import validate
 from utilities import json_schemas
 from typing import List
+from flask_jwt_extended import get_jwt_identity
+
 import enums, re, os, stripe, gzip, functools, logging, geoip2.webservice
 
 # will merge with the previous imports if the code is kept - batu
-from models import Callback
-from services import assistant_services
-from flask_jwt_extended import get_jwt_identity
 
 
 # GeoIP Client
 geoIP = geoip2.webservice.Client(140914, 'cKrqAZ675SPb')
 
 # Signer
-verificationSigner = URLSafeTimedSerializer(BaseConfig.SECRET_KEY)
+verificationSigner = URLSafeTimedSerializer(os.environ['SECRET_KEY_TEMP'])
 
 # Configure logging system
 logging.basicConfig(filename='logs/errors.log',
@@ -63,8 +64,8 @@ def gen_dummy_data():
     db.session.add(Company(Name='Sabic', URL='ff.com', StripeID='cus_DbgKupMRLNYXly'))
 
     # Get Companies
-    aramco = Company.query.filter(Company.Name == "Aramco").first()
-    sabic = Company.query.filter(Company.Name == "Sabic").first()
+    aramco: Company = Company.query.filter(Company.Name == "Aramco").first()
+    sabic: Company = Company.query.filter(Company.Name == "Sabic").first()
 
     # Create and validate a flow for an assistant
 
@@ -73,6 +74,7 @@ def gen_dummy_data():
     reader_a = Assistant(Name="Reader", Message="Hey there",
                          TopBarText="Aramco Bot", SecondsUntilPopup=1,
                          Active=True, Company=aramco)
+
     flow = {
         "groups": [
             {
@@ -283,15 +285,15 @@ def gen_dummy_data():
                                "Availability": ["Only weekend days"],
                                "No Type": ["I am fine thank you"]}
     }
-    s1 = Conversation(Data=data, DateTime=datetime.now(),
+    conversation1 = Conversation(Data=data, DateTime=datetime.now(),
                       TimeSpent=55, SolutionsReturned=2, QuestionsAnswered=3,
                       UserType=enums.UserType.Candidate, Score= 1,
-                      Status=enums.ConversationStatus.Accepted, Assistant=reader_a)
-    db.session.add(s1)
+                      ApplicationStatus=enums.ApplicationStatus.Accepted, Assistant=reader_a)
+    db.session.add(conversation1)
     db.session.add(Conversation(Data=data, DateTime=datetime.now(),
                                 TimeSpent=120, SolutionsReturned=20, QuestionsAnswered=7,
                                 UserType=enums.UserType.Client, Score= 0.05, Completed=False,
-                                Status=enums.ConversationStatus.Rejected, Assistant=reader_a))
+                                ApplicationStatus=enums.ApplicationStatus.Rejected, Assistant=reader_a))
 
     # add chatbot session in bulk
     for i in range(50):
@@ -315,6 +317,9 @@ def gen_dummy_data():
     db.session.add(addCandidate(db2, 'Ahmed', 1500, "Web Developer", "html,css, javascript",
                                 2, "Cardiff"))
 
+    for i in list(range(120)):
+        db.session.add(addCandidate(db1, 'Ahmed', 1500, "Web Developer", "html,css, javascript",
+                                    2, "Cardiff"))
 
     # Add CRM conncetion for aramco company
     db.session.add(CRM(Type=enums.CRM.Adapt, Company=aramco, Auth={
@@ -327,6 +332,20 @@ def gen_dummy_data():
         "dateFormat": 0,
         "timeFormat": 0}))
 
+    # Create an AutoPilot for a Company
+    auto_pilot_services.create('First Pilot',
+                               "First pilot to automate the acceptance and rejection of candidates application",
+                               aramco.ID)
+    auto_pilot_services.create('Second Pilot', '', aramco.ID)
+    reader_a.AutoPilot = auto_pilot_services.getByID(1,1).Data
+
+    # Add Appointment
+    a = Appointment(DateTime=datetime.now() + timedelta(days=5),
+                    Conversation=conversation1, Assistant=reader_a)
+
+    db.session.add(a)
+
+
     seed() # will save changes as well
 
 
@@ -338,7 +357,9 @@ def addCandidate(db, name, desiredSalary, jobTitle, skills, exp, location):
                      CandidateJobTitle=jobTitle,
                      CandidateSkills =skills,
                      CandidateYearsExperience = exp,
-                     CandidateLocation = location)
+                     CandidateLocation = location,
+                     Currency= Currency('USD'))
+
 
 
 def seed():
@@ -389,27 +410,34 @@ def isValidEmail(email: str) -> bool:
 
 # -------- SQLAlchemy Converters -------- #
 """Convert a SQLAlchemy object to a single dict """
-def getDictFromSQLAlchemyObj(obj):
-    d = {}
+def getDictFromSQLAlchemyObj(obj, excludedColumns: list = None) -> dict:
+
+    dict = {} # Results
+    if not obj: return dict
+
+    # A nested for loop for joining two tables
     for attr in obj.__table__.columns:
         key = attr.name
         if key not in ['Password']:
-            d[key] = getattr(obj, key)
-            if isinstance(d[attr.name], Enum): # Convert Enums
-                d[key] = d[key].value
+            dict[key] = getattr(obj, key)
+            if isinstance(dict[key], Enum): # Convert Enums
+                dict[key] = dict[key].value
 
-            if key == Candidate.Currency.name and d[key]: # Convert Currency
-                d[key] = d[key].code
+            if isinstance(dict[key], time): # Convert Times
+                dict[key] = str(dict[key])
 
-            if key in [Job.JobStartDate.name, Job.JobEndDate.name] and d[key]: # Convert Datetime
-                d[key] = '/'.join(map(str, [d[key].year, d[key].month, d[key].day]))
+            if isinstance(dict[key], Currency): # Convert Currencies
+                dict[key] = dict[key].code
 
-            if key == Assistant.Flow.name and d[key]: # Parse Flow !!
-                flow_services.parseFlow(d[key]) # pass by reference
+            if key in [Job.JobStartDate.name, Job.JobEndDate.name] and dict[key]: # Convert Datetime only for Jobs
+                dict[key] = '/'.join(map(str, [dict[key].year, dict[key].month, dict[key].day]))
+
+            if key == Assistant.Flow.name and dict[key]: # Parse Flow !!
+                flow_services.parseFlow(dict[key]) # pass by reference
 
     if hasattr(obj, "FilePath"):
-        d["FilePath"] = obj.FilePath
-    return d
+        dict["FilePath"] = obj.FilePath
+    return dict
 
 
 """Used when you want to only gather specific data from a table (columns)"""
@@ -448,6 +476,11 @@ def getListFromSQLAlchemyList(SQLAlchemyList):
 
 # ---------------- #
 
+def isStringsLengthGreaterThanZero(*args) -> bool:
+    for arg in args:
+        if len(arg.strip()) == 0:
+            return False
+    return True
 
 
 def jsonResponse(success: bool, http_code: int, msg: str, data=None):

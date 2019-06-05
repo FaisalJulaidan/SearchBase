@@ -21,7 +21,6 @@ def conversation(assistantID):
     security_callback: Callback = assistant_services.getByID(assistantID, user['companyID'])
     if not security_callback.Success:
         return helpers.jsonResponse(False, 404, "Assistant not found.")
-    assistant: Assistant = security_callback.Data
 
     #############
     # Get the assistant's user inputs/chatbot conversation
@@ -52,6 +51,7 @@ def conversation(assistantID):
 @jwt_required
 @helpers.gzipped
 def conversation_file_uploads(assistantID, filename):
+
     # Authenticate
     user = get_jwt_identity()['user']
     # For all type of requests methods, get the assistant
@@ -61,14 +61,14 @@ def conversation_file_uploads(assistantID, filename):
     assistant: Assistant = security_callback.Data
 
     # Security procedure ->
-    # the id of the user input is included in the name of the file after "_" symbol, but encrypted
+    # the id of the Conversation is included in the name of the file after "_" symbol, but encrypted
     try:
         id = helpers.decode_id(filename[filename.index('_') + 1:filename.index('.')])[0]
         if not id: raise Exception
     except Exception as exc:
         return helpers.jsonResponse(False, 404, "File not found.")
 
-    # Get associated chatbotSession with this file
+    # Get associated Conversation with this file
     cs_callback: Callback = conversation_services.getByID(id, assistantID)
     if not cs_callback.Success:
         return helpers.jsonResponse(False, 404, "File not found.")
@@ -80,7 +80,7 @@ def conversation_file_uploads(assistantID, filename):
 
 
     if request.method == "GET":
-        callback: Callback = stored_file_services.downloadFile(filename, '/user_files')
+        callback: Callback = stored_file_services.downloadFile(filename, stored_file_services.USER_FILES_PATH)
         if not callback.Success:
             return helpers.jsonResponse(False, 404, "File not found.")
 

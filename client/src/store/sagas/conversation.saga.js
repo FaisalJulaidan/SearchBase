@@ -3,6 +3,7 @@ import * as actionTypes from '../actions/actionTypes';
 import {conversationActions} from "../actions";
 import {http, successMessage, errorMessage, loadingMessage} from "helpers";
 
+
 function* fetchConversations({assistantID}) {
     try {
         const res = yield http.get(`/assistant/${assistantID}/conversations`);
@@ -40,7 +41,7 @@ function* watchDeleteConversation() {
 
 function* clearAllConversations({assistantID}) {
     try {
-        loadingMessage('Removing all conversation...', 0);
+        loadingMessage('Removing all conversations...', 0);
         const res = yield http.delete(`/assistant/${assistantID}/conversation`);
         yield put(conversationActions.clearAllConversationsSuccess());
         successMessage('All conversation cleared');

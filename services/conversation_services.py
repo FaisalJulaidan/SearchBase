@@ -1,3 +1,4 @@
+import logging
 from datetime import datetime, timedelta
 from typing import List
 
@@ -5,60 +6,71 @@ from jsonschema import validate
 from sqlalchemy.sql import and_
 from sqlalchemy.sql import desc
 
+from enums import UserType, ApplicationStatus
 from models import db, Callback, Conversation, Assistant
-from services import assistant_services, stored_file_services, databases_services
+from services import assistant_services, stored_file_services, auto_pilot_services
 from services.CRM import crm_services
 from utilities import json_schemas, helpers
-from enums import DatabaseType, UserType, ConversationStatus
-import logging
 
 
 # Process chatbot conversation data
 def processConversation(assistantHashID, data: dict) -> Callback:
-    callback: Callback = assistant_services.getAssistantByHashID(assistantHashID)
-    if not callback.Success:
-        return Callback(False, "Assistant not found!")
-    assistant: Assistant = callback.Data
-
-    # Fetch selected solutions from the database to get their complete details as they were hidden in the chatbot
-    selectedSolutions = []
-    for solution in data['selectedSolutions']:
-        selectedSolutions.append({
-            'data': helpers.decrypt(solution['output'], isDict=True),
-            'databaseType': solution.get('databaseType')['enumName']
-        })
-
-    collectedData = data['collectedData']
-    conversationData = {
-        'collectedData': collectedData,
-        'selectedSolutions': selectedSolutions,
-        'keywordsByDataType': data['keywordsByDataType'],
-    }
-
-    # Validate submitted conversation after adding the modified version of selected solutions
     try:
+        callback: Callback = assistant_services.getByHashID(assistantHashID)
+        if not callback.Success:
+            return Callback(False, "Assistant not found!")
+        assistant: Assistant = callback.Data
+
+        # Fetch selected solutions from the database to get their complete details as they were hidden in the chatbot
+        selectedSolutions = []
+        for solution in data['selectedSolutions']:
+            selectedSolutions.append({
+                'data': helpers.decrypt(solution['output'], isDict=True),
+                'databaseType': solution.get('databaseType')['enumName']
+            })
+
+        collectedData = data['collectedData']
+        conversationData = {
+            'collectedData': collectedData,
+            'selectedSolutions': selectedSolutions,
+            'keywordsByDataType': data['keywordsByDataType'],
+        }
+
+
+        # Validate submitted conversation after adding the modified version of selected solutions
         validate(conversationData, json_schemas.conversation)
-    except Exception as exc:
-        print("conversation_services.processConversation ERROR 1: " + str(exc.args))
-        logging.error("conversation_services.processConversation(): " + str(exc.args))
-        return Callback(False, "The submitted chatbot data doesn't follow the correct format.", exc.args[0])
+        if data['score'] > 1:
+            raise Exception("Score is corrupted")
 
-    try:
         # collectedData is an array, and timeSpent is in seconds.
         conversation = Conversation(Data=conversationData,
-                                      TimeSpent=data['timeSpent'],
-                                      Completed=data['isSessionCompleted'],  # isSessionCompleted -> isConversationCompleted
-                                      SolutionsReturned=data['solutionsReturned'],
-                                      QuestionsAnswered=len(collectedData),
-                                      UserType=UserType[data['userType'].replace(" ", "")],
-                                      Score=data['score'],
-                                      Assistant=assistant)
+                                    TimeSpent=data['timeSpent'],
+                                    Completed=data['isConversationCompleted'],
+                                    SolutionsReturned=data['solutionsReturned'],
+                                    QuestionsAnswered=len(collectedData),
+                                    UserType=UserType[data['userType'].replace(" ", "")],
+                                    Score=round(data['score'], 2),
+                                    Assistant=assistant)
+
+        # AutoPilot Operations
+        if assistant.AutoPilot:
+            ap_callback: Callback = auto_pilot_services.processConversation(conversation, assistant.AutoPilot)
+            if ap_callback.Success:
+                conversation.AutoPilotStatus = True
+                conversation.ApplicationStatus = ap_callback.Data['applicationStatus']
+                conversation.AcceptanceEmailSentAt = ap_callback.Data['acceptanceEmailSentAt']
+                conversation.RejectionEmailSentAt = ap_callback.Data['rejectionEmailSentAt']
+                # conversation.AppointmentEmailSentAt = ap_callback.Data['appointmentEmailSentAt']
+            conversation.AutoPilotResponse = ap_callback.Message
+
+
         # CRM integration
         if assistant.CRM:
             crm_callback: Callback = crm_services.processConversation(assistant, conversation)
             if crm_callback.Success:
                 conversation.CRMSynced = True
             conversation.CRMResponse = crm_callback.Message
+
 
         db.session.add(conversation)
         db.session.commit()
@@ -74,8 +86,8 @@ def processConversation(assistantHashID, data: dict) -> Callback:
 # ----- Getters ----- #
 def getAllByAssistantID(assistantID):
     try:
-        conversations: List[Conversation] = db.session.query(Conversation).filter(
-            Conversation.AssistantID == assistantID) \
+        conversations: List[Conversation] = db.session.query(Conversation)\
+            .filter(Conversation.AssistantID == assistantID) \
             .order_by(desc(Conversation.DateTime)).all()
 
 
@@ -113,12 +125,13 @@ def getByID(conversationID, assistantID):
         db.session.rollback()
         return Callback(False, 'Could not retrieve the conversation.')
 
+
 # ----- Updaters ----- #
 def updateStatus(conversationID, assistantID, newStatus):
     try:
         db.session.query(Conversation)\
             .filter(and_(Conversation.AssistantID == assistantID, Conversation.ID == conversationID))\
-            .update({'Status': ConversationStatus[newStatus] })
+            .update({'ApplicationStatus': ApplicationStatus[newStatus]})
 
         db.session.commit()
         return Callback(True, 'Status updated Successfully')

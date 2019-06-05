@@ -85,6 +85,27 @@ const disconnectCrmFailure = (error) => {
     };
 };
 
+const exportRecruiterValueReport = (connectedCRM_Type) => {
+    return {
+        type: actionTypes.EXPORT_RECRUITER_VALUE_REPORT_REQUEST,
+        connectedCRM_Type
+    };
+};
+
+const exportRecruiterValueReportSuccess = (exportData) => {
+    return {
+        type: actionTypes.EXPORT_RECRUITER_VALUE_REPORT_SUCCESS,
+        exportData
+    };
+};
+
+const exportRecruiterValueReportFailure = (error) => {
+    return {
+        type: actionTypes.EXPORT_RECRUITER_VALUE_REPORT_FAILURE,
+        error
+    };
+};
+
 
 export const crmActions = {
     getConnectedCRMs,
@@ -103,5 +124,8 @@ export const crmActions = {
     disconnectCrmSuccess,
     disconnectCrmFailure,
 
+    exportRecruiterValueReport,
+    exportRecruiterValueReportSuccess,
+    exportRecruiterValueReportFailure
 
 };

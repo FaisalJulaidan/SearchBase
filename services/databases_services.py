@@ -179,7 +179,7 @@ def getAllCandidates(dbID, page) -> dict:
     try:
         result = db.session.query(Candidate) \
             .filter(Candidate.DatabaseID == dbID) \
-            .paginate(page=page, error_out=False, per_page=100)
+            .paginate(page=page, error_out=False, per_page=20)
 
         data = {
             'records': helpers.getListFromSQLAlchemyList(result.items),
@@ -200,7 +200,7 @@ def getAllJobs(dbID, page) -> dict:
     try:
         result = db.session.query(Job) \
             .filter(Job.DatabaseID == dbID) \
-            .paginate(page=page, error_out=False, per_page=100)
+            .paginate(page=page, error_out=False, per_page=20)
 
         data = {
             'records': helpers.getListFromSQLAlchemyList(result.items),
@@ -236,7 +236,7 @@ def deleteDatabase(databaseID, companyID) -> Callback:
 def scan(session, assistantHashID):
     try:
 
-        callback: Callback = assistant_services.getAssistantByHashID(assistantHashID)
+        callback: Callback = assistant_services.getByHashID(assistantHashID)
         if not callback.Success:
             return Callback(False, "Assistant not found!")
         assistant: Assistant = callback.Data
@@ -519,19 +519,3 @@ def createPandaJob(id, title, desc, location, type, salary: float, essentialSkil
             "Score": 0,
             "Source": source,
             }
-
-
-def getOptions() -> Callback:
-    options = {
-        'types': [dt.name for dt in enums.DatabaseType],
-        enums.DatabaseType.Candidates.name: [{'column': c.key, 'type': str(c.type), 'nullable': c.nullable}
-                                             for c in Candidate.__table__.columns
-                                             if (c.key != 'ID' and c.key != 'DatabaseID')],
-        enums.DatabaseType.Jobs.name: [{'column': c.key, 'type': str(c.type), 'nullable': c.nullable}
-                                       for c in Job.__table__.columns
-                                       if (c.key != 'ID' and c.key != 'DatabaseID')],
-        'currencyCodes': ['GBP', 'USD', 'EUR', 'AED', 'CAD']
-    }
-    return Callback(True, '', options)
-
-

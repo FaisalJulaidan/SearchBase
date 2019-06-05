@@ -1,15 +1,19 @@
 import React, {Component} from 'react';
-import {Card, Divider, Form} from "antd";
-import {getInitialVariables, initActionType, getBlockId, initActionTypeSkip} from './CardTypesHelpers'
+import {Card, Divider, Form, Icon, Input, Tag, Tooltip} from "antd";
+import {getInitialVariables, initActionType, initActionTypeSkip} from './CardTypesHelpers'
 import {
     ActionFormItem,
     AfterMessageFormItem,
     ButtonsForm,
     DataTypeFormItem,
     QuestionFormItem,
-    ShowGoToBlockFormItem, ShowGoToBlockSkipFormItem,
-    ShowGoToGroupFormItem, ShowGoToGroupSkipFormItem, SkipFormItem,
-    SkippableFormItem, SkipTextFormItem,
+    ShowGoToBlockFormItem,
+    ShowGoToBlockSkipFormItem,
+    ShowGoToGroupFormItem,
+    ShowGoToGroupSkipFormItem,
+    SkipFormItem,
+    SkippableFormItem,
+    SkipTextFormItem,
     StoreInDBFormItem
 } from './CardTypesFormItems'
 
@@ -24,6 +28,10 @@ class UserInput extends Component {
         showGoToBlockSkip: false,
         showGoToGroupSkip: false,
 
+        tags: [],
+        inputVisible: false,
+        inputValue: '',
+
     };
 
     componentDidMount() {
@@ -32,7 +40,8 @@ class UserInput extends Component {
         this.setState({
             ...initActionType(block, this.props.modalState.allGroups),
             ...initActionTypeSkip(block, this.props.modalState.allGroups),
-            showSkip: block.Skippable || false
+            showSkip: block.Skippable || false,
+            tags: block.Content.keywords || []
         });
     }
 
@@ -54,7 +63,8 @@ class UserInput extends Component {
                     text: values.text,
                     blockToGoID: values.blockToGoID || values.blockToGoIDGroup || null,
                     action: values.action,
-                    afterMessage: values.afterMessage || ""
+                    afterMessage: values.afterMessage || "",
+                    keywords: this.state.tags || []
                 }
             };
 
@@ -70,13 +80,26 @@ class UserInput extends Component {
     });
 
 
+    //Tags component's functions
+    removeTag = (removedTag) => this.setState({tags: this.state.tags.filter(tag => tag !== removedTag)});
+    showInput = () => this.setState({inputVisible: true}, () => this.input.focus());
+    handleInputChange = e => this.setState({inputValue: e.target.value});
+    saveInputRef = input => this.input = input;
+    handleInputConfirm = () => {
+        const inputValue = this.state.inputValue;
+        let tags = this.state.tags;
+        if (inputValue && tags.indexOf(inputValue) === -1)
+            tags = [...tags, inputValue];
+        this.setState({tags, inputVisible: false, inputValue: '',});
+    };
+
     render() {
         const {modalState, options, form, handleNewBlock, handleEditBlock, handleDeleteBlock} = this.props;
         const {blockOptions, block} = getInitialVariables(options.flow ,modalState, 'User Input');
         const {allGroups, allBlocks, currentGroup, layout} = modalState;
         const {getFieldDecorator} = form;
 
-        const {showSkip} = this.state;
+        const {tags, inputVisible, inputValue, showSkip} = this.state;
 
         const buttons = ButtonsForm(handleNewBlock, handleEditBlock, handleDeleteBlock, this.onSubmit, block);
 
@@ -92,6 +115,40 @@ class UserInput extends Component {
                                       getFieldDecorator={getFieldDecorator}
                                       options={this.props.options}
                                       layout={layout}/>
+
+                    <FormItem label="Scoring Keywords" {...layout}
+                              extra="Every matched keyword from user input will add up to the score">
+                        <div>
+                            {tags.map((tag) => {
+                                const isLongTag = tag.length > 20;
+                                const tagElem = (
+                                    <Tag key={tag} closable={true} onClose={() => this.removeTag(tag)}>
+                                        {isLongTag ? `${tag.slice(0, 20)}...` : tag}
+                                    </Tag>
+                                );
+                                return isLongTag ? <Tooltip title={tag} key={tag}>{tagElem}</Tooltip> : tagElem;
+                            })}
+                            {inputVisible && (
+                                <Input
+                                    ref={this.saveInputRef}
+                                    type="text"
+                                    size="small"
+                                    style={{width: 78}}
+                                    value={inputValue}
+                                    onChange={this.handleInputChange}
+                                    onBlur={this.handleInputConfirm}
+                                    onPressEnter={this.handleInputConfirm}
+                                />
+                            )}
+                            {!inputVisible && (
+                                <Tag
+                                    onClick={this.showInput}
+                                    style={{background: '#fff', borderStyle: 'dashed'}}>
+                                    <Icon type="plus"/> New Keyword
+                                </Tag>
+                            )}
+                        </div>
+                    </FormItem>
 
                     <ActionFormItem FormItem={FormItem} blockOptions={blockOptions} block={block}
                                     setStateHandler={(state) => this.setState(state)}

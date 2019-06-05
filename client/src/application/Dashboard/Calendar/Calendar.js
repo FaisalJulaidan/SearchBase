@@ -2,57 +2,44 @@ import React from 'react';
 import {connect} from 'react-redux';
 import styles from './Calendar.module.less'
 import NoHeaderPanel from 'components/NoHeaderPanel/NoHeaderPanel'
-import {Badge, Calendar as AntdCalendar, Col, Divider, Drawer, Icon, Row, Typography} from 'antd';
+import {Badge, Calendar as AntdCalendar, Col, Divider, Icon, Input, Modal, Row, Typography} from 'antd';
 import moment from 'moment';
 import './Calendar.less'
 
 const {Title, Paragraph} = Typography;
-
-const pStyle = {
-    fontSize: 16,
-    color: 'rgba(0,0,0,0.85)',
-    lineHeight: '24px',
-    display: 'block',
-    marginBottom: 16,
-};
-
-const DescriptionItem = ({title, content}) => (
-    <div
-        style={{
-            fontSize: 14,
-            lineHeight: '22px',
-            marginBottom: 7,
-            color: 'rgba(0,0,0,0.65)',
-        }}
-    >
-        <p
-            style={{
-                marginRight: 8,
-                display: 'inline-block',
-                color: 'rgba(0,0,0,0.85)',
-            }}
-        >
-            {title}:
-        </p>
-        {content}
-    </div>
-);
+const { TextArea } = Input;
 
 class Calendar extends React.Component {
 
     state = {
         value: moment(),
         visible: false,
-        drawerData: []
+        appointments: [
+            {
+                name: "Jamie Burns",
+                dateTime: 'Mon, 27 May 2019 23:13:45 GMT',
+                notes: "This is a good candidate and fits very well in big projects"
+            }, {
+                name: "Emilio Blake",
+                dateTime: 'Mon, 27 May 2019 23:13:45 GMT',
+                notes: null
+            }, {
+                name: "Marvin Williamson",
+                dateTime: 'Mon, 27 May 2019 23:13:45 GMT',
+                notes: null
+            },
+        ]
     };
 
-    onCloseDrawer = () => this.setState({visible: false, drawerData: []});
+    onCloseModal = () => {
+        this.setState({visible: false});
+    };
 
     onSelect = value => {
         const x = this.getListData(value);
 
         if (x.length)
-            this.setState({value, visible: true, drawerData: x});
+            this.setState({value, visible: true});
         else
             this.setState({value});
     };
@@ -64,23 +51,12 @@ class Calendar extends React.Component {
         switch (value.date()) {
             case 8:
                 listData = [
-                    {type: 'warning', content: 'Candidate appointment'},
-                    {type: 'success', content: 'Client xyz'},
+                    {type: 'warning', content: '2 Appointments'},
                 ];
                 break;
             case 10:
                 listData = [
-                    {type: 'warning', content: 'Candidate appointment baz'},
-                    {type: 'success', content: 'Client xyz foo'},
-                    {type: 'warning', content: 'Candidate appointment foo'},
-                    {type: 'warning', content: 'Candidate appointment bar'},
-                    {type: 'success', content: 'Client xyz bar'},
-                ];
-                break;
-            case 15:
-                listData = [
-                    {type: 'success', content: 'Client xyz'},
-                    {type: 'warning', content: 'Candidate appointment'},
+                    {type: 'warning', content: '1 Appointment'},
                 ];
                 break;
             default:
@@ -120,7 +96,6 @@ class Calendar extends React.Component {
 
     render() {
         const {value} = this.state;
-
         return (
             <NoHeaderPanel>
                 <div className={styles.Title}>
@@ -132,49 +107,36 @@ class Calendar extends React.Component {
                     </div>
                 </div>
 
-                <div className={styles.Body}>
+                <div>
                     <AntdCalendar value={value} onSelect={this.onSelect} onPanelChange={this.onPanelChange}
                                   dateCellRender={this.dateCellRender} monthCellRender={this.monthCellRender}/>
 
-                    <Drawer title="Basic Drawer"
-                            placement="right"
-                            width={640}
-                            closable={false}
-                            onClose={this.onCloseDrawer}
-                            visible={this.state.visible}>
+                    <Modal title="Appointments Details"
+                           width={640}
+                           className={'custom_calendar'}
+                           onCancel={this.onCloseModal}
+                           onOk={this.onCloseModal}
+                           okText="Save"
+                           cancelText="Cancel"
+                           visible={this.state.visible}>
                         {
-                            this.state.drawerData.map((i, k) =>
-                                <div key={k}>
-                                    <p style={pStyle}>Personal</p>
-                                    <Row>
-                                        <Col span={12}>
-                                            <DescriptionItem title="Full Name" content="Lily"/>{' '}
-                                        </Col>
-                                        <Col span={12}>
-                                            <DescriptionItem title="Account" content="AntDesign@example.com"/>
-                                        </Col>
-                                    </Row>
-                                    <Row>
-                                        <Col span={12}>
-                                            <DescriptionItem title="City" content="HangZhou"/>
-                                        </Col>
-                                        <Col span={12}>
-                                            <DescriptionItem title="Country" content="China🇨🇳"/>
-                                        </Col>
-                                    </Row>
-                                    <Row>
-                                        <Col span={12}>
-                                            <DescriptionItem title="Birthday" content="February 2,1900"/>
-                                        </Col>
-                                        <Col span={12}>
-                                            <DescriptionItem title="Website" content="-"/>
-                                        </Col>
-                                    </Row>
+                            this.state.appointments.map((a, index) =>
+                                <div key={index}>
+                                    {console.log(a.name)}
+                                    <Title level={4}>{a.name}</Title>
                                     <Row>
                                         <Col span={24}>
-                                            <DescriptionItem
-                                                title="Message"
-                                                content="Make things as simple as possible but no simpler."
+                                            <p>
+                                                <b>Date & Time: </b>
+                                                <span style={{color:'#9254de'}}>{a.dateTime}</span>
+                                            </p>
+                                        </Col>
+                                        <Col span={24}>
+                                            <p><b>Notes:</b></p>
+                                            <TextArea
+                                                placeholder="Write your notes here..."
+                                                autosize={{ minRows: 2, maxRows: 6 }}
+                                                value={a.notes}
                                             />
                                         </Col>
                                     </Row>
@@ -182,7 +144,7 @@ class Calendar extends React.Component {
                                 </div>
                             )
                         }
-                    </Drawer>
+                    </Modal>
                 </div>
             </NoHeaderPanel>
         );

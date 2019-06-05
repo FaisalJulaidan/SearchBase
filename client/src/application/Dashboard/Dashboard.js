@@ -1,22 +1,11 @@
-import React, {Component} from 'react';
+import React, {Component, lazy, Suspense} from 'react';
 
 import {Avatar, Dropdown, Icon, Layout, Menu} from 'antd';
 import "./Dashboard.less"
 import styles from "./Dashboard.module.less"
-import Assistants from './Assistants/Assistants';
-import Databases from './Databases/Databases';
+
 import {getUser, history} from "helpers";
 import {Route, Switch, withRouter} from 'react-router-dom';
-import Flow from "./Assistants/Assistant/Flow/Flow";
-import Profile from "./AccountDetails/Profile/Profile";
-import Billing from "./AccountDetails/Billing/Billing";
-import UsersManagement from "./AccountDetails/UsersManagement/UsersManagement";
-import Documentation from "./Documentation/Documentation";
-import Integration from "./Assistants/Assistant/Integration/Integration";
-import Conversations from "./Assistants/Assistant/Conversations/Conversations";
-import Calendar from './Calendar/Calendar'
-import Home from "./Home/Home";
-import Analytics from "./Assistants/Assistant/Analytics/Analytics";
 import {authActions, optionsActions} from "store/actions";
 import {store} from "store/store";
 import {connect} from 'react-redux';
@@ -25,9 +14,26 @@ import {CSSTransition, TransitionGroup} from "react-transition-group";
 
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
 import {faCloud} from '@fortawesome/free-solid-svg-icons'
-import CRM from "./Assistants/Assistant/CRM/CRM";
-import Crms from "./Crms/Crms";
-import Crm from "./Crms/Crm/Crm";
+
+const Home = lazy(() => import('./Home/Home'));
+const Assistants = lazy(() => import('./Assistants/Assistants'));
+const AssistantCRM = lazy(() => import('./Assistants/Assistant/CRM/CRM'));
+const Databases = lazy(() => import('./Databases/Databases'));
+const DatabasesConfigs = lazy(() => import('./Databases/Database/Database'));
+const Analytics = lazy(() => import('./Assistants/Assistant/Analytics/Analytics'));
+const Flow = lazy(() => import('./Assistants/Assistant/Flow/Flow'));
+const Profile = lazy(() => import('./AccountDetails/Profile/Profile'));
+const Billing = lazy(() => import('./AccountDetails/Billing/Billing'));
+const UsersManagement = lazy(() => import('./AccountDetails/UsersManagement/UsersManagement'));
+const Documentation = lazy(() => import('./Documentation/Documentation'));
+const Integration = lazy(() => import('./Assistants/Assistant/Integration/Integration'));
+const Conversations = lazy(() => import('./Assistants/Assistant/Conversations/Conversations'));
+const Calendar = lazy(() => import('./Calendar/Calendar'));
+const AutoPilot = lazy(() => import('./AutoPilot/AutoPilot'));
+const AutoPilotConfigs = lazy(() => import('./AutoPilot/AutoPilotConfigs/AutoPilotConfigs'));
+const Crms = lazy(() => import('./Crms/Crms'));
+const Crm = lazy(() => import('./Crms/Crm/Crm'));
+
 
 const {SubMenu} = Menu;
 const {Divider} = Menu;
@@ -99,7 +105,6 @@ class Dashboard extends Component {
                     </Menu.Item>
                 </Menu>
             );
-
             userInfo = (
                 <Dropdown overlay={userInfoMenu} overlayStyle={{width: '255px'}}>
                     {avatar}
@@ -108,8 +113,8 @@ class Dashboard extends Component {
         }
         // End of User Information
 
-        const newLayoutRoutes = ["/dashboard/crmlist", "/dashboard/calendar"];
-        const isNewLyaout = newLayoutRoutes.includes(this.props.location.pathname);
+        const newLayoutRoutes = ["/dashboard/crmlist", "/dashboard/calendar", "/dashboard/auto_pilot", "/dashboard/databases"];
+        const isNewLyaout = newLayoutRoutes.some(a => this.props.location.pathname.indexOf(a) > -1);
         return (
             <Layout style={{height: '100%'}}>
                 <Sider
@@ -160,14 +165,19 @@ class Dashboard extends Component {
                             <span>Assistants</span>
                         </Menu.Item>
 
-                        <Menu.Item key="databases">
-                            <Icon type="database"/>
-                            <span>Databases</span>
+                        <Menu.Item key="auto_pilot">
+                            <Icon type="clock-circle"/>
+                            <span>Auto Pilot</span>
                         </Menu.Item>
 
                         <Menu.Item key="crmlist">
                             <Icon type="interation"/>
                             <span>CRMs List</span>
+                        </Menu.Item>
+
+                        <Menu.Item key="databases">
+                            <Icon type="database"/>
+                            <span>Databases</span>
                         </Menu.Item>
 
                         <Menu.Item key="calendar">
@@ -182,11 +192,13 @@ class Dashboard extends Component {
                                 <Icon type="profile"/>
                                 Profile
                             </Menu.Item>
+
                             {/*<Menu.Item key="billing">*/}
                             {/*<Icon type="pound"/>*/}
                             {/*Billing*/}
                             {/*</Menu.Item>*/}
-                            <Menu.Item key="users-management" style={{fontSize: '9pt'}}>
+
+                            <Menu.Item key="users_management" style={{fontSize: '9pt'}}>
                                 <Icon type="usergroup-add"/>
                                 Users Management
                             </Menu.Item>
@@ -234,28 +246,39 @@ class Dashboard extends Component {
                         <Route render={() =>
                             <TransitionGroup style={{height: '100%'}}>
                                 <CSSTransition key={location.key} classNames="fade" timeout={550}>
-                                    <Switch location={location} style={{height: '100%'}}>
-                                        <Route path={`${match.path}/assistants/:id/script`} component={Flow}/>
-                                        <Route path={`${match.path}/assistants/:id/integration`}
-                                               component={Integration}/>
-                                        <Route path={`${match.path}/assistants/:id/conversations`} component={Conversations}/>
-                                        <Route path={`${match.path}/assistants/:id/analytics`}
-                                               component={Analytics}/>
-                                        <Route path={`${match.path}/assistants/:id/CRMIntegration`}
-                                               component={CRM}/>
-                                        <Route path={`${match.path}/assistants`} component={Assistants} exact/>
-                                        <Route path={`${match.path}/crmlist`} component={Crms} exact/>
-                                        <Route path={`${match.path}/crmlist/:crm`} component={Crm} exact/>
-                                        <Route path={`${match.path}/databases`} component={Databases} exact/>
-                                        <Route path={`${match.path}/calendar`} component={Calendar} exact/>
-                                        <Route path={`${match.path}/profile`} component={Profile} exact/>
-                                        <Route path={`${match.path}/billing`} component={Billing} exact/>
-                                        <Route path={`${match.path}/users-management`} component={UsersManagement}
-                                               exact/>
-                                        <Route path={`${match.path}/documentation`} component={Documentation}
-                                               exact/>
-                                        <Route path="/dashboard" component={Home}/>
-                                    </Switch>
+                                    <Suspense fallback={<div> Loading...</div>}>
+                                        <Switch location={location} style={{height: '100%'}}>
+
+                                            <Route path={`${match.path}/assistants/:id/script`} component={Flow}/>
+                                            <Route path={`${match.path}/assistants/:id/integration`} component={Integration}/>
+                                            <Route path={`${match.path}/assistants/:id/conversations`} component={Conversations}/>
+                                            <Route path={`${match.path}/assistants/:id/analytics`} component={Analytics}/>
+                                            <Route path={`${match.path}/assistants/:id/CRMIntegration`} component={AssistantCRM}/>
+                                            <Route path={`${match.path}/assistants`} component={Assistants} exact/>
+
+                                            <Route path={`${match.path}/crmlist`} component={Crms} exact/>
+                                            <Route path={`${match.path}/crmlist/:crm`} component={Crm} exact/>
+
+                                            <Route path={`${match.path}/databases`} component={Databases} exact/>
+                                            <Route path={`${match.path}/databases/:id`}
+                                                   component={DatabasesConfigs} exact/>
+
+                                            <Route path={`${match.path}/calendar`} component={Calendar} exact/>
+                                            <Route path={`${match.path}/profile`} component={Profile} exact/>
+                                            <Route path={`${match.path}/billing`} component={Billing} exact/>
+
+                                            <Route path={`${match.path}/auto_pilot`} component={AutoPilot} exact/>
+                                            <Route path={`${match.path}/auto_pilot/configs`}
+                                                   component={AutoPilotConfigs}
+                                                   exact/>
+
+                                            <Route path={`${match.path}/users_management`} component={UsersManagement}
+                                                   exact/>
+                                            <Route path={`${match.path}/documentation`} component={Documentation}
+                                                   exact/>
+                                            <Route path="/dashboard" component={Home}/>
+                                        </Switch>
+                                    </Suspense>
                                 </CSSTransition>
                             </TransitionGroup>
                         }/>

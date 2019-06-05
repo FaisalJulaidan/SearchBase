@@ -109,7 +109,7 @@ class AutoPilotConfigs extends React.Component {
                     <div className={styles.Body}>
                         <Form layout='vertical' style={{width: '100%'}}>
                             <FormItem
-                                label="Auto pilot name"
+                                label="Name"
                                 wrapperCol = {{span: 12}}
                                 >
                                 {getFieldDecorator('name', {
@@ -134,7 +134,7 @@ class AutoPilotConfigs extends React.Component {
                             </FormItem>
 
                             <FormItem
-                                label="Auto pilot description"
+                                label="Description"
                                 wrapperCol = {{span: 12}}
                             >
                                 {getFieldDecorator('description', {
@@ -156,7 +156,7 @@ class AutoPilotConfigs extends React.Component {
                                     <>
                                         <Switch onChange={this.onAcceptChange} style={{marginRight: 15}}
                                                 defaultChecked={autoPilot.AcceptApplications}/>
-                                        Greater Than
+                                        A score greater than
                                         <InputNumber min={0} max={100}
                                                      onChange={value => this.changeScore(value, 'acceptanceScore')}
                                                      defaultValue={this.state.acceptanceScore}
@@ -195,7 +195,7 @@ class AutoPilotConfigs extends React.Component {
                                     <>
                                         <Switch onChange={this.onRejectChange} style={{marginRight: 15}}
                                                 defaultChecked={autoPilot.RejectApplications}/>
-                                        Less Than
+                                        A score less than
                                         <InputNumber min={1} max={100}
                                                      onChange={value => this.changeScore(value, 'rejectionScore')}
                                                      formatter={value => `${value}%`}

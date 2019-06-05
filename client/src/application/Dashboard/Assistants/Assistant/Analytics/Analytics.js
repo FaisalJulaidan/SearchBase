@@ -99,9 +99,9 @@ class Analytics extends React.Component {
 
     userApplications(){
         const {analytics} = this.props.analytics;
-        return {accepted: analytics.filter(a=> a.Status==="Accepted").length,
-                pending: analytics.filter(a=> a.Status==="Pending").length,
-                rejected: analytics.filter(a=> a.Status==="Rejected").length,}
+        return {accepted: analytics.filter(a=> a.ApplicationStatus==="Accepted").length,
+                pending: analytics.filter(a=> a.ApplicationStatus==="Pending").length,
+                rejected: analytics.filter(a=> a.ApplicationStatus==="Rejected").length,}
     }
 
     averageScore(){

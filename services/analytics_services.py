@@ -22,7 +22,7 @@ def getAnalytics(assistant, startDate=datetime.now() - timedelta(days=365), endD
         monthlyUses = db.session.query(Conversation.ID,
                                     Conversation.DateTime,
                                     Conversation.TimeSpent,
-                                    Conversation.Status,
+                                    Conversation.ApplicationStatus,
                                     Conversation.Score,
                                     Conversation.UserType)\
                                 .filter(between(Conversation.DateTime, startDate, endDate))\
@@ -31,6 +31,7 @@ def getAnalytics(assistant, startDate=datetime.now() - timedelta(days=365), endD
 
         return Callback(True, 'Analytics successfully gathered', monthlyUses)
     except Exception as e:
+        print(e)
         return Callback(False, 'Analytics could not be gathered')
 
 

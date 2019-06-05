@@ -10,6 +10,7 @@ from itsdangerous import URLSafeTimedSerializer
 from cryptography.fernet import Fernet
 from jsonschema import validate
 from utilities import json_schemas
+from typing import List
 import enums, re, os, stripe, gzip, functools, logging, geoip2.webservice
 
 # will merge with the previous imports if the code is kept - batu
@@ -386,10 +387,10 @@ def isValidEmail(email: str) -> bool:
     return True
 
 
-# Convert a SQLAlchemy object to a single dict
+# -------- SQLAlchemy Converters -------- #
+"""Convert a SQLAlchemy object to a single dict """
 def getDictFromSQLAlchemyObj(obj):
     d = {}
-    print(obj)
     for attr in obj.__table__.columns:
         key = attr.name
         if key not in ['Password']:
@@ -414,36 +415,39 @@ def getDictFromSQLAlchemyObj(obj):
 """Used when you want to only gather specific data from a table (columns)"""
 """Provide a list of keys (e.g ['id', 'name']) and the list of tuples"""
 """provided by sqlalchemy when querying for specific columns"""
-"""this func will work for enums aswell."""
+"""this func will work for enums as well."""
+def getDictFromLimitedQuery(columnsList, tupleList: List[tuple]):
 
-def getDictFromLimitedQuery(list, tuplel):
-    if not tuplel:
+    if not isinstance(tupleList, list):
         raise Exception("Provided list of tuples is empty. (Check data being returned from db)")
-    if len(list) != len(tuplel[0]) :
+
+    # If the database returned an empty list, it's ok
+    if not len(tupleList) > 0:
+        return []
+
+    # When tupleList is not empty, then the number of items in each tuple must match the number of items in columnsList
+    if len(columnsList) != len(tupleList[0]) :
         raise Exception("List of indexes provided must match in length to the items in each of the tuples")
+
     d = []
-    for item in tuplel:
+    for item in tupleList:
         dict = {}
         for idx, i in enumerate(item):
             if isinstance(i, Enum):
-                dict[list[idx]] = i.value
+                dict[columnsList[idx]] = i.value
             else:
-                dict[list[idx]] = i
+                dict[columnsList[idx]] = i
         d.append(dict)
     return d
 
 
 
-# Convert a SQLAlchemy list of objects to a list of dicts
+"""Convert a SQLAlchemy list of objects to a list of dicts"""
 def getListFromSQLAlchemyList(SQLAlchemyList):
     return list(map(getDictFromSQLAlchemyObj, SQLAlchemyList))
 
+# ---------------- #
 
-def isStringsLengthGreaterThanZero(*args):
-    for arg in args:
-        if len(arg.strip()) == 0:
-            return False
-    return True
 
 
 def jsonResponse(success: bool, http_code: int, msg: str, data=None):
@@ -485,7 +489,7 @@ def gzipped(f):
     return view_func
 
 
-# messing around saving space
+# Check if the logged in user owns the accessed assistant for security
 def validAssistant(func):
     def wrapperValidAssistant(assistantID):
         user = get_jwt_identity()['user']

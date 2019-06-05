@@ -18,7 +18,7 @@ export const analytics = (state = initialState, action) => {
             });
         case actionTypes.FETCH_ANALYTICS_FAILURE:
             return updateObject(state, {
-                assistantList: [],
+                analytics: [],
                 isLoading: false,
                 errorMsg: action.error
             });

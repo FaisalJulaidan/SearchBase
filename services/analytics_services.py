@@ -28,6 +28,7 @@ def getAnalytics(assistant, startDate=datetime.now() - timedelta(days=365), endD
                                 .filter(between(Conversation.DateTime, startDate, endDate))\
                                 .filter(Conversation.AssistantID == assistant.ID) \
                                 .all()
+
         return Callback(True, 'Analytics successfully gathered', monthlyUses)
     except Exception as e:
         return Callback(False, 'Analytics could not be gathered')

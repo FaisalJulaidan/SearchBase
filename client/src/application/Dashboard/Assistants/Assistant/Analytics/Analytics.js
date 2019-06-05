@@ -5,7 +5,6 @@ import Header from "../../../../../components/Header/Header";
 import {Chart, Axis, Tooltip, Geom } from "bizcharts";
 import {analyticsActions} from "store/actions";
 import {connect} from 'react-redux';
-import NumberInfo from 'ant-design-pro/lib/NumberInfo';
 import {Icon, Spin, Button, Row, Col, Statistic} from 'antd';
 
 import moment from 'moment';
@@ -34,7 +33,7 @@ class Analytics extends React.Component {
             split: "yearly",
             curDate: moment()
         };
-        this.changeSplit = this.changeSplit.bind(this)
+        this.changeSplit = this.changeSplit.bind(this);
         this.iterator = this.iterator.bind(this)
     }
 
@@ -49,7 +48,7 @@ class Analytics extends React.Component {
         this.props.dispatch(analyticsActions.fetchAnalytics(assistant.ID))
     }
     changeSplit(split){
-        const {analytics} = this.props.analytics
+        const {analytics} = this.props.analytics;
         if(split !== this.state.split){
             this.setState({split})
         }
@@ -59,80 +58,77 @@ class Analytics extends React.Component {
         switch(split){
             case "yearly":
                 return new Array(12).fill(1).map((i, x) => {return moment(this.state.curDate).set('month', x)});
-                break;
             case "monthly":
                 return new Array(moment(this.state.curDate).daysInMonth()).fill(1).map((i, x) => {return moment(this.state.curDate).set('date', x+1 )});
-                break;
             case "daily":
                 return new Array(24).fill(1).map((i, x) => {return moment(this.state.curDate).set('hour', x)})
-                break;
         }
     }
     iterator(change){
         switch(this.state.split){
             case "yearly":
-                this.setState({curDate: this.state.curDate.set('year', this.state.curDate.get('year')+change)})
+                this.setState({curDate: this.state.curDate.set('year', this.state.curDate.get('year')+change)});
                 break;
             case "monthly":
-                this.setState({curDate: this.state.curDate.set('month', this.state.curDate.get('month')+change)})
+                this.setState({curDate: this.state.curDate.set('month', this.state.curDate.get('month')+change)});
                 break;
             case "daily":
-                this.setState(({curDate: this.state.curDate.set('day', this.state.curDate.get('day') + change)}))
+                this.setState(({curDate: this.state.curDate.set('day', this.state.curDate.get('day') + change)}));
                 break;
         }
     }
 
     timeSpentChatting() {
-        const {analytics} = this.props.analytics
-        let compareTo = moment()
+        const {analytics} = this.props.analytics;
+        let compareTo = moment();
         // Filters the analytics array so that it gets only the current time (year/month etc) then accumulates all the
         // total timespent values, and divides by the length of the array to get the average, also rounds to 2 digits
 
-        let timeSpent = ["year", "month", "day"]
+        let timeSpent = ["year", "month", "day"];
         let current = timeSpent.map(t =>
             analytics.filter(a => moment(a.DateTime).isSame(compareTo, t))
-                .reduce((a, n, i, ba) => (a + parseInt(n.TimeSpent)) / (ba.length - 1 == i ? ba.length : 1), 0)
-                .toFixed(2))
+                .reduce((a, n, i, ba) => (a + parseInt(n.TimeSpent)) / (ba.length - 1 === i ? ba.length : 1), 0)
+                .toFixed(2));
         let previous = timeSpent.map(t =>
             analytics.filter(a => moment(a.DateTime).isSame(compareTo.clone().subtract(1, t), t))
-                .reduce((a, n, i, ba) => (a + parseInt(n.TimeSpent)) / (ba.length - 1 == i ? ba.length : 1), 0)
-                .toFixed(2))
+                .reduce((a, n, i, ba) => (a + parseInt(n.TimeSpent)) / (ba.length - 1 === i ? ba.length : 1), 0)
+                .toFixed(2));
 
         return {current, previous}
     }
 
     userApplications(){
-        const {analytics} = this.props.analytics
+        const {analytics} = this.props.analytics;
         return {accepted: analytics.filter(a=> a.Status==="Accepted").length,
                 pending: analytics.filter(a=> a.Status==="Pending").length,
                 rejected: analytics.filter(a=> a.Status==="Rejected").length,}
     }
 
     averageScore(){
-        const {analytics} = this.props.analytics
+        const {analytics} = this.props.analytics;
         return (analytics.reduce((a, i) => a + parseInt(i.Score), 0) / analytics.length ).toFixed(2)
     }
 
     candidateClientSplit(){
-        const {analytics} = this.props.analytics
+        const {analytics} = this.props.analytics;
         return {clients: analytics.filter(a=> a.UserType==="Client").length,
             candidates: analytics.filter(a=> a.UserType==="Candidate").length}
     }
 
 
     render() {
-        const {analytics} = this.props.analytics
-        // console.log(this.props)
+        const {analytics} = this.props.analytics;
         const {split} = this.state;
-        let data, tsc, userapplications, averageScore, clientCandidate // timespentchatting = tsc
+        let data, tsc, userApplications, averageScore, clientCandidate; // timeSpentChatting = tsc
+
         if(!this.props.analytics.isLoading && analytics){
             data = this.dateFormatting(split).map(t =>
                 ({time: t.format(splits[this.state.split].render), chats: analytics.filter(a => moment(a.DateTime).isSame(t, splits[split].compare)).length}))
-            tsc = this.timeSpentChatting()
-            userapplications = this.userApplications()
-            averageScore = this.averageScore()
-            clientCandidate = this.candidateClientSplit()
-            // maybe move timespent to onload to save resources , no need to constantly recalculate? idk
+            tsc = this.timeSpentChatting();
+            userApplications = this.userApplications();
+            averageScore = this.averageScore();
+            clientCandidate = this.candidateClientSplit();
+            // maybe move timeSpent to onload to save resources , no need to constantly recalculate? idk
         }
         const cols = {
             chats: {
@@ -208,21 +204,21 @@ class Analytics extends React.Component {
                                 </div>
 
                                 <div className={styles.Panel_Body}>
-                                    {!userapplications ?
+                                    {!userApplications ?
                                         <Spin/> :
                                         <Row gutter={16}>
                                             <Col span={8}>
-                                                <Statistic title="Accepted" value={userapplications.accepted}
+                                                <Statistic title="Accepted" value={userApplications.accepted}
                                                            prefix={<Icon type="check-circle" theme="twoTone"
                                                                          twoToneColor="#2ecc71"/>}/>
                                             </Col>
                                             <Col span={8}>
-                                                <Statistic title="Pending" value={userapplications.pending}
+                                                <Statistic title="Pending" value={userApplications.pending}
                                                            prefix={<Icon type="minus-circle" theme="twoTone"
                                                                          twoToneColor="#f1c40f"/>}/>
                                             </Col>
                                             <Col span={8}>
-                                                <Statistic title="Rejected" value={userapplications.rejected}
+                                                <Statistic title="Rejected" value={userApplications.rejected}
                                                            prefix={<Icon type="close-circle" theme="twoTone"
                                                                          twoToneColor="#e74c3c"/>}/>
                                             </Col>
@@ -326,5 +322,4 @@ const mapStateToProps = state =>  {
 };
 
 export default connect(mapStateToProps)(Analytics);
-// export default Analytics
 

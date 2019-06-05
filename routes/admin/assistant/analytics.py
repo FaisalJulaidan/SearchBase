@@ -11,13 +11,17 @@ analytics_router: Blueprint = Blueprint('analytics_router', __name__, template_f
 # @helpers.validAssistant
 def admin_analytics_data(assistantID):
     if request.method == "GET":
+        result = []
         callback: Callback = analytics_services.getAnalytics(assistantID)
         if not callback.Success:
             return helpers.jsonResponse(False, 400, 'Failed to gather analytics')
-        return helpers.jsonResponse(True, 200,
-                                    callback.Message,
-                                    helpers.getDictFromLimitedQuery(['ID', 'DateTime', 'TimeSpent', 'Status', 'Score', 'UserType'],
-                                    callback.Data))
+        try:
+            result = helpers.getDictFromLimitedQuery(['ID', 'DateTime', 'TimeSpent', 'Status', 'Score', 'UserType'],
+                                                     callback.Data)
+        except Exception as e:
+            return helpers.jsonResponse(False, 400, 'Failed to gather analytics')
+        else:
+            return helpers.jsonResponse(True, 200, callback.Message, result)
 
 
 

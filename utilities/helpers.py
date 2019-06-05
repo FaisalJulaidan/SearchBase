@@ -417,6 +417,8 @@ def getDictFromSQLAlchemyObj(obj):
 """this func will work for enums aswell."""
 
 def getDictFromLimitedQuery(list, tuplel):
+    if not tuplel:
+        raise Exception("Provided list of tuples is empty. (Check data being returned from db)")
     if len(list) != len(tuplel[0]) :
         raise Exception("List of indexes provided must match in length to the items in each of the tuples")
     d = []

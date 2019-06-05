@@ -122,9 +122,10 @@ class Analytics extends React.Component {
 
     render() {
         const {analytics} = this.props.analytics
+        console.log(this.props)
         const {split} = this.state;
         let data, tsc, userapplications, averageScore, clientCandidate // timespentchatting = tsc
-        if(!this.props.analytics.isLoading){
+        if(!this.props.analytics.isLoading && Object.entries(analytics).length !== 0){
             data = this.dateFormatting(split).map(t =>
                 ({time: t.format(splits[this.state.split].render), chats: analytics.filter(a => moment(a.DateTime).isSame(t, splits[split].compare)).length}))
             tsc = this.timeSpentChatting()
@@ -160,35 +161,39 @@ class Analytics extends React.Component {
 
                                 <div className={styles.Panel_Body}
                                      ref={chartDiv => this.chartDiv = chartDiv}>
-                                    <Button onClick={() => this.changeSplit('yearly')} type={split==="yearly" ? "primary" : null}>Yearly</Button>
-                                    <Button onClick={() => this.changeSplit('monthly')} type={split==="monthly" ? "primary" : null}>Monthly</Button>
-                                    <Button onClick={() => this.changeSplit('daily')} type={split==="daily" ? "primary" : null}>Daily</Button>
-                                    <div className={styles.Date_Selector}>
-                                        <Icon type="caret-left" onClick={() => {this.iterator(-1)}} />
-                                        <h1>{moment(this.state.curDate).format(splits[this.state.split].format)}</h1>
-                                        <Icon type="caret-right" onClick={() => {this.iterator(1)}}/>
-                                    </div>
-
-                                    <Chart height={500} data={data} scale={cols} forceFit>
-                                        <Axis name="time    " />
-                                        <Axis name="chats" />
-                                        <Tooltip
-                                            crosshairs={{
-                                                type: "y"
-                                            }}
-                                        />
-                                        <Geom type="line" position="time*chats" size={2} />
-                                        <Geom
-                                            type="point"
-                                            position="time*chats"
-                                            size={4}
-                                            shape={"square"}
-                                            style={{
-                                                stroke: "#fff",
-                                                lineWidth: 1
-                                            }}
-                                        />
-                                    </Chart>
+                                    {!data ?
+                                    <Spin/> :
+                                    <React.Fragment>
+                                        <Button onClick={() => this.changeSplit('yearly')} type={split==="yearly" ? "primary" : null}>Yearly</Button>
+                                        <Button onClick={() => this.changeSplit('monthly')} type={split==="monthly" ? "primary" : null}>Monthly</Button>
+                                        <Button onClick={() => this.changeSplit('daily')} type={split==="daily" ? "primary" : null}>Daily</Button>
+                                        <div className={styles.Date_Selector}>
+                                            <Icon type="caret-left" onClick={() => {this.iterator(-1)}} />
+                                            <h1>{moment(this.state.curDate).format(splits[this.state.split].format)}</h1>
+                                            <Icon type="caret-right" onClick={() => {this.iterator(1)}}/>
+                                        </div>
+                                        <Chart height={500} data={data} scale={cols} forceFit>
+                                            <Axis name="time    " />
+                                            <Axis name="chats" />
+                                            <Tooltip
+                                                crosshairs={{
+                                                    type: "y"
+                                                }}
+                                            />
+                                            <Geom type="line" position="time*chats" size={2} />
+                                            <Geom
+                                                type="point"
+                                                position="time*chats"
+                                                size={4}
+                                                shape={"square"}
+                                                style={{
+                                                    stroke: "#fff",
+                                                    lineWidth: 1
+                                                }}
+                                            />
+                                        </Chart>
+                                    </React.Fragment>
+                                    }
                                 </div>
                         </div>
                     </div>

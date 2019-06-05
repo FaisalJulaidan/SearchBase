@@ -19,8 +19,6 @@ def getAnalytics(assistantID, startDate=datetime.now() - timedelta(days=365), en
     #need to fiugre out whether the start and end dates will affect the whole page, or just the chart hmm
 
     try:
-
-        # Conversation.Status) \
         monthlyUses = db.session.query(Conversation.ID,
                                     Conversation.DateTime,
                                     Conversation.TimeSpent,
@@ -32,7 +30,6 @@ def getAnalytics(assistantID, startDate=datetime.now() - timedelta(days=365), en
                                 .all()
         return Callback(True, 'Analytics successfully gathered', monthlyUses)
     except Exception as e:
-        print(e)
         return Callback(False, 'Analytics could not be gathered')
 
 

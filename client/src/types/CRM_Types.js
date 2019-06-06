@@ -8,5 +8,6 @@
  @property {function} link
  @property {string} image
  @property {string} type - The name of the CRM
- @property {('CONNECTED'|'NOT_CONNECTED'|'FAILED')} status
+ @property {boolean} disabled
+ @property {('CONNECTED'|'NOT_CONNECTED'|'FAILED'|'Comming Soon')} status
  */

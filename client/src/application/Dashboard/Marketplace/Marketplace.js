@@ -30,11 +30,27 @@ class Marketplace extends React.Component {
                 status: 'NOT_CONNECTED',
             },
             {
-                title: 'Bullhorn',
-                desc: `Bullhorn provides customer relationship management, applicant tracking system and operations software for the staffing industry.`,
-                image: getLink('/static/images/CRM/bullhorn.png'),
-                type: "Bullhorn",
+                title: 'Greenhouse',
+                desc: `Greenhouse works seamlessly with over 220 partners and third-party apps and technologies, enabling you to solve specific problems.`,
+                image: getLink('/static/images/CRM/greenhouse.png'),
+                type: "Greenhouse",
                 status: 'NOT_CONNECTED',
+            },
+            {
+                title: 'Outlook Calendar',
+                desc: `Calendar is the calendar and scheduling component of Outlook that is fully integrated with email, contacts, and other features.`,
+                image: getLink('/static/images/CRM/outlook-calendar.png'),
+                type: "outlook",
+                status: 'Comming Soon',
+                disabled: true
+            },
+            {
+                title: 'Google Calendar',
+                desc: `Google Calendar is a time-management and scheduling calendar service lets you keep track of important events, share your schedule.`,
+                image: getLink('/static/images/CRM/gmail.jpg'),
+                type: "gmail",
+                status: 'Comming Soon',
+                disabled: true
             },
         ]
     };
@@ -49,6 +65,10 @@ class Marketplace extends React.Component {
             state => state.CRMs.map(
                 crm => {
                     const index = nextProps.CRMsList.findIndex(serverCRM => serverCRM.Type === crm.type);
+
+                    if (crm.status === 'Comming Soon')
+                        return 0;
+
                     if (index === -1) {
                         // if there is not crm from the server
                         crm.status = 'NOT_CONNECTED';
@@ -95,7 +115,9 @@ class Marketplace extends React.Component {
                                         <AuroraCardAvatar title={crm.title}
                                                           desc={crm.desc}
                                                           image={crm.image}
-                                                          status={crm.status}/>
+                                                          status={crm.status}
+                                                          disabled={crm.disabled}
+                                        />
                                     </Link>
                                 </Spin>
                             </div>

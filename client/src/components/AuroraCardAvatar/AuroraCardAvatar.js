@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import styles from "./AuroraCardAvatar.module.less"
-import {Typography, Avatar, Tooltip, Tag, Divider, Icon} from 'antd';
+import {Avatar, Divider, Icon, Tag, Tooltip, Typography} from 'antd';
 
 const {Title, Text} = Typography;
 
@@ -15,6 +15,8 @@ class AuroraCardAvatar extends React.Component {
                     return <Tag>Not Connected</Tag>;
                 case 'FAILED':
                     return <Tag color={'#f50'}><Icon type="disconnect"/> Failed</Tag>;
+                case 'Comming Soon':
+                    return <Tag color={'purple'}> Comming Soon</Tag>;
                 default:
                     return null
             }
@@ -22,6 +24,9 @@ class AuroraCardAvatar extends React.Component {
         return (
             <Tooltip title={`Disconnect from first`} visible={false}>
                 <button
+                    style={{
+                        pointerEvents: this.props.disabled ? 'none' : 'auto'
+                    }}
                     className={[styles.SelectButton, styles.Unbuttonized, this.props.selected ? styles.Selected : ''].join(' ')}
                     onClick={this.props.onClick}>
                     <div className={styles.Main}>
@@ -51,6 +56,7 @@ AuroraCardAvatar.propTypes = {
         PropTypes.element
     ]),
     onClick: PropTypes.func,
-    status: PropTypes.oneOf(['CONNECTED', 'NOT_CONNECTED', 'FAILED'])
+    disabled: PropTypes.bool,
+    status: PropTypes.oneOf(['CONNECTED', 'NOT_CONNECTED', 'FAILED', 'Comming Soon'])
 };
 export default AuroraCardAvatar

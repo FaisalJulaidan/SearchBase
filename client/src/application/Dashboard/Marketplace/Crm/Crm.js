@@ -103,8 +103,8 @@ class Crm extends React.Component {
                     <Breadcrumb>
                         <Breadcrumb.Item>
                             <a href={"javascript:void(0);"}
-                               onClick={() => history.push('/dashboard/crmlist')}>
-                                CRMs List
+                               onClick={() => history.push('/dashboard/marketplace')}>
+                                Marketplace
                             </a>
                         </Breadcrumb.Item>
                         <Breadcrumb.Item>{crm.type}</Breadcrumb.Item>

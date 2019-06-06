@@ -2,7 +2,7 @@ import React from 'react'
 import {connect} from 'react-redux';
 import styles from "./AutoPilot.module.less";
 import NoHeaderPanel from 'components/NoHeaderPanel/NoHeaderPanel'
-import {Typography} from 'antd';
+import {Icon, Typography} from 'antd';
 import CreateNewBox from "components/CreateNewBox/CreateNewBox";
 import ViewBox from "components/ViewBox/ViewBox";
 import {AutoPilotIcon} from "components/SVGs";
@@ -11,7 +11,7 @@ import {autoPilotActions} from "store/actions";
 import 'types/TimeSlots_Types'
 import {history} from "helpers";
 
-const {Title, Paragraph} = Typography;
+const {Title, Paragraph, Text} = Typography;
 
 class AutoPilot extends React.Component {
     state = {visible: false};
@@ -27,13 +27,13 @@ class AutoPilot extends React.Component {
         return (
             <>
                 <NoHeaderPanel>
-                    <div className={styles.Title}>
-                        <div className={styles.Details}>
-                            <Title>Auto Pilots</Title>
-                            <Paragraph type="secondary">
-                                Automate your assistants using auto pilots
-                            </Paragraph>
-                        </div>
+                    <div className={styles.Header}>
+                        <Title className={styles.Title}>
+                            <Icon type="interation"/> Auto Pilots
+                        </Title>
+                        <Paragraph type="secondary">
+                            Automate your assistants using auto pilots
+                        </Paragraph>
                     </div>
 
                     <div className={styles.Body}>
@@ -52,7 +52,6 @@ class AutoPilot extends React.Component {
                                     />
                             )
                         }
-
                     </div>
                 </NoHeaderPanel>
 

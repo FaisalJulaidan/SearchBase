@@ -1,6 +1,6 @@
 import React from 'react'
 import {Icon, Spin, Typography} from 'antd';
-import styles from './Crms.module.less'
+import styles from './Marketplace.module.less'
 import 'types/CRM_Types';
 import {getLink} from "helpers";
 import {crmActions} from "store/actions";
@@ -11,7 +11,7 @@ import {Link} from "react-router-dom";
 
 const {Title, Paragraph, Text} = Typography;
 
-class Crms extends React.Component {
+class Marketplace extends React.Component {
     state = {
         /** @type {CRM[]} */
         CRMs: [
@@ -20,6 +20,13 @@ class Crms extends React.Component {
                 desc: `Bond Adapt, specialist portfolio of recruitment software applications has earned a reputation for increasing business growth.`,
                 image: getLink('/static/images/CRM/adapt.png'),
                 type: "Adapt",
+                status: 'NOT_CONNECTED',
+            },
+            {
+                title: 'Bullhorn',
+                desc: `Bullhorn provides customer relationship management, applicant tracking system and operations software for the staffing industry.`,
+                image: getLink('/static/images/CRM/bullhorn.png'),
+                type: "Bullhorn",
                 status: 'NOT_CONNECTED',
             },
             {
@@ -60,20 +67,20 @@ class Crms extends React.Component {
     render() {
         return (
             <NoHeaderPanel>
-                <div className={styles.Title}>
-                    <div className={styles.Details}>
-                        <Title> <Icon type="interation"/> CRMs List</Title>
-                        <Paragraph type="secondary">
-                            <Text>From the list below, choose your CRM or ATS for your account to be directly connected.
-                                If you need help with the setup or wish to contact us to arrange an integration with
-                                your provider, please contact us at: <Text code><a target={'_blank'}
-                                                                                   href={"mailto:info@thesearchbase.com"}
-                                                                                   style={{cursor: 'pointer'}}>
-                                    info@thesearchbase.com
-                                </a></Text>.
-                            </Text>
-                        </Paragraph>
-                    </div>
+                <div className={styles.Header}>
+                    <Title className={styles.Title}>
+                        <Icon type="interation"/> Marketplace
+                    </Title>
+                    <Paragraph type="secondary">
+                        From the list below, choose your CRM or ATS for your account to be directly connected.
+                        If you need help with the setup or wish to contact us to arrange an integration with
+                        your provider, please contact us at:
+                        <Text code>
+                            <a target={'_blank'} href={"mailto:info@thesearchbase.com"} style={{cursor: 'pointer'}}>
+                                info@thesearchbase.com
+                            </a>
+                        </Text>.
+                    </Paragraph>
                 </div>
 
                 <div className={styles.Body}>
@@ -82,7 +89,7 @@ class Crms extends React.Component {
                             <div className={styles.CardFrame} key={i}>
                                 <Spin spinning={this.props.isLoadingCrms}>
                                     <Link to={{
-                                        pathname: `/dashboard/crmlist/${crm.type}`,
+                                        pathname: `/dashboard/marketplace/${crm.type}`,
                                         state: {crm: crm}
                                     }}>
                                         <AuroraCardAvatar title={crm.title}
@@ -108,4 +115,4 @@ function mapStateToProps(state) {
     };
 }
 
-export default connect(mapStateToProps)(Crms);
+export default connect(mapStateToProps)(Marketplace);

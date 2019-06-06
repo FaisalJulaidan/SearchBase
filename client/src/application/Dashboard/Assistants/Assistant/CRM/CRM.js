@@ -6,19 +6,19 @@ import {assistantActions} from "store/actions";
 
 class CRM extends React.Component {
     handleSave = CRMID => {
-        this.props.hideModal();
+        this.props.hideNewAssistantModal();
         if (CRMID)
             this.props.dispatch(assistantActions.selectAssistantCRM(CRMID, this.props.assistant.ID));
     };
 
     handleReset = () => {
-        this.props.hideModal();
+        this.props.hideNewAssistantModal();
         this.props.dispatch(assistantActions.resetAssistantCRM(this.props.assistant.ID));
     };
 
     render = () => <CRMModal assistant={this.props.assistant}
                              visible={this.props.visible}
-                             handleCancel={this.props.hideModal}
+                             handleCancel={this.props.hideNewAssistantModal}
                              handleSave={this.handleSave}
                              handleReset={this.handleReset}
                              CRMsList={this.props.CRMsList}/>

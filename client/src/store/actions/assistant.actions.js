@@ -22,6 +22,29 @@ const fetchAssistantsFailure = (error) => {
 };
 
 
+const fetchAssistant = (assistantID) => {
+    return {
+        type: actionTypes.FETCH_ASSISTANT_REQUEST,
+        assistantID
+    };
+};
+
+const fetchAssistantSuccess = (assistant) => {
+    return {
+        type: actionTypes.FETCH_ASSISTANT_SUCCESS,
+        meta: {thunk: true},
+        assistant
+    };
+};
+
+const fetchAssistantFailure = (error) => {
+    return {
+        type: actionTypes.FETCH_ASSISTANT_FAILURE,
+        error
+    };
+};
+
+
 const addAssistant = (newAssistant) => {
     return {
         type: actionTypes.ADD_ASSISTANT_REQUEST,
@@ -64,6 +87,31 @@ const updateAssistantSuccess = (assistantID, updatedAssistant, successMsg) => {
 const updateAssistantFailure = (error) => {
     return {
         type: actionTypes.UPDATE_ASSISTANT_FAILURE,
+        error
+    };
+};
+
+
+const updateAssistantConfigs = (assistantID, updatedSettings) => {
+    return {
+        type: actionTypes.UPDATE_ASSISTANT_CONFIGS_REQUEST,
+        assistantID,
+        updatedSettings
+    };
+};
+
+const updateAssistantConfigsSuccess = (assistantID, updatedAssistant, successMsg) => {
+    return {
+        type: actionTypes.UPDATE_ASSISTANT_CONFIGS_SUCCESS,
+        assistantID,
+        updatedAssistant,
+        successMsg
+    };
+};
+
+const updateAssistantConfigsFailure = (error) => {
+    return {
+        type: actionTypes.UPDATE_ASSISTANT_CONFIGS_FAILURE,
         error
     };
 };
@@ -281,6 +329,10 @@ export const assistantActions = {
     fetchAssistantsSuccess,
     fetchAssistantsFailure,
 
+    fetchAssistant,
+    fetchAssistantSuccess,
+    fetchAssistantFailure,
+
     addAssistant,
     addAssistantSuccess,
     addAssistantFailure,
@@ -288,6 +340,10 @@ export const assistantActions = {
     updateAssistant,
     updateAssistantSuccess,
     updateAssistantFailure,
+
+    updateAssistantConfigs,
+    updateAssistantConfigsSuccess,
+    updateAssistantConfigsFailure,
 
     deleteAssistant,
     deleteAssistantSuccess,

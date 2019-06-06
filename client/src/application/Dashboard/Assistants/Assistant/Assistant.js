@@ -1,20 +1,21 @@
 import React, {Component} from 'react';
-import {Button, Card, Col, Row, Switch} from 'antd';
+import {Button, Card, Col, Row, Switch, Tabs, Typography} from 'antd';
+import './Assistant.less';
+import styles from "./Assistant.module.less";
 import {Link} from "react-router-dom";
 import AssistantSettings from "./AssistantSettings/AssistantSettings";
 import CRM from "./CRM/CRM";
 import SelectAutoPilotModal from "./SelectAutoPilotModal/SelectAutoPilotModal";
-import './Assistant.less';
 import AuroraBlink from "components/AuroraBlink/AuroraBlink";
-import {getLink} from "helpers";
+import {getLink, history} from "helpers";
+import {store} from "store/store";
+import {assistantActions, crmActions} from "store/actions";
+import NoHeaderPanel from 'components/NoHeaderPanel/NoHeaderPanel'
 
-const covers = [
-    // 'https://42f2671d685f51e10fc6-b9fcecea3e50b3b59bdc28dead054ebc.ssl.cf5.rackcdn.com/illustrations/voice_control_ofo1.svg',
-    // 'https://42f2671d685f51e10fc6-b9fcecea3e50b3b59bdc28dead054ebc.ssl.cf5.rackcdn.com/illustrations/group_chat_v059.svg',
-    // 'https://42f2671d685f51e10fc6-b9fcecea3e50b3b59bdc28dead054ebc.ssl.cf5.rackcdn.com/illustrations/status_update_jjgk.svg',
-    getLink('/static/images/undraw/messages.svg'),
-];
 
+
+const {Title, Paragraph, Text} = Typography;
+const { TabPane } = Tabs;
 
 class Assistant extends Component {
 
@@ -24,6 +25,11 @@ class Assistant extends Component {
         selectAutoPilotModalVisible: false
     };
 
+    componentWillMount() {
+        store.dispatch(assistantActions.fetchAssistant(this.props.match.params.id)).then(()=> {
+
+        }).catch(() => history.push(`/dashboard/assistants`))
+    }
 
     showSettingsModal = () => this.setState({assistantSettingsVisible: true});
     hideSettingsModal = () => this.setState({assistantSettingsVisible: false});
@@ -40,108 +46,47 @@ class Assistant extends Component {
         const {assistant, isStatusChanging} = this.props;
         return (
             <>
-                <Card loading={this.props.isLoading}
-                      style={{width: 460, margin: 15, float: 'left', height: 369}}
-                      cover={
-                          <img alt="example"
-                               height={150}
-                               width="100%"
-                               src={covers[Math.floor(Math.random() * covers.length)]}/>
-                      }
-                      title={assistant.Name}
-                      extra={<Switch loading={isStatusChanging}
-                                     checked={assistant.Active}
-                                     onChange={this.onActiveChanged}
-                                     checkedChildren="On"
-                                     unCheckedChildren="Off"
-                      />
-                      }
-                      actions={[]}
-                      className={'assistant'}>
+                <NoHeaderPanel>
+                    <div className={styles.Header}>
+                        <Title className={styles.Title}>
+                            Assistants
+                        </Title>
+                        <Paragraph type="secondary">
+                            Here you can see all assistants created by you
+                        </Paragraph>
 
-                    <Row type={'flex'} justify={'center'} gutter={8}>
-                        <Col span={8}>
-                            {/*4*/}
-                            <Link to={{
-                                pathname: `assistants/${assistant.ID}/conversations`,
-                                state: {assistant: assistant}
-                            }}>
-                                <Button block icon={'code'}>Conversations</Button>
-                            </Link>
-                        </Col>
+                    </div>
 
-                        <Col span={8}>
-                            {/*2*/}
-                            <Link to={{
-                                pathname: `assistants/${assistant.ID}/script`,
-                                state: {assistant: assistant}
-                            }}>
-                                <Button block icon={'build'}>Script</Button>
-                            </Link>
-                        </Col>
 
-                        <Col span={8}>
-                            {/*3*/}
-                            <Button block onClick={this.showCRMModal} icon={'cluster'}>
-                                CRM
-                                {assistant.CRMConnected ?
-                                    <AuroraBlink color={'#00c878'} style={{top: 7, right: 28}}/> : null}
-                            </Button>
-                        </Col>
-                    </Row>
+                    <div className={styles.Body}>
+                        <Tabs>
+                            <TabPane tab="Tab 1" key="1">
+                                Content of tab 1
+                            </TabPane>
+                            <TabPane tab="Tab 2" key="2">
+                                Content of tab 2
+                            </TabPane>
+                            <TabPane tab="Tab 3" key="3">
+                                Content of tab 3
+                            </TabPane>
+                        </Tabs>
+                    </div>
+                </NoHeaderPanel>
 
-                    <Row type={'flex'} justify={'center'} gutter={8}>
-                        <Col span={8}>
-                            {/*1*/}
-                            <Button block icon={'setting'} onClick={this.showSettingsModal}>Settings</Button>
-                        </Col>
+                {/*<AssistantSettings assistant={assistant}*/}
+                                   {/*isAssistantNameValid={this.props.isAssistantNameValid}*/}
+                                   {/*hideModal={this.hideSettingsModal}*/}
+                                   {/*visible={this.state.assistantSettingsVisible}/>*/}
 
-                        <Col span={8}>
-                            {/*5*/}
-                            <Link to={{
-                                pathname: `assistants/${assistant.ID}/analytics`,
-                                state: {assistant: assistant}
-                            }}>
-                                <Button block icon={'line-chart'}>Analytics</Button>
-                            </Link>
+                {/*<CRM assistant={assistant}*/}
+                     {/*CRMsList={this.props.CRMsList}*/}
+                     {/*hideModal={this.hideCRMModal}*/}
+                     {/*visible={this.state.CRMVisible}/>*/}
 
-                        </Col>
-
-                        <Col span={8}>
-                            {/*6*/}
-                            <Link to={{
-                                pathname: `assistants/${assistant.ID}/integration`,
-                                state: {assistant: assistant}
-                            }}>
-                                <Button block icon={'sync'}>Integration</Button>
-                            </Link>
-                        </Col>
-                    </Row>
-
-                    <Row type={'flex'} justify={'center'} gutter={8}>
-                        <Col span={24}>
-                            <Button block icon={'api'}
-                                    onClick={this.showSelectAutoPilotModal}
-                            >Connect Auto Pilot</Button>
-                        </Col>
-
-                    </Row>
-                </Card>
-
-                <AssistantSettings assistant={assistant}
-                                   isAssistantNameValid={this.props.isAssistantNameValid}
-                                   hideModal={this.hideSettingsModal}
-                                   visible={this.state.assistantSettingsVisible}/>
-
-                <CRM assistant={assistant}
-                     CRMsList={this.props.CRMsList}
-                     hideModal={this.hideCRMModal}
-                     visible={this.state.CRMVisible}/>
-
-                <SelectAutoPilotModal
-                    assistant={assistant}
-                    hideModal={this.hideSelectAutoPilotModal}
-                    selectAutoPilotModalVisible={this.state.selectAutoPilotModalVisible}/>
+                {/*<SelectAutoPilotModal*/}
+                    {/*assistant={assistant}*/}
+                    {/*hideModal={this.hideSelectAutoPilotModal}*/}
+                    {/*selectAutoPilotModalVisible={this.state.selectAutoPilotModalVisible}/>*/}
 
             </>
         )

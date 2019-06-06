@@ -1,19 +1,28 @@
 import React, {Component} from 'react';
-import {Button, Skeleton, Modal} from 'antd';
+import {Modal, Typography, Icon, Menu} from 'antd';
 import {connect} from 'react-redux';
 
 import styles from "./Assistants.module.less"
-import Assistant from "./Assistant/Assistant"
 
 import {assistantActions, crmActions} from "store/actions";
-import NewAssistantModal from "./Modals/NewAssistantModal";
-// import CreateNewBox from "components/CreateNewBox/CreateNewBox"
+import {RobotIcon} from "components/SVGs";
+import {history} from "helpers";
 
+import NewAssistantModal from "./Modals/NewAssistantModal";
+import EditModal from "./Modals/EditModal";
+import NoHeaderPanel from 'components/NoHeaderPanel/NoHeaderPanel'
+import CreateNewBox from "components/CreateNewBox/CreateNewBox"
+import ViewBox from "components/ViewBox/ViewBox";
+
+
+const {Title, Paragraph, Text} = Typography;
 const confirm = Modal.confirm;
 
 class Assistants extends Component {
     state = {
-        visible: false,
+        newAssistantModalVisible: false,
+        editModalVisible: false,
+        assistantToEdit: null
     };
 
 
@@ -21,16 +30,30 @@ class Assistants extends Component {
         this.props.dispatch(assistantActions.fetchAssistants());
     }
 
-    showModal = () => this.setState({visible: true});
-    hideModal = () => this.setState({visible: false});
+    showNewAssistantModal = () => this.setState({newAssistantModalVisible: true});
+    hideNewAssistantModal = () => this.setState({newAssistantModalVisible: false});
+
+    showEditModal = (assistant) => this.setState({editModalVisible: true, assistantToEdit: assistant});
+    hideEditModal = () => this.setState({editModalVisible: false});
 
     addAssistant = (values) => {
         this.props.dispatch(assistantActions.addAssistant(values));
-        this.hideModal();
+        this.hideNewAssistantModal();
     };
 
-    isAssistantNameValid = (name) => {
-        return !(this.props.assistantList.findIndex(a => a.Name.toLowerCase() === name.toLowerCase()) >= 0)
+    updateAssistant = (assistantID, values) => {
+        this.props.dispatch(assistantActions.updateAssistant(assistantID, values));
+        this.hideEditModal();
+    };
+
+    deleteAssistant = (assistantID) => {
+        confirm({
+            title: `Delete assistant confirmation`,
+            content: `If you click OK, this assistant will be deleted with its content forever`,
+            onOk: () => {
+                this.props.dispatch(assistantActions.deleteAssistant(assistantID));
+            }
+        });
     };
 
     activateHandler = (checked, assistantID) => {
@@ -47,66 +70,88 @@ class Assistants extends Component {
         this.props.dispatch(assistantActions.changeAssistantStatus(assistantID, checked))
     };
 
+    isAssistantNameValid = (name) => {
+        return !(this.props.assistantList.findIndex(assistant => assistant.Name.toLowerCase() === name.toLowerCase()) >= 0)
+    };
+
+    optionsMenuClickHandler = (e, assistant) => {
+        if (e.key === 'edit')
+            this.showEditModal(assistant);
+        if (e.key === 'delete')
+            this.deleteAssistant(assistant.ID)
+    };
+
+    // it must be an array of Menu.Item. ViewBox expect that in its options Menu
+    optionsMenuItems = [
+        <Menu.Item style={{padding:10, paddingRight: 30}} key="edit">
+            <Icon type="edit" theme="twoTone" twoToneColor="#595959" style={{marginRight: 5}}/>
+            Edit
+        </Menu.Item>,
+        <Menu.Item style={{padding:10, paddingRight: 30}} key="delete">
+            <Icon type="delete" theme="twoTone" twoToneColor="#f50808" />
+            Delete
+        </Menu.Item>
+    ];
+
     render() {
         return (
-            <div style={{height: '100%'}}>
-                <div className={styles.Panel}>
-                    <div className={styles.Panel_Header}>
-                        <div>
-                            <h3>Assistants List</h3>
-                            <p>Here you can see all assistants created by you</p>
-                        </div>
-                        <div>
-                            <Button className={styles.Panel_Header_Button} type="primary" icon="plus"
-                                    onClick={this.showModal}>
-                                Add Assistant
-                            </Button>
-                        </div>
-                    </div>
 
 
-                    <div className={styles.Panel_Body}>
-                        <div className={styles.AssistantsList}>
-                            {
-                                !this.props.isLoading ?
-                                    (
-                                        this.props.assistantList.map((assistant, i) =>
-                                            <Assistant assistant={assistant}
-                                                       key={i}
-                                                       index={i}
-                                                       isStatusChanging={this.props.isStatusChanging}
-                                                       activateHandler={this.activateHandler}
-                                                       isAssistantNameValid={this.isAssistantNameValid}
-                                                       CRMsList={this.props.CRMsList}
-                                                       isLoading={this.props.isLoading}/>)
-                                    )
-                                    : <Skeleton active/>
-                            }
-                        </div>
-                    </div>
+        <>
+            <NoHeaderPanel>
+                <div className={styles.Header}>
+                    <Title className={styles.Title}>
+                        <Icon type="robot"/> Assistants
+                    </Title>
+                    <Paragraph type="secondary">
+                        Here you can see all assistants created by you
+
+                    </Paragraph>
 
                 </div>
 
-                <NewAssistantModal visible={this.state.visible}
-                                   options={this.props.options}
-                                   addAssistant={this.addAssistant}
-                                   isAssistantNameValid={this.isAssistantNameValid}
-                                   hideModal={this.hideModal}/>
 
-            </div>
+                <div className={styles.Body}>
+                    <CreateNewBox text={'Add Assistant'} onClick={this.showNewAssistantModal}/>
+                    {
+                        this.props.assistantList.map(
+                            (assistant, i) =>
+                                <ViewBox
+                                    onClick={() => history.push(`/dashboard/assistants/${assistant.ID}`)}
+                                    optionsMenuItems={this.optionsMenuItems}
+                                    optionsMenuClickHandler={(e)=>this.optionsMenuClickHandler(e, assistant)}
+                                    key={i}
+                                    title={assistant.Name}
+                                    text={assistant.Description || "No description"}
+                                    icon={<RobotIcon/>}
+                                    iconWidth={75} iconHeight={75} iconTop={183} iconRight={15}
+                                />
+                        )
+                    }
+                </div>
+            </NoHeaderPanel>
+
+            <NewAssistantModal visible={this.state.newAssistantModalVisible}
+                               addAssistant={this.addAssistant}
+                               isAssistantNameValid={this.isAssistantNameValid}
+                               hideModal={this.hideNewAssistantModal}/>
+
+            <EditModal visible={this.state.editModalVisible}
+                       assistant={this.state.assistantToEdit}
+                       hideModal={this.hideEditModal}
+                       isAssistantNameValid={this.isAssistantNameValid}
+                       updateAssistant={this.updateAssistant}
+            />
+        </>
         );
     }
 }
 
 function mapStateToProps(state) {
-    console.log(state)
     return {
         assistantList: state.assistant.assistantList,
-        registerList: state.assistant.registerList,
         isLoading: state.assistant.isLoading,
         isStatusChanging: state.assistant.isStatusChanging,
-        options: state.options.options,
-        CRMsList: state.crm.CRMsList,
     };
 }
 

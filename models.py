@@ -132,6 +132,7 @@ class Assistant(db.Model):
 
     ID = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
     Name = db.Column(db.String(128), nullable=False)
+    Description = db.Column(db.String(260), nullable=True)
     Flow = db.Column(MagicJSON, nullable=True)
     Message = db.Column(db.String(500), nullable=False)
     TopBarText = db.Column(db.String(64), nullable=False)

@@ -51,7 +51,7 @@ def uploadFile(assistant: Assistant, storedFile: StoredFile):
 def searchCandidates(assistant: Assistant, session):
     # Check CRM type
     # if assistant.CRM.Type is CRM.Adapt:
-    #     return Adapt.pullAllCadidates(assistant.CRM.Auth)
+    #     return Adapt.searchCandidates(assistant.CRM.Auth)
     if assistant.CRM.Type is CRM.Bullhorn:
         return Bullhorn.searchCandidates(assistant.CRM.Auth, assistant.CompanyID, session)
     elif assistant.CRM.Type is CRM.Greenhouse:

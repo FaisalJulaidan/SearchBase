@@ -24,16 +24,16 @@ class SelectAutoPilotModal extends React.Component {
                visible={this.props.selectAutoPilotModalVisible}
                width={800}
                destroyOnClose={true}
-               onCancel={this.props.hideModal}
+               onCancel={this.props.hideNewAssistantModal}
                footer={[
-                   <Button key="reset" onClick={this.props.hideModal}>Close</Button>,
+                   <Button key="reset" onClick={this.props.hideNewAssistantModal}>Close</Button>,
                    <Popconfirm key="disconnect"
                                title="Are you sure disconnect this assistant?"
                                onConfirm={() => {
                                    this.disconnectAutoPilot();
-                                   this.props.hideModal()
+                                   this.props.hideNewAssistantModal()
                                }}
-                               onCancel={this.props.hideModal}
+                               onCancel={this.props.hideNewAssistantModal}
                                okText="Yes"
                                cancelText="No">
                        <Button type={'danger'}>Disconnect All</Button>

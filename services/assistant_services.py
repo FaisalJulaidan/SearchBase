@@ -10,31 +10,32 @@ from werkzeug.utils import secure_filename
 import logging, json
 
 
-def create(name, message, topBarText, secondsUntilPopup, mailEnabled, mailPeriod, template, config, companyID) -> Assistant or None:
+def create(name, desc, welcomeMessage, topBarText, companyID) -> Assistant or None:
     try:
 
-        # Validate the json config
-        validate(config, json_schemas.assistant_config)
+        # flow = None
+        # if template and template != 'none':
+        #     # Get json template
+        #     relative_path = join('static/assistant_templates', template + '.json')
+        #     absolute_path = join(BaseConfig.APP_ROOT, relative_path)
+        #     flow = json.load(open(absolute_path))
+        #     # Validate template
+        #     callback: Callback = flow_services.isValidFlow(flow)
+        #     if not callback.Success:
+        #         raise Exception(callback.Message)
 
-        flow = None
-        if template and template != 'none':
-            # Get json template
-            relative_path = join('static/assistant_templates', template + '.json')
-            absolute_path = join(BaseConfig.APP_ROOT, relative_path)
-            flow = json.load(open(absolute_path))
-            # Validate template
-            callback: Callback = flow_services.isValidFlow(flow)
-            if not callback.Success:
-                raise Exception(callback.Message)
+        assistant = Assistant(Name=name,
+                              Description=desc,
+                              Message=welcomeMessage,
+                              TopBarText=topBarText,
+                              SecondsUntilPopup=0,
+                              Active=True,
+                              CompanyID=companyID)
 
-        assistant = Assistant(Name=name, Flow=flow, Message=message, TopBarText=topBarText,
-                              SecondsUntilPopup=secondsUntilPopup, MailEnabled=mailEnabled, MailPeriod=mailPeriod,
-                              Config=config, CompanyID=companyID)
         db.session.add(assistant)
-
-        # Save
         db.session.commit()
-        return Callback(True, 'Assistant has ben created successfully!', assistant)
+
+        return Callback(True, 'Assistant created successfully', assistant)
     except Exception as exc:
         print(exc)
         logging.error("assistant_services.create(): " + str(exc))
@@ -95,7 +96,13 @@ def getAll(companyID) -> Callback:
     try:
         if not companyID: raise Exception
         # Get result and check if None then raise exception
-        result = db.session.query(Assistant).filter(Assistant.CompanyID == companyID).all()
+        result = db.session.query(Assistant.ID,
+                                  Assistant.Name,
+                                  Assistant.Description,
+                                  Assistant.Message,
+                                  Assistant.TopBarText,
+                                  Assistant.Active)\
+            .filter(Assistant.CompanyID == companyID).all()
 
         if len(result) == 0:
             return Callback(True,"No assistants  to be retrieved.", [])
@@ -127,7 +134,29 @@ def getAllWithEnabledNotifications(companyID) -> Callback:
 
 
 # ----- Updaters ----- #
-def update(id, name, message, topBarText, secondsUntilPopup, mailEnabled, mailPeriod, config, companyID)-> Callback:
+def update(id, name, desc, message, topBarText, companyID)-> Callback:
+    try:
+        assistant: Assistant = db.session.query(Assistant) \
+            .filter(and_(Assistant.ID == id, Assistant.CompanyID == companyID)) \
+            .first()
+
+        assistant.Name = name
+        assistant.Description = desc
+        assistant.Message = message
+        assistant.TopBarText = topBarText
+
+        db.session.commit()
+        return Callback(True, 'Assistant updated successfully', assistant)
+
+    except Exception as exc:
+        print(exc)
+        db.session.rollback()
+        logging.error("assistant_services.update(): " + str(exc))
+        return Callback(False,
+                        "Couldn't update assistant " + str(id))
+
+
+def updateConfigs(id, name, message, topBarText, secondsUntilPopup, mailEnabled, mailPeriod, config, companyID)-> Callback:
     try:
         # Validate the json config
         validate(config, json_schemas.assistant_config)

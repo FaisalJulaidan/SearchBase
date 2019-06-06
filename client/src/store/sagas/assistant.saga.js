@@ -21,6 +21,21 @@ function* fetchAssistants() {
     }
 }
 
+function* fetchAssistant({assistantID, meta}) {
+    try {
+        const res = yield http.get(`/assistant/${assistantID}`);
+        // yield put(crmActions.getConnectedCRMs());
+
+        yield put({...assistantActions.fetchAssistantsSuccess(res.data?.data.assistants), meta});
+    } catch (error) {
+        console.error(error);
+        const msg = "Couldn't load assistants";
+        yield put({...assistantActions.fetchAssistantsFailure(msg), meta});
+        errorMessage(msg);
+    }
+}
+
+
 function* addAssistant({type, newAssistant}) {
     try {
         loadingMessage('Building assistant...', 0);
@@ -45,6 +60,19 @@ function* updateAssistant({assistantID, updatedSettings}) {
         console.error(error);
         const msg = "Couldn't update assistant";
         yield put(assistantActions.updateAssistantFailure(msg));
+        errorMessage(msg);
+    }
+}
+
+function* updateAssistantConfigs({assistantID, updatedSettings}) {
+    try {
+        const res = yield http.put(`assistant/${assistantID}/configs`, updatedSettings);
+        yield put(assistantActions.updateAssistantConfigsSuccess(assistantID, res.data?.data, res.data?.msg));
+        successMessage('Assistant configuration updated');
+    } catch (error) {
+        console.error(error);
+        const msg = "Couldn't update assistant configuration";
+        yield put(assistantActions.updateAssistantConfigsFailure(msg));
         errorMessage(msg);
     }
 }
@@ -200,6 +228,10 @@ function* watchFetchAssistants() {
     yield takeEvery(actionTypes.FETCH_ASSISTANTS_REQUEST, fetchAssistants)
 }
 
+function* watchFetchAssistant() {
+    yield takeEvery(actionTypes.FETCH_ASSISTANT_REQUEST, fetchAssistant)
+}
+
 function* watchAddAssistant() {
     yield takeEvery(actionTypes.ADD_ASSISTANT_REQUEST, addAssistant)
 }
@@ -208,6 +240,9 @@ function* watchUpdateAssistant() {
     yield takeEvery(actionTypes.UPDATE_ASSISTANT_REQUEST, updateAssistant)
 }
 
+function* watchUpdateAssistantConfigs() {
+    yield takeEvery(actionTypes.UPDATE_ASSISTANT_CONFIGS_REQUEST, updateAssistantConfigs)
+}
 function* watchDeleteAssistant() {
     yield takeEvery(actionTypes.DELETE_ASSISTANT_REQUEST, deleteAssistant)
 }
@@ -222,6 +257,7 @@ export function* assistantSaga() {
         watchFetchAssistants(),
         watchAddAssistant(),
         watchUpdateAssistant(),
+        watchUpdateAssistantConfigs(),
         watchDeleteAssistant(),
         watchUpdateFlow(),
         watchUpdateStatus(),

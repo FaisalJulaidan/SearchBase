@@ -53,6 +53,9 @@ function camelize(str) {
     }).replace(/\s+/g, '');
 }
 
+/**
+ * @return {string}
+ */
 function PascalCase(string) {
     return `${string}`
         .replace(new RegExp(/[-_]+/, 'g'), ' ')
@@ -135,11 +138,10 @@ const createSaga = (sagaName, actionName) => {
             successMessage(res.data?.msg || CHANGE THIS);
             yield put(${actionFile}.${placeholder_camel}Success());
         } catch (error) {
-            const defaultMsg = "CHANGE THIS";
-            let data = error.response?.data;
-            errorMessage(data.msg || defaultMsg);
+            const msg = error.response?.data?.msg || "CHANGE THIS";
+            errorMessage(msg);
             yield put(${actionFile}.${placeholder_camel}Failure(data.msg || defaultMsg));
-            if (!data.msg) errorHandler(error)
+            errorHandler(error)
         }
     }
 

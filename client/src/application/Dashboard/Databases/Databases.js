@@ -35,7 +35,7 @@ class Databases extends Component {
     hideUploadModal = () => this.setState({uploadModalVisible: false});
 
     showEditModal = (database) => this.setState({editModalVisible: true, databaseToEdit: database});
-    hideEditModal = () => this.setState({editModalVisible: false})
+    hideEditModal = () => this.setState({editModalVisible: false});
 
     updateDatabase = (updatedDatabase, databaseID) => {
         this.props.dispatch(databaseActions.updateDatabase(updatedDatabase, databaseID));

@@ -17,6 +17,7 @@ import {faCloud} from '@fortawesome/free-solid-svg-icons'
 
 const Home = lazy(() => import('./Home/Home'));
 const Assistants = lazy(() => import('./Assistants/Assistants'));
+const Assistant = lazy(() => import('./Assistants/Assistant/Assistant'));
 const AssistantCRM = lazy(() => import('./Assistants/Assistant/CRM/CRM'));
 const Databases = lazy(() => import('./Databases/Databases'));
 const DatabasesConfigs = lazy(() => import('./Databases/Database/Database'));
@@ -113,7 +114,7 @@ class Dashboard extends Component {
         }
         // End of User Information
 
-        const newLayoutRoutes = ["/dashboard/marketplace", "/dashboard/calendar", "/dashboard/auto_pilot", "/dashboard/databases"];
+        const newLayoutRoutes = ["/dashboard/assistants", "/dashboard/marketplace", "/dashboard/calendar", "/dashboard/auto_pilot", "/dashboard/databases"];
         const isNewLyaout = newLayoutRoutes.some(a => this.props.location.pathname.indexOf(a) > -1);
         return (
             <Layout style={{height: '100%'}}>
@@ -249,6 +250,7 @@ class Dashboard extends Component {
                                     <Suspense fallback={<div> Loading...</div>}>
                                         <Switch location={location} style={{height: '100%'}}>
 
+                                            <Route path={`${match.path}/assistants/:id`} component={Assistant}/>
                                             <Route path={`${match.path}/assistants/:id/script`} component={Flow}/>
                                             <Route path={`${match.path}/assistants/:id/integration`} component={Integration}/>
                                             <Route path={`${match.path}/assistants/:id/conversations`} component={Conversations}/>

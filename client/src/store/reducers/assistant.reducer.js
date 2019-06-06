@@ -2,13 +2,14 @@ import * as actionTypes from '../actions/actionTypes';
 import {updateObject} from '../utility';
 import {deepClone} from "helpers";
 
-const initialState = {assistantList: [], isLoading: false, errorMsg: null, isUpdatingFlow: false};
+const initialState = {assistantList: [], assistant: null, isLoading: false, errorMsg: null, isUpdatingFlow: false};
 
 export const assistant = (state = initialState, action) => {
     let assistantsCopy;
     let index;
 
     switch (action.type) {
+        // Fetch
         case actionTypes.FETCH_ASSISTANTS_REQUEST:
             return updateObject(state, {
                 assistantList: [],
@@ -26,6 +27,25 @@ export const assistant = (state = initialState, action) => {
                 isLoading: false,
                 errorMsg: action.error
             });
+
+        case actionTypes.FETCH_ASSISTANT_REQUEST:
+            return updateObject(state, {
+                assistant: null,
+                errorMsg: null,
+                isLoading: true,
+            });
+        case actionTypes.FETCH_ASSISTANT_SUCCESS:
+            return updateObject(state, {
+                assistant: action.assistant,
+                isLoading: false
+            });
+        case actionTypes.FETCH_ASSISTANT_FAILURE:
+            return updateObject(state, {
+                assistant: null,
+                isLoading: false,
+                errorMsg: action.error
+            });
+
 
         // Add
         case actionTypes.ADD_ASSISTANT_REQUEST:
@@ -46,6 +66,8 @@ export const assistant = (state = initialState, action) => {
                 errorMsg: action.error
             });
 
+
+
         // Update
         case actionTypes.UPDATE_ASSISTANT_REQUEST:
 
@@ -64,6 +86,28 @@ export const assistant = (state = initialState, action) => {
                 assistantList: assistantsCopy
             });
         case actionTypes.UPDATE_ASSISTANT_FAILURE:
+            return updateObject(state, {
+                isLoading: false,
+                errorMsg: action.error
+            });
+
+        case actionTypes.UPDATE_ASSISTANT_CONFIGS_REQUEST:
+
+            return updateObject(state, {
+                successMsg: null,
+                errorMsg: null,
+                isLoading: true
+            });
+        case actionTypes.UPDATE_ASSISTANT_CONFIGS_SUCCESS:
+            assistantsCopy = state.assistantList
+                .map(a => a.ID === action.assistantID ? {...action.updatedAssistant}: a);
+
+            return updateObject(state, {
+                successMsg: action.successMsg,
+                isLoading: false,
+                assistantList: assistantsCopy
+            });
+        case actionTypes.UPDATE_ASSISTANT_CONFIGS_FAILURE:
             return updateObject(state, {
                 isLoading: false,
                 errorMsg: action.error

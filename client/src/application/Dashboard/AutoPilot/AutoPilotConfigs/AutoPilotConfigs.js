@@ -107,10 +107,9 @@ class AutoPilotConfigs extends React.Component {
                     </div>
 
                     <div className={styles.Body}>
-                        <Form layout='vertical' style={{width: '100%'}}>
+                        <Form layout='vertical' wrapperCol = {{span: 12}} style={{width: '100%'}}>
                             <FormItem
                                 label="Name"
-                                wrapperCol = {{span: 12}}
                                 >
                                 {getFieldDecorator('name', {
                                     initialValue: autoPilot.Name,
@@ -135,7 +134,6 @@ class AutoPilotConfigs extends React.Component {
 
                             <FormItem
                                 label="Description"
-                                wrapperCol = {{span: 12}}
                             >
                                 {getFieldDecorator('description', {
                                     initialValue: autoPilot.Description,
@@ -145,8 +143,8 @@ class AutoPilotConfigs extends React.Component {
                                 )}
                             </FormItem>
 
-                            <Divider/>
                             <br />
+                            <Divider/>
                             <h2> Applications Acceptance Automation:</h2>
                             <FormItem label="Auto accept applicants "
                                       help="Select the percentage to auto accept the applicants">
@@ -183,9 +181,8 @@ class AutoPilotConfigs extends React.Component {
                             </FormItem>
 
 
-
-                            <Divider/>
                             <br />
+                            <Divider/>
                             <h2> Applications Rejection Automation:</h2>
                             <Form.Item label="Auto reject applicants "
                                        help="Select the percentage to auto reject the applicants">
@@ -220,8 +217,8 @@ class AutoPilotConfigs extends React.Component {
                                 )}
                             </FormItem>
 
-                            <Divider/>
                             <br />
+                            <Divider/>
                             <h2> Manage Appointments Automation:</h2>
                             <FormItem label="Auto manage candidates appointments"
                                       help="Accepted candidates will receive an email (if provided) to pick a time slot"

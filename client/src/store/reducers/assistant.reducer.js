@@ -4,7 +4,9 @@ import {deepClone} from "helpers";
 
 const initialState = {assistantList: [], assistant: null, isLoading: false, errorMsg: null, isUpdatingFlow: false};
 
+
 export const assistant = (state = initialState, action) => {
+
     let assistantsCopy;
     let index;
 
@@ -99,13 +101,11 @@ export const assistant = (state = initialState, action) => {
                 isLoading: true
             });
         case actionTypes.UPDATE_ASSISTANT_CONFIGS_SUCCESS:
-            assistantsCopy = state.assistantList
-                .map(a => a.ID === action.assistantID ? {...action.updatedAssistant}: a);
 
             return updateObject(state, {
                 successMsg: action.successMsg,
                 isLoading: false,
-                assistantList: assistantsCopy
+                assistant: action.updatedAssistant
             });
         case actionTypes.UPDATE_ASSISTANT_CONFIGS_FAILURE:
             return updateObject(state, {

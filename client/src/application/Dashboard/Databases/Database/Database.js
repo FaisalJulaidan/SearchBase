@@ -5,7 +5,7 @@ import NoHeaderPanel from 'components/NoHeaderPanel/NoHeaderPanel'
 import {databaseActions} from "store/actions";
 import {Form, Table, Typography} from 'antd';
 import {history} from "helpers";
-import {store} from "../../../../store/store";
+import {store} from "store/store";
 
 const {Title, Paragraph} = Typography;
 
@@ -66,7 +66,8 @@ class Database extends React.Component {
                                columns={this.getColumnsByType(databaseInfo?.Type.name)}
                                rowKey={record => record.ID}
                                dataSource={databaseContent?.records}
-                               size='middle'
+                               size='large'
+                               bordered={true}
                                loading={this.props.isLoadingDatabase}
                                pagination={{
                                    pageSize: databaseContent?.totalPerPage,

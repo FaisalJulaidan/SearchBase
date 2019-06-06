@@ -5,7 +5,6 @@ import ViewsModal from "./ViewModal/ViewsModal";
 import {Badge, Button, Divider, Icon, Modal, Popover, Progress, Table, Tag} from 'antd';
 import {conversationActions} from "store/actions";
 import connect from "react-redux/es/connect/connect";
-import Header from "components/Header/Header";
 import {CSVLink} from "react-csv";
 
 const confirm = Modal.confirm;
@@ -26,7 +25,8 @@ class Conversations extends React.Component {
 
 
     componentDidMount() {
-        const {assistant} = this.props.location.state;
+        const {assistant} = this.props;
+        console.log(assistant)
         this.props.dispatch(conversationActions.fetchConversations(assistant.ID))
     }
 
@@ -42,7 +42,7 @@ class Conversations extends React.Component {
     }
 
     refreshConversations = () => {
-        const {assistant} = this.props.location.state;
+        const {assistant} = this.props;
         this.setState({ConversationsRefreshed:true});
         this.props.dispatch(conversationActions.fetchConversations(assistant.ID))
     };
@@ -211,8 +211,7 @@ class Conversations extends React.Component {
 
 
     render() {
-        const {assistant} = this.props.location.state;
-        const {conversations, options} = this.props;
+        const {assistant, conversations, options} = this.props;
 
         if(this.state.ConversationsRefreshed){this.populateDownloadData(conversations)}
 
@@ -238,13 +237,6 @@ class Conversations extends React.Component {
             key: 'Name',
             render: (text, record) => (
                 <p style={{textTransform: 'capitalize'}}>{this.findUserName(record.Data.keywordsByDataType, record.UserType)}</p>),
-
-        }, {
-            // title: 'Solutions Returned',
-            // dataIndex: 'SolutionsReturned',
-            // sorter: (a, b) => a.SolutionsReturned - b.SolutionsReturned,
-            // render: (text, record) => (
-            //     <p style={{textAlign: ''}}>{text}</p>),
 
         }, {
             title: 'Time Spent',
@@ -359,30 +351,21 @@ class Conversations extends React.Component {
         }];
 
         return (
-            <div style={{height: '100%'}}>
-                <Header display={assistant.Name}/>
-                <div className={styles.Panel}>
-                    <div className={styles.Panel_Header}>
-                        <div>
-                            <h3>{assistant.Name}: conversations</h3>
-                            <p>Here you can find all the responses to your chatbot</p>
-                        </div>
-
-                        <div>
-
-                            <Button className={styles.Panel_Header_Button} type="primary" icon="sync"
+                    <>
+                        <div className={styles.Header}>
+                            <Button type="primary" icon="sync"
                                     onClick={this.refreshConversations} loading={this.props.isLoading}>
                                 Refresh
                             </Button>
 
-                            <Button className={styles.Panel_Header_Button} type="primary" icon="download"
+                            <Button type="primary" icon="download"
                                     loading={this.props.isLoading}>
                                 <CSVLink filename={"Conversations_Export.csv"} data={this.state.downloadData}
                                          style={{color:"white"}}> Export CSV</CSVLink>
                             </Button>
 
 
-                            <Button hidden className={styles.Panel_Header_Button} type="primary" icon="delete"
+                            <Button hidden type="primary" icon="delete"
                                     disabled={!!(!conversations?.conversationsList?.length)}
                                     onClick={() => {
                                         this.clearAllConversations(assistant.ID)
@@ -390,15 +373,14 @@ class Conversations extends React.Component {
                                 Clear All
                             </Button>
                         </div>
-                    </div>
 
-                    <div className={styles.Panel_Body}>
                         <Table columns={columns}
                                rowKey={record => record.ID}
                                dataSource={conversations.conversationsList}
                                onChange={this.handleFilter}
                                loading={this.props.isLoading}
-                               size='middle'
+                               bordered={true}
+                               size='default'
                         />
 
                         {
@@ -415,10 +397,7 @@ class Conversations extends React.Component {
                                                                    isUpdatingStatus={this.props.isUpdatingStatus}
                                                                    buildStatusBadge={this.buildStatusBadge}/>
                         }
-
-                    </div>
-                </div>
-            </div>
+                    </>
         );
     }
 }

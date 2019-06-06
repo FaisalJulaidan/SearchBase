@@ -86,6 +86,7 @@ def assistant_configs(assistantID):
         updatedSettings = request.json
         callback: Callback = assistant_services.updateConfigs(assistantID,
                                                        updatedSettings.get("assistantName"),
+                                                       updatedSettings.get('assistantDesc'),
                                                        updatedSettings.get("welcomeMessage"),
                                                        updatedSettings.get("topBarTitle"),
                                                        updatedSettings.get("secondsUntilPopup"),

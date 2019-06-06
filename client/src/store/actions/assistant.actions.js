@@ -25,6 +25,7 @@ const fetchAssistantsFailure = (error) => {
 const fetchAssistant = (assistantID) => {
     return {
         type: actionTypes.FETCH_ASSISTANT_REQUEST,
+        meta: {thunk: true},
         assistantID
     };
 };
@@ -32,7 +33,6 @@ const fetchAssistant = (assistantID) => {
 const fetchAssistantSuccess = (assistant) => {
     return {
         type: actionTypes.FETCH_ASSISTANT_SUCCESS,
-        meta: {thunk: true},
         assistant
     };
 };

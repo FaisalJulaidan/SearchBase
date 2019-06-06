@@ -1,16 +1,19 @@
 import React, {Component} from 'react';
-import {Button, Card, Col, Row, Switch, Tabs, Typography} from 'antd';
+import {connect} from 'react-redux';
+import {Button, Card, Col, Row, Switch, Tabs, Typography, Spin} from 'antd';
 import './Assistant.less';
 import styles from "./Assistant.module.less";
 import {Link} from "react-router-dom";
-import AssistantSettings from "./AssistantSettings/AssistantSettings";
 import CRM from "./CRM/CRM";
 import SelectAutoPilotModal from "./SelectAutoPilotModal/SelectAutoPilotModal";
 import AuroraBlink from "components/AuroraBlink/AuroraBlink";
+import Conversations from "./Conversations/Conversations"
+import Settings from "./Settings/Settings"
 import {getLink, history} from "helpers";
 import {store} from "store/store";
 import {assistantActions, crmActions} from "store/actions";
 import NoHeaderPanel from 'components/NoHeaderPanel/NoHeaderPanel'
+import {optionsActions} from "../../../../store/actions";
 
 
 
@@ -25,11 +28,18 @@ class Assistant extends Component {
         selectAutoPilotModalVisible: false
     };
 
-    componentWillMount() {
-        store.dispatch(assistantActions.fetchAssistant(this.props.match.params.id)).then(()=> {
+    componentDidMount() {
+        console.log("1111111111")
+        store.dispatch(assistantActions.fetchAssistant(this.props.match.params.id))
+            .then(()=> {}).catch(() => history.push(`/dashboard/assistants`));
 
-        }).catch(() => history.push(`/dashboard/assistants`))
+        if (!this.props.options) store.dispatch(optionsActions.getOptions())
     }
+
+    isAssistantNameValid = (name) => {
+        return !(this.props.assistantList.findIndex(assistant => assistant.Name.toLowerCase() === name.toLowerCase()) >= 0)
+    };
+
 
     showSettingsModal = () => this.setState({assistantSettingsVisible: true});
     hideSettingsModal = () => this.setState({assistantSettingsVisible: false});
@@ -43,33 +53,52 @@ class Assistant extends Component {
     onActiveChanged = checked => this.props.activateHandler(checked, this.props.assistant.ID);
 
     render() {
-        const {assistant, isStatusChanging} = this.props;
+        const {assistant, isAssistantLoading} = this.props;
+
         return (
+
             <>
                 <NoHeaderPanel>
                     <div className={styles.Header}>
                         <Title className={styles.Title}>
-                            Assistants
+                            {assistant?.Name}
                         </Title>
                         <Paragraph type="secondary">
-                            Here you can see all assistants created by you
+                            {assistant?.Description || 'No description'}
                         </Paragraph>
+                        {console.log(assistant)}
 
                     </div>
 
+                    <div className={[styles.Body, 'assistantTabs'].join(' ')}>
+                        {!assistant ? <Spin/> :
 
-                    <div className={styles.Body}>
-                        <Tabs>
-                            <TabPane tab="Tab 1" key="1">
-                                Content of tab 1
-                            </TabPane>
-                            <TabPane tab="Tab 2" key="2">
-                                Content of tab 2
-                            </TabPane>
-                            <TabPane tab="Tab 3" key="3">
-                                Content of tab 3
-                            </TabPane>
-                        </Tabs>
+                            <Tabs defaultActiveKey={'2'} size={"large"}>
+                                <TabPane tab="Analytics" key="1">
+                                    Content of tab 1
+                                </TabPane>
+                                <TabPane tab="Conversations" key="2">
+                                    <Conversations assistant={assistant} />
+                                </TabPane>
+
+                                <TabPane tab="Script" key="3">
+                                    Content of tab 3
+                                </TabPane>
+
+                                <TabPane tab="Connections" key="4">
+                                    Content of tab 3
+                                </TabPane>
+
+                                <TabPane tab="Integration" key="5">
+                                    Content of tab 3
+                                </TabPane>
+
+                                <TabPane tab="Settings" key="6">
+                                    <Settings assistant={assistant}
+                                              isAssistantNameValid={this.isAssistantNameValid} />
+                                </TabPane>
+                            </Tabs>
+                        }
                     </div>
                 </NoHeaderPanel>
 
@@ -93,4 +122,15 @@ class Assistant extends Component {
     }
 }
 
-export default Assistant;
+function mapStateToProps(state) {
+    return {
+        assistantList: state.assistant.assistantList,
+        assistant: state.assistant.assistant,
+        isAssistantLoading: state.assistant.isLoading,
+        options: state.options.options,
+        isLoading: state.assistant.isLoading,
+        isStatusChanging: state.assistant.isStatusChanging,
+    };
+}
+
+export default connect(mapStateToProps)(Assistant);

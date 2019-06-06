@@ -26,11 +26,11 @@ function* fetchAssistant({assistantID, meta}) {
         const res = yield http.get(`/assistant/${assistantID}`);
         // yield put(crmActions.getConnectedCRMs());
 
-        yield put({...assistantActions.fetchAssistantsSuccess(res.data?.data.assistants), meta});
+        yield put({...assistantActions.fetchAssistantSuccess(res.data?.data), meta});
     } catch (error) {
         console.error(error);
         const msg = "Couldn't load assistants";
-        yield put({...assistantActions.fetchAssistantsFailure(msg), meta});
+        yield put({...assistantActions.fetchAssistantFailure(msg), meta});
         errorMessage(msg);
     }
 }
@@ -255,6 +255,7 @@ function* watchSelectAssistantCrm() {
 export function* assistantSaga() {
     yield all([
         watchFetchAssistants(),
+        watchFetchAssistant(),
         watchAddAssistant(),
         watchUpdateAssistant(),
         watchUpdateAssistantConfigs(),

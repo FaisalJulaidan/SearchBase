@@ -25,8 +25,7 @@ class Assistants extends Component {
         assistantToEdit: null
     };
 
-
-    componentDidMount() {
+    componentWillMount() {
         this.props.dispatch(assistantActions.fetchAssistants());
     }
 
@@ -95,8 +94,6 @@ class Assistants extends Component {
 
     render() {
         return (
-
-
         <>
             <NoHeaderPanel>
                 <div className={styles.Header}>
@@ -105,7 +102,6 @@ class Assistants extends Component {
                     </Title>
                     <Paragraph type="secondary">
                         Here you can see all assistants created by you
-
                     </Paragraph>
 
                 </div>
@@ -150,6 +146,7 @@ class Assistants extends Component {
 function mapStateToProps(state) {
     return {
         assistantList: state.assistant.assistantList,
+        options: state.options.options,
         isLoading: state.assistant.isLoading,
         isStatusChanging: state.assistant.isStatusChanging,
     };

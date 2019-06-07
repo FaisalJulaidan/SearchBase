@@ -3,12 +3,9 @@ import {connect} from 'react-redux';
 import styles from "./Database.module.less";
 import NoHeaderPanel from 'components/NoHeaderPanel/NoHeaderPanel'
 import {databaseActions} from "store/actions";
-import {Button, Col, Form, Input, InputNumber, Table, Typography, Pagination} from 'antd';
+import {Form, Table, Typography} from 'antd';
 import {history} from "helpers";
-import {store} from "../../../../store/store";
-import {authActions} from "../../../../store/actions";
-
-const FormItem = Form.Item;
+import {store} from "store/store";
 
 const {Title, Paragraph} = Typography;
 
@@ -65,10 +62,12 @@ class Database extends React.Component {
                     </div>
 
                     <div className={styles.Body}>
-                        <Table columns={this.getColumnsByType(databaseInfo?.Type.name)}
+                        <Table className={styles.Table}
+                               columns={this.getColumnsByType(databaseInfo?.Type.name)}
                                rowKey={record => record.ID}
                                dataSource={databaseContent?.records}
-                               size='middle'
+                               size='large'
+                               bordered={true}
                                loading={this.props.isLoadingDatabase}
                                pagination={{
                                    pageSize: databaseContent?.totalPerPage,
@@ -165,7 +164,7 @@ const CandidateColumns = [{
     render: (text, record, index) => (<p>{record.Currency || "--"}</p>),
 }];
 
-
+// Job Columns
 const JobColumns = [{
     title: '#',
     key: '#',

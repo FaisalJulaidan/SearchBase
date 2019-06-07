@@ -7,3 +7,4 @@ export * from './database.saga';
 export * from './options.saga';
 export * from './crm.saga';
 export * from './autoPilot.saga';
+export * from './analytics.saga';

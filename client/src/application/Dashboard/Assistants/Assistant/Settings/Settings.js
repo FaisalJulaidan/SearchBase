@@ -1,16 +1,29 @@
 import React, {Component} from 'react';
-import {Button, Select, Form, Input, InputNumber, Modal, Slider, Switch} from "antd";
+import {store} from "store/store";
+
+import {Button, Select, Form, Input, InputNumber, Divider, Slider, Switch, Modal} from "antd";
+import {assistantActions, crmActions} from "store/actions";
+
 import countries from 'helpers/static_data/countries'
 const FormItem = Form.Item;
 const Option = Select.Option;
+const confirm = Modal.confirm;
 
-class AssistantSettingsModal extends Component {
+
+class Settings extends Component {
     state = {
         isPopupDisabled: this.props.assistant.SecondsUntilPopup <= 0,
         isAlertsEnabled: this.props.assistant.MailEnabled,
         // alertOptions: {0: "Immediately", 4: "4 hours", 8: "8 hours", 12: "12 hours", 24: "24 hours"}
         alertOptions: {0: "Immediately"}
     };
+
+    componentDidMount() {
+        this.setState({
+            inputValue: this.props.assistant.SecondsUntilPopup
+        });
+    }
+
 
     checkName = (rule, value, callback) => {
         if (!this.props.isAssistantNameValid(value) && this.props.assistant.Name !== value) {
@@ -29,11 +42,6 @@ class AssistantSettingsModal extends Component {
     };
 
 
-    componentDidMount() {
-        this.setState({
-            inputValue: this.props.assistant.SecondsUntilPopup
-        });
-    }
 
     handleSave = () => this.props.form.validateFields((err, values) => {
         if (!err) {
@@ -44,16 +52,21 @@ class AssistantSettingsModal extends Component {
                 restrictedCountries: values.restrictedCountries || []
             };
             delete values.restrictedCountries;
-            this.props.handleSave(values)
+            store.dispatch(assistantActions.updateAssistantConfigs(this.props.assistant.ID, values))
         }
     });
 
-    render() {
-        const formItemLayout = {
-            labelCol: {span: 6},
-            wrapperCol: {span: 14},
-        };
+    handleDelete = () => {
+        confirm({
+            title: `Delete assistant confirmation`,
+            content: `If you click OK, this assistant will be deleted with its content forever`,
+            onOk: () => {
+                this.props.dispatch(assistantActions.deleteAssistant(this.props.assistant.ID));
+            }
+        });
+    };
 
+    render() {
         const alertsKeys = Object.keys(this.state.alertOptions);
         const maxAlertsLength = parseInt(alertsKeys[alertsKeys.length - 1]);
 
@@ -63,27 +76,14 @@ class AssistantSettingsModal extends Component {
         const countriesOptions = [...countries.map(country => <Option key={country.code}>{country.name}</Option>)];
 
         return (
-            <Modal
-                title="Edit Assistant"
-                visible={this.props.visible}
-                width={800}
-                destroyOnClose={true}
-                onCancel={this.props.handleCancel}
-                footer={[
-                    <Button key="delete" type="danger" onClick={this.props.handleDelete}>
-                        Delete
-                    </Button>,
-                    <Button key="cancel" onClick={this.props.handleCancel}>Cancel</Button>,
-                    <Button key="submit" type="primary" onClick={this.handleSave}>
-                        Save
-                    </Button>,
-                ]}>
+            <>
+                <Form layout='vertical' wrapperCol={{span: 12}}>
 
-                <Form layout='horizontal'>
+                    <h2> Basic Settings:</h2>
                     <FormItem
                         label="Assistant Name"
                         extra="Enter a name for your assistant to easily identify it in the dashboard"
-                        {...formItemLayout}>
+                    >
                         {
                             getFieldDecorator('assistantName', {
                                 initialValue: assistant.Name,
@@ -97,9 +97,24 @@ class AssistantSettingsModal extends Component {
                     </FormItem>
 
                     <FormItem
+                        label="Description"
+                        extra="Enter a description for your assistant to easily identify it in the dashboard">
+                        {
+                            getFieldDecorator('assistantDesc', {
+                                initialValue: assistant?.Description,
+                                rules: [{
+                                    required: false,
+                                    message: 'Please input your assistant description'
+                                }]
+                            })
+                            (<Input placeholder="Ex: Qualify candidates for sales job"/>)
+                        }
+                    </FormItem>
+
+                    <FormItem
                         label="Introduction Message"
                         extra="This will be sent as first message"
-                        {...formItemLayout}>
+                    >
 
                         {
                             getFieldDecorator('welcomeMessage', {
@@ -117,7 +132,7 @@ class AssistantSettingsModal extends Component {
                     <FormItem
                         label="Header Title"
                         extra="This will appear on top of your Chatbot"
-                        {...formItemLayout}>
+                    >
                         {
                             getFieldDecorator('topBarTitle', {
                                 initialValue: assistant.TopBarText,
@@ -130,14 +145,19 @@ class AssistantSettingsModal extends Component {
                             )
                         }
                     </FormItem>
+                    <Button type={'primary'} onClick={this.handleSave}>Save changes</Button>
+
+                    {/* ================================ */}
+                    <br />
+                    <Divider/>
+                    <h2> Advance Settings:</h2>
 
                     <FormItem
-                        {...formItemLayout}
-                        label="Pop up"
+                        label="Pop up after"
                         extra="This will make your chatbot pop up automatically on your website"
                     >
                         <Switch checked={!this.state.isPopupDisabled} onChange={this.togglePopupSwitch}
-                                style={{marginRight: '5px'}}/>
+                                style={{marginRight: '15px'}}/>
                         {getFieldDecorator('secondsUntilPopup', {initialValue: assistant.SecondsUntilPopup === 0 ? 1 : assistant.SecondsUntilPopup})(
                             <InputNumber disabled={this.state.isPopupDisabled} min={1}/>
                         )}
@@ -145,8 +165,7 @@ class AssistantSettingsModal extends Component {
                     </FormItem>
 
                     <FormItem
-                        {...formItemLayout}
-                        label="Restricted Contries"
+                        label="Restricted Countries"
                         extra="Chatbot will be disabled for users who live in the selected countries"
                     >
                         {
@@ -163,7 +182,6 @@ class AssistantSettingsModal extends Component {
                     </FormItem>
 
                     <FormItem
-                        {...formItemLayout}
                         label="Records Notifications"
                         extra="If you turn this on, we will notify you through your email"
                     >
@@ -172,7 +190,6 @@ class AssistantSettingsModal extends Component {
                     </FormItem>
 
                     <FormItem
-                        {...formItemLayout}
                         label="Alert Me Every:"
                         extra="Select how often you would like to be notified"
                     >
@@ -185,11 +202,18 @@ class AssistantSettingsModal extends Component {
                                 marks={this.state.alertOptions} step={null}/>
                         )}
                     </FormItem>
+                    <Button type={'primary'} onClick={this.handleSave}>Save changes</Button>
+                </Form>
 
-                 </Form>
-            </Modal>
+                <br />
+                <Divider/>
+                <h2> Delete Assistant:</h2>
+                <Button type={'danger'} onClick={this.handleDelete}>Delete</Button>
+                <br /><br /><br />
+
+            </>
         );
     }
 }
 
-export default Form.create()(AssistantSettingsModal)
+export default Form.create()(Settings)

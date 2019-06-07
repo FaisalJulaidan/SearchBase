@@ -128,11 +128,11 @@ class Role(db.Model):
         return '<Role {}>'.format(self.Name)
 
 
-
 class Assistant(db.Model):
 
     ID = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
     Name = db.Column(db.String(128), nullable=False)
+    Description = db.Column(db.String(260), nullable=True)
     Flow = db.Column(MagicJSON, nullable=True)
     Message = db.Column(db.String(500), nullable=False)
     TopBarText = db.Column(db.String(64), nullable=False)
@@ -180,7 +180,11 @@ class Conversation(db.Model):
     Completed = db.Column(db.Boolean, nullable=False, default=True)
     ApplicationStatus = db.Column(Enum(enums.ApplicationStatus), nullable=False, default=enums.ApplicationStatus.Pending)
     Score = db.Column(db.Float(), nullable=False)
+
+    AcceptanceEmailSentAt = db.Column(db.DateTime(), default=None)
+    RejectionEmailSentAt = db.Column(db.DateTime(), default=None)
     AppointmentEmailSentAt = db.Column(db.DateTime(), default=None)
+
 
     AutoPilotStatus = db.Column(db.Boolean, nullable=False, default=False)
     AutoPilotResponse = db.Column(db.String(250), nullable=True)
@@ -205,10 +209,15 @@ class AutoPilot(db.Model):
     Name = db.Column(db.String(128), nullable=False)
     Description = db.Column(db.String(260), nullable=True)
     Active = db.Column(db.Boolean, nullable=False, default=True)
+
     AcceptApplications = db.Column(db.Boolean, nullable=False, default=False)
     AcceptanceScore = db.Column(db.Float(), nullable=False, default=1)
+    SendAcceptanceEmail = db.Column(db.Boolean, nullable=False, default=False)
+
     RejectApplications = db.Column(db.Boolean, nullable=False, default=False)
     RejectionScore = db.Column(db.Float(), nullable=False, default=0.05)
+    SendRejectionEmail = db.Column(db.Boolean, nullable=False, default=False)
+
     SendCandidatesAppointments = db.Column(db.Boolean, nullable=False, default=False)
 
     # Relationships:
@@ -370,10 +379,10 @@ class Candidate(db.Model):
     CandidateEmail = db.Column(db.String(64), nullable=True)
     CandidateMobile = db.Column(db.String(20), nullable=True)
     CandidateLocation = db.Column(db.String(64), nullable=False) # Required
-    CandidateSkills = db.Column(db.String(150), nullable=False) # Required
+    CandidateSkills = db.Column(db.String(1080), nullable=False) # Required
     CandidateLinkdinURL = db.Column(db.String(512), nullable=True)
     CandidateAvailability = db.Column(db.String(64), nullable=True)
-    CandidateJobTitle = db.Column(db.String(64), nullable=True)
+    CandidateJobTitle = db.Column(db.String(120), nullable=True)
     CandidateEducation = db.Column(db.String(64), nullable=True)
     CandidateYearsExperience = db.Column(db.Float(), nullable=True)
     CandidateDesiredSalary = db.Column(db.Float(), nullable=True)

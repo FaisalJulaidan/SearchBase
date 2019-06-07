@@ -1,11 +1,12 @@
 import React from 'react'
 import {history} from "helpers";
 import NoHeaderPanel from 'components/NoHeaderPanel/NoHeaderPanel'
-import {Avatar, Breadcrumb, Button, Form, Modal, Tabs, Typography} from 'antd';
+import {Avatar, Breadcrumb, Button, Form, Tabs, Typography} from 'antd';
 import styles from './Crm.module.less'
 import 'types/CRM_Types';
 import {AdaptFeatures, AdaptFormItems, AdaptHeader} from "./CrmForms/Adapt";
 import {BullhornFeatures, BullhornFormItems, BullhornHeader} from "./CrmForms/Bullhorn";
+import {GreenhouseFeatures, GreenhouseFormItem, GreenhouseHeader} from "./CrmForms/Greenhouse";
 import VincereFormItems from "./CrmForms/Vincere";
 import {connect} from 'react-redux';
 import {crmActions} from "store/actions";
@@ -14,8 +15,6 @@ import {CSVLink} from "react-csv";
 const TabPane = Tabs.TabPane;
 const {Title} = Typography;
 const FormItem = Form.Item;
-
-const confirm = Modal.confirm;
 
 class Crm extends React.Component {
 
@@ -96,6 +95,10 @@ class Crm extends React.Component {
                             crm.type === "Bullhorn" &&
                             <BullhornHeader/>
                         }
+                        {
+                            crm.type === "Greenhouse" &&
+                            <GreenhouseHeader/>
+                        }
                     </div>
                 </div>
 
@@ -103,19 +106,25 @@ class Crm extends React.Component {
                     <Breadcrumb>
                         <Breadcrumb.Item>
                             <a href={"javascript:void(0);"}
-                               onClick={() => history.push('/dashboard/crmlist')}>
-                                CRMs List
+                               onClick={() => history.push('/dashboard/marketplace')}>
+                                Marketplace
                             </a>
                         </Breadcrumb.Item>
                         <Breadcrumb.Item>{crm.type}</Breadcrumb.Item>
                     </Breadcrumb>
 
-                    {crm.type === "Bullhorn" ? <><br/>
-                        <Button className={styles.Panel_Header_Button} type="primary" icon="download"
-                                loading={crm.exportData===undefined}>
-                            <CSVLink filename={"Recruiter Pipeline Report.csv"} data={crm.exportData || []}
-                                     style={{color:"white"}}> Recruiter Pipeline Report</CSVLink>
-                        </Button></> : <></>}
+                    {
+                        crm.type === "Bullhorn" ?
+                            <>
+                                <br/>
+                                <Button className={styles.Panel_Header_Button} type="primary" icon="download"
+                                        loading={crm.exportData === undefined}>
+                                    <CSVLink filename={"Recruiter Pipeline Report.csv"} data={crm.exportData || []}
+                                             style={{color: "white"}}> Recruiter Pipeline Report</CSVLink>
+                                </Button>
+                            </>
+                            : <></>
+                    }
 
                     <br/>
 
@@ -128,6 +137,10 @@ class Crm extends React.Component {
                             {
                                 crm.type === "Bullhorn" &&
                                 <BullhornFeatures/>
+                            }
+                            {
+                                crm.type === "Greenhouse" &&
+                                <GreenhouseFeatures/>
                             }
                         </TabPane>
 
@@ -180,6 +193,20 @@ class Crm extends React.Component {
                                                       connectCRM={this.connectCRM}
                                                       testCRM={this.testCRM}/>
 
+                                }
+
+                                {
+                                    crm.type === "Greenhouse" &&
+                                    <GreenhouseFormItem getFieldDecorator={getFieldDecorator}
+                                                        layout={layout}
+                                                        FormItem={FormItem}
+                                                        CRM={crm}
+                                                        isConnecting={this.props.isConnecting}
+                                                        isTesting={this.props.isTesting}
+                                                        isDisconnecting={this.props.isDisconnecting}
+                                                        disconnectCRM={this.disconnectCRM}
+                                                        connectCRM={this.connectCRM}
+                                                        testCRM={this.testCRM}/>
                                 }
 
                             </Form>

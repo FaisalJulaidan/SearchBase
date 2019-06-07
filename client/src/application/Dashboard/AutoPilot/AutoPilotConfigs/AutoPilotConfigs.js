@@ -1,7 +1,7 @@
 import React from 'react'
 import styles from "./AutoPilotConfigs.module.less";
 import NoHeaderPanel from 'components/NoHeaderPanel/NoHeaderPanel'
-import {Button, Col, Form, Input, InputNumber, Switch, Typography} from 'antd';
+import {Button, Col, Form, Input, InputNumber, Switch, Typography, Divider} from 'antd';
 import 'types/TimeSlots_Types'
 import {history} from "helpers";
 import TimeSlots from "./TimeSlots/TimeSlots";
@@ -21,7 +21,9 @@ class AutoPilotConfigs extends React.Component {
     state = {
         rejectApplications: false,
         acceptApplications: false,
-        SendCandidatesAppointments: false,
+        sendAcceptanceEmail: false,
+        sendRejectionEmail: false,
+        sendCandidatesAppointments: false,
 
         acceptanceScore: null,
         rejectionScore: null
@@ -35,7 +37,9 @@ class AutoPilotConfigs extends React.Component {
         this.setState({
             rejectApplications: autoPilot.RejectApplications,
             acceptApplications: autoPilot.AcceptApplications,
-            SendCandidatesAppointments: autoPilot.SendCandidatesAppointments,
+            sendAcceptanceEmail: autoPilot.SendAcceptanceEmail,
+            sendRejectionEmail: autoPilot.SendRejectionEmail,
+            sendCandidatesAppointments: autoPilot.SendCandidatesAppointments,
             acceptanceScore: autoPilot.AcceptanceScore * 100,
             rejectionScore: autoPilot.RejectionScore * 100
         })
@@ -43,7 +47,9 @@ class AutoPilotConfigs extends React.Component {
 
     onRejectChange = (checked) => this.setState({rejectApplications: checked});
     onAcceptChange = (checked) => this.setState({acceptApplications: checked});
-    onAppointmentChange = (checked) => this.setState({SendCandidatesAppointments: checked});
+    onAppointmentChange = (checked) => this.setState({sendCandidatesAppointments: checked});
+    onSendAcceptanceEmailChange = (checked) => this.setState({sendAcceptanceEmail: checked});
+    onSendRejectionEmailChange = (checked) => this.setState({sendRejectionEmail: checked});
 
     changeScore = (value, stateName) => this.setState(state => state[stateName] = value);
 
@@ -69,9 +75,11 @@ class AutoPilotConfigs extends React.Component {
             description: values.description,
             acceptApplications: state.acceptApplications,
             rejectApplications: state.rejectApplications,
+            sendAcceptanceEmail: state.sendAcceptanceEmail,
+            sendRejectionEmail: state.sendRejectionEmail,
             acceptanceScore: state.acceptanceScore / 100,
             rejectionScore: state.rejectionScore / 100,
-            sendCandidatesAppointments: state.SendCandidatesAppointments,
+            sendCandidatesAppointments: state.sendCandidatesAppointments,
 
             openTimeSlots: weekDays
         };
@@ -99,10 +107,9 @@ class AutoPilotConfigs extends React.Component {
                     </div>
 
                     <div className={styles.Body}>
-                        <Form layout='vertical' style={{width: '100%'}}>
+                        <Form layout='vertical' wrapperCol = {{span: 12}} style={{width: '100%'}}>
                             <FormItem
-                                label="Auto Pilot Name"
-                                wrapperCol = {{span: 12}}
+                                label="Name"
                                 >
                                 {getFieldDecorator('name', {
                                     initialValue: autoPilot.Name,
@@ -126,8 +133,7 @@ class AutoPilotConfigs extends React.Component {
                             </FormItem>
 
                             <FormItem
-                                label="Auto Pilot Description"
-                                wrapperCol = {{span: 12}}
+                                label="Description"
                             >
                                 {getFieldDecorator('description', {
                                     initialValue: autoPilot.Description,
@@ -137,36 +143,18 @@ class AutoPilotConfigs extends React.Component {
                                 )}
                             </FormItem>
 
-
-                            <Form.Item label="Auto Reject Applicants "
-                                       extra="Select the percentage to auto reject the applicants">
-                                {getFieldDecorator('rejectApplications', {
-                                    valuePropName: 'checked',
-                                })(
-                                    <>
-                                        <Switch onChange={this.onRejectChange} style={{marginRight: 15}}
-                                                defaultChecked={autoPilot.RejectApplications}/>
-                                        Less Than
-                                        <InputNumber min={1} max={100}
-                                                     onChange={value => this.changeScore(value, 'rejectionScore')}
-                                                     formatter={value => `${value}%`}
-                                                     key={this.state.acceptanceScore ? 'notLoadedYet' : 'loaded'}
-                                                     defaultValue={this.state.rejectionScore}
-                                                     style={{marginLeft: 15}}
-                                                     disabled={!this.state.rejectApplications}/>
-                                    </>
-                                )}
-                            </Form.Item>
-
-                            <FormItem label="Auto Accept Applicants "
-                                      extra="Select the percentage to auto accept the applicants">
+                            <br />
+                            <Divider/>
+                            <h2> Applications Acceptance Automation:</h2>
+                            <FormItem label="Auto accept applicants "
+                                      help="Select the percentage to auto accept the applicants">
                                 {getFieldDecorator('acceptApplications', {
                                     valuePropName: 'checked',
                                 })(
                                     <>
                                         <Switch onChange={this.onAcceptChange} style={{marginRight: 15}}
                                                 defaultChecked={autoPilot.AcceptApplications}/>
-                                        Greater Than
+                                        A score greater than
                                         <InputNumber min={0} max={100}
                                                      onChange={value => this.changeScore(value, 'acceptanceScore')}
                                                      defaultValue={this.state.acceptanceScore}
@@ -178,14 +166,71 @@ class AutoPilotConfigs extends React.Component {
                                 )}
                             </FormItem>
 
-                            <FormItem label="Auto Set Appointment">
-                                {getFieldDecorator('SendCandidatesAppointments', {
+                            <FormItem label="Auto send acceptance emails"
+                                      help="Accepted applicants will be notified via email if email is provided (candidates applications only)"
+                            >
+                                {getFieldDecorator('sendAcceptanceEmail', {
+                                    initialValue: autoPilot.SendAcceptanceEmail,
+                                    rules: [],
+                                })(
+                                    <div style={{marginLeft: 3}}>
+                                        <Switch onChange={this.onSendAcceptanceEmailChange}
+                                                checked={this.state.sendAcceptanceEmail}/>
+                                    </div>
+                                )}
+                            </FormItem>
+
+
+                            <br />
+                            <Divider/>
+                            <h2> Applications Rejection Automation:</h2>
+                            <Form.Item label="Auto reject applicants "
+                                       help="Select the percentage to auto reject the applicants">
+                                {getFieldDecorator('rejectApplications', {
+                                    valuePropName: 'checked',
+                                })(
+                                    <>
+                                        <Switch onChange={this.onRejectChange} style={{marginRight: 15}}
+                                                defaultChecked={autoPilot.RejectApplications}/>
+                                        A score less than
+                                        <InputNumber min={1} max={100}
+                                                     onChange={value => this.changeScore(value, 'rejectionScore')}
+                                                     formatter={value => `${value}%`}
+                                                     key={this.state.acceptanceScore ? 'notLoadedYet' : 'loaded'}
+                                                     defaultValue={this.state.rejectionScore}
+                                                     style={{marginLeft: 15}}
+                                                     disabled={!this.state.rejectApplications}/>
+                                    </>
+                                )}
+                            </Form.Item>
+
+                            <FormItem label="Auto send rejection emails"
+                                      help="Rejected applicants will be notified via email if email is provided (candidates applications only)">
+                                {getFieldDecorator('sendRejectionEmail', {
+                                    initialValue: autoPilot.SendRejectionEmail,
+                                    rules: [],
+                                })(
+                                    <div style={{marginLeft: 3}}>
+                                        <Switch onChange={this.onSendRejectionEmailChange}
+                                                checked={this.state.sendRejectionEmail}/>
+                                    </div>
+                                )}
+                            </FormItem>
+
+                            <br />
+                            <Divider/>
+                            <h2> Manage Appointments Automation:</h2>
+                            <FormItem label="Auto manage candidates appointments"
+                                      help="Accepted candidates will receive an email (if provided) to pick a time slot"
+
+                            >
+                                {getFieldDecorator('sendCandidatesAppointments', {
                                     initialValue: autoPilot.SendCandidatesAppointments,
                                     rules: [],
                                 })(
                                     <div style={{marginLeft: 3}}>
                                         <Switch onChange={this.onAppointmentChange}
-                                                checked={this.state.SendCandidatesAppointments}/>
+                                                checked={this.state.sendCandidatesAppointments}/>
                                     </div>
                                 )}
                             </FormItem>
@@ -194,7 +239,7 @@ class AutoPilotConfigs extends React.Component {
                                        getFieldDecorator={getFieldDecorator}
                                        autoPilot={autoPilot}
                                        layout={layout}
-                                       showSetAppointment={this.state.SendCandidatesAppointments}/>
+                                       showSetAppointment={this.state.sendCandidatesAppointments}/>
 
                             <br/>
 

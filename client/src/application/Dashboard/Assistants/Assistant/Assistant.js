@@ -1,20 +1,24 @@
 import React, {Component} from 'react';
-import {Button, Card, Col, Row, Switch} from 'antd';
+import {connect} from 'react-redux';
+import {Button, Card, Col, Row, Switch, Tabs, Typography, Spin} from 'antd';
+import './Assistant.less';
+import styles from "./Assistant.module.less";
 import {Link} from "react-router-dom";
-import AssistantSettings from "./AssistantSettings/AssistantSettings";
 import CRM from "./CRM/CRM";
 import SelectAutoPilotModal from "./SelectAutoPilotModal/SelectAutoPilotModal";
-import './Assistant.less';
 import AuroraBlink from "components/AuroraBlink/AuroraBlink";
-import {getLink} from "helpers";
+import Conversations from "./Conversations/Conversations"
+import Settings from "./Settings/Settings"
+import {getLink, history} from "helpers";
+import {store} from "store/store";
+import {assistantActions, crmActions} from "store/actions";
+import NoHeaderPanel from 'components/NoHeaderPanel/NoHeaderPanel'
+import {optionsActions} from "../../../../store/actions";
 
-const covers = [
-    // 'https://42f2671d685f51e10fc6-b9fcecea3e50b3b59bdc28dead054ebc.ssl.cf5.rackcdn.com/illustrations/voice_control_ofo1.svg',
-    // 'https://42f2671d685f51e10fc6-b9fcecea3e50b3b59bdc28dead054ebc.ssl.cf5.rackcdn.com/illustrations/group_chat_v059.svg',
-    // 'https://42f2671d685f51e10fc6-b9fcecea3e50b3b59bdc28dead054ebc.ssl.cf5.rackcdn.com/illustrations/status_update_jjgk.svg',
-    getLink('/static/images/undraw/messages.svg'),
-];
 
+
+const {Title, Paragraph, Text} = Typography;
+const { TabPane } = Tabs;
 
 class Assistant extends Component {
 
@@ -22,6 +26,18 @@ class Assistant extends Component {
         assistantSettingsVisible: false,
         CRMVisible: false,
         selectAutoPilotModalVisible: false
+    };
+
+    componentDidMount() {
+        console.log("1111111111")
+        store.dispatch(assistantActions.fetchAssistant(this.props.match.params.id))
+            .then(()=> {}).catch(() => history.push(`/dashboard/assistants`));
+
+        if (!this.props.options) store.dispatch(optionsActions.getOptions())
+    }
+
+    isAssistantNameValid = (name) => {
+        return !(this.props.assistantList.findIndex(assistant => assistant.Name.toLowerCase() === name.toLowerCase()) >= 0)
     };
 
 
@@ -37,109 +53,84 @@ class Assistant extends Component {
     onActiveChanged = checked => this.props.activateHandler(checked, this.props.assistant.ID);
 
     render() {
-        const {assistant, isStatusChanging} = this.props;
+        const {assistant, isAssistantLoading} = this.props;
+
         return (
+
             <>
-                <Card loading={this.props.isLoading}
-                      style={{width: 500, margin: 15, float: 'left', height: 369}}
-                      cover={
-                          <img alt="example"
-                               height={150}
-                               width="100%"
-                               src={covers[Math.floor(Math.random() * covers.length)]}/>
-                      }
-                      title={assistant.Name}
-                      extra={<Switch loading={isStatusChanging} checked={assistant.Active} onChange={this.onActiveChanged}/>}
-                      actions={[]}
-                      className={'assistant'}>
+                <NoHeaderPanel>
+                    <div className={styles.Header}>
+                        <Title className={styles.Title}>
+                            {assistant?.Name}
+                        </Title>
+                        <Paragraph type="secondary">
+                            {assistant?.Description || 'No description'}
+                        </Paragraph>
+                        {console.log(assistant)}
 
-                    <Row type={'flex'} justify={'center'} gutter={8}>
-                        <Col span={8}>
-                            {/*4*/}
-                            <Link to={{
-                                pathname: `assistants/${assistant.ID}/conversations`,
-                                state: {assistant: assistant}
-                            }}>
-                                <Button block icon={'code'}>Conversations</Button>
-                            </Link>
-                        </Col>
+                    </div>
 
-                        <Col span={8}>
-                            {/*2*/}
-                            <Link to={{
-                                pathname: `assistants/${assistant.ID}/script`,
-                                state: {assistant: assistant}
-                            }}>
-                                <Button block icon={'build'}>Script</Button>
-                            </Link>
-                        </Col>
+                    <div className={[styles.Body, 'assistantTabs'].join(' ')}>
+                        {!assistant ? <Spin/> :
 
-                        <Col span={8}>
-                            {/*3*/}
-                            <Button block onClick={this.showCRMModal} icon={'cluster'}>
-                                CRM
-                                {assistant.CRMConnected ?
-                                    <AuroraBlink color={'#00c878'} style={{top: 7, right: 28}}/> : null}
-                            </Button>
-                        </Col>
-                    </Row>
+                            <Tabs defaultActiveKey={'2'} size={"large"}>
+                                <TabPane tab="Analytics" key="1">
+                                    Content of tab 1
+                                </TabPane>
+                                <TabPane tab="Conversations" key="2">
+                                    <Conversations assistant={assistant} />
+                                </TabPane>
 
-                    <Row type={'flex'} justify={'center'} gutter={8}>
-                        <Col span={8}>
-                            {/*1*/}
-                            <Button block icon={'setting'} onClick={this.showSettingsModal}>Settings</Button>
-                        </Col>
+                                <TabPane tab="Script" key="3">
+                                    Content of tab 3
+                                </TabPane>
 
-                        <Col span={8}>
-                            {/*5*/}
-                            <Link to={{
-                                pathname: `assistants/${assistant.ID}/analytics`,
-                                state: {assistant: assistant}
-                            }}>
-                                <Button block icon={'line-chart'}>Analytics</Button>
-                            </Link>
+                                <TabPane tab="Connections" key="4">
+                                    Content of tab 3
+                                </TabPane>
 
-                        </Col>
+                                <TabPane tab="Integration" key="5">
+                                    Content of tab 3
+                                </TabPane>
 
-                        <Col span={8}>
-                            {/*6*/}
-                            <Link to={{
-                                pathname: `assistants/${assistant.ID}/integration`,
-                                state: {assistant: assistant}
-                            }}>
-                                <Button block icon={'sync'}>Integration</Button>
-                            </Link>
-                        </Col>
-                    </Row>
+                                <TabPane tab="Settings" key="6">
+                                    <Settings assistant={assistant}
+                                              isAssistantNameValid={this.isAssistantNameValid} />
+                                </TabPane>
+                            </Tabs>
+                        }
+                    </div>
+                </NoHeaderPanel>
 
-                    <Row type={'flex'} justify={'center'} gutter={8}>
-                        <Col span={24}>
-                            <Button block icon={'api'}
-                                    onClick={this.showSelectAutoPilotModal}
-                            >Connect Auto Pilot</Button>
-                        </Col>
+                {/*<AssistantSettings assistant={assistant}*/}
+                                   {/*isAssistantNameValid={this.props.isAssistantNameValid}*/}
+                                   {/*hideModal={this.hideSettingsModal}*/}
+                                   {/*visible={this.state.assistantSettingsVisible}/>*/}
 
-                    </Row>
-                </Card>
+                {/*<CRM assistant={assistant}*/}
+                     {/*CRMsList={this.props.CRMsList}*/}
+                     {/*hideModal={this.hideCRMModal}*/}
+                     {/*visible={this.state.CRMVisible}/>*/}
 
-                <AssistantSettings assistant={assistant}
-                                   isAssistantNameValid={this.props.isAssistantNameValid}
-                                   hideModal={this.hideSettingsModal}
-                                   visible={this.state.assistantSettingsVisible}/>
-
-                <CRM assistant={assistant}
-                     CRMsList={this.props.CRMsList}
-                     hideModal={this.hideCRMModal}
-                     visible={this.state.CRMVisible}/>
-
-                <SelectAutoPilotModal
-                    assistant={assistant}
-                    hideModal={this.hideSelectAutoPilotModal}
-                    selectAutoPilotModalVisible={this.state.selectAutoPilotModalVisible}/>
+                {/*<SelectAutoPilotModal*/}
+                    {/*assistant={assistant}*/}
+                    {/*hideModal={this.hideSelectAutoPilotModal}*/}
+                    {/*selectAutoPilotModalVisible={this.state.selectAutoPilotModalVisible}/>*/}
 
             </>
         )
     }
 }
 
-export default Assistant;
+function mapStateToProps(state) {
+    return {
+        assistantList: state.assistant.assistantList,
+        assistant: state.assistant.assistant,
+        isAssistantLoading: state.assistant.isLoading,
+        options: state.options.options,
+        isLoading: state.assistant.isLoading,
+        isStatusChanging: state.assistant.isStatusChanging,
+    };
+}
+
+export default connect(mapStateToProps)(Assistant);

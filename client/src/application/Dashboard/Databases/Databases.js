@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
-import {Button, Menu, Modal, Icon, Typography} from 'antd';
+import {Icon, Menu, Modal, Typography} from 'antd';
 import styles from "./Databases.module.less"
 
 import NoHeaderPanel from 'components/NoHeaderPanel/NoHeaderPanel'
@@ -11,8 +11,6 @@ import ViewBox from "components/ViewBox/ViewBox";
 import EditModal from "./EditModal/EditModal"
 import {DatabaseIcon} from "components/SVGs";
 import {history} from "helpers";
-
-import {getLink} from "helpers";
 
 const {Title, Paragraph} = Typography;
 const confirm = Modal.confirm;
@@ -37,7 +35,7 @@ class Databases extends Component {
     hideUploadModal = () => this.setState({uploadModalVisible: false});
 
     showEditModal = (database) => this.setState({editModalVisible: true, databaseToEdit: database});
-    hideEditModal = () => this.setState({editModalVisible: false})
+    hideEditModal = () => this.setState({editModalVisible: false});
 
     updateDatabase = (updatedDatabase, databaseID) => {
         this.props.dispatch(databaseActions.updateDatabase(updatedDatabase, databaseID));
@@ -86,13 +84,13 @@ class Databases extends Component {
 
             <>
                 <NoHeaderPanel>
-                    <div className={styles.Title}>
-                        <div className={styles.Details}>
-                            <Title>Database</Title>
-                            <Paragraph type="secondary">
-                                Upload your database to empower your chatbot for candidates and jobs scanning
-                            </Paragraph>
-                        </div>
+                    <div className={styles.Header}>
+                        <Title className={styles.Title}>
+                            <Icon type="database"/> Database
+                        </Title>
+                        <Paragraph type="secondary">
+                            Upload your database to empower your chatbot for candidates and jobs scanning
+                        </Paragraph>
                     </div>
 
                     <div className={styles.Body}>

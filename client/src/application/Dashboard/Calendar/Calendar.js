@@ -98,13 +98,13 @@ class Calendar extends React.Component {
         const {value} = this.state;
         return (
             <NoHeaderPanel>
-                <div className={styles.Title}>
-                    <div className={styles.Details}>
-                        <Title> <Icon type="calendar"/> Calendar</Title>
-                        <Paragraph type="secondary">
-                            Here you can find all assigned calendars
-                        </Paragraph>
-                    </div>
+                <div className={styles.Header}>
+                    <Title className={styles.Title}>
+                        <Icon type="calendar"/> Calendar
+                    </Title>
+                    <Paragraph type="secondary">
+                        Here you can find all assigned calendars
+                    </Paragraph>
                 </div>
 
                 <div>

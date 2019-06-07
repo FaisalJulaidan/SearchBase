@@ -1,7 +1,7 @@
 from flask import json, after_this_request, request
 from models import db, Role, Company, Assistant, Plan, Conversation, Database, Candidate, Job, CRM,\
-    OpenTimeSlot, AutoPilot, Appointment
-from services import user_services, flow_services, auto_pilot_services
+    OpenTimeSlot, AutoPilot, Appointment, Callback
+from services import user_services, flow_services, auto_pilot_services, assistant_services
 from datetime import datetime, timedelta, time
 from enum import Enum
 from hashids import Hashids
@@ -10,8 +10,14 @@ from io import BytesIO
 from itsdangerous import URLSafeTimedSerializer
 from cryptography.fernet import Fernet
 from sqlalchemy_utils import Currency
+from jsonschema import validate
+from utilities import json_schemas
+from typing import List
+from flask_jwt_extended import get_jwt_identity
 
 import enums, re, os, stripe, gzip, functools, logging, geoip2.webservice
+
+# will merge with the previous imports if the code is kept - batu
 
 
 # GeoIP Client
@@ -402,7 +408,8 @@ def isValidEmail(email: str) -> bool:
     return True
 
 
-# Convert a SQLAlchemy object to a single dict
+# -------- SQLAlchemy Converters -------- #
+"""Convert a SQLAlchemy object to a single dict """
 def getDictFromSQLAlchemyObj(obj, excludedColumns: list = None) -> dict:
 
     dict = {} # Results
@@ -433,10 +440,41 @@ def getDictFromSQLAlchemyObj(obj, excludedColumns: list = None) -> dict:
     return dict
 
 
-# Convert a SQLAlchemy list of objects to a list of dicts
-def getListFromSQLAlchemyList(SQLAlchemyList, excludedColumns: list = None) -> list:
+"""Used when you want to only gather specific data from a table (columns)"""
+"""Provide a list of keys (e.g ['id', 'name']) and the list of tuples"""
+"""provided by sqlalchemy when querying for specific columns"""
+"""this func will work for enums as well."""
+def getDictFromLimitedQuery(columnsList, tupleList: List[tuple]):
+
+    if not isinstance(tupleList, list):
+        raise Exception("Provided list of tuples is empty. (Check data being returned from db)")
+
+    # If the database returned an empty list, it's ok
+    if not len(tupleList) > 0:
+        return []
+
+    # When tupleList is not empty, then the number of items in each tuple must match the number of items in columnsList
+    if len(columnsList) != len(tupleList[0]) :
+        raise Exception("List of indexes provided must match in length to the items in each of the tuples")
+
+    d = []
+    for item in tupleList:
+        dict = {}
+        for idx, i in enumerate(item):
+            if isinstance(i, Enum):
+                dict[columnsList[idx]] = i.value
+            else:
+                dict[columnsList[idx]] = i
+        d.append(dict)
+    return d
+
+
+
+"""Convert a SQLAlchemy list of objects to a list of dicts"""
+def getListFromSQLAlchemyList(SQLAlchemyList):
     return list(map(getDictFromSQLAlchemyObj, SQLAlchemyList))
 
+# ---------------- #
 
 def isStringsLengthGreaterThanZero(*args) -> bool:
     for arg in args:
@@ -482,3 +520,16 @@ def gzipped(f):
         return f(*args, **kwargs)
 
     return view_func
+
+
+# Check if the logged in user owns the accessed assistant for security
+def validAssistant(func):
+    def wrapperValidAssistant(assistantID):
+        user = get_jwt_identity()['user']
+        callback: Callback = assistant_services.getByID(assistantID, user['companyID'])
+        if not callback.Success:
+            return jsonResponse(False, 404, "Assistant not found.", None)
+        assistant: Assistant = callback.Data
+        return func(assistant)
+    return wrapperValidAssistant
+

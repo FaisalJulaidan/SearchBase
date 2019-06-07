@@ -5,35 +5,30 @@ import {destroyMessage, errorHandler, errorMessage, http, loadingMessage, succes
 import * as Sentry from '@sentry/browser';
 
 function* fetchCRMs() {
-    let msg = "Couldn't load CRMs";
     try {
         const res = yield http.get(`/crm`);
-        if (!res.data?.data)
-            yield put(crmActions.getConnectedCRMsFailure(msg));
-
         yield put(crmActions.getConnectedCRMsSuccess(res.data?.data));
     } catch (error) {
-        msg = error.response?.data?.msg;
+        const msg = error.response?.data?.msg || "Couldn't load CRMs";
         console.error(error);
-        yield put(crmActions.getConnectedCRMsFailure(msg));
-        Sentry.captureException(error);
         errorMessage(msg);
+        yield put(crmActions.getConnectedCRMsFailure());
+        errorHandler(error);
     }
 }
 
 function* connectCrm({connectedCRM}) {
-    const defaultMsg = "Couldn't Connect CRM";
     try {
         loadingMessage('Connecting to ' + connectedCRM.type, 0);
         const res = yield http.post(`/crm/connect`, {type: connectedCRM.type, auth: connectedCRM.auth});
-        destroyMessage();
-        successMessage(res.data?.msg || defaultMsg);
+        successMessage(res.data?.msg || `${connectedCRM.type} connected successfully`);
         yield put(crmActions.connectCrmSuccess(res.data.data));
     } catch (error) {
-        let data = error.response?.data;
-        errorMessage(data.msg || defaultMsg);
-        yield put(crmActions.connectCrmFailure(data.msg || defaultMsg));
-        if (!data.msg) errorHandler(error)
+        const msg = error.response?.data?.msg || "Couldn't Connect CRM";
+        console.error(error);
+        errorMessage(msg);
+        yield put(crmActions.connectCrmFailure(msg));
+        errorHandler(error)
     }
 }
 
@@ -46,10 +41,11 @@ function* testCrm({testedCRM}) {
         successMessage(res.data?.msg || defaultMsg);
         yield put(crmActions.testCrmSuccess());
     } catch (error) {
-        let data = error.response?.data;
-        errorMessage(data.msg || defaultMsg);
-        yield put(crmActions.testCrmFailure(data.msg || defaultMsg));
-        if (!data.msg) errorHandler(error)
+        const msg = error.response?.data?.msg || "Test CRM connection failed";
+        console.error(error);
+        errorMessage(msg);
+        yield put(crmActions.testCrmFailure(msg));
+        errorHandler(error)
     }
 }
 

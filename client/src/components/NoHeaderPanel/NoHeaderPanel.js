@@ -29,7 +29,6 @@ class NoHeaderPanel extends Component {
     }
 
     render() {
-        console.log(this.props);
         const TitleElement = React.Children.only(this.props.children[0]);
         const BodyElement = React.Children.only(this.props.children[1]);
 

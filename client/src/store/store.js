@@ -7,6 +7,7 @@ import rootReducer from './reducers';
 import { middleware as thunkMiddleware } from 'redux-saga-thunk'
 import {
     assistantSaga,
+    analyticsSaga,
     authSaga,
     profileSaga,
     conversationSaga,
@@ -44,6 +45,7 @@ sagaMiddleware.run(databaseSaga);
 sagaMiddleware.run(optionsSaga);
 sagaMiddleware.run(crmSaga);
 sagaMiddleware.run(autoPilotSaga);
+sagaMiddleware.run(analyticsSaga);
 
 
 export { store, persistor }

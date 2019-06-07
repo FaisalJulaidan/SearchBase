@@ -17,6 +17,7 @@ import {faCloud} from '@fortawesome/free-solid-svg-icons'
 
 const Home = lazy(() => import('./Home/Home'));
 const Assistants = lazy(() => import('./Assistants/Assistants'));
+const Assistant = lazy(() => import('./Assistants/Assistant/Assistant'));
 const AssistantCRM = lazy(() => import('./Assistants/Assistant/CRM/CRM'));
 const Databases = lazy(() => import('./Databases/Databases'));
 const DatabasesConfigs = lazy(() => import('./Databases/Database/Database'));
@@ -26,13 +27,13 @@ const Profile = lazy(() => import('./AccountDetails/Profile/Profile'));
 const Billing = lazy(() => import('./AccountDetails/Billing/Billing'));
 const UsersManagement = lazy(() => import('./AccountDetails/UsersManagement/UsersManagement'));
 const Documentation = lazy(() => import('./Documentation/Documentation'));
-const Integration = lazy(() => import('./Assistants/Assistant/Conversations/Conversations'));
+const Integration = lazy(() => import('./Assistants/Assistant/Integration/Integration'));
 const Conversations = lazy(() => import('./Assistants/Assistant/Conversations/Conversations'));
 const Calendar = lazy(() => import('./Calendar/Calendar'));
 const AutoPilot = lazy(() => import('./AutoPilot/AutoPilot'));
 const AutoPilotConfigs = lazy(() => import('./AutoPilot/AutoPilotConfigs/AutoPilotConfigs'));
-const Crms = lazy(() => import('./Crms/Crms'));
-const Crm = lazy(() => import('./Crms/Crm/Crm'));
+const Marketplace = lazy(() => import('./Marketplace/Marketplace'));
+const Crm = lazy(() => import('./Marketplace/Crm/Crm'));
 
 
 const {SubMenu} = Menu;
@@ -105,7 +106,6 @@ class Dashboard extends Component {
                     </Menu.Item>
                 </Menu>
             );
-
             userInfo = (
                 <Dropdown overlay={userInfoMenu} overlayStyle={{width: '255px'}}>
                     {avatar}
@@ -114,7 +114,7 @@ class Dashboard extends Component {
         }
         // End of User Information
 
-        const newLayoutRoutes = ["/dashboard/crmlist", "/dashboard/calendar", "/dashboard/auto_pilot", "/dashboard/databases"];
+        const newLayoutRoutes = ["/dashboard/assistants", "/dashboard/marketplace", "/dashboard/calendar", "/dashboard/auto_pilot", "/dashboard/databases"];
         const isNewLyaout = newLayoutRoutes.some(a => this.props.location.pathname.indexOf(a) > -1);
         return (
             <Layout style={{height: '100%'}}>
@@ -166,24 +166,24 @@ class Dashboard extends Component {
                             <span>Assistants</span>
                         </Menu.Item>
 
-                        <Menu.Item key="databases">
-                            <Icon type="database"/>
-                            <span>Databases</span>
+                        <Menu.Item key="auto_pilot">
+                            <Icon type="clock-circle"/>
+                            <span>Auto Pilot</span>
                         </Menu.Item>
 
-                        <Menu.Item key="crmlist">
+                        <Menu.Item key="marketplace">
                             <Icon type="interation"/>
-                            <span>CRMs List</span>
+                            <span>Marketplace</span>
+                        </Menu.Item>
+
+                        <Menu.Item key="databases">
+                            <Icon type="database"/>
+                            <span>Database</span>
                         </Menu.Item>
 
                         <Menu.Item key="calendar">
                             <Icon type="calendar"/>
                             <span>Calendar</span>
-                        </Menu.Item>
-
-                        <Menu.Item key="auto_pilot">
-                            <Icon type="api"/>
-                            <span>Auto Pilot</span>
                         </Menu.Item>
 
                         <Divider/>
@@ -250,18 +250,16 @@ class Dashboard extends Component {
                                     <Suspense fallback={<div> Loading...</div>}>
                                         <Switch location={location} style={{height: '100%'}}>
 
+                                            <Route path={`${match.path}/assistants/:id`} component={Assistant}/>
                                             <Route path={`${match.path}/assistants/:id/script`} component={Flow}/>
-                                            <Route path={`${match.path}/assistants/:id/integration`}
-                                                   component={Integration}/>
+                                            <Route path={`${match.path}/assistants/:id/integration`} component={Integration}/>
                                             <Route path={`${match.path}/assistants/:id/conversations`} component={Conversations}/>
-                                            <Route path={`${match.path}/assistants/:id/analytics`}
-                                                   component={Analytics}/>
-                                            <Route path={`${match.path}/assistants/:id/CRMIntegration`}
-                                                   component={AssistantCRM}/>
+                                            <Route path={`${match.path}/assistants/:id/analytics`} component={Analytics}/>
+                                            <Route path={`${match.path}/assistants/:id/CRMIntegration`} component={AssistantCRM}/>
                                             <Route path={`${match.path}/assistants`} component={Assistants} exact/>
 
-                                            <Route path={`${match.path}/crmlist`} component={Crms} exact/>
-                                            <Route path={`${match.path}/crmlist/:crm`} component={Crm} exact/>
+                                            <Route path={`${match.path}/marketplace`} component={Marketplace} exact/>
+                                            <Route path={`${match.path}/marketplace/:crm`} component={Crm} exact/>
 
                                             <Route path={`${match.path}/databases`} component={Databases} exact/>
                                             <Route path={`${match.path}/databases/:id`}

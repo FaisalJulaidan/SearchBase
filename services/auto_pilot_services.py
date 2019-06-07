@@ -14,6 +14,7 @@ def processConversation(conversation: Conversation, autoPilot: AutoPilot):
             "applicationStatus": ApplicationStatus.Pending,
             "appointmentEmailSentAt": None,
             "acceptanceEmailSentAt": None,
+            "rejectionEmailSentAt": None,
             # "response": None
         }
 
@@ -22,23 +23,48 @@ def processConversation(conversation: Conversation, autoPilot: AutoPilot):
             keywords = conversation.Data.get('keywordsByDataType')
             email = keywords.get(DataType.CandidateEmail.value['name'], [""])[0]
 
+            def __processSendingEmails (email, status: ApplicationStatus, autoPilot: AutoPilot):
+
+                name = " ".join(keywords.get(DataType.CandidateName.value['name'], [""])) # get user candidate name
+                logoPath = sfs.PUBLIC_URL + sfs.UPLOAD_FOLDER + sfs.COMPANY_LOGOS_PATH + "/" + autoPilot.Company.LogoPath
+
+                # Send Acceptance Letters
+                if status is ApplicationStatus.Accepted and AutoPilot.SendAcceptanceEmail:
+                    callback: Callback = mail_services.send_email(
+                        email,
+                        'Acceptance Letter',
+                        '/emails/acceptance_letter.html',
+                        companyName=autoPilot.Company.Name,
+                        logoPath=logoPath,
+                        userName=name)
+
+                    if callback.Success:
+                        result['acceptanceEmailSentAt'] = datetime.now()
+
+                # Send Rejection Letters
+                elif status is ApplicationStatus.Rejected and AutoPilot.SendRejectionEmail:
+                    callback: Callback = mail_services.send_email(
+                        email,
+                        'Rejection Letter',
+                        '/emails/rejection_letter.html',
+                        companyName=autoPilot.Company.Name,
+                        logoPath=logoPath,
+                        userName=name)
+
+                    if callback.Success:
+                        result['rejectionEmailSentAt'] = datetime.now()
+
+                # Process candidates appointment email if score is accepted
+                elif status is ApplicationStatus.Rejected and AutoPilot.SendCandidatesAppointments:
+                    pass
+
             # Get application status
             result['applicationStatus'] = __getApplicationResult(conversation.Score, autoPilot)
 
-            # Process appointment email if score is accepted
-            # result['appointmentEmailSentAt'] = __sendAppointmentEmail(conversation, autoPilot)
+            # Send candidates emails
+            if email and conversation.UserType is UserType.Candidate:
+                __processSendingEmails(email, result['applicationStatus'], autoPilot)
 
-            # Process acceptance email if score is accepted
-            if conversation.UserType is UserType.Candidate and result['applicationStatus'] is ApplicationStatus.Accepted and email:
-                email_callback: Callback = __sendAcceptanceLetterEmail(
-                    email,
-                    " ".join(keywords.get(DataType.CandidateName.value['name'], [""])),
-                    autoPilot.Company.Name,
-                    conversation.Assistant.LogoName
-                )
-
-                if email_callback.Success:
-                    result['acceptanceEmailSentAt'] = datetime.now()
 
         return Callback(True, "Automation done via " + autoPilot.Name + " pilot successfully.", result)
 
@@ -109,8 +135,8 @@ def fetchAll(companyID) -> Callback:
 
 
 # ----- Updaters ----- #
-def update(id, name, desc, active, acceptApplications, acceptanceScore, rejectApplications,
-           rejectionScore, SendCandidatesAppointments, openTimeSlots, companyID: int) -> Callback:
+def update(id, name, desc, active, acceptApplications, acceptanceScore, sendAcceptanceEmail, rejectApplications,
+           rejectionScore, sendRejectionEmail, SendCandidatesAppointments, openTimeSlots, companyID: int) -> Callback:
     try:
 
         # TODO OpenTimeSlots & Appointments Feature
@@ -129,8 +155,12 @@ def update(id, name, desc, active, acceptApplications, acceptanceScore, rejectAp
         autoPilot.Active = active
         autoPilot.AcceptApplications = acceptApplications
         autoPilot.AcceptanceScore = acceptanceScore
+        autoPilot.SendAcceptanceEmail = sendAcceptanceEmail
+
         autoPilot.RejectApplications = rejectApplications
         autoPilot.RejectionScore = rejectionScore
+        autoPilot.SendRejectionEmail = sendRejectionEmail
+
         autoPilot.SendCandidatesAppointments = SendCandidatesAppointments
 
         # TODO OpenTimeSlots & Appointments Feature
@@ -190,7 +220,6 @@ def __parseAutoPilot(autoPilot: AutoPilot) -> dict:
         "OpenTimeSlots": helpers.getListFromSQLAlchemyList(autoPilot.OpenTimeSlots)
     }
 
-
 def __getApplicationResult(score, autoPilot: AutoPilot) -> ApplicationStatus:
     result = ApplicationStatus.Pending
     if autoPilot.AcceptApplications and (score > autoPilot.AcceptanceScore):
@@ -198,11 +227,6 @@ def __getApplicationResult(score, autoPilot: AutoPilot) -> ApplicationStatus:
     if autoPilot.RejectApplications and (score < autoPilot.RejectionScore):
         result = ApplicationStatus.Rejected
     return result
-
-
-def __sendAcceptanceLetterEmail(receiverEmail, userName, companyName, logoPath) -> Callback:
-    return mail_services.send_email(receiverEmail, 'Acceptance Letter', '/emails/acceptance_letter.html',
-                             companyName=companyName, logoPath=logoPath, userName=userName)
 
 
 def __sendAppointmentEmail(conversation: Conversation, autoPilot):

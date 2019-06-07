@@ -19,33 +19,25 @@ def assistants():
         # Get all assistants
         callback: Callback = assistant_services.getAll(user['companyID'])
         if not callback.Success:
-            return helpers.jsonResponse(False, 404, "Cannot get Assistants!")
-
-        # notifications_callback: Callback = assistant_services.getAllNotificationsRegisters()
-        # if notifications_callback.Success:
-        #     registers = helpers.getListFromSQLAlchemyList(notifications_callback.Data)
-        # else:
-        #     registers = {}
-
-        return helpers.jsonResponse(True, 200, "Assistants Returned!",
-                                    {"assistants": helpers.getListFromSQLAlchemyList(callback.Data)})
+            return helpers.jsonResponse(False, 404, "Cannot fetch Assistants")
+        return helpers.jsonResponse(True, 200,
+                                    "Assistants Returned!",
+                                    {"assistants": helpers.getDictFromLimitedQuery(['ID','Name', 'Description',
+                                                                                    'Message','TopBarText', 'Active'],
+                                                                                   callback.Data)})
     if request.method == "POST":
         data = request.json
         callback: Callback = assistant_services.create(data.get('assistantName'),
+                                                       data.get('assistantDesc'),
                                                        data.get('welcomeMessage'),
-                                                       data.get('topBarTitle'),
-                                                       data.get('secondsUntilPopup'),
-                                                       data.get('alertsEnabled'),
-                                                       data.get('alertEvery'),
-                                                       data.get('template'),
-                                                       data.get('config'),
+                                                       data.get('topBarText'),
                                                        user['companyID'])
         if not callback.Success:
-            return helpers.jsonResponse(False, 400, callback.Message)
+            return helpers.jsonResponse(False, 400, "Assistant updated successfully")
         return helpers.jsonResponse(True, 200, callback.Message, helpers.getDictFromSQLAlchemyObj(callback.Data))
 
 
-@assistant_router.route("/assistant/<int:assistantID>", methods=['DELETE', 'PUT'])
+@assistant_router.route("/assistant/<int:assistantID>", methods=['GET', 'DELETE', 'PUT'])
 @jwt_required
 def assistant(assistantID):
 
@@ -53,17 +45,23 @@ def assistant(assistantID):
     user = get_jwt_identity()['user']
 
     callback: Callback = Callback(False, 'Error!', None)
+
+    if request.method == "GET":
+        # Fetch assistant
+        callback: Callback = assistant_services.getByID(assistantID, user['companyID'])
+        if not callback.Success:
+            return helpers.jsonResponse(False, 404, "Can't fetch assistant")
+        return helpers.jsonResponse(True, 200,
+                                    "Assistant fetched successfully",
+                                    helpers.getDictFromSQLAlchemyObj(callback.Data))
     # Update assistant
     if request.method == "PUT":
-        updatedSettings = request.json
+        data = request.json
         callback: Callback = assistant_services.update(assistantID,
-                                                       updatedSettings.get("assistantName"),
-                                                       updatedSettings.get("welcomeMessage"),
-                                                       updatedSettings.get("topBarTitle"),
-                                                       updatedSettings.get("secondsUntilPopup"),
-                                                       updatedSettings.get("alertsEnabled"),
-                                                       updatedSettings.get("alertEvery"),
-                                                       updatedSettings.get('config'),
+                                                       data.get("assistantName"),
+                                                       data.get('assistantDesc'),
+                                                       data.get("welcomeMessage"),
+                                                       data.get("topBarText"),
                                                        user['companyID']
                                                        )
     # Delete assistant
@@ -73,6 +71,34 @@ def assistant(assistantID):
     if not callback.Success:
         return helpers.jsonResponse(False, 400, callback.Message, None)
     return helpers.jsonResponse(True, 200, callback.Message, helpers.getDictFromSQLAlchemyObj(callback.Data))
+
+
+@assistant_router.route("/assistant/<int:assistantID>/configs", methods=['PUT'])
+@jwt_required
+def assistant_configs(assistantID):
+
+    # Authenticate
+    user = get_jwt_identity()['user']
+
+    callback: Callback = Callback(False, 'Error!', None)
+    # Update assistant
+    if request.method == "PUT":
+        updatedSettings = request.json
+        callback: Callback = assistant_services.updateConfigs(assistantID,
+                                                       updatedSettings.get("assistantName"),
+                                                       updatedSettings.get('assistantDesc'),
+                                                       updatedSettings.get("welcomeMessage"),
+                                                       updatedSettings.get("topBarTitle"),
+                                                       updatedSettings.get("secondsUntilPopup"),
+                                                       updatedSettings.get("alertsEnabled"),
+                                                       updatedSettings.get("alertEvery"),
+                                                       updatedSettings.get('config'),
+                                                       user['companyID']
+                                                       )
+    if not callback.Success:
+        return helpers.jsonResponse(False, 400, callback.Message, None)
+    return helpers.jsonResponse(True, 200, callback.Message, helpers.getDictFromSQLAlchemyObj(callback.Data))
+
 
 
 # Activate or deactivate assistant

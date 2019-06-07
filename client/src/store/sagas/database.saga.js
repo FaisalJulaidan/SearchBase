@@ -29,10 +29,8 @@ function* watchGetDatabaseList() {
 
 function* fetchDatabase({databaseID, pageNumber, meta}) {
     try {
-        loadingMessage('Loading database...', 0);
         const res = yield http.get(`/databases/${databaseID}/page/${pageNumber ? pageNumber : 1}`);
         yield put({...databaseActions.fetchDatabaseSuccess(res.data.msg, res.data.data), meta});
-        successMessage('Database loaded');
     } catch (error) {
         console.log(error);
         const msg = "Couldn't load database's content";

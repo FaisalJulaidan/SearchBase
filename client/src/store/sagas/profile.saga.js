@@ -1,7 +1,7 @@
-import {put, takeLatest, all, takeEvery} from 'redux-saga/effects'
+import {all, put, takeEvery, takeLatest} from 'redux-saga/effects'
 import * as actionTypes from '../actions/actionTypes';
 import {profileActions} from "../actions";
-import {http, updateUsername, errorMessage, successMessage, loadingMessage} from "helpers";
+import {errorMessage, http, loadingMessage, successMessage, updateUsername} from "helpers";
 
 
 function* getProfileData() {
@@ -14,8 +14,7 @@ function* getProfileData() {
         yield put(profileActions.getProfileSuccess(profile))
 
     } catch (error) {
-        console.log(error);
-        const msg = "Couldn't load profile";
+        const msg = error.response?.data?.msg || "Couldn't load profile";
         yield put(profileActions.getProfileFailure(msg));
         errorMessage(msg);
     }
@@ -30,8 +29,7 @@ function* saveProfileData(action) {
         successMessage('Profile saved');
 
     } catch (error) {
-        console.log(error);
-        const msg = "Couldn't save profile";
+        const msg = error.response?.data?.msg || "Couldn't save profile";
         yield put(profileActions.saveProfileDetailsFailure(msg));
         errorMessage(msg);
     }
@@ -45,8 +43,7 @@ function* saveDataSettings(action) {
         yield put(profileActions.getProfile());
         successMessage('Data Settings saved');
     } catch (error) {
-        console.log(error);
-        const msg = "Couldn't save settings";
+        const msg = error.response?.data?.msg || "Couldn't save settings";
         yield put(profileActions.saveDataSettingsFailure(msg));
         errorMessage(msg);
     }
@@ -58,10 +55,8 @@ function* changePassword({newPassword, oldPassword}) {
         const res = yield http.post(`/profile/password`, {newPassword, oldPassword});
         yield put(profileActions.changePasswordSuccess(res.data.msg));
         successMessage('Password updated');
-
     } catch (error) {
-        console.log(error);
-        const msg = "Couldn't update password";
+        const msg = error.response?.data?.msg || "Couldn't update password";
         yield put(profileActions.changePasswordFailure(msg));
         errorMessage(msg);
     }
@@ -75,8 +70,7 @@ function* uploadLogo({file}) {
         yield put(profileActions.uploadLogoSuccess(res.data?.data));
 
     } catch (error) {
-        console.log(error);
-        const msg = "Couldn't upload logo";
+        const msg = error.response?.data?.msg || "Couldn't upload logo";
         errorMessage(msg);
         yield put(profileActions.uploadLogoFailure(msg));
     }
@@ -88,10 +82,8 @@ function* deleteLogo() {
         const res = yield http.delete(`/company/logo`);
         successMessage('Logo deleted');
         yield put(profileActions.deleteLogoSuccess());
-
     } catch (error) {
-        console.log(error);
-        const msg = "Can't delete logo";
+        const msg = error.response?.data?.msg || "Can't delete logo";
         errorMessage(msg);
         yield put(profileActions.deleteLogoFailure(msg));
     }

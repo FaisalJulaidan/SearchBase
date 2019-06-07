@@ -33,7 +33,7 @@ def assistants():
                                                        data.get('topBarText'),
                                                        user['companyID'])
         if not callback.Success:
-            return helpers.jsonResponse(False, 400, "Assistant updated successfully")
+            return helpers.jsonResponse(False, 400, "Assistant didn't update successfully")
         return helpers.jsonResponse(True, 200, callback.Message, helpers.getDictFromSQLAlchemyObj(callback.Data))
 
 

@@ -135,13 +135,12 @@ const createSaga = (sagaName, actionName) => {
         try {
             // TODO: CHANGE THE HTTP TYPE & API NAME & PAYLOAD 
             const res = yield http.post('TODO', {});
-            successMessage(res.data?.msg || CHANGE THIS);
+            successMessage(res.data?.msg || CHANGE_THIS);
             yield put(${actionFile}.${placeholder_camel}Success());
         } catch (error) {
-            const msg = error.response?.data?.msg || "CHANGE THIS";
+            const msg = error.response?.data?.msg || CHANGE_THIS;
             errorMessage(msg);
-            yield put(${actionFile}.${placeholder_camel}Failure(data.msg || defaultMsg));
-            errorHandler(error)
+            yield put(${actionFile}.${placeholder_camel}Failure(msg));
         }
     }
 

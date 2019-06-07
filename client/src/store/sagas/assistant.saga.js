@@ -1,23 +1,17 @@
 import {all, put, takeEvery, takeLatest} from 'redux-saga/effects'
 import * as actionTypes from '../actions/actionTypes';
 import {assistantActions, crmActions, flowActions} from "../actions";
-import {errorHandler, errorMessage, flow, http, loadingMessage, successMessage} from "helpers";
-import * as Sentry from '@sentry/browser';
+import {errorMessage, flow, http, loadingMessage, successMessage} from "helpers";
 
 function* fetchAssistants() {
     try {
         const res = yield http.get(`/assistants`);
-        yield put(crmActions.getConnectedCRMs());
-
-        if (!res.data?.data)
-            throw Error(`Can't fetch assistants`);
-
         yield put(assistantActions.fetchAssistantsSuccess(res.data?.data.assistants));
+        yield put(crmActions.getConnectedCRMs());
     } catch (error) {
-        console.error(error);
-        const msg = "Couldn't load assistants";
-        yield put(assistantActions.fetchAssistantsFailure(msg));
+        const msg = error.response?.data?.msg || "Couldn't load assistants";
         errorMessage(msg);
+        yield put(assistantActions.fetchAssistantsFailure(msg));
     }
 }
 
@@ -25,13 +19,11 @@ function* fetchAssistant({assistantID, meta}) {
     try {
         const res = yield http.get(`/assistant/${assistantID}`);
         // yield put(crmActions.getConnectedCRMs());
-
         yield put({...assistantActions.fetchAssistantSuccess(res.data?.data), meta});
     } catch (error) {
-        console.error(error);
-        const msg = "Couldn't load assistants";
-        yield put({...assistantActions.fetchAssistantFailure(msg), meta});
+        const msg = error.response?.data?.msg || "Couldn't load assistants";
         errorMessage(msg);
+        yield put({...assistantActions.fetchAssistantFailure(msg), meta});
     }
 }
 
@@ -42,12 +34,10 @@ function* addAssistant({type, newAssistant}) {
         const res = yield http.post(`/assistants`, newAssistant);
         yield put(assistantActions.addAssistantSuccess(res.data?.data, res.data?.msg));
         successMessage('Assistant added');
-
     } catch (error) {
-        console.error(error);
-        const msg = "Couldn't create a new assistant";
-        yield put(assistantActions.addAssistantFailure(msg));
+        const msg = error.response?.data?.msg || "Couldn't create a new assistant";
         errorMessage(msg);
+        yield put(assistantActions.addAssistantFailure(msg));
     }
 }
 
@@ -57,10 +47,9 @@ function* updateAssistant({assistantID, updatedSettings}) {
         yield put(assistantActions.updateAssistantSuccess(assistantID, res.data?.data, res.data?.msg));
         successMessage('Assistant updated');
     } catch (error) {
-        console.error(error);
-        const msg = "Couldn't update assistant";
-        yield put(assistantActions.updateAssistantFailure(msg));
+        const msg = error.response?.data?.msg || "Couldn't update assistant";
         errorMessage(msg);
+        yield put(assistantActions.updateAssistantFailure(msg));
     }
 }
 
@@ -70,13 +59,11 @@ function* updateAssistantConfigs({assistantID, updatedSettings}) {
         yield put(assistantActions.updateAssistantConfigsSuccess(assistantID, res.data?.data, res.data?.msg));
         successMessage('Assistant configuration updated');
     } catch (error) {
-        console.error(error);
-        const msg = "Couldn't update assistant configuration";
-        yield put(assistantActions.updateAssistantConfigsFailure(msg));
+        const msg = error.response?.data?.msg || "Couldn't update assistant configuration";
         errorMessage(msg);
+        yield put(assistantActions.updateAssistantConfigsFailure(msg));
     }
 }
-
 
 function* deleteAssistant({assistantID}) {
     try {
@@ -85,13 +72,11 @@ function* deleteAssistant({assistantID}) {
         yield put(assistantActions.deleteAssistantSuccess(assistantID, res.data?.msg));
         successMessage('Assistant deleted');
     } catch (error) {
-        console.error(error);
-        const msg = "Couldn't delete assistant";
-        yield put(assistantActions.deleteAssistantFailure(msg));
+        const msg = error.response?.data?.msg || "Couldn't delete assistant";
         errorMessage(msg);
+        yield put(assistantActions.deleteAssistantFailure(msg));
     }
 }
-
 
 function* updateFlow({assistant}) {
     try {
@@ -100,10 +85,9 @@ function* updateFlow({assistant}) {
         yield put(assistantActions.updateFlowSuccess(assistant, res.data?.msg));
         successMessage('Script updated');
     } catch (error) {
-        console.error(error);
-        const msg = "Couldn't update script";
-        yield put(assistantActions.updateFlowFailure(msg));
+        const msg = error.response?.data?.msg || "Couldn't update script";
         errorMessage(msg);
+        yield put(assistantActions.updateFlowFailure(msg));
     }
 }
 
@@ -117,59 +101,36 @@ function* updateStatus({status, assistantID}) {
         yield successMessage('Status updated');
 
     } catch (error) {
-        console.error(error);
-        const msg = "Couldn't update assistant's status";
-        yield put(assistantActions.changeAssistantStatusFailure(msg));
+        const msg = error.response?.data?.msg || "Couldn't update assistant's status";
         errorMessage(msg);
+        yield put(assistantActions.changeAssistantStatusFailure(msg));
     }
 }
 
 
 function* selectAssistantCRM({assistantID, CRMID}) {
-    let msg = "Can't select CRM";
     try {
         const res = yield http.post(`/assistant/${assistantID}/crm`, {CRMID});
-        yield put(assistantActions.fetchAssistants());
-
-        if (!res.data?.success) {
-            errorMessage(res.data?.msg || msg);
-            yield put(assistantActions.selectAssistantCRMFailure(msg));
-        }
-
-        if (res.data?.msg)
-            successMessage(res.data.msg);
-
         yield put(assistantActions.selectAssistantCRMSuccess(res.data.data));
+        yield put(assistantActions.fetchAssistants());
+        successMessage(res.data.msg);
     } catch (error) {
-        msg = error.response?.data?.msg;
-        console.error(error);
-        yield put(assistantActions.selectAssistantCRMFailure(msg));
-        Sentry.captureException(error);
+        const msg = error.response?.data?.msg || "Can't select CRM";
         errorMessage(msg);
+        yield put(assistantActions.selectAssistantCRMFailure(msg));
     }
 }
 
 function* resetAssistantCRM({assistantID}) {
-    let msg = "Can't reset CRM";
     try {
         const res = yield http.delete(`/assistant/${assistantID}/crm`);
-        yield put(assistantActions.fetchAssistants());
-
-        if (!res.data?.success) {
-            errorMessage(res.data?.msg || msg);
-            yield put(assistantActions.resetAssistantCRMFailure(msg));
-        }
-
-        if (res.data?.msg)
-            successMessage(res.data.msg);
-
         yield put(assistantActions.resetAssistantCRMSuccess(res.data.data));
+        yield put(assistantActions.fetchAssistants());
+        successMessage(res.data.msg);
     } catch (error) {
-        msg = error.response?.data?.msg;
-        console.error(error);
-        yield put(assistantActions.resetAssistantCRMFailure(msg));
-        Sentry.captureException(error);
+        const msg = error.response?.data?.msg || "Can't reset CRM";
         errorMessage(msg);
+        yield put(assistantActions.resetAssistantCRMFailure(msg));
     }
 }
 
@@ -180,11 +141,9 @@ function* selectAutoPilot({assistantID, autoPilotID}) {
         successMessage(res.data?.msg || 'Auto pilot connected successfully');
         yield put(assistantActions.selectAutoPilotSuccess(assistantID, autoPilotID));
     } catch (error) {
-        const defaultMsg = "Couldn't connect to this auto pilot";
-        let data = error.response?.data;
-        errorMessage(data.msg || defaultMsg);
-        yield put(assistantActions.selectAutoPilotFailure(data.msg || defaultMsg));
-        if (!data.msg) errorHandler(error)
+        const msg = error.response?.data?.msg || "Couldn't connect to this auto pilot";
+        errorMessage(msg);
+        yield put(assistantActions.selectAutoPilotFailure(msg));
     }
 }
 
@@ -194,11 +153,9 @@ function* disconnectAutoPilot({assistantID, autoPilotID}) {
         successMessage(res.data?.msg || "Disconnected from auto pilot successfuly");
         yield put(assistantActions.disconnectAutoPilotSuccess(assistantID, autoPilotID));
     } catch (error) {
-        const defaultMsg = "CHANGE THIS";
-        let data = error.response?.data;
-        errorMessage(data.msg || defaultMsg);
-        yield put(assistantActions.disconnectAutoPilotFailure(data.msg || defaultMsg));
-        if (!data.msg) errorHandler(error)
+        const msg = error.response?.data?.msg || "Couldn't disconnect from auto pilot";
+        errorMessage(msg);
+        yield put(assistantActions.disconnectAutoPilotFailure(msg));
     }
 }
 
@@ -206,11 +163,9 @@ function* watchDisconnectAutoPilot() {
     yield takeEvery(actionTypes.DISCONNECT_AUTO_PILOT_REQUEST, disconnectAutoPilot)
 }
 
-
 function* watchSelectAutoPilot() {
     yield takeEvery(actionTypes.SELECT_AUTO_PILOT_REQUEST, selectAutoPilot)
 }
-
 
 function* watchResetAssistantCrm() {
     yield takeEvery(actionTypes.RESET_ASSISTANT_CRM_REQUEST, resetAssistantCRM)
@@ -243,6 +198,7 @@ function* watchUpdateAssistant() {
 function* watchUpdateAssistantConfigs() {
     yield takeEvery(actionTypes.UPDATE_ASSISTANT_CONFIGS_REQUEST, updateAssistantConfigs)
 }
+
 function* watchDeleteAssistant() {
     yield takeEvery(actionTypes.DELETE_ASSISTANT_REQUEST, deleteAssistant)
 }

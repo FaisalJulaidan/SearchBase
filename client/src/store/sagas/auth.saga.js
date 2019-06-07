@@ -28,19 +28,14 @@ function* login({email, password, prevPath}) {
         yield history.push(prevPath || '/dashboard');
 
     } catch (error) {
-        console.log(error);
+        const msg = error.response?.data?.msg || 'Couldn\'t Login';
         yield put(authActions.loginFailure(error.response.data));
-        errorMessage(error.response.data.msg, 0);
+        errorMessage(msg, 0);
     }
-}
-
-function* watchLogin() {
-    yield takeLatest(actionTypes.LOGIN_REQUEST, login)
 }
 
 // Signup
 function* signup({signupDetails}) {
-
     try {
         loadingMessage('Creating your account', 0);
         const res = yield axios.post(`/api/signup`, {...signupDetails}, {
@@ -55,16 +50,11 @@ function* signup({signupDetails}) {
         warningMessage('Please check your email to verify your account', 0);
 
     } catch (error) {
-        console.log(error);
+        const msg = error.response?.data?.msg || "Couldn't signup";
         yield put(authActions.signupFailure(error.response.data));
-        errorMessage(error.response.data.msg, 0);
+        errorMessage(msg, 0);
     }
 }
-
-function* watchSignup() {
-    yield takeLatest(actionTypes.SIGNUP_REQUEST, signup)
-}
-
 
 // Reset Password
 function* forgetPassword({data}) {
@@ -76,17 +66,13 @@ function* forgetPassword({data}) {
         yield put(authActions.resetPasswordSuccess());
         successMessage('Email to reset your password has been sent');
     } catch (error) {
-        console.log(error);
-        const msg = "Couldn't send reset password to this email";
+        const msg = error.response?.data?.msg || "Couldn't send reset password to this email";
         yield put(authActions.resetPasswordFailure(msg));
         errorMessage(msg, 0);
 
     }
 }
 
-function* watchForgetPassword() {
-    yield takeLatest(actionTypes.RESET_PASSWORD_REQUEST, forgetPassword)
-}
 
 function* newResetPassword({data}) {
     try {
@@ -101,17 +87,11 @@ function* newResetPassword({data}) {
         successMessage('Login using your new password', 0);
 
     } catch (error) {
-        console.log(error);
-        const msg = "Couldn't update account password";
+        const msg = error.response?.data?.msg || "Couldn't update account password";
         yield put(authActions.newResetPasswordFailure(msg));
         errorMessage(msg, 0);
     }
 }
-
-function* watchNewResetPassword() {
-    yield takeLatest(actionTypes.NEW_RESET_PASSWORD_REQUEST, newResetPassword)
-}
-
 
 // Logout
 function* logout() {
@@ -119,6 +99,23 @@ function* logout() {
     yield localStorage.clear();
     yield history.push('/login');
     successMessage('You have been logged out');
+}
+
+
+function* watchLogin() {
+    yield takeLatest(actionTypes.LOGIN_REQUEST, login)
+}
+
+function* watchSignup() {
+    yield takeLatest(actionTypes.SIGNUP_REQUEST, signup)
+}
+
+function* watchForgetPassword() {
+    yield takeLatest(actionTypes.RESET_PASSWORD_REQUEST, forgetPassword)
+}
+
+function* watchNewResetPassword() {
+    yield takeLatest(actionTypes.NEW_RESET_PASSWORD_REQUEST, newResetPassword)
 }
 
 function* watchLogout() {

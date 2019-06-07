@@ -22,7 +22,7 @@ export const GreenhouseFormItem = ({
             CRM.status !== "CONNECTED" &&
             CRM.status !== "FAILED" &&
             <div>
-                <FormItem label="API Key"
+                <FormItem label="User ID"
                           {...layout}>
                     {getFieldDecorator('user_id', {
                         rules: [{

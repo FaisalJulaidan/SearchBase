@@ -142,9 +142,7 @@ class Integration extends React.Component {
 
     render() {
         return (
-
             <>
-
                 <div className={styles.Header}>
                     <Button type={"primary"}
                             style={{marginLeft: "5px"}}
@@ -188,7 +186,6 @@ class Integration extends React.Component {
                     <Button style={{marginLeft: "5px"}} onClick={this.generateDirectLink}
                             className={"ant-btn-primary"}>Generate Direct Link</Button>
                 </div>
-
             </>
 
         );

@@ -70,12 +70,14 @@ http.interceptors.response.use(
 
             if (error.response.status === 500) {
                 console.log('there is an error and going to notify Sentry');
-                errorHandler(error)
+                errorHandler(error);
+                return;
             }
 
             if (error.request.responseURL.includes('assistants')) {
                 console.log('there is an error with Assistants and will notify Sentry');
-                errorHandler(error)
+                errorHandler(error);
+                return;
             }
 
         } else

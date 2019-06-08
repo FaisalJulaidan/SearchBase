@@ -108,11 +108,10 @@ function* updateStatus({status, assistantID}) {
 }
 
 
-function* selectAssistantCRM({assistantID, CRMID}) {
+function* connectAssistantCRM({assistantID, CRMID}) {
     try {
         const res = yield http.post(`/assistant/${assistantID}/crm`, {CRMID});
-        yield put(assistantActions.selectAssistantCRMSuccess(res.data.data));
-        yield put(assistantActions.fetchAssistants());
+        yield put(assistantActions.connectAssistantCRMSuccess(CRMID, res.data?.msg));
         successMessage(res.data.msg);
     } catch (error) {
         const msg = error.response?.data?.msg || "Can't select CRM";
@@ -121,11 +120,10 @@ function* selectAssistantCRM({assistantID, CRMID}) {
     }
 }
 
-function* resetAssistantCRM({assistantID}) {
+function* disconnectAssistantCRM({assistantID}) {
     try {
         const res = yield http.delete(`/assistant/${assistantID}/crm`);
-        yield put(assistantActions.resetAssistantCRMSuccess(res.data.data));
-        yield put(assistantActions.fetchAssistants());
+        yield put(assistantActions.disconnectAssistantCRMSuccess(res.data?.msg));
         successMessage(res.data.msg);
     } catch (error) {
         const msg = error.response?.data?.msg || "Can't reset CRM";
@@ -135,11 +133,11 @@ function* resetAssistantCRM({assistantID}) {
 }
 
 
-function* selectAutoPilot({assistantID, autoPilotID}) {
+function* connectAutoPilot({assistantID, autoPilotID}) {
     try {
         const res = yield http.post(`/assistant/${assistantID}/auto_pilot`, {AutoPilotID: autoPilotID});
         successMessage(res.data?.msg || 'Auto pilot connected successfully');
-        yield put(assistantActions.selectAutoPilotSuccess(assistantID, autoPilotID));
+        yield put(assistantActions.connectAutoPilotSuccess(autoPilotID));
     } catch (error) {
         const msg = error.response?.data?.msg || "Couldn't connect to this auto pilot";
         errorMessage(msg);
@@ -150,8 +148,8 @@ function* selectAutoPilot({assistantID, autoPilotID}) {
 function* disconnectAutoPilot({assistantID, autoPilotID}) {
     try {
         const res = yield http.delete(`/assistant/${assistantID}/auto_pilot`, {AutoPilotID: autoPilotID});
-        successMessage(res.data?.msg || "Disconnected from auto pilot successfuly");
-        yield put(assistantActions.disconnectAutoPilotSuccess(assistantID, autoPilotID));
+        successMessage(res.data?.msg || "Disconnected from auto pilot successfully");
+        yield put(assistantActions.disconnectAutoPilotSuccess(res.data?.msg));
     } catch (error) {
         const msg = error.response?.data?.msg || "Couldn't disconnect from auto pilot";
         errorMessage(msg);
@@ -160,15 +158,15 @@ function* disconnectAutoPilot({assistantID, autoPilotID}) {
 }
 
 function* watchDisconnectAutoPilot() {
-    yield takeEvery(actionTypes.DISCONNECT_AUTO_PILOT_REQUEST, disconnectAutoPilot)
+    yield takeEvery(actionTypes.DISCONNECT_ASSISTANT_AUTO_PILOT_REQUEST, disconnectAutoPilot)
 }
 
 function* watchSelectAutoPilot() {
-    yield takeEvery(actionTypes.SELECT_AUTO_PILOT_REQUEST, selectAutoPilot)
+    yield takeEvery(actionTypes.CONNECT_ASSISTANT_AUTO_PILOT_REQUEST, connectAutoPilot)
 }
 
 function* watchResetAssistantCrm() {
-    yield takeEvery(actionTypes.RESET_ASSISTANT_CRM_REQUEST, resetAssistantCRM)
+    yield takeEvery(actionTypes.DISCONNECT_ASSISTANT_CRM_REQUEST, disconnectAssistantCRM)
 }
 
 function* watchUpdateStatus() {
@@ -204,7 +202,7 @@ function* watchDeleteAssistant() {
 }
 
 function* watchSelectAssistantCrm() {
-    yield takeEvery(actionTypes.SELECT_ASSISTANT_CRM_REQUEST, selectAssistantCRM)
+    yield takeEvery(actionTypes.CONNECT_ASSISTANT_CRM_REQUEST, connectAssistantCRM)
 }
 
 

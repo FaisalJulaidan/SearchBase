@@ -18,17 +18,12 @@ import {faCloud} from '@fortawesome/free-solid-svg-icons'
 const Home = lazy(() => import('./Home/Home'));
 const Assistants = lazy(() => import('./Assistants/Assistants'));
 const Assistant = lazy(() => import('./Assistants/Assistant/Assistant'));
-const AssistantCRM = lazy(() => import('./Assistants/Assistant/CRM/CRM'));
 const Databases = lazy(() => import('./Databases/Databases'));
-const DatabasesConfigs = lazy(() => import('./Databases/Database/Database'));
-const Analytics = lazy(() => import('./Assistants/Assistant/Analytics/Analytics'));
-const Flow = lazy(() => import('./Assistants/Assistant/Flow/Flow'));
+const Database = lazy(() => import('./Databases/Database/Database'));
 const Profile = lazy(() => import('./AccountDetails/Profile/Profile'));
 const Billing = lazy(() => import('./AccountDetails/Billing/Billing'));
 const UsersManagement = lazy(() => import('./AccountDetails/UsersManagement/UsersManagement'));
 const Documentation = lazy(() => import('./Documentation/Documentation'));
-const Integration = lazy(() => import('./Assistants/Assistant/Integration/Integration'));
-const Conversations = lazy(() => import('./Assistants/Assistant/Conversations/Conversations'));
 const Calendar = lazy(() => import('./Calendar/Calendar'));
 const AutoPilot = lazy(() => import('./AutoPilot/AutoPilot'));
 const AutoPilotConfigs = lazy(() => import('./AutoPilot/AutoPilotConfigs/AutoPilotConfigs'));
@@ -250,29 +245,21 @@ class Dashboard extends Component {
                                     <Suspense fallback={<div> Loading...</div>}>
                                         <Switch location={location} style={{height: '100%'}}>
 
-                                            <Route path={`${match.path}/assistants/:id`} component={Assistant}/>
-                                            {/*<Route path={`${match.path}/assistants/:id/script`} component={Flow}/>*/}
-                                            {/*<Route path={`${match.path}/assistants/:id/integration`} component={Integration}/>*/}
-                                            {/*<Route path={`${match.path}/assistants/:id/conversations`} component={Conversations}/>*/}
-                                            {/*<Route path={`${match.path}/assistants/:id/analytics`} component={Analytics}/>*/}
-                                            {/*<Route path={`${match.path}/assistants/:id/CRMIntegration`} component={AssistantCRM}/>*/}
                                             <Route path={`${match.path}/assistants`} component={Assistants} exact/>
+                                            <Route path={`${match.path}/assistants/:id`} component={Assistant} exact/>
 
                                             <Route path={`${match.path}/marketplace`} component={Marketplace} exact/>
                                             <Route path={`${match.path}/marketplace/:crm`} component={Crm} exact/>
 
                                             <Route path={`${match.path}/databases`} component={Databases} exact/>
-                                            <Route path={`${match.path}/databases/:id`}
-                                                   component={DatabasesConfigs} exact/>
+                                            <Route path={`${match.path}/databases/:id`} component={Database} exact/>
 
                                             <Route path={`${match.path}/calendar`} component={Calendar} exact/>
                                             <Route path={`${match.path}/profile`} component={Profile} exact/>
                                             <Route path={`${match.path}/billing`} component={Billing} exact/>
 
                                             <Route path={`${match.path}/auto_pilot`} component={AutoPilot} exact/>
-                                            <Route path={`${match.path}/auto_pilot/configs`}
-                                                   component={AutoPilotConfigs}
-                                                   exact/>
+                                            <Route path={`${match.path}/auto_pilot/configs`} component={AutoPilotConfigs} exact/>
 
                                             <Route path={`${match.path}/users_management`} component={UsersManagement}
                                                    exact/>

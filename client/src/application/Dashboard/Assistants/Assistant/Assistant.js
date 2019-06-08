@@ -1,13 +1,9 @@
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
 import { Prompt } from "react-router-dom";
-import {Button, Col, Row, Switch, Tabs, Typography, Spin, Modal} from 'antd';
+import {Col, Row, Switch, Tabs, Typography, Spin, Modal} from 'antd';
 import './Assistant.less';
 import styles from "./Assistant.module.less";
-import {Link} from "react-router-dom";
-import CRM from "./CRM/CRM";
-import SelectAutoPilotModal from "./SelectAutoPilotModal/SelectAutoPilotModal";
-import AuroraBlink from "components/AuroraBlink/AuroraBlink";
 
 import Conversations from "./Conversations/Conversations"
 import Settings from "./Settings/Settings"
@@ -126,7 +122,7 @@ class Assistant extends Component {
                     <div className={[styles.Body, 'assistantTabs'].join(' ')}>
                         {!assistant ? <Spin/> :
 
-                            <Tabs defaultActiveKey={'Script'} size={"large"} animated={false} onTabClick={this.onTabClick}>
+                            <Tabs defaultActiveKey={'Connections'} size={"large"} animated={false} onTabClick={this.onTabClick}>
                                 <TabPane tab="Analytics" key="Analytics">
                                     <Analytics assistant={assistant}/>
                                 </TabPane>

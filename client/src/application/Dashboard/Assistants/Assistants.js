@@ -55,19 +55,6 @@ class Assistants extends Component {
         });
     };
 
-    activateHandler = (checked, assistantID) => {
-        if(!checked){
-            confirm({
-                title: `Deactivate assistant`,
-                content: <p>Are you sure you want to deactivate this assistant</p>,
-                onOk: () => {
-                    this.props.dispatch(assistantActions.changeAssistantStatus(assistantID, checked))
-                }
-            });
-            return;
-        }
-        this.props.dispatch(assistantActions.changeAssistantStatus(assistantID, checked))
-    };
 
     isAssistantNameValid = (name) => {
         return !(this.props.assistantList.findIndex(assistant => assistant.Name.toLowerCase() === name.toLowerCase()) >= 0)
@@ -103,9 +90,7 @@ class Assistants extends Component {
                     <Paragraph type="secondary">
                         Here you can see all assistants created by you
                     </Paragraph>
-
                 </div>
-
 
                 <div className={styles.Body}>
                     <CreateNewBox text={'Add Assistant'} onClick={this.showNewAssistantModal}/>
@@ -148,7 +133,6 @@ function mapStateToProps(state) {
         assistantList: state.assistant.assistantList,
         options: state.options.options,
         isLoading: state.assistant.isLoading,
-        isStatusChanging: state.assistant.isStatusChanging,
     };
 }
 

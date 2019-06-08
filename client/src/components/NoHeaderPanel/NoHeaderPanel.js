@@ -1,4 +1,5 @@
 import React, {Component} from 'react';
+import {Spin} from 'antd';
 import styles from "./NoHeaderPanel.module.less";
 
 
@@ -34,7 +35,7 @@ class NoHeaderPanel extends Component {
 
         return (
             this.props.loading ?
-                null
+                <Spin/>
                 :
                 <div style={{height: '100%'}}>
                     <div className={styles.Panel}>

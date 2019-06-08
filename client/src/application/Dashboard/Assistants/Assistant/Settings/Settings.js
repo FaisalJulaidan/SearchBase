@@ -1,8 +1,10 @@
 import React, {Component} from 'react';
+import {connect} from 'react-redux';
 import {store} from "store/store";
 
-import {Button, Select, Form, Input, InputNumber, Divider, Slider, Switch, Modal} from "antd";
+import {Button, Select, Form, Input, InputNumber, Divider, Slider, Switch, Modal, Radio} from "antd";
 import {assistantActions, crmActions} from "store/actions";
+import {history} from "helpers";
 
 import countries from 'helpers/static_data/countries'
 const FormItem = Form.Item;
@@ -61,7 +63,8 @@ class Settings extends Component {
             title: `Delete assistant confirmation`,
             content: `If you click OK, this assistant will be deleted with its content forever`,
             onOk: () => {
-                this.props.dispatch(assistantActions.deleteAssistant(this.props.assistant.ID));
+                this.props.dispatch(assistantActions.deleteAssistant(this.props.assistant.ID))
+                    .then(() => history.push('/dashboard/assistants'));
             }
         });
     };
@@ -150,7 +153,7 @@ class Settings extends Component {
                     {/* ================================ */}
                     <br />
                     <Divider/>
-                    <h2> Advance Settings:</h2>
+                    <h2> Advanced Settings:</h2>
 
                     <FormItem
                         label="Pop up after"
@@ -163,6 +166,27 @@ class Settings extends Component {
                         )}
                         <span className="ant-form-text"> seconds</span>
                     </FormItem>
+
+                    <Form.Item label="Alert Me Every:"
+                               extra="Select how often you would like to be notified via email of new chats"
+
+                    >
+                        {getFieldDecorator('notifyEvery', {
+                            initialValue: assistant.NotifyEvery,
+                            rules: [{
+                                required: true,
+                                message: 'Please select how often or never',
+                            }],
+                        })(
+                            <Radio.Group style={{width:'100%'}}>
+                                <Radio.Button value="never">Never</Radio.Button>
+                                <Radio.Button value="immediately">Immediately</Radio.Button>
+                                <Radio.Button value="6hrs">Every 6hrs</Radio.Button>
+                                <Radio.Button value="daily">Daily</Radio.Button>
+                                <Radio.Button value="weekly">Weekly</Radio.Button>
+                            </Radio.Group>,
+                        )}
+                    </Form.Item>
 
                     <FormItem
                         label="Restricted Countries"
@@ -181,27 +205,35 @@ class Settings extends Component {
                         }
                     </FormItem>
 
-                    <FormItem
-                        label="Records Notifications"
-                        extra="If you turn this on, we will notify you through your email"
-                    >
-                        <Switch checked={this.state.isAlertsEnabled} onChange={this.toggleAlertsSwitch}
-                                style={{marginRight: '5px'}}/>
-                    </FormItem>
 
-                    <FormItem
-                        label="Alert Me Every:"
-                        extra="Select how often you would like to be notified"
-                    >
-                        {getFieldDecorator('alertEvery', {
-                            initialValue: this.props.assistant.MailPeriod
-                        })(
-                            <Slider
-                                max={maxAlertsLength}
-                                disabled={!this.state.isAlertsEnabled}
-                                marks={this.state.alertOptions} step={null}/>
-                        )}
-                    </FormItem>
+                    {/*<FormItem*/}
+                        {/*label="Records Notifications"*/}
+                        {/*extra="If you turn this on, we will notify you through your email"*/}
+                    {/*>*/}
+                        {/*<Switch checked={this.state.isAlertsEnabled} onChange={this.toggleAlertsSwitch}*/}
+                                {/*style={{marginRight: '5px'}}/>*/}
+                    {/*</FormItem>*/}
+
+                    {/*<FormItem*/}
+                        {/*label="Alert Me Every:"*/}
+                        {/*extra="Select how often you would like to be notified"*/}
+                    {/*>*/}
+                        {/*{getFieldDecorator('alertEveryy', {*/}
+                            {/*initialValue: this.props.assistant.MailPeriod*/}
+                        {/*})(*/}
+                            {/*<Slider*/}
+                                {/*max={maxAlertsLength}*/}
+                                {/*disabled={!this.state.isAlertsEnabled}*/}
+                                {/*marks={this.state.alertOptions} step={null}/>*/}
+                        {/*)}*/}
+                    {/*</FormItem>*/}
+
+
+
+
+
+
+
                     <Button type={'primary'} onClick={this.handleSave}>Save changes</Button>
                 </Form>
 
@@ -209,11 +241,14 @@ class Settings extends Component {
                 <Divider/>
                 <h2> Delete Assistant:</h2>
                 <Button type={'danger'} onClick={this.handleDelete}>Delete</Button>
-                <br /><br /><br />
 
             </>
         );
     }
 }
 
-export default Form.create()(Settings)
+function mapStateToProps(state) {
+    return {};
+}
+
+export default connect(mapStateToProps)(Form.create()(Settings));

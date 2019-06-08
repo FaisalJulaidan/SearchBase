@@ -138,8 +138,7 @@ class Assistant(db.Model):
     TopBarText = db.Column(db.String(64), nullable=False)
     SecondsUntilPopup = db.Column(db.Float, nullable=False, default=0.0)
 
-    MailEnabled = db.Column(db.Boolean(), nullable=False, default=False)
-    MailPeriod = db.Column(db.Integer, nullable=False, default=12)
+    NotifyEvery = db.Column(db.String(64), nullable=False, default='never')
     Active = db.Column(db.Boolean(), nullable=False, default=True)
     Config = db.Column(MagicJSON, nullable=True)
 
@@ -154,6 +153,9 @@ class Assistant(db.Model):
     AutoPilotID = db.Column(db.Integer, db.ForeignKey('auto_pilot.ID'))
     AutoPilot = db.relationship("AutoPilot", back_populates="Assistants")
 
+    # NotifySchedulerJobID = db.Column(db.Integer, db.ForeignKey('apscheduler_jobs.FakeID', ondelete='cascade'), nullable=True, unique=True)
+    # NotifySchedulerJob = db.relationship('ApschedulerJobs', foreign_keys=[NotifySchedulerJobID], back_populates='NotifySchedulerJob')
+
     # - Many to one
     Statistics = db.relationship('Statistics', back_populates='Assistant')
     Conversations = db.relationship('Conversation', back_populates='Assistant')
@@ -161,7 +163,8 @@ class Assistant(db.Model):
 
     # Constraints:
     # cannot have two assistants with the same name under one company
-    __table_args__ = (db.UniqueConstraint('CompanyID', 'Name', name='uix1_assistant'),)
+    __table_args__ = (db.UniqueConstraint('CompanyID', 'Name', name='uix1_assistant'),
+                      db.CheckConstraint(NotifyEvery.in_(['never', 'immediately', '6hrs', 'daily', 'weekly'])))
 
     def __repr__(self):
         return '<Assistant {}>'.format(self.Name)
@@ -421,21 +424,8 @@ class Job(db.Model):
     def __repr__(self):
         return '<Job {}>'.format(self.JobTitle)
 
-# class Task(db.Model):
-#
-#     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-#
-#     ApschedulerJobID1 = db.Column(db.VARCHAR(200), db.ForeignKey('apscheduler_jobs.id'), nullable=True, unique=True)
-#     ApschedulerJob1 = db.relationship('ApschedulerJobs', foreign_keys=[ApschedulerJobID1], back_populates='ApschedulerJoba')
-#
-#     ApschedulerJobID2 = db.Column(db.VARCHAR(200), db.ForeignKey('apscheduler_jobs.id'), nullable=True, unique=True)
-#     ApschedulerJob2 = db.relationship('ApschedulerJobs', foreign_keys=[ApschedulerJobID2], back_populates='ApschedulerJobb')
-#
-#     def __repr__(self):
-#         return '<Task {}>'.format(self.ApschedulerJobID)
-#
-#
-# # a hidden table was made by APScheduler being redefined to be able use foreign keys
+
+# a hidden table was made by APScheduler being redefined to be able use foreign keys
 # class ApschedulerJobs(db.Model):
 #
 #     __table_args__ = {
@@ -443,14 +433,12 @@ class Job(db.Model):
 #         'mysql_charset': 'utf8'
 #     }
 #
+#     FakeID = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
 #     id = db.Column(db.VARCHAR(200), primary_key=True)
 #     next_run_time = db.Column(db.REAL)
 #     job_state = db.Column(db.BLOB)
 #
-#     ApschedulerJoba = db.relationship('Task', back_populates='ApschedulerJob1', cascade="all, delete, delete-orphan")
-#     ApschedulerJobb = db.relationship('Task', back_populates='ApschedulerJob2', cascade="all, delete, delete-orphan")
-
-
+#     NotifySchedulerJob = db.relationship('Assistant', uselist=False, back_populates='NotifySchedulerJob')
 
 
 # =================== Triggers ============================

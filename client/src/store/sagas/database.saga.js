@@ -1,21 +1,19 @@
 import * as actionTypes from '../actions/actionTypes';
-import {put, takeEvery, takeLatest, all} from 'redux-saga/effects'
+import {all, put, takeLatest} from 'redux-saga/effects'
 import {databaseActions, flowActions} from "../actions";
-import {http, successMessage, loadingMessage, errorMessage} from "helpers";
+import {errorMessage, http, loadingMessage, successMessage} from "helpers";
 
 const promiseFn = (flag) => {
     if (flag) return new Promise(resolve => resolve());
     else      return new Promise((r, reject) => reject());
 };
 
-
 function* getDatabasesList() {
     try {
         const res = yield http.get(`/databases`);
         yield put(databaseActions.getDatabasesListSuccess(res.data.data));
     } catch (error) {
-        console.log(error);
-        const msg = "Couldn't load databases list";
+        const msg = error.response?.data?.msg || "Couldn't load databases list";
         yield put(databaseActions.getDatabasesListFailure(msg));
         errorMessage(msg);
 
@@ -32,8 +30,7 @@ function* fetchDatabase({databaseID, pageNumber, meta}) {
         const res = yield http.get(`/databases/${databaseID}/page/${pageNumber ? pageNumber : 1}`);
         yield put({...databaseActions.fetchDatabaseSuccess(res.data.msg, res.data.data), meta});
     } catch (error) {
-        console.log(error);
-        const msg = "Couldn't load database's content";
+        const msg = error.response?.data?.msg || "Couldn't load databases list";
         yield put({...databaseActions.fetchDatabaseFailure(msg), meta});
         errorMessage(msg);
 
@@ -52,10 +49,8 @@ function* uploadDatabase({newDatabase}) {
         const res = yield http.post(`/databases`, newDatabase);
         yield put(databaseActions.uploadDatabaseSuccess(res.data.msg, res.data.data));
         successMessage('Database uploaded');
-
     } catch (error) {
-        console.log(error);
-        const msg = "Couldn't upload new database";
+        const msg = error.response?.data?.msg || "Couldn't upload new database";
         yield put(databaseActions.uploadDatabaseFailure(msg));
         errorMessage(msg);
     }
@@ -75,8 +70,7 @@ function* deleteDatabase({databaseID}) {
         yield put(databaseActions.deleteDatabaseSuccess(res.data.msg, databaseID));
 
     } catch (error) {
-        console.log(error);
-        const msg = "Couldn't delete database";
+        const msg = error.response?.data?.msg || "Couldn't delete database";
         yield put(databaseActions.deleteDatabaseFailure(msg));
         errorMessage(msg);
     }
@@ -94,10 +88,8 @@ function* updateDatabase({data, databaseID}) {
         yield put(databaseActions.updateDatabaseSuccess(res.data.msg, res.data.data));
         yield put(databaseActions.getDatabasesList());
         successMessage('Database updated');
-
     } catch (error) {
-        console.log(error);
-        const msg = "Couldn't update database";
+        const msg = error.response?.data?.msg || "Couldn't update database";
         yield put(databaseActions.updateDatabaseFailure(msg));
         errorMessage(msg);
     }

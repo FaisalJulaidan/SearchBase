@@ -26,12 +26,6 @@ class TimeSlots extends React.Component {
         /** @type {WeekDay[]}*/
         weekDays: [
             {
-                day: 'Sunday',
-                active: false,
-                from: null,
-                to: null,
-            },
-            {
                 day: 'Monday',
                 active: false,
                 from: null,
@@ -63,6 +57,12 @@ class TimeSlots extends React.Component {
             },
             {
                 day: 'Saturday',
+                active: false,
+                from: null,
+                to: null,
+            },
+            {
+                day: 'Sunday',
                 active: false,
                 from: null,
                 to: null,

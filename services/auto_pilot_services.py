@@ -5,7 +5,6 @@ import logging
 from utilities import helpers
 from services import mail_services, stored_file_services as sfs
 from enums import UserType, DataType, ApplicationStatus
-import os
 
 
 def processConversation(conversation: Conversation, autoPilot: AutoPilot):

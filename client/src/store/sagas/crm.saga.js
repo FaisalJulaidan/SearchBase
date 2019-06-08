@@ -1,8 +1,7 @@
 import {all, put, takeEvery} from 'redux-saga/effects'
 import * as actionTypes from '../actions/actionTypes';
 import {crmActions} from "../actions";
-import {destroyMessage, errorHandler, errorMessage, http, loadingMessage, successMessage} from "helpers";
-import * as Sentry from '@sentry/browser';
+import {destroyMessage, errorMessage, http, loadingMessage, successMessage} from "helpers";
 
 function* fetchCRMs() {
     try {
@@ -10,10 +9,8 @@ function* fetchCRMs() {
         yield put(crmActions.getConnectedCRMsSuccess(res.data?.data));
     } catch (error) {
         const msg = error.response?.data?.msg || "Couldn't load CRMs";
-        console.error(error);
         errorMessage(msg);
         yield put(crmActions.getConnectedCRMsFailure());
-        errorHandler(error);
     }
 }
 
@@ -25,10 +22,8 @@ function* connectCrm({connectedCRM}) {
         yield put(crmActions.connectCrmSuccess(res.data.data));
     } catch (error) {
         const msg = error.response?.data?.msg || "Couldn't Connect CRM";
-        console.error(error);
         errorMessage(msg);
         yield put(crmActions.connectCrmFailure(msg));
-        errorHandler(error)
     }
 }
 
@@ -42,32 +37,19 @@ function* testCrm({testedCRM}) {
         yield put(crmActions.testCrmSuccess());
     } catch (error) {
         const msg = error.response?.data?.msg || "Test CRM connection failed";
-        console.error(error);
         errorMessage(msg);
         yield put(crmActions.testCrmFailure(msg));
-        errorHandler(error)
     }
 }
 
 function* disconnectCrm({disconnectedCRMID}) {
-    let msg = "Couldn't disconnect";
     try {
         const res = yield http.delete(`/crm/${disconnectedCRMID.ID}`);
-
-        if (!res.data?.success) {
-            errorMessage(res.data?.msg || msg);
-            yield put(crmActions.disconnectCrmFailure(msg));
-        }
-
-        if (res.data?.msg)
-            successMessage(res.data.msg);
-
+        successMessage(res.data.msg || 'CRM Disconnected');
         yield put(crmActions.disconnectCrmSuccess(res.data.data));
     } catch (error) {
-        msg = error.response?.data?.msg;
-        console.error(error);
+        const msg = error.response?.data?.msg || "Couldn't disconnect";
         yield put(crmActions.disconnectCrmFailure(msg));
-        Sentry.captureException(error);
         errorMessage(msg);
     }
 }
@@ -77,9 +59,9 @@ function* exportRecruiterValueReport({connectedCRM_Type}) {
         const res = yield http.post(`/crm/recruiter_value_report`, {crm_type: connectedCRM_Type.Name});
         yield put(crmActions.exportRecruiterValueReportSuccess(res.data.data));
     } catch (error) {
-        let data = error.response?.data;
-        yield put(crmActions.exportRecruiterValueReportFailure(data.msg || "An error has occurred"));
-        if (!data.msg) errorHandler(error)
+        const msg = error.response?.data?.msg || "An error has occurred";
+        yield put(crmActions.exportRecruiterValueReportFailure(msg));
+        errorMessage(msg);
     }
 }
 

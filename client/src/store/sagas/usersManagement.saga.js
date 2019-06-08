@@ -1,15 +1,14 @@
-import {put, takeEvery, all} from 'redux-saga/effects'
+import {all, put, takeEvery} from 'redux-saga/effects'
 import * as actionTypes from '../actions/actionTypes';
 import {usersManagementActions} from "../actions";
-import {http, loadingMessage, successMessage, errorMessage} from "helpers";
+import {errorMessage, http, loadingMessage, successMessage} from "helpers";
 
 function* getUsers() {
     try {
         const res = yield http.get(`/users`);
         return yield put(usersManagementActions.getUsersSuccess(res.data.data))
     } catch (error) {
-        console.log(error);
-        const msg = "Couldn't load users";
+        const msg = error.response?.data?.msg || "Couldn't load users";
         yield put(usersManagementActions.getUsersFailure(msg));
         errorMessage(msg);
     }
@@ -24,8 +23,7 @@ function* addUser(action) {
         successMessage('New user added');
 
     } catch (error) {
-        console.log(error);
-        const msg = "Couldn't add a new user";
+        const msg = error.response?.data?.msg || "Couldn't add a new user";
         yield put(usersManagementActions.addUserFailure(msg));
         errorMessage(msg);
     }
@@ -40,8 +38,7 @@ function* editUser(action) {
         successMessage('User edited');
 
     } catch (error) {
-        console.log(error);
-        const msg = "Couldn't update the user";
+        const msg = error.response?.data?.msg || "Couldn't update the user";
         yield put(usersManagementActions.editUserFailure(msg));
         errorMessage(msg);
     }
@@ -57,8 +54,7 @@ function* deleteUser(action) {
         successMessage('User deleted');
 
     } catch (error) {
-        console.log(error.response);
-        const msg = "Couldn't delete the user";
+        const msg = error.response?.data?.msg || "Couldn't delete the user";
         yield put(usersManagementActions.deleteUserFailure(msg));
         errorMessage(msg);
     }

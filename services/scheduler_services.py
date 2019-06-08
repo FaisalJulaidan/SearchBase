@@ -3,6 +3,7 @@ from pytz import utc
 from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.jobstores.sqlalchemy import SQLAlchemyJobStore
 from apscheduler.executors.pool import ThreadPoolExecutor, ProcessPoolExecutor
+
 import os
 
 jobstores = {
@@ -19,10 +20,11 @@ job_defaults = {
 
 scheduler = BackgroundScheduler(jobstores=jobstores, executors=executors, job_defaults=job_defaults, timezone=utc)
 
+def printSomething ():
+    print("SOMETHINGS...")
 
-# job = scheduler.add_job(func=tasks.printSomething, trigger='interval', seconds=5,
-#                         id="3559a1946b52419899e8841d4317d194", replace_existing=True)
-# # job = scheduler.get_job("3559a1946b52419899e8841d4317d194")
+# job = scheduler.add_job(func=tasks.printSomething, trigger='interval', seconds=5)                                                                                                                          id="3559a1946b52419899e8841d4317d194", replace_existing=True)
+# job = scheduler.get_job("3559a1946b52419899e8841d4317d194")
 #
 #
 # scheduler.start()

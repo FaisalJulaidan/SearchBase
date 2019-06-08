@@ -20,7 +20,7 @@ class App extends Component {
     constructor(props) {
         super(props);
         // Clear recent notifications boxes when route changes
-        history.listen(() => destroyMessage());
+        // history.listen(() => destroyMessage());
     }
 
     render() {
@@ -34,7 +34,7 @@ class App extends Component {
                         <Route path="/signup" component={Signup}/>
                         <Route path="/forget_password" component={ForgetPassword}/>
                         <Route path="/reset_password/" component={NewResetPassword}/>
-                        <Route path="/appointmentspicker/" component={AppointmentsPicker}/>
+                        <Route path="/appointments_picker/" component={AppointmentsPicker}/>
                         <PrivateRoute path="/dashboard" component={Dashboard}/>
                         <Redirect to={{pathname: '/dashboard'}}/>
                     </Switch>

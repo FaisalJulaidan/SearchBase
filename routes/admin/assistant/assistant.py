@@ -33,7 +33,7 @@ def assistants():
                                                        data.get('topBarText'),
                                                        user['companyID'])
         if not callback.Success:
-            return helpers.jsonResponse(False, 400, "Assistant updated successfully")
+            return helpers.jsonResponse(False, 400, "Assistant didn't update successfully")
         return helpers.jsonResponse(True, 200, callback.Message, helpers.getDictFromSQLAlchemyObj(callback.Data))
 
 
@@ -90,8 +90,7 @@ def assistant_configs(assistantID):
                                                        updatedSettings.get("welcomeMessage"),
                                                        updatedSettings.get("topBarTitle"),
                                                        updatedSettings.get("secondsUntilPopup"),
-                                                       updatedSettings.get("alertsEnabled"),
-                                                       updatedSettings.get("alertEvery"),
+                                                       updatedSettings.get("notifyEvery"),
                                                        updatedSettings.get('config'),
                                                        user['companyID']
                                                        )

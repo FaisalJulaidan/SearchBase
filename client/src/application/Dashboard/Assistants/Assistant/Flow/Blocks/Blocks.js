@@ -1,13 +1,12 @@
 import React, {Component} from 'react';
 
 import styles from "./Blocks.module.less";
-import {Button, Form, Modal} from "antd";
+import {Button, Form, Modal, Empty} from "antd";
 
 import Block from "./Block/Block";
 import {DragDropContext, Draggable, Droppable} from 'react-beautiful-dnd';
 import NewBlockModal from "./Modals/NewBlockModal";
 import EditBlockModal from "./Modals/EditBlockModal1";
-import AssistantToolsModal from "./Modals/AssistantToolsModal";
 
 // a little function to help us with reordering the result
 const reorder = (list, startIndex, endIndex) => {
@@ -27,7 +26,6 @@ class Blocks extends Component {
         addBlockVisible: false,
         editBlockVisible: false,
         deleteBlockVisible: false,
-        assistantToolsBlockVisible: false,
         blocks: [],
         edittedBlock: {},
         deletedBlock: {content: {}}
@@ -74,12 +72,10 @@ class Blocks extends Component {
     // this called from block.js & editBlockModal when you click on delete block button
     handleDeleteBlock = deletedBlock => this.props.deleteBlock(deletedBlock);
 
-    // ASSISTANT TOOLS MODAL
-    showAssistantToolsModal = () => this.setState({assistantToolsBlockVisible: true});
-    closeAssistantToolsModal = () => this.setState({assistantToolsBlockVisible: false});
 
 
     render() {
+
         return (
             <div className={styles.Panel}>
                 <div className={styles.Panel_Header_With_Button}>
@@ -87,10 +83,6 @@ class Blocks extends Component {
                         <h3>{this.props.currentGroup.name} Questions</h3>
                     </div>
                     <div>
-                        <Button className={styles.Panel_Header_Button} type="primary" icon="tool"
-                                onClick={this.showAssistantToolsModal}>
-                            Tools
-                        </Button>
                         <Button className={styles.Panel_Header_Button} type="primary" icon="plus"
                                 onClick={this.showAddBlockModal} disabled={!this.props.currentGroup.id}>
                             Add Question
@@ -105,6 +97,7 @@ class Blocks extends Component {
                                 {(provided) => (
                                     <div ref={provided.innerRef}>
                                         {
+                                            this.state.blocks.length ?
                                             this.state.blocks.map((block, index) =>
                                                 <Draggable key={block.ID} draggableId={block.ID} index={index}>
                                                     {(provided) => (
@@ -119,8 +112,12 @@ class Blocks extends Component {
                                                         </div>
                                                     )}
                                                 </Draggable>
-                                            )
+                                            ) :
+                                            <Empty description={this.state.currentGroup ? 'No questions yet' : 'No groups yet'}
+                                                   style={{marginTop: '5px'}}/>
                                         }
+
+
                                         {provided.placeholder}
                                     </div>
                                 )}
@@ -149,8 +146,6 @@ class Blocks extends Component {
                                 allGroups={this.props.allGroups}
                                 options={this.props.options}/>
 
-                <AssistantToolsModal visible={this.state.assistantToolsBlockVisible}
-                               closeModal={this.closeAssistantToolsModal}/>
             </div>
         );
     }

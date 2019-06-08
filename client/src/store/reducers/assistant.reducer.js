@@ -101,7 +101,6 @@ export const assistant = (state = initialState, action) => {
                 isLoading: true
             });
         case actionTypes.UPDATE_ASSISTANT_CONFIGS_SUCCESS:
-
             return updateObject(state, {
                 successMsg: action.successMsg,
                 isLoading: false,
@@ -140,16 +139,10 @@ export const assistant = (state = initialState, action) => {
                 isStatusChanging: true
             });
         case actionTypes.CHANGE_ASSISTANT_STATUS_SUCCESS:
-            let newAssistantStatus = [...state.assistantList].map(assistant => {
-                if(assistant.ID === action.assistantID)
-                    assistant.Active = action.status;
-                return assistant
-            });
-
             return updateObject(state, {
                 successMsg: action.successMsg,
                 isStatusChanging: false,
-                assistantList: newAssistantStatus
+                assistant: {...state.assistant, Active: action.status}
             });
         case actionTypes.CHANGE_ASSISTANT_STATUS_FAILURE:
             return updateObject(state, {

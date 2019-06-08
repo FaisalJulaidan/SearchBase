@@ -1,7 +1,7 @@
 import {all, put, takeLatest} from 'redux-saga/effects'
 import * as actionTypes from '../actions/actionTypes';
-import {assistantActions, autoPilotActions} from "../actions";
-import {destroyMessage, errorHandler, errorMessage, flow, http, loadingMessage, successMessage} from "helpers";
+import {autoPilotActions} from "../actions";
+import {errorMessage, http, loadingMessage, successMessage} from "helpers";
 
 function* fetchAutoPilots() {
     try {
@@ -11,15 +11,10 @@ function* fetchAutoPilots() {
         yield put(autoPilotActions.fetchAutoPilotsSuccess(res.data?.data));
 
     } catch (error) {
-        console.error(error);
-        const msg = "Couldn't load auto pilots";
+        const msg = error.response?.data?.msg || "Couldn't load auto pilots";
         yield put(autoPilotActions.fetchAutoPilotsFailure(msg));
         errorMessage(msg);
     }
-}
-
-function* watchFetchAutoPilots() {
-    yield takeLatest(actionTypes.FETCH_AUTOPILOTS_REQUEST, fetchAutoPilots)
 }
 
 function* addAutoPilot({type, newAutoPilot}) {
@@ -30,35 +25,23 @@ function* addAutoPilot({type, newAutoPilot}) {
         successMessage('Auto pilot added');
 
     } catch (error) {
-        console.error(error);
-        const msg = "Couldn't create a new auto pilot";
+        const msg = error.response?.data?.msg || "Couldn't create a new auto pilot";
         yield put(autoPilotActions.addAutoPilotFailure(msg));
         errorMessage(msg);
     }
 }
 
-function* watchAddAutoPilot() {
-    yield takeLatest(actionTypes.ADD_AUTOPILOT_REQUEST, addAutoPilot)
-}
-
 function* updateAutoPilot({autoPilotID, updatedValues}) {
     try {
-        console.log(autoPilotID)
         const res = yield http.put(`auto_pilot/${autoPilotID}`, updatedValues);
         yield put(autoPilotActions.updateAutoPilotSuccess(autoPilotID, res.data?.data, res.data?.msg));
         successMessage('Auto pilot updated');
     } catch (error) {
-        console.error(error);
-        const msg = "Couldn't update auto pilot";
+        const msg = error.response?.data?.msg || "Couldn't update auto pilot";
         yield put(autoPilotActions.updateAutoPilotFailure(msg));
         errorMessage(msg);
     }
 }
-
-function* watchUpdateAutoPilot() {
-    yield takeLatest(actionTypes.UPDATE_AUTOPILOT_REQUEST, updateAutoPilot)
-}
-
 
 function* deleteAutoPilot({autoPilotID}) {
     try {
@@ -67,16 +50,10 @@ function* deleteAutoPilot({autoPilotID}) {
         yield put(autoPilotActions.deleteAutoPilotSuccess(autoPilotID, res.data?.msg));
         successMessage('AutoPilot deleted');
     } catch (error) {
-        console.error(error);
-        const msg = "Couldn't delete auto pilot";
+        const msg = error.response?.data?.msg || "Couldn't delete auto pilot";
         yield put(autoPilotActions.deleteAutoPilotFailure(msg));
         errorMessage(msg);
     }
-}
-
-
-function* watchDeleteAutoPilot() {
-    yield takeLatest(actionTypes.DELETE_AUTOPILOT_REQUEST, deleteAutoPilot)
 }
 
 function* updateStatus({status, autoPilotID}) {
@@ -87,11 +64,27 @@ function* updateStatus({status, autoPilotID}) {
         yield successMessage('Status updated');
 
     } catch (error) {
-        console.error(error);
-        const msg = "Couldn't update assistant's status";
+        const msg = error.response?.data?.msg || "Couldn't update assistant's status";
         yield put(autoPilotActions.updateAutoPilotFailure(msg));
         errorMessage(msg);
     }
+}
+
+function* watchFetchAutoPilots() {
+    yield takeLatest(actionTypes.FETCH_AUTOPILOTS_REQUEST, fetchAutoPilots)
+}
+
+function* watchAddAutoPilot() {
+    yield takeLatest(actionTypes.ADD_AUTOPILOT_REQUEST, addAutoPilot)
+}
+
+function* watchUpdateAutoPilot() {
+    yield takeLatest(actionTypes.UPDATE_AUTOPILOT_REQUEST, updateAutoPilot)
+}
+
+
+function* watchDeleteAutoPilot() {
+    yield takeLatest(actionTypes.DELETE_AUTOPILOT_REQUEST, deleteAutoPilot)
 }
 
 function* watchUpdateStatus() {

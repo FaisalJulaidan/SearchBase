@@ -156,7 +156,7 @@ def update(id, name, desc, message, topBarText, companyID)-> Callback:
                         "Couldn't update assistant " + str(id))
 
 
-def updateConfigs(id, name, desc,  message, topBarText, secondsUntilPopup, mailEnabled, mailPeriod, config, companyID)-> Callback:
+def updateConfigs(id, name, desc,  message, topBarText, secondsUntilPopup, notifyEvery, config, companyID)-> Callback:
     try:
         # Validate the json config
         validate(config, json_schemas.assistant_config)
@@ -170,8 +170,7 @@ def updateConfigs(id, name, desc,  message, topBarText, secondsUntilPopup, mailE
         assistant.Message = message
         assistant.TopBarText = topBarText
         assistant.SecondsUntilPopup = secondsUntilPopup
-        assistant.MailEnabled = mailEnabled
-        assistant.MailPeriod = mailPeriod
+        assistant.NotifyEvery = notifyEvery
         assistant.Config = config
 
         db.session.commit()

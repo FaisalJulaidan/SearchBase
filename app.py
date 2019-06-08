@@ -11,6 +11,7 @@ from sqlalchemy_utils import create_database, database_exists
 from services.auth_services import jwt
 from utilities import helpers, tasks
 from flask_babel import Babel
+from services import scheduler_services
 
 # Import all routers to register them as blueprints
 from routes.admin.routers import profile_router, analytics_router, sub_router, \
@@ -99,6 +100,7 @@ if os.environ['FLASK_ENV'] in ['production', 'staging']:
     print('Production mode running...')
 
 elif os.environ['FLASK_ENV'] == 'development':
+
     # Server Setup
     app.config.from_object('config.DevelopmentConfig')
     config.BaseConfig.USE_ENCRYPTION = False
@@ -113,6 +115,7 @@ elif os.environ['FLASK_ENV'] == 'development':
         db.drop_all()
         db.create_all()
         helpers.gen_dummy_data()
+
 
     print('Development mode running...')
 

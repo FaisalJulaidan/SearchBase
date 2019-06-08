@@ -5,10 +5,8 @@ import styles from './SentryBoundary.module.less';
 import {getLink} from "helpers";
 import {Button} from 'antd';
 
-Sentry.init({
-    dsn: "https://12d2940f9cae4c8bb456358a2d550217@sentry.io/1436966",
-    enabled: !(process.env.NODE_ENV === 'development')
-});
+if (!(process.env.NODE_ENV === 'development'))
+    Sentry.init({dsn: "https://12d2940f9cae4c8bb456358a2d550217@sentry.io/1436966"});
 
 class SentryBoundary extends Component {
 

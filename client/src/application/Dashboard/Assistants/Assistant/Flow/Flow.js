@@ -2,53 +2,34 @@ import React, {Component} from 'react';
 
 import Groups from "./Groups/Groups";
 import Blocks from "./Blocks/Blocks";
-import Header from "../../../../../components/Header/Header";
+import AssistantToolsModal from "./Tools/AssistantToolsModal"
 import {assistantActions} from "store/actions";
 import connect from "react-redux/es/connect/connect";
 import styles from "./Flow.module.less"
-import {Modal, Spin} from "antd";
+import {Modal, Spin, Button} from "antd";
 import shortid from 'shortid';
-import { Prompt } from "react-router-dom";
 import {destroyMessage, successMessage, history, deepClone} from "helpers";
 
 const confirm = Modal.confirm;
 
 class Flow extends Component {
 
-    savedClicked = false; // Important for solving the saving flow bug
 
     state = {
         currentGroup: {blocks: []},
         assistant: {Flow: {groups:[]}},
-        isSaved: true
+        assistantToolsBlockVisible: false,
+
     };
 
     componentWillReceiveProps(nextProps, nextContext) {
-        if (nextProps.successMsg && this.savedClicked){
-            this.savedClicked = false;
-            this.setState({isSaved: true});
-        }
-    }
 
-    componentDidUpdate = () => {
-        if (!this.state.isSaved) {
-            console.log('reload?');
-            window.onbeforeunload = () => true
-        } else {
-            window.onbeforeunload = undefined
-        }
-    };
+    }
 
 
     componentDidMount() {
-        const {assistantList, match} = this.props;
-        const assistant = assistantList.find(assistant => assistant.ID === +match.params.id);
-        // if the user try to access assistant that does not exist using the URL, he will be redirected
-        if (!(assistant)){
-            history.push('/dashboard/assistants');
-            return;
-        }
-        this.setState({assistant: assistant}, () =>{
+        const {assistant} = this.props;
+        this.setState({assistant}, () =>{
             if(this.state.assistant?.Flow?.groups.length)
                this.selectGroup(this.state.assistant.Flow.groups[0])
         })
@@ -82,8 +63,8 @@ class Flow extends Component {
         this.setState({
             assistant: updatedAssistant,
             currentGroup: newGroup,
-            isSaved: false
         });
+
         destroyMessage();
         successMessage('Group added!');
     };
@@ -97,9 +78,8 @@ class Flow extends Component {
 
         this.setState({
             assistant: updatedAssistant,
-            isSaved: false
         });
-        destroyMessage();
+        this.props.setIsFlowSaved(false);
         successMessage('Group updated!');
     };
 
@@ -109,10 +89,9 @@ class Flow extends Component {
         this.setState({
             assistant: updatedAssistant,
             currentGroup: {blocks: []},
-            isSaved: false
         });
-        destroyMessage();
-        successMessage('Group deleted!');
+        this.props.setIsFlowSaved(false);
+        successMessage('Group deleted');
         // TODO: Check the related blocks to this group
     };
 
@@ -146,10 +125,9 @@ class Flow extends Component {
         this.setState({
             assistant: updatedAssistant,
             currentGroup: updatedGroup,
-            isSaved: false
         });
-        destroyMessage();
-        successMessage('Block added!');
+        this.props.setIsFlowSaved(false);
+        successMessage('Block added');
     };
 
     editBlock = (edittedBlock) => {
@@ -184,9 +162,8 @@ class Flow extends Component {
         this.setState({
             assistant: updatedAssistant,
             currentGroup: updatedGroup,
-            isSaved: false
         });
-        destroyMessage();
+        this.props.setIsFlowSaved(false);
         successMessage('Block updated!');
     };
 
@@ -233,9 +210,8 @@ class Flow extends Component {
                 this.setState({
                     assistant: updatedAssistant,
                     currentGroup: updatedGroup,
-                    isSaved: false
                 });
-                destroyMessage();
+                this.props.setIsFlowSaved(false);
                 successMessage('Block deleted!');
             }
         });
@@ -275,15 +251,19 @@ class Flow extends Component {
         this.setState({
             assistant: updatedAssistant,
             currentGroup: updatedGroup,
-            isSaved: false
-        })
+        });
+        this.props.setIsFlowSaved(false)
     };
 
     saveFlow = () => {
-        this.savedClicked = true;
-        this.props.dispatch(assistantActions.updateFlow(this.state.assistant));
-        this.props.location.state.assistant = this.state.assistant;
+        this.props.dispatch(assistantActions.updateFlow(this.state.assistant))
+            .then( ()=> {this.props.setIsFlowSaved(true)});
     };
+
+    // ASSISTANT TOOLS MODAL
+    showAssistantToolsModal = () => this.setState({assistantToolsBlockVisible: true});
+    closeAssistantToolsModal = () => this.setState({assistantToolsBlockVisible: false});
+
 
     render() {
         const {assistant} = this.state;
@@ -292,18 +272,23 @@ class Flow extends Component {
         return (
             <Spin spinning={!(!!assistant)} style={{height: '100%'}}>
 
-                <div style={{height: '100%'}}>
-                    <Header display={assistant.Name}
-                            button={{
-                                icon: "save",
-                                onClick: this.saveFlow,
-                                text: 'Save Script',
-                                disabled: this.state.isSaved,
-                                loading: this.props.isUpdatingFlow
-                            }}/>
+                <>
 
-                    <div className={styles.Panel_Body_Only}>
-                        <div style={{margin: '0 5px 0 0', width: '16%'}}>
+                    <div className={styles.Header}>
+                        <Button className={styles.Panel_Header_Button} type="primary" icon="tool"
+                                onClick={this.showAssistantToolsModal}>
+                            Tools
+                        </Button>
+                        <Button type={"primary"}
+                                icon={"save"}
+                                onClick={this.saveFlow}
+                                disabled={this.props.isFlowSaved}
+                                loading={this.props.isUpdatingFlow}>
+                            Save Script
+                        </Button>
+                    </div>
+
+                    <div style={{marginBottom: 15}}>
                             {
                                 assistant && <Groups selectGroup={this.selectGroup}
                                                 isLoading={this.props.isLoading}
@@ -313,9 +298,9 @@ class Flow extends Component {
                                                 editGroup={this.editGroup}
                                                 deleteGroup={this.deleteGroup}/>
                             }
-                        </div>
+                    </div>
 
-                        <div style={{margin: '0 0 0 5px', width: '84%'}}>
+                    <div>
                             {
                                 assistant && <Blocks addBlock={this.addBlock}
                                                 editBlock={this.editBlock}
@@ -325,14 +310,13 @@ class Flow extends Component {
                                                 allGroups={Flow?.groups}
                                                 options={this.props.options}/>
                             }
-                        </div>
-
                     </div>
-                </div>
 
-                <Prompt when={!this.state.isSaved}
-                        message={() => `Your script is not saved are you sure you want leave without saving it?`}/>
+                    <AssistantToolsModal visible={this.state.assistantToolsBlockVisible}
+                                         closeModal={this.closeAssistantToolsModal}/>
 
+
+                </>
             </Spin>
         );
     }
@@ -342,7 +326,6 @@ class Flow extends Component {
 function mapStateToProps(state) {
     return {
         options: state.options.options,
-        assistantList: state.assistant.assistantList,
         successMsg: state.assistant.updateFlowSuccessMsg,
         isUpdatingFlow: state.assistant.isUpdatingFlow,
     };

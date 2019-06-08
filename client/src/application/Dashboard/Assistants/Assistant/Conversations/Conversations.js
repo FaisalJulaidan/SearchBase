@@ -92,8 +92,8 @@ class Conversations extends React.Component {
                     if (this.state.viewModal)
                         this.getNextConversation(deletedConversation)
                             .then(() => this.props.dispatch(conversationActions.deleteConversation(ID, AssistantID)));
-
-
+                    else
+                        this.props.dispatch(conversationActions.deleteConversation(ID, AssistantID))
                 },
                 maskClosable: true
             });
@@ -380,6 +380,7 @@ class Conversations extends React.Component {
                                onChange={this.handleFilter}
                                loading={this.props.isLoading}
                                bordered={true}
+                               pagination={{position:'both'}}
                                size='default'
                         />
 
@@ -405,11 +406,9 @@ class Conversations extends React.Component {
 const mapStateToProps = state =>  {
     const {conversation} = state;
     return {
-        options: state.options.options,
         conversations: conversation.conversations,
         isLoading: conversation.isLoading,
         errorMsg: conversation.errorMsg,
-
         isClearingAll: conversation.isClearingAll,
         isUpdatingStatus: conversation.isUpdatingStatus,
     };

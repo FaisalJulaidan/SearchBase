@@ -8,7 +8,7 @@ from sqlalchemy.sql import desc
 
 from enums import UserType, ApplicationStatus
 from models import db, Callback, Conversation, Assistant
-from services import assistant_services, stored_file_services, auto_pilot_services
+from services import assistant_services, stored_file_services, auto_pilot_services, mail_services
 from services.CRM import crm_services
 from utilities import json_schemas, helpers
 
@@ -36,7 +36,6 @@ def processConversation(assistantHashID, data: dict) -> Callback:
             'keywordsByDataType': data['keywordsByDataType'],
         }
 
-
         # Validate submitted conversation after adding the modified version of selected solutions
         validate(conversationData, json_schemas.conversation)
         if data['score'] > 1:
@@ -63,7 +62,6 @@ def processConversation(assistantHashID, data: dict) -> Callback:
                 # conversation.AppointmentEmailSentAt = ap_callback.Data['appointmentEmailSentAt']
             conversation.AutoPilotResponse = ap_callback.Message
 
-
         # CRM integration
         if assistant.CRM:
             crm_callback: Callback = crm_services.processConversation(assistant, conversation)
@@ -71,6 +69,8 @@ def processConversation(assistantHashID, data: dict) -> Callback:
                 conversation.CRMSynced = True
             conversation.CRMResponse = crm_callback.Message
 
+        # Notify company about the new chatbot session
+        mail_services.notifyNewConversation(assistant, data)
 
         db.session.add(conversation)
         db.session.commit()
@@ -83,20 +83,20 @@ def processConversation(assistantHashID, data: dict) -> Callback:
         db.session.rollback()
         return Callback(False, "An error occurred while processing chatbot data.")
 
+
 # ----- Getters ----- #
 def getAllByAssistantID(assistantID):
     try:
-        conversations: List[Conversation] = db.session.query(Conversation)\
+        conversations: List[Conversation] = db.session.query(Conversation) \
             .filter(Conversation.AssistantID == assistantID) \
             .order_by(desc(Conversation.DateTime)).all()
-
 
         for conversation in conversations:
             filePaths = ""
             storedFile_callback: Callback = stored_file_services.getByConversation(conversation)
             if storedFile_callback.Success:
                 filePaths = storedFile_callback.Data.FilePath
-            conversation.FilePath =  filePaths
+            conversation.FilePath = filePaths
         return Callback(True, "User inputs retrieved successfully.", conversations)
 
     except Exception as exc:
@@ -129,8 +129,8 @@ def getByID(conversationID, assistantID):
 # ----- Updaters ----- #
 def updateStatus(conversationID, assistantID, newStatus):
     try:
-        db.session.query(Conversation)\
-            .filter(and_(Conversation.AssistantID == assistantID, Conversation.ID == conversationID))\
+        db.session.query(Conversation) \
+            .filter(and_(Conversation.AssistantID == assistantID, Conversation.ID == conversationID)) \
             .update({'ApplicationStatus': ApplicationStatus[newStatus]})
 
         db.session.commit()

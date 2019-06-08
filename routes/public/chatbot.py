@@ -12,12 +12,12 @@ chatbot_router = Blueprint('chatbot_router', __name__, template_folder="../templ
 CORS(chatbot_router)
 
 
-
 @chatbot_router.route("/widgets/<path:path>", methods=['GET'])
 @helpers.gzipped
 def get_widget(path):
     if request.method == "GET":
         return send_from_directory('static/widgets/', path)
+
 
 @chatbot_router.route("/assistant/<string:assistantIDAsHash>/chatbot_direct_link", methods=['GET'])
 def chatbot_direct_link(assistantIDAsHash):
@@ -43,9 +43,6 @@ def chatbot(assistantIDAsHash):
         callback: Callback = conversation_services.processConversation(assistantIDAsHash, data)
         if not callback.Success:
             return helpers.jsonResponse(False, 400, callback.Message, callback.Data)
-
-        # Notify company about the new chatbot session
-        mail_services.notifyNewConversation(assistantIDAsHash)
 
         return helpers.jsonResponse(True, 200,
                                     "Collected data is successfully processed",

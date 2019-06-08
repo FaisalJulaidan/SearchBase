@@ -120,6 +120,7 @@ const updateAssistantConfigsFailure = (error) => {
 const deleteAssistant = (assistantID) => {
     return {
         type: actionTypes.DELETE_ASSISTANT_REQUEST,
+        meta: {thunk: true},
         assistantID
     };
 };
@@ -168,6 +169,7 @@ const changeAssistantStatusFailure = (error) => {
 const updateFlow = (assistant) => {
     return {
         type: actionTypes.UPDATE_FLOW_REQUEST,
+        meta: {thunk: true},
         assistant
     };
 };

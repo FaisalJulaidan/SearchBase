@@ -66,65 +66,64 @@ class Groups extends Component {
     render() {
         const {groupsList} = this.props;
         return (
-            <div className={styles.Panel}>
-                <div className={styles.Panel_Header}>
-                    <h3>Groups</h3>
-                </div>
-
-                <div className={styles.Panel_Body}>
-
-                    <Row type="flex" justify="center" style={{marginBottom: '5px'}}>
-                        <Col>
-                            <Button
-                                style={{marginRight: 10}}
-                                onClick={this.showNewGroupModal}
-                                type="default"
-                                size={"small"}
-                                icon="plus"
-                            >Add</Button>
-                            <Button
-                                type="default"
-                                size={"small"}
-                                icon="edit"
-                                disabled={!(!!this.props.currentGroup.name)}
-                                onClick={() => this.showEditGroupModal()}>
-                                Edit
-                            </Button>
-                        </Col>
-                    </Row>
-
-
-                    <NewGroup visible={this.state.newGroupModal}
-                              handleCancel={this.handleAddGroupCancel}
-                              handleSave={this.handleAddGroup}/>
-
+            <>
+                <Row>
 
                     {
                         groupsList ?
-                            <Menu mode="inline" defaultSelectedKeys={['0']}>
-                                {
+                            <Col xs={{ span: 14}} lg={{ span: 17}}>
 
-                                    this.props.groupsList.map((group, index) =>
-                                        <Menu.Item onClick={() => this.props.selectGroup(group)} key={index}>
-                                            {group.name}
-                                        </Menu.Item>
-                                    )
-                                }
-                            </Menu>
+                                <Menu mode="horizontal" defaultSelectedKeys={['0']}>
+                                    {
+                                        this.props.groupsList.map((group, index) =>
+                                            <Menu.Item onClick={() => this.props.selectGroup(group)} key={index}>
+                                                {group.name}
+                                            </Menu.Item>
+
+                                        )
+                                    }
+                                </Menu>
+
+                            </Col>
                             :
-                            <Empty description={'No groups yet'} style={{mariginTop: '5px'}}>
-                                <Button type="primary" onClick={this.showNewGroupModal}>Create Now</Button>
-                            </Empty>
-
+                            null
                     }
-                </div>
+
+                    <Col xs={{ span: 10}} lg={{ span: 7}} style={{paddingTop: 20, textAlign: groupsList ? "right" : "left"}}>
+                        <Button
+                            style={{marginRight: 10}}
+                            onClick={this.showNewGroupModal}
+                            type="default"
+                            size={"small"}
+                            icon="plus"
+                        >
+                            Add group
+                        </Button>
+                        <Button
+                            type="default"
+                            size={"small"}
+                            icon="edit"
+                            disabled={!(!!this.props.currentGroup.name)}
+                            onClick={() => this.showEditGroupModal()}>
+                            Edit
+                        </Button>
+                    </Col>
+                </Row>
+
+
+                <NewGroup visible={this.state.newGroupModal}
+                          handleCancel={this.handleAddGroupCancel}
+                          handleSave={this.handleAddGroup}/>
+
+
+
 
                 <EditGroup group={this.props.currentGroup}
                            visible={this.state.editGroupModal}
                            handleCancel={this.handleEditGroupCancel}
                            handleUpdate={this.handleEditGroup}
                            handleDelete={this.handleDeleteGroup}/>
-            </div>
+            </>
         );
     }
 }

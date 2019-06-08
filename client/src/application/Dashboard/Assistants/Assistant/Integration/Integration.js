@@ -1,11 +1,10 @@
 import React from 'react';
 
-import {Button, Col, Input, Row} from "antd";
-import Header from "../../../../../components/Header/Header"
+import {Button, Col, Input, Row, Divider} from "antd";
 
 import styles from "./Integration.module.less"
 import ReactDOMServer from 'react-dom/server'
-import {hasher} from "helpers";
+import {hasher, getLink} from "helpers";
 import {SwatchesPicker} from 'react-color';
 import {connect} from 'react-redux';
 
@@ -43,8 +42,7 @@ class Integration extends React.Component {
     state = {
         source: "",
         dataName: "tsb-widget",
-        assistantID: "assistantid",
-        // dataIcon: "#ffffff",
+        assistantID: null,
         dataCircle: "#9254de",
         async: true,
         defer: true,
@@ -55,24 +53,16 @@ class Integration extends React.Component {
 
     componentDidMount() {
         this.setState({
-            assistantID: hasher.encode(this.props.match.params.id),
+            assistantID: hasher.encode(this.props.assistant.ID),
             source: this.getWidgetSrc()
         });
         this.firstHead = [...document.head.children];
     }
 
-
     componentWillUnmount() {
         this.removeChatbot();
     }
 
-    componentWillReceiveProps(nextProps) {
-        if (nextProps.assistantList[0]) {
-            this.setState({
-                assistant: nextProps.assistantList.find(assistant => +this.props.match.params.id === assistant.ID)
-            });
-        }
-    }
 
     handleChange = (color) => this.setState({dataCircle: color.hex || color.target.value});
 
@@ -123,40 +113,28 @@ class Integration extends React.Component {
         script.defer = this.state.defer;
         script.setAttribute("data-name", this.state.dataName);
         script.setAttribute("data-id", this.state.assistantID);
-        // script.setAttribute("data-icon", this.state.dataIcon);
         script.setAttribute("data-circle", this.state.dataCircle);
         script.setAttribute("id", "oldBotScript");
 
         document.body.appendChild(script);
     };
 
-
     getWidgetSrc = () => {
-        // include the colon if there is port number, which means localhost and not real server
-        let colon = "";
-        if (window.location.port !== "") {
-            colon = ":";
-        }
-        const {protocol, port, hostname} = window.location;
-        return protocol + '//' + hostname + colon + port + "/api/widgets/chatbot.js";
+        return getLink("/api/widgets/chatbot.js");
     };
 
     generateDirectLink = () => {
-        const {protocol, port, hostname} = window.location;
-        let colon = "";
-        if (window.location.port !== "") colon = ":";
-        if (port === "3000")
-            window.open(`${protocol}//${hostname}${colon}5000/api/assistant/${this.state.assistantID}/chatbot_direct_link`);
-        else
-            window.open(`${protocol}//${hostname}${colon}${port}/api/assistant/${this.state.assistantID}/chatbot_direct_link`);
 
+        if (window.location.port !== "")
+            window.open(`http://localhost:5000/api/assistant/${this.state.assistantID}/chatbot_direct_link`);
+        else
+            window.open(getLink(`/api/assistant/${this.state.assistantID}/chatbot_direct_link`));
     };
 
     getChatbotScript = () => {
         return <script src={this.getWidgetSrc()}
                        data-name={this.state.dataName}
                        data-id={this.state.assistantID}
-            // data-icon={this.state.dataIcon}
                        data-circle={this.state.dataCircle}
                        async={this.state.async}
                        defer={this.state.defer}/>
@@ -164,81 +142,54 @@ class Integration extends React.Component {
 
     render() {
         return (
-            <div style={{height: '100%'}}>
-                <Header display={`Integration`}/>
 
-                <div className={styles.Panel_Body_Only}>
+            <>
 
-                    {/*Left Panel*/}
-                    <div style={{marginRight: 5, width: '45%'}} className={styles.Panel}>
-
-                        <div className={styles.Panel_Header} style={{position: "inherit"}}>
-                            <h3>Choosing your Assistant's looks</h3>
-                        </div>
-
-                        <div className={styles.Panel_Body}>
-
-                            <Row type="flex" justify="center">
-                                <Col>
-                                    <p> Currently you can edit the colour setting of your assistant's button.
-                                        Simply pick your preferred one bellow.</p>
-                                </Col>
-                            </Row>
-
-                            <br/>
-
-                            <Row type="flex" justify="center" style={{marginBottom: 50}}>
-                                <Col>
-                                    <SwatchesPicker color={this.state.dataCircle} onChange={this.handleChange}/>
-                                </Col>
-                            </Row>
-
-                            <Row type="flex" justify="center">
-                                <Col>
-                                    <p style={{lineHeight: '27px', marginRight: 5}}>Selected Color:</p>
-                                </Col>
-                                <Col>
-                                    <Input style={{padding: "3px", width: "60px"}} type="color" name="dataCircle"
-                                           value={this.state.dataCircle} onChange={this.handleChange}/>
-                                </Col>
-
-                            </Row>
-
-
-                        </div>
-                    </div>
-
-
-                    {/*Right Panel*/}
-                    <div style={{marginLeft: 5, width: '55%'}} className={styles.Panel}>
-
-                        <div className={styles.Panel_Header} style={{position: "inherit"}}>
-                            <h3>Connecting your assistant</h3>
-                        </div>
-
-                        <div className={styles.Panel_Body} style={{textAlign: 'center'}}>
-                            <p style={{textAlign: 'left'}}>
-                                To integrate your assistant, you must paste the pre-made code into any part of your
-                                HTML
-                                source code.
-                            </p>
-
-                            <TextArea value={ReactDOMServer.renderToString(this.getChatbotScript())}
-                                      id={"pasteArea"}
-                                      style={{width: "100%", height: "110px", fontWeight: "600", margin: "1.5% 0"}}
-                                      readOnly/>
-                            <Button onClick={this.copyScriptPaste} className={"ant-btn-primary"}>Copy</Button>
-                            <Button style={{marginLeft: "5px"}}
-                                    disabled={this.state.isTestButtonDisabled}
-                                    onClick={this.testIntegration}
-                                    className={"ant-btn-primary"}>Test</Button>
-                            <Button style={{marginLeft: "5px"}} onClick={this.generateDirectLink}
-                                    className={"ant-btn-primary"}>Generate Direct Link</Button>
-                        </div>
-                    </div>
+                <div className={styles.Header}>
+                    <Button style={{marginLeft: "5px"}}
+                            disabled={this.state.isTestButtonDisabled}
+                            onClick={this.testIntegration}>
+                        Test Chatbot Live
+                    </Button>
                 </div>
 
-            </div>
+
+                <div>
+                    <h2>Customize Chatbot Color:</h2>
+                    <p>
+                        Currently you can edit the colour setting of your assistant's button.
+                        Simply pick your preferred one bellow.
+                    </p>
+
+                    <br/>
+                    <SwatchesPicker color={this.state.dataCircle} onChange={this.handleChange}/>
+
+                    <br/>
+                    <p style={{paddingBottom: 5}}>Selected Color:</p>
+                    <Input style={{padding: "3px", width: "60px"}} type="color" name="dataCircle"
+                           value={this.state.dataCircle} onChange={this.handleChange}/>
+                </div>
+
+
+                <br/>
+                <Divider/>
+                <h2>Installation Code:</h2>
+                <div>
+                    <p>
+                        To integrate your assistant, you must paste the pre-made code into any
+                        part of your HTML source code.
+                    </p>
+                    <TextArea value={ReactDOMServer.renderToString(this.getChatbotScript())}
+                              id={"pasteArea"}
+                              style={{height: "70px", fontWeight: "600", margin: "1.5% 0"}}
+                              readOnly/>
+                    <Button onClick={this.copyScriptPaste} className={"ant-btn-primary"}>Copy</Button>
+                    <Button style={{marginLeft: "5px"}} onClick={this.generateDirectLink}
+                            className={"ant-btn-primary"}>Generate Direct Link</Button>
+                </div>
+
+            </>
+
         );
     }
 }

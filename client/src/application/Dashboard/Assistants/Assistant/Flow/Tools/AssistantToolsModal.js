@@ -2,7 +2,7 @@ import React, {Component} from 'react';
 
 import {Icon, Modal, Tabs} from 'antd';
 
-import TextWebLink from "../Tools/TextWebLink";
+import TextWebLink from "./TextWebLink";
 
 const TabPane = Tabs.TabPane;
 

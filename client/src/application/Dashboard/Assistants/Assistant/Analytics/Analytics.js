@@ -1,21 +1,21 @@
 import React from 'react';
 import styles from "./Analytics.module.less";
 
-import Header from "../../../../../components/Header/Header";
+import Panel from 'components/Panel/Panel'
 import {Chart, Axis, Tooltip, Geom } from "bizcharts";
 import {analyticsActions} from "store/actions";
 import {connect} from 'react-redux';
 import {Icon, Spin, Button, Row, Col, Statistic} from 'antd';
-
 import moment from 'moment';
+
 
 const splits = {
         yearly: {format:"YYYY", render: 'MMM', compare: "month"},
         monthly: {format:"MMM", render:"D", compare: "days"},
         daily: {format: "ddd", render: "HH", compare: "hour"}};
-
 const visitData = [];
 const beginDay = new Date().getTime();
+
 for (let i = 0; i < 10; i += 1) {
     visitData.push({
         x: moment(new Date(beginDay + (1000 * 60 * 60 * 24 * i))).format('MMM-DD'),
@@ -27,7 +27,7 @@ for (let i = 0; i < 10; i += 1) {
 class Analytics extends React.Component {
     //split can  be yearly/monthly/daily/hourly
     constructor(props){
-        super(props)
+        super(props);
         this.state = {
             height: 100,
             split: "yearly",
@@ -44,11 +44,12 @@ class Analytics extends React.Component {
         this.setState({height});
     }
     componentWillMount(){
-        const {assistant} = this.props.location.state;
+        const {assistant} = this.props;
         this.props.dispatch(analyticsActions.fetchAnalytics(assistant.ID))
     }
+
     changeSplit(split){
-        const {analytics} = this.props.analytics;
+        const {analytics} = this.props;
         if(split !== this.state.split){
             this.setState({split})
         }
@@ -64,6 +65,7 @@ class Analytics extends React.Component {
                 return new Array(24).fill(1).map((i, x) => {return moment(this.state.curDate).set('hour', x)})
         }
     }
+
     iterator(change){
         switch(this.state.split){
             case "yearly":
@@ -139,35 +141,32 @@ class Analytics extends React.Component {
             }
         };
         return (
-            <div style={{height: '100%'}}>
-                <div style={{padding: '0 5px'}}>
-                    <div style={{width: '100%', height: 56, marginBottom: 10}}>
-                        <Header display={"Analytics Page"}/>
-                    </div>
-                </div>
+            <>
+                <Row gutter={16}>
+                    <Col span={18}>
+                        <Panel>
+                            {/* Panel Header*/}
+                            <div>
+                                <h3>
+                                    <Icon type="fund" theme="twoTone" twoToneColor={"#9254de"}/> Chats
+                                </h3>
+                            </div>
 
-                <div style={{height: 'calc(100% - 66px)', width: '100%', display: 'flex'}}>
-                    <div style={{margin: 5, width: '70%'}}>
-                        <div className={styles.Panel}>
-                                <div className={styles.Panel_Header}>
-                                    <h3>
-                                        <Icon type="fund" theme="twoTone" twoToneColor={"#9254de"}/> Chats
-                                    </h3>
-                                </div>
-
-                                <div className={styles.Panel_Body}
-                                     ref={chartDiv => this.chartDiv = chartDiv}>
-                                    {!data ?
+                            {/* Panel Body*/}
+                            <div align="center" ref={chartDiv => this.chartDiv = chartDiv}>
+                                {!data ?
                                     <Spin/> :
-                                    <React.Fragment>
-                                        <Button onClick={() => this.changeSplit('yearly')} type={split==="yearly" ? "primary" : null}>Yearly</Button>
-                                        <Button onClick={() => this.changeSplit('monthly')} type={split==="monthly" ? "primary" : null}>Monthly</Button>
+                                    <>
+                                        <Button style={{marginRight: 8}} onClick={() => this.changeSplit('yearly')} type={split==="yearly" ? "primary" : null}>Yearly</Button>
+                                        <Button style={{marginRight: 8}} onClick={() => this.changeSplit('monthly')} type={split==="monthly" ? "primary" : null}>Monthly</Button>
                                         <Button onClick={() => this.changeSplit('daily')} type={split==="daily" ? "primary" : null}>Daily</Button>
+
                                         <div className={styles.Date_Selector}>
                                             <Icon type="caret-left" onClick={() => {this.iterator(-1)}} />
                                             <h1>{moment(this.state.curDate).format(splits[this.state.split].format)}</h1>
                                             <Icon type="caret-right" onClick={() => {this.iterator(1)}}/>
                                         </div>
+
                                         <Chart height={500} data={data} scale={cols} forceFit>
                                             <Axis name="time    " />
                                             <Axis name="chats" />
@@ -188,56 +187,59 @@ class Analytics extends React.Component {
                                                 }}
                                             />
                                         </Chart>
-                                    </React.Fragment>
-                                    }
-                                </div>
-                        </div>
-                    </div>
-
-                    <div style={{height: '100%', width: '30%', margin: 5}}>
-                        <div style={{height: 'calc(25% - 5px)', marginBottom: 5}}>
-                            <div className={styles.Panel}>
-                                <div className={styles.Panel_Header}>
-                                    <h3>
-                                        <Icon type="team" style={{color: "#9254de"}}/> User Applications
-                                    </h3>
-                                </div>
-
-                                <div className={styles.Panel_Body}>
-                                    {!userApplications ?
-                                        <Spin/> :
-                                        <Row gutter={16}>
-                                            <Col span={8}>
-                                                <Statistic title="Accepted" value={userApplications.accepted}
-                                                           prefix={<Icon type="check-circle" theme="twoTone"
-                                                                         twoToneColor="#2ecc71"/>}/>
-                                            </Col>
-                                            <Col span={8}>
-                                                <Statistic title="Pending" value={userApplications.pending}
-                                                           prefix={<Icon type="minus-circle" theme="twoTone"
-                                                                         twoToneColor="#f1c40f"/>}/>
-                                            </Col>
-                                            <Col span={8}>
-                                                <Statistic title="Rejected" value={userApplications.rejected}
-                                                           prefix={<Icon type="close-circle" theme="twoTone"
-                                                                         twoToneColor="#e74c3c"/>}/>
-                                            </Col>
-                                        </Row>
-                                    }
-                                </div>
+                                    </>
+                                }
                             </div>
-                        </div>
 
-                        <div style={{height: 'calc(25% - 10px)', marginBottom: 5}}>
-                            <div className={styles.Panel}>
-                                    <div className={styles.Panel_Header}>
-                                        <h3>
-                                            <Icon type="eye" theme="twoTone" twoToneColor="#9254de"/> Time spent chatting
-                                        </h3>
-                                    </div>
+                        </Panel>
+                    </Col>
 
-                                <div className={styles.Panel_Body}>
-                                    {!tsc ?
+                    <Col span={6}>
+                        <Panel>
+                            {/* Panel Header*/}
+                            <div>
+                                <h3>
+                                    <Icon type="team" style={{color: "#9254de"}}/> User Applications
+                                </h3>
+                            </div>
+
+                            {/* Panel Body*/}
+                            <div align="center">
+                                {!userApplications ?
+                                    <Spin/> :
+                                    <Row gutter={16}>
+                                        <Col span={8}>
+                                            <Statistic title="Accepted" value={userApplications.accepted}
+                                                       prefix={<Icon type="check-circle" theme="twoTone"
+                                                                     twoToneColor="#2ecc71"/>}/>
+                                        </Col>
+                                        <Col span={8}>
+                                            <Statistic title="Pending" value={userApplications.pending}
+                                                       prefix={<Icon type="minus-circle" theme="twoTone"
+                                                                     twoToneColor="#f1c40f"/>}/>
+                                        </Col>
+                                        <Col span={8}>
+                                            <Statistic title="Rejected" value={userApplications.rejected}
+                                                       prefix={<Icon type="close-circle" theme="twoTone"
+                                                                     twoToneColor="#e74c3c"/>}/>
+                                        </Col>
+                                    </Row>
+                                }
+                            </div>
+
+                        </Panel>
+
+                        <Panel>
+                            {/* Panel Header*/}
+                            <div>
+                                <h3>
+                                    <Icon type="eye" theme="twoTone" twoToneColor="#9254de"/> Time spent chatting
+                                </h3>
+                            </div>
+
+                            {/* Panel Body*/}
+                            <div align="center">
+                                {!tsc ?
                                     <Spin /> :
                                     <Row gutter={16}>
                                         <Col span={8}>
@@ -258,58 +260,63 @@ class Analytics extends React.Component {
                                                        suffix={Math.floor(tsc.current[2] % 60) + "s"}
                                                        prefix={<Icon type={tsc.current[2] > tsc.previous[2] ? "caret-up" : "caret-down"} />} />
                                         </Col>
-                                    </Row> }
-                                </div>
+                                    </Row>
+                                }
                             </div>
-                        </div>
-                        <div style={{height: 'calc(25% - 5px)', marginBottom: 5}}>
-                            <div className={styles.Panel}>
-                                <div className={styles.Panel_Header}>
-                                    <h3>
-                                        <Icon type="team" style={{color: "#9254de"}}/> Average Score
-                                    </h3>
-                                </div>
 
-                                <div className={styles.Panel_Body}>
-                                        {!averageScore ?
-                                        <Spin/> :
-                                        <Row gutter={16}>
-                                            <Col span={16}>
-                                                <Statistic value={averageScore}/>
-                                            </Col>
-                                        </Row>
-                                    }
-                                </div>
+                        </Panel>
+
+                        <Panel>
+                            {/* Panel Header*/}
+                            <div>
+                                <h3>
+                                    <Icon type="team" style={{color: "#9254de"}}/> Average Score
+                                </h3>
                             </div>
-                        </div>
-                        <div style={{height: 'calc(25% - 5px)'}}>
-                            <div className={styles.Panel}>
-                                <div className={styles.Panel_Header}>
-                                    <h3>
-                                        <Icon type="team" style={{color: "#9254de"}}/> Clients Candidate split
-                                    </h3>
-                                </div>
 
-                                <div className={styles.Panel_Body}>
-                                    {!clientCandidate ?
-                                        <Spin/> :
-                                        <Row gutter={16}>
-                                            <Col span={8}>
-                                                <Statistic title="Clients" value={clientCandidate.clients}/>
-                                            </Col>
-                                            <Col span={8}>
-                                                <Statistic title="Candidates" value={clientCandidate.candidates}/>
-                                            </Col>
-                                        </Row>
-
-                                    }
-                                </div>
+                            {/* Panel Body*/}
+                            <div align="center">
+                                {!averageScore ?
+                                    <Spin/> :
+                                    <Row>
+                                        <Col>
+                                            <Statistic value={averageScore}/>
+                                        </Col>
+                                    </Row>
+                                }
                             </div>
-                        </div>
 
-                    </div>
-                </div>
-            </div>
+                        </Panel>
+
+                        <Panel>
+                            {/* Panel Header*/}
+                            <div>
+                                <h3>
+                                    <Icon type="team" style={{color: "#9254de"}}/> Clients Candidate split
+                                </h3>
+                            </div>
+
+                            {/* Panel Body*/}
+                            <div align="center">
+                                {!clientCandidate ?
+                                    <Spin/> :
+                                    <Row >
+                                        <Col span={12}>
+                                            <Statistic title="Clients" value={clientCandidate.clients}/>
+                                        </Col>
+                                        <Col span={12}>
+                                            <Statistic title="Candidates" value={clientCandidate.candidates}/>
+                                        </Col>
+                                    </Row>
+
+                                }
+                            </div>
+                        </Panel>
+                    </Col>
+
+                </Row>
+
+            </>
 
         );
     }

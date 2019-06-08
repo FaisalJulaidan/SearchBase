@@ -78,16 +78,16 @@ function* deleteAssistant({assistantID}) {
     }
 }
 
-function* updateFlow({assistant}) {
+function* updateFlow({assistant, meta}) {
     try {
         loadingMessage('Updating script...', 0);
         const res = yield http.put(`/assistant/${assistant.ID}/flow`, {flow: flow.parse(assistant.Flow)});
-        yield put(assistantActions.updateFlowSuccess(assistant, res.data?.msg));
+        yield put({...assistantActions.updateFlowSuccess(assistant, res.data?.msg), meta});
         successMessage('Script updated');
     } catch (error) {
         const msg = error.response?.data?.msg || "Couldn't update script";
         errorMessage(msg);
-        yield put(assistantActions.updateFlowFailure(msg));
+        yield put({...assistantActions.updateFlowFailure(msg), meta});
     }
 }
 

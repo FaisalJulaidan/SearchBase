@@ -1,28 +1,35 @@
 import React from 'react';
+import {Spin} from 'antd';
 
-import "./Header.less"
 import styles from "./Panel.module.less";
 import PropTypes from 'prop-types';
 
 
 // Not complete yet...
 const Panel = (props) => {
+    const TitleElement = React.Children.only(props.children[0]);
+    const BodyElement = React.Children.only(props.children[1]);
+
     return (
-        <div className={styles.Panel}>
-            <div className={styles.Panel_Header}>
-
-
+        props.loading ?
+            <Spin/>
+            :
+            <div style={{height: '100%'}}>
+                <div className={styles.Panel}>
+                    <div className={styles.Panel_Header}>
+                        {React.cloneElement(TitleElement)}
+                    </div>
+                    <div className={styles.Panel_Body}>
+                        {React.cloneElement(BodyElement)}
+                    </div>
+                </div>
             </div>
-            <div className={styles.Panel_Body}>
-
-            </div>
-        </div>
     );
 
 };
 
 Panel.propTypes = {
-    assistantName: PropTypes.string,
+    title: PropTypes.string,
 };
 
 export default Panel;

@@ -251,11 +251,11 @@ class Dashboard extends Component {
                                         <Switch location={location} style={{height: '100%'}}>
 
                                             <Route path={`${match.path}/assistants/:id`} component={Assistant}/>
-                                            <Route path={`${match.path}/assistants/:id/script`} component={Flow}/>
-                                            <Route path={`${match.path}/assistants/:id/integration`} component={Integration}/>
-                                            <Route path={`${match.path}/assistants/:id/conversations`} component={Conversations}/>
-                                            <Route path={`${match.path}/assistants/:id/analytics`} component={Analytics}/>
-                                            <Route path={`${match.path}/assistants/:id/CRMIntegration`} component={AssistantCRM}/>
+                                            {/*<Route path={`${match.path}/assistants/:id/script`} component={Flow}/>*/}
+                                            {/*<Route path={`${match.path}/assistants/:id/integration`} component={Integration}/>*/}
+                                            {/*<Route path={`${match.path}/assistants/:id/conversations`} component={Conversations}/>*/}
+                                            {/*<Route path={`${match.path}/assistants/:id/analytics`} component={Analytics}/>*/}
+                                            {/*<Route path={`${match.path}/assistants/:id/CRMIntegration`} component={AssistantCRM}/>*/}
                                             <Route path={`${match.path}/assistants`} component={Assistants} exact/>
 
                                             <Route path={`${match.path}/marketplace`} component={Marketplace} exact/>

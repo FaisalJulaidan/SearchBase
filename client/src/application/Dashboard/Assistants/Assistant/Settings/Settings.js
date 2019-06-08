@@ -1,8 +1,10 @@
 import React, {Component} from 'react';
+import {connect} from 'react-redux';
 import {store} from "store/store";
 
 import {Button, Select, Form, Input, InputNumber, Divider, Slider, Switch, Modal} from "antd";
 import {assistantActions, crmActions} from "store/actions";
+import {history} from "helpers";
 
 import countries from 'helpers/static_data/countries'
 const FormItem = Form.Item;
@@ -61,7 +63,8 @@ class Settings extends Component {
             title: `Delete assistant confirmation`,
             content: `If you click OK, this assistant will be deleted with its content forever`,
             onOk: () => {
-                this.props.dispatch(assistantActions.deleteAssistant(this.props.assistant.ID));
+                this.props.dispatch(assistantActions.deleteAssistant(this.props.assistant.ID))
+                    .then(() => history.push('/dashboard/assistants'));
             }
         });
     };
@@ -209,11 +212,14 @@ class Settings extends Component {
                 <Divider/>
                 <h2> Delete Assistant:</h2>
                 <Button type={'danger'} onClick={this.handleDelete}>Delete</Button>
-                <br /><br /><br />
 
             </>
         );
     }
 }
 
-export default Form.create()(Settings)
+function mapStateToProps(state) {
+    return {};
+}
+
+export default connect(mapStateToProps)(Form.create()(Settings));

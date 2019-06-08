@@ -29,9 +29,7 @@ class Flow extends Component {
 
     componentDidMount() {
         const {assistant} = this.props;
-        console.log(assistant)
-        this.setState({...assistant}, () =>{
-            console.log(this.state);
+        this.setState({assistant}, () =>{
             if(this.state.assistant?.Flow?.groups.length)
                this.selectGroup(this.state.assistant.Flow.groups[0])
         })

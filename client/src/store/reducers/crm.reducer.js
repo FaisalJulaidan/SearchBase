@@ -2,7 +2,9 @@ import * as actionTypes from '../actions/actionTypes';
 import {updateObject} from '../utility';
 
 const initialState = {
-    CRMsList: [], errorMsg: null, currentCRM: {},
+    CRMsList: [],
+    errorMsg: null,
+    currentCRM: {},
     isLoadingCrms: false,
     isConnecting: false,
     isTesting: false,

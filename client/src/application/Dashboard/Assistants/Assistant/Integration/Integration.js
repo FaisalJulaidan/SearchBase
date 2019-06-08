@@ -146,7 +146,8 @@ class Integration extends React.Component {
             <>
 
                 <div className={styles.Header}>
-                    <Button style={{marginLeft: "5px"}}
+                    <Button type={"primary"}
+                            style={{marginLeft: "5px"}}
                             disabled={this.state.isTestButtonDisabled}
                             onClick={this.testIntegration}>
                         Test Chatbot Live

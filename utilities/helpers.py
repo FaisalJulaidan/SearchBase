@@ -1,7 +1,7 @@
 from flask import json, after_this_request, request
 from models import db, Role, Company, Assistant, Plan, Conversation, Database, Candidate, Job, CRM,\
     OpenTimeSlot, AutoPilot, Appointment, Callback
-from services import user_services, flow_services, auto_pilot_services, assistant_services
+from services import user_services, flow_services, auto_pilot_services, assistant_services, scheduler_services
 from datetime import datetime, timedelta, time
 from enum import Enum
 from hashids import Hashids
@@ -14,7 +14,7 @@ from jsonschema import validate
 from utilities import json_schemas
 from typing import List
 from flask_jwt_extended import get_jwt_identity
-
+from utilities import tasks
 import enums, re, os, stripe, gzip, functools, logging, geoip2.webservice
 
 # will merge with the previous imports if the code is kept - batu
@@ -69,11 +69,15 @@ def gen_dummy_data():
 
     # Create and validate a flow for an assistant
 
+    # job = scheduler_services.scheduler.add_job(func=scheduler_services.printSomething, trigger='interval', seconds=5, id="3559a1946b52419899e8841d4317d194", replace_existing=True)
+    # scheduler_services.scheduler.start()
 
     # Create Assistants for Aramco and Sabic companies
     reader_a = Assistant(Name="Reader", Message="Hey there",
                          TopBarText="Aramco Bot", SecondsUntilPopup=1,
                          Active=True, Company=aramco)
+
+
 
     flow = {
         "groups": [

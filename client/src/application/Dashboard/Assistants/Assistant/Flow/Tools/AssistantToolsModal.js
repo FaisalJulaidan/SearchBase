@@ -15,9 +15,6 @@ class AssistantToolsModal extends Component {
         },
     };
 
-    componentWillReceiveProps(nextProps) {
-        console.log("nextProps: ", nextProps);
-    }
 
     onChangeTab = (currentTab) => this.setState({currentTab});
 

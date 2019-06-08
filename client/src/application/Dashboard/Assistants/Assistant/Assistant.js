@@ -14,6 +14,7 @@ import Settings from "./Settings/Settings"
 import Integration from "./Integration/Integration"
 import Analytics from "./Analytics/Analytics"
 import Flow from "./Flow/Flow"
+import Connections from "./Connections/Connections"
 
 import {getLink, history} from "helpers";
 import {store} from "store/store";
@@ -36,12 +37,27 @@ class Assistant extends Component {
     };
 
     componentDidMount() {
-        store.dispatch(assistantActions.fetchAssistant(this.props.match.params.id))
+        this.props.dispatch(assistantActions.fetchAssistant(this.props.match.params.id))
             .then(()=> {}).catch(() => history.push(`/dashboard/assistants`));
 
-        if (!this.props.options) store.dispatch(optionsActions.getOptions())
+        if (!this.props.options) this.props.dispatch(optionsActions.getOptions());
+
+        this.props.dispatch(crmActions.getConnectedCRMs());
+
+        window.onbeforeunload = this.onPageExist
     }
 
+    onPageExist = (e) => {
+        window.onbeforeunload = () => undefined;
+        confirm({
+            title: `Save changes...?????`,
+            content: <p>Your Script change will be lost</p>,
+            onOk: () => {
+                return "lfkg;dlfgksdfl;gdsfl;g"
+            }
+        });
+        return void(0);
+    };
 
     isAssistantNameValid = (name) => {
         return !(this.props.assistantList.findIndex(assistant => assistant.Name.toLowerCase() === name.toLowerCase()) >= 0)
@@ -62,14 +78,14 @@ class Assistant extends Component {
     };
 
     onTabClick = (key, e) => {
-        if (key !== 'Script'){
-            if (!this.state.isFlowSaved) {
-                console.log('reload?');
-                window.onbeforeunload = () => true
-            } else {
-                window.onbeforeunload = undefined
-            }
-        }
+        // if (key !== 'Script'){
+        //     if (!this.state.isFlowSaved) {
+        //         console.log('reload?');
+        //         window.onbeforeunload = () => true
+        //     } else {
+        //         window.onbeforeunload = undefined
+        //     }
+        // }
     };
 
     setIsFlowSaved = (bool) => {
@@ -121,11 +137,13 @@ class Assistant extends Component {
                                 <TabPane tab="Script" key="Script">
                                     <Flow setIsFlowSaved={this.setIsFlowSaved}
                                           isFlowSaved={this.state.isFlowSaved}
-                                          assistant={{assistant}} />
+                                          assistant={assistant} />
                                 </TabPane>
 
                                 <TabPane tab="Connections" key="Connections">
-                                    Content of tab 3
+                                    <Connections assistant={assistant}
+                                                 CRMsList={this.props.CRMsList}
+                                                 autoPilotsList={this.props.autoPilotsList} />
                                 </TabPane>
 
                                 <TabPane tab="Integration" key="Integration">
@@ -141,8 +159,8 @@ class Assistant extends Component {
                     </div>
                 </NoHeaderPanel>
 
-                <Prompt when={!this.state.isFlowsaved}
-                        message={() => `Your script is not saved are you sure you want leave without saving it?`}/>
+                {/*<Prompt when={!this.state.isFlowSaved}*/}
+                        {/*message={() => `Your script is not saved are you sure you want leave without saving it?`}/>*/}
 
                 {/*<AssistantSettings assistant={assistant}*/}
                                    {/*isAssistantNameValid={this.props.isAssistantNameValid}*/}
@@ -172,6 +190,9 @@ function mapStateToProps(state) {
         options: state.options.options,
         isLoading: state.assistant.isLoading,
         isStatusChanging: state.assistant.isStatusChanging,
+
+        CRMsList: state.crm.CRMsList,
+        autoPilotsList: state.autoPilot.autoPilotsList,
     };
 }
 

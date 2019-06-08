@@ -90,8 +90,7 @@ def assistant_configs(assistantID):
                                                        updatedSettings.get("welcomeMessage"),
                                                        updatedSettings.get("topBarTitle"),
                                                        updatedSettings.get("secondsUntilPopup"),
-                                                       updatedSettings.get("alertsEnabled"),
-                                                       updatedSettings.get("alertEvery"),
+                                                       updatedSettings.get("notifyEvery"),
                                                        updatedSettings.get('config'),
                                                        user['companyID']
                                                        )

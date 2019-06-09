@@ -88,6 +88,7 @@ def chatbot_upload_files(assistantIDAsHash, sessionID):
                 filename = str(uuid.uuid4()) + '_' + helpers.encode_id(sessionID) + '.' + \
                            secure_filename(file.filename).rsplit('.', 1)[1].lower()
 
+                mail_services.notifyNewConversation(callback.Data.Assistant, callback.Data, file)
                 # Upload file to DigitalOcean Space
                 upload_callback: Callback = stored_file_services.uploadFile(file, filename,
                                                                             stored_file_services.USER_FILES_PATH,
@@ -110,8 +111,6 @@ def chatbot_upload_files(assistantIDAsHash, sessionID):
 
             # Save changes
             db.session.commit()
-
-            mail_services.notifyNewConversation(callback.Data.Assistant, callback.Data, request.files.getlist('file')[0])
 
             if callback.Data.Assistant.CRM:
                 # Send through CRM

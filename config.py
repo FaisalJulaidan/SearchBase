@@ -71,6 +71,14 @@ class BaseConfig(object):
     MAIL_PASSWORD = 'pilbvnczzdgxkyzy'
     MAIL_SUPPRESS_SEND = False
 
+    # # Mail Config
+    # MAIL_SERVER = 'smtp.office365.com'
+    # MAIL_PORT = 587
+    # MAIL_USE_TLS = True
+    # MAIL_USERNAME = 'info@thesearchbase.com'
+    # MAIL_PASSWORD = 'yyfcnddsbwhnqknj'
+    # MAIL_SUPPRESS_SEND = False
+
     # run code only with main app (second one)
     # check if WERKZEUG_RUN_MAIN is in the environment variables and its True
     # if os.environ.get("WERKZEUG_RUN_MAIN", None):

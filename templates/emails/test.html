@@ -178,23 +178,11 @@
                         <!-- / Header -->
                         <table class="container header" border="0" cellpadding="0" cellspacing="0" width="620"
                                style="width: 620px;">
-                            <td>
-                            <td style="padding: 30px 0 25px 0; margin-bottom: 100px; border-bottom: solid 1px #eeeeee;font-size: 30px; text-decoration: none; color: #000000;"
-                                align="center">
-                                {% if data["records"]|length == 1 %}
-                                    A {{ data["userType"] }} has engaged with your chatbot
-                                {% endif %}
-
-                                {% if data[logoPath] %}
-                                    <td style="padding: 30px 0 25px 0; margin-bottom: 100px; border-bottom: solid 1px #eeeeee;"
-                                        align="right">
-                                        <a href="#">
-                                            <img src="{{ data["logoPath"] }}" alt="company logo" width="42"
-                                                 height="42"/>
-                                        </a>
-                                    </td>
-                                {% endif %}
-                            </td>
+                            <tr>
+                                <td style="padding: 30px 0 25px 0; margin-bottom: 100px; border-bottom: solid 1px #eeeeee;font-size: 30px; text-decoration: none; color: #000000;"
+                                    align="center">
+                                    A Candidate has engaged with your chatbot
+                                </td>
                             </tr>
                         </table>
                         <!-- /// Header -->
@@ -205,61 +193,31 @@
                             <tr style="line-height: 15px;">
                                 <td class="hero-subheader__title"
                                     style="font-size: 23px; font-weight: bold; padding: 15px 0 5px 0;">
-                                    {{ data["userType"] }}
+                                    Candidate
                                 </td>
                             </tr>
                             <tr>
                                 <td style="font-size: 11px;color:grey">
-                                    Any files submitted by the {{ data["userType"] }} have also been attached to
+                                    Any files submitted by the Candidate have also been attached to
                                     this email.
                                 </td>
                             </tr>
                             <tr>
                                 <td style="font-size: 15px;padding-top: 13px;line-height: 17px;">
-                                    Completed Chatbot: {{ data["conversationCompleted"] }}<br/>
-                                    {% for key, value in data["records"][0]["keywordsByDataType"].items() %}
-                                        {% if not "&FILE_UPLOAD&" in value %}
-                                            {{ key.replace(data["userType"], "") }}: {{ " ".join(value) }}<br/>
-                                        {% endif %}
-                                    {% endfor %}
+                                    Name: Bob Ross<br/>
+                                    Location: Salsa Rico<br/>
+                                    Status: Big deal<br/>
                                     <br/>
                                     <br/>
                                 </td>
                             </tr>
-
-                            {% if data["records"][0].get("selectedSolutions") %}
-                                <tr>
-                                    <td class="hero-subheader__title"
-                                        style="font-size: 23px; font-weight: bold; padding: 15px 0 15px 0;"
-                                        align="left">
-                                        They are also interested in the following solutions:<br/>
-                                    </td>
-                                </tr>
-
-                                <tr>
-                                    <td style="font-size: 15px;">
-                                        {{ data["records"][0].get("selectedSolutions") }}
-                                    </td>
-                                </tr>
-                            {#                                    {% else %}#}
-                            {#                                        <tr>#}
-                            {#                                        <td style="font-size: 15px;">#}
-                            {#                                            {% for record in data["records"] %}#}
-                            {#                                                {% for key, value in record.get("keywordsByDataType").items() %}#}
-                            {#                                                    {{ key }}: {{ " ".join(value) }}<br/>#}
-                            {#                                                {% endfor %}#}
-                            {#                                                <br/><br/>#}
-                            {#                                            {% endfor %}#}
-                            {#                                        </td>#}
-                            {#                                        </tr>#}
-                            {% endif %}
                         </table>
 
-                        <table class="container hero-subheader" width="620" style="text-align: right">
+                        <table class="container hero-subheader" width="100%" style="text-align: right">
                             <tr>
                                 <td align="right">
                                     <label style="font-size: 28px; text-decoration: none; color: #847486;
-                                    vertical-align: top;">{{ data["assistantName"] }}</label>
+                                    vertical-align: top;">CPS Main</label>
                                     <!--<svg height="62" viewBox="-60 0 466 466.204" width="75">
                                         <g fill="#f4b844">
                                             <path d="M325.281 153.344a29.024 29.024 0 0 1-19.879 49.539v-58.028a28.868 28.868 0 0 1 19.88 8.489zm0 0M40.8 144.855v58.028c-15.773-.348-28.382-13.235-28.382-29.016 0-15.777 12.61-28.668 28.383-29.012zm0 0M107.371 203.465h131.461v24.379h-131.46zm0 0M107.371 227.844h131.461v24.898h-131.46zm0 0M233.652 325.473v.96H112.551v-39.98h121.101zm0 0"
@@ -280,6 +238,7 @@
                             </tr>
                         </table>
                         <!-- /// Hero subheader -->
+
 
                         <!-- / Divider -->
                         <table class="container" border="0" cellpadding="0" cellspacing="0" width="100%"
@@ -307,7 +266,7 @@
                                         <tr>
                                             <td style="text-align: center; padding: 50px 0 10px 0;">
                                                 <a href="#"
-                                                   style="font-size: 28px; text-decoration: none; color: #d5d5d5;">{{ data["companyName"] }}</a>
+                                                   style="font-size: 28px; text-decoration: none; color: #d5d5d5;">Aramco</a>
                                             </td>
                                         </tr>
 

@@ -1,15 +1,15 @@
-from datetime import datetime
+import logging
+import os
 from threading import Thread
 
 from flask import render_template, current_app
 from flask_mail import Mail, Message
 from werkzeug.datastructures import FileStorage
 
+from config import BaseConfig
 from models import Callback
-from services import user_services, assistant_services, conversation_services, stored_file_services as sfs
+from services import user_services, stored_file_services as sfs
 from utilities import helpers
-import logging
-import json
 
 mail = Mail()
 
@@ -196,7 +196,7 @@ def sendSolutionAlert(record, solutions):
 #         return Callback(False, "Error in notifying for new chatbot conversation")
 
 
-def notifyNewConversation(assistant, conversation, file=None):
+def notifyNewConversation(assistant, conversation, file: FileStorage = None):
     try:
         if "immediately" not in assistant.NotifyEvery:
             return Callback(False, "Assistant is not set to receive instant notification!")
@@ -205,30 +205,39 @@ def notifyNewConversation(assistant, conversation, file=None):
             return Callback(False, "Users not found!")
 
         fileInfo = None
-        # if file:
-        #     file_callback = sfs.getByConversation(conversation)
-        #     if not file_callback.Success:
-        #         raise Exception(file_callback.Message)
-        #
-        #     print(file_callback.Data.FilePath)
-        #     file_callback = sfs.downloadFile(file_callback.Data.FilePath)
-        #     if not file_callback.Success:
-        #         raise Exception(file_callback.Message)
-        #
-        #     file = file_callback.Data
-        #     file_content = file.read()
-        #
-        #     fileInfo = {"filename": "file TEST", "file_content": file_content}
+        if file:
+            # file_callback = sfs.getByConversation(conversation)
+            # if not file_callback.Success:
+            #     raise Exception(file_callback.Message)
+            #
+            # print(file_callback.Data.FilePath)
+            # file_callback = sfs.downloadFile(file_callback.Data.FilePath)
+            # if not file_callback.Success:
+            #     raise Exception(file_callback.Message)
+            #
+            # file = file_callback.Data
+            # file_content = file.read()
+            savePath = os.path.join(BaseConfig.USER_FILES, file.filename)
+            file.save(savePath)
+            with current_app.open_resource(savePath) as fp:
+                file_content = fp.read()
 
-        logoPath = sfs.PUBLIC_URL + sfs.UPLOAD_FOLDER + sfs.COMPANY_LOGOS_PATH + "/" + (assistant.Company.LogoPath or "")
+            fileInfo = {"filename": file.filename, "file_content": file_content}
+
+        logoPath = sfs.PUBLIC_URL + sfs.UPLOAD_FOLDER + sfs.COMPANY_LOGOS_PATH + "/" + (
+                    assistant.Company.LogoPath or "")
+
+        completedConversation = "No"
+        if conversation.Completed:
+            completedConversation = "Yes"
 
         information = {"assistantName": assistant.Name, "records": [conversation.Data], "assistantID": assistant.ID,
                        "logoPath": logoPath, "userType": conversation.UserType.name,
-                       "companyName": assistant.Company.Name}
+                       "companyName": assistant.Company.Name, "conversationCompleted": completedConversation}
         # TODO FILE
         # send emails, jobs applied for
-        for user in users_callback.Data:  # "evgeniybtonchev@gmail.com" vvvvvvvvvvvv
-            email_callback: Callback = send_email(to=user.Email,
+        for user in users_callback.Data:  # user.Email "evgeniybtonchev@gmail.com" vvvvvvvvvvvv
+            email_callback: Callback = send_email(to="evgeniybtonchev@gmail.com",
                                                   subject='Your new ' + conversation.UserType.name,
                                                   template='emails/new_record_notification.html', file=fileInfo,
                                                   data=information)
@@ -252,7 +261,7 @@ def send_async_email(app, msg):
 def send_email(to, subject, template, file=None, **kwargs):
     try:
         # create Message with the Email: title, recipients and sender
-        msg = Message(subject, recipients=[to], sender="thesearchbase@gmail.com")
+        msg = Message(subject, recipients=[to], sender=tsbEmail)
 
         try:
             # get app context / if it fails assume its working outside the app

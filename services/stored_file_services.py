@@ -109,7 +109,7 @@ def uploadFile(file, filename, path, public=False):
         return Callback(False, "Couldn't upload file")
 
 
-def downloadFile(filename, path):
+def downloadFile(path):
     try:
         # Connect to DigitalOcean Space
         session = boto3.session.Session()
@@ -118,7 +118,7 @@ def downloadFile(filename, path):
                               endpoint_url=os.environ['SERVER_SPACES'],
                               aws_access_key_id=os.environ['PUBLIC_KEY_SPACES'],
                               aws_secret_access_key=os.environ['SECRET_KEY_SPACES'])
-        file = s3.Object('tsb', UPLOAD_FOLDER + path + '/' + filename)
+        file = s3.Object('tsb', UPLOAD_FOLDER + path)
 
         # Check if file exists
         try:

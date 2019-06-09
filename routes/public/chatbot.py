@@ -1,12 +1,15 @@
+import logging
+import uuid
+
 from flask import Blueprint, request, send_from_directory
 from flask import render_template
 from flask_cors import CORS
 from werkzeug.utils import secure_filename
+
 from models import Callback, db, Conversation
 from services import conversation_services, flow_services, databases_services, stored_file_services, mail_services
 from services.CRM import crm_services
 from utilities import helpers
-import uuid, logging
 
 chatbot_router = Blueprint('chatbot_router', __name__, template_folder="../templates")
 CORS(chatbot_router)
@@ -27,7 +30,6 @@ def chatbot_direct_link(assistantIDAsHash):
 
 @chatbot_router.route("/assistant/<string:assistantIDAsHash>/chatbot", methods=['GET', 'POST'])
 def chatbot(assistantIDAsHash):
-
     if request.method == "GET":
         # Get blocks for the chatbot to use
         callback: Callback = flow_services.getChatbot(assistantIDAsHash)
@@ -51,7 +53,6 @@ def chatbot(assistantIDAsHash):
 
 @chatbot_router.route("/assistant/<string:assistantHashID>/chatbot/solutions", methods=['POST'])
 def getSolutions_forChatbot(assistantHashID):
-
     if request.method == "POST":
         # chatbot collected information
         data = request.json
@@ -67,7 +68,6 @@ def getSolutions_forChatbot(assistantHashID):
 
 @chatbot_router.route("/assistant/<string:assistantIDAsHash>/session/<int:sessionID>/file", methods=['POST'])
 def chatbot_upload_files(assistantIDAsHash, sessionID):
-
     callback: Callback = conversation_services.getByID(sessionID, helpers.decode_id(assistantIDAsHash)[0])
     if not callback.Success:
         return helpers.jsonResponse(False, 404, "Session not found.", None)
@@ -89,26 +89,29 @@ def chatbot_upload_files(assistantIDAsHash, sessionID):
                            secure_filename(file.filename).rsplit('.', 1)[1].lower()
 
                 # Upload file to DigitalOcean Space
-                upload_callback : Callback = stored_file_services.uploadFile(file,
-                                                                             filename,
-                                                                             stored_file_services.USER_FILES_PATH,
-                                                                             True)
+                upload_callback: Callback = stored_file_services.uploadFile(file, filename,
+                                                                            stored_file_services.USER_FILES_PATH,
+                                                                            True)
 
                 if not upload_callback.Success:
                     filename = 'fileCorrupted'
 
                 # if there is multiple files, split there name by commas to store a ref of the uploaded files in DB
-                if filenames == '': filenames = filename
-                else: filenames+= ',' + filename
+                if filenames == '':
+                    filenames = filename
+                else:
+                    filenames += ',' + filename
 
             # Store filePaths in the DB as reference
-            dbRef_callback : Callback = stored_file_services.createRef(filenames, session)
+            dbRef_callback: Callback = stored_file_services.createRef(filenames, session)
             if not dbRef_callback.Success:
                 logging.error("Couldn't Save Stored Files Reference For: " + str(filenames))
                 raise Exception(dbRef_callback.Message)
 
             # Save changes
             db.session.commit()
+
+            mail_services.notifyNewConversation(callback.Data.Assistant, callback.Data, request.files.getlist('file')[0])
 
             if callback.Data.Assistant.CRM:
                 # Send through CRM

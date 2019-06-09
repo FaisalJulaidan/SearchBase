@@ -1,3 +1,4 @@
+import copy
 import logging
 from datetime import datetime, timedelta
 from typing import List
@@ -69,11 +70,16 @@ def processConversation(assistantHashID, data: dict) -> Callback:
                 conversation.CRMSynced = True
             conversation.CRMResponse = crm_callback.Message
 
-        # Notify company about the new chatbot session
-        mail_services.notifyNewConversation(assistant, data)
-
         db.session.add(conversation)
         db.session.commit()
+
+        # Notify company about the new chatbot session
+        fileUpload = False
+        for key, value in conversation.Data['keywordsByDataType'].items():
+            if "&FILE_UPLOAD&" in value:
+                fileUpload = True
+        if not fileUpload:
+            mail_services.notifyNewConversation(assistant, conversation)
 
         return Callback(True, 'Chatbot data has been processed successfully!', conversation)
 

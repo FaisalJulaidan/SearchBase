@@ -29,8 +29,6 @@ def getChatbot(assistantHashID) -> Callback:
 
         assistant['ID'] = assistantHashID  # Use the assistant hashID instead of the integer one
         del assistant['CompanyID']
-        del assistant['MailEnabled']
-        del assistant['MailPeriod']
 
         data = {
             "assistant": assistant,

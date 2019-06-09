@@ -3,9 +3,10 @@ from threading import Thread
 
 from flask import render_template, current_app
 from flask_mail import Mail, Message
+from werkzeug.datastructures import FileStorage
 
 from models import Callback
-from services import user_services, assistant_services, conversation_services, stored_file_services
+from services import user_services, assistant_services, conversation_services, stored_file_services as sfs
 from utilities import helpers
 import logging
 import json
@@ -195,26 +196,41 @@ def sendSolutionAlert(record, solutions):
 #         return Callback(False, "Error in notifying for new chatbot conversation")
 
 
-def notifyNewConversation(assistant, conversation):
+def notifyNewConversation(assistant, conversation, file=None):
     try:
-        if not assistant.MailEnabled or assistant.MailPeriod is not 0:
+        if "immediately" not in assistant.NotifyEvery:
             return Callback(False, "Assistant is not set to receive instant notification!")
         users_callback: Callback = user_services.getAllByCompanyIDWithEnabledNotifications(assistant.CompanyID)
         if not users_callback.Success:
             return Callback(False, "Users not found!")
 
-        information = {"assistantName": assistant.Name, "records": [conversation], "assistantID": assistant.ID}
+        fileInfo = None
+        if file:
+            file_callback = sfs.getByConversation(conversation)
+            if not file_callback.Success:
+                raise Exception(file_callback.Message)
 
-        file_callback = stored_file_services.downloadFile(storedFile.FilePath)
-        if not file_callback.Success:
-            raise Exception(file_callback.Message)
-        file = file_callback.Data
-        file_content = file.get()["Body"].read()
+            print(file_callback.Data.FilePath)
+            file_callback = sfs.downloadFile(file_callback.Data.FilePath)
+            if not file_callback.Success:
+                raise Exception(file_callback.Message)
 
+            file = file_callback.Data
+            file_content = file.read()
+
+            fileInfo = {"filename": "file TEST", "file_content": file_content}
+
+        logoPath = sfs.PUBLIC_URL + sfs.UPLOAD_FOLDER + sfs.COMPANY_LOGOS_PATH + "/" + (assistant.Company.LogoPath or "")
+
+        information = {"assistantName": assistant.Name, "records": [conversation.Data], "assistantID": assistant.ID,
+                       "logoPath": logoPath, "userType": conversation.UserType.name,
+                       "companyName": assistant.Company.Name}
         # TODO FILE
         # send emails, jobs applied for
         for user in users_callback.Data:  # user.Email vvvvvvvvvvvv
-            email_callback: Callback = send_email("evgeniybtonchev@gmail.com", 'Your new ' + conversation["userType"], 'emails/new_record_notification.html',
+            email_callback: Callback = send_email(to="evgeniybtonchev@gmail.com",
+                                                  subject='Your new ' + conversation.UserType.name,
+                                                  template='emails/new_record_notification.html', file=fileInfo,
                                                   data=information)
             if not email_callback.Success:
                 return Callback(False, email_callback.Message)
@@ -222,7 +238,7 @@ def notifyNewConversation(assistant, conversation):
         return Callback(True, "Emails have been sent")
 
     except Exception as exc:
-        print("ERROR: ", exc)
+        print("mail_service.notifyNewChatbotSession() ERROR: ", exc)
         logging.error("mail_service.notifyNewChatbotSession(): " + str(exc))
         return Callback(False, "Error in notifying for new chatbot session")
 
@@ -233,7 +249,7 @@ def send_async_email(app, msg):
         mail.send(msg)
 
 
-def send_email(to, subject, template, **kwargs):
+def send_email(to, subject, template, file=None, **kwargs):
     try:
         # create Message with the Email: title, recipients and sender
         msg = Message(subject, recipients=[to], sender="thesearchbase@gmail.com")
@@ -251,6 +267,9 @@ def send_email(to, subject, template, **kwargs):
             # use application context to load the template which the email will use
             with app.app_context():
                 msg.html = render_template(template, **kwargs)
+
+        if file:
+            msg.attach(file.get("filename"), 'application/octect-stream', file.get("file_content"))
 
         # create and start the Thread of the email sending
         thr = Thread(target=send_async_email, args=[app, msg])

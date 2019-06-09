@@ -15,8 +15,6 @@ from sqlalchemy_utils.types.encrypted.encrypted_type import AesEngine
 
 db = SQLAlchemy(model_class=FlaskBaseModel)
 db = initialize_flask_sqlathanor(db)
-
-
 # Activate Foreign Keys
 @event.listens_for(Engine, "connect")
 def _set_sqlite_pragma(dbapi_connection, connection_record):
@@ -424,6 +422,13 @@ class Job(db.Model):
     def __repr__(self):
         return '<Job {}>'.format(self.JobTitle)
 
+class Notifications(db.Model):
+
+    ID = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
+    LastSentdate = db.Column(db.DateTime(), nullable=True)
+
+    # Relationships
+    AssistantID = db.Column(db.Integer, db.ForeignKey('database.ID', ondelete='cascade'), nullable=False)
 
 # a hidden table was made by APScheduler being redefined to be able use foreign keys
 # class ApschedulerJobs(db.Model):

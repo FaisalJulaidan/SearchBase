@@ -3,7 +3,9 @@ from pytz import utc
 from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.jobstores.sqlalchemy import SQLAlchemyJobStore
 from apscheduler.executors.pool import ThreadPoolExecutor, ProcessPoolExecutor
-
+from models import db, Callback, Assistant, User, Notifications
+# import dateutil
+from datetime import date, datetime
 import os
 
 jobstores = {
@@ -15,14 +17,53 @@ executors = {
 }
 job_defaults = {
     'coalesce': False,
-    'max_instances': 3
+    'max_instances': 1
 }
 
 scheduler = BackgroundScheduler(jobstores=jobstores, executors=executors, job_defaults=job_defaults, timezone=utc)
 
-def printSomething ():
-    print("SOMETHINGS...")
+def getNextInterval():
+    now = datetime.now()
+    now.replace(hour=0, minute=0, second=0)
+    # print(now)
+    # print(db)
 
+    try:
+        monthlyUses = db.session.query(Assistant.NotifyEvery, Assistant.Name)\
+                        .filter(Assistant.CompanyID == User.CompanyID) \
+                        .all()
+
+        print(monthlyUses)
+        # return Callback(True, 'Analytics successfully gathered', monthlyUses)
+    except Exception as e:
+        print(e)
+        # return Callback(False, 'Analytics could not be gathered')
+#
+# @scheduler.scheduled_job('interval', seconds=6)
+# def notifyUserAboutChats():
+#     getNextInterval()
+
+
+
+# @scheduler.scheduled_job('cron', id='kekistan', hour='every 6')
+# def notifyUserAboutChats():
+    # print('lol')
+
+# print(db)
+
+# scheduler.add_job(getNextInterval, 'cron', second='*/6', id='hourly', replace_existing=True)
+# scheduler.add_job(getNextInterval, 'cron', second='*/6', id='daily', replace_existing=True)
+# scheduler.add_job(getNextInterval, 'cron', second='*/6', id='weekly', replace_existing=True)
+
+now = datetime.now()
+kek = now.replace(hour=0, minute=0, second=0)
+# print(kek)
+
+
+
+
+# print("lol")
+scheduler.start()
 # job = scheduler.add_job(func=tasks.printSomething, trigger='interval', seconds=5)                                                                                                                          id="3559a1946b52419899e8841d4317d194", replace_existing=True)
 # job = scheduler.get_job("3559a1946b52419899e8841d4317d194")
 #

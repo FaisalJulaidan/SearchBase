@@ -227,8 +227,8 @@ def notifyNewConversation(assistant, conversation, file=None):
                        "companyName": assistant.Company.Name}
         # TODO FILE
         # send emails, jobs applied for
-        for user in users_callback.Data:  # user.Email vvvvvvvvvvvv
-            email_callback: Callback = send_email(to="evgeniybtonchev@gmail.com",
+        for user in users_callback.Data:  # "evgeniybtonchev@gmail.com" vvvvvvvvvvvv
+            email_callback: Callback = send_email(to=user.Email,
                                                   subject='Your new ' + conversation.UserType.name,
                                                   template='emails/new_record_notification.html', file=fileInfo,
                                                   data=information)

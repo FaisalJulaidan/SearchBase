@@ -205,20 +205,20 @@ def notifyNewConversation(assistant, conversation, file=None):
             return Callback(False, "Users not found!")
 
         fileInfo = None
-        if file:
-            file_callback = sfs.getByConversation(conversation)
-            if not file_callback.Success:
-                raise Exception(file_callback.Message)
-
-            print(file_callback.Data.FilePath)
-            file_callback = sfs.downloadFile(file_callback.Data.FilePath)
-            if not file_callback.Success:
-                raise Exception(file_callback.Message)
-
-            file = file_callback.Data
-            file_content = file.read()
-
-            fileInfo = {"filename": "file TEST", "file_content": file_content}
+        # if file:
+        #     file_callback = sfs.getByConversation(conversation)
+        #     if not file_callback.Success:
+        #         raise Exception(file_callback.Message)
+        #
+        #     print(file_callback.Data.FilePath)
+        #     file_callback = sfs.downloadFile(file_callback.Data.FilePath)
+        #     if not file_callback.Success:
+        #         raise Exception(file_callback.Message)
+        #
+        #     file = file_callback.Data
+        #     file_content = file.read()
+        #
+        #     fileInfo = {"filename": "file TEST", "file_content": file_content}
 
         logoPath = sfs.PUBLIC_URL + sfs.UPLOAD_FOLDER + sfs.COMPANY_LOGOS_PATH + "/" + (assistant.Company.LogoPath or "")
 

@@ -29,10 +29,10 @@ def getNextInterval():
     # print(db)
 
     try:
-        monthlyUses = db.session.query(Assistant.NotifyEvery, Assistant.Name)\
+        monthlyUses = db.session.query(Assistant.NotifyEvery, Assistant.Name, Notifications.LastSentDate) \
                         .filter(Assistant.CompanyID == User.CompanyID) \
+                        .outerjoin(Notifications) \
                         .all()
-
         print(monthlyUses)
         # return Callback(True, 'Analytics successfully gathered', monthlyUses)
     except Exception as e:

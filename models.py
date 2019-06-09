@@ -158,6 +158,7 @@ class Assistant(db.Model):
     Statistics = db.relationship('Statistics', back_populates='Assistant')
     Conversations = db.relationship('Conversation', back_populates='Assistant')
     Appointments = db.relationship('Appointment', back_populates='Assistant')
+    Notifications = db.relationship('Notifications', back_populates='Assistant')
 
     # Constraints:
     # cannot have two assistants with the same name under one company
@@ -425,10 +426,13 @@ class Job(db.Model):
 class Notifications(db.Model):
 
     ID = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
-    LastSentdate = db.Column(db.DateTime(), nullable=True)
+    LastSentDate = db.Column(db.DateTime(), nullable=True)
 
     # Relationships
-    AssistantID = db.Column(db.Integer, db.ForeignKey('database.ID', ondelete='cascade'), nullable=False)
+    AssistantID = db.Column(db.Integer, db.ForeignKey('assistant.ID', ondelete='cascade'), nullable=False)
+    Assistant = db.relationship('Assistant', back_populates='Notifications')
+
+
 
 # a hidden table was made by APScheduler being redefined to be able use foreign keys
 # class ApschedulerJobs(db.Model):

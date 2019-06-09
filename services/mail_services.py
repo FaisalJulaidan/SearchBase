@@ -221,7 +221,7 @@ def notifyNewConversation(assistant, conversation, file: FileStorage = None):
             file.save(savePath)
             with current_app.open_resource(savePath) as fp:
                 file_content = fp.read()
-
+            os.remove(savePath)
             fileInfo = {"filename": file.filename, "file_content": file_content}
 
         logoPath = sfs.PUBLIC_URL + sfs.UPLOAD_FOLDER + sfs.COMPANY_LOGOS_PATH + "/" + (
@@ -236,8 +236,8 @@ def notifyNewConversation(assistant, conversation, file: FileStorage = None):
                        "companyName": assistant.Company.Name, "conversationCompleted": completedConversation}
         # TODO FILE
         # send emails, jobs applied for
-        for user in users_callback.Data:  # user.Email "evgeniybtonchev@gmail.com" vvvvvvvvvvvv
-            email_callback: Callback = send_email(to="evgeniybtonchev@gmail.com",
+        for user in users_callback.Data:
+            email_callback: Callback = send_email(to=user.Email,
                                                   subject='Your new ' + conversation.UserType.name,
                                                   template='emails/new_record_notification.html', file=fileInfo,
                                                   data=information)

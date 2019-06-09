@@ -5,6 +5,7 @@ from apscheduler.jobstores.sqlalchemy import SQLAlchemyJobStore
 from apscheduler.executors.pool import ThreadPoolExecutor, ProcessPoolExecutor
 from models import db, Callback, Assistant, User, Notifications
 # import dateutil
+from utilities import helpers
 from datetime import date, datetime
 import os
 
@@ -24,17 +25,23 @@ scheduler = BackgroundScheduler(jobstores=jobstores, executors=executors, job_de
 
 def getNextInterval():
     now = datetime.now()
-    now.replace(hour=0, minute=0, second=0)
-    # print(now)
-    # print(db)
-
+    # make it more efficient by only querying what is necessary maybe
+    notify = {'6hrs': [], 'daily': [], 'weekly': []}
     try:
-        monthlyUses = db.session.query(Assistant.NotifyEvery, Assistant.Name, Notifications.LastSentDate) \
+        monthlyUses = helpers.getDictFromLimitedQuery(["NotifyEvery", "Name", "Email"],
+                      db.session.query(Assistant.NotifyEvery, Assistant.Name, User.Email) \
+                        .filter(Assistant.NotifyEvery != "never") \
                         .filter(Assistant.CompanyID == User.CompanyID) \
-                        .outerjoin(Notifications) \
-                        .all()
-        print(monthlyUses)
-        # return Callback(True, 'Analytics successfully gathered', monthlyUses)
+                        .all())
+        for obj in monthlyUses:
+            notify[obj['NotifyEvery']].append(obj)
+
+        if now.hour % 6 == 0:
+            for i in notify['6hrs']:
+                #send email?
+        if now.hour == 0:
+            for i in notify['daily']:
+                #send email?
     except Exception as e:
         print(e)
         # return Callback(False, 'Analytics could not be gathered')

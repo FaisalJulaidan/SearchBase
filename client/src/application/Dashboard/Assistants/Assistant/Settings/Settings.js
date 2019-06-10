@@ -186,7 +186,7 @@ class Settings extends Component {
                                 <Radio.Button onClick={() => {this.setState({isManualNotify: !isManualNotify})}}>Custom</Radio.Button>
                             </Radio.Group>
                             {getFieldDecorator('notifyEvery', {
-                                initialValue: assistant.NotifyEvery,
+                                    initialValue: assistant.NotifyEvery,
                                 rules: [{
                                     required: true,
                                     message: 'Please type in a number of hours',
@@ -199,20 +199,14 @@ class Settings extends Component {
                         <Form.Item label="Alert Me Every:"
                                    extra="Select how often you would like to be notified via email of new chats">
                             {getFieldDecorator('notifyEvery', {
-                                initialValue: assistant.NotifyEvery,
+                                initialValue: assistant.NotifyEvery === null ? "null" : assistant.NotifyEvery,
                                 rules: [{
-                                    validator: (rule, value, callback) => {
-                                        console.log('kekistan')
-                                        console.log(value)
-                                        if(value !== undefined && value !== ""){
-                                            callback()
-                                        }
-                                    },
+                                    required: true,
                                     message: 'Please select how often or never',
                                 }],
                             })(
                                 <Radio.Group style={{width:'100%'}}>
-                                    <Radio.Button value={null} disabled={isManualNotify}>Never</Radio.Button>
+                                    <Radio.Button value={"null"} disabled={isManualNotify}>Never</Radio.Button>
                                     <Radio.Button value={0} disabled={isManualNotify}>Immediately</Radio.Button>
                                     <Radio.Button value={6} disabled={isManualNotify}>Every 6hrs</Radio.Button>
                                     <Radio.Button value={24} disabled={isManualNotify}>Daily</Radio.Button>

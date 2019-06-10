@@ -39,7 +39,6 @@ def getNextInterval():
     try:
         notifications = helpers.getDictFromLimitedQuery(["LastSentDate", "Type"],
                              db.session.query(Notifications.LastSentDate, Notifications.Type).all())
-        # print(notifications)
         monthlyUses = helpers.getDictFromLimitedQuery(["NotifyEvery", "Name", "Email"],
                               db.session.query(Assistant.NotifyEvery, Assistant.Name, User.Email) \
                                 .filter(Assistant.NotifyEvery != "never") \
@@ -49,7 +48,6 @@ def getNextInterval():
             notify[obj['Type']].append()
         for obj in monthlyUses:
             notify[obj['NotifyEvery']].append(obj)
-        # print(now.weekday())
         # if now.weekday() == 0:
         #     for i in notify['weekly']:
         #         #send email?
@@ -58,8 +56,6 @@ def getNextInterval():
         #         #send email?
         # if now.hour == 0:
             # for i in notify['daily']:
-                # print('kek')#
-                #send email?
     except Exception as e:
         print(e)
         # return Callback(False, 'Analytics could not be gathered')

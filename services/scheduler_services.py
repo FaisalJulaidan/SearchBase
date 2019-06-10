@@ -25,9 +25,12 @@ scheduler = BackgroundScheduler(jobstores=jobstores, executors=executors, job_de
 
 def getNextInterval():
     now = datetime.now()
-    # make it more efficient by only querying what is necessary maybe
+
+    # make it more efficient by only querying what is nbuecessary maybe
     notify = {'6hrs': [], 'daily': [], 'weekly': []}
     try:
+        notifications = helpers.getDictFromLimitedQuery(["LastSentDate", "Type"],
+                            db.session.query(Notifications.LastSentDate, Notifications.Type))
         monthlyUses = helpers.getDictFromLimitedQuery(["NotifyEvery", "Name", "Email"],
                       db.session.query(Assistant.NotifyEvery, Assistant.Name, User.Email) \
                         .filter(Assistant.NotifyEvery != "never") \
@@ -35,12 +38,16 @@ def getNextInterval():
                         .all())
         for obj in monthlyUses:
             notify[obj['NotifyEvery']].append(obj)
-
-        if now.hour % 6 == 0:
-            for i in notify['6hrs']:
-                #send email?
-        if now.hour == 0:
-            for i in notify['daily']:
+        print(now.weekday())
+        # if now.weekday() == 0:
+        #     for i in notify['weekly']:
+        #         #send email?
+        # if now.hour % 6 == 0:
+        #     for i in notify['6hrs']:
+        #         #send email?
+        # if now.hour == 0:
+            # for i in notify['daily']:
+                # print('kek')#
                 #send email?
     except Exception as e:
         print(e)

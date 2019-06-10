@@ -170,7 +170,8 @@ def updateConfigs(id, name, desc,  message, topBarText, secondsUntilPopup, notif
         assistant.Message = message
         assistant.TopBarText = topBarText
         assistant.SecondsUntilPopup = secondsUntilPopup
-        assistant.NotifyEvery = notifyEvery
+        print(notifyEvery)
+        assistant.NotifyEvery = None if notifyEvery == None else int(notifyEvery)
         assistant.Config = config
 
         db.session.commit()

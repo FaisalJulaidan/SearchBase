@@ -11,13 +11,16 @@ const FormItem = Form.Item;
 const Option = Select.Option;
 const confirm = Modal.confirm;
 
+const manualNotify = [null, 0, 6, 24, 168]
+
 
 class Settings extends Component {
     state = {
         isPopupDisabled: this.props.assistant.SecondsUntilPopup <= 0,
         isAlertsEnabled: this.props.assistant.MailEnabled,
         // alertOptions: {0: "Immediately", 4: "4 hours", 8: "8 hours", 12: "12 hours", 24: "24 hours"}
-        alertOptions: {0: "Immediately"}
+        alertOptions: {0: "Immediately"},
+        isManualNotify: manualNotify.indexOf(this.props.assistant.NotifyEvery) === -1
     };
 
     componentDidMount() {
@@ -46,6 +49,9 @@ class Settings extends Component {
 
 
     handleSave = () => this.props.form.validateFields((err, values) => {
+        console.log(err)
+        console.log(values)
+        console.log('kekistan')
         if (!err) {
             if (this.state.isPopupDisabled)
                 values.secondsUntilPopup = 0;
@@ -72,7 +78,7 @@ class Settings extends Component {
     render() {
         const alertsKeys = Object.keys(this.state.alertOptions);
         const maxAlertsLength = parseInt(alertsKeys[alertsKeys.length - 1]);
-
+        const {isManualNotify} = this.state;
         const {getFieldDecorator} = this.props.form;
         const {assistant} = this.props;
 
@@ -167,27 +173,54 @@ class Settings extends Component {
                         <span className="ant-form-text"> seconds</span>
                     </FormItem>
 
-                    <Form.Item label="Alert Me Every:"
-                               extra="Select how often you would like to be notified via email of new chats"
 
-                    >
-                        {getFieldDecorator('notifyEvery', {
-                            initialValue: assistant.NotifyEvery,
-                            rules: [{
-                                required: true,
-                                message: 'Please select how often or never',
-                            }],
-                        })(
+                    {isManualNotify ?
+                        <Form.Item label="Alert Me Every:"
+                                  extra="Select how often you would like to be notified via email of new chats">
                             <Radio.Group style={{width:'100%'}}>
-                                <Radio.Button value="never">Never</Radio.Button>
-                                <Radio.Button value="immediately">Immediately</Radio.Button>
-                                <Radio.Button value="6hrs">Every 6hrs</Radio.Button>
-                                <Radio.Button value="daily">Daily</Radio.Button>
-                                <Radio.Button value="weekly">Weekly</Radio.Button>
-                            </Radio.Group>,
-                        )}
-                    </Form.Item>
-
+                                <Radio.Button value={null} disabled={isManualNotify}>Never</Radio.Button>
+                                <Radio.Button value={0} disabled={isManualNotify}>Immediately</Radio.Button>
+                                <Radio.Button value={6} disabled={isManualNotify}>Every 6hrs</Radio.Button>
+                                <Radio.Button value={24} disabled={isManualNotify}>Daily</Radio.Button>
+                                <Radio.Button value={168} disabled={isManualNotify}>Weekly</Radio.Button>
+                                <Radio.Button onClick={() => {this.setState({isManualNotify: !isManualNotify})}}>Custom</Radio.Button>
+                            </Radio.Group>
+                            {getFieldDecorator('notifyEvery', {
+                                initialValue: assistant.NotifyEvery,
+                                rules: [{
+                                    required: true,
+                                    message: 'Please type in a number of hours',
+                            }],
+                            })(
+                                <Input placeholder="Amount of time between notifications, in hours"/>
+                            )}
+                        </Form.Item>
+                    :
+                        <Form.Item label="Alert Me Every:"
+                                   extra="Select how often you would like to be notified via email of new chats">
+                            {getFieldDecorator('notifyEvery', {
+                                initialValue: assistant.NotifyEvery,
+                                rules: [{
+                                    validator: (rule, value, callback) => {
+                                        console.log('kekistan')
+                                        console.log(value)
+                                        if(value !== undefined && value !== ""){
+                                            callback()
+                                        }
+                                    },
+                                    message: 'Please select how often or never',
+                                }],
+                            })(
+                                <Radio.Group style={{width:'100%'}}>
+                                    <Radio.Button value={null} disabled={isManualNotify}>Never</Radio.Button>
+                                    <Radio.Button value={0} disabled={isManualNotify}>Immediately</Radio.Button>
+                                    <Radio.Button value={6} disabled={isManualNotify}>Every 6hrs</Radio.Button>
+                                    <Radio.Button value={24} disabled={isManualNotify}>Daily</Radio.Button>
+                                    <Radio.Button value={168} disabled={isManualNotify}>Weekly</Radio.Button>
+                                    <Radio.Button onClick={() => {this.setState({isManualNotify: !isManualNotify})}}>Custom</Radio.Button>
+                                </Radio.Group>
+                            )}
+                        </Form.Item>}
                     <FormItem
                         label="Restricted Countries"
                         extra="Chatbot will be disabled for users who live in the selected countries"

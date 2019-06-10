@@ -136,7 +136,7 @@ class Assistant(db.Model):
     TopBarText = db.Column(db.String(64), nullable=False)
     SecondsUntilPopup = db.Column(db.Float, nullable=False, default=0.0)
 
-    NotifyEvery = db.Column(db.String(64), nullable=False, default='never')
+    NotifyEvery = db.Column(db.String(64), nullable=True)
     Active = db.Column(db.Boolean(), nullable=False, default=True)
     Config = db.Column(MagicJSON, nullable=True)
 
@@ -161,8 +161,9 @@ class Assistant(db.Model):
 
     # Constraints:
     # cannot have two assistants with the same name under one company
-    __table_args__ = (db.UniqueConstraint('CompanyID', 'Name', name='uix1_assistant'),
-                      db.CheckConstraint(NotifyEvery.in_(['never', 'immediately', '6hrs', 'daily', 'weekly'])))
+    __table_args__ = (db.UniqueConstraint('CompanyID', 'Name', name='uix1_assistant'),)
+    # db.CheckConstraint(NotifyEvery.in_(['never', 'immediately', '6hrs', 'daily', 'weekly'])
+
 
     def __repr__(self):
         return '<Assistant {}>'.format(self.Name)

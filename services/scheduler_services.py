@@ -21,24 +21,35 @@ job_defaults = {
     'max_instances': 1
 }
 
+''' 
+Types
+Null - Never notify
+0 - Immediately notify
+any other number - notify after x hours
+'''
+
+
 scheduler = BackgroundScheduler(jobstores=jobstores, executors=executors, job_defaults=job_defaults, timezone=utc)
 
 def getNextInterval():
     now = datetime.now()
 
     # make it more efficient by only querying what is nbuecessary maybe
-    notify = {'6hrs': [], 'daily': [], 'weekly': []}
+    notify = {'6hrs': {'data':[], 'lastSent': None}, 'daily': [], 'weekly': []}
     try:
         notifications = helpers.getDictFromLimitedQuery(["LastSentDate", "Type"],
-                            db.session.query(Notifications.LastSentDate, Notifications.Type))
+                             db.session.query(Notifications.LastSentDate, Notifications.Type).all())
+        # print(notifications)
         monthlyUses = helpers.getDictFromLimitedQuery(["NotifyEvery", "Name", "Email"],
-                      db.session.query(Assistant.NotifyEvery, Assistant.Name, User.Email) \
-                        .filter(Assistant.NotifyEvery != "never") \
-                        .filter(Assistant.CompanyID == User.CompanyID) \
-                        .all())
+                              db.session.query(Assistant.NotifyEvery, Assistant.Name, User.Email) \
+                                .filter(Assistant.NotifyEvery != "never") \
+                                .filter(Assistant.CompanyID == User.CompanyID) \
+                                .all())
+        for obj in notifications:
+            notify[obj['Type']].append()
         for obj in monthlyUses:
             notify[obj['NotifyEvery']].append(obj)
-        print(now.weekday())
+        # print(now.weekday())
         # if now.weekday() == 0:
         #     for i in notify['weekly']:
         #         #send email?

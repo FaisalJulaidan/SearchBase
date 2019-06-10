@@ -537,3 +537,8 @@ def validAssistant(func):
         return func(assistant)
     return wrapperValidAssistant
 
+def findIndexOfKeyInArray(key, value, array):
+    for item, idx in array:
+        if item.key == value:
+            return idx
+    return False

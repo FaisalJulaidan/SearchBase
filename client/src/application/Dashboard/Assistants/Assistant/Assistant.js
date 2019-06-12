@@ -73,7 +73,8 @@ class Assistant extends Component {
         this.props.dispatch(assistantActions.changeAssistantStatus(this.props.assistant.ID, checked))
     };
 
-    onTabClick = (key, e) => {
+    onTabClick = () => {
+        Window.confirm()
         // if (key !== 'Script'){
         //     if (!this.state.isFlowSaved) {
         //         console.log('reload?');
@@ -155,23 +156,8 @@ class Assistant extends Component {
                     </div>
                 </NoHeaderPanel>
 
-                {/*<Prompt when={!this.state.isFlowSaved}*/}
-                        {/*message={() => `Your script is not saved are you sure you want leave without saving it?`}/>*/}
-
-                {/*<AssistantSettings assistant={assistant}*/}
-                                   {/*isAssistantNameValid={this.props.isAssistantNameValid}*/}
-                                   {/*hideModal={this.hideSettingsModal}*/}
-                                   {/*visible={this.state.assistantSettingsVisible}/>*/}
-
-                {/*<CRM assistant={assistant}*/}
-                     {/*CRMsList={this.props.CRMsList}*/}
-                     {/*hideModal={this.hideCRMModal}*/}
-                     {/*visible={this.state.CRMVisible}/>*/}
-
-                {/*<SelectAutoPilotModal*/}
-                    {/*assistant={assistant}*/}
-                    {/*hideModal={this.hideSelectAutoPilotModal}*/}
-                    {/*selectAutoPilotModalVisible={this.state.selectAutoPilotModalVisible}/>*/}
+                <Prompt when={!this.state.isFlowSaved}
+                        message={() => `Your script is not saved are you sure you want leave without saving it?`}/>
 
             </>
         )

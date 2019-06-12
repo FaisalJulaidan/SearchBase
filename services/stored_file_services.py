@@ -1,10 +1,15 @@
+import boto3
+import botocore
+import logging
+import os
+
 from models import db, Callback, StoredFile, Conversation
-import logging, boto3, botocore, os
 
 PUBLIC_URL = "https://tsb.ams3.digitaloceanspaces.com/"
 UPLOAD_FOLDER = os.environ['FLASK_ENV']
 COMPANY_LOGOS_PATH = '/company_logos'
 USER_FILES_PATH = '/user_files'
+
 
 def getByID(id) -> StoredFile or None:
     try:
@@ -35,7 +40,7 @@ def getByConversation(conversation: Conversation) -> StoredFile or None:
     except Exception as exc:
         print("stored_file_services.getBySession() ERROR: ", exc)
         logging.error("stored_file_services.getBySession(): " + str(exc))
-        return Callback(False,'StoredFile with ID ' + str(id) + ' does not exist')
+        return Callback(False, 'StoredFile with ID ' + str(id) + ' does not exist')
 
 
 def getAll():
@@ -48,11 +53,10 @@ def getAll():
         print("stored_file_services.getAll() ERROR: ", exc)
         logging.error("stored_file_services.getAll(): " + str(exc))
         db.session.rollback()
-        return Callback(False,'StoredFiles could not be retrieved/empty')
+        return Callback(False, 'StoredFiles could not be retrieved/empty')
 
 
 def createRef(filePath, conversation) -> StoredFile or None:
-
     try:
         if not filePath: raise Exception;
         newStoredFile = StoredFile(FilePath=filePath, Conversation=conversation)
@@ -81,7 +85,6 @@ def removeByID(id):
 
 
 def uploadFile(file, filename, path, public=False):
-
     try:
         # Set config arguments
         ExtraArgs = {}
@@ -91,9 +94,9 @@ def uploadFile(file, filename, path, public=False):
         session = boto3.session.Session()
         s3 = session.client('s3',
                             region_name='ams3',
-                            endpoint_url= os.environ['SERVER_SPACES'],
-                            aws_access_key_id= os.environ['PUBLIC_KEY_SPACES'],
-                            aws_secret_access_key= os.environ['SECRET_KEY_SPACES'])
+                            endpoint_url=os.environ['SERVER_SPACES'],
+                            aws_access_key_id=os.environ['PUBLIC_KEY_SPACES'],
+                            aws_secret_access_key=os.environ['SECRET_KEY_SPACES'])
 
         # Upload file
         s3.upload_fileobj(file, 'tsb', UPLOAD_FOLDER + path + '/' + filename,
@@ -106,16 +109,16 @@ def uploadFile(file, filename, path, public=False):
         return Callback(False, "Couldn't upload file")
 
 
-def downloadFile(filename, path):
+def downloadFile(path):
     try:
         # Connect to DigitalOcean Space
         session = boto3.session.Session()
         s3 = session.resource('s3',
-                                region_name='ams3',
-                                endpoint_url= os.environ['SERVER_SPACES'],
-                                aws_access_key_id= os.environ['PUBLIC_KEY_SPACES'],
-                                aws_secret_access_key= os.environ['SECRET_KEY_SPACES'])
-        file = s3.Object('tsb', UPLOAD_FOLDER + path + '/' + filename)
+                              region_name='ams3',
+                              endpoint_url=os.environ['SERVER_SPACES'],
+                              aws_access_key_id=os.environ['PUBLIC_KEY_SPACES'],
+                              aws_secret_access_key=os.environ['SECRET_KEY_SPACES'])
+        file = s3.Object('tsb', UPLOAD_FOLDER + path)
 
         # Check if file exists
         try:
@@ -132,15 +135,14 @@ def downloadFile(filename, path):
 
 
 def deleteFile(filename, path):
-
     try:
         # Connect to DigitalOcean Space
         session = boto3.session.Session()
         s3 = session.resource('s3',
-                            region_name='ams3',
-                            endpoint_url='https://ams3.digitaloceanspaces.com',
-                            aws_access_key_id= os.environ['PUBLIC_KEY_SPACES'],
-                            aws_secret_access_key= os.environ['SECRET_KEY_SPACES'])
+                              region_name='ams3',
+                              endpoint_url='https://ams3.digitaloceanspaces.com',
+                              aws_access_key_id=os.environ['PUBLIC_KEY_SPACES'],
+                              aws_secret_access_key=os.environ['SECRET_KEY_SPACES'])
         # Delete file
         s3.Object('tsb', UPLOAD_FOLDER + path + '/' + filename).delete()
 

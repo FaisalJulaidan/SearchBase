@@ -74,7 +74,6 @@ class Assistant extends Component {
     };
 
     onTabClick = () => {
-        Window.confirm()
         // if (key !== 'Script'){
         //     if (!this.state.isFlowSaved) {
         //         console.log('reload?');

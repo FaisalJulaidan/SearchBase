@@ -144,6 +144,9 @@ class AutoPilotConfigs extends React.Component {
                             </FormItem>
 
                             <br />
+                            <Button type={'primary'} onClick={this.onSubmit}>Save changes</Button>
+
+                            <br />
                             <Divider/>
                             <h2> Applications Acceptance Automation:</h2>
                             <FormItem label="Auto accept applicants "
@@ -180,6 +183,8 @@ class AutoPilotConfigs extends React.Component {
                                 )}
                             </FormItem>
 
+                            <br />
+                            <Button type={'primary'} onClick={this.onSubmit}>Save changes</Button>
 
                             <br />
                             <Divider/>
@@ -218,6 +223,9 @@ class AutoPilotConfigs extends React.Component {
                             </FormItem>
 
                             <br />
+                            <Button type={'primary'} onClick={this.onSubmit}>Save changes</Button>
+
+                            <br />
                             <Divider/>
                             <h2> Manage Appointments Automation:</h2>
                             <FormItem label="Auto manage candidates appointments"
@@ -241,15 +249,11 @@ class AutoPilotConfigs extends React.Component {
                                        layout={layout}
                                        showSetAppointment={this.state.sendCandidatesAppointments}/>
 
-                            <br/>
-
-                            <Col span={16} offset={4}>
-                                <Button type={'primary'} onClick={this.onSubmit}>Update Auto Pilot</Button>
-                            </Col>
-
 
                             <br/>
-                            <br/>
+                            <br />
+                            <Button type={'primary'} onClick={this.onSubmit}>Save changes</Button>
+
                         </Form>
 
 

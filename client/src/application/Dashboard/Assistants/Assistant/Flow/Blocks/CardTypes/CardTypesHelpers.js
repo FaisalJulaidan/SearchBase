@@ -1,7 +1,3 @@
-export const onDelete = (id, type, handler) => handler({
-    id: id,
-    type: type
-});
 
 export const onCancel = (handleNewBlock, handleEditBlock) => handleNewBlock ? handleNewBlock(false) : handleEditBlock(false);
 

@@ -23,7 +23,7 @@ class EditGroup extends Component {
             <Modal
                 width={800}
                 title="Edit Group"
-                visible={this.props.newAutoPilotModalVisible}
+                visible={this.props.visible}
                 onOk={this.props.handleUpdate}
                 onCancel={this.props.handleCancel}
                 footer={[

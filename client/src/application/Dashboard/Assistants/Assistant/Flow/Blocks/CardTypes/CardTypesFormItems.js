@@ -1,6 +1,6 @@
 import {Button, Cascader, Checkbox, Input, Select, Spin,} from "antd";
 import React from 'react';
-import {onCancel, onDelete, onSelectAction} from "./CardTypesHelpers";
+import {onCancel, onSelectAction} from "./CardTypesHelpers";
 
 const Option = Select.Option;
 const CheckboxGroup = Checkbox.Group;
@@ -329,7 +329,7 @@ export const ButtonsForm = (handleNewBlock, handleEditBlock, handleDeleteBlock, 
         <Button key="submit" type="primary" onClick={() => onSubmit('NewBlock')}>Add</Button>
     ] : [
         <Button key="delete" type="danger"
-                onClick={() => onDelete(block.ID, block.Type, handleDeleteBlock)}>
+                onClick={() => handleDeleteBlock(block)}>
             Delete
         </Button>,
         <Button key="cancel" onClick={() => onCancel(handleNewBlock, handleEditBlock)}>Cancel</Button>,

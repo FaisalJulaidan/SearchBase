@@ -22,10 +22,6 @@ class Flow extends Component {
 
     };
 
-    componentWillReceiveProps(nextProps, nextContext) {
-
-    }
-
 
     componentDidMount() {
         const {assistant} = this.props;
@@ -167,7 +163,8 @@ class Flow extends Component {
         successMessage('Block updated!');
     };
 
-    deleteBlock = (deletedBlock) => {
+    deleteBlock = (deletedBlock, closeModalCallback) => {
+        debugger
         const {updatedAssistant, updatedGroup} = this.getUpdatableState();
         let counter = 0;
         updatedAssistant.Flow.groups.forEach((group) => {
@@ -213,6 +210,7 @@ class Flow extends Component {
                 });
                 this.props.setIsFlowSaved(false);
                 successMessage('Block deleted!');
+                closeModalCallback();
             }
         });
     };

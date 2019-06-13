@@ -43,6 +43,12 @@ class Assistant extends Component {
         window.onbeforeunload = this.onPageExist
     }
 
+    componentWillReceiveProps(nextProps, nextContext) {
+        if (nextProps.match.params.id !== this.props.match.params.id )
+            this.props.dispatch(assistantActions.fetchAssistant(this.props.match.params.id))
+                .then(()=> {}).catch(() => history.push(`/dashboard/assistants`));
+    }
+
     onPageExist = (e) => {
         window.onbeforeunload = () => undefined;
         confirm({
@@ -134,7 +140,7 @@ class Assistant extends Component {
                     <div className={[styles.Body, 'assistantTabs'].join(' ')}>
                         {!assistant ? <Spin/> :
 
-                            <Tabs defaultActiveKey={'Connections'} size={"large"} animated={false} onTabClick={this.onTabClick}>
+                            <Tabs defaultActiveKey={'Script'} size={"large"} animated={false} onTabClick={this.onTabClick}>
                                 <TabPane tab="Analytics" key="Analytics">
                                     <Analytics assistant={assistant}/>
                                 </TabPane>

@@ -65,6 +65,7 @@ class Groups extends Component {
 
     render() {
         const {groupsList} = this.props;
+        console.log(this.props.currentGroup);
         return (
             <>
                 <Row>
@@ -73,10 +74,10 @@ class Groups extends Component {
                         groupsList ?
                             <Col xs={{ span: 14}} lg={{ span: 17}}>
 
-                                <Menu mode="horizontal" defaultSelectedKeys={['0']}>
+                                <Menu mode="horizontal" selectedKeys={[this.props.currentGroup.name]}>
                                     {
                                         this.props.groupsList.map((group, index) =>
-                                            <Menu.Item onClick={() => this.props.selectGroup(group)} key={index}>
+                                            <Menu.Item onClick={() => this.props.selectGroup(group)} key={group.name}>
                                                 {group.name}
                                             </Menu.Item>
 

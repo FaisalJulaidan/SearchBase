@@ -23,8 +23,8 @@ class AssistantToolsModal extends Component {
             <div>
                 <Modal width={800}
                        title="Assistant tools"
-                       visible={this.props.newAutoPilotModalVisible}
-                       onCancel={this.props.closeEditAutoPilotModal}
+                       visible={this.props.visible}
+                       onCancel={this.props.closeModal}
                        destroyOnClose={true}
                        footer={null}>
 

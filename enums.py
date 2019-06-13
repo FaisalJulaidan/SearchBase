@@ -75,6 +75,7 @@ class ValidationType(Enum):
     Time = 'Time'
     Date = 'Date'
     DateTime = 'DateTime'
+    Salary = 'Salary'
 
 
 # === Data Types Stuff === #
@@ -178,7 +179,7 @@ class DataType(Enum):
     CandidateDesiredSalary = dataTypeCreator(
         'Candidate Desired Salary',
         'CandidateDesiredSalary',
-        ValidationType.Number,
+        ValidationType.Salary,
         DataTypeSection.Candidate,
         [UserType.Candidate])
 
@@ -250,7 +251,7 @@ class DataType(Enum):
     JobSalary = dataTypeCreator(
         'Job Salary',
         'JobSalary',
-        ValidationType.Number,
+        ValidationType.Salary,
         DataTypeSection.Job,
         [UserType.Candidate, UserType.Client])
 

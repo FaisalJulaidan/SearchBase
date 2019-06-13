@@ -45,8 +45,6 @@ class Connections extends Component {
 
 
     render() {
-        console.log(this.state.defaultSelectedCRM);
-        console.log(this.state.defaultSelectedAutoPilot);
         const {CRMsList, autoPilotsList} = this.props;
         const {defaultSelectedCRM, selectedCRM, defaultSelectedAutoPilot, selectedAutoPilot} = this.state;
         return (

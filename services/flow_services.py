@@ -1,9 +1,12 @@
-from models import db, Callback, Assistant
-from services import assistant_services
-from jsonschema import validate
-from utilities import json_schemas, helpers
+import logging
+
 from flask import request
-import logging, enums
+from jsonschema import validate
+
+import enums
+from models import db, Callback, Assistant
+from services import assistant_services, options_services
+from utilities import json_schemas, helpers
 
 
 # ----- Getters ----- #
@@ -32,7 +35,8 @@ def getChatbot(assistantHashID) -> Callback:
 
         data = {
             "assistant": assistant,
-            "isDisabled": False
+            "isDisabled": False,
+            "currencies": options_services.getOptions().Data['databases']['currencyCodes']
         }
 
         return Callback(True, '', data)

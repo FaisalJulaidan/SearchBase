@@ -65,7 +65,6 @@ class Groups extends Component {
 
     render() {
         const {groupsList} = this.props;
-        console.log(this.props.currentGroup);
         return (
             <>
                 <Row>

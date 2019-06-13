@@ -32,7 +32,10 @@ class Assistant extends Component {
         isFlowSaved: true
     };
 
+    firstHead = null;
+
     componentDidMount() {
+        this.firstHead = [...document.head.children];
         this.props.dispatch(assistantActions.fetchAssistant(this.props.match.params.id))
             .then(()=> {}).catch(() => history.push(`/dashboard/assistants`));
 
@@ -43,11 +46,6 @@ class Assistant extends Component {
         window.onbeforeunload = this.onPageExist
     }
 
-    componentWillReceiveProps(nextProps, nextContext) {
-        if (nextProps.match.params.id !== this.props.match.params.id )
-            this.props.dispatch(assistantActions.fetchAssistant(this.props.match.params.id))
-                .then(()=> {}).catch(() => history.push(`/dashboard/assistants`));
-    }
 
     onPageExist = (e) => {
         window.onbeforeunload = () => undefined;
@@ -79,21 +77,38 @@ class Assistant extends Component {
         this.props.dispatch(assistantActions.changeAssistantStatus(this.props.assistant.ID, checked))
     };
 
-    onTabClick = () => {
-        // if (key !== 'Script'){
-        //     if (!this.state.isFlowSaved) {
-        //         console.log('reload?');
-        //         window.onbeforeunload = () => true
-        //     } else {
-        //         window.onbeforeunload = undefined
-        //     }
-        // }
+    onTabClick = (key, e) => {
+        if (key !== 'integration')
+            this.removeChatbot()// if (key !== 'Script'){
     };
 
     setIsFlowSaved = (bool) => {
         this.setState({isFlowSaved: !!bool})
     };
 
+
+    removeChatbot = () => {
+        let oldBot = document.getElementById("TheSearchBase_Chatbot");
+        let oldBotScript = document.getElementById("oldBotScript");
+
+        if (oldBot && oldBotScript) {
+            console.log('removing the chatbot');
+
+            oldBot.remove();
+            oldBotScript.remove();
+            let newHead = document.head.children;
+            let elements = [];
+
+            // find all new css
+            for (const element of newHead)
+                if (!isNodeExist(element, this.firstHead))
+                    elements.push(element);
+
+            // remove all new css
+            for (let i = 0; i < elements.length; i++)
+                elements[i].remove();
+        }
+    };
 
     render() {
         const {assistant, isAssistantLoading} = this.props;
@@ -161,7 +176,8 @@ class Assistant extends Component {
                                 </TabPane>
 
                                 <TabPane tab="Integration" key="Integration">
-                                    <Integration assistant={assistant}/>
+                                    <Integration assistant={assistant}
+                                                 removeChatbot={this.removeChatbot}/>
                                 </TabPane>
 
                                 <TabPane tab="Settings" key="Settings">
@@ -180,6 +196,35 @@ class Assistant extends Component {
         )
     }
 }
+
+const isNodeExist = (element, inArray) => {
+    let isExist = false;
+    for (const inArray_element of inArray)
+        if (element.isEqualNode(inArray_element)) {
+            isExist = true;
+            break;
+        }
+    return isExist
+};
+
+
+(function (arr) {
+    arr.forEach(function (item) {
+        if (item.hasOwnProperty('remove')) {
+            return;
+        }
+        Object.defineProperty(item, 'remove', {
+            configurable: true,
+            enumerable: true,
+            writable: true,
+            value: function remove() {
+                this.parentNode.removeChild(this);
+            }
+        })
+    })
+})([Element.prototype, CharacterData.prototype, DocumentType.prototype]);
+
+
 
 function mapStateToProps(state) {
     return {

@@ -10,33 +10,6 @@ import {connect} from 'react-redux';
 
 const {TextArea} = Input;
 
-
-(function (arr) {
-    arr.forEach(function (item) {
-        if (item.hasOwnProperty('remove')) {
-            return;
-        }
-        Object.defineProperty(item, 'remove', {
-            configurable: true,
-            enumerable: true,
-            writable: true,
-            value: function remove() {
-                this.parentNode.removeChild(this);
-            }
-        })
-    })
-})([Element.prototype, CharacterData.prototype, DocumentType.prototype]);
-
-const isNodeExist = (element, inArray) => {
-    let isExist = false;
-    for (const inArray_element of inArray)
-        if (element.isEqualNode(inArray_element)) {
-            isExist = true;
-            break;
-        }
-    return isExist
-};
-
 class Integration extends React.Component {
 
     state = {
@@ -49,43 +22,14 @@ class Integration extends React.Component {
         isTestButtonDisabled: false
     };
 
-    firstHead = null;
-
     componentDidMount() {
         this.setState({
-            assistantID: hasher.encode(this.props.assistant.ID),
+            assistantID: hasher.encode(this.props.assistant?.ID),
             source: this.getWidgetSrc()
         });
-        this.firstHead = [...document.head.children];
     }
-
-    componentWillUnmount() {
-        this.removeChatbot();
-    }
-
 
     handleChange = (color) => this.setState({dataCircle: color.hex || color.target.value});
-
-    removeChatbot = () => {
-        let oldBot = document.getElementById("TheSearchBase_Chatbot");
-        if (oldBot) oldBot.remove();
-
-        let oldBotScript = document.getElementById("oldBotScript");
-        if (oldBotScript) oldBotScript.remove();
-
-
-        let newHead = document.head.children;
-        let elements = [];
-
-        // find all new css
-        for (const element of newHead)
-            if (!isNodeExist(element, this.firstHead))
-                elements.push(element);
-
-        // remove all new css
-        for (let i = 0; i < elements.length; i++)
-            elements[i].remove();
-    };
 
     copyScriptPaste = () => {
         const pasteArea = document.getElementById("pasteArea");
@@ -104,7 +48,7 @@ class Integration extends React.Component {
         let oldBot = document.getElementById("TheSearchBase_Chatbot");
 
         if (oldBot)
-            this.removeChatbot();
+            this.props.removeChatbot();
 
         const script = document.createElement("script");
 

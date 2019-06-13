@@ -100,6 +100,8 @@ class ProductionConfig(BaseConfig):
     DEBUG = False
     TESTING = False
     USE_ENCRYPTION = True
+    SQLALCHEMY_POOL_RECYCLE = 499
+    SQLALCHEMY_POOL_TIMEOUT = 20
 
 
 class DevelopmentConfig(BaseConfig):

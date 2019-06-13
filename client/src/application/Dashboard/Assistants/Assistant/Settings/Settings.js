@@ -2,7 +2,7 @@ import React, {Component} from 'react';
 import {connect} from 'react-redux';
 import {store} from "store/store";
 
-import {Button, Select, Form, Input, InputNumber, Divider, Slider, Switch, Modal, Radio} from "antd";
+import {Button, Select, Form, Input, InputNumber, Divider, Switch, Modal, Radio} from "antd";
 import {assistantActions, crmActions} from "store/actions";
 import {history} from "helpers";
 

@@ -1,6 +1,6 @@
 import React from 'react'
 import {connect} from 'react-redux';
-import styles from "./AutoPilot.module.less";
+import styles from "./AutoPilots.module.less";
 import NoHeaderPanel from 'components/NoHeaderPanel/NoHeaderPanel'
 import {Icon, Typography} from 'antd';
 import CreateNewBox from "components/CreateNewBox/CreateNewBox";
@@ -13,7 +13,7 @@ import {history} from "helpers";
 
 const {Title, Paragraph, Text} = Typography;
 
-class AutoPilot extends React.Component {
+class AutoPilots extends React.Component {
     state = {visible: false};
 
     componentDidMount() {
@@ -40,9 +40,9 @@ class AutoPilot extends React.Component {
                         <CreateNewBox text={'Add Auto Pilot'} onClick={this.showModal}/>
                         {
                             this.props.autoPilotsList.map(
-                                (/**@type AutoPilot*/ autoPilot, i) =>
+                                (/**@type AutoPilots*/ autoPilot, i) =>
                                     <ViewBox
-                                        onClick={() => history.push('/dashboard/auto_pilot/configs', {autoPilot: autoPilot})}
+                                        onClick={() => history.push(`/dashboard/auto_pilots/${autoPilot.ID}`)}
                                         key={i}
                                         title={autoPilot.Name}
                                         text={autoPilot.Description}
@@ -72,5 +72,5 @@ function mapStateToProps(state) {
     };
 }
 
-export default connect(mapStateToProps)(AutoPilot);
+export default connect(mapStateToProps)(AutoPilots);
 

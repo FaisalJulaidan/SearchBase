@@ -25,8 +25,8 @@ const Billing = lazy(() => import('./AccountDetails/Billing/Billing'));
 const UsersManagement = lazy(() => import('./AccountDetails/UsersManagement/UsersManagement'));
 const Documentation = lazy(() => import('./Documentation/Documentation'));
 const Calendar = lazy(() => import('./Calendar/Calendar'));
-const AutoPilot = lazy(() => import('./AutoPilot/AutoPilot'));
-const AutoPilotConfigs = lazy(() => import('./AutoPilot/AutoPilotConfigs/AutoPilotConfigs'));
+const AutoPilots = lazy(() => import('./AutoPilot/AutoPilots'));
+const AutoPilot = lazy(() => import('./AutoPilot/AutoPilot/AutoPilot'));
 const Marketplace = lazy(() => import('./Marketplace/Marketplace'));
 const Crm = lazy(() => import('./Marketplace/Crm/Crm'));
 
@@ -161,7 +161,7 @@ class Dashboard extends Component {
                             <span>Assistants</span>
                         </Menu.Item>
 
-                        <Menu.Item key="auto_pilot">
+                        <Menu.Item key="auto_pilots">
                             <Icon type="clock-circle"/>
                             <span>Auto Pilot</span>
                         </Menu.Item>
@@ -258,8 +258,8 @@ class Dashboard extends Component {
                                             <Route path={`${match.path}/profile`} component={Profile} exact/>
                                             <Route path={`${match.path}/billing`} component={Billing} exact/>
 
-                                            <Route path={`${match.path}/auto_pilot`} component={AutoPilot} exact/>
-                                            <Route path={`${match.path}/auto_pilot/configs`} component={AutoPilotConfigs} exact/>
+                                            <Route path={`${match.path}/auto_pilots`} component={AutoPilots} exact/>
+                                            <Route path={`${match.path}/auto_pilots/:id`} component={AutoPilot} exact/>
 
                                             <Route path={`${match.path}/users_management`} component={UsersManagement}
                                                    exact/>

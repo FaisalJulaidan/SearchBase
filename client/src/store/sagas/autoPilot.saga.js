@@ -6,13 +6,23 @@ import {errorMessage, http, loadingMessage, successMessage} from "helpers";
 function* fetchAutoPilots() {
     try {
         const res = yield http.get(`/auto_pilots`);
-        if (!res.data?.data)
-            throw Error(`Can't fetch auto pilots`);
         yield put(autoPilotActions.fetchAutoPilotsSuccess(res.data?.data));
 
     } catch (error) {
         const msg = error.response?.data?.msg || "Couldn't load auto pilots";
         yield put(autoPilotActions.fetchAutoPilotsFailure(msg));
+        errorMessage(msg);
+    }
+}
+
+function* fetchAutoPilot({autoPilotID, meta}) {
+    try {
+        const res = yield http.get(`/auto_pilot/${autoPilotID}`);
+        yield put({...autoPilotActions.fetchAutoPilotSuccess(res.data?.data), meta});
+
+    } catch (error) {
+        const msg = error.response?.data?.msg || "Couldn't load auto pilots";
+        yield put({...autoPilotActions.fetchAutoPilotFailure(msg), meta});
         errorMessage(msg);
     }
 }
@@ -43,15 +53,15 @@ function* updateAutoPilot({autoPilotID, updatedValues}) {
     }
 }
 
-function* deleteAutoPilot({autoPilotID}) {
+function* deleteAutoPilot({autoPilotID, meta}) {
     try {
         loadingMessage('Removing auto pilot...', 0);
         const res = yield http.delete(`/auto_pilot/${autoPilotID}`);
-        yield put(autoPilotActions.deleteAutoPilotSuccess(autoPilotID, res.data?.msg));
+        yield put({...autoPilotActions.deleteAutoPilotSuccess(autoPilotID, res.data?.msg), meta});
         successMessage('AutoPilot deleted');
     } catch (error) {
         const msg = error.response?.data?.msg || "Couldn't delete auto pilot";
-        yield put(autoPilotActions.deleteAutoPilotFailure(msg));
+        yield put({...autoPilotActions.deleteAutoPilotFailure(msg), meta});
         errorMessage(msg);
     }
 }
@@ -74,6 +84,10 @@ function* watchFetchAutoPilots() {
     yield takeLatest(actionTypes.FETCH_AUTOPILOTS_REQUEST, fetchAutoPilots)
 }
 
+function* watchFetchAutoPilot() {
+    yield takeLatest(actionTypes.FETCH_AUTOPILOT_REQUEST, fetchAutoPilot)
+}
+
 function* watchAddAutoPilot() {
     yield takeLatest(actionTypes.ADD_AUTOPILOT_REQUEST, addAutoPilot)
 }
@@ -94,6 +108,7 @@ function* watchUpdateStatus() {
 export function* autoPilotSaga() {
     yield all([
         watchFetchAutoPilots(),
+        watchFetchAutoPilot(),
         watchAddAutoPilot(),
         watchUpdateAutoPilot(),
         watchDeleteAutoPilot(),

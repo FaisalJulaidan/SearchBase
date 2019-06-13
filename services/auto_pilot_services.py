@@ -93,7 +93,7 @@ def create(name, desc, companyID: int) -> Callback:
                          ]
         db.session.add_all(openTimeSlots)
         db.session.commit()
-        return Callback(True, "Got AutoPilot successfully.", __parseAutoPilot(autoPilot))
+        return Callback(True, "Got AutoPilot successfully.", parseAutoPilot(autoPilot))
 
     except Exception as exc:
         print(exc)
@@ -117,14 +117,11 @@ def getByID(id: int, companyID: int) -> Callback:
         logging.error("auto_pilot.getByID(): " + str(exc))
         return Callback(False, 'Could not get the AutoPilot.')
 
-# AutoPilots will be returned parsed
+
 def fetchAll(companyID) -> Callback:
     try:
 
-        result: list = []
-        for autoPilot in db.session.query(AutoPilot).filter(AutoPilot.CompanyID == companyID).all():
-            result.append(__parseAutoPilot(autoPilot))
-
+        result = db.session.query(AutoPilot).filter(AutoPilot.CompanyID == companyID).all()
         return Callback(True, "Fetched all AutoPilots successfully.", result)
 
     except Exception as exc:
@@ -132,6 +129,13 @@ def fetchAll(companyID) -> Callback:
         logging.error("auto_pilot.fetchAll(): " + str(exc))
         return Callback(False, 'Could not fetch all the AutoPilots.')
 
+
+# Add openTimeSlots to the autoPilot object after parsing it
+def parseAutoPilot(autoPilot: AutoPilot) -> dict:
+    return {
+        **helpers.getDictFromSQLAlchemyObj(autoPilot),
+        "OpenTimeSlots": helpers.getListFromSQLAlchemyList(autoPilot.OpenTimeSlots)
+    }
 
 # ----- Updaters ----- #
 def update(id, name, desc, active, acceptApplications, acceptanceScore, sendAcceptanceEmail, rejectApplications,
@@ -213,11 +217,7 @@ def removeByID(id, companyID):
 
 # ----- Private Functions (shouldn't be accessed from the outside) ----- #
 # It takes an autoPilot object and join all its children tables into one dict
-def __parseAutoPilot(autoPilot: AutoPilot) -> dict:
-    return {
-        **helpers.getDictFromSQLAlchemyObj(autoPilot),
-        "OpenTimeSlots": helpers.getListFromSQLAlchemyList(autoPilot.OpenTimeSlots)
-    }
+
 
 def __getApplicationResult(score, autoPilot: AutoPilot) -> ApplicationStatus:
     result = ApplicationStatus.Pending

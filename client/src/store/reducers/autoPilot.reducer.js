@@ -2,11 +2,11 @@ import * as actionTypes from '../actions/actionTypes';
 import {updateObject} from '../utility';
 import {deepClone} from "helpers";
 
-const initialState = {autoPilotsList: [], isLoading: false, errorMsg: null};
+const initialState = {autoPilotsList: [], autoPilot: null, isLoading: false, errorMsg: null};
 
 export const autoPilot = (state = initialState, action) => {
     switch (action.type) {
-        // Fetch
+        // Fetch All
         case actionTypes.FETCH_AUTOPILOTS_REQUEST:
             return updateObject(state, {
                 autoPilotsList: [],
@@ -24,6 +24,26 @@ export const autoPilot = (state = initialState, action) => {
                 isLoading: false,
                 errorMsg: action.errorMsg
             });
+
+
+        // Fetch
+        case actionTypes.FETCH_AUTOPILOT_REQUEST:
+            return updateObject(state, {
+                errorMsg: null,
+                isLoading: true,
+            });
+        case actionTypes.FETCH_AUTOPILOT_SUCCESS:
+            return updateObject(state, {
+                autoPilot: action.autoPilot,
+                isLoading: false
+            });
+        case actionTypes.FETCH_AUTOPILOT_FAILURE:
+            return updateObject(state, {
+                autoPilot: null,
+                isLoading: false,
+                errorMsg: action.errorMsg
+            });
+
 
         // Add
         case actionTypes.ADD_AUTOPILOT_REQUEST:
@@ -52,13 +72,10 @@ export const autoPilot = (state = initialState, action) => {
                 isLoading: true
             });
         case actionTypes.UPDATE_AUTOPILOT_SUCCESS:
-            const autoPilotsCopy = state.autoPilotsList
-                .map(a => a.ID === action.autoPilotID ? {...action.updatedAutoPilot}: a);
-
             return updateObject(state, {
                 successMsg: action.successMsg,
                 isLoading: false,
-                autoPilotsList: autoPilotsCopy
+                autoPilot: action.updatedAutoPilot
             });
         case actionTypes.UPDATE_AUTOPILOT_FAILURE:
             return updateObject(state, {
@@ -78,7 +95,8 @@ export const autoPilot = (state = initialState, action) => {
             return updateObject(state, {
                 successMsg: action.successMsg,
                 isDeleting: false,
-                autoPilotList: autoPilotsList
+                autoPilotList: autoPilotsList,
+                autoPilot: null
             });
 
         case actionTypes.DELETE_AUTOPILOT_FAILURE:
@@ -95,16 +113,10 @@ export const autoPilot = (state = initialState, action) => {
             });
 
         case actionTypes.UPDATE_AUTOPILOT_STATUS_SUCCESS:
-            let newAutoPilotStatus = [...state.autoPilotsList].map(autoPilot => {
-                if(autoPilot.ID === action.autoPilotID)
-                    autoPilot.Active = action.status;
-                return autoPilot
-            });
-
             return updateObject(state, {
                 successMsg: action.successMsg,
                 isStatusChanging: false,
-                autoPilotsList: newAutoPilotStatus
+                autoPilot: {...state.autoPilot, Active: action.status}
             });
 
         case actionTypes.UPDATE_AUTOPILOT_STATUS_FAILURE:

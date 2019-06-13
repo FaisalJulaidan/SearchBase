@@ -32,7 +32,6 @@ export const assistant = (state = initialState, action) => {
 
         case actionTypes.FETCH_ASSISTANT_REQUEST:
             return updateObject(state, {
-                assistant: null,
                 errorMsg: null,
                 isLoading: true,
             });

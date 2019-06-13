@@ -150,7 +150,7 @@ class Assistant(db.Model):
     CRMID = db.Column(db.Integer, db.ForeignKey('CRM.ID'))
     CRM = db.relationship('CRM', back_populates='Assistants')
 
-    AutoPilotID = db.Column(db.Integer, db.ForeignKey('auto_pilot.ID'))
+    AutoPilotID = db.Column(db.Integer, db.ForeignKey('auto_pilot.ID', ondelete='cascade'))
     AutoPilot = db.relationship("AutoPilot", back_populates="Assistants")
 
     # NotifySchedulerJobID = db.Column(db.Integer, db.ForeignKey('apscheduler_jobs.FakeID', ondelete='cascade'), nullable=True, unique=True)

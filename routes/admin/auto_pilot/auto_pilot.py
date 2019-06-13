@@ -27,17 +27,23 @@ def auto_pilots():
 
     if not callback.Success:
         return helpers.jsonResponse(False, 400, callback.Message, None)
-    return helpers.jsonResponse(True, 200, callback.Message, callback.Data)
+    return helpers.jsonResponse(True, 200, callback.Message, helpers.getListFromSQLAlchemyList(callback.Data))
 
 
 # Update & Delete auto pilots
-@auto_pilot_router.route("/auto_pilot/<int:autoPilotID>", methods=['DELETE', 'PUT'])
+@auto_pilot_router.route("/auto_pilot/<int:autoPilotID>", methods=['GET','DELETE', 'PUT'])
 @jwt_required
 def auto_pilot(autoPilotID):
     # Authenticate
     user = get_jwt_identity()['user']
 
-    callback: Callback = Callback(False, 'Error!', None)
+    # Get AutoPilot by ID
+    if request.method == "GET":
+        callback = auto_pilot_services.getByID(autoPilotID, user['companyID'])
+        if not callback.Success:
+            return helpers.jsonResponse(False, 400, callback.Message, None)
+        return helpers.jsonResponse(True, 200, callback.Message, auto_pilot_services.parseAutoPilot(callback.Data))
+
     # Update AutoPilot
     if request.method == "PUT":
         data = request.json
@@ -57,7 +63,7 @@ def auto_pilot(autoPilotID):
                     user['companyID'])
         if not callback.Success:
             return helpers.jsonResponse(False, 400, callback.Message, None)
-        return helpers.jsonResponse(True, 200, callback.Message, helpers.getDictFromSQLAlchemyObj(callback.Data))
+        return helpers.jsonResponse(True, 200, callback.Message, auto_pilot_services.parseAutoPilot(callback.Data))
 
     # Delete assistant
     if request.method == "DELETE":

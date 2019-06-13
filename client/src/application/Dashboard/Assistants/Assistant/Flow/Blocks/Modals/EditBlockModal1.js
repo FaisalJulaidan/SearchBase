@@ -31,15 +31,15 @@ class EditBlockModal extends Component {
     handleEditBlock = (edittedBlock) => {
         if (edittedBlock)
             this.props.handleEditBlock(edittedBlock);
-        this.props.closeModal();
+        this.props.closeEditAutoPilotModal();
     };
 
     render() {
         return (
             <Modal width={800}
                    title="Edit Block"
-                   visible={this.props.visible}
-                   onCancel={this.props.closeModal}
+                   visible={this.props.newAutoPilotModalVisible}
+                   onCancel={this.props.closeEditAutoPilotModal}
                    destroyOnClose={true}
                    footer={null}>
 

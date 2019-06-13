@@ -35,7 +35,7 @@ class NewBlockModal extends Component {
     handleNewBlock = (newBlock) => {
         if (newBlock)
             this.props.handleAddBlock(newBlock);
-        this.props.closeModal();
+        this.props.closeEditAutoPilotModal();
     };
 
     onChangeTab = (currentTab) => this.setState({currentTab});
@@ -45,8 +45,8 @@ class NewBlockModal extends Component {
             <div>
                 <MyModal width={800}
                          title="Add New Question"
-                         visible={this.props.visible}
-                         onCancel={this.props.closeModal}
+                         visible={this.props.newAutoPilotModalVisible}
+                         onCancel={this.props.closeEditAutoPilotModal}
                          destroyOnClose={true}
                          footer={null}>
 

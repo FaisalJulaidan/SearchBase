@@ -36,14 +36,14 @@ class LogoUploader extends Component {
 
     onZoomChange = zoom => this.setState({zoom});
 
-    handleCancel = () => this.setState({visible: false});
+    handleCancel = () => this.setState({newAutoPilotModalVisible: false});
 
     handleOk = async () => {
         const croppedImage = await croppedImg(this.state.imageSrc, this.state.croppedAreaPixels, this.state.mainFile.name);
         const formData = new FormData();
         formData.append('file', croppedImage);
         this.props.uploadLogo(formData);
-        this.setState({visible: false});
+        this.setState({newAutoPilotModalVisible: false});
     };
 
     onFileChange = async e => {
@@ -54,7 +54,7 @@ class LogoUploader extends Component {
                 imageSrc: imageDataUrl,
                 crop: {x: 0, y: 0},
                 zoom: 1,
-                visible: true
+                newAutoPilotModalVisible: true
             })
         }
     };
@@ -67,7 +67,7 @@ class LogoUploader extends Component {
             name: 'file',
             beforeUpload: file => {
                 this.onFileChange(file);
-                this.setState({visible: true});
+                this.setState({newAutoPilotModalVisible: true});
 
                 return false;
             },

@@ -96,6 +96,8 @@ def produceRecruiterValueReport(companyID, crmName):
     if crmName == CRM.Bullhorn.name:
         return Bullhorn.produceRecruiterValueReport(crm_callback.Data, companyID)
 
+    return Callback(True, crmName + " doesn't support this functionality")
+
 
 # Connect to a new CRM
 # details is a dict that has {auth, type}

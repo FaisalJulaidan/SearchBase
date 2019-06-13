@@ -23,7 +23,7 @@ class NewGroup extends Component {
                 width={800}
                 title="Create New Group"
                 destroyOnClose={true}
-                visible={this.props.visible}
+                visible={this.props.newAutoPilotModalVisible}
                 onOk={this.props.handleSave}
                 onCancel={this.props.handleCancel}
                 footer={[

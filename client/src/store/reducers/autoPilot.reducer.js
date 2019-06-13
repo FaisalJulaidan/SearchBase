@@ -5,6 +5,9 @@ import {deepClone} from "helpers";
 const initialState = {autoPilotsList: [], autoPilot: null, isLoading: false, errorMsg: null};
 
 export const autoPilot = (state = initialState, action) => {
+
+    let autoPilotsListCopy;
+
     switch (action.type) {
         // Fetch All
         case actionTypes.FETCH_AUTOPILOTS_REQUEST:
@@ -75,13 +78,34 @@ export const autoPilot = (state = initialState, action) => {
             return updateObject(state, {
                 successMsg: action.successMsg,
                 isLoading: false,
-                autoPilot: action.updatedAutoPilot
+                autoPilotsList: state.autoPilotsList
+                    .map(a => a.ID === action.autoPilotID ? {...action.updatedAutoPilot}: a)
             });
         case actionTypes.UPDATE_AUTOPILOT_FAILURE:
             return updateObject(state, {
                 isLoading: false,
                 errorMsg: action.errorMsg
             });
+
+        // Update Extended Configs
+        case actionTypes.UPDATE_AUTOPILOT_CONFIGS_REQUEST:
+            return updateObject(state, {
+                successMsg: null,
+                errorMsg: null,
+                isLoading: true
+            });
+        case actionTypes.UPDATE_AUTOPILOT_CONFIGS_SUCCESS:
+            return updateObject(state, {
+                successMsg: action.successMsg,
+                isLoading: false,
+                autoPilot: action.updatedAutoPilot
+            });
+        case actionTypes.UPDATE_AUTOPILOT_CONFIGS_FAILURE:
+            return updateObject(state, {
+                isLoading: false,
+                errorMsg: action.errorMsg
+            });
+
 
         // Delete
         case actionTypes.DELETE_AUTOPILOT_REQUEST:
@@ -91,11 +115,10 @@ export const autoPilot = (state = initialState, action) => {
             });
 
         case actionTypes.DELETE_AUTOPILOT_SUCCESS:
-            let autoPilotsList = [...state.autoPilotsList].filter(autoPilot => autoPilot.ID !== action.autoPilotID);
             return updateObject(state, {
                 successMsg: action.successMsg,
                 isDeleting: false,
-                autoPilotList: autoPilotsList,
+                autoPilotList: [...state.autoPilotsList].filter(autoPilot => autoPilot.ID !== action.autoPilotID),
                 autoPilot: null
             });
 

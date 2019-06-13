@@ -7,7 +7,6 @@ import 'types/TimeSlots_Types'
 import {history} from "helpers";
 import TimeSlots from "./TimeSlots/TimeSlots";
 import {autoPilotActions} from "store/actions";
-import {store} from "store/store";
 
 const FormItem = Form.Item;
 const confirm = Modal.confirm;
@@ -100,7 +99,7 @@ class AutoPilot extends React.Component {
             openTimeSlots: weekDays
         };
 
-        store.dispatch(autoPilotActions.updateAutoPilot(autoPilot.ID, payload));
+        this.props.dispatch(autoPilotActions.updateAutoPilotConfigs(autoPilot.ID, payload));
     });
 
     render() {

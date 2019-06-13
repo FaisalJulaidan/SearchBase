@@ -4,11 +4,11 @@ import {Icon, Menu, Modal, Typography} from 'antd';
 import styles from "./Databases.module.less"
 
 import NoHeaderPanel from 'components/NoHeaderPanel/NoHeaderPanel'
-import UploadModal from "./UploadModal/UploadModal";
+import UploadModal from "./Modals/UploadModal/UploadModal";
 import {databaseActions} from "store/actions";
 import CreateNewBox from "components/CreateNewBox/CreateNewBox";
 import ViewBox from "components/ViewBox/ViewBox";
-import EditModal from "./EditModal/EditModal"
+import EditDatabaseModal from "./Modals/EditDatabaseModal"
 import {DatabaseIcon} from "components/SVGs";
 import {history} from "helpers";
 
@@ -122,7 +122,7 @@ class Databases extends Component {
                 />
 
 
-                <EditModal visible={this.state.editModalVisible}
+                <EditDatabaseModal visible={this.state.editModalVisible}
                     databaseOptions={this.props.options?.databases}
                     database={this.state.databaseToEdit}
                     hideModal={this.hideEditModal}

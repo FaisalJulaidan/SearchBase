@@ -93,7 +93,7 @@ def create(name, desc, companyID: int) -> Callback:
                          ]
         db.session.add_all(openTimeSlots)
         db.session.commit()
-        return Callback(True, "Got AutoPilot successfully.", parseAutoPilot(autoPilot))
+        return Callback(True, "Got AutoPilot successfully.", autoPilot)
 
     except Exception as exc:
         print(exc)
@@ -138,8 +138,31 @@ def parseAutoPilot(autoPilot: AutoPilot) -> dict:
     }
 
 # ----- Updaters ----- #
-def update(id, name, desc, active, acceptApplications, acceptanceScore, sendAcceptanceEmail, rejectApplications,
-           rejectionScore, sendRejectionEmail, SendCandidatesAppointments, openTimeSlots, companyID: int) -> Callback:
+def update(id, name, desc, companyID: int) -> Callback:
+    try:
+
+        # Get AutoPilot
+        autoPilot_callback: Callback = getByID(id, companyID)
+        if not autoPilot_callback.Success: return autoPilot_callback
+        autoPilot = autoPilot_callback.Data
+
+        # Update the autoPilot
+        autoPilot.Name = name
+        autoPilot.Description = desc
+
+        # Save all changes
+        db.session.commit()
+        return Callback(True, "Updated the AutoPilot successfully.", autoPilot)
+
+    except Exception as exc:
+        print(exc)
+        logging.error("auto_pilot.update(): " + str(exc))
+        db.session.rollback()
+        return Callback(False, "Couldn't update the AutoPilot.")
+
+
+def updateConfigs(id, name, desc, active, acceptApplications, acceptanceScore, sendAcceptanceEmail, rejectApplications,
+                  rejectionScore, sendRejectionEmail, SendCandidatesAppointments, openTimeSlots, companyID: int) -> Callback:
     try:
 
         # TODO OpenTimeSlots & Appointments Feature

@@ -68,7 +68,6 @@ export const assistant = (state = initialState, action) => {
             });
 
 
-
         // Update
         case actionTypes.UPDATE_ASSISTANT_REQUEST:
 

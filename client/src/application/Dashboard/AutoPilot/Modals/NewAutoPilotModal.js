@@ -9,20 +9,13 @@ const FormItem = Form.Item;
 
 class NewAutoPilotModal extends Component {
 
-
-    onSubmit = () => this.props.form.validateFields((err, values) => {
+    onSubmit = () => {
+        this.props.form.validateFields((err, values) => {
             if (!err) {
-                store.dispatch(
-                    autoPilotActions.addAutoPilot({
-                            name: values.name,
-                            description: values.description || ''
-                        }
-                    )
-                );
-                this.props.closeModal()
+                this.props.addAutoPilot(values)
             }
-
         });
+    };
 
 
     render() {
@@ -43,11 +36,9 @@ class NewAutoPilotModal extends Component {
                                 required: true,
                                 message: "Please add name or the name you entered is duplicated",
                                 validator: (_, value, callback) => {
-                                    // check if the value equalls any of the name from
-                                    // this.props.autoPilotsSlots
-                                    // if there is an error retrun the callback with the message
                                     const { /**@type AutoPilot[]*/ autoPilotsList} = this.props;
-                                    if (autoPilotsList.some(autoPilot => autoPilot.Name === value))
+                                    if (autoPilotsList.some(autoPilot => autoPilot.Name === value
+                                        && this.props.autoPilot.Name !== value))
                                         return callback(value + ' is duplicated');
                                     else
                                         return callback()

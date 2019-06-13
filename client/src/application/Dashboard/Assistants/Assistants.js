@@ -9,7 +9,7 @@ import {RobotIcon} from "components/SVGs";
 import {history} from "helpers";
 
 import NewAssistantModal from "./Modals/NewAssistantModal";
-import EditModal from "./Modals/EditModal";
+import EditAssistantModal from "./Modals/EditAssistantModal";
 import NoHeaderPanel from 'components/NoHeaderPanel/NoHeaderPanel'
 import CreateNewBox from "components/CreateNewBox/CreateNewBox"
 import ViewBox from "components/ViewBox/ViewBox";
@@ -117,7 +117,7 @@ class Assistants extends Component {
                                isAssistantNameValid={this.isAssistantNameValid}
                                hideModal={this.hideNewAssistantModal}/>
 
-            <EditModal visible={this.state.editModalVisible}
+            <EditAssistantModal visible={this.state.editModalVisible}
                        assistant={this.state.assistantToEdit}
                        hideModal={this.hideEditModal}
                        isAssistantNameValid={this.isAssistantNameValid}

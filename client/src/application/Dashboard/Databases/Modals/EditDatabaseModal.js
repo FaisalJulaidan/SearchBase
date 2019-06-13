@@ -5,7 +5,7 @@ import React, {Component} from 'react';
 const FormItem = Form.Item;
 const Option = Select.Option;
 
-class EditModal extends Component {
+class EditDatabaseModal extends Component {
 
     constructor(props) {
         super(props);
@@ -88,4 +88,4 @@ class EditModal extends Component {
     }
 }
 
-export default Form.create()(EditModal);
+export default Form.create()(EditDatabaseModal);

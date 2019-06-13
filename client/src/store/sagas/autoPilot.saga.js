@@ -53,6 +53,18 @@ function* updateAutoPilot({autoPilotID, updatedValues}) {
     }
 }
 
+function* updateAutoPilotConfigs({autoPilotID, updatedValues}) {
+    try {
+        const res = yield http.put(`auto_pilot/${autoPilotID}/configs`, updatedValues);
+        yield put(autoPilotActions.updateAutoPilotConfigsSuccess(res.data?.data, res.data?.msg));
+        successMessage('Auto pilot updated');
+    } catch (error) {
+        const msg = error.response?.data?.msg || "Couldn't update auto pilot";
+        yield put(autoPilotActions.updateAutoPilotConfigsFailure(msg));
+        errorMessage(msg);
+    }
+}
+
 function* deleteAutoPilot({autoPilotID, meta}) {
     try {
         loadingMessage('Removing auto pilot...', 0);
@@ -96,6 +108,9 @@ function* watchUpdateAutoPilot() {
     yield takeLatest(actionTypes.UPDATE_AUTOPILOT_REQUEST, updateAutoPilot)
 }
 
+function* watchUpdateAutoPilotConfigs() {
+    yield takeLatest(actionTypes.UPDATE_AUTOPILOT_CONFIGS_REQUEST, updateAutoPilotConfigs)
+}
 
 function* watchDeleteAutoPilot() {
     yield takeLatest(actionTypes.DELETE_AUTOPILOT_REQUEST, deleteAutoPilot)
@@ -111,6 +126,7 @@ export function* autoPilotSaga() {
         watchFetchAutoPilot(),
         watchAddAutoPilot(),
         watchUpdateAutoPilot(),
+        watchUpdateAutoPilotConfigs(),
         watchDeleteAutoPilot(),
         watchUpdateStatus(),
     ])

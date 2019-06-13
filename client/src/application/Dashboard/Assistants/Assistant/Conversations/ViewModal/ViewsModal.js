@@ -87,7 +87,7 @@ class ViewsModal extends Component {
                         </span>
                     </h3>}
                 destroyOnClose={true}
-                visible={this.props.visible}
+                visible={this.props.newAutoPilotModalVisible}
                 onCancel={this.props.closeViewModal}
                 onOk={this.props.closeViewModal}
                 footer={[

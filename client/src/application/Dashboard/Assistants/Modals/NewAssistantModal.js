@@ -25,24 +25,10 @@ class NewAssistantModal extends Component {
         }
     };
 
-    togglePopupSwitch = () => {
-        this.setState({isPopupDisabled: !this.state.isPopupDisabled})
-    };
-
-    toggleAlertsSwitch = () => {
-        this.setState({isAlertsEnabled: !this.state.isAlertsEnabled})
-    };
 
     handleAdd = () => {
         this.props.form.validateFields((err, values) => {
             if (!err) {
-                // if(this.state.isPopupDisabled) {values.secondsUntilPopup = 0}
-                // values["alertsEnabled"] = this.state.isAlertsEnabled;
-                // values.config = {
-                //     restrictedCountries: values.restrictedCountries || []
-                // };
-                // delete values.restrictedCountries;
-
                 this.props.addAssistant(values)
             }
         });
@@ -51,10 +37,6 @@ class NewAssistantModal extends Component {
 
 
     render() {
-
-        // const alertsKeys = Object.keys(this.state.alertOptions);
-        // const maxAlertsLength = parseInt(alertsKeys[alertsKeys.length - 1]);
-        // const countriesOptions = [...countries.map(country => <Option key={country.code}>{country.name}</Option>)];
 
         const {getFieldDecorator} = this.props.form;
         const {hideModal, visible} = this.props;

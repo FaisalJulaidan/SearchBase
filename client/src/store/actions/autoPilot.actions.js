@@ -95,6 +95,30 @@ const updateAutoPilotFailure = (errorMsg) => {
     };
 };
 
+// Update
+const updateAutoPilotConfigs = (autoPilotID, updatedValues) => {
+    return {
+        type: actionTypes.UPDATE_AUTOPILOT_CONFIGS_REQUEST,
+        autoPilotID,
+        updatedValues
+    };
+};
+
+const updateAutoPilotConfigsSuccess = (updatedAutoPilot, successMsg) => {
+    return {
+        type: actionTypes.UPDATE_AUTOPILOT_CONFIGS_SUCCESS,
+        updatedAutoPilot,
+        successMsg
+    };
+};
+
+const updateAutoPilotConfigsFailure = (errorMsg) => {
+    return {
+        type: actionTypes.UPDATE_AUTOPILOT_CONFIGS_FAILURE,
+        errorMsg
+    };
+};
+
 
 // Delete
 const deleteAutoPilot = (autoPilotID) => {
@@ -161,6 +185,10 @@ export const autoPilotActions = {
     updateAutoPilot,
     updateAutoPilotSuccess,
     updateAutoPilotFailure,
+
+    updateAutoPilotConfigs,
+    updateAutoPilotConfigsSuccess,
+    updateAutoPilotConfigsFailure,
 
     deleteAutoPilot,
     deleteAutoPilotSuccess,

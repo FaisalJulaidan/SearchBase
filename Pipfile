@@ -74,6 +74,8 @@ babel = "*"
 self = "*"
 boto3 = "*"
 geoip2 = "*"
+msal = "*"
+authlib = "*"
 
 [requires]
 python_version = "3.7"

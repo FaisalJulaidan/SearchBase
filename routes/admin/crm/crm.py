@@ -4,7 +4,7 @@ from flask import Blueprint, request
 from flask_jwt_extended import jwt_required, get_jwt_identity
 
 from models import Callback
-from services.CRM import crm_services, Bullhorn
+from services.CRM import crm_services, Bullhorn, Outlook
 from utilities import helpers
 
 crm_router: Blueprint = Blueprint('crm_router', __name__, template_folder="../../templates")
@@ -104,3 +104,9 @@ def bullhorn_callback():
 @crm_router.route("/crm_callback", methods=['GET', 'POST', 'PUT'])
 def crm_callback():
     return str(request.url)
+
+
+# @crm_router.route("/custom_test", methods=['GET', 'POST', 'PUT'])
+# def test():
+#     if request.method == "POST":
+#         return Outlook.login().Message

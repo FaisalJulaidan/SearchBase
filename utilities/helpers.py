@@ -209,7 +209,7 @@ def gen_dummy_data():
     }
     flow_services.updateFlow(flow, reader_a)
 
-    helper_a = Assistant(Name="Helper", Message="Hey there", TopBarText="Aramco Bot", SecondsUntilPopup=1, Active=True, Company=aramco, LastSentDate=datetime.now())
+    helper_a = Assistant(Name="Helper", Message="Hey there", TopBarText="Aramco Bot", SecondsUntilPopup=1, Active=True, Company=aramco, LastSentDate=datetime.now(), NotifyEvery=5)
 
     reader_s = Assistant(Name="Reader", Message="Hey there", TopBarText="Sabic Bot", SecondsUntilPopup=1, Active=True, Company=sabic, LastSentDate=datetime.now())
     helper_s = Assistant(Name="Helper", Message="Hey there", TopBarText="Sabic Bot", SecondsUntilPopup=1, Active=True, Company=sabic, LastSentDate=datetime.now())

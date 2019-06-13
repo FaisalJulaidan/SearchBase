@@ -35,13 +35,16 @@ scheduler = BackgroundScheduler(jobstores=jobstores, executors=executors, job_de
 def getNextInterval(assistantID=None):
     try:
         now = datetime.now()
+        query =  db.session.query(Assistant.ID, Assistant.NotifyEvery, Assistant.Name, User.Email, Assistant.LastSentDate) \
+            .filter(Assistant.NotifyEvery != None) \
+            .filter(Assistant.CompanyID == User.CompanyID)
+
+        if assistantID != None:
+            query.filter(Assistant.ID == assistantID)
+
         monthlyUses = helpers.getDictFromLimitedQuery(["AssistantID", "NotifyEvery", "Name", "Email", "LastSentDate"],
-                          db.session.query(Assistant.ID, Assistant.NotifyEvery, Assistant.Name, User.Email, Assistant.LastSentDate) \
-                                .filter(Assistant.NotifyEvery != None) \
-                                .filter(Assistant.ID == assistantID) \
-                                .filter(Assistant.CompanyID == User.CompanyID) \
-                                .all())
-        print(monthlyUses)
+                         query.all())
+
         for record in monthlyUses:
             if ((now - record['LastSentDate']).total_seconds()/86400) > record['NotifyEvery'] \
                     or record['LastSentDate'] == None:

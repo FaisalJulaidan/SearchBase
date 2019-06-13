@@ -54,5 +54,5 @@ def getNextInterval(assistantID=None):
         print(e)
 
 
-scheduler.add_job(getNextInterval, 'cron', hours='*/1', id='hourly', replace_existing=True)
+scheduler.add_job(getNextInterval, 'cron', hour='*/1', id='hourly', replace_existing=True)
 scheduler.start()

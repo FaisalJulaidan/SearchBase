@@ -36,7 +36,7 @@ def getNextInterval(assistantID=None):
     try:
         helpers.HPrint('kek')
         now = datetime.now()
-        query =  db.session.query(Assistant.ID, Assistant.NotifyEvery, Assistant.Name, User.Email, Assistant.LastNotificationDate) \
+        query = db.session.query(Assistant.ID, Assistant.NotifyEvery, Assistant.Name, User.Email, Assistant.LastNotificationDate) \
             .filter(Assistant.NotifyEvery != None) \
             .filter(Assistant.CompanyID == User.CompanyID)
 

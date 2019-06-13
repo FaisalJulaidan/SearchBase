@@ -76,9 +76,11 @@ def processConversation(assistantHashID, data: dict) -> Callback:
         #immediate notification
         if assistant.NotifyEvery == 0:
             print("notify via email")
+            assistant.LastNotificationDate = datetime.now()
             # notify via email ?
 
         db.session.add(conversation)
+        db.session.save(assistant)
         db.session.commit()
 
         return Callback(True, 'Chatbot data has been processed successfully!', conversation)

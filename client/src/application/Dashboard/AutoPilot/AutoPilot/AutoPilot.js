@@ -2,7 +2,7 @@ import React from 'react'
 import {connect} from 'react-redux';
 import styles from "./AutoPilot.module.less";
 import NoHeaderPanel from 'components/NoHeaderPanel/NoHeaderPanel'
-import {Button, Form, Input, InputNumber, Switch, Typography, Divider, Spin, Modal} from 'antd';
+import {Button, Form, Input, InputNumber, Switch, Typography, Divider, Spin, Modal, Breadcrumb} from 'antd';
 import 'types/TimeSlots_Types'
 import {history} from "helpers";
 import TimeSlots from "./TimeSlots/TimeSlots";
@@ -112,7 +112,19 @@ class AutoPilot extends React.Component {
         return (
             <>
                 <NoHeaderPanel>
-                    <div className={styles.Title}>
+                    <div className={styles.Header}>
+                        <div style={{marginBottom: 20}}>
+                            <Breadcrumb>
+                                <Breadcrumb.Item>
+                                    <a href={"javascript:void(0);"}
+                                       onClick={() => history.push('/dashboard/auto_pilots')}>
+                                        Auto Pilots
+                                    </a>
+                                </Breadcrumb.Item>
+                                <Breadcrumb.Item>{autoPilot?.Name}</Breadcrumb.Item>
+                            </Breadcrumb>
+                        </div>
+
                         <div className={styles.Details}>
                             <Title>{autoPilot?.Name}</Title>
                             <Paragraph type="secondary">

@@ -8,6 +8,7 @@ import UploadModal from "./Modals/UploadModal/UploadModal";
 import {databaseActions} from "store/actions";
 import CreateNewBox from "components/CreateNewBox/CreateNewBox";
 import ViewBox from "components/ViewBox/ViewBox";
+import LoadingViewBox from "components/LoadingViewBox/LoadingViewBox";
 import EditDatabaseModal from "./Modals/EditDatabaseModal"
 import {DatabaseIcon} from "components/SVGs";
 import {history} from "helpers";
@@ -97,6 +98,8 @@ class Databases extends Component {
                         <CreateNewBox text={'Add Database'} onClick={this.showUploadModal}/>
 
                         {
+                            this.props.isLoading ? <LoadingViewBox/>
+                            :
                             this.props.databasesList.map(
                                 (database, i) =>
                                     <ViewBox
@@ -139,6 +142,7 @@ class Databases extends Component {
 function mapStateToProps(state) {
     return {
         databasesList: state.database.databasesList,
+        isLoading: state.database.isLoading,
         options: state.options.options,
     };
 }

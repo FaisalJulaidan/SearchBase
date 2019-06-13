@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
 import { Prompt } from "react-router-dom";
-import {Col, Row, Switch, Tabs, Typography, Spin, Modal} from 'antd';
+import {Col, Row, Switch, Tabs, Typography, Spin, Modal, Breadcrumb} from 'antd';
 import './Assistant.less';
 import styles from "./Assistant.module.less";
 
@@ -97,6 +97,18 @@ class Assistant extends Component {
             <>
                 <NoHeaderPanel>
                     <div className={styles.Header}>
+
+                        <div style={{marginBottom: 20}}>
+                            <Breadcrumb>
+                                <Breadcrumb.Item>
+                                    <a href={"javascript:void(0);"}
+                                       onClick={() => history.push('/dashboard/assistants')}>
+                                        Assistants
+                                    </a>
+                                </Breadcrumb.Item>
+                                <Breadcrumb.Item>{assistant?.Name}</Breadcrumb.Item>
+                            </Breadcrumb>
+                        </div>
 
                         <Row>
                             <Col span={20}>

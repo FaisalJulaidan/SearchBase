@@ -13,6 +13,7 @@ import EditAssistantModal from "./Modals/EditAssistantModal";
 import NoHeaderPanel from 'components/NoHeaderPanel/NoHeaderPanel'
 import CreateNewBox from "components/CreateNewBox/CreateNewBox"
 import ViewBox from "components/ViewBox/ViewBox";
+import LoadingViewBox from "components/LoadingViewBox/LoadingViewBox";
 
 
 const {Title, Paragraph, Text} = Typography;
@@ -95,6 +96,8 @@ class Assistants extends Component {
                 <div className={styles.Body}>
                     <CreateNewBox text={'Add Assistant'} onClick={this.showNewAssistantModal}/>
                     {
+                        this.props.isLoading ? <LoadingViewBox/>
+                        :
                         this.props.assistantList.map(
                             (assistant, i) =>
                                 <ViewBox

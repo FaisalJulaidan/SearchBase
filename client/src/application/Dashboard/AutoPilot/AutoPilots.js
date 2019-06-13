@@ -5,6 +5,7 @@ import NoHeaderPanel from 'components/NoHeaderPanel/NoHeaderPanel'
 import {Icon, Typography, Menu, Modal} from 'antd';
 import CreateNewBox from "components/CreateNewBox/CreateNewBox";
 import ViewBox from "components/ViewBox/ViewBox";
+import LoadingViewBox from "components/LoadingViewBox/LoadingViewBox";
 import {AutoPilotIcon} from "components/SVGs";
 import NewAutoPilotModal from './Modals/NewAutoPilotModal'
 import EditAutoPilotModal from './Modals/EditAutoPilotModal'
@@ -88,7 +89,10 @@ class AutoPilots extends React.Component {
 
                     <div className={styles.Body}>
                         <CreateNewBox text={'Add Auto Pilot'} onClick={this.showNewAutoPilotModal}/>
+
                         {
+                            this.props.isLoading ? <LoadingViewBox/>
+                            :
                             this.props.autoPilotsList.map(
                                 (/**@type AutoPilots*/ autoPilot, i) =>
                                     <ViewBox
@@ -130,7 +134,8 @@ class AutoPilots extends React.Component {
 
 function mapStateToProps(state) {
     return {
-        autoPilotsList: state.autoPilot.autoPilotsList
+        autoPilotsList: state.autoPilot.autoPilotsList,
+        isLoading: state.autoPilot.isLoading
     };
 }
 

@@ -16,6 +16,7 @@ from typing import List
 from flask_jwt_extended import get_jwt_identity
 from utilities import tasks
 import enums, re, os, stripe, gzip, functools, logging, geoip2.webservice
+import inspect
 
 # will merge with the previous imports if the code is kept - batu
 
@@ -209,10 +210,10 @@ def gen_dummy_data():
     }
     flow_services.updateFlow(flow, reader_a)
 
-    helper_a = Assistant(Name="Helper", Message="Hey there", TopBarText="Aramco Bot", SecondsUntilPopup=1, Active=True, Company=aramco, LastSentDate=datetime.now(), NotifyEvery=5)
+    helper_a = Assistant(Name="Helper", Message="Hey there", TopBarText="Aramco Bot", SecondsUntilPopup=1, Active=True, Company=aramco, LastNotificationDate=datetime.now(), NotifyEvery=5)
 
-    reader_s = Assistant(Name="Reader", Message="Hey there", TopBarText="Sabic Bot", SecondsUntilPopup=1, Active=True, Company=sabic, LastSentDate=datetime.now())
-    helper_s = Assistant(Name="Helper", Message="Hey there", TopBarText="Sabic Bot", SecondsUntilPopup=1, Active=True, Company=sabic, LastSentDate=datetime.now())
+    reader_s = Assistant(Name="Reader", Message="Hey there", TopBarText="Sabic Bot", SecondsUntilPopup=1, Active=True, Company=sabic, LastNotificationDate=datetime.now())
+    helper_s = Assistant(Name="Helper", Message="Hey there", TopBarText="Sabic Bot", SecondsUntilPopup=1, Active=True, Company=sabic, LastNotificationDate=datetime.now())
 
 
     # Create Roles
@@ -542,3 +543,13 @@ def findIndexOfKeyInArray(key, value, array):
         if item.key == value:
             return idx
     return False
+
+#Helpful printer, so you can find out where a print if you forget about it and want to remove it
+def HPrint(message):
+    callerframerecord = inspect.stack()[1]
+    frame = callerframerecord[0]
+    info = inspect.getframeinfo(frame)
+    filenamearr = info.filename.split('\\')
+    filename = filenamearr[len(filenamearr)-1]
+
+    print(message + " - (%s, line %s)" % (filename, info.lineno))

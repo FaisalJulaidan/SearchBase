@@ -8,7 +8,7 @@ from sqlalchemy.sql import desc
 
 from enums import UserType, ApplicationStatus
 from models import db, Callback, Conversation, Assistant
-from services import assistant_services, stored_file_services, auto_pilot_services, scheduler_services
+from services import assistant_services, stored_file_services, auto_pilot_services
 from services.CRM import crm_services
 from utilities import json_schemas, helpers
 
@@ -20,6 +20,7 @@ def processConversation(assistantHashID, data: dict) -> Callback:
         if not callback.Success:
             return Callback(False, "Assistant not found!")
         assistant: Assistant = callback.Data
+
 
         # Fetch selected solutions from the database to get their complete details as they were hidden in the chatbot
         selectedSolutions = []
@@ -71,6 +72,11 @@ def processConversation(assistantHashID, data: dict) -> Callback:
                 conversation.CRMSynced = True
             conversation.CRMResponse = crm_callback.Message
 
+
+        #immediate notification
+        if assistant.NotifyEvery == 0:
+            print("notify via email")
+            # notify via email ?
 
         db.session.add(conversation)
         db.session.commit()

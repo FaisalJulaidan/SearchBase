@@ -136,7 +136,7 @@ class Assistant(db.Model):
     TopBarText = db.Column(db.String(64), nullable=False)
     SecondsUntilPopup = db.Column(db.Float, nullable=False, default=0.0)
 
-    LastSentDate = db.Column(db.DateTime(), nullable=True)
+    LastNotificationDate = db.Column(db.DateTime(), nullable=True)
     NotifyEvery = db.Column(db.Integer, nullable=True)
     Active = db.Column(db.Boolean(), nullable=False, default=True)
     Config = db.Column(MagicJSON, nullable=True)

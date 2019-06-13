@@ -34,21 +34,22 @@ scheduler = BackgroundScheduler(jobstores=jobstores, executors=executors, job_de
 # If assistantID is supplied, it will only look for data relating to that assistant
 def getNextInterval(assistantID=None):
     try:
+        helpers.HPrint('kek')
         now = datetime.now()
-        query =  db.session.query(Assistant.ID, Assistant.NotifyEvery, Assistant.Name, User.Email, Assistant.LastSentDate) \
+        query =  db.session.query(Assistant.ID, Assistant.NotifyEvery, Assistant.Name, User.Email, Assistant.LastNotificationDate) \
             .filter(Assistant.NotifyEvery != None) \
             .filter(Assistant.CompanyID == User.CompanyID)
 
         if assistantID != None:
             query.filter(Assistant.ID == assistantID)
 
-        monthlyUses = helpers.getDictFromLimitedQuery(["AssistantID", "NotifyEvery", "Name", "Email", "LastSentDate"],
+        monthlyUses = helpers.getDictFromLimitedQuery(["AssistantID", "NotifyEvery", "Name", "Email", "LastNotificationDate"],
                          query.all())
 
         for record in monthlyUses:
-            if ((now - record['LastSentDate']).total_seconds()/86400) > record['NotifyEvery'] \
-                    or record['LastSentDate'] == None:
-                db.session.query(Assistant).filter(Assistant.ID == record['AssistantID']).update({'LastSentDate': now})
+            if ((now - record['LastNotificationDate']).total_seconds()/86400) > record['NotifyEvery'] \
+                    or record['LastNotificationDate'] == None:
+                db.session.query(Assistant).filter(Assistant.ID == record['AssistantID']).update({'LastNotificationDate': now})
     except Exception as e:
         print(e)
 

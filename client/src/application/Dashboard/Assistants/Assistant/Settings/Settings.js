@@ -183,39 +183,42 @@ class Settings extends Component {
                                 <Radio.Button value={6} disabled={isManualNotify}>Every 6hrs</Radio.Button>
                                 <Radio.Button value={24} disabled={isManualNotify}>Daily</Radio.Button>
                                 <Radio.Button value={168} disabled={isManualNotify}>Weekly</Radio.Button>
+                                <Radio.Button value={730} disabled={isManualNotify}>Monthly</Radio.Button>
                                 <Radio.Button onClick={() => {this.setState({isManualNotify: !isManualNotify})}}>Custom</Radio.Button>
                             </Radio.Group>
                             {getFieldDecorator('notifyEvery', {
-                                    initialValue: assistant.NotifyEvery,
+                                initialValue: assistant.NotifyEvery,
                                 rules: [{
                                     required: true,
                                     message: 'Please type in a number of hours',
                             }],
                             })(
-                                <Input placeholder="Amount of time between notifications, in hours"/>
+                               <InputNumber placeholder="Amount of time between notifications, in hours"/>
                             )}
                         </Form.Item>
-                    :
-                        <Form.Item label="Alert Me Every:"
-                                   extra="Select how often you would like to be notified via email of new chats">
+                        :<Form.Item label="Alert Me Every:"
+                                    extra="Select how often you would like to be notified via email of new chats">
+
                             {getFieldDecorator('notifyEvery', {
-                                initialValue: assistant.NotifyEvery === null ? "null" : assistant.NotifyEvery,
+                                initialValue: assistant.NotifyEvery,
                                 rules: [{
                                     required: true,
-                                    message: 'Please select how often or never',
+                                    message: 'Please select an option',
                                 }],
                             })(
                                 <Radio.Group style={{width:'100%'}}>
-                                    <Radio.Button value={"null"} disabled={isManualNotify}>Never</Radio.Button>
+                                    <Radio.Button value={null} disabled={isManualNotify}>Never</Radio.Button>
                                     <Radio.Button value={0} disabled={isManualNotify}>Immediately</Radio.Button>
                                     <Radio.Button value={6} disabled={isManualNotify}>Every 6hrs</Radio.Button>
                                     <Radio.Button value={24} disabled={isManualNotify}>Daily</Radio.Button>
                                     <Radio.Button value={168} disabled={isManualNotify}>Weekly</Radio.Button>
+                                    <Radio.Button value={730} disabled={isManualNotify}>Monthly</Radio.Button>
                                     <Radio.Button onClick={() => {this.setState({isManualNotify: !isManualNotify})}}>Custom</Radio.Button>
                                 </Radio.Group>
                             )}
                         </Form.Item>}
-                    <FormItem
+
+                        <FormItem
                         label="Restricted Countries"
                         extra="Chatbot will be disabled for users who live in the selected countries"
                     >

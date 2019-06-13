@@ -8,7 +8,7 @@ from sqlalchemy.sql import desc
 
 from enums import UserType, ApplicationStatus
 from models import db, Callback, Conversation, Assistant
-from services import assistant_services, stored_file_services, auto_pilot_services
+from services import assistant_services, stored_file_services, auto_pilot_services, scheduler_services
 from services.CRM import crm_services
 from utilities import json_schemas, helpers
 

@@ -61,6 +61,7 @@ class Company(db.Model):
     Databases = db.relationship('Database', back_populates='Company')
     Roles = db.relationship('Role', back_populates='Company')
     CRMs = db.relationship('CRM', back_populates='Company')
+    Calendars = db.relationship('Calendar', back_populates='Company')
     AutoPilots = db.relationship('AutoPilot', back_populates='Company')
 
     def __repr__(self):
@@ -148,6 +149,9 @@ class Assistant(db.Model):
 
     CRMID = db.Column(db.Integer, db.ForeignKey('CRM.ID'))
     CRM = db.relationship('CRM', back_populates='Assistants')
+
+    CalendarID = db.Column(db.Integer, db.ForeignKey('calendar.ID'))
+    Calendar = db.relationship('Calendar', back_populates='Assistants')
 
     AutoPilotID = db.Column(db.Integer, db.ForeignKey('auto_pilot.ID'))
     AutoPilot = db.relationship("AutoPilot", back_populates="Assistants")
@@ -298,6 +302,8 @@ class CRM(db.Model):
         return '<CRM {}>'.format(self.ID)
 
 
+
+
 class Statistics(db.Model):
     ID = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
     Name = db.Column(db.String(128), nullable=False)
@@ -421,6 +427,26 @@ class Job(db.Model):
 
     def __repr__(self):
         return '<Job {}>'.format(self.JobTitle)
+
+
+class Calendar(db.Model):
+
+    ID = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
+    Type = db.Column(Enum(enums.Calendar), nullable=True)
+    Auth = db.Column(EncryptedType(JsonEncodedDict, os.environ['SECRET_KEY_DB'], AesEngine, 'pkcs5'), nullable=True)
+
+    # Relationships:
+    CompanyID = db.Column(db.Integer, db.ForeignKey('company.ID', ondelete='cascade'), nullable=False)
+    Company = db.relationship('Company', back_populates='Calendars')
+
+    Assistants = db.relationship('Assistant', back_populates='Calendar')
+
+    # Constraints:
+    # each company will have one CRM of each type
+    __table_args__ = (db.UniqueConstraint('Type', 'CompanyID', name='uix1_calendar'),)
+
+    def __repr__(self):
+        return '<Calendar {}>'.format(self.ID)
 
 
 # a hidden table was made by APScheduler being redefined to be able use foreign keys

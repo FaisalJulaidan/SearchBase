@@ -553,3 +553,5 @@ def HPrint(message):
     filename = filenamearr[len(filenamearr)-1]
 
     print(message + " - (%s, line %s)" % (filename, info.lineno))
+
+# def csrf():

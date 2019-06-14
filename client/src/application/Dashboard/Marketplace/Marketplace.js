@@ -9,6 +9,8 @@ import AuroraCardAvatar from "components/AuroraCardAvatar/AuroraCardAvatar";
 import NoHeaderPanel from 'components/NoHeaderPanel/NoHeaderPanel'
 import {Link} from "react-router-dom";
 
+import axios from 'axios'
+
 const {Title, Paragraph, Text} = Typography;
 
 class Marketplace extends React.Component {
@@ -49,13 +51,18 @@ class Marketplace extends React.Component {
                 desc: `Google Calendar is a time-management and scheduling calendar service lets you keep track of important events, share your schedule.`,
                 image: getLink('/static/images/CRM/gmail.jpg'),
                 type: "gmail",
-                status: 'Comming Soon',
-                disabled: true
+                status: 'Comming Soon'
             },
         ]
     };
 
     componentDidMount() {
+        let loc = this.props.location.search.replace("?", "").split("&")
+        let isGoogleAuthorize = loc.filter(e => e.substring(0, "googleVerification".length) === "googleVerification").length > 0
+        if(isGoogleAuthorize){
+            let code = loc.filter(e => e.substr(0, 4) === "code")[0].replace("code=", "")
+            axios.post("/api/calendar/google/authorize", {code})
+        }
         this.props.dispatch(crmActions.getConnectedCRMs())
     }
 

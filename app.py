@@ -22,6 +22,7 @@ from routes.public.routers import public_router, resetPassword_router, chatbot_r
 
 app = Flask(__name__, static_folder='static')
 
+
 # Register Routes:
 app.register_blueprint(assistant_router, url_prefix='/api')
 app.register_blueprint(flow_router, url_prefix='/api')
@@ -38,8 +39,6 @@ app.register_blueprint(auth_router, url_prefix='/api')
 app.register_blueprint(database_router, url_prefix='/api')
 app.register_blueprint(auto_pilot_router, url_prefix='/api')
 app.register_blueprint(options_router, url_prefix='/api')
-
-
 
 @app.after_request
 def apply_caching(response):
@@ -69,7 +68,6 @@ db.app = app
 migrate_var = Migrate(app, db)
 manager = Manager(app)
 babel = Babel(app)
-oauth = OAuth()
 # scheduler = APScheduler()
 manager.add_command('db', MigrateCommand)
 
@@ -89,7 +87,6 @@ if os.environ['FLASK_ENV'] in ['production', 'staging']:
     jwt.init_app(app)
     db.init_app(app)
     mail.init_app(app)
-    oauth.init_app(app)
     app.app_context().push()
 
     if not database_exists(url):

@@ -3,8 +3,10 @@ import logging
 from flask import Blueprint, request
 from flask_jwt_extended import jwt_required, get_jwt_identity
 
-from models import Callback
-from services.CRM import crm_services, Bullhorn
+import json
+from models import Callback, Calendar, db
+import enums
+from services.CRM import crm_services, Bullhorn, Google
 from utilities import helpers
 
 crm_router: Blueprint = Blueprint('crm_router', __name__, template_folder="../../templates")
@@ -104,3 +106,18 @@ def bullhorn_callback():
 @crm_router.route("/crm_callback", methods=['GET', 'POST', 'PUT'])
 def crm_callback():
     return str(request.url)
+
+
+@crm_router.route("/calendar/google/authorize", methods=['GET', 'POST'])
+# @jwt_required
+def calendar_auth():
+    r = request.get_json()
+    try:
+        new = Calendar(Auth=r['code'], Type=enums.Calendar.Google, CompanyID=2)
+        db.session.add(new)
+        db.session.commit()
+    except Exception as e:
+        print(e)
+    return '123'
+
+

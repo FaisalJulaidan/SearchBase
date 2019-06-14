@@ -30,8 +30,10 @@ export const assistant = (state = initialState, action) => {
                 errorMsg: action.error
             });
 
+
         case actionTypes.FETCH_ASSISTANT_REQUEST:
             return updateObject(state, {
+                assistant: null,
                 errorMsg: null,
                 isLoading: true,
             });

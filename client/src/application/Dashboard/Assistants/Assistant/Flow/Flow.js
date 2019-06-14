@@ -8,7 +8,7 @@ import connect from "react-redux/es/connect/connect";
 import styles from "./Flow.module.less"
 import {Button, Modal, Spin} from "antd";
 import shortid from 'shortid';
-import {deepClone, destroyMessage, successMessage} from "helpers";
+import {deepClone, successMessage} from "helpers";
 
 const confirm = Modal.confirm;
 
@@ -19,7 +19,6 @@ class Flow extends Component {
         currentGroup: {blocks: []},
         assistant: {Flow: {groups: []}},
         assistantToolsBlockVisible: false,
-
     };
 
 
@@ -30,21 +29,6 @@ class Flow extends Component {
                 this.selectGroup(this.state.assistant.Flow.groups[0])
         })
     }
-
-    componentWillReceiveProps(nextProps) {
-        if (nextProps.assistant.ID !== this.props.assistant.ID) {
-            if (nextProps.assistant?.Flow?.groups.length)
-                this.selectGroup(nextProps.assistant.Flow.groups[0]);
-            else {
-                nextProps.assistant.Flow = {groups: []};
-                this.setState({
-                    currentGroup: {blocks: []},
-                    assistant: nextProps.assistant
-                });
-            }
-        }
-    }
-
 
     getUpdatableState = () => {
         const {assistant, currentGroup} = this.state;
@@ -76,7 +60,7 @@ class Flow extends Component {
             currentGroup: newGroup,
         });
 
-        destroyMessage();
+        this.props.setIsFlowSaved(false);
         successMessage('Group added!');
     };
 

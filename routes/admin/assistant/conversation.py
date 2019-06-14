@@ -63,7 +63,7 @@ def conversation_file_uploads(assistantID, filename):
     # Security procedure ->
     # the id of the Conversation is included in the name of the file after "_" symbol, but encrypted
     try:
-        id = helpers.decode_id(filename[filename.index('_') + 1:filename.index('.')])[0]
+        id = helpers.decodeID(filename[filename.index('_') + 1:filename.index('.')])[0]
         if not id: raise Exception
     except Exception as exc:
         return helpers.jsonResponse(False, 404, "File not found.")

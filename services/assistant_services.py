@@ -46,7 +46,7 @@ def create(name, desc, welcomeMessage, topBarText, companyID) -> Assistant or No
 # ----- Getters ----- #
 def getByHashID(hashID):
     try:
-        assistantID = helpers.decode_id(hashID)
+        assistantID = helpers.decodeID(hashID)
         if len(assistantID) == 0:
             return Callback(False, "Assistant not found!", None)
 
@@ -297,7 +297,7 @@ def uploadLogo(assistantID, file, companyID):
         if not assistant: raise Exception
 
         # Generate unique name: hash_sessionIDEncrypted.extension
-        filename = helpers.encode_id(assistant.ID) + '.' + \
+        filename = helpers.encodeID(assistant.ID) + '.' + \
                    secure_filename(file.filename).rsplit('.', 1)[1].lower()
         assistant.LogoName = filename
 

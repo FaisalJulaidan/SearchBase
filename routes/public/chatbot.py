@@ -68,7 +68,7 @@ def getSolutions_forChatbot(assistantHashID):
 
 @chatbot_router.route("/assistant/<string:assistantIDAsHash>/session/<int:sessionID>/file", methods=['POST'])
 def chatbot_upload_files(assistantIDAsHash, sessionID):
-    callback: Callback = conversation_services.getByID(sessionID, helpers.decode_id(assistantIDAsHash)[0])
+    callback: Callback = conversation_services.getByID(sessionID, helpers.decodeID(assistantIDAsHash)[0])
     if not callback.Success:
         return helpers.jsonResponse(False, 404, "Session not found.", None)
     session: Conversation = callback.Data
@@ -85,7 +85,7 @@ def chatbot_upload_files(assistantIDAsHash, sessionID):
                     return helpers.jsonResponse(False, 404, "No selected file")
 
                 # Generate unique name: hash_sessionIDEncrypted.extension
-                filename = str(uuid.uuid4()) + '_' + helpers.encode_id(sessionID) + '.' + \
+                filename = str(uuid.uuid4()) + '_' + helpers.encodeID(sessionID) + '.' + \
                            secure_filename(file.filename).rsplit('.', 1)[1].lower()
 
                 mail_services.notifyNewConversation(callback.Data.Assistant, callback.Data, file)

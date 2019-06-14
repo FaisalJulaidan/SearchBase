@@ -16,11 +16,13 @@ def reset_password():
         if not email:
             return helpers.jsonResponse(False, 400, "Provide your email")
 
-        company_callback: Callback = company_services.getByEmail(email)
-        if not company_callback.Success:
-            return helpers.jsonResponse(False, 400, company_callback.Message)
+        # Check if user exists
+        user_callback: Callback = user_services.getByEmail(email)
+        if not user_callback.Success:
+            return helpers.jsonResponse(False, 400, user_callback.Message)
 
-        mail_callback: Callback = mail_services.sendPasswordResetEmail(email, company_callback.Data.ID)
+        # Send a reset password email . The email will contain a token that has the email encrypted in it
+        mail_callback: Callback = mail_services.sendPasswordResetEmail(email, user_callback.Data.ID)
         if not mail_callback.Success:
             return helpers.jsonResponse(False, 400, mail_callback.Message)
 
@@ -30,15 +32,16 @@ def reset_password():
 @resetPassword_router.route("/reset_password/<payload>", methods=['POST'])
 def reset_password_verify(payload):
     if request.method == "POST":
-
         try:
             data = helpers.verificationSigner.loads(payload, salt='reset-pass-key', max_age=1800)  # expires in 30mins
             email = data.split(";")[0].lower()
             password = request.json.get("password", None)
 
+            # Check if password exist
             if not password:
                 return helpers.jsonResponse(False, 400, "Server did not manage to receive your new password")
 
+            # Update password using the email included in the token (payload)
             resetPassword_callback: Callback = user_services.updatePasswordByEmail(email, password)
             if not resetPassword_callback.Success:
                 return helpers.jsonResponse(False, 400, resetPassword_callback.Message)

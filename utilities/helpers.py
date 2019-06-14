@@ -35,13 +35,25 @@ logging.basicConfig(filename='logs/errors.log',
 fernet = Fernet(os.environ['SECRET_KEY_TEMP'])
 
 
+
+# Get domain based on current environment
+def getDomain():
+    if os.environ['FLASK_ENV'] == 'development':
+        return 'localhost:3000'
+    elif os.environ['FLASK_ENV'] == 'staging':
+        return 'http://staging.thesearchbase.com'
+    elif os.environ['FLASK_ENV'] == 'production':
+        return 'http://thesearchbase.com'
+    return None
+
+
 # ID Hasher
 # IMPORTANT: don't you ever make changes to the hash values before consulting Faisal Julaidan
 hashids = Hashids(salt=BaseConfig.HASH_IDS_SALT, min_length=5)
-def encode_id(id):
+def encodeID(id):
     return hashids.encrypt(id)
 
-def decode_id(id):
+def decodeID(id):
     return hashids.decrypt(id)
 
 # Encryptors

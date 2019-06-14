@@ -129,7 +129,7 @@ def uploadLogo(file, companyID):
         if not company: raise Exception
 
         # Generate unique name: hash_sessionIDEncrypted.extension
-        filename = helpers.encode_id(companyID) + '.' + \
+        filename = helpers.encodeID(companyID) + '.' + \
                    secure_filename(file.filename).rsplit('.', 1)[1].lower()
         company.LogoPath = filename
 

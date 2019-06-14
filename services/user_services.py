@@ -236,7 +236,7 @@ def updateUser(firstname, surname, newEmail, userID):
         return Callback(False, "User could not be updated")
 
 
-def changePasswordByID(userID, newPassword, oldPassword=None):
+def updatePasswordByID(userID, newPassword, oldPassword=None):
     try:
         result: User = db.session.query(User).filter(User.ID == userID).first()
         if not result:

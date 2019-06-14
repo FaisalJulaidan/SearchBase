@@ -81,7 +81,7 @@ def sendVerificationEmail(email, companyName) -> Callback:
     try:
 
         payload = email + ";" + companyName
-        link = "https://www.thesearchbase.com/account/verify/" + \
+        link = helpers.getDomain() + "/account/verify/" + \
                helpers.verificationSigner.dumps(payload, salt='email-confirm-key')
 
         send_email((email), 'Account verification',
@@ -94,11 +94,11 @@ def sendVerificationEmail(email, companyName) -> Callback:
         return Callback(False, 'Could not send a verification email to ' + email)
 
 
-def sendPasswordResetEmail(email, companyID):
+def sendPasswordResetEmail(email, userID):
     try:
 
-        payload = email + ";" + str(companyID)
-        link = "https://www.thesearchbase.com/reset_password/" + \
+        payload = email + ";" + str(userID)
+        link = helpers.getDomain() + "/reset_password/" + \
                helpers.verificationSigner.dumps(payload, salt='reset-pass-key')
 
         send_email((email), 'Password reset',
@@ -126,7 +126,7 @@ def sendNewUserHasRegistered(name, email, companyName, tel):
 
 def addedNewUserEmail(adminEmail, targetEmail, password):
     try:
-        link = "https://www.thesearchbase.com/admin/changepassword"
+        link = helpers.getDomain() + "/admin/changepassword"
 
         send_email((targetEmail), 'You have been added to TheSearchBase',
                    'emails/account_invitation.html', password=password, adminEmail=adminEmail)

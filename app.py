@@ -10,6 +10,7 @@ from flask_migrate import Migrate, MigrateCommand
 from sqlalchemy_utils import create_database, database_exists
 from services.auth_services import jwt
 from utilities import helpers, tasks
+from authlib.flask.client import OAuth
 from flask_babel import Babel
 # from services import scheduler_services
 
@@ -68,6 +69,7 @@ db.app = app
 migrate_var = Migrate(app, db)
 manager = Manager(app)
 babel = Babel(app)
+oauth = OAuth()
 # scheduler = APScheduler()
 manager.add_command('db', MigrateCommand)
 
@@ -87,6 +89,7 @@ if os.environ['FLASK_ENV'] in ['production', 'staging']:
     jwt.init_app(app)
     db.init_app(app)
     mail.init_app(app)
+    oauth.init_app(app)
     app.app_context().push()
 
     if not database_exists(url):

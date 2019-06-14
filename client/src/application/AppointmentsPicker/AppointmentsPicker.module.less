@@ -1,7 +1,6 @@
 .Wrapper {
-  height: calc(100% - 80px);
+  min-height: calc(100% - 80px);
   background: #F4F6FC;
-  padding: 0 100px;
 }
 
 .Container {
@@ -28,6 +27,7 @@
 }
 
 .Table {
+  width: 100%;
   padding: 10px;
   background: #fff;
   border-radius: 5px;
@@ -37,17 +37,24 @@
 }
 
 .TableContent {
-  display: flex;
-
+  width: 100%;
+  display: inline-flex;
 }
 
-.TableContent > div {
-  width: 130px;
+
+.Columns {
+  display: inline-flex;
+  width: calc(100% - 68px);
   text-align: center;
 }
 
-.TableContent > div button {
+.Columns > div {
+  width: 14.2857142857%;
+}
+
+.Columns button {
   margin: 10px 0;
+  padding: 0;
 }
 
 .Header {
@@ -60,5 +67,5 @@
 }
 
 .NavigateButtons {
-  margin: 10px;
+  margin-top: 10px;
 }

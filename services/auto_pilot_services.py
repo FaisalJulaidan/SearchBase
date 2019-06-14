@@ -1,5 +1,5 @@
 from sqlalchemy import and_
-from models import db, Callback, AutoPilot, OpenTimeSlot, Conversation
+from models import db, Callback, AutoPilot, OpenTimes, Conversation
 from datetime import datetime, time
 import logging
 from utilities import helpers
@@ -40,6 +40,29 @@ def processConversation(conversation: Conversation, autoPilot: AutoPilot):
                     if callback.Success:
                         result['acceptanceEmailSentAt'] = datetime.now()
 
+
+                    # Process candidates appointment email if score is accepted
+                    if AutoPilot.SendCandidatesAppointments:
+                        payload = str(conversation.ID) + ";" +\
+                                  str(conversation.Assistant.ID) + ";" +\
+                                  str(autoPilot.CompanyID) + ";" +\
+                                  name
+
+                        callback: Callback = mail_services.send_email(
+                            email,
+                            'Appointment',
+                            '/emails/appointment_letter.html',
+                            companyName=autoPilot.Company.Name,
+                            logoPath=logoPath,
+                            userName=name,
+                            appointmentLink=helpers.getDomain() + "/appointments_picker/" + \
+                                                helpers.verificationSigner.dumps(payload, salt='appointment-key')
+                        )
+
+                        if callback.Success:
+                            result['appointmentEmailSentAt'] = datetime.now()
+
+
                 # Send Rejection Letters
                 elif status is ApplicationStatus.Rejected and AutoPilot.SendRejectionEmail:
                     callback: Callback = mail_services.send_email(
@@ -53,9 +76,7 @@ def processConversation(conversation: Conversation, autoPilot: AutoPilot):
                     if callback.Success:
                         result['rejectionEmailSentAt'] = datetime.now()
 
-                # Process candidates appointment email if score is accepted
-                elif status is ApplicationStatus.Rejected and AutoPilot.SendCandidatesAppointments:
-                    pass
+
 
             # Get application status
             result['applicationStatus'] = __getApplicationResult(conversation.Score, autoPilot)
@@ -83,13 +104,13 @@ def create(name, desc, companyID: int) -> Callback:
 
         # Create the AutoPilot with default open time slots
         default = {"From": time(8,30), "To": time(12,0), "Duration": 30, "AutoPilot": autoPilot, "Active": False}
-        openTimeSlots = [OpenTimeSlot(Day=0, **default), # Monday
-                         OpenTimeSlot(Day=1, **default),
-                         OpenTimeSlot(Day=2, **default),
-                         OpenTimeSlot(Day=3, **default),
-                         OpenTimeSlot(Day=4, **default),
-                         OpenTimeSlot(Day=5, **default),
-                         OpenTimeSlot(Day=6, **default), # Sunday
+        openTimeSlots = [OpenTimes(Day=0, **default),  # Monday
+                         OpenTimes(Day=1, **default),
+                         OpenTimes(Day=2, **default),
+                         OpenTimes(Day=3, **default),
+                         OpenTimes(Day=4, **default),
+                         OpenTimes(Day=5, **default),
+                         OpenTimes(Day=6, **default),  # Sunday
                          ]
         db.session.add_all(openTimeSlots)
         db.session.commit()
@@ -118,6 +139,7 @@ def getByID(id: int, companyID: int) -> Callback:
         return Callback(False, 'Could not get the AutoPilot.')
 
 
+# Get the list of autoPilots
 def fetchAll(companyID) -> Callback:
     try:
 

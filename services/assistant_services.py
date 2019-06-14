@@ -1,12 +1,13 @@
-from models import db, Assistant, Callback
+from models import db, Assistant, Callback, Appointment, AutoPilot
 from sqlalchemy import and_
 from utilities import helpers, json_schemas
 from services.CRM import crm_services
 from os.path import join
 from config import BaseConfig
-from services import flow_services, stored_file_services, auto_pilot_services
+from services import flow_services, stored_file_services, auto_pilot_services, conversation_services
 from jsonschema import validate
 from werkzeug.utils import secure_filename
+from datetime import datetime
 import logging, json
 
 
@@ -34,13 +35,36 @@ def create(name, desc, welcomeMessage, topBarText, companyID) -> Assistant or No
 
         db.session.add(assistant)
         db.session.commit()
-
         return Callback(True, 'Assistant created successfully', assistant)
+
     except Exception as exc:
         print(exc)
         logging.error("assistant_services.create(): " + str(exc))
         db.session.rollback()
         return Callback(False, 'Failed to create the assistant', None)
+
+
+def addAppointment(conversationID, assistantID, dateTime):
+    try:
+        callback: Callback = conversation_services.getByID(conversationID, assistantID)
+        if not callback.Success: raise Exception("conversation does not exist anymore")
+
+        db.session.add(
+            Appointment(
+            DateTime=datetime.strptime(dateTime, "%Y-%m-%d %H:%M"),
+            AssistantID= assistantID,
+            ConversationID= conversationID
+            )
+        )
+
+        db.session.commit()
+        return Callback(True, 'Appointment added successfully.')
+
+    except Exception as exc:
+        print("addAppointment() ERROR:" + str(exc))
+        logging.error("assistant_services.addAppointment(): " + str(exc))
+        db.session.rollback()
+        return Callback(False, "Couldn't add the appointment")
 
 
 # ----- Getters ----- #
@@ -79,12 +103,11 @@ def getByID(id: int, companyID: int) -> Callback:
 def getByName(name) -> Callback:
     try:
         # Get result and check if None then raise exception
-        result = db.session.query(Assistant).filter(Assistant.Name == name).first()
-        if not result: raise Exception
+        assistant: Assistant = db.session.query(Assistant).filter(Assistant.Name == name).first()
+        if not assistant: raise Exception
 
-        return Callback(True,
-                        "Got assistant by nickname successfully.",
-                        result)
+        return Callback(True, "Got assistant by nickname successfully.", assistant)
+
     except Exception as exc:
         print(exc)
         logging.error("assistant_services.getByName(): " + str(exc))
@@ -132,6 +155,28 @@ def getAllWithEnabledNotifications(companyID) -> Callback:
         db.session.rollback()
         return Callback(False, 'Could not get all assistants.')
 
+
+# Return the openTimes from the autoPilot connected to this assistant
+def getOpenTimes(assistantID) -> Callback:
+    try:
+        # Get assistant and check if None then raise exception
+        assistant: Assistant = db.session.query(Assistant).filter(Assistant.ID == assistantID).first()
+        if not assistant: raise Exception
+
+        connectedAutoPilot: AutoPilot = assistant.AutoPilot
+
+        # If the assistant is not connected to an autoPilot then return an empty array which means no open times
+        if not connectedAutoPilot:
+            return Callback(True,"There are no open time slots", None)
+
+        # OpenTimes is an array of all open slots per day
+        return Callback(True,"Got open time slots successfully.", connectedAutoPilot.OpenTimes)
+
+    except Exception as exc:
+        print(exc)
+        logging.error("assistant_services.getOpenTimes(): " + str(exc))
+        db.session.rollback()
+        return Callback(False, 'Could not get the open times for this assistant.')
 
 # ----- Updaters ----- #
 def update(id, name, desc, message, topBarText, companyID)-> Callback:

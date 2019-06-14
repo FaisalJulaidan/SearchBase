@@ -41,6 +41,9 @@ def forget_password():
 def reset_password(payload):
     return serve()
 
+@public_router.route('/appointments_picker/<payload>')
+def appointments_picker(payload):
+    return serve()
 
 @public_router.route('/dashboard', defaults={'path': ''})
 @public_router.route('/dashboard/<path:path>')

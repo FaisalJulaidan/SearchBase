@@ -17,6 +17,10 @@ from utilities import json_schemas, helpers
 # Process chatbot conversation data
 def processConversation(assistantHashID, data: dict) -> Callback:
     try:
+
+        if data['score'] > 1:
+            raise Exception("Score is corrupted")
+
         callback: Callback = assistant_services.getByHashID(assistantHashID)
         if not callback.Success:
             return Callback(False, "Assistant not found!")
@@ -30,6 +34,7 @@ def processConversation(assistantHashID, data: dict) -> Callback:
                 'databaseType': solution.get('databaseType')['enumName']
             })
 
+        # collectedData is an array
         collectedData = data['collectedData']
         conversationData = {
             'collectedData': collectedData,
@@ -39,10 +44,9 @@ def processConversation(assistantHashID, data: dict) -> Callback:
 
         # Validate submitted conversation after adding the modified version of selected solutions
         validate(conversationData, json_schemas.conversation)
-        if data['score'] > 1:
-            raise Exception("Score is corrupted")
 
-        # collectedData is an array, and timeSpent is in seconds.
+
+        # timeSpent is in seconds.
         conversation = Conversation(Data=conversationData,
                                     TimeSpent=data['timeSpent'],
                                     Completed=data['isConversationCompleted'],

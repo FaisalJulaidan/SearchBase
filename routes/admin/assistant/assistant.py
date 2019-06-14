@@ -22,8 +22,12 @@ def assistants():
             return helpers.jsonResponse(False, 404, "Cannot fetch Assistants")
         return helpers.jsonResponse(True, 200,
                                     "Assistants Returned!",
-                                    {"assistants": helpers.getDictFromLimitedQuery(['ID','Name', 'Description',
-                                                                                    'Message','TopBarText', 'Active'],
+                                    {"assistants": helpers.getDictFromLimitedQuery(['ID',
+                                                                                    'Name',
+                                                                                    'Description',
+                                                                                    'Message',
+                                                                                    'TopBarText',
+                                                                                    'Active'],
                                                                                    callback.Data)})
     if request.method == "POST":
         data = request.json

@@ -1,11 +1,10 @@
-from datetime import datetime, timedelta
+from datetime import datetime
 from flask_jwt_extended import JWTManager, create_access_token, get_jwt_identity, create_refresh_token
 from models import Callback, User, db
 from services import user_services, role_services, sub_services, company_services, mail_services
 from utilities import helpers
 from config import BaseConfig
 import logging
-
 
 
 jwt = JWTManager()
@@ -86,19 +85,16 @@ def authenticate(email: str, password_to_check: str) -> Callback:
     try:
         # Login Exception Handling
         if not (email or password_to_check):
-            print("Invalid request: Email or password not received!")
             return Callback(False, "Email or password not received. Please try again!")
 
         user_callback: Callback = user_services.getByEmail(email.lower())
         # If user is not found
         if not user_callback.Success:
-            print("Invalid request: Email not found")
             return Callback(False, "Record with the current email or password was not found")
 
         # Get the user from the callback object
         user: User = user_callback.Data
         if not password_to_check == user.Password:
-            print("Invalid request: Incorrect Password")
             return Callback(False, "Record with the current email or password was not found")
 
         if not user.Verified:
@@ -110,7 +106,7 @@ def authenticate(email: str, password_to_check: str) -> Callback:
                          "username": user.Firstname + ' ' + user.Surname,
                          "lastAccess": user.LastAccess,
                          "phoneNumber": user.PhoneNumber,
-                         "plan": helpers.getPlanNickname(user.Company.SubID),
+                         # "plan": helpers.getPlanNickname(user.Company.SubID),
                          }
                 }
 

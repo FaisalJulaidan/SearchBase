@@ -34,7 +34,6 @@ class Assistant extends Component {
     firstHead = null;
 
     componentWillMount() {
-        this.firstHead = [...document.head.children];
         this.props.dispatch(assistantActions.fetchAssistant(this.props.match.params.id))
             .then(() => {
             }).catch(() => history.push(`/dashboard/assistants`));
@@ -51,6 +50,15 @@ class Assistant extends Component {
         }
     }
 
+    componentDidMount() {
+        setTimeout(() => {
+            this.firstHead = [...document.head.children];
+            console.log(this.firstHead)
+        }, 1000)
+    }
+     componentWillUnmount() {
+        this.removeChatbot()
+     }
 
     onScriptTabChanges = () => {
         if (!this.state.isFlowSaved)
@@ -77,6 +85,7 @@ class Assistant extends Component {
     };
 
     onTabClick = (key, e) => {
+        // this.firstHead = [...document.head.children];
         if (this.state.activeTab !== key)
             this.removeChatbot();
 

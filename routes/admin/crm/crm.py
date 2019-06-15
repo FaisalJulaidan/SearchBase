@@ -3,7 +3,8 @@ import logging
 from flask import Blueprint, request
 from flask_jwt_extended import jwt_required, get_jwt_identity
 
-import json
+import requests
+import os
 from models import Callback, Calendar, db
 import enums
 from services.CRM import crm_services, Bullhorn, Google
@@ -111,13 +112,31 @@ def crm_callback():
 @crm_router.route("/calendar/google/authorize", methods=['GET', 'POST'])
 # @jwt_required
 def calendar_auth():
-    r = request.get_json()
+    params = request.get_json()
     try:
-        new = Calendar(Auth=r['code'], Type=enums.Calendar.Google, CompanyID=2)
-        db.session.add(new)
-        db.session.commit()
+        resp = requests.post("https://oauth2.googleapis.com/token",
+                        data={
+                            'code': params['code'],
+                            'client_secret': os.environ['GOOGLE_CALENDAR_CLIENT_SECRET'],
+                            'client_id': os.environ['GOOGLE_CALENDAR_CLIENT_ID'],
+                            'redirect_uri': os.environ['GOOGLE_CALENDAR_REDIRECT_URI'],
+                            'grant_type': 'authorization_code'
+                        })
+        print(resp.text)
+        if 'error' in resp.json():
+            raise Exception(resp.json()['error_description'])
+
+        # new = Calendar(Auth=r['code'], Type=enums.Calendar.Google, CompanyID=2)
+        # db.session.add(new)
+        # db.session.commit()
     except Exception as e:
         print(e)
     return '123'
+
+#probably remove this later on, just for consistency
+@crm_router.route("/calendar/google/getRedirectURI", methods=['GET'])
+def get_redirect_uri():
+    return os.environ['GOOGLE_CALENDAR_REDIRECT_URI']
+
 
 

@@ -74,10 +74,6 @@ babel = "*"
 self = "*"
 boto3 = "*"
 geoip2 = "*"
-authlib = "*"
-google-api-python-client = "*"
-oauth2client = "*"
-google-auth-oauthlib = "*"
 
 [requires]
 python_version = "3.7"

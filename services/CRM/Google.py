@@ -1,4 +1,5 @@
-from models import Callback
+from models import Callback, Calendar, db
+import enums
 import requests
 import os
 
@@ -17,11 +18,12 @@ def authorizeUser(code):
                              })
         if 'error' in resp.json():
             raise Exception(resp.json()['error_description'])
-
-        # new = Calendar(Auth=r['code'], Type=enums.Calendar.Google, CompanyID=2)
-        # db.session.add(new)
-        # db.session.commit()
+        if 'refresh_token' not in resp.json():
+            raise Exception("Please go to https://myaccount.google.com/permissions and reset permissions with our app, then try again")
+        #need to get company id automatically
+        new = Calendar(Auth=resp.json()['refresh_token'], Type=enums.Calendar.Google, CompanyID=2)
+        db.session.add(new)
+        db.session.commit()
+        return Callback(True, 'User authorized succesfully')
     except Exception as e:
-        print(e)
-    return '123'
-
+        return Callback(False, str(e))

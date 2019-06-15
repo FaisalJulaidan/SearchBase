@@ -1,10 +1,7 @@
-import logging
-
 from flask import Blueprint, request
 from flask_jwt_extended import jwt_required, get_jwt_identity
 
-from models import Callback, Calendar, db
-import enums
+from models import Callback
 from services.CRM import crm_services, Bullhorn, Google
 from utilities import helpers
 
@@ -115,7 +112,7 @@ def calendar_auth():
     if not callback.Success:
         return helpers.jsonResponse(False, 400, callback.Message)
 
-    return helpers.jsonResponse(True, 200, callback.Message, callback.Data)
+    return helpers.jsonResponse(True, 200, callback.Message)
 
 
 

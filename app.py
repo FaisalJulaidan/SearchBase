@@ -10,7 +10,6 @@ from flask_migrate import Migrate, MigrateCommand
 from sqlalchemy_utils import create_database, database_exists
 from services.auth_services import jwt
 from utilities import helpers, tasks
-from authlib.flask.client import OAuth
 from flask_babel import Babel
 # from services import scheduler_services
 

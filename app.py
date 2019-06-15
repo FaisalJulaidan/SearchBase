@@ -117,6 +117,21 @@ elif os.environ['FLASK_ENV'] == 'development':
         db.create_all()
         dummy_data.generate()
 
+    # payload = str(5) + ";" + str(1) + ";" + str(1) + ";"  + "Faisal Jul"
+    # mail_services.send_email(
+    #     "Julaidan.faisal@gmail.com",
+    #     'Appointment',
+    #     '/emails/appointment_letter.html',
+    #     companyName="Company Name",
+    #     logoPath="f",
+    #     userName="Faisal Jula",
+    #     appointmentLink=helpers.getDomain() + "/appointments_picker/" + \
+    #                     helpers.verificationSigner.dumps(payload, salt='appointment-key')
+    # )
+
+    # a = datetime.strptime("2019-12-14 16:08", "%Y-%m-%d %H:%M")
+    # print(a)
+
 
     print('Development mode running...')
 

@@ -120,7 +120,7 @@ class UploadModal extends Component {
     prev = () => this.setState({current: this.state.current - 1});
 
     submitDatabase = () => {
-        this.props.hideNewAssistantModal();
+        this.props.hideModal();
         const {validRecords, databaseConfiguration} = this.state;
         if (validRecords) {
             this.props.uploadDatabase({...databaseConfiguration, records: validRecords});
@@ -152,8 +152,8 @@ class UploadModal extends Component {
         return (
             <Modal width={"80%"}
                    title="Upload New Database"
-                   visible={this.props.newAutoPilotModalVisible}
-                   onCancel={this.props.hideNewAssistantModal}
+                   visible={this.props.visible}
+                   onCancel={this.props.hideModal}
                    destroyOnClose={true}
                    footer={null}>
                 <Spin spinning={this.state.isFileUploading} tip="Reading Excel File">

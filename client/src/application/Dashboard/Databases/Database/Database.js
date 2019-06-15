@@ -3,7 +3,7 @@ import {connect} from 'react-redux';
 import styles from "./Database.module.less";
 import NoHeaderPanel from 'components/NoHeaderPanel/NoHeaderPanel'
 import {databaseActions} from "store/actions";
-import {Form, Table, Typography} from 'antd';
+import {Form, Table, Typography, Spin, Breadcrumb} from 'antd';
 import {history} from "helpers";
 import {store} from "store/store";
 
@@ -51,34 +51,48 @@ class Database extends React.Component {
         const {databaseContent, databaseInfo} = this.props.database;
         return (
             <>
-                <NoHeaderPanel>
-                    <div className={styles.Title}>
-                        <div className={styles.Details}>
-                            <Title>{databaseInfo?.Name} ({databaseInfo?.Type.name})</Title>
-                            <Paragraph type="secondary">
-                                View Your database content
-                            </Paragraph>
-                        </div>
-                    </div>
+                {this.props.isLoading ? <Spin/> :
+                    <NoHeaderPanel>
+                        <div className={styles.Header}>
+                            <div style={{marginBottom: 20}}>
+                                <Breadcrumb>
+                                    <Breadcrumb.Item>
+                                        <a href={"javascript:void(0);"}
+                                           onClick={() => history.push('/dashboard/databases')}>
+                                            Databases
+                                        </a>
+                                    </Breadcrumb.Item>
+                                    <Breadcrumb.Item>{databaseInfo?.Name}</Breadcrumb.Item>
+                                </Breadcrumb>
+                            </div>
 
-                    <div className={styles.Body}>
-                        <Table className={styles.Table}
-                               columns={this.getColumnsByType(databaseInfo?.Type.name)}
-                               rowKey={record => record.ID}
-                               dataSource={databaseContent?.records}
-                               size='large'
-                               bordered={true}
-                               loading={this.props.isLoadingDatabase}
-                               pagination={{
-                                   pageSize: databaseContent?.totalPerPage,
-                                   current: this.state.currentPage,
-                                   total:databaseContent?.totalItems,
-                                   position:"both",
-                               }}
-                               onChange={(p)=> this.fetchDatabase(p.current)}
-                        />
-                    </div>
-                </NoHeaderPanel>
+                            <div className={styles.Title}>
+                                <Title>{databaseInfo?.Name} ({databaseInfo?.Type.name})</Title>
+                                <Paragraph type="secondary">
+                                    View Your database content
+                                </Paragraph>
+                            </div>
+                        </div>
+
+                        <div className={styles.Body}>
+                            <Table className={styles.Table}
+                                   columns={this.getColumnsByType(databaseInfo?.Type.name)}
+                                   rowKey={record => record.ID}
+                                   dataSource={databaseContent?.records}
+                                   size='large'
+                                   bordered={true}
+                                   loading={this.props.isLoading}
+                                   pagination={{
+                                       pageSize: databaseContent?.totalPerPage,
+                                       current: this.state.currentPage,
+                                       total:databaseContent?.totalItems,
+                                       position:"both",
+                                   }}
+                                   onChange={(p)=> this.fetchDatabase(p.current)}
+                            />
+                        </div>
+                    </NoHeaderPanel>}
+
             </>
         )
     }
@@ -88,7 +102,7 @@ function mapStateToProps(state) {
     return {
         databasesList: state.database.databasesList,
         database: state.database.fetchedDatabase,
-        isLoadingDatabase: state.database.isLoading,
+        isLoading: state.database.isLoading,
         options: state.options.options,
     };
 }
@@ -106,62 +120,62 @@ const CandidateColumns = [{
     title: 'Name',
     key: 'CandidateName',
     dataIndex: 'CandidateName',
-    render: (text, record, index) => (<p>{record.CandidateName || "--"}</p>),
+    render: (text, record, index) => (<p>{record.CandidateName}</p>),
 }, {
     title: 'Email',
     key: 'CandidateEmail',
     dataIndex: 'CandidateEmail',
-    render: (text, record, index) => (<p>{record.CandidateEmail || "--"}</p>),
+    render: (text, record, index) => (<p>{record.CandidateEmail}</p>),
 }, {
     title: 'Mobile',
     key: 'CandidateMobile',
     dataIndex: 'CandidateMobile',
-    render: (text, record, index) => (<p>{record.CandidateMobile || "--"}</p>),
+    render: (text, record, index) => (<p>{record.CandidateMobile}</p>),
 } , {
     title: 'Location',
     key: 'Location',
     dataIndex: 'Location',
-    render: (text, record, index) => (<p>{record.CandidateLocation || "--"}</p>),
+    render: (text, record, index) => (<p>{record.CandidateLocation}</p>),
 } , {
     title: 'Skills',
     key: 'CandidateSkills',
     dataIndex: 'CandidateSkills',
-    render: (text, record, index) => (<p>{record.CandidateSkills || "--"}</p>),
+    render: (text, record, index) => (<p>{record.CandidateSkills}</p>),
 } , {
     title: 'Linkdin URL',
     key: 'CandidateLinkdinURL',
     dataIndex: 'CandidateLinkdinURL',
-    render: (text, record, index) => (<p>{record.CandidateLinkdinURL || "--"}</p>),
+    render: (text, record, index) => (<p>{record.CandidateLinkdinURL}</p>),
 }, {
     title: 'Availability',
     key: 'CandidateAvailability',
     dataIndex: 'CandidateAvailability',
-    render: (text, record, index) => (<p>{record.CandidateAvailability || "--"}</p>),
+    render: (text, record, index) => (<p>{record.CandidateAvailability}</p>),
 }, {
     title: 'Job Title',
     key: 'CandidateJobTitle',
     dataIndex: 'CandidateJobTitle',
-    render: (text, record, index) => (<p>{record.CandidateJobTitle || "--"}</p>),
+    render: (text, record, index) => (<p>{record.CandidateJobTitle}</p>),
 }, {
     title: 'Education',
     key: 'CandidateEducation',
     dataIndex: 'CandidateEducation',
-    render: (text, record, index) => (<p>{record.CandidateEducation || "--"}</p>),
+    render: (text, record, index) => (<p>{record.CandidateEducation}</p>),
 }, {
     title: 'Years Of Experience',
     key: 'CandidateYearsExperience',
     dataIndex: 'CandidateYearsExperience',
-    render: (text, record, index) => (<p>{record.CandidateYearsExperience || "--"}</p>),
+    render: (text, record, index) => (<p>{record.CandidateYearsExperience}</p>),
 }, {
     title: 'Desired Salary',
     key: 'CandidateDesiredSalary',
     dataIndex: 'CandidateDesiredSalary',
-    render: (text, record, index) => (<p>{record.CandidateDesiredSalary || "--"}</p>),
+    render: (text, record, index) => (<p>{record.CandidateDesiredSalary}</p>),
 }, {
     title: 'Currency',
     key: 'Currency',
     dataIndex: 'Currency',
-    render: (text, record, index) => (<p>{record.Currency || "--"}</p>),
+    render: (text, record, index) => (<p>{record.Currency}</p>),
 }];
 
 // Job Columns
@@ -172,53 +186,53 @@ const JobColumns = [{
 },{
     title: 'Job Title',
     key: 'JobTitle',
-    render: (text, record, index) => (<p>{record.JobTitle || "--"}</p>),
+    render: (text, record, index) => (<p>{record.JobTitle}</p>),
 }, {
     title: 'Description',
     key: 'JobDescription',
-    render: (text, record, index) => (<p>{record.JobDescription || "--"}</p>),
+    render: (text, record, index) => (<p>{record.JobDescription}</p>),
 }, {
     title: 'Location',
     key: 'JobLocation',
-    render: (text, record, index) => (<p>{record.JobLocation || "--"}</p>),
+    render: (text, record, index) => (<p>{record.JobLocation}</p>),
 } , {
     title: 'Type',
     key: 'JobType',
-    render: (text, record, index) => (<p>{record.JobType || "--"}</p>),
+    render: (text, record, index) => (<p>{record.JobType}</p>),
 } , {
     title: 'Salary',
     key: 'JobSalary',
-    render: (text, record, index) => (<p>{record.JobSalary || "--"}</p>),
+    render: (text, record, index) => (<p>{record.JobSalary}</p>),
 } , {
     title: 'Currency',
     key: 'Currency',
-    render: (text, record, index) => (<p>{record.Currency || "--"}</p>),
+    render: (text, record, index) => (<p>{record.Currency}</p>),
 }, {
     title: 'Essential Skills',
     key: 'JobEssentialSkills',
-    render: (text, record, index) => (<p>{record.JobEssentialSkills || "--"}</p>),
+    render: (text, record, index) => (<p>{record.JobEssentialSkills}</p>),
 }, {
     title: 'Desired Skills',
     key: 'JobDesiredSkills',
-    render: (text, record, index) => (<p>{record.JobDesiredSkills || "--"}</p>),
+    render: (text, record, index) => (<p>{record.JobDesiredSkills}</p>),
 }, {
     title: 'Education',
     key: 'CandidateEducation',
-    render: (text, record, index) => (<p>{record.CandidateEducation || "--"}</p>),
+    render: (text, record, index) => (<p>{record.CandidateEducation}</p>),
 }, {
     title: 'Years Required',
     key: 'JobYearsRequired',
-    render: (text, record, index) => (<p>{record.JobYearsRequired || "--"}</p>),
+    render: (text, record, index) => (<p>{record.JobYearsRequired}</p>),
 }, {
     title: 'Start Date',
     key: 'JobStartDate',
-    render: (text, record, index) => (<p>{record.JobStartDate || "--"}</p>),
+    render: (text, record, index) => (<p>{record.JobStartDate}</p>),
 }, {
     title: 'End Date',
     key: 'JobEndDate',
-    render: (text, record, index) => (<p>{record.JobEndDate || "--"}</p>),
+    render: (text, record, index) => (<p>{record.JobEndDate}</p>),
 }, {
     title: 'Job URL',
     key: 'JobLinkURL',
-    render: (text, record, index) => (<p>{record.JobLinkURL || "--"}</p>),
+    render: (text, record, index) => (<p>{record.JobLinkURL}</p>),
 }];

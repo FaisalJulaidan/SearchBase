@@ -9,6 +9,7 @@ import {options} from "./options.reducer";
 import {crm} from "./crm.reducer";
 import {analytics} from './analytics.reducer'
 import {autoPilot} from "./autoPilot.reducer";
+import {appointmentsPicker} from "./appointmentsPicker.reducer";
 import * as actionTypes from '../actions/actionTypes';
 import storage from 'redux-persist/lib/storage'
 
@@ -23,7 +24,8 @@ const appReducer = combineReducers({
     usersManagement,
     database,
     options,
-    analytics
+    analytics,
+    appointmentsPicker
 });
 
 const rootReducer = (state, action) => {

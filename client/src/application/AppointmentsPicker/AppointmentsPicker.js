@@ -20,7 +20,7 @@ class AppointmentsPicker extends React.Component {
         firstDate: moment(),
     };
 
-    firstDateAfter4weeks = moment().add(3, 'weeks');
+    firstDateAfter4weeks = moment().add(28, 'day');
 
     componentDidMount() {
         this.updateWindowDimensions();
@@ -35,20 +35,7 @@ class AppointmentsPicker extends React.Component {
         this.setState({width: window.innerWidth, height: window.innerHeight});
     }
 
-    getPadding = () => {
-        const is_xl = this.state.width >= 1400;
-        const is_lg = this.state.width >= 1100;
-        const is_md = this.state.width >= 800;
 
-        if (is_xl)
-            return {padding: '0 250px'};
-        else if (is_lg)
-            return {padding: '0 200px'};
-        else if (is_md)
-            return {padding: '0 100px'};
-        else if (this.state.width < 800)
-            return {padding: 25};
-    };
 
     getTimeSlots = (From, To, duration) => {
         const hours = moment.duration(To.diff(From)).hours(); // 3
@@ -64,19 +51,21 @@ class AppointmentsPicker extends React.Component {
         return totalHalfHours
     };
 
-    nextWeek = () => this.setState(state => {
-        const nextWeek = state.firstDate.clone().add(7, 'days');
+    nextWeek = range => this.setState(state => {
+        const nextWeek = state.firstDate.clone().add(range, 'days');
         if (!nextWeek.isAfter(this.firstDateAfter4weeks))
             return state.firstDate = nextWeek;
     });
 
-    lastWeek = () => this.setState(state => {
-        const lastWeek = state.firstDate.clone().add(-7, 'days');
+    lastWeek = range => this.setState(state => {
+        const lastWeek = state.firstDate.clone().add(-range, 'days');
         if (!lastWeek.isBefore(moment().subtract(1, "days")))
             return state.firstDate = lastWeek;
     });
 
     render() {
+
+        const range = this.state.width < 700 ? 3 : 7;
 
         const weekDaysKey = {
             0: 'Sun',
@@ -88,10 +77,7 @@ class AppointmentsPicker extends React.Component {
             6: 'Sat',
         };
 
-        const range = 7;
-
         let weekDays = [];
-
         const json_res = {
             companyLogoURL: null,
             openTimes: [
@@ -292,7 +278,7 @@ class AppointmentsPicker extends React.Component {
                     </div>
                 </div>
 
-                <div className={styles.Wrapper} style={this.getPadding()}>
+                <div className={styles.Wrapper}>
 
                     <div className={styles.Title}>
                         <Typography>
@@ -324,7 +310,7 @@ class AppointmentsPicker extends React.Component {
                         <div className={styles.Table}>
                             <div className={styles.TableContent}>
                                 <Button className={styles.NavigateButtons}
-                                        onClick={() => this.lastWeek()}
+                                        onClick={() => this.lastWeek(range)}
                                         icon={'left'} size={'large'}></Button>
 
                                 <div className={styles.Columns}>
@@ -353,7 +339,7 @@ class AppointmentsPicker extends React.Component {
                                 </div>
 
                                 <Button className={styles.NavigateButtons}
-                                        onClick={() => this.nextWeek()}
+                                        onClick={() => this.nextWeek(range)}
                                         icon={'right'} size={'large'}></Button>
                             </div>
                         </div>

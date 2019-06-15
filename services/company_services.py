@@ -20,13 +20,12 @@ def create(name, url, ownerEmail) -> Company or None:
         return Callback(True, "Company uas been created successfully.", newCompany)
 
     except stripe.error as exc:
-        print(exc)
+        helpers.logError("company_service.create() Stripe Issue: " + str(exc))
         db.session.rollback()
-        logging.error("company_service.create() Stripe Issue: " + str(exc))
         return Callback(False, "An error occurred while creating a stripe customer for the new company.")
+
     except Exception as exc:
-        print(exc)
-        logging.error("company_service.create(): " + str(exc))
+        helpers.logError("company_service.create(): " + str(exc))
         db.session.rollback()
         return Callback(False, "Couldn't create a company entity.")
 
@@ -45,7 +44,6 @@ def getByID(id) -> Company or None:
         else:
             raise Exception
     except Exception as exc:
-        logging.error("company_service.getByID(): " + str(exc))
         db.session.rollback()
         return Callback(False,
                         'Company with ID ' + str(id) + ' does not exist')
@@ -57,8 +55,7 @@ def removeByName(name) -> bool:
         db.session.commit()
         return True
     except Exception as exc:
-        print(exc)
-        logging.error("company_service.removeByName(): " + str(exc))
+        helpers.logError("company_service.removeByName(): " + str(exc))
         db.session.rollback()
         return False
 
@@ -73,8 +70,7 @@ def getByEmail(email) -> Callback:
 
         return Callback(True, 'Company was successfully retrieved.', result)
     except Exception as exc:
-        print("company_services.getByEmail() ERROR: ", exc)
-        logging.error("company_service.getByEmail(): " + str(exc))
+        helpers.logError("company_service.getByEmail(): " + str(exc))
         db.session.rollback()
         return Callback(False, 'Company could not be retrieved')
 
@@ -86,8 +82,7 @@ def getByCompanyID(id) -> Callback:
 
         return Callback(True, 'Company was successfully retrieved.', result)
     except Exception as exc:
-        print("company_services.getByCompanyID() ERROR: ", exc)
-        logging.error("company_service.getByCompanyID(): " + str(exc))
+        helpers.logError("company_service.getByCompanyID(): " + str(exc))
         db.session.rollback()
         return Callback(False, 'Company could not be retrieved')
 
@@ -101,8 +96,7 @@ def getByStripeID(id) -> Callback:
         return Callback(True, "Got company successfully.", result)
 
     except Exception as exc:
-        print(exc)
-        logging.error("company_service.getByStripeID(): " + str(exc))
+        helpers.logError("company_service.getByStripeID(): " + str(exc))
         db.session.rollback()
         return Callback(False, 'Could not get the assistant by nickname.')
 
@@ -116,8 +110,7 @@ def updateCompany(companyName, companyID):
 
         return Callback(True, "Company has been updated")
     except Exception as exc:
-        print("company_service.updateCompany() ERROR: ", exc)
-        logging.error("company_service.updateCompany(): " + str(exc))
+        helpers.logError("company_service.updateCompany(): " + str(exc))
         db.session.rollback()
         return Callback(False, "Company cold not be updated")
 
@@ -146,8 +139,7 @@ def uploadLogo(file, companyID):
         return Callback(True, 'Logo uploaded successfully.', filename)
 
     except Exception as exc:
-        print("company_service.uploadLogo(): ", exc)
-        logging.error("company_service.uploadLogo(): " + str(exc))
+        helpers.logError("company_service.uploadLogo(): " + str(exc))
         db.session.rollback()
         return Callback(False, 'Error in uploading logo.')
 
@@ -173,6 +165,6 @@ def deleteLogo(companyID):
         return Callback(True, 'Logo deleted successfully.')
 
     except Exception as exc:
-        logging.error("company_service.deleteLogo(): " + str(exc))
+        helpers.logError("company_service.deleteLogo(): " + str(exc))
         db.session.rollback()
         return Callback(False, 'Error in deleting logo.')

@@ -10,7 +10,7 @@ def addNewsletterPerson(email):
         db.session.commit()
         return Callback(True, email + ' has been registered for newsletters.')
     except Exception as exc:
-        logging.error("newsletter_service.addNewsletterPerson(): " + str(exc))
+        helpers.logError("newsletter_service.addNewsletterPerson(): " + str(exc))
         db.session.rollback()
         return Callback(False, 'Could not register' + email+ ' for newsletters.')
 
@@ -32,8 +32,7 @@ def removeNewsletterPerson(email):
         return Callback(True, email + ' has been unsubscribed from newsletters.')
 
     except Exception as exc:
-        print("removeNewsletterPerson() Error: ", exc)
-        logging.error("newsletter_service.removeNewsletterPerson(): " + str(exc))
+        helpers.logError("newsletter_service.removeNewsletterPerson(): " + str(exc))
         db.session.rollback()
         return Callback(False, 'Could not unsubscribe' + email+ ' from newsletters.')
 
@@ -44,7 +43,6 @@ def getAll():
 
         return Callback(True, "Newsletters retrieved", result)
     except Exception as exc:
-        print("newsletter_services.getAll ERROR: ", exc)
-        logging.error("newsletter_service.getAll(): " + str(exc))
+        helpers.logError("newsletter_service.getAll(): " + str(exc))
         db.session.rollback()
         return Callback(False, "Error in getting newsletters: ")

@@ -55,8 +55,7 @@ def add_user_with_permission(name, email, role, admin_id):
         return Callback(True, 'User has been created successfully!')
 
     except Exception as exc:
-        print("user_services.add_user_with_permission ERROR: " + str(exc))
-        logging.error("user_services.add_user_with_permission(): " + str(exc))
+        helpers.logError("user_services.add_user_with_permission(): " + str(exc))
         db.session.rollback()
         return Callback(False, 'Sorry, Could not create the user.')
 
@@ -94,8 +93,7 @@ def update_user_with_permission(user_id, first_name, surname, email, role, admin
         return Callback(True, 'User has been edited successfully!')
 
     except Exception as exc:
-        print(exc)
-        logging.error("user_services.update_user_with_permission(): " + str(exc))
+        helpers.logError("user_services.update_user_with_permission(): " + str(exc))
         db.session.rollback()
         return Callback(False, 'Sorry, Could not update the user.')
 
@@ -119,7 +117,6 @@ def delete_user_with_permission(user_id, admin_id):
         return Callback(True, 'User has been deleted successfully!')
 
     except Exception as exc:
-        print(exc)
-        logging.error("user_services.delete_user_with_permission(): " + str(exc))
+        helpers.logError("user_services.delete_user_with_permission(): " + str(exc))
         db.session.rollback()
         return Callback(False, 'Sorry, Could not delete the user.')

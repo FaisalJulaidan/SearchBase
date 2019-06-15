@@ -4,7 +4,6 @@ from models import Callback, User, db
 from services import user_services, role_services, sub_services, company_services, mail_services
 from utilities import helpers
 from config import BaseConfig
-import logging
 
 
 jwt = JWTManager()
@@ -62,7 +61,7 @@ def signup(details) -> Callback:
         # If subscription failed, remove the new created company and user
         if not sub_callback.Success or not sendVerEmail_callback.Success:
             # Removing the company will cascade and remove the new created user and roles as well.
-            print('remove company')
+
             company_services.removeByName(details['companyName'])
             return sub_callback
 
@@ -75,8 +74,7 @@ def signup(details) -> Callback:
         return Callback(True, 'Signed up successfully!')
 
     except Exception as exc:
-        print(exc)
-        logging.error("auth_services.signup(): " + str(exc))
+        helpers.logError("auth_services.signup(): " + str(exc))
         db.session.rollback()
         return Callback(False, "Failed to signup!", None)
 
@@ -127,8 +125,7 @@ def authenticate(email: str, password_to_check: str) -> Callback:
 
         return Callback(True, "Authorised!", data)
     except Exception as exc:
-        print(exc)
-        logging.error("auth_services.authenticate(): " + str(exc))
+        helpers.logError("auth_services.authenticate(): " + str(exc))
         db.session.rollback()
         return Callback(False, "Unauthorised!", None)
 
@@ -151,5 +148,5 @@ def refreshToken() -> Callback:
                 'expiresIn': datetime.now() + BaseConfig.JWT_ACCESS_TOKEN_EXPIRES}
         return Callback(True, "Authorised!", data)
     except Exception as exc:
-        logging.error("auth_services.refreshToken(): " + str(exc))
+        helpers.logError("auth_services.refreshToken(): " + str(exc))
         return Callback(False, "Unauthorised!", None)

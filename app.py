@@ -9,7 +9,7 @@ from flask_script import Manager
 from flask_migrate import Migrate, MigrateCommand
 from sqlalchemy_utils import create_database, database_exists
 from services.auth_services import jwt
-from utilities import helpers, tasks
+from utilities import helpers, tasks, dummy_data
 from flask_babel import Babel
 from services import scheduler_services, mail_services, assistant_services
 from datetime import datetime
@@ -94,7 +94,6 @@ if os.environ['FLASK_ENV'] in ['production', 'staging']:
         print('Create db tables')
         create_database(url)
         db.create_all()
-        helpers.seed()
 
     # Check if staging what to do
     # scheduler.start()
@@ -116,8 +115,7 @@ elif os.environ['FLASK_ENV'] == 'development':
         print('Reinitialize the database...')
         db.drop_all()
         db.create_all()
-        helpers.gen_dummy_data()
-
+        dummy_data.generate()
 
     # payload = str(5) + ";" + str(1) + ";" + str(1) + ";"  + "Faisal Jul"
     # mail_services.send_email(

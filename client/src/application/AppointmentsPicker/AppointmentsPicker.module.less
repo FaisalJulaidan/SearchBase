@@ -1,6 +1,25 @@
+@import "~antd/lib/style/themes/default.less";
+
 .Wrapper {
   min-height: calc(100% - 80px);
   background: #F4F6FC;
+  @media (max-width: @screen-sm) {
+    padding: 25px;
+  }
+
+  @media (min-width: @screen-sm) and (max-width: @screen-lg) {
+    padding: 25px 100px;
+  }
+
+  @media (min-width: @screen-lg) and (max-width: @screen-xl) {
+    padding: 25px 150px;
+  }
+
+  @media (min-width: @screen-xl) {
+    padding: 25px 250px;
+  }
+
+
 }
 
 .Container {
@@ -50,6 +69,9 @@
 
 .Columns > div {
   width: 14.2857142857%;
+  @media screen and (max-width: 800px) {
+    width: 33.33%;
+  }
 }
 
 .Columns button {
@@ -59,6 +81,9 @@
 
 .Header {
   padding: 0 10px 10px;
+  @media screen and (max-width: 800px) {
+    padding: 0 0 10px
+  }
   border-bottom: 1px #e0e0e0 solid;
 }
 

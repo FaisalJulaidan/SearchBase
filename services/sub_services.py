@@ -1,5 +1,6 @@
+from utilities import helpers
 from models import Callback, db, Plan, Company
-import logging, stripe
+import stripe
 
 
 def unsubscribe(company: Company) -> Callback:
@@ -20,8 +21,7 @@ def unsubscribe(company: Company) -> Callback:
         return Callback(True, 'You have unsubscribe successfully!')
 
     except Exception as exc:
-        print(exc)
-        logging.error("sub_services.unsubscribe(): SubID " + company.SubID + " / " + str(exc))
+        helpers.logError("sub_services.unsubscribe(): SubID " + company.SubID + " / " + str(exc))
         db.session.rollback()
         return Callback(False, 'An error occurred while trying to unsubscribe')
 
@@ -96,8 +96,7 @@ def subscribe(company: Company, planID, trialDays=None, token=None, coupon='') -
                                                       'planNickname': plan.Nickname})
 
     except Exception as exc:
-        print(exc)
-        logging.error("sub_services.subscribe(): " + str(exc))
+        helpers.logError("sub_services.subscribe(): " + str(exc))
         db.session.rollback()
         return Callback(False, 'An error occurred while subscribing with Stripe')
 
@@ -111,7 +110,7 @@ def getPlanByID(planID) -> Callback:
 
         return Callback(True, 'Plan found.', result)
     except Exception as exc:
-        logging.error("sub_services.getPlanByID(): " + str(exc))
+        helpers.logError("sub_services.getPlanByID(): " + str(exc))
         return Callback(False, 'Could not find a plan with ID ' + planID)
 
 
@@ -124,8 +123,7 @@ def getPlanByNickname(nickname) -> Callback:
         return Callback(True, 'No message.',
                         result)
     except Exception as exc:
-        print(exc)
-        logging.error("sub_services.getPlanByNickname(): " + str(exc))
+        helpers.logError("sub_services.getPlanByNickname(): " + str(exc))
         return Callback(False, 'Could not find a plan with ' + nickname + ' nickname')
 
 
@@ -137,8 +135,7 @@ def getStripePlan(planID) -> Callback:
 
         return Callback(True, 'No message.', result)
     except Exception as exc:
-        print(exc)
-        logging.error("sub_services.getPlanByNickname(): " + str(exc))
+        helpers.logError("sub_services.getPlanByNickname(): " + str(exc))
         return Callback(False, "This plan doesn't exist! Make sure the plan ID is correct.")
 
 
@@ -154,8 +151,7 @@ def getStripePlanNicknameBySubID(SubID):
         return Callback(True, 'No message.', result)
 
     except Exception as exc:
-        print(exc)
-        logging.error("sub_services.getStripePlanNicknameBySubID(): " + str(exc))
+        helpers.logError("sub_services.getStripePlanNicknameBySubID(): " + str(exc))
         db.session.rollback()
         return Callback(False, 'Could not find plan nickname form Stripe')
 
@@ -169,6 +165,6 @@ def isCouponValid(coupon) -> Callback:
         return Callback(True, "Coupon is valid")
     except Exception as exc:
         print("coupon is not valid")
-        logging.error("sub_services.isCouponValid(): " + str(exc))
+        helpers.logError("sub_services.isCouponValid(): " + str(exc))
         db.session.rollback()
         return Callback(False, "coupon is not valid.")

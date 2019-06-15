@@ -4,11 +4,10 @@ from utilities import helpers, json_schemas
 from services.CRM import crm_services
 from os.path import join
 from config import BaseConfig
-from services import flow_services, stored_file_services, auto_pilot_services, conversation_services
+from services import stored_file_services, auto_pilot_services, conversation_services
 from jsonschema import validate
 from werkzeug.utils import secure_filename
 from datetime import datetime
-import logging, json
 
 
 def create(name, desc, welcomeMessage, topBarText, companyID) -> Assistant or None:
@@ -38,8 +37,7 @@ def create(name, desc, welcomeMessage, topBarText, companyID) -> Assistant or No
         return Callback(True, 'Assistant created successfully', assistant)
 
     except Exception as exc:
-        print(exc)
-        logging.error("assistant_services.create(): " + str(exc))
+        helpers.logError("assistant_services.create(): " + str(exc))
         db.session.rollback()
         return Callback(False, 'Failed to create the assistant', None)
 
@@ -61,8 +59,7 @@ def addAppointment(conversationID, assistantID, dateTime):
         return Callback(True, 'Appointment added successfully.')
 
     except Exception as exc:
-        print("addAppointment() ERROR:" + str(exc))
-        logging.error("assistant_services.addAppointment(): " + str(exc))
+        helpers.logError("assistant_services.addAppointment(): " + str(exc))
         db.session.rollback()
         return Callback(False, "Couldn't add the appointment")
 
@@ -81,8 +78,7 @@ def getByHashID(hashID):
 
 
     except Exception as exc:
-        print("getAssistantByHashID() ERROR:" + str(exc))
-        logging.error("assistant_services.getAssistantByHashID(): " + str(exc))
+        helpers.logError("assistant_services.getAssistantByHashID(): " + str(exc))
         return Callback(False, "Assistant not found!")
 
 
@@ -95,8 +91,7 @@ def getByID(id: int, companyID: int) -> Callback:
         return Callback(True, "Got assistant successfully.", result)
 
     except Exception as exc:
-        print(exc)
-        logging.error("assistant_services.getByID(): " + str(exc))
+        helpers.logError("assistant_services.getByID(): " + str(exc))
         return Callback(False, 'Could not get the assistant.')
 
 
@@ -109,8 +104,7 @@ def getByName(name) -> Callback:
         return Callback(True, "Got assistant by nickname successfully.", assistant)
 
     except Exception as exc:
-        print(exc)
-        logging.error("assistant_services.getByName(): " + str(exc))
+        helpers.logError("assistant_services.getByName(): " + str(exc))
         db.session.rollback()
         return Callback(False, 'Could not get the assistant by nickname.')
 
@@ -133,9 +127,8 @@ def getAll(companyID) -> Callback:
         return Callback(True, "Got all assistants  successfully.", result)
 
     except Exception as exc:
-        print(exc)
         db.session.rollback()
-        logging.error("assistant_services.getAll(): " + str(exc))
+        helpers.logError("assistant_services.getAll(): " + str(exc))
         return Callback(False, 'Could not get all assistants.')
 
 
@@ -150,8 +143,7 @@ def getAllWithEnabledNotifications(companyID) -> Callback:
             return Callback(True, "Got all assistants  successfully.", result)
 
     except Exception as exc:
-        print(exc)
-        logging.error("assistant_services.getAllWithEnabledNotifications(): " + str(exc))
+        helpers.logError("assistant_services.getAllWithEnabledNotifications(): " + str(exc))
         db.session.rollback()
         return Callback(False, 'Could not get all assistants.')
 
@@ -173,8 +165,7 @@ def getOpenTimes(assistantID) -> Callback:
         return Callback(True,"Got open time slots successfully.", connectedAutoPilot.OpenTimes)
 
     except Exception as exc:
-        print(exc)
-        logging.error("assistant_services.getOpenTimes(): " + str(exc))
+        helpers.logError("assistant_services.getOpenTimes(): " + str(exc))
         db.session.rollback()
         return Callback(False, 'Could not get the open times for this assistant.')
 
@@ -194,9 +185,8 @@ def update(id, name, desc, message, topBarText, companyID)-> Callback:
         return Callback(True, 'Assistant updated successfully', assistant)
 
     except Exception as exc:
-        print(exc)
         db.session.rollback()
-        logging.error("assistant_services.update(): " + str(exc))
+        helpers.logError("assistant_services.update(): " + str(exc))
         return Callback(False,
                         "Couldn't update assistant " + str(id))
 
@@ -222,9 +212,8 @@ def updateConfigs(id, name, desc,  message, topBarText, secondsUntilPopup, notif
         return Callback(True, name + ' Updated Successfully', assistant)
 
     except Exception as exc:
-        print(exc)
         db.session.rollback()
-        logging.error("assistant_services.update(): " + str(exc))
+        helpers.logError("assistant_services.update(): " + str(exc))
         return Callback(False,
                         "Couldn't update assistant " + str(id))
 
@@ -240,8 +229,7 @@ def updateStatus(assistantID, newStatus, companyID):
         return Callback(True, 'Assistant status has been changed.')
 
     except Exception as exc:
-        print("Error in assistant_services.changeStatus(): ", exc)
-        logging.error("assistant_services.changeStatus(): " + str(exc))
+        helpers.logError("assistant_services.changeStatus(): " + str(exc))
         db.session.rollback()
         return Callback(False, "Could not change the assistant's status.")
 
@@ -253,8 +241,7 @@ def removeByID(id, companyID) -> Callback:
         return Callback(True, 'Assistant has been deleted.')
 
     except Exception as exc:
-        print("Error in assistant_services.removeByID(): ", exc)
-        logging.error("assistant_services.removeByID(): " + str(exc))
+        helpers.logError("assistant_services.removeByID(): " + str(exc))
         db.session.rollback()
         return Callback(False, 'Error in deleting assistant.')
 
@@ -274,8 +261,7 @@ def connectToCRM(assistantID, CRMID, companyID):
         return Callback(True, 'Assistant has been connected to CRM.')
 
     except Exception as exc:
-        print("assistant_services.connectToCRM(): ", exc)
-        logging.error("assistant_services.connectToCRM(): " + str(exc))
+        helpers.logError("assistant_services.connectToCRM(): " + str(exc))
         db.session.rollback()
         return Callback(False, 'Error in connecting assistant to CRM.')
 
@@ -290,8 +276,7 @@ def disconnectFromCRM(assistantID, companyID):
         return Callback(True, 'Assistant has been disconnected from CRM.')
 
     except Exception as exc:
-        print("assistant_services.disconnectFromCRM(): ", exc)
-        logging.error("assistant_services.disconnectFromCRM(): " + str(exc))
+        helpers.logError("assistant_services.disconnectFromCRM(): " + str(exc))
         db.session.rollback()
         return Callback(False, 'Error in disconnecting assistant from CRM.')
 
@@ -311,8 +296,7 @@ def connectToAutoPilot(assistantID, autoPilotID, companyID):
         return Callback(True, 'Assistant has been connected to AutoPilot.')
 
     except Exception as exc:
-        print("assistant_services.connectToAutoPilot(): ", exc)
-        logging.error("assistant_services.connectToAutoPilot(): " + str(exc))
+        helpers.logError("assistant_services.connectToAutoPilot(): " + str(exc))
         db.session.rollback()
         return Callback(False, 'Error in connecting assistant to AutoPilot.')
 
@@ -327,8 +311,7 @@ def disconnectFromAutoPilot(assistantID, companyID):
         return Callback(True, 'Assistant has been disconnected from AutoPilot.')
 
     except Exception as exc:
-        print("assistant_services.disconnectFromAutoPilot(): ", exc)
-        logging.error("assistant_services.disconnectFromAutoPilot(): " + str(exc))
+        helpers.logError("assistant_services.disconnectFromAutoPilot(): " + str(exc))
         db.session.rollback()
         return Callback(False, 'Error in disconnecting assistant from AutoPilot.')
 
@@ -359,8 +342,7 @@ def uploadLogo(assistantID, file, companyID):
         return Callback(True, 'Logo uploaded successfully.')
 
     except Exception as exc:
-        print("assistant_services.uploadLogo(): ", exc)
-        logging.error("assistant_services.uploadLogo(): " + str(exc))
+        helpers.logError("assistant_services.uploadLogo(): " + str(exc))
         db.session.rollback()
         return Callback(False, 'Error in uploading logo.')
 
@@ -386,6 +368,6 @@ def deleteLogo(assistantID, companyID):
         return Callback(True, 'Logo deleted successfully.')
 
     except Exception as exc:
-        logging.error("assistant_services.deleteLogo(): " + str(exc))
+        helpers.logError("assistant_services.deleteLogo(): " + str(exc))
         db.session.rollback()
         return Callback(False, 'Error in deleting logo.')

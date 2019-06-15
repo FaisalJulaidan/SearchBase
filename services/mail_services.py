@@ -63,7 +63,7 @@ def sendDemoRequest(email) -> Callback:
         send_email(tsbEmail, 'Demo Request', '/emails/arrange_demo.html', email=email)
         return Callback(True, "Demo has been requested. We will be in touch soon.")
     except Exception as exc:
-        logging.error("mail_service.sendDemoRequest(): " + str(exc))
+        helpers.logError("mail_service.sendDemoRequest(): " + str(exc))
         return Callback(False, "Demo Request could not be sent at this time")
 
 
@@ -73,7 +73,7 @@ def contactUsIndex(name, email, message) -> Callback:
                    message=message)
         return Callback(True, "Thank you. We will contact you as soon as possible.")
     except Exception as exc:
-        logging.error("mail_service.contactUsIndex(): " + str(exc))
+        helpers.logError("mail_service.contactUsIndex(): " + str(exc))
         return Callback(False, "We could not send your message at this time. Please try again later.")
 
 
@@ -90,7 +90,7 @@ def sendVerificationEmail(email, companyName) -> Callback:
         return Callback(True, 'Verification email is on its way to ' + email)
 
     except Exception as exc:
-        logging.error("mail_service.sendVerificationEmail(): " + str(exc))
+        helpers.logError("mail_service.sendVerificationEmail(): " + str(exc))
         return Callback(False, 'Could not send a verification email to ' + email)
 
 
@@ -107,7 +107,7 @@ def sendPasswordResetEmail(email, userID):
         return Callback(True, 'Password reset email is on its way to ' + email)
 
     except Exception as exc:
-        logging.error("mail_service.sendPasswordResetEmail(): " + str(exc))
+        helpers.logError("mail_service.sendPasswordResetEmail(): " + str(exc))
         return Callback(False, 'Could not send a password reset email to ' + email)
 
 
@@ -120,7 +120,7 @@ def sendNewUserHasRegistered(name, email, companyName, tel):
         return Callback(True, 'Signed up email is on its way')
 
     except Exception as exc:
-        logging.error("mail_service.sendNewUserHasRegistered(): " + str(exc))
+        helpers.logError("mail_service.sendNewUserHasRegistered(): " + str(exc))
         return Callback(False, 'Could not send a signed up email')
 
 
@@ -134,7 +134,7 @@ def addedNewUserEmail(adminEmail, targetEmail, password):
         return Callback(True, 'Email sent is on its way to ' + targetEmail)
 
     except Exception as exc:
-        logging.error("mail_service.addedNewUserEmail(): " + str(exc))
+        helpers.logError("mail_service.addedNewUserEmail(): " + str(exc))
         return Callback(False, 'Could not send email to ' + targetEmail)
 
 
@@ -149,7 +149,7 @@ def sendSolutionAlert(record, solutions):
         return Callback(True, 'Email sent is on its way to ' + targetEmail)
 
     except Exception as exc:
-        logging.error("mail_service.sendSolutionAlert(): " + str(exc))
+        helpers.logError("mail_service.sendSolutionAlert(): " + str(exc))
         return Callback(False, 'Could not send email')
 
 
@@ -192,7 +192,7 @@ def sendSolutionAlert(record, solutions):
 #                 raise Exception("sendRecords_callback: ", sendRecords_callback.Message)
 #
 #     except Exception as exc:
-#         logging.error("mail_service.notifyNewChatbotSessionsCountForLastXHours(): " + str(exc))
+#         helpers.logError("mail_service.notifyNewChatbotSessionsCountForLastXHours(): " + str(exc))
 #         return Callback(False, "Error in notifying for new chatbot conversation")
 
 
@@ -247,8 +247,7 @@ def notifyNewConversation(assistant, conversation, file: FileStorage = None):
         return Callback(True, "Emails have been sent")
 
     except Exception as exc:
-        print("mail_service.notifyNewChatbotSession() ERROR: ", exc)
-        logging.error("mail_service.notifyNewChatbotSession(): " + str(exc))
+        helpers.logError("mail_service.notifyNewChatbotSession(): " + str(exc))
         return Callback(False, "Error in notifying for new chatbot session")
 
 
@@ -286,6 +285,5 @@ def send_email(to, subject, template, file=None, **kwargs):
 
         return Callback(True, "Email sent to " + to + " successfully")
     except Exception as exc:
-        print("EXCEPTION: ", str(exc))
-        logging.error("mail_service.send_email(): " + str(exc))
+        helpers.logError("mail_service.send_email(): " + str(exc))
         return Callback(False, "Sending email to " + to + " failed")

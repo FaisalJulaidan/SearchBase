@@ -89,8 +89,7 @@ def processConversation(conversation: Conversation, autoPilot: AutoPilot):
         return Callback(True, "Automation done via " + autoPilot.Name + " pilot successfully.", result)
 
     except Exception as exc:
-        print(exc)
-        logging.error("auto_pilot.processConversation(): " + str(exc))
+        helpers.logError("auto_pilot.processConversation(): " + str(exc))
         return Callback(False,
                         autoPilot.Name + " pilot failed to function. Please contact TSB support and let them know",
                         None)
@@ -117,8 +116,7 @@ def create(name, desc, companyID: int) -> Callback:
         return Callback(True, "Got AutoPilot successfully.", autoPilot)
 
     except Exception as exc:
-        print(exc)
-        logging.error("auto_pilot.create(): " + str(exc))
+        helpers.logError("auto_pilot.create(): " + str(exc))
         db.session.rollback()
         return Callback(False, 'Could not create AutoPilot.')
 
@@ -134,8 +132,7 @@ def getByID(id: int, companyID: int) -> Callback:
         return Callback(True, "Got AutoPilot successfully.", result)
 
     except Exception as exc:
-        print(exc)
-        logging.error("auto_pilot.getByID(): " + str(exc))
+        helpers.logError("auto_pilot.getByID(): " + str(exc))
         return Callback(False, 'Could not get the AutoPilot.')
 
 
@@ -147,8 +144,7 @@ def fetchAll(companyID) -> Callback:
         return Callback(True, "Fetched all AutoPilots successfully.", result)
 
     except Exception as exc:
-        print(exc)
-        logging.error("auto_pilot.fetchAll(): " + str(exc))
+        helpers.logError("auto_pilot.fetchAll(): " + str(exc))
         return Callback(False, 'Could not fetch all the AutoPilots.')
 
 
@@ -177,8 +173,7 @@ def update(id, name, desc, companyID: int) -> Callback:
         return Callback(True, "Updated the AutoPilot successfully.", autoPilot)
 
     except Exception as exc:
-        print(exc)
-        logging.error("auto_pilot.update(): " + str(exc))
+        helpers.logError("auto_pilot.update(): " + str(exc))
         db.session.rollback()
         return Callback(False, "Couldn't update the AutoPilot.")
 
@@ -225,8 +220,7 @@ def updateConfigs(id, name, desc, active, acceptApplications, acceptanceScore, s
         return Callback(True, "Updated the AutoPilot successfully.", autoPilot)
 
     except Exception as exc:
-        print(exc)
-        logging.error("auto_pilot.update(): " + str(exc))
+        helpers.logError("auto_pilot.update(): " + str(exc))
         db.session.rollback()
         return Callback(False, 'Could update the AutoPilot.')
 
@@ -241,8 +235,7 @@ def updateStatus(autoPilotID, newStatus, companyID):
         return Callback(True, 'AutoPilot status has been changed.')
 
     except Exception as exc:
-        print("Error in auto_pilot.changeStatus(): ", exc)
-        logging.error("auto_pilot.changeStatus(): " + str(exc))
+        helpers.logError("auto_pilot.changeStatus(): " + str(exc))
         db.session.rollback()
         return Callback(False, "Could not change the AutoPilot's status.")
 
@@ -254,8 +247,7 @@ def removeByID(id, companyID):
         return Callback(True, 'AutoPilot has been deleted.')
 
     except Exception as exc:
-        print("Error in auto_pilot.removeByID(): ", exc)
-        logging.error("auto_pilot.removeByID(): " + str(exc))
+        helpers.logError("auto_pilot.removeByID(): " + str(exc))
         db.session.rollback()
         return Callback(False, 'Error in deleting AutoPilot.')
 

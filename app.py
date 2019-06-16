@@ -131,7 +131,6 @@ elif os.environ['FLASK_ENV'] == 'development':
     # a = datetime.strptime("2019-12-14 16:08", "%Y-%m-%d %H:%M")
     # print(a)
 
-    print(helpers.currencyConverter.convert('USD', 'GBP', 1000))
     print('Development mode running...')
 
 else:

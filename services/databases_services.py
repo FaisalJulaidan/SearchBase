@@ -277,8 +277,7 @@ def scanCandidates(session, dbIDs, extraCandidates=None):
             df = df.append(extraCandidates, ignore_index=True)  # TODO
             # print("df: ", df["CandidateLocation"])
 
-
-        # Convert job salary to the submitted currency from chat (Foramt: "Greater Than 5000 GBP")
+        # Convert job salary to the submitted currency from chat (Format: "Greater Than 5000 GBP")
         if keywords.get(DT.JobSalary.value['name']):
             inputSplitted = keywords.get(DT.JobSalary.value['name'])[-1].split(' ')
             df[Job.JobSalary.name] = df.apply(lambda x: helpers.currencyConverter.convert(x[Job.Currency.name], inputSplitted[3], x[Job.JobSalary.name]), axis=1)
@@ -421,7 +420,6 @@ def scanJobs(session, dbIDs, extraJobs=None):
                          "Desirable skills include [desirableSkills]."]
 
         data = []
-
         for record in topResults:
             desc = []
             # Build random dynamic job description

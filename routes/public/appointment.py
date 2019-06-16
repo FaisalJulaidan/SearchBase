@@ -11,7 +11,8 @@ appointment_router = Blueprint('appointment_router', __name__, template_folder="
 def candidate_appointment(payload):
     try:
 
-        data = helpers.verificationSigner.loads(payload, salt='appointment-key').split(";")
+        # token expires in 5 days
+        data = helpers.verificationSigner.loads(payload, salt='appointment-key', max_age=432000).split(";")
 
         conversationID = int(data[0])
         assistantID = int(data[1])

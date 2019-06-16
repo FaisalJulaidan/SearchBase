@@ -182,57 +182,71 @@ const CandidateColumns = [{
 const JobColumns = [{
     title: '#',
     key: '#',
+    dataIndex: '#',
     render: (text, record, index) => (<p>{index + 1}</p>),
 },{
     title: 'Job Title',
     key: 'JobTitle',
+    dataIndex: 'JobTitle',
     render: (text, record, index) => (<p>{record.JobTitle}</p>),
 }, {
     title: 'Description',
     key: 'JobDescription',
+    dataIndex: 'JobDescription',
     render: (text, record, index) => (<p>{record.JobDescription}</p>),
 }, {
     title: 'Location',
     key: 'JobLocation',
+    dataIndex: 'JobLocation',
     render: (text, record, index) => (<p>{record.JobLocation}</p>),
 } , {
     title: 'Type',
     key: 'JobType',
+    dataIndex: 'JobType',
     render: (text, record, index) => (<p>{record.JobType}</p>),
 } , {
     title: 'Salary',
     key: 'JobSalary',
+    dataIndex: 'JobSalary',
     render: (text, record, index) => (<p>{record.JobSalary}</p>),
 } , {
     title: 'Currency',
     key: 'Currency',
+    dataIndex: 'Currency',
     render: (text, record, index) => (<p>{record.Currency}</p>),
 }, {
     title: 'Essential Skills',
     key: 'JobEssentialSkills',
+    dataIndex: 'JobEssentialSkills',
     render: (text, record, index) => (<p>{record.JobEssentialSkills}</p>),
 }, {
     title: 'Desired Skills',
     key: 'JobDesiredSkills',
+    dataIndex: 'JobDesiredSkills',
     render: (text, record, index) => (<p>{record.JobDesiredSkills}</p>),
 }, {
     title: 'Education',
     key: 'CandidateEducation',
+    dataIndex: 'CandidateEducation',
     render: (text, record, index) => (<p>{record.CandidateEducation}</p>),
 }, {
     title: 'Years Required',
     key: 'JobYearsRequired',
+    dataIndex: 'JobYearsRequired',
     render: (text, record, index) => (<p>{record.JobYearsRequired}</p>),
 }, {
     title: 'Start Date',
     key: 'JobStartDate',
+    dataIndex: 'JobStartDate',
     render: (text, record, index) => (<p>{record.JobStartDate}</p>),
 }, {
     title: 'End Date',
     key: 'JobEndDate',
+    dataIndex: 'JobEndDate',
     render: (text, record, index) => (<p>{record.JobEndDate}</p>),
 }, {
     title: 'Job URL',
     key: 'JobLinkURL',
+    dataIndex: 'JobLinkURL',
     render: (text, record, index) => (<p>{record.JobLinkURL}</p>),
 }];

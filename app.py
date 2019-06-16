@@ -13,7 +13,6 @@ from utilities import helpers, tasks, dummy_data
 from flask_babel import Babel
 from services import scheduler_services, mail_services, assistant_services
 from datetime import datetime
-
 # Import all routers to register them as blueprints
 from routes.admin.routers import profile_router, analytics_router, sub_router, \
     conversation_router, users_router, flow_router, assistant_router,\
@@ -132,7 +131,7 @@ elif os.environ['FLASK_ENV'] == 'development':
     # a = datetime.strptime("2019-12-14 16:08", "%Y-%m-%d %H:%M")
     # print(a)
 
-
+    print(helpers.currencyConverter.convert('USD', 'GBP', 1000))
     print('Development mode running...')
 
 else:

@@ -239,8 +239,7 @@ class Settings extends Component {
 
                 <br />
                 <Divider/>
-                <h2> Delete Assistant:</h2>
-                <Button type={'danger'} onClick={this.handleDelete}>Delete</Button>
+                <Button type={'danger'} size={'large'} onClick={this.handleDelete}>Delete Assistant</Button>
 
             </>
         );

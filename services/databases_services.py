@@ -1,6 +1,5 @@
 import enums
 import json
-import logging
 import pandas
 import random
 import re
@@ -278,46 +277,44 @@ def scanCandidates(session, dbIDs, extraCandidates=None):
             df = df.append(extraCandidates, ignore_index=True)  # TODO
             # print("df: ", df["CandidateLocation"])
 
-        def wordsCounter(dataType: DT, dbColumn, x=1):
-            if keywords.get(dataType.value['name']):
-                df['Score'] += x * df[dbColumn.name].str.count('|'.join(keywords[dataType.value['name']]),
-                                                               flags=re.IGNORECASE) | 0
 
-        def greaterCounter(dataType: DT, dbColumn, plus=1):
-            if keywords.get(dataType.value['name']):
-                df.loc[df[dbColumn.name] <=
-                       float(keywords[dataType.value['name']][-1]), 'Score'] += plus
+        # Convert job salary to the submitted currency from chat (Foramt: "Greater Than 5000 GBP")
+        if keywords.get(DT.JobSalary.value['name']):
+            inputSplitted = keywords.get(DT.JobSalary.value['name'])[-1].split(' ')
+            df[Job.JobSalary.name] = df.apply(lambda x: helpers.currencyConverter.convert(x[Job.Currency.name], inputSplitted[3], x[Job.JobSalary.name]), axis=1)
+            df[Job.Currency.name] = inputSplitted[3]
 
-        def lessCounter(dataType: DT, dbColumn, plus=1):
-            if keywords.get(dataType.value['name']):
-                df.loc[df[dbColumn.name] >=
-                       float(keywords[dataType.value['name']][-1]), 'Score'] += plus
+        elif keywords.get(DT.CandidateDesiredSalary.value['name']):
+            inputSplitted = keywords.get(DT.JobSalary.value['name'])[-1].split(' ')
+            df[Job.JobSalary.name] = df.apply(lambda x: helpers.currencyConverter.convert(x[Job.Currency.name], inputSplitted[3], x[Job.JobSalary.name]), axis=1)
+            df[Job.Currency.name] = inputSplitted[3]
 
         # Desired Salary
-        greaterCounter(DT.CandidateDesiredSalary, Candidate.CandidateDesiredSalary, 3)
-        greaterCounter(DT.JobSalary, Candidate.CandidateDesiredSalary, 3)
+        __salary(DT.CandidateDesiredSalary, Candidate.CandidateDesiredSalary, keywords, df, 3)
+        __salary(DT.JobSalary, Candidate.CandidateDesiredSalary, keywords, df, 3)
 
         # Years of EXP
-        lessCounter(DT.CandidateYearsExperience, Candidate.CandidateYearsExperience, 5)
+        __numCounter(DT.CandidateYearsExperience, '<', Candidate.CandidateYearsExperience, keywords, df, 5)
 
         # Education
-        wordsCounter(DT.CandidateEducation, Candidate.CandidateEducation)
+        __wordsCounter(DT.CandidateEducation, Candidate.CandidateEducation, keywords, df, 1)
 
         # Location
-        wordsCounter(DT.JobLocation, Candidate.CandidateLocation, 6)
-        wordsCounter(DT.CandidateLocation, Candidate.CandidateLocation, 6)
+        __wordsCounter(DT.JobLocation, Candidate.CandidateLocation, keywords, df, 6)
+        __wordsCounter(DT.CandidateLocation, Candidate.CandidateLocation, keywords, df, 6)
 
         # JobTitle
-        wordsCounter(DT.CandidateJobTitle, Candidate.CandidateJobTitle)
-        wordsCounter(DT.JobTitle, Candidate.CandidateJobTitle)
+        __wordsCounter(DT.CandidateJobTitle, Candidate.CandidateJobTitle, keywords, df, 1)
+        __wordsCounter(DT.JobTitle, Candidate.CandidateJobTitle, keywords, df, 1)
 
         # Skills
-        wordsCounter(DT.CandidateSkills, Candidate.CandidateSkills, 2)
-        wordsCounter(DT.JobDesiredSkills, Candidate.CandidateSkills, 2)
-        wordsCounter(DT.JobEssentialSkills, Candidate.CandidateSkills, 2)
+        __wordsCounter(DT.CandidateSkills, Candidate.CandidateSkills, keywords, df, 2)
+        __wordsCounter(DT.JobDesiredSkills, Candidate.CandidateSkills, keywords, df, 2)
+        __wordsCounter(DT.JobEssentialSkills, Candidate.CandidateSkills, keywords, df, 2)
 
         # Availability
-        wordsCounter(DT.CandidateAvailability, Candidate.CandidateAvailability)
+        __wordsCounter(DT.CandidateAvailability, Candidate.CandidateAvailability, keywords, df, 1)
+
 
         topResults = json.loads(df[df['Score'] > 0].nlargest(session.get('showTop', 2), 'Score')
                                 .to_json(orient='records'))
@@ -367,48 +364,50 @@ def scanJobs(session, dbIDs, extraJobs=None):
         df = df.drop('DatabaseID', axis=1)  # Drop column
 
         keywords = session['keywordsByDataType']
-        df['Score'] = 0  # Add column for tracking score
+        df['Score'] = 8  # Add column for tracking score
         df['Source'] = "Internal Database"  # Source of solution e.g. Bullhorn, Adapt...
 
         if extraJobs:
             df = df.append(extraJobs, ignore_index=True)
 
-        def wordsCounter(dataType: DT, dbColumn, x=1):
-            if keywords.get(dataType.value['name']):
-                df['Score'] += x * df[dbColumn.name].str.count('|'.join(keywords[dataType.value['name']]),
-                                                               flags=re.IGNORECASE) | 0
 
-        def greaterCounter(dataType: DT, dbColumn, plus=1):
-            if keywords.get(dataType.value['name']):
-                df.loc[df[dbColumn.name] <=
-                       float(keywords[dataType.value['name']][-1]), 'Score'] += plus
+        # Convert job salary to the submitted currency from chat
+        if keywords.get(DT.JobSalary.value['name']):
+            inputSplitted = keywords.get(DT.JobSalary.value['name'])[-1].split(' ') # (Format: "Greater Than 5000 GBP")
+            df[Job.JobSalary.name] = df.apply(lambda x: helpers.currencyConverter.convert(x[Job.Currency.name], inputSplitted[3], x[Job.JobSalary.name]), axis=1)
+            df[Job.Currency.name] = inputSplitted[3]
 
-        def lessCounter(dataType: DT, dbColumn, plus=1):
-            if keywords.get(dataType.value['name']):
-                df.loc[df[dbColumn.name] >=
-                       float(keywords[dataType.value['name']][-1]), 'Score'] += plus
+        elif keywords.get(DT.CandidateDesiredSalary.value['name']):
+            inputSplitted = keywords.get(DT.JobSalary.value['name'])[-1].split(' ')
+            df[Job.JobSalary.name] = df.apply(lambda x: helpers.currencyConverter.convert(x[Job.Currency.name], inputSplitted[3], x[Job.JobSalary.name] or 0), axis=1)
+            df[Job.Currency.name] = inputSplitted[3]
 
         # Salary
-        lessCounter(DT.JobSalary, Job.JobSalary, 3)
-        lessCounter(DT.CandidateDesiredSalary, Job.JobSalary, 3)
+        __salary(DT.JobSalary, Job.JobSalary, keywords, df, 8)
+        __salary(DT.CandidateDesiredSalary, Job.JobSalary, keywords, df, 8)
+
         # Year Required
-        greaterCounter(DT.JobYearsRequired, Job.JobYearsRequired, 5)
-        greaterCounter(DT.CandidateYearsExperience, Job.JobYearsRequired, 5)
+        __numCounter(DT.JobYearsRequired, '>', Job.JobYearsRequired, keywords, df, 5)
+        __numCounter(DT.CandidateYearsExperience, '>', Job.JobYearsRequired, keywords, df, 5)
+
         # Job Title
-        wordsCounter(DT.JobTitle, Job.JobTitle, 2)
-        wordsCounter(DT.JobTitle, Job.JobDescription, 2)
-        wordsCounter(DT.CandidateSkills, Job.JobTitle, 2)
-        wordsCounter(DT.CandidateSkills, Job.JobDescription, 2)
+        __wordsCounter(DT.JobTitle, Job.JobTitle, keywords, df, 2)
+        __wordsCounter(DT.JobTitle, Job.JobDescription, keywords, df, 2)
+        __wordsCounter(DT.CandidateSkills, Job.JobTitle, keywords, df, 2)
+        __wordsCounter(DT.CandidateSkills, Job.JobDescription, keywords, df, 2)
+
         # Type
-        wordsCounter(DT.JobType, Job.JobType, 2)
+        __wordsCounter(DT.JobType, Job.JobType, keywords, df, 2)
+
         # Location
-        wordsCounter(DT.JobLocation, Job.JobLocation, 3)
-        wordsCounter(DT.CandidateLocation, Job.JobLocation, 3)
+        __wordsCounter(DT.JobLocation, Job.JobLocation, keywords, df, 3)
+        __wordsCounter(DT.CandidateLocation, Job.JobLocation, keywords, df, 3)
+
         # Skills
-        wordsCounter(DT.JobEssentialSkills, Job.JobEssentialSkills, 3)
-        wordsCounter(DT.JobDesiredSkills, Job.JobDesiredSkills, 3)
-        wordsCounter(DT.CandidateSkills, Job.JobEssentialSkills, 3)
-        wordsCounter(DT.CandidateSkills, Job.JobDesiredSkills, 3)
+        __wordsCounter(DT.JobEssentialSkills, Job.JobEssentialSkills, keywords, df, 3)
+        __wordsCounter(DT.JobDesiredSkills, Job.JobDesiredSkills, keywords, df, 3)
+        __wordsCounter(DT.CandidateSkills, Job.JobEssentialSkills, keywords, df, 3)
+        __wordsCounter(DT.CandidateSkills, Job.JobDesiredSkills, keywords, df, 3)
 
         # Results
         topResults = json.loads(df[df['Score'] > 0].nlargest(session.get('showTop', 0), 'Score')
@@ -422,6 +421,7 @@ def scanJobs(session, dbIDs, extraJobs=None):
                          "Desirable skills include [desirableSkills]."]
 
         data = []
+
         for record in topResults:
             desc = []
             # Build random dynamic job description
@@ -447,8 +447,15 @@ def scanJobs(session, dbIDs, extraJobs=None):
             subTitles = []
             if record[Job.JobLocation.name]:
                 subTitles.append("Location: " + record[Job.JobLocation.name])
+
+            if record[Job.JobSalary.name]:
+                currency = record[Job.Currency.name] or '' # it could be a Currency object e.g. {code: 'USD'...}
+                if isinstance(record[Job.Currency.name], dict): currency = currency['code']
+                subTitles.append("Salary: " + str(int(record[Job.JobSalary.name])) + ' ' + currency)
+
             if record[Job.JobEssentialSkills.name]:
                 subTitles.append("Essential Skills: " + record[Job.JobEssentialSkills.name])
+
 
             data.append({
                 "id": record["ID"],
@@ -465,6 +472,30 @@ def scanJobs(session, dbIDs, extraJobs=None):
     except Exception as exc:
         helpers.logError("databases_service.scanJobs(): " + str(exc))
         return Callback(False, 'Error while search the database for matches!')
+
+
+def __wordsCounter(dataType: DT, dbColumn, keywords, df, x=1):
+    if keywords.get(dataType.value['name']):
+        df['Score'] += x * df[dbColumn.name].str.count('|'.join(keywords[dataType.value['name']]),
+                                                       flags=re.IGNORECASE) | 0
+
+
+def __numCounter(dataType: DT, compare, dbColumn, keywords, df, plus=1):
+    if keywords.get(dataType.value['name']):
+        if compare == '>':
+            df.loc[df[dbColumn.name] <= float(keywords[dataType.value['name']][-1]), 'Score'] += plus
+        else: # '<'
+            df.loc[df[dbColumn.name] >= float(keywords[dataType.value['name']][-1]), 'Score'] += plus
+
+
+def __salary(dataType: DT, dbColumn, keywords, df, plus=1):
+    input = keywords.get(dataType.value['name'])
+    if input:
+        inputSplitted = input[-1].split(' ') # Less Than 5000 GBP
+        if inputSplitted[0] == 'Less':
+            df.loc[df[dbColumn.name] <= float(inputSplitted[2]), 'Score'] += plus
+        else: # Greater
+            df.loc[df[dbColumn.name] >= float(inputSplitted[2]), 'Score'] += plus
 
 
 def createPandaCandidate(id, name, email, mobile, location, skills,

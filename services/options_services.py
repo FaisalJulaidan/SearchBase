@@ -54,7 +54,7 @@ def getOptions(industry=None) -> Callback:
                                            for c in Job.__table__.columns
                                            if (c.key != 'ID' and c.key != 'DatabaseID')
                                            ],
-            'currencyCodes': ['GBP', 'USD', 'EUR', 'AED', 'CAD']
+            'currencyCodes': ['GBP', 'USD', 'EUR', 'CAD']
         },
         'assistantTemplates':
         [

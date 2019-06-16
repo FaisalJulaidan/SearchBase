@@ -96,7 +96,7 @@ class AutoPilot extends React.Component {
             rejectionScore: state.rejectionScore / 100,
             sendCandidatesAppointments: state.sendCandidatesAppointments,
 
-            openTimeSlots: weekDays
+            openTimes: weekDays
         };
 
         this.props.dispatch(autoPilotActions.updateAutoPilotConfigs(autoPilot.ID, payload));
@@ -125,7 +125,7 @@ class AutoPilot extends React.Component {
                             </Breadcrumb>
                         </div>
 
-                        <div className={styles.Details}>
+                        <div className={styles.Title}>
                             <Title>{autoPilot?.Name}</Title>
                             <Paragraph type="secondary">
                                 {autoPilot?.Description}
@@ -283,7 +283,7 @@ class AutoPilot extends React.Component {
 
 
                                 <br/>
-                                <br />
+                                <br/>
                                 <Button type={'primary'} onClick={this.onSubmit}>Save changes</Button>
 
                             </Form>
@@ -291,8 +291,7 @@ class AutoPilot extends React.Component {
 
                         <br />
                         <Divider/>
-                        <h2> Delete Auto Pilot:</h2>
-                        <Button type={'danger'} onClick={this.handleDelete}>Delete</Button>
+                        <Button type={'danger'} size={'large'} onClick={this.handleDelete}>Delete Auto Pilot</Button>
 
                         {/*Blur Effect (Hidden) */}
                         <div style={{display: 'none'}}>

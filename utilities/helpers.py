@@ -11,6 +11,7 @@ from cryptography.fernet import Fernet
 from sqlalchemy_utils import Currency
 from typing import List
 from flask_jwt_extended import get_jwt_identity
+from forex_python.converter import CurrencyRates
 import re, os, stripe, gzip, functools, logging, geoip2.webservice
 
 
@@ -31,7 +32,8 @@ logging.basicConfig(filename='logs/errors.log',
 # Fernet for encryption
 fernet = Fernet(os.environ['SECRET_KEY_TEMP'])
 
-
+# Currency converter by forex-python
+currencyConverter = CurrencyRates()
 
 
 # ======== Helper Functions ======== #

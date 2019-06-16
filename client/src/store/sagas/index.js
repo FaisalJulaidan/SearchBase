@@ -1,6 +1,6 @@
 export * from './auth.saga';
 export * from './assistant.saga';
-export * from './profile.saga';
+export * from './account.saga';
 export * from './conversation.saga';
 export * from './usersManagement.saga';
 export * from './database.saga';

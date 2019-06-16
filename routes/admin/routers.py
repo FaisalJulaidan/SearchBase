@@ -1,7 +1,7 @@
 from flask import Blueprint
 
-from .account.profile import profile_router
-profile_router: Blueprint = profile_router
+from .account.account import account_router
+profile_router: Blueprint = account_router
 
 from .account.users import users_router
 users_router: Blueprint = users_router
@@ -26,9 +26,6 @@ crm_router: Blueprint = crm_router
 
 from .account.users import users_router
 users_router: Blueprint = users_router
-
-from .account.profile import profile_router
-profile_router: Blueprint = profile_router
 
 from .database.database import database_router
 database_router: Blueprint = database_router

@@ -54,8 +54,12 @@ class Company(db.Model):
     Name = db.Column(db.String(80), nullable=False)
     URL = db.Column(db.String(250), nullable=False)
     LogoPath = db.Column(db.String(64), nullable=True)
-    StripeID = db.Column(db.String(68), unique=True, nullable=False, )
+    StripeID = db.Column(db.String(68), unique=True, nullable=False)
     SubID = db.Column(db.String(68), unique=True, default=None)
+
+    TrackingData = db.Column(db.Boolean, nullable=False, default=False)
+    TechnicalSupport = db.Column(db.Boolean, nullable=False, default=True)
+    AccountSpecialist = db.Column(db.Boolean, nullable=False, default=False)
 
     # Relationships:
     Users = db.relationship('User', back_populates='Company')
@@ -82,13 +86,9 @@ class User(db.Model):
         ],
         deprecated=['md5_crypt']
     ))
+
     Verified = db.Column(db.Boolean(), nullable=False, default=False)
-
-    TrackingData = db.Column(db.Boolean, nullable=False, default=False)
-    TechnicalSupport = db.Column(db.Boolean, nullable=False, default=False)
-    AccountSpecialist = db.Column(db.Boolean, nullable=False, default=False)
-    UserInputNotifications = db.Column(db.Boolean, nullable=False, default=False)
-
+    ChatbotNotifications = db.Column(db.Boolean, nullable=False, default=False)
     LastAccess = db.Column(db.DateTime(), nullable=True)
     CreatedOn = db.Column(db.DateTime(), nullable=False, default=datetime.now)
 

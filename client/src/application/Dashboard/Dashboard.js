@@ -20,9 +20,9 @@ const Assistants = lazy(() => import('./Assistants/Assistants'));
 const Assistant = lazy(() => import('./Assistants/Assistant/Assistant'));
 const Databases = lazy(() => import('./Databases/Databases'));
 const Database = lazy(() => import('./Databases/Database/Database'));
-const Profile = lazy(() => import('./AccountDetails/Profile/Profile'));
-const Billing = lazy(() => import('./AccountDetails/Billing/Billing'));
-const UsersManagement = lazy(() => import('./AccountDetails/UsersManagement/UsersManagement'));
+const Account = lazy(() => import('./ControlPanel/Account/Account'));
+const Billing = lazy(() => import('./ControlPanel/Billing/Billing'));
+const UsersManagement = lazy(() => import('./ControlPanel/UsersManagement/UsersManagement'));
 const Documentation = lazy(() => import('./Documentation/Documentation'));
 const Calendar = lazy(() => import('./Calendar/Calendar'));
 const AutoPilots = lazy(() => import('./AutoPilot/AutoPilots'));
@@ -85,7 +85,7 @@ class Dashboard extends Component {
             );
             let userInfoMenu = (
                 <Menu onClick={this.handleMenuClick}>
-                    <Menu.Item key="profile">
+                    <Menu.Item key="account">
                         <div style={{display: 'flex', marginTop: '10px'}}>
                             {avatar}
                             <div style={{marginLeft: '10px'}}>
@@ -109,8 +109,15 @@ class Dashboard extends Component {
         }
         // End of User Information
 
-        const newLayoutRoutes = ["/dashboard/assistants", "/dashboard/marketplace", "/dashboard/calendar", "/dashboard/auto_pilot", "/dashboard/databases"];
-        const isNewLyaout = newLayoutRoutes.some(a => this.props.location.pathname.indexOf(a) > -1);
+        const newLayoutRoutes = [
+            "/dashboard/assistants",
+            "/dashboard/marketplace",
+            "/dashboard/calendar",
+            "/dashboard/auto_pilot",
+            "/dashboard/databases",
+            "/dashboard/account",
+        ];
+        const isNewLayout = newLayoutRoutes.some(a => this.props.location.pathname.indexOf(a) > -1);
         return (
             <Layout style={{height: '100%'}}>
                 <Sider
@@ -118,7 +125,7 @@ class Dashboard extends Component {
                     collapsible
                     collapsed={this.state.collapsed}
                     style={{
-                        // backgroundColor: isNewLyaout ? '#20252e' : ''
+                        // backgroundColor: isNewLayout ? '#20252e' : ''
                     }}
 
                     className={styles.Sider}>
@@ -136,7 +143,7 @@ class Dashboard extends Component {
                                     <div style={{
                                         lineHeight: '32px',
                                         marginLeft: 18,
-                                        // color: isNewLyaout ? 'white' : '#9254de'
+                                        // color: isNewLayout ? 'white' : '#9254de'
                                         color: "#9254de"
                                     }}>TheSearchBase
                                     </div>
@@ -146,7 +153,7 @@ class Dashboard extends Component {
                     </div>
 
                     <Menu
-                        // theme={isNewLyaout ? "dark" : "light"}
+                        // theme={isNewLayout ? "dark" : "light"}
                         theme={"light"}
                         defaultSelectedKeys={this.state.selectedMenuKey}
                         selectedKeys={location.pathname.split('/')[2] ? [location.pathname.split('/')[2]] : [location.pathname.split('/')[1]]}
@@ -183,10 +190,10 @@ class Dashboard extends Component {
 
                         <Divider/>
 
-                        <SubMenu key="sub2" title={<span><Icon type="user"/><span>Account Details</span></span>}>
-                            <Menu.Item key="profile">
+                        <SubMenu key="sub2" title={<span><Icon type="user"/><span>Control Panel</span></span>}>
+                            <Menu.Item key="account">
                                 <Icon type="profile"/>
-                                Profile
+                                Account
                             </Menu.Item>
 
                             {/*<Menu.Item key="billing">*/}
@@ -194,9 +201,9 @@ class Dashboard extends Component {
                             {/*Billing*/}
                             {/*</Menu.Item>*/}
 
-                            <Menu.Item key="users_management" style={{fontSize: '9pt'}}>
+                            <Menu.Item key="users_management">
                                 <Icon type="usergroup-add"/>
-                                Users Management
+                                Users
                             </Menu.Item>
                         </SubMenu>
 
@@ -212,7 +219,7 @@ class Dashboard extends Component {
 
                     <Header className={styles.Header}
                             style={
-                                isNewLyaout ?
+                                isNewLayout ?
                                     {
                                         position: 'fixed',
                                         width: `calc(100% - ${this.state.collapsed ? 80 : 200}px)`,
@@ -234,7 +241,7 @@ class Dashboard extends Component {
                     {/*HERE GOES ALL THE ROUTES*/}
 
                     <Content style={
-                        isNewLyaout ?
+                        isNewLayout ?
                             {minHeight: 'auto', marginTop: 64}
                             :
                             {margin: 16, marginTop: 10, marginBottom: 0, height: '100%'}
@@ -255,7 +262,7 @@ class Dashboard extends Component {
                                             <Route path={`${match.path}/databases/:id`} component={Database} exact/>
 
                                             <Route path={`${match.path}/calendar`} component={Calendar} exact/>
-                                            <Route path={`${match.path}/profile`} component={Profile} exact/>
+                                            <Route path={`${match.path}/account`} component={Account} exact/>
                                             <Route path={`${match.path}/billing`} component={Billing} exact/>
 
                                             <Route path={`${match.path}/auto_pilots`} component={AutoPilots} exact/>
@@ -284,7 +291,7 @@ class Dashboard extends Component {
 
 function mapStateToProps(state) {
     return {
-        profile: state.profile.profile
+        account: state.account.account
     };
 }
 

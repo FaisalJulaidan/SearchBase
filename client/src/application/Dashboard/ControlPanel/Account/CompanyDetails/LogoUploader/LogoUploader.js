@@ -4,9 +4,11 @@ import {croppedImg} from 'helpers/cropImage'
 import {Button, Card, Icon, Modal, Upload} from 'antd';
 import Cropper from 'react-easy-crop'
 import styles from './LogoUploader.module.less'
-import {profileActions} from "store/actions";
+import {accountActions} from "store/actions";
 
 const Dragger = Upload.Dragger;
+
+
 
 class LogoUploader extends Component {
 
@@ -36,14 +38,14 @@ class LogoUploader extends Component {
 
     onZoomChange = zoom => this.setState({zoom});
 
-    handleCancel = () => this.setState({newAutoPilotModalVisible: false});
+    handleCancel = () => this.setState({visible: false});
 
     handleOk = async () => {
         const croppedImage = await croppedImg(this.state.imageSrc, this.state.croppedAreaPixels, this.state.mainFile.name);
         const formData = new FormData();
         formData.append('file', croppedImage);
         this.props.uploadLogo(formData);
-        this.setState({newAutoPilotModalVisible: false});
+        this.setState({visible: false});
     };
 
     onFileChange = async e => {
@@ -54,7 +56,7 @@ class LogoUploader extends Component {
                 imageSrc: imageDataUrl,
                 crop: {x: 0, y: 0},
                 zoom: 1,
-                newAutoPilotModalVisible: true
+                visible: true
             })
         }
     };
@@ -67,7 +69,7 @@ class LogoUploader extends Component {
             name: 'file',
             beforeUpload: file => {
                 this.onFileChange(file);
-                this.setState({newAutoPilotModalVisible: true});
+                this.setState({visible: true});
 
                 return false;
             },
@@ -75,11 +77,12 @@ class LogoUploader extends Component {
             accept: 'image/png',
             showUploadList: false
         };
-        const {profileData} = this.props;
+
+        const {account} = this.props;
         return (
             <div>
                 <div style={{width: 300}}>
-                    <h3>Logo uploader</h3>
+
                     <Dragger {...props}>
                         <p className="ant-upload-drag-icon">
                             <Icon type="inbox"/>
@@ -92,13 +95,13 @@ class LogoUploader extends Component {
                     </Dragger>
 
                     {
-                        profileData?.company?.LogoPath ?
+                        account?.company?.LogoPath ?
                             <div>
                                 <h3>The current logo</h3>
                                 <Card hoverable
                                       style={{width: 300, textAlign: 'center'}}
                                       cover={<img alt="example"
-                                                  src={`${process.env.REACT_APP_ASSETS_PUBLIC_URL}${process.env.REACT_APP_ENV}/company_logos/${profileData?.company.LogoPath}?timestamp=${this.state.timeStamp}`}/>}
+                                                  src={`${process.env.REACT_APP_ASSETS_PUBLIC_URL}${process.env.REACT_APP_ENV}/company_logos/${account?.company.LogoPath}?timestamp=${this.state.timeStamp}`}/>}
                                 >
                                     <Button type={'danger'} onClick={() => this.deleteLogo()}>Delete</Button>
                                 </Card>
@@ -133,11 +136,9 @@ class LogoUploader extends Component {
 function readFile(file) {
     return new Promise(resolve => {
         const reader = new FileReader();
-        reader.addEventListener('load', () => resolve(reader.result), false)
+        reader.addEventListener('load', () => resolve(reader.result), false);
         reader.readAsDataURL(file)
     })
 }
-
-
 
 export default LogoUploader;

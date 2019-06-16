@@ -46,17 +46,11 @@ class ChangePassword extends React.Component {
     render() {
         const {getFieldDecorator} = this.props.form;
 
-        const formItemLayout = {
-            labelCol: {span: 6},
-            wrapperCol: {span: 14}
-        };
-
         return (
-            <Form onSubmit={this.handleSubmit}>
+            <Form layout='vertical' wrapperCol={{span: 12}} onSubmit={this.handleSubmit}>
 
                 <FormItem
-                    label={"Old Password:"}
-                    {...formItemLayout}>
+                    label={"Old Password:"}>
                     {getFieldDecorator('oldPassword', {
                         rules: [{required: true, message: 'Please input your old password!'},],
                     })(
@@ -67,8 +61,7 @@ class ChangePassword extends React.Component {
                 </FormItem>
 
                 <FormItem
-                    label={"New Password:"}
-                    {...formItemLayout}>
+                    label={"New Password:"}>
                     {getFieldDecorator('newPassword', {
                         rules: [
                             {required: true, message: 'Please input your new password!'},
@@ -83,8 +76,7 @@ class ChangePassword extends React.Component {
                 </FormItem>
 
                 <FormItem
-                    label={"Confirm Password:"}
-                    {...formItemLayout}>
+                    label={"Confirm Password:"}>
                     {getFieldDecorator('confirmNewPassword', {
                         rules: [
                             {required: true, message: 'Please confirm your new password!'},
@@ -99,9 +91,7 @@ class ChangePassword extends React.Component {
                 </FormItem>
                 <br/>
 
-                <div style={{textAlign: "center", marginBottom: "25px"}}><Button htmlType={"submit"}
-                                                           className={"ant-btn-primary"}>Update</Button>
-                </div>
+                <Button htmlType={"submit"} type={'primary'} size={'large'}>Update Password</Button>
             </Form>
         )
     }

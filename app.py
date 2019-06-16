@@ -14,7 +14,7 @@ from flask_babel import Babel
 from services import scheduler_services, mail_services, assistant_services
 from datetime import datetime
 # Import all routers to register them as blueprints
-from routes.admin.routers import profile_router, analytics_router, sub_router, \
+from routes.admin.routers import account_router, analytics_router, sub_router, \
     conversation_router, users_router, flow_router, assistant_router,\
     database_router, options_router, crm_router, auto_pilot_router
 from routes.public.routers import public_router, reset_password_router, chatbot_router, auth_router, appointment_router
@@ -27,7 +27,7 @@ app.register_blueprint(flow_router, url_prefix='/api')
 app.register_blueprint(crm_router, url_prefix='/api')
 app.register_blueprint(public_router)
 app.register_blueprint(reset_password_router, url_prefix='/api')
-app.register_blueprint(profile_router, url_prefix='/api')
+app.register_blueprint(account_router, url_prefix='/api')
 app.register_blueprint(sub_router)
 app.register_blueprint(analytics_router, url_prefix='/api')
 app.register_blueprint(conversation_router, url_prefix='/api')

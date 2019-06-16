@@ -1,7 +1,7 @@
 import {combineReducers} from 'redux';
 import {auth} from './auth.reducer';
 import {assistant} from "./assistant.reducer";
-import {profile} from "./profile.reducer";
+import {account} from "./account.reducer";
 import {conversation} from "./conversation.reducer";
 import {usersManagement} from "./usersManagement.reducer";
 import {database} from "./database.reducer";
@@ -19,7 +19,7 @@ const appReducer = combineReducers({
     crm,
     assistant,
     autoPilot,
-    profile,
+    account,
     conversation,
     usersManagement,
     database,

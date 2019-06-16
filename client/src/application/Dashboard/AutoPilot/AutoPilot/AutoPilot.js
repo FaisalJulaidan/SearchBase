@@ -172,9 +172,6 @@ class AutoPilot extends React.Component {
                                 </FormItem>
 
                                 <br />
-                                <Button type={'primary'} onClick={this.onSubmit}>Save changes</Button>
-
-                                <br />
                                 <Divider/>
                                 <h2> Applications Acceptance Automation:</h2>
                                 <FormItem label="Auto accept applicants "
@@ -215,11 +212,9 @@ class AutoPilot extends React.Component {
                                 </FormItem>
 
                                 <br />
-                                <Button type={'primary'} onClick={this.onSubmit}>Save changes</Button>
-
-                                <br />
                                 <Divider/>
                                 <h2> Applications Rejection Automation:</h2>
+
                                 <Form.Item label="Auto reject applicants "
                                            help="Select the percentage to auto reject the applicants">
                                     {getFieldDecorator('rejectApplications', {
@@ -254,9 +249,6 @@ class AutoPilot extends React.Component {
                                 </FormItem>
 
                                 <br />
-                                <Button type={'primary'} onClick={this.onSubmit}>Save changes</Button>
-
-                                <br />
                                 <Divider/>
                                 <h2> Manage Appointments Automation:</h2>
                                 <FormItem label="Auto manage candidates appointments"
@@ -279,13 +271,6 @@ class AutoPilot extends React.Component {
                                            autoPilot={autoPilot}
                                            layout={layout}
                                            showSetAppointment={this.state.sendCandidatesAppointments}/>
-
-
-
-                                <br/>
-                                <br/>
-                                <Button type={'primary'} onClick={this.onSubmit}>Save changes</Button>
-
                             </Form>
                         }
 

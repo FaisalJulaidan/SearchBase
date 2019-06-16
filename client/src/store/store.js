@@ -14,7 +14,7 @@ import {
     crmSaga,
     databaseSaga,
     optionsSaga,
-    profileSaga,
+    accountSaga,
     usersManagementSaga
 } from './sagas'
 
@@ -38,7 +38,7 @@ const persistor = persistStore(store);
 
 sagaMiddleware.run(assistantSaga);
 sagaMiddleware.run(authSaga);
-sagaMiddleware.run(profileSaga);
+sagaMiddleware.run(accountSaga);
 sagaMiddleware.run(conversationSaga);
 sagaMiddleware.run(usersManagementSaga);
 sagaMiddleware.run(databaseSaga);

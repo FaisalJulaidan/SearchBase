@@ -234,7 +234,7 @@ class Settings extends Component {
 
 
 
-                    <Button type={'primary'} onClick={this.handleSave}>Save changes</Button>
+                    <Button type={'primary'} size={'large'} onClick={this.handleSave}>Save changes</Button>
                 </Form>
 
                 <br />

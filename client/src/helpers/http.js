@@ -77,10 +77,11 @@ http.interceptors.response.use(
             if (error.request.responseURL.includes('assistants')) {
                 console.log('there is an error with Assistants and will notify Sentry');
                 errorHandler(error);
-                return;
             }
 
-        } else
+        } else {
             return Promise.reject(error);
+        }
+
     }
 );

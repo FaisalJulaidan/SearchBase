@@ -78,7 +78,7 @@ def getAllByCompanyIDWithEnabledNotifications(companyID) -> Callback:
     try:
         # Get result and check if None then raise exception
         result = db.session.query(User) \
-            .filter(and_(User.CompanyID == companyID, User.UserInputNotifications)).all()
+            .filter(and_(User.CompanyID == companyID, User.ChatbotNotifications)).all()
         if not result: raise Exception
 
         return Callback(True,
@@ -115,7 +115,7 @@ def getProfile(userID):
         profile = {
             'user': helpers.getDictFromSQLAlchemyObj(result),
             'company': helpers.getDictFromSQLAlchemyObj(result.Company),
-            'newsletters': newsletter_services.checkForNewsletter(result.Email).Success
+            'newsletters': newsletter_services.check(result.Email).Success
         }
 
         # For security purposes IMPORTANT!
@@ -210,18 +210,37 @@ def updateStripeID(email, cusID: str):
         return Callback(False, 'Could not update subID for ' + email)
 
 
-def updateUser(firstname, surname, newEmail, userID):
+def updateUser(firstname, surname, phoneNumber, chatbotNotifications: bool, newsletters: bool, userID):
     try:
+
+        if not (firstname
+                and surname
+                and isinstance(phoneNumber, str)
+                and isinstance(chatbotNotifications, bool)
+                and isinstance(newsletters, bool)):
+            raise Exception("Did not provide all required fields")
+
         callback: Callback = getByID(userID)
         if not callback: return Callback(False, "Could not find user")
+        user: User = callback.Data
 
-        callback.Data.Firstname = firstname
-        callback.Data.Surname = surname
-        callback.Data.Email = newEmail
+        user.Firstname = firstname
+        user.Surname = surname
+        user.PhoneNumber = phoneNumber
+        user.ChatbotNotifications = chatbotNotifications
 
+        if newsletters:
+            newsletters_callback: Callback = newsletter_services.add(user.Email)
+        else:
+            newsletters_callback: Callback = newsletter_services.remove(user.Email)
+
+        if not newsletters_callback.Success:
+            raise Exception(newsletters_callback.Message)
+
+        # Save
         db.session.commit()
 
-        return Callback(True, "User has been updated")
+        return Callback(True, "User has been updated", user)
     except Exception as exc:
         helpers.logError("user_services.updateUser(): " + str(exc))
         db.session.rollback()
@@ -240,7 +259,7 @@ def updatePasswordByID(userID, newPassword, oldPassword=None):
 
         result.Password = newPassword
         db.session.commit()
-        return Callback(True, "Password has been changed.")
+        return Callback(True, "Password updated successfully.")
 
     except Exception as exc:
         helpers.logError("user_services.changePasswordByID(): " + str(exc))

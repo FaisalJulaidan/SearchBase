@@ -1,21 +1,21 @@
 import * as actionTypes from './actionTypes';
 
-const getProfile = () => {
+const getAccount = () => {
     return {
-        type: actionTypes.GET_PROFILE_REQUEST
+        type: actionTypes.GET_ACCOUNT_REQUEST
     }
 };
 
-const getProfileSuccess = (profile) => {
+const getAccountSuccess = (account) => {
     return {
-        type: actionTypes.GET_PROFILE_SUCCESS,
-        profileData: profile
+        type: actionTypes.GET_ACCOUNT_SUCCESS,
+        account
     }
 };
 
-const getProfileFailure = (error) => {
+const getAccountFailure = (error) => {
     return {
-        type: actionTypes.GET_PROFILE_FAILURE,
+        type: actionTypes.GET_ACCOUNT_FAILURE,
         error
     }
 };
@@ -41,23 +41,23 @@ const saveProfileDetailsFailure = (error) => {
     }
 };
 
-const saveDataSettings = (dataSettings) => {
+const saveCompanyDetails = (dataSettings) => {
     return {
-        type: actionTypes.SAVE_DATA_SETTINGS_REQUEST,
+        type: actionTypes.SAVE_COMPANY_DETAILS_REQUEST,
         dataSettings
     }
 };
 
-const saveDataSettingsSuccess = (successMsg) => {
+const saveCompanyDetailsSuccess = (successMsg) => {
     return {
-        type: actionTypes.SAVE_DATA_SETTINGS_SUCCESS,
+        type: actionTypes.SAVE_COMPANY_DETAILS_SUCCESS,
         successMsg
     }
 };
 
-const saveDataSettingsFailure = (error) => {
+const saveCompanyDetailsFailure = (error) => {
     return {
-        type: actionTypes.SAVE_DATA_SETTINGS_FAILURE,
+        type: actionTypes.SAVE_COMPANY_DETAILS_FAILURE,
         error
     }
 };
@@ -126,16 +126,16 @@ const deleteLogoFailure = (error) => {
     };
 };
 
-export const profileActions = {
-    getProfile,
-    getProfileSuccess,
-    getProfileFailure,
+export const accountActions = {
+    getAccount,
+    getAccountSuccess,
+    getAccountFailure,
     saveProfileDetails,
     saveProfileDetailsSuccess,
     saveProfileDetailsFailure,
-    saveDataSettings,
-    saveDataSettingsSuccess,
-    saveDataSettingsFailure,
+    saveCompanyDetails,
+    saveCompanyDetailsSuccess,
+    saveCompanyDetailsFailure,
 
     changePassword,
     changePasswordSuccess,

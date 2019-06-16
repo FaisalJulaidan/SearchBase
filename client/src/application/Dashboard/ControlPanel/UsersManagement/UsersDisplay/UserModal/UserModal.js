@@ -40,7 +40,7 @@ class UserModal extends React.Component {
                 width={800}
                 title="Add New User"
                 destroyOnClose={true}
-                visible={this.props.newAutoPilotModalVisible}
+                visible={this.props.visible}
                 onOk={this.props.handleSave}
                 onCancel={this.props.handleCancel}
                 footer={[

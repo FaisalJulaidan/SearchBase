@@ -1,31 +1,39 @@
 from models import db, Callback, Newsletter
 from utilities import helpers
 import logging, sqlalchemy.exc
+from sqlalchemy import exists
 
-def addNewsletterPerson(email):
+def add(email):
     try:
-        newNewsletter = Newsletter(Email=email)
-        db.session.add(newNewsletter)
+        exists = db.session.query(Newsletter).filter(Newsletter.Email == email).scalar() is not None
 
-        db.session.commit()
-        return Callback(True, email + ' has been registered for newsletters.')
+        if not exists:
+            newNewsletter = Newsletter(Email=email)
+            db.session.add(newNewsletter)
+            db.session.commit()
+
+        return Callback(True, email + ' registered for newsletters successfully.')
+
     except Exception as exc:
         helpers.logError("newsletter_service.addNewsletterPerson(): " + str(exc))
         db.session.rollback()
         return Callback(False, 'Could not register' + email+ ' for newsletters.')
 
-def checkForNewsletter(email):
+def check(email):
     try:
-        result = db.session.query(Newsletter).filter(Newsletter.Email == email).first()
-        if not result: raise Exception
 
+        exists = db.session.query(Newsletter).filter(Newsletter.Email == email).scalar() is not None
+        if not exists:
+            Callback(False, email + ' is not registered for newsletters')
         return Callback(True, email + ' is registered for newsletters')
+
     except Exception as exc:
+        helpers.logError("newsletter_service.check(): " + str(exc))
         db.session.rollback()
-        return Callback(False, email + ' is not registered for newsletters')
+        return Callback(False, "Cannot check if email is registered for newsletters")
 
 
-def removeNewsletterPerson(email):
+def remove(email):
     try:
         db.session.query(Newsletter).filter(Newsletter.Email == email).delete()
         db.session.commit()

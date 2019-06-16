@@ -1,9 +1,11 @@
 import React from 'react'
 import styles from './AppointmentsPicker.module.less'
-import {Button, Typography} from 'antd'
+import {Button, Skeleton, Typography} from 'antd'
 import {faCloud} from '@fortawesome/free-solid-svg-icons'
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
 import moment from 'moment';
+import {appointmentsPickerActions} from "store/actions";
+import {connect} from 'react-redux';
 
 const {Title, Paragraph, Text} = Typography;
 
@@ -21,10 +23,14 @@ class AppointmentsPicker extends React.Component {
     };
 
     firstDateAfter4weeks = moment().add(28, 'day');
+    requestToken = 'dummyText';
 
     componentDidMount() {
         this.updateWindowDimensions();
         window.addEventListener('resize', this.updateWindowDimensions);
+
+        this.requestToken = this.props.location.pathname.split('/')[2];
+        this.props.dispatch(appointmentsPickerActions.fetchAppointment(this.requestToken));
     }
 
     componentWillUnmount() {
@@ -34,7 +40,6 @@ class AppointmentsPicker extends React.Component {
     updateWindowDimensions() {
         this.setState({width: window.innerWidth, height: window.innerHeight});
     }
-
 
 
     getTimeSlots = (From, To, duration) => {
@@ -64,9 +69,7 @@ class AppointmentsPicker extends React.Component {
     });
 
     render() {
-
         const range = this.state.width < 700 ? 3 : 7;
-
         const weekDaysKey = {
             0: 'Sun',
             1: 'Mon',
@@ -78,190 +81,116 @@ class AppointmentsPicker extends React.Component {
         };
 
         let weekDays = [];
-        const json_res = {
-            companyLogoURL: null,
-            openTimes: [
-                {
-                    ID: 1,
-                    Day: 0,
-                    From: '08:30:00',
-                    To: '10:30:00',
-                    Duration: 60,
-                    Active: true,
-                    AutoPilotID: 1
-                },
-                {
-                    ID: 2,
-                    Day: 1,
-                    From: '08:30:00',
-                    To: '10:30:00',
-                    Duration: 60,
-                    Active: false,
-                    AutoPilotID: 1
-                },
-                {
-                    ID: 3,
-                    Day: 2,
-                    From: '08:30:00',
-                    To: '10:30:00',
-                    Duration: 60,
-                    Active: true,
-                    AutoPilotID: 1
-                },
-                {
-                    ID: 4,
-                    Day: 3,
-                    From: '08:30:00',
-                    To: '10:30:00',
-                    Duration: 60,
-                    Active: true,
-                    AutoPilotID: 1
-                },
-                {
-                    ID: 5,
-                    Day: 4,
-                    From: '08:30:00',
-                    To: '10:30:00',
-                    Duration: 60,
-                    Active: false,
-                    AutoPilotID: 1
-                },
-                {
-                    ID: 6,
-                    Day: 5,
-                    From: '08:30:00',
-                    To: '10:30:00',
-                    Duration: 60,
-                    Active: false,
-                    AutoPilotID: 1
-                },
-                {
-                    ID: 7,
-                    Day: 6,
-                    From: '00:00:00',
-                    To: '10:30:00',
-                    Duration: 30,
-                    Active: true,
-                    AutoPilotID: 1
-                }
-            ],
-            takenTimeSlots: [
-                {
-                    ID: 1,
-                    DateTime: "Wed, 19 Jun 2019 9:30:39 GMT",
-                    AssistantID: 1,
-                    ConversationID: 1
-                },
-                {
-                    ID: 1,
-                    DateTime: "Sun, 16 Jun 2019 10:30:39 GMT",
-                    AssistantID: 1,
-                    ConversationID: 1
-                },
-                {
-                    ID: 1,
-                    DateTime: "Wed, 19 Jun 2019 8:30:39 GMT",
-                    AssistantID: 1,
-                    ConversationID: 1
-                }
-            ],
-            userName: 'Faisal Julaidan'
-        };
+
+        const sv_appointment = this.props.appointment;
 
 
-        for (let i = 0; i < range; i++) {
-            const date = this.state.firstDate.clone().add(i, 'days');
-            const weekDay = {
-                day: date.date(),
-                dayText: date.format('ddd'), // Sun
-                month: date.month(),
-                monthText: date.format('MMM'), // Jun
-                year: date.year(),
+        // sv_appointment.openTimes.forEach(openTime => {
+        //
+        //     // console.log(openTime.From, 'from');
+        //     // console.log(openTime.To, 'to');
+        // });
 
-                slots: []
-            };
-
-            const svWeekDay = json_res.openTimes.find(ot => weekDaysKey[ot.Day] === weekDay.dayText);
-
-            svWeekDay.To = moment(svWeekDay.To, 'HH:mm');
-            svWeekDay.From = moment(svWeekDay.From, 'HH:mm');
-
-            const totalSlots = this.getTimeSlots(
-                svWeekDay.From,
-                svWeekDay.To,
-                svWeekDay.Duration
-            );
-
-            // generate slots
-            for (let j = 0; j <= totalSlots; j++) {
-                if (j === 0)
-                    weekDay.slots.push({
-                        active: svWeekDay.Active,
-                        duration: svWeekDay.Duration,
-                        time: svWeekDay.From.format('HH:mm')
-                    });
-                else
-                    weekDay.slots.push({
-                        active: svWeekDay.Active,
-                        duration: svWeekDay.Duration,
-                        time: svWeekDay.From.add(svWeekDay.Duration, 'minutes').format('HH:mm')
-                    });
-            }
-
-            weekDays.push(weekDay)
+        for (const i in sv_appointment.openTimes) {
+            sv_appointment.openTimes[i].From = moment(sv_appointment.openTimes[i].From, 'HH:mm');
+            sv_appointment.openTimes[i].To = moment(sv_appointment.openTimes[i].To, 'HH:mm')
         }
 
+        if (sv_appointment.openTimes) {
 
-        /**
-         * Refining the taken slots:
-         *  1- find the day
-         *  2- find the slot
-         *  3- deactivate the slot
-         */
-        for (let i = 0; i < range; i++) {
-            json_res.takenTimeSlots.forEach((timeSlot) => {
-                const takenTimeSlot = moment(timeSlot.DateTime, 'ddd, DD MMM YYYY HH:mm:ss');
-                // finding the day
-                weekDays.find(weekDay => {
-                    // founded the day
-                    if (weekDay.day === takenTimeSlot.date() && weekDay.month === takenTimeSlot.month()) {
-                        // finding the slot
-                        weekDay.slots.find(slot => {
-                            // founded the slot
-                            if (slot.time === takenTimeSlot.format('HH:mm')) {
-                                // deactivate it
+            for (let i = 0; i < range; i++) {
+                const date = this.state.firstDate.clone().add(i, 'days');
+
+                const weekDay = {
+                    day: date.date(),
+                    dayText: date.format('ddd'), // Sun
+                    month: date.month(),
+                    monthText: date.format('MMM'), // Jun
+                    year: date.year(),
+
+                    slots: []
+                };
+
+                const svWeekDay = sv_appointment.openTimes.find(ot => weekDaysKey[ot.Day] === weekDay.dayText);
+
+                const totalSlots = this.getTimeSlots(
+                    svWeekDay.From,
+                    svWeekDay.To,
+                    svWeekDay.Duration
+                );
+
+
+                // generate slots
+                for (let j = 0; j <= totalSlots; j++) {
+                    if (j === 0)
+                        weekDay.slots.push({
+                            active: svWeekDay.Active,
+                            duration: svWeekDay.Duration,
+                            time: svWeekDay.From.format('HH:mm')
+                        });
+                    else
+                        weekDay.slots.push({
+                            active: svWeekDay.Active,
+                            duration: svWeekDay.Duration,
+                            time: svWeekDay.From.clone().add(svWeekDay.Duration, 'minutes').format('HH:mm')
+                        });
+                }
+
+                weekDays.push(weekDay)
+            }
+
+
+            /**
+             * Refining the taken slots:
+             *  1- find the day
+             *  2- find the slot
+             *  3- deactivate the slot
+             */
+            for (let i = 0; i < range; i++) {
+                sv_appointment.takenTimeSlots.forEach((timeSlot) => {
+                    const takenTimeSlot = moment(timeSlot.DateTime, 'ddd, DD MMM YYYY HH:mm:ss');
+                    // finding the day
+                    weekDays.find(weekDay => {
+                        // founded the day
+                        if (weekDay.day === takenTimeSlot.date() && weekDay.month === takenTimeSlot.month()) {
+                            // finding the slot
+                            weekDay.slots.find(slot => {
+                                // founded the slot
+                                if (slot.time === takenTimeSlot.format('HH:mm')) {
+                                    // deactivate it
+                                    slot.active = false;
+                                }
+                            })
+                        }
+                    })
+                });
+            }
+
+            /**
+             * Refining the current day slots:
+             *  1- go for current day
+             *  2- deactivate all passed slots
+             */
+            // find the current day
+            weekDays.find(
+                weekDay => {
+                    // founded the current day
+                    if (weekDay.day === moment().date() && weekDay.month === moment().month()) {
+
+                        // 1- deactivate the passed slots
+                        // 2- deactivate the next 6 hours
+                        weekDay.slots.forEach(slot => {
+                            // is slot passed the current time ? then deactivate it
+                            if (moment(slot.time, 'HH:mm').isBefore())
                                 slot.active = false;
-                            }
+
+                            if (moment(slot.time, 'HH:mm').isBefore(moment().add(6, 'hours')))
+                                slot.active = false;
                         })
                     }
-                })
-            });
-        }
-
-        /**
-         * Refining the current day slots:
-         *  1- go for current day
-         *  2- deactivate all passed slots
-         */
-        // find the current day
-        weekDays.find(
-            weekDay => {
-                // founded the current day
-                if (weekDay.day === moment().date() && weekDay.month === moment().month()) {
-
-                    // 1- deactivate the passed slots
-                    // 2- deactivate the next 6 hours
-                    weekDay.slots.forEach(slot => {
-                        // is slot passed the current time ? then deactivate it
-                        if (moment(slot.time, 'HH:mm').isBefore())
-                            slot.active = false;
-
-                        if (moment(slot.time, 'HH:mm').isBefore(moment().add(6, 'hours')))
-                            slot.active = false;
-                    })
                 }
-            }
-        );
+            );
+        }
 
 
         return (
@@ -281,73 +210,75 @@ class AppointmentsPicker extends React.Component {
                 <div className={styles.Wrapper}>
 
                     <div className={styles.Title}>
-                        <Typography>
-                            <Title>Introduction</Title>
-                            <Paragraph>
-                                In the process of internal desktop applications development, many different design specs
-                                and
-                                implementations would be involved, which might cause designers and developers
-                                difficulties and
-                                duplication and reduce the efficiency of development.
-                            </Paragraph>
-                            <Paragraph>
-                                After massive project practice and summaries, Ant Design, a design language for
-                                background
-                                applications, is refined by Ant UED Team, which aims to{' '}
-                                <Text strong>
-                                    uniform the user interface specs for internal background projects, lower the
-                                    unnecessary
-                                    cost of design differences and implementation and liberate the resources of design
-                                    and
-                                    front-end development
-                                </Text>
-                            </Paragraph>
-                        </Typography>
+                        {
+                            this.props.appointment ?
+                                <Typography>
+                                    <Title>Hi {this.props.appointment.userName} </Title>
+                                    <Paragraph>
+                                        In the process of internal desktop applications development, many different
+                                        design specs
+                                        and
+                                        implementations would be involved, which might cause designers and developers
+                                        difficulties and
+                                        duplication and reduce the efficiency of development.
+                                    </Paragraph>
+                                </Typography>
+                                : <Skeleton active/>
+                        }
                     </div>
 
                     <div className={styles.Container}>
 
-                        <div className={styles.Table}>
-                            <div className={styles.TableContent}>
-                                <Button className={styles.NavigateButtons}
-                                        onClick={() => this.lastWeek(range)}
-                                        icon={'left'} size={'large'}></Button>
+                        {
+                            this.props.appointment ?
+                                <div className={styles.Table}>
+                                    <div className={styles.TableContent}>
+                                        <Button className={styles.NavigateButtons}
+                                                onClick={() => this.lastWeek(range)}
+                                                icon={'left'} size={'large'}></Button>
 
-                                <div className={styles.Columns}>
-                                    {
-                                        weekDays.map((weekDay, i) =>
-                                            <div key={i}>
-                                                <div className={styles.Header}>
-                                                    <h3>{weekDay.dayText}</h3>
-                                                    {weekDay.monthText} {weekDay.day}
-                                                </div>
-                                                {
-                                                    <div className={styles.Body}>
+                                        <div className={styles.Columns}>
+                                            {
+                                                weekDays.map((weekDay, i) =>
+                                                    <div key={i}>
+                                                        <div className={styles.Header}>
+                                                            <h3>{weekDay.dayText}</h3>
+                                                            {weekDay.monthText} {weekDay.day}
+                                                        </div>
                                                         {
-                                                            weekDay.slots.map(
-                                                                (slot, i) =>
-                                                                    <Button key={i} block
-                                                                            disabled={!slot.active}>{slot.time}</Button>
-                                                            )
+                                                            <div className={styles.Body}>
+                                                                {
+                                                                    weekDay.slots.map(
+                                                                        (slot, i) =>
+                                                                            <Button key={i} block
+                                                                                    disabled={!slot.active}>{slot.time}</Button>
+                                                                    )
+                                                                }
+                                                            </div>
                                                         }
+
                                                     </div>
-                                                }
+                                                )
+                                            }
+                                        </div>
 
-                                            </div>
-                                        )
-                                    }
+                                        <Button className={styles.NavigateButtons}
+                                                onClick={() => this.nextWeek(range)}
+                                                icon={'right'} size={'large'}></Button>
+                                    </div>
                                 </div>
+                                : <Skeleton active={true}/>
+                        }
 
-                                <Button className={styles.NavigateButtons}
-                                        onClick={() => this.nextWeek(range)}
-                                        icon={'right'} size={'large'}></Button>
-                            </div>
-                        </div>
+                        {
+                            this.props.appointment ?
+                                <div style={{width: '100%'}}>
+                                    <Button type={'primary'} style={{marginTop: 10, float: 'right'}}
+                                            size={'large'}>Submit</Button>
+                                </div>
+                                : <Skeleton active={true}/>
+                        }
 
-                        <div style={{width: '100%'}}>
-                            <Button type={'primary'} style={{marginTop: 10, float: 'right'}}
-                                    size={'large'}>Submit</Button>
-                        </div>
                     </div>
                 </div>
 
@@ -356,4 +287,10 @@ class AppointmentsPicker extends React.Component {
     }
 }
 
-export default AppointmentsPicker
+function mapStateToProps(state) {
+    return {
+        appointment: state.appointmentsPicker.appointment,
+    };
+}
+
+export default connect(mapStateToProps)(AppointmentsPicker);

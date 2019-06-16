@@ -8,4 +8,5 @@ export * from "./options.actions";
 export * from "./crm.actions";
 export * from "./autoPilot.actions";
 export * from "./analytics.actions";
+export * from "./appointmentsPicker.actions";
 

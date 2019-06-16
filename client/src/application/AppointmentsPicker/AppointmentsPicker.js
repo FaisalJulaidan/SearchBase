@@ -71,25 +71,18 @@ class AppointmentsPicker extends React.Component {
     render() {
         const range = this.state.width < 700 ? 3 : 7;
         const weekDaysKey = {
-            0: 'Sun',
-            1: 'Mon',
-            2: 'Tue',
-            3: 'Wed',
-            4: 'Thu',
-            5: 'Fri',
-            6: 'Sat',
+            0: 'Mon',
+            1: 'Tue',
+            2: 'Wed',
+            3: 'Thu',
+            4: 'Fri',
+            5: 'Sat',
+            6: 'Sun',
         };
 
         let weekDays = [];
 
         const sv_appointment = this.props.appointment;
-
-
-        // sv_appointment.openTimes.forEach(openTime => {
-        //
-        //     // console.log(openTime.From, 'from');
-        //     // console.log(openTime.To, 'to');
-        // });
 
         for (const i in sv_appointment.openTimes) {
             sv_appointment.openTimes[i].From = moment(sv_appointment.openTimes[i].From, 'HH:mm');
@@ -121,20 +114,21 @@ class AppointmentsPicker extends React.Component {
 
 
                 // generate slots
-                for (let j = 0; j <= totalSlots; j++) {
-                    if (j === 0)
-                        weekDay.slots.push({
-                            active: svWeekDay.Active,
-                            duration: svWeekDay.Duration,
-                            time: svWeekDay.From.format('HH:mm')
-                        });
-                    else
-                        weekDay.slots.push({
-                            active: svWeekDay.Active,
-                            duration: svWeekDay.Duration,
-                            time: svWeekDay.From.clone().add(svWeekDay.Duration, 'minutes').format('HH:mm')
-                        });
-                }
+                if (totalSlots)
+                    for (let j = 1; j <= totalSlots; j++) {
+                        if (j === 1)
+                            weekDay.slots.push({
+                                active: svWeekDay.Active,
+                                duration: svWeekDay.Duration,
+                                time: svWeekDay.From.format('HH:mm')
+                            });
+                        else
+                            weekDay.slots.push({
+                                active: svWeekDay.Active,
+                                duration: svWeekDay.Duration,
+                                time: svWeekDay.From.clone().add(svWeekDay.Duration * (j - 1), 'minutes').format('HH:mm')
+                            });
+                    }
 
                 weekDays.push(weekDay)
             }

@@ -47,7 +47,7 @@ class ChangePassword extends React.Component {
         const {getFieldDecorator} = this.props.form;
 
         return (
-            <Form layout='vertical' wrapperCol={{span: 12}} onSubmit={this.handleSubmit}>
+            <Form layout='vertical' wrapperCol={{span: 6}} onSubmit={this.handleSubmit}>
 
                 <FormItem
                     label={"Old Password:"}>

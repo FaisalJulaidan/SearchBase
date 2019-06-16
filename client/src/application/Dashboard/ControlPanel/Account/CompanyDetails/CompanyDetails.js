@@ -31,8 +31,8 @@ class CompanyDetails extends React.Component {
 
         return (
             <>
-                <Form layout='vertical' wrapperCol={{span: 12}} onSubmit={this.handleSubmit}>
-                    <h2>Company Details:</h2>
+                <Form layout='vertical' wrapperCol={{span: 6}} onSubmit={this.handleSubmit}>
+                    <h2>Company Details</h2>
 
                     <FormItem label={"Name"}>
                         {getFieldDecorator("companyName", {
@@ -113,7 +113,7 @@ class CompanyDetails extends React.Component {
 
                 <br/>
                 <Divider/>
-                <h2>Company Logo:</h2>
+                <h2>Company Logo</h2>
                 <p>
                     your company logo will replace TheSearchBase logo in the
                     chatbot and emails sent on behalf of your company by us

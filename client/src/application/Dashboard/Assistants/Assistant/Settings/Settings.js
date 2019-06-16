@@ -80,9 +80,9 @@ class Settings extends Component {
 
         return (
             <>
-                <Form layout='vertical' wrapperCol={{span: 12}}>
+                <Form layout='vertical' wrapperCol={{span: 6}}>
 
-                    <h2> Basic Settings:</h2>
+                    <h2>Basic Settings</h2>
                     <FormItem
                         label="Assistant Name"
                         extra="Enter a name for your assistant to easily identify it in the dashboard"
@@ -148,12 +148,12 @@ class Settings extends Component {
                             )
                         }
                     </FormItem>
-                    <Button type={'primary'} onClick={this.handleSave}>Save changes</Button>
+                    <Button type={'primary'} size={'large'} onClick={this.handleSave}>Save changes</Button>
 
                     {/* ================================ */}
                     <br />
                     <Divider/>
-                    <h2> Advanced Settings:</h2>
+                    <h2>Advanced Settings</h2>
 
                     <FormItem
                         label="Pop up after"
@@ -169,6 +169,7 @@ class Settings extends Component {
 
                     <Form.Item label="Alert Me Every:"
                                extra="Select how often you would like to be notified via email of new chats"
+                               wrapperCol={{span: 16}}
 
                     >
                         {getFieldDecorator('notifyEvery', {

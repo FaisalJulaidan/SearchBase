@@ -135,7 +135,7 @@ class AutoPilot extends React.Component {
 
                     <div className={styles.Body}>
                         {!autoPilot ? <Spin/> :
-                            <Form layout='vertical' wrapperCol = {{span: 12}} style={{width: '100%'}}>
+                            <Form layout='vertical' wrapperCol = {{span: 6}} style={{width: '100%'}}>
                                 <FormItem
                                     label="Name"
                                     >
@@ -213,7 +213,7 @@ class AutoPilot extends React.Component {
 
                                 <br />
                                 <Divider/>
-                                <h2> Applications Rejection Automation:</h2>
+                                <h2> Applications Rejection Automation</h2>
 
                                 <Form.Item label="Auto reject applicants "
                                            help="Select the percentage to auto reject the applicants">

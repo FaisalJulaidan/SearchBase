@@ -28,8 +28,8 @@ class ProfileDetails extends React.Component {
         return (
 
             <>
-                <Form layout='vertical' wrapperCol={{span: 12}} onSubmit={this.handleSubmit}>
-                    <h2> Profile Details:</h2>
+                <Form layout='vertical' wrapperCol={{span: 6}} onSubmit={this.handleSubmit}>
+                    <h2>Profile Details</h2>
                     <FormItem label={"First Name"}>
                         {getFieldDecorator("firstname", {
                             initialValue: account?.user?.Firstname,
@@ -113,8 +113,7 @@ class ProfileDetails extends React.Component {
                 </Form>
 
                 <Divider/>
-                <h2>Password Update:</h2>
-                <br />
+                <h2>Password Update</h2>
                 <ChangePassword savePassword={this.props.savePassword}/>
             </>
 

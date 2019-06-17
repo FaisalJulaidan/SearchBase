@@ -1,9 +1,11 @@
 from models import Callback, Calendar, db
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
+from utilities import helpers
 import enums
 import requests
 import os
 import dateutil
+import json
 from sqlalchemy import exc
 
 #todo - csrf - if necessary
@@ -70,3 +72,75 @@ def authorizeUser(code):
     except Exception as e:
         print(e)
         return Callback(False, str(e))
+
+'''Add event function'''
+''' Params
+    @companyID - The company ID the calendar relates to
+    @eventName - The name of the event, presented on the calendar
+    @description - Description of the event, presented on the calendar
+    @start - start date of the event (RFC 3339 - SEND WITH TIMEZONE)
+    @end - end date of the event (RFC 3339 - SEND WITH TIMEZONE)
+'''
+
+def addEvent(companyID, eventName, description, start, end):
+    try:
+        start = dateutil.parser.parse(start)
+        end = dateutil.parser.parse(end)
+
+        token = getToken(enums.Calendar.Google, companyID)
+        calendar = db.session.query(Calendar)\
+            .filter(Calendar.CompanyID == companyID) \
+            .filter(Calendar.Type == enums.Calendar.Google)\
+            .first()
+
+        calendarID = None
+        if calendar.MetaData is None:
+            calendarID = createCalendar(token)
+            #copy pre existing data?
+            calendar.MetaData = {'calendarID': calendarID}
+        else:
+            calendarID = calendar.MetaData['calendarID']
+            if not verifyCalendarExists(calendarID, token):
+                calendarID = createCalendar(token)
+                calendar.MetaData = {'calendarID': calendarID}
+
+        db.session.commit()
+
+        headers = {'Authorization': 'Bearer ' + token}
+        data = {'summary' : eventName,
+                'description': description,
+                'start': {'dateTime': start.isoformat()},
+                'end': {'dateTime': end.isoformat()}}
+        helpers.HPrint(json.dumps(data))
+        resp = requests.post("https://www.googleapis.com/calendar/v3/calendars/{}/events".format(calendarID), json=data, headers=headers)
+        return Callback(True, 'Successfully added event')
+    except Exception as e:
+        helpers.HPrint(str(e))
+
+
+def createCalendar(token):
+    try:
+        auth = {'Authorization': 'Bearer ' + token}
+        data = {'summary' : 'TSB Appointments'}
+        resp = requests.post("https://www.googleapis.com/calendar/v3/calendars", json=data, headers=auth)
+        if 'error' in resp.json():
+            raise Exception(resp.json()["error"])
+        return resp.json()['id']
+    except Exception as e:
+        helpers.HPrint(str(e))
+
+def verifyCalendarExists(id, token):
+    try:
+        auth = {'Authorization': 'Bearer ' + token}
+        resp = requests.get("https://www.googleapis.com/calendar/v3/users/me/calendarList", headers=auth)
+        print(resp.json())
+        if 'error' in resp.json():
+            raise Exception(resp.json()['error'])
+        else:
+            for item in resp.json()['items']:
+                if item['id'] == id:
+                    return True
+            return False
+    except Exception as e:
+        helpers.HPrint(str(e))
+        return False

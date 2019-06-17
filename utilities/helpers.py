@@ -529,14 +529,15 @@ def gzipped(f):
 
 # Check if the logged in user owns the accessed assistant for security
 def validAssistant(func):
-    def wrapperValidAssistant(assistantID):
+    def wrapper(assistantID):
         user = get_jwt_identity()['user']
         callback: Callback = assistant_services.getByID(assistantID, user['companyID'])
         if not callback.Success:
             return jsonResponse(False, 404, "Assistant not found.", None)
         assistant: Assistant = callback.Data
         return func(assistant)
-    return wrapperValidAssistant
+    wrapper.__name__ = func.__name__
+    return wrapper
 
 def findIndexOfKeyInArray(key, value, array):
     for item, idx in array:

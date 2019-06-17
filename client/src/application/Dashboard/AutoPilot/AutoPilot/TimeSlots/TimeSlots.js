@@ -105,8 +105,9 @@ class TimeSlots extends React.Component {
                 const totalHalfHours = (minutes / 30) + (hours * 2); // 1 + 6 = 7
 
                 if (this.state.duration === "60min")
-                    if (totalHalfHours < 2)
-                        return 0;
+                    if (totalHalfHours < 2) {
+                        return 'Non';
+                    }
                     else
                         return Math.ceil(totalHalfHours / 2);
                 else

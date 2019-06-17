@@ -49,9 +49,9 @@ def addAppointment(conversationID, assistantID, dateTime):
 
         db.session.add(
             Appointment(
-            DateTime=datetime.strptime(dateTime, "%Y-%m-%d %H:%M"),
-            AssistantID= assistantID,
-            ConversationID= conversationID
+                DateTime=datetime.strptime(dateTime, "%Y-%m-%d %H:%M"),  # 2019-06-23 16:04
+                AssistantID=assistantID,
+                ConversationID=conversationID
             )
         )
 

@@ -19,7 +19,8 @@ import re, os, stripe, gzip, functools, logging, geoip2.webservice
 # ======== Global Variables ======== #
 
 # GeoIP Client
-geoIP = geoip2.webservice.Client(140914, os.environ['GEOIP_KEY'])
+geoIP = geoip2.webservice.Client(140914, 'cKrqAZ675SPb')
+# geoIP = geoip2.webservice.Client(140914, os.environ['GEOIP_KEY'])
 
 # Signer
 verificationSigner = URLSafeTimedSerializer(os.environ['SECRET_KEY_TEMP'])

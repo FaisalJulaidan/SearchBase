@@ -7,7 +7,7 @@ import moment from 'moment';
 import {appointmentsPickerActions} from "store/actions";
 import {connect} from 'react-redux';
 
-const {Title, Paragraph, Text} = Typography;
+const {Title, Paragraph} = Typography;
 
 class AppointmentsPicker extends React.Component {
 
@@ -20,6 +20,8 @@ class AppointmentsPicker extends React.Component {
         width: 0,
         height: 0,
         firstDate: moment(),
+        stWeekDays: [],
+        selectedTimeSlot: ''
     };
 
     firstDateAfter4weeks = moment().add(28, 'day');
@@ -37,39 +39,36 @@ class AppointmentsPicker extends React.Component {
         window.removeEventListener('resize', this.updateWindowDimensions);
     }
 
+    componentDidUpdate(prevProps, prevState) {
+        if (prevState.width !== this.state.width)
+            this.createTimeTable();
+    }
+
+    componentWillReceiveProps(nextProps) {
+        this.createTimeTable(nextProps)
+    }
+
     updateWindowDimensions() {
         this.setState({width: window.innerWidth, height: window.innerHeight});
     }
 
+    createTimeTable = (props = this.props, state = this.state) => {
+        const getTimeSlots = (From, To, duration) => {
+            const hours = moment.duration(To.diff(From)).hours(); // 3
+            const minutes = moment.duration(To.diff(From)).minutes();// 30
+            let totalHalfHours = (minutes / 30) + (hours * 2); // 1 + 6 = 7
 
-    getTimeSlots = (From, To, duration) => {
-        const hours = moment.duration(To.diff(From)).hours(); // 3
-        const minutes = moment.duration(To.diff(From)).minutes();// 30
-        let totalHalfHours = (minutes / 30) + (hours * 2); // 1 + 6 = 7
+            if (duration === 60)
+                if (totalHalfHours < 2)
+                    totalHalfHours = 0;
+                else
+                    totalHalfHours = Math.ceil(totalHalfHours / 2);
 
-        if (duration === 60)
-            if (totalHalfHours < 2)
-                totalHalfHours = 0;
-            else
-                totalHalfHours = Math.ceil(totalHalfHours / 2);
+            return totalHalfHours
+        };
 
-        return totalHalfHours
-    };
+        const range = state.width < 700 ? 3 : 7;
 
-    nextWeek = range => this.setState(state => {
-        const nextWeek = state.firstDate.clone().add(range, 'days');
-        if (!nextWeek.isAfter(this.firstDateAfter4weeks))
-            return state.firstDate = nextWeek;
-    });
-
-    lastWeek = range => this.setState(state => {
-        const lastWeek = state.firstDate.clone().add(-range, 'days');
-        if (!lastWeek.isBefore(moment().subtract(1, "days")))
-            return state.firstDate = lastWeek;
-    });
-
-    render() {
-        const range = this.state.width < 700 ? 3 : 7;
         const weekDaysKey = {
             0: 'Mon',
             1: 'Tue',
@@ -81,8 +80,7 @@ class AppointmentsPicker extends React.Component {
         };
 
         let weekDays = [];
-
-        const sv_appointment = this.props.appointment;
+        let sv_appointment = props.appointment;
 
         for (const i in sv_appointment.openTimes) {
             sv_appointment.openTimes[i].From = moment(sv_appointment.openTimes[i].From, 'HH:mm');
@@ -92,7 +90,7 @@ class AppointmentsPicker extends React.Component {
         if (sv_appointment.openTimes) {
 
             for (let i = 0; i < range; i++) {
-                const date = this.state.firstDate.clone().add(i, 'days');
+                const date = state.firstDate.clone().add(i, 'days');
 
                 const weekDay = {
                     day: date.date(),
@@ -106,27 +104,32 @@ class AppointmentsPicker extends React.Component {
 
                 const svWeekDay = sv_appointment.openTimes.find(ot => weekDaysKey[ot.Day] === weekDay.dayText);
 
-                const totalSlots = this.getTimeSlots(
+                const totalSlots = getTimeSlots(
                     svWeekDay.From,
                     svWeekDay.To,
                     svWeekDay.Duration
                 );
-
 
                 // generate slots
                 if (totalSlots)
                     for (let j = 1; j <= totalSlots; j++) {
                         if (j === 1)
                             weekDay.slots.push({
+                                selected: false,
                                 active: svWeekDay.Active,
                                 duration: svWeekDay.Duration,
-                                time: svWeekDay.From.format('HH:mm')
+                                time: svWeekDay.From.format('HH:mm'),
+                                timeMoment: svWeekDay.From,
+                                dateMoment: date
                             });
                         else
                             weekDay.slots.push({
+                                selected: false,
                                 active: svWeekDay.Active,
                                 duration: svWeekDay.Duration,
-                                time: svWeekDay.From.clone().add(svWeekDay.Duration * (j - 1), 'minutes').format('HH:mm')
+                                time: svWeekDay.From.clone().add(svWeekDay.Duration * (j - 1), 'minutes').format('HH:mm'),
+                                timeMoment: svWeekDay.From.clone().add(svWeekDay.Duration * (j - 1), 'minutes'),
+                                dateMoment: date
                             });
                     }
 
@@ -184,9 +187,56 @@ class AppointmentsPicker extends React.Component {
                     }
                 }
             );
+
+            this.setState({stWeekDays: weekDays})
         }
+    };
+
+    /**
+     * It adds a {range} days for the first date
+     * Not more than 4 weeks from the first date
+     * @param range {{3 | 7}}  Range is the factor to add 3 is for mobile 7 for larger screens
+     * */
+    nextWeek = range => this.setState(state => {
+        const nextWeek = state.firstDate.clone().add(range, 'days');
+        if (!nextWeek.isAfter(this.firstDateAfter4weeks))
+            return state.firstDate = nextWeek;
+    }, () => this.createTimeTable());
+
+    /**
+     * It removes a {range} days for the first date
+     * Not more less than the current date
+     * @param range {{3 | 7}}  Range is the factor to add 3 is for mobile 7 for larger screens
+     * */
+    lastWeek = range => this.setState(state => {
+        const lastWeek = state.firstDate.clone().add(-range, 'days');
+        if (!lastWeek.isBefore(moment().subtract(1, "days")))
+            return state.firstDate = lastWeek;
+    }, () => this.createTimeTable());
 
 
+    /**
+     * It removes any selected time slot
+     * then
+     * It selects the new picked time slot
+     * @param i {number} stWeekDays pointer for the selected day
+     * @param j {number} slots pointer for the selected slot in the above day
+     * */
+    selectTimeSlot = (i, j) => this.setState(state => {
+        // remove any prev selected button
+        state.stWeekDays.forEach(weekDay => weekDay.slots.forEach(slot => slot.selected = false));
+        const currentSlot = state.stWeekDays[i].slots[j];
+        // select the new one
+        currentSlot.selected = true;
+        // store the selected day and slot
+        state.selectTimeSlot = `${currentSlot.dateMoment.format('YYYY-MM-DD')} ${currentSlot.timeMoment.format('HH:mm')}`;
+        // Server expect something like this: 2019-06-23 16:00
+        return state
+    });
+
+    render() {
+
+        const range = this.state.width < 700 ? 3 : 7;
         return (
             <div style={{height: '100%'}}>
                 <div className={styles.Navbar}>
@@ -233,7 +283,7 @@ class AppointmentsPicker extends React.Component {
 
                                         <div className={styles.Columns}>
                                             {
-                                                weekDays.map((weekDay, i) =>
+                                                this.state.stWeekDays.map((weekDay, i) =>
                                                     <div key={i}>
                                                         <div className={styles.Header}>
                                                             <h3>{weekDay.dayText}</h3>
@@ -243,8 +293,10 @@ class AppointmentsPicker extends React.Component {
                                                             <div className={styles.Body}>
                                                                 {
                                                                     weekDay.slots.map(
-                                                                        (slot, i) =>
-                                                                            <Button key={i} block
+                                                                        (slot, j) =>
+                                                                            <Button key={j} block
+                                                                                    onClick={() => this.selectTimeSlot(i, j)}
+                                                                                    type={slot.selected ? 'primary' : ''}
                                                                                     disabled={!slot.active}>{slot.time}</Button>
                                                                     )
                                                                 }
@@ -267,7 +319,8 @@ class AppointmentsPicker extends React.Component {
                         {
                             this.props.appointment ?
                                 <div style={{width: '100%'}}>
-                                    <Button type={'primary'} style={{marginTop: 10, float: 'right'}}
+                                    <Button type={'primary'}
+                                            style={{marginTop: 10, float: 'right'}}
                                             size={'large'}>Submit</Button>
                                 </div>
                                 : <Skeleton active={true}/>

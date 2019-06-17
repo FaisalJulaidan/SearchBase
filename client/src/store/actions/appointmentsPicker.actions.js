@@ -22,9 +22,37 @@ const fetchAppointmentFailure = (error) => {
 };
 
 
+const selectAppointmentTime = (token, pickedTimeSlot) => {
+    return {
+        type: actionTypes.SELECT_APPOINTMENT_TIME_REQUEST,
+        token,
+        pickedTimeSlot
+    };
+};
+
+const selectAppointmentTimeSuccess = (isSuccess) => {
+    return {
+        type: actionTypes.SELECT_APPOINTMENT_TIME_SUCCESS,
+        isSuccess
+    };
+};
+
+const selectAppointmentTimeFailure = (error) => {
+    return {
+        type: actionTypes.SELECT_APPOINTMENT_TIME_FAILURE,
+        error
+    };
+};
+
+
 export const appointmentsPickerActions = {
     fetchAppointment,
     fetchAppointmentSuccess,
     fetchAppointmentFailure,
+
+    selectAppointmentTime,
+    selectAppointmentTimeSuccess,
+    selectAppointmentTimeFailure,
+
 
 };

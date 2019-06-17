@@ -1,9 +1,7 @@
 import React, {Component, lazy, Suspense} from 'react';
 import {Redirect, Route, Switch, withRouter} from 'react-router-dom';
 import {connect} from 'react-redux';
-import {history} from './helpers';
 import {PrivateRoute} from './hoc';
-import {destroyMessage} from './helpers/alert';
 import SentryBoundary from "components/SentryBoundary/SentryBoundary";
 import styles from "./components/LoadingSpinner/LoadingSpinner.module.less";
 
@@ -14,6 +12,7 @@ const Signup = lazy(() => import('./application/Signup/Signup'));
 const ForgetPassword = lazy(() => import('./application/ForgetPassword/ForgetPassword'));
 const NewResetPassword = lazy(() => import('./application/ForgetPassword/NewResetPassword/NewResetPassword'));
 const AppointmentsPicker = lazy(() => import('./application/AppointmentsPicker/AppointmentsPicker'));
+const AccountVerification = lazy(() => import('./application/AccountVerification/AccountVerification'));
 
 
 class App extends Component {
@@ -33,6 +32,7 @@ class App extends Component {
                         <Route path="/signup" component={Signup}/>
                         <Route path="/forget_password" component={ForgetPassword}/>
                         <Route path="/reset_password/" component={NewResetPassword}/>
+                        <Route path="/account_verification/" component={AccountVerification}/>
                         <Route path="/appointments_picker/" component={AppointmentsPicker}/>
                         <PrivateRoute path="/dashboard" component={Dashboard}/>
                         <Redirect to={{pathname: '/dashboard'}}/>

@@ -7,96 +7,19 @@ from models import db, Callback, Conversation, Assistant, CRM as CRM_Model, Stor
 from services.Marketplace.CRM import Greenhouse, Adapt, Bullhorn
 
 
-# Process chatbot session
-def processConversation(assistant: Assistant, conversation: Conversation) -> Callback:
-    # Insert base on userType
-    if conversation.UserType is UserType.Candidate:
-        return insertCandidate(assistant, conversation)
-    elif conversation.UserType is UserType.Client:
-        return insertClient(assistant, conversation)
-    else:
-        return Callback(False, "The data couldn't be synced with the CRM due to lack of information" +
-                        " whether user is a Candidate or Client ")
+# Create Event ----
+# def processConversation(assistant: Assistant, conversation: Conversation) -> Callback:
+#     # Insert base on userType
+#     if conversation.UserType is UserType.Candidate:
+#         return insertCandidate(assistant, conversation)
+#     elif conversation.UserType is UserType.Client:
+#         return insertClient(assistant, conversation)
+#     else:
+#         return Callback(False, "The data couldn't be synced with the CRM due to lack of information" +
+#                         " whether user is a Candidate or Client ")
 
 
-def insertCandidate(assistant: Assistant, conversation: Conversation):
-    # Check CRM type
-    if assistant.CRM.Type is CRM.Bullhorn:
-        return Bullhorn.insertCandidate(assistant.CRM.Auth, conversation)
-    elif assistant.CRM.Type is CRM.Adapt:
-        return Adapt.insertCandidate(assistant.CRM.Auth, conversation)
-    elif assistant.CRM.Type is CRM.Greenhouse:
-        return Callback(True, "Greenhouse does not accept candidates at this stage")
-
-
-def insertClient(assistant: Assistant, conversation: Conversation):
-    # Check CRM type
-    if assistant.CRM.Type is CRM.Bullhorn:
-        return Bullhorn.insertClient(assistant.CRM.Auth, conversation)
-    elif assistant.CRM.Type is CRM.Adapt:
-        return Adapt.insertClient(assistant.CRM.Auth, conversation)
-    elif assistant.CRM.Type is CRM.Greenhouse:
-        return Callback(True, "Greenhouse does not accept clients")
-
-
-def uploadFile(assistant: Assistant, storedFile: StoredFile):
-    # Check CRM type
-    if assistant.CRM.Type is CRM.Bullhorn:
-        return Bullhorn.uploadFile(assistant.CRM.Auth, storedFile)
-    elif assistant.CRM.Type is CRM.Greenhouse:
-        return Greenhouse.uploadFile(assistant.CRM.Auth, storedFile)
-
-
-def searchCandidates(assistant: Assistant, session):
-    # Check CRM type
-    # if assistant.CRM.Type is CRM.Adapt:
-    #     return Adapt.searchCandidates(assistant.CRM.Auth)
-    if assistant.CRM.Type is CRM.Bullhorn:
-        return Bullhorn.searchCandidates(assistant.CRM.Auth, assistant.CompanyID, session)
-    elif assistant.CRM.Type is CRM.Greenhouse:
-        return Greenhouse.searchCandidates(assistant.CRM.Auth)
-
-
-def searchJobs(assistant: Assistant, session):
-    # Check CRM type
-    # if assistant.CRM.Type is CRM.Adapt:
-    #     return Adapt.pullAllCadidates(assistant.CRM.Auth)
-    if assistant.CRM.Type is CRM.Bullhorn:
-        return Bullhorn.searchJobs(assistant.CRM.Auth, assistant.CompanyID, session)
-    elif assistant.CRM.Type is CRM.Greenhouse:
-        return Greenhouse.searchJobs(assistant.CRM.Auth, session)
-
-
-def getAllCandidates(assistant: Assistant):
-    # Check CRM type
-    # if assistant.CRM.Type is CRM.Adapt:
-    #     return Adapt.pullAllCadidates(assistant.CRM.Auth)
-    if assistant.CRM.Type is CRM.Bullhorn:
-        return Bullhorn.getAllCandidates(assistant.CRM.Auth, assistant.CompanyID)
-    elif assistant.CRM.Type is CRM.Greenhouse:
-        return Greenhouse.getAllCandidates(assistant.CRM.Auth)
-
-
-def getAllJobs(assistant: Assistant):
-    # Check CRM type
-    # if assistant.CRM.Type is CRM.Adapt:
-    #     return Adapt.pullAllCadidates(assistant.CRM.Auth)
-    if assistant.CRM.Type is CRM.Bullhorn:
-        return Bullhorn.getAllJobs(assistant.CRM.Auth, assistant.CompanyID)
-    elif assistant.CRM.Type is CRM.Greenhouse:
-        return Greenhouse.getAllJobs(assistant.CRM.Auth)
-
-
-def produceRecruiterValueReport(companyID, crmName):
-    crm_callback: Callback = getCRMByType(crmName, companyID)
-    if not crm_callback.Success:
-        return Callback(False, "CRM not found")
-    # Check CRM type
-    if crmName == CRM.Bullhorn.name:
-        return Bullhorn.produceRecruiterValueReport(crm_callback.Data, companyID)
-
-
-# Connect to a new CRM
+# Connect to a new Mailing Service
 # details is a dict that has {auth, type}
 def connect(company_id, details) -> Callback:
     try:

@@ -114,16 +114,14 @@ def outlook_callback():
     print("request.url: ", request.url)
     print("method: ", request.method)
 
-    # auth code
-    if request.method == "GET":
-        args = request.args
-        if args.get("error") or (not args.get("code") or not args.get("state")):
-            return helpers.jsonResponse(False, 400, args.get("error_description") or "User error in request")
+    args = request.args
+    if args.get("error") or (not args.get("code") or not args.get("state")):
+        return helpers.jsonResponse(False, 400, args.get("error_description") or "User error in request")
 
-        login_callback: Callback = Outlook.login(args)
-        if not login_callback.Success:
-            return helpers.jsonResponse(False, 400, login_callback.Message)
-
+    login_callback: Callback = Outlook.login(args)
+    if not login_callback.Success:
+        return helpers.jsonResponse(False, 400, login_callback.Message)
+    print("login_callback.Data: ", login_callback.Data)
     return helpers.jsonResponse(True, 200, "Success")
 
 

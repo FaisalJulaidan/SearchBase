@@ -29,7 +29,7 @@ def login(auth):
 
         url = "https://login.microsoftonline.com/common/oauth2/v2.0/token"
 
-        get_access_token = requests.post(url, headers=headers, data=json.dumps(body))
+        get_access_token = requests.post(url, headers=headers, data=body)
         if not get_access_token.ok:
             raise Exception(get_access_token.text)
 

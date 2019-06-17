@@ -278,6 +278,8 @@ class AutoPilot extends React.Component {
                         <Divider/>
                         <Button type={'danger'} size={'large'} onClick={this.handleDelete}>Delete Auto Pilot</Button>
 
+                        <Button type={'primary'} size={'large'} onClick={this.onSubmit}>Save changes</Button>
+
                         {/*Blur Effect (Hidden) */}
                         <div style={{display: 'none'}}>
                             <svg id="svg-filter">

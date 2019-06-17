@@ -1,20 +1,18 @@
 from sqlalchemy.sql import exists
 from models import db, Callback, User, Company, Role
-from services import mail_services, company_services, newsletter_services, role_services
+from services import mail_services, company_services, newsletter_services
 from utilities import helpers
 from sqlalchemy import and_
-import logging
 
 
-def create(firstname, surname, email, password, phone, company: Company, role: Role, verified=False) -> Callback:
+def create(firstname, surname, email, password, phone, company: Company, roleID: int, verified=False) -> Callback:
     try:
+
         # Create a new user with its associated company and role
         newUser: User = User(Firstname=firstname, Surname=surname, Email=email.lower(), Verified=verified,
                              Password=password, PhoneNumber=phone, Company=company,
-                             Role=role)
+                             RoleID=roleID)
         db.session.add(newUser)
-        db.session.flush()
-
         db.session.commit()
         return Callback(True, 'User has been created successfully!', newUser)
 
@@ -62,16 +60,12 @@ def getAllByCompanyID(companyID) -> Callback:
     try:
         # Get result and check if None then raise exception
         result = db.session.query(User).filter(User.CompanyID == companyID).all()
-        if not result: raise Exception
 
-        return Callback(True,
-                        'Users with company ID ' + str(companyID) + ' were successfully retrieved.',
-                        result)
+        return Callback(True,'Users  retrieved successfully.', result)
     except Exception as exc:
         helpers.logError("user_services.getAllByCompanyID(): " + str(exc))
         db.session.rollback()
-        return Callback(False,
-                        'Users with company ID ' + str(companyID) + ' could not be retrieved.')
+        return Callback(False, 'Users could not be retrieved.')
 
 
 def getAllByCompanyIDWithEnabledNotifications(companyID) -> Callback:
@@ -131,35 +125,6 @@ def getProfile(userID):
         helpers.logError("user_services.getProfile(): " + str(exc))
         db.session.rollback()
         return Callback(False, 'User settings for this user does not exist.')
-
-
-def getUsersWithRolesByCompanyID(companyID):
-    try:
-        # Get users and check if None then raise exception
-        users = db.session.query(User).filter(User.CompanyID == companyID).all()
-        if not users:
-            raise Exception("No Records")
-
-        # Get roles
-        role_callback: Callback = role_services.getAllByCompanyID(companyID)
-        if not role_callback.Success:
-            raise Exception("Roles could not be retrieved")
-
-        # Convert to lists
-        users = helpers.getListFromSQLAlchemyList(users)
-        roles = helpers.getListFromSQLAlchemyList(role_callback.Data)
-
-        # Put the user's role in his user record
-        for user in users:
-            user["Role"] = next((x for x in roles if x["ID"] == user["RoleID"]), [None])
-
-        result = {"users": users, "roles": roles}
-
-        return Callback(True, 'Users with company ID ' + str(companyID) + ' were successfully retrieved.', result)
-    except Exception as exc:
-        helpers.logError("user_services.getUsersWithRolesByCompanyID(): " + str(exc))
-        db.session.rollback()
-        return Callback(False, 'Users with company ID ' + str(companyID) + ' could not be retrieved.')
 
 
 # ----- Updaters ----- #

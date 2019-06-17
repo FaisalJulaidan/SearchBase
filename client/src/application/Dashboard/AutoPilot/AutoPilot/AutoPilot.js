@@ -135,7 +135,7 @@ class AutoPilot extends React.Component {
 
                     <div className={styles.Body}>
                         {!autoPilot ? <Spin/> :
-                            <Form layout='vertical' wrapperCol = {{span: 6}} style={{width: '100%'}}>
+                            <Form layout='vertical' wrapperCol = {{span: 10}} style={{width: '100%'}}>
                                 <FormItem
                                     label="Name"
                                     >

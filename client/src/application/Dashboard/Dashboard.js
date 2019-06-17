@@ -116,6 +116,7 @@ class Dashboard extends Component {
             "/dashboard/auto_pilot",
             "/dashboard/databases",
             "/dashboard/account",
+            "/dashboard/users_management",
         ];
         const isNewLayout = newLayoutRoutes.some(a => this.props.location.pathname.indexOf(a) > -1);
         return (

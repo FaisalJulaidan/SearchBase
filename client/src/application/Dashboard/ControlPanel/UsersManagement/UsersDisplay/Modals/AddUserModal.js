@@ -7,7 +7,7 @@ const TabPane = Tabs.TabPane;
 const OptGroup = Select.OptGroup;
 const Option = Select.Option;
 
-class UserModal extends React.Component {
+class AddUserModal extends React.Component {
 
     state = {
         roles: ["Admin", "User"]
@@ -37,7 +37,7 @@ class UserModal extends React.Component {
 
         return (
             <Modal
-                width={800}
+                width={500}
                 title="Add New User"
                 destroyOnClose={true}
                 visible={this.props.visible}
@@ -103,4 +103,4 @@ class UserModal extends React.Component {
     }
 }
 
-export default Form.create()(UserModal)
+export default Form.create()(AddUserModal)

@@ -96,11 +96,11 @@ class User(db.Model):
     CompanyID = db.Column(db.Integer, db.ForeignKey('company.ID', ondelete='cascade'), nullable=False)
     Company = db.relationship('Company', back_populates='Users')
 
-    RoleID = db.Column(db.Integer, db.ForeignKey('role.ID', ondelete='SET NULL'))
+    RoleID = db.Column(db.Integer, db.ForeignKey('role.ID'), nullable=False)
     Role = db.relationship('Role', back_populates='Users')
 
-
-    # __table_args__ = (db.UniqueConstraint('Email', name='uix1_user'),)
+    # Constraints:
+    __table_args__ = (db.UniqueConstraint('Email', name='uix1_user'),)
 
     def __repr__(self):
         return '<User {}>'.format(self.Email)
@@ -116,7 +116,7 @@ class Role(db.Model):
     AccessBilling = db.Column(db.Boolean(), nullable=False, default=False)
 
     # Relationships:
-    CompanyID = db.Column(db.Integer, db.ForeignKey('company.ID', ondelete='cascade'), nullable=False)
+    CompanyID = db.Column(db.Integer, db.ForeignKey('company.ID', ondelete='cascade'), nullable=True)
     Company = db.relationship('Company', back_populates='Roles')
 
     Users = db.relationship('User', back_populates="Role")

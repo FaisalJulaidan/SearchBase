@@ -2,7 +2,7 @@ from flask import Blueprint, request
 from flask_jwt_extended import jwt_required, get_jwt_identity
 
 from models import Callback
-from services import user_services, user_management_services
+from services import user_services, user_management_services, role_services
 from utilities import helpers
 
 users_router: Blueprint = Blueprint('users_router', __name__, template_folder="../../templates")
@@ -15,13 +15,22 @@ def users():
 
     if request.method == "GET":
 
-        # Data is already converted to javascript lists (needed)
-        callback: Callback = user_services.getUsersWithRolesByCompanyID(user.get('companyID'))
-        if not callback.Success:
-            return helpers.jsonResponse(False, 400, "Users could not been retrieved")
+        users_callback: Callback = user_services.getAllByCompanyID(user.get('companyID'))
+        roles_callback: Callback = role_services.getAllByCompanyID(user.get('companyID'))
+        if not (users_callback.Success or roles_callback.Success):
+            return helpers.jsonResponse(False, 400, "could not retrieve list of Users")
 
-        return helpers.jsonResponse(True, 200, "Users have been retrieved",
-                                    {"users": callback.Data["users"], "roles": callback.Data["roles"]})
+        users =[]
+        for user in users_callback.Data:
+            users.append({
+                'user': helpers.getDictFromSQLAlchemyObj(user),
+                'role': helpers.getDictFromSQLAlchemyObj(user.Role),
+            })
+
+        return helpers.jsonResponse(True,
+                                    200,
+                                    "Users have been retrieved",
+                                    {'users': users, 'roles': helpers.getListFromSQLAlchemyList(roles_callback.Data)})
 
     if request.method == "POST":
 
@@ -35,6 +44,14 @@ def users():
         return helpers.jsonResponse(True, 200,
                                     "User has been added and an email with his login details is on its way to him")
 
+        return helpers.jsonResponse(True, 200, "User updated successfully!")
+
+
+@users_router.route("/user/<int:user_id>", methods=['PUT','DELETE'])
+@jwt_required
+def user(user_id):
+    user = get_jwt_identity()['user']
+
     if request.method == "PUT":
 
         update_callback: Callback = user_management_services.update_user_with_permission(request.json.get("ID", 0),
@@ -45,14 +62,6 @@ def users():
                                                                                          user.get('id'))
         if not update_callback.Success:
             return helpers.jsonResponse(False, 400, update_callback.Message)
-
-        return helpers.jsonResponse(True, 200, "User updated successfully!")
-
-
-@users_router.route("/user/<int:user_id>", methods=['DELETE'])
-@jwt_required
-def user(user_id):
-    user = get_jwt_identity()['user']
 
     if request.method == "DELETE":
 

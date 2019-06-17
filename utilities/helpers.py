@@ -153,7 +153,7 @@ def validAssistant(func):
 
 # -------- SQLAlchemy Converters -------- #
 """Convert a SQLAlchemy object to a single dict """
-def getDictFromSQLAlchemyObj(obj, excludedColumns: list = None) -> dict:
+def getDictFromSQLAlchemyObj(obj) -> dict:
 
     dict = {} # Results
     if not obj: return dict

@@ -80,7 +80,7 @@ class Settings extends Component {
 
         return (
             <>
-                <Form layout='vertical' wrapperCol={{span: 6}}>
+                <Form layout='vertical' wrapperCol={{span: 10}}>
 
                     <h2>Basic Settings</h2>
                     <FormItem

@@ -41,10 +41,10 @@ const saveProfileDetailsFailure = (error) => {
     }
 };
 
-const saveCompanyDetails = (dataSettings) => {
+const saveCompanyDetails = (companyData) => {
     return {
         type: actionTypes.SAVE_COMPANY_DETAILS_REQUEST,
-        dataSettings
+        companyData
     }
 };
 

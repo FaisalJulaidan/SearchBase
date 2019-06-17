@@ -36,10 +36,10 @@ function* saveProfileData({profileData}) {
     }
 }
 
-function* saveCompanyDetails(action) {
+function* saveCompanyDetails({companyData}) {
     try {
         loadingMessage('Saving company settings...', 0);
-        const res = yield http.post(`/company`, action.dataSettings);
+        const res = yield http.post(`/company`, companyData);
         yield put(accountActions.saveCompanyDetailsSuccess(res.data.msg));
         yield put(accountActions.getAccount());
         successMessage('Company settings saved');

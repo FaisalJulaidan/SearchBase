@@ -36,10 +36,9 @@ def signup(details) -> Callback:
 
         # Roles
         # Create owner, admin, user roles for the new company
-        ownerRole: Callback = role_services.create('Owner', True, True, True, True, company)
         adminRole: Callback = role_services.create('Admin', True, True, True, False, company)
         userRole: Callback = role_services.create('User', True, False, False, False, company)
-        if not (ownerRole.Success or adminRole.Success or userRole.Success):
+        if not (adminRole.Success or userRole.Success):
             return Callback(False, 'Could not create roles for the new user.')
 
         # User
@@ -50,7 +49,7 @@ def signup(details) -> Callback:
                                              details['password'],
                                              details['telephone'],
                                              company,
-                                             ownerRole.Data)
+                                             2) # RoleID = 2 -> Owner
 
 
         # Subscribe to basic plan with 14 trial days
@@ -59,14 +58,13 @@ def signup(details) -> Callback:
         sendVerEmail_callback: Callback = mail_services.sendVerificationEmail(details["email"], details["companyName"])
 
         # If subscription failed, remove the new created company and user
-        if not sub_callback.Success or not sendVerEmail_callback.Success:
+        if not (user_callback.Success or sub_callback.Success or sendVerEmail_callback.Success):
             # Removing the company will cascade and remove the new created user and roles as well.
-
             company_services.removeByName(details['companyName'])
             return sub_callback
 
         # ###############
-        # Just for testing, But to be REMOVED because user has to verify this manually
+        # Just for testing, But to be REMOVED because user has to verify account manually
         # user_services.verifyByEmail(email)
         # ###############
 

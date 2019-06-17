@@ -1,10 +1,15 @@
 import React from "react";
-import styles from "./UsersManagement.module.less";
-import {Tabs, Modal} from "antd";
+import {Tabs, Modal, Typography, Spin} from "antd";
 import connect from "react-redux/es/connect/connect";
-import {usersManagementActions} from "../../../../store/actions";
-import UsersDisplay from "./UsersDisplay/UsersDisplay";
 
+import './UsersManagement.less';
+import styles from "./UsersManagement.module.less"
+
+import {usersManagementActions} from "store/actions";
+import UsersDisplay from "./UsersDisplay/UsersDisplay";
+import NoHeaderPanel from 'components/NoHeaderPanel/NoHeaderPanel'
+
+const {Title, Paragraph} = Typography;
 const TabPane = Tabs.TabPane;
 const confirm = Modal.confirm;
 
@@ -15,60 +20,54 @@ class UsersManagement extends React.Component {
         this.props.dispatch(usersManagementActions.getUsers());
     }
 
-    addUser = (user) => {
-        this.props.dispatch(usersManagementActions.addUser({user:user}));
-    };
-
-    editUser = (user) => {
-        this.props.dispatch(usersManagementActions.editUser({user:user}));
-    };
-
-    deleteUser = (user) => {
-        confirm({
-            title: `Delete user confirmation`,
-            content: `If you click OK, this user will be deleted and its associated details forever`,
-            onOk: () => {
-                this.props.dispatch(usersManagementActions.deleteUser({user:user}));
-            }
-        });
-    };
 
     render () {
+        const {usersList, roles} = this.props;
         return (
-            <div style={{height: '100%'}}>
-                <div className={styles.Panel}>
-                    <div className={styles.Panel_Header}>
-                        <div>
-                            <h3>Users Management</h3>
-                            <p>Here you can edit other users under your company and what permissions they have.</p>
-                        </div>
-                    </div>
+                <>
+                    {this.props.isLoading ? <Spin/> :
+                        <NoHeaderPanel>
+                            <div className={styles.Header}>
+                                <Title className={styles.Title}>
+                                    Users Management
+                                </Title>
+                                <Paragraph type="secondary">
+                                    Here you can edit other users under your company and what permissions they have.
+                                </Paragraph>
+                            </div>
 
-                    <div className={styles.Panel_Body} style={{overflowY: "auto"}}>
-                        <Tabs defaultActiveKey={"1"}>
-                            <TabPane tab={"Users"} key={"1"}>
-                                <UsersDisplay
-                                    users={this.props.usersData.users}
-                                    addUser={this.addUser}
-                                    editUser={this.editUser}
-                                    deleteUser={this.deleteUser}
-                                />
-                            </TabPane>
+                            <div className={[styles.Body, 'usersTabs'].join(' ')}>
+                                {!usersList ? <Spin/> :
 
-                            {/*<TabPane tab={"Permissions"} key={"2"}>*/}
-                                {/*Coming soon...*/}
-                            {/*</TabPane>*/}
-                        </Tabs>
-                    </div>
-                </div>
-            </div>
+                                    <Tabs defaultActiveKey={'1'} size={"large"} animated={false}>
+                                        <TabPane tab={"Users"} key={"1"}>
+                                            <UsersDisplay
+                                                users={usersList}
+                                                roles={roles}
+                                                addUser={this.addUser}
+                                                editUser={this.editUser}
+                                                deleteUser={this.deleteUser}
+                                            />
+                                        </TabPane>
+
+                                        <TabPane disabled={true} tab={"Permissions (coming soon)"} key={"2"}>
+                                            Coming soon...
+                                        </TabPane>
+                                    </Tabs>
+                                }
+                            </div>
+                        </NoHeaderPanel>
+                    }
+                </>
         )
     }
 }
 
 function mapStateToProps(state) {
     return {
-        usersData: state.usersManagement.usersList
+        usersList: state.usersManagement.usersList,
+        roles: state.usersManagement.roles,
+        isLoading: state.usersManagement.isLoading
     };
 }
 

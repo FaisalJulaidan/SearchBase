@@ -28,7 +28,7 @@ class ProfileDetails extends React.Component {
         return (
 
             <>
-                <Form layout='vertical' wrapperCol={{span: 6}} onSubmit={this.handleSubmit}>
+                <Form layout='vertical' wrapperCol={{span: 10}} onSubmit={this.handleSubmit}>
                     <h2>Profile Details</h2>
                     <FormItem label={"First Name"}>
                         {getFieldDecorator("firstname", {

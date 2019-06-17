@@ -7,8 +7,6 @@ import styles from "./Account.module.less"
 
 import ProfileDetails from "./ProfileDetails/ProfileDetails";
 import CompanyDetails from "./CompanyDetails/CompanyDetails";
-import ChangePassword from "./ProfileDetails/ChangePassword";
-import LogoUploader from "./CompanyDetails/LogoUploader/LogoUploader";
 
 import {accountActions} from "store/actions/account.actions";
 import NoHeaderPanel from 'components/NoHeaderPanel/NoHeaderPanel'

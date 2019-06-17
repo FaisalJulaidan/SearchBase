@@ -23,11 +23,148 @@ class Conversations extends React.Component {
         visibleAutomation: false
     };
 
+    constructor(props) {
+        super(props);
+        this.columns = [
+            {
+                title: '#',
+                render: (text, record, index) => (<p>{index + 1}</p>),
+
+            }, {
+                title: 'User Type',
+                dataIndex: 'UserType',
+                key: 'UserType',
+                filters: [
+                    {text: 'Candidate', value: 'Candidate'},
+                    {text: 'Client', value: 'Client'},
+                ],
+                onFilter: (value, record) => record.UserType ? record.UserType.indexOf(value) === 0 : false,
+                render: (text, record) => (<Tag key={record.UserType}>{record.UserType}</Tag>),
+
+            }, {
+                title: 'Name',
+                dataIndex: 'Name',
+                key: 'Name',
+                render: (text, record) => (
+                    <p style={{textTransform: 'capitalize'}}>{this.findUserName(record.Data.keywordsByDataType, record.UserType)}</p>),
+
+            }, {
+                title: 'Time Spent',
+                dataIndex: 'TimeSpent',
+                key: 'TimeSpent',
+                sorter: (a, b) => a.TimeSpent - b.TimeSpent,
+                render: (_, record) => {
+                    let date = new Date(null);
+                    date.setSeconds(record.TimeSpent); // specify value for SECONDS here
+                    let mm = date.getUTCMinutes();
+                    let ss = date.getSeconds();
+                    if (mm < 10) mm = "0" + mm;
+                    if (ss < 10) ss = "0" + ss;
+
+                    return <p>{`${mm}:${ss}`} mins</p>
+                }
+            }, {
+                title: 'Date & Time',
+                dataIndex: 'DateTime',
+                key: 'DateTime',
+                sorter: (a, b) => new Date(a.DateTime).valueOf() - new Date(b.DateTime).valueOf(),
+                render: (text, record) => (<p>{record.DateTime}</p>),
+
+            }, {
+                title: 'Score',
+                dataIndex: 'Score',
+                sorter: (a, b) => a.Score - b.Score,
+                render: (text, record) => {
+                    return (
+                        <div style={{width: 100}}>
+                            <Progress percent={record.Score * 100} size="small"
+                                      status={record.Score < 0.1 ? "exception" : "active"}/>
+                        </div>
+                    );
+                }
+
+            }, {
+                title: 'Application Status',
+                dataIndex: 'ApplicationStatus',
+                key: 'ApplicationStatus',
+                // filters: [
+                //     {text: 'Completed', value: 'Completed'},
+                //     {text: 'Incomplete', value: 'Incomplete'},
+                // ],
+                // onFilter: (value, record) => record.Completed ? record.UserType.indexOf(value) === 0 : false,
+                render: (text, record) => {
+                    const {isUpdatingStatus} = this.props;
+                    const content = (
+                        <div>
+                            <Button className={styles.StatusChangeBtn} type="link"
+                                    disabled={isUpdatingStatus}
+                                    onClick={() => this.updateStatus("Rejected", record)}>
+                                <Icon type="close-circle" theme="filled"
+                                      style={{color: "red", fontSize: "18px"}} />
+                            </Button>
+
+                            <Button className={styles.StatusChangeBtn} type="link"
+                                    style={{fontSize: "18px"}}
+                                    disabled={isUpdatingStatus}
+                                    onClick={() => this.updateStatus("Pending", record)} >
+                                <Icon type="clock-circle"/>
+                            </Button>
+
+                            <Button className={styles.StatusChangeBtn} type="link"
+                                    disabled={isUpdatingStatus}
+                                    onClick={() => this.updateStatus("Accepted", record)} >
+                                <Icon type="check-circle" theme="filled"
+                                      style={{color: "#52c41a", fontSize: "18px"}} />
+                            </Button>
+                        </div>
+                    );
+
+                    return (
+                        <Popover placement="top" title="Change status?" content={content} trigger="hover">
+                            {this.buildStatusBadge(record.ApplicationStatus)}
+                        </Popover>
+                    )
+                },
+
+            },{
+                title: 'Conversation',
+                dataIndex: 'Completed',
+                key: 'Completed',
+                // filters: [
+                //     {text: 'Completed', value: 'Completed'},
+                //     {text: 'Incomplete', value: 'Incomplete'},
+                // ],
+                // onFilter: (value, record) => record.Completed ? record.UserType.indexOf(value) === 0 : false,
+                render: (text, record) => (
+                    record.Completed ?
+                        <Tag color="#87d068">Completed</Tag> :
+                        <Tag color="red">Incomplete</Tag>),
+
+            }, {
+                title: 'Action',
+                key: 'action',
+                render: (text, record, index) => (
+                    <span>
+              <a onClick={() => {
+                  this.setState({viewModal: true, selectedConversation: record, destroyModal: true})
+              }}>
+                  View
+              </a>
+                    <Divider type="vertical" />
+              <a onClick={() => {
+                  this.deleteConversation(record)
+              }}>
+                  Delete
+              </a>
+            </span>
+                ),
+            }
+        ];
+    }
+
 
     componentDidMount() {
-        const {assistant} = this.props;
-        console.log(assistant)
-        this.props.dispatch(conversationActions.fetchConversations(assistant.ID))
+        this.props.dispatch(conversationActions.fetchConversations(this.props.assistant.ID))
     }
 
     componentWillReceiveProps(nextProps) {
@@ -215,141 +352,6 @@ class Conversations extends React.Component {
 
         if(this.state.ConversationsRefreshed){this.populateDownloadData(conversations)}
 
-        const columns = [
-            {
-            title: '#',
-            render: (text, record, index) => (<p>{index + 1}</p>),
-
-        }, {
-            title: 'User Type',
-            dataIndex: 'UserType',
-            key: 'UserType',
-            filters: [
-                {text: 'Candidate', value: 'Candidate'},
-                {text: 'Client', value: 'Client'},
-            ],
-            onFilter: (value, record) => record.UserType ? record.UserType.indexOf(value) === 0 : false,
-            render: (text, record) => (<Tag key={record.UserType}>{record.UserType}</Tag>),
-
-        }, {
-            title: 'Name',
-            dataIndex: 'Name',
-            key: 'Name',
-            render: (text, record) => (
-                <p style={{textTransform: 'capitalize'}}>{this.findUserName(record.Data.keywordsByDataType, record.UserType)}</p>),
-
-        }, {
-            title: 'Time Spent',
-            dataIndex: 'TimeSpent',
-            key: 'TimeSpent',
-            sorter: (a, b) => a.TimeSpent - b.TimeSpent,
-            render: (_, record) => {
-                let date = new Date(null);
-                date.setSeconds(record.TimeSpent); // specify value for SECONDS here
-                let mm = date.getUTCMinutes();
-                let ss = date.getSeconds();
-                if (mm < 10) mm = "0" + mm;
-                if (ss < 10) ss = "0" + ss;
-
-                return <p>{`${mm}:${ss}`} mins</p>
-            }
-        }, {
-            title: 'Date & Time',
-            dataIndex: 'DateTime',
-            key: 'DateTime',
-            sorter: (a, b) => new Date(a.DateTime).valueOf() - new Date(b.DateTime).valueOf(),
-            render: (text, record) => (<p>{record.DateTime}</p>),
-
-        }, {
-            title: 'Score',
-            dataIndex: 'Score',
-            sorter: (a, b) => a.Score - b.Score,
-            render: (text, record) => {
-                return (
-                    <div style={{width: 100}}>
-                        <Progress percent={record.Score * 100} size="small"
-                                  status={record.Score < 0.1 ? "exception" : "active"}/>
-                    </div>
-                );
-            }
-
-        }, {
-            title: 'Application Status',
-            dataIndex: 'ApplicationStatus',
-            key: 'ApplicationStatus',
-            // filters: [
-            //     {text: 'Completed', value: 'Completed'},
-            //     {text: 'Incomplete', value: 'Incomplete'},
-            // ],
-            // onFilter: (value, record) => record.Completed ? record.UserType.indexOf(value) === 0 : false,
-            render: (text, record) => {
-                const {isUpdatingStatus} = this.props;
-                const content = (
-                    <div>
-                        <Button className={styles.StatusChangeBtn} type="link"
-                                disabled={isUpdatingStatus}
-                                onClick={() => this.updateStatus("Rejected", record)}>
-                            <Icon type="close-circle" theme="filled"
-                                  style={{color: "red", fontSize: "18px"}} />
-                        </Button>
-
-                        <Button className={styles.StatusChangeBtn} type="link"
-                                style={{fontSize: "18px"}}
-                                disabled={isUpdatingStatus}
-                                onClick={() => this.updateStatus("Pending", record)} >
-                            <Icon type="clock-circle"/>
-                        </Button>
-
-                        <Button className={styles.StatusChangeBtn} type="link"
-                                disabled={isUpdatingStatus}
-                                onClick={() => this.updateStatus("Accepted", record)} >
-                            <Icon type="check-circle" theme="filled"
-                                  style={{color: "#52c41a", fontSize: "18px"}} />
-                        </Button>
-                    </div>
-                );
-
-                return (
-                    <Popover placement="top" title="Change status?" content={content} trigger="hover">
-                        {this.buildStatusBadge(record.ApplicationStatus)}
-                    </Popover>
-                )
-            },
-
-        },{
-            title: 'Conversation',
-            dataIndex: 'Completed',
-            key: 'Completed',
-            // filters: [
-            //     {text: 'Completed', value: 'Completed'},
-            //     {text: 'Incomplete', value: 'Incomplete'},
-            // ],
-            // onFilter: (value, record) => record.Completed ? record.UserType.indexOf(value) === 0 : false,
-            render: (text, record) => (
-                record.Completed ?
-                    <Tag color="#87d068">Completed</Tag> :
-                    <Tag color="red">Incomplete</Tag>),
-
-        }, {
-            title: 'Action',
-            key: 'action',
-            render: (text, record, index) => (
-                <span>
-              <a onClick={() => {
-                  this.setState({viewModal: true, selectedConversation: record, destroyModal: true})
-              }}>
-                  View
-              </a>
-                    <Divider type="vertical" />
-              <a onClick={() => {
-                  this.deleteConversation(record)
-              }}>
-                  Delete
-              </a>
-            </span>
-            ),
-        }];
-
         return (
                     <>
                         <div className={styles.Header}>
@@ -374,7 +376,7 @@ class Conversations extends React.Component {
                             {/*</Button>*/}
                         </div>
 
-                        <Table columns={columns}
+                        <Table columns={this.columns}
                                rowKey={record => record.ID}
                                dataSource={conversations.conversationsList}
                                onChange={this.handleFilter}
@@ -382,7 +384,7 @@ class Conversations extends React.Component {
                                bordered={true}
                                pagination={{position:'both', pageSize: 20}}
                                size='default'
-                               scroll={{ x: 1300 }}
+                               scroll={{ x: 1200 }}
                         />
 
                         {

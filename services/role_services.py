@@ -27,26 +27,21 @@ def getByNameAndCompanyID(name: str, companyID: int) -> Callback:
                         'Role was successfully retrieved.',
                         result)
     except Exception as exc:
-        db.session.rollback()
         helpers.logError("role_service.getByNameAndCompanyID(): " + str(exc))
-        return Callback(False,
-                        'Role could not be retrieved.')
+        db.session.rollback()
+        return Callback(False, 'Role could not be retrieved.')
 
 
 def getAllByCompanyID(companyID: int) -> Callback:
     try:
         # Get result and check if None then raise exception
         result = db.session.query(Role).filter(Role.CompanyID == companyID).all()
-        if not result: raise Exception
 
-        return Callback(True,
-                        'Roles with company ID ' + str(companyID) + ' were successfully retrieved.',
-                        result)
+        return Callback(True, 'Roles retrieved successfully.',result)
     except Exception as exc:
         helpers.logError("role_service.getAllByCompanyID(): " + str(exc))
         db.session.rollback()
-        return Callback(False,
-                        'Roles with company ID ' + str(companyID) + ' could not be retrieved.')
+        return Callback(False, 'Roles cannot be retrieved.')
 
 
 def removeAllByCompany(company: Company) -> Callback:

@@ -1,265 +1,160 @@
 import React from "react";
-
-import {Button, Form, Input, Select, Popconfirm, Table,} from 'antd';
+import {usersManagementActions} from "store/actions";
+import {Button, Table, Divider, Tag, Modal} from 'antd';
 import {isEmpty} from "lodash";
-import UserModal from "./UserModal/UserModal";
+import AddUserModal from "./Modals/AddUserModal";
+import EditUserModal from "./Modals/EditUserModal";
 import styles from "./UsersDisplay.less"
 import {getUser} from "helpers";
 
-
-const data = [];
-const FormItem = Form.Item;
-const Option = Select.Option;
-const EditableContext = React.createContext();  // is used even though IDE may not detect it
-
-const EditableRow = ({form, index, ...props}) => (
-    <EditableContext.Provider value={form}>
-        <tr {...props} />
-    </EditableContext.Provider>
-);
-
-
-const EditableFormRow = Form.create()(EditableRow);
-
-class EditableCell extends React.Component {
-    getInput = () => {
-        const {record} = this.props;
-        if (this.props.inputType === 'role') {
-            return (
-                <Select disabled={record.Role.Name === "Owner"} placeholder="Select a role">
-                    <Option value="Admin">Admin</Option>
-                    <Option value="User">User</Option>
-                </Select>
-            );
-        }
-        return <Input/>;
-    };
-
-    render() {
-        const {
-            editing,
-            dataIndex,
-            title,
-            inputType,
-            record,
-            index,
-            ...restProps
-        } = this.props;
-        return (
-            <EditableContext.Consumer>
-                {(form) => {
-                    const {getFieldDecorator} = form;
-                    return (
-                        <td {...restProps}>
-                            {editing ? (
-                                <FormItem style={{margin: 0}}>
-                                    {getFieldDecorator(dataIndex, {
-                                        rules: [{
-                                            required: true,
-                                            message: `Please Input ${title}!`,
-                                        }],
-                                        initialValue: record[dataIndex],
-                                    })(this.getInput())}
-                                </FormItem>
-                            ) : restProps.children}
-                        </td>
-                    );
-                }}
-            </EditableContext.Consumer>
-        );
-    }
-}
+const confirm = Modal.confirm;
 
 class UsersDisplay extends React.Component {
+
+    state = {
+        addUserModalVisible: false,
+        editUserModalVisible: false,
+        userToEdit: null
+    };
+
     constructor(props) {
         super(props);
-        this.state = {data, editingKey: '', UserModal: false};
         this.columns = [
             {
-                title: 'Name',
-                dataIndex: 'Fullname',
-                width: '31%',
-                editable: true,
+                title: 'Role',
+                key: 'Role',
+                width: '5%',
+                render: (text, record) => (
+                    <Tag color={record.role.Name === 'Owner' ? 'purple' : null }>
+                        {record.role.Name}
+                    </Tag>),
+
+            },
+            {
+                title: 'First name',
+                key: 'Firstname',
+                render: (text, record) => (<p>{record.user.Firstname}</p>),
+
+            },
+            {
+                title: 'Surname',
+                key: 'Surname',
+                render: (text, record) => (<p>{record.user.Surname}</p>),
             },
             {
                 title: 'Email',
-                dataIndex: 'Email',
-                width: '35%',
-                editable: true,
+                key: 'Email',
+                render: (text, record) => (<p>{record.user.Email}</p>),
             },
             {
-                title: 'Role',
-                dataIndex: 'RoleName',
-                width: '18%',
-                editable: true,
+                title: 'Phone Number',
+                key: 'PhoneNumber',
+                render: (text, record) => (<p>{record.user.PhoneNumber}</p>),
+            },
+            {
+                title: 'Last Access',
+                key: 'LastAccess',
+                render: (text, record) => (<p>{record.user.LastAccess}</p>),
+            },
+            {
+                title: 'Verified',
+                key: 'Verified',
+                render: (text, record) => (
+                    <>
+                        { record.user.Verified ?
+                            <Tag color="#87d068">
+                                Verified
+                            </Tag>
+                            :
+                            <Tag color={'red'}>
+                                Unverified
+                            </Tag>
+                        }
+                    </>
+                    ),
+
             },
             {
                 title: 'Action',
-                dataIndex: 'operation',
-                render: (text, record) => {
-                    const editable = this.isEditing(record);
-                    return (
-                        <div>
-                            {editable ? (
-                                <span>
-                  <EditableContext.Consumer>
-                    {form => (
-                        <a
-                            href="javascript:;"
-                            onClick={() => this.handleEdit(form, record.key)}
-                            style={{marginRight: 8}}
-                        >
-                            Save
-                        </a>
-                    )}
-                  </EditableContext.Consumer>
-                  <Popconfirm
-                      title="Sure to cancel?"
-                      onConfirm={() => this.cancel(record.key)}
-                  >
-                    <a>Cancel</a>
-                  </Popconfirm>
-                </span>
-                            ) : (
-                                <>
-                                    <a style={{marginRight:"7px"}} onClick={() => this.edit(record.key)}>Edit</a>
-                                    <a onClick={() => this.delete(record.key)}>Delete</a>
-                                </>
-                            )}
-                        </div>
-                    );
-                },
+                key: 'action',
+                render: (text, record) => (
+                    <>
+                        {record.role.Name === 'Owner' ? null :
+                            <span>
+                                <a onClick={() => this.showEditUserModal(record)}>
+                                    Edit
+                                </a>
+                                <Divider type="vertical" />
+                                <a onClick={() => {this.deleteUser(record?.user.ID)}}>
+                                    Delete
+                                </a>
+                            </span>
+                        }
+                    </>
+                ),
             },
         ];
     }
 
-    componentWillReceiveProps(nextProps) {
-        let data = nextProps.users;
-        if (!isEmpty(data)) {
-            if (data !== this.state.data) {
-                //add records needed by the columns
-                // needs key
-                const user = getUser();
-                data = data.filter(record => {
-                    if(record.Email !== user.email && record.Role.Name !== "Owner"){ return record; }
-                });
-
-                data = data.map((record, index) => {
-                    data[index]["key"] = data[index]["ID"];
-                    return record
-                });
-
-                // cant put 2 in 1
-                data = data.map((record, index) => {
-                    data[index]["Fullname"] = data[index]["Firstname"] + " " + data[index]["Surname"];
-                    return record
-                });
-
-                // cant go down a . when editing
-                data = data.map((record, index) => {
-                    data[index]["RoleName"] = data[index]["Role"]["Name"];
-                    return record
-                });
-
-                this.setState({
-                    data: data
-                });
-            }
-        }
-    }
-
-    isEditing = record => record.key === this.state.editingKey;
-
-    cancel = () => {
-        this.setState({editingKey: ''});
+    addUser = (user) => {
+        this.props.dispatch(usersManagementActions.addUser({user:user}));
     };
 
-    handleAdd = (form) => {
-        this.props.addUser(form);
-        this.setState({UserModal: false})
+    editUser = (userID, values) => {
+        this.props.dispatch(usersManagementActions.editUser(userID, values));
     };
 
-    handleEdit(form, key) {
-        form.validateFields((error, row) => {
-            if (error) {
-                return;
-            }
-            console.log("row", row);
-            const newData = [...this.state.data];
-            const index = newData.findIndex(item => key === item.key);
-            if (index > -1) {
-                const item = newData[index];
-                const newRecord = {...item, ...row};
-
-                console.log("item", item);
-                console.log("newRecord", newRecord);
-                this.props.editUser(newRecord);
-
-                newData.splice(index, 1, newRecord);
-                this.setState({data: newData, editingKey: ''});
-            } else {
-                newData.push(row);
-                this.setState({data: newData, editingKey: ''});
+    deleteUser = (userID) => {
+        confirm({
+            title: `Delete user confirmation`,
+            content: `If you click OK, this user will be deleted and its associated details forever`,
+            onOk: () => {
+                this.props.dispatch(usersManagementActions.deleteUser(userID));
             }
         });
-    }
-
-    edit(key) {
-        this.setState({editingKey: key});
-    }
-
-    delete = (key) => {
-        this.props.deleteUser(this.state.data.filter(record => record["key"] === key)[0]);
     };
 
-    showUserModal = () => this.setState({UserModal: true});
+    showAddUserModal = () => this.setState({addUserModalVisible: true});
 
-    handleUserCancel = () => this.setState({UserModal: false});
+    hideAddUserModal = () => this.setState({addUserModalVisible: false});
+
+    showEditUserModal = (user) => this.setState({editUserModalVisible: true, userToEdit: user});
+
+    hideEditUserModal = () => this.setState({editUserModalVisible: false});
+
 
     render() {
-        const components = {
-            body: {
-                row: EditableFormRow,
-                cell: EditableCell,
-            },
-        };
-
-        const columns = this.columns.map((col) => {
-            if (!col.editable) {
-                return col;
-            }
-            return {
-                ...col,
-                onCell: record => ({
-                    record,
-                    inputType: col.dataIndex === 'RoleName' ? 'role' : 'text',
-                    dataIndex: col.dataIndex,
-                    title: col.title,
-                    editing: this.isEditing(record),
-                }),
-            };
-        });
-
+        const {users, roles} = this.props;
         return (
             <>
-                <UserModal
-                    visible={this.state.UserModal}
-                    handleCancel={this.handleUserCancel}
-                    handleSave={this.handleAdd}
-                />
                 <div style={{textAlign: "right"}}>
-                    <Button className={styles.Panel_Header_Button} style={{marginBottom: "10px"}} type="primary"
+                    <Button style={{marginBottom: "10px"}} type="primary"
                             icon="plus"
-                            onClick={this.showUserModal}>
+                            onClick={this.showAddUserModal}>
                         Add User
                     </Button>
                 </div>
+
                 <Table
-                    components={components}
                     bordered
-                    dataSource={this.state.data}
-                    columns={columns}
-                    rowClassName="editable-row"
+                    dataSource={users}
+                    columns={this.columns}
+                    scroll={{ x: 600 }}
+                />
+
+                <AddUserModal
+                    roles={roles}
+                    visible={this.state.addUserModalVisible}
+                    handleCancel={this.hideAddUserModal}
+                    handleSave={this.addUser}
+                />
+
+                <EditUserModal
+                    userData={this.state.userToEdit}
+                    roles={roles}
+                    visible={this.state.editUserModalVisible}
+                    handleCancel={this.hideEditUserModal}
+                    handleSave={this.editUser}
                 />
             </>
         );

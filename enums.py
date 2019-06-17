@@ -20,6 +20,10 @@ class CRM(Enum):
     Vincere = 'Vincere'
     Greenhouse = 'Greenhouse'
 
+@unique
+class Calendar(Enum):
+    Google = 'Google'
+    Outlook = 'Outlook'
 
 @unique
 class ApplicationStatus(Enum):

@@ -2,9 +2,12 @@ from flask import Blueprint, request
 from flask_jwt_extended import jwt_required, get_jwt_identity
 
 from models import Callback
+from services.CRM import crm_services, Bullhorn, Google
 from services.Marketplace.CRM import crm_services
 from services.Marketplace.Mail import Outlook
 from utilities import helpers
+
+from datetime import datetime
 
 crm_router: Blueprint = Blueprint('crm_router', __name__, template_folder="../../templates")
 
@@ -103,6 +106,37 @@ def bullhorn_callback():
 @crm_router.route("/crm_callback", methods=['GET', 'POST', 'PUT'])
 def crm_callback():
     return str(request.url)
+
+
+@crm_router.route("/calendar/<assistantID>/google/authorize", methods=['GET', 'POST'])
+@jwt_required
+@helpers.validAssistant
+def calendar_auth(assistant):
+    params = request.get_json()
+    callback: Callback = Google.authorizeUser(params['code'])
+    if not callback.Success:
+        return helpers.jsonResponse(False, 400, callback.Message)
+    return helpers.jsonResponse(True, 200, callback.Message)
+
+
+#post method, only adds events
+@crm_router.route("/calendar/<assistantID>/google/event", methods=['POST'])
+@jwt_required
+@helpers.validAssistant
+def calendar_add_event(assistant):
+    body = request.json
+    callback: Callback = Google.addEvent(assistant.CompanyID,
+                                        body['eventName'],
+                                        body['eventDescription'],
+                                        body['startDate'],
+                                        body['endDate'])
+    if not callback.Success:
+        return helpers.jsonResponse(False, 400, callback.Message)
+    return helpers.jsonResponse(True, 200, callback.Message)
+    # Google.addEvent()
+    # Callback = Google.getToken("Google", 2)
+    # print(Callback)
+    # return helpers.jsonResponse(True, 200, 'hello', Callback)
 
 
 @crm_router.route("/outlook_callback", methods=['GET', 'POST', 'PUT'])

@@ -15,8 +15,6 @@ from sqlalchemy_utils.types.encrypted.encrypted_type import AesEngine
 
 db = SQLAlchemy(model_class=FlaskBaseModel)
 db = initialize_flask_sqlathanor(db)
-
-
 # Activate Foreign Keys
 @event.listens_for(Engine, "connect")
 def _set_sqlite_pragma(dbapi_connection, connection_record):
@@ -63,6 +61,7 @@ class Company(db.Model):
     Databases = db.relationship('Database', back_populates='Company')
     Roles = db.relationship('Role', back_populates='Company')
     CRMs = db.relationship('CRM', back_populates='Company')
+    Calendars = db.relationship('Calendar', back_populates='Company')
     AutoPilots = db.relationship('AutoPilot', back_populates='Company')
 
     def __repr__(self):
@@ -138,7 +137,8 @@ class Assistant(db.Model):
     TopBarText = db.Column(db.String(64), nullable=False)
     SecondsUntilPopup = db.Column(db.Float, nullable=False, default=0.0)
 
-    NotifyEvery = db.Column(db.String(64), nullable=False, default='never')
+    LastNotificationDate = db.Column(db.DateTime(), nullable=True)
+    NotifyEvery = db.Column(db.Integer, nullable=True)
     Active = db.Column(db.Boolean(), nullable=False, default=True)
     Config = db.Column(MagicJSON, nullable=True)
 
@@ -149,6 +149,9 @@ class Assistant(db.Model):
 
     CRMID = db.Column(db.Integer, db.ForeignKey('CRM.ID'))
     CRM = db.relationship('CRM', back_populates='Assistants')
+
+    CalendarID = db.Column(db.Integer, db.ForeignKey('calendar.ID'))
+    Calendar = db.relationship('Calendar', back_populates='Assistants')
 
     AutoPilotID = db.Column(db.Integer, db.ForeignKey('auto_pilot.ID'))
     AutoPilot = db.relationship("AutoPilot", back_populates="Assistants")
@@ -163,8 +166,7 @@ class Assistant(db.Model):
 
     # Constraints:
     # cannot have two assistants with the same name under one company
-    __table_args__ = (db.UniqueConstraint('CompanyID', 'Name', name='uix1_assistant'),
-                      db.CheckConstraint(NotifyEvery.in_(['never', 'immediately', '6hrs', 'daily', 'weekly'])))
+    __table_args__ = (db.UniqueConstraint('CompanyID', 'Name', name='uix1_assistant'),)
 
     def __repr__(self):
         return '<Assistant {}>'.format(self.Name)
@@ -300,6 +302,8 @@ class CRM(db.Model):
         return '<CRM {}>'.format(self.ID)
 
 
+
+
 class Statistics(db.Model):
     ID = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
     Name = db.Column(db.String(128), nullable=False)
@@ -423,6 +427,27 @@ class Job(db.Model):
 
     def __repr__(self):
         return '<Job {}>'.format(self.JobTitle)
+
+
+class Calendar(db.Model):
+
+    ID = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
+    Type = db.Column(Enum(enums.Calendar), nullable=True)
+    Auth = db.Column(EncryptedType(JsonEncodedDict, os.environ['SECRET_KEY_DB'], AesEngine, 'pkcs5'), nullable=True)
+    MetaData = db.Column(MagicJSON, nullable=True)
+
+    # Relationships:
+    CompanyID = db.Column(db.Integer, db.ForeignKey('company.ID', ondelete='cascade'), nullable=False)
+    Company = db.relationship('Company', back_populates='Calendars')
+
+    Assistants = db.relationship('Assistant', back_populates='Calendar')
+
+    # Constraints:
+    # each company will have one CRM of each type
+    __table_args__ = (db.UniqueConstraint('Type', 'CompanyID', name='uix1_calendar'),)
+
+    def __repr__(self):
+        return '<Calendar {}>'.format(self.ID)
 
 
 # a hidden table was made by APScheduler being redefined to be able use foreign keys

@@ -7,6 +7,7 @@ import 'types/CRM_Types';
 import {AdaptFeatures, AdaptFormItems, AdaptHeader} from "./CrmForms/Adapt";
 import {BullhornFeatures, BullhornFormItems, BullhornHeader} from "./CrmForms/Bullhorn";
 import {GreenhouseFeatures, GreenhouseFormItem, GreenhouseHeader} from "./CrmForms/Greenhouse";
+import {GoogleFeatures, GoogleFormItems, GoogleHeader} from './CrmForms/Google'
 import {OutlookFeatures, OutlookFormItems, OutlookHeader} from "./CrmForms/Outlook";
 import VincereFormItems from "./CrmForms/Vincere";
 import {connect} from 'react-redux';
@@ -21,10 +22,12 @@ class Crm extends React.Component {
 
     componentWillMount() {
         if (!this.props.location.state)
-            return history.push('/dashboard/crmlist');
+            return history.push('/dashboard/marketplace');
         const /** @type {CRM}*/crm = this.props.location.state?.crm || {};
         this.props.dispatch(crmActions.exportRecruiterValueReport({Name: crm.type}))
     }
+
+    googleAuthentication
 
     componentWillReceiveProps(nextProps) {
         const /** @type {CRM}*/crm = this.props.location.state?.crm || {};
@@ -101,6 +104,10 @@ class Crm extends React.Component {
                             <GreenhouseHeader/>
                         }
                         {
+                            crm.type === "gmail" &&
+                            <GoogleHeader/>
+                        }
+                        {
                             crm.type === "Outlook" &&
                             <OutlookHeader/>
                         }
@@ -146,6 +153,10 @@ class Crm extends React.Component {
                             {
                                 crm.type === "Greenhouse" &&
                                 <GreenhouseFeatures/>
+                            }
+                            {
+                                crm.type === "gmail" &&
+                                <GoogleFeatures/>
                             }
                             {
                                 crm.type === "Outlook" &&
@@ -207,6 +218,19 @@ class Crm extends React.Component {
                                 {
                                     crm.type === "Greenhouse" &&
                                     <GreenhouseFormItem getFieldDecorator={getFieldDecorator}
+                                                        layout={layout}
+                                                        FormItem={FormItem}
+                                                        CRM={crm}
+                                                        isConnecting={this.props.isConnecting}
+                                                        isTesting={this.props.isTesting}
+                                                        isDisconnecting={this.props.isDisconnecting}
+                                                        disconnectCRM={this.disconnectCRM}
+                                                        connectCRM={this.connectCRM}
+                                                        testCRM={this.testCRM}/>
+                                }
+                                {
+                                    crm.type === "gmail" &&
+                                    <GoogleFormItems getFieldDecorator={getFieldDecorator}
                                                         layout={layout}
                                                         FormItem={FormItem}
                                                         CRM={crm}

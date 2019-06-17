@@ -69,7 +69,15 @@ def processConversation(assistantHashID, data: dict) -> Callback:
                 conversation.CRMSynced = True
             conversation.CRMResponse = crm_callback.Message
 
+
+        #immediate notification
+        if assistant.NotifyEvery == 0:
+            print("notify via email")
+            assistant.LastNotificationDate = datetime.now()
+            # notify via email ?
+
         db.session.add(conversation)
+        db.session.save(assistant)
         db.session.commit()
 
         # Notify company about the new chatbot session

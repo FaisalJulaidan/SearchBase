@@ -3,7 +3,10 @@ from pytz import utc
 from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.jobstores.sqlalchemy import SQLAlchemyJobStore
 from apscheduler.executors.pool import ThreadPoolExecutor, ProcessPoolExecutor
-
+from models import db, Callback, Assistant, User
+# import dateutil
+from utilities import helpers
+from datetime import date, datetime
 import os
 
 jobstores = {
@@ -15,21 +18,41 @@ executors = {
 }
 job_defaults = {
     'coalesce': False,
-    'max_instances': 3
+    'max_instances': 1
 }
+
+''' 
+Types
+Null - Never notify
+0 - Immediately notify
+any other number - notify after x hours
+'''
+
 
 scheduler = BackgroundScheduler(jobstores=jobstores, executors=executors, job_defaults=job_defaults, timezone=utc)
 
-def printSomething ():
-    print("SOMETHINGS...")
+# If assistantID is supplied, it will only look for data relating to that assistant
+def getNextInterval(assistantID=None):
+    try:
+        helpers.HPrint('kek')
+        now = datetime.now()
+        query = db.session.query(Assistant.ID, Assistant.NotifyEvery, Assistant.Name, User.Email, Assistant.LastNotificationDate) \
+            .filter(Assistant.NotifyEvery != None) \
+            .filter(Assistant.CompanyID == User.CompanyID)
 
-# job = scheduler.add_job(func=tasks.printSomething, trigger='interval', seconds=5)                                                                                                                          id="3559a1946b52419899e8841d4317d194", replace_existing=True)
-# job = scheduler.get_job("3559a1946b52419899e8841d4317d194")
-#
-#
-# scheduler.start()
-# task: Task = Task(ApschedulerJobID1="3559a1946b52419899e8841d4317d194")
-# db.session.add(task)
-# print(task.ApschedulerJobID1)
-# db.session.commit()
-# scheduler.reschedule_job(job_id="3559a1946b52419899e8841d4317d194",trigger='interval', seconds=10)
+        if assistantID != None:
+            query.filter(Assistant.ID == assistantID)
+
+        monthlyUses = helpers.getDictFromLimitedQuery(["AssistantID", "NotifyEvery", "Name", "Email", "LastNotificationDate"],
+                         query.all())
+
+        for record in monthlyUses:
+            if ((now - record['LastNotificationDate']).total_seconds()/86400) > record['NotifyEvery'] \
+                    or record['LastNotificationDate'] == None:
+                db.session.query(Assistant).filter(Assistant.ID == record['AssistantID']).update({'LastNotificationDate': now})
+    except Exception as e:
+        print(e)
+
+
+scheduler.add_job(getNextInterval, 'cron', hour='*/1', id='hourly', replace_existing=True)
+scheduler.start()

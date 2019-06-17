@@ -11,7 +11,7 @@ from sqlalchemy_utils import create_database, database_exists
 from services.auth_services import jwt
 from utilities import helpers, tasks
 from flask_babel import Babel
-from services import scheduler_services
+# from services import scheduler_services
 
 # Import all routers to register them as blueprints
 from routes.admin.routers import profile_router, analytics_router, sub_router, \
@@ -20,6 +20,7 @@ from routes.admin.routers import profile_router, analytics_router, sub_router, \
 from routes.public.routers import public_router, resetPassword_router, chatbot_router, auth_router
 
 app = Flask(__name__, static_folder='static')
+
 
 # Register Routes:
 app.register_blueprint(assistant_router, url_prefix='/api')
@@ -37,7 +38,6 @@ app.register_blueprint(auth_router, url_prefix='/api')
 app.register_blueprint(database_router, url_prefix='/api')
 app.register_blueprint(auto_pilot_router, url_prefix='/api')
 app.register_blueprint(options_router, url_prefix='/api')
-
 
 @app.after_request
 def apply_caching(response):
@@ -100,7 +100,6 @@ if os.environ['FLASK_ENV'] in ['production', 'staging']:
     print('Production mode running...')
 
 elif os.environ['FLASK_ENV'] == 'development':
-
     # Server Setup
     app.config.from_object('config.DevelopmentConfig')
     config.BaseConfig.USE_ENCRYPTION = False

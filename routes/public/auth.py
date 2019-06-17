@@ -36,24 +36,25 @@ def refresh_token():
 def signup_process():
     if request.method == "POST":
         callback: Callback = auth_services.signup(request.json)
-        if callback.Success:
-            return helpers.jsonResponse(True, 200, callback.Message, callback.Data)
-        else:
+        if not callback.Success:
             return helpers.jsonResponse(False, 401, callback.Message, callback.Data)
+        return helpers.jsonResponse(True, 200, callback.Message, callback.Data)
 
 
-@auth_router.route("/account/verify/<payload>", methods=['GET'])  # TODO
+@auth_router.route("verify_account/<payload>", methods=['POST'])  # TODO
 def verify_account(payload):
-    if request.method == "GET":
+    if request.method == "POST":
         try:
-            data = helpers.verificationSigner.loads(payload)
+            data = helpers.verificationSigner.loads(payload, salt='email-confirm-key')
+            print(data)
             email = data.split(";")[0]
-            user_callback: Callback = user_services.verifyByEmail(email)
-            if not user_callback.Success:
-                raise Exception(user_callback.Message)
 
-            return redirect("/login")
+            callback: Callback = user_services.verifyByEmail(email)
+            if not callback.Success:
+                raise Exception("Couldn't verify your account")
 
-        except Exception as e:
-            print(e)
-            return redirect("/login")
+            return helpers.jsonResponse(True, 200, callback.Message, callback.Data)
+
+        except Exception as exc:
+            helpers.logError("auth_router.verify_account(): ====> " + str(exc))
+            return helpers.jsonResponse(False, 400, "Couldn't verify your account")

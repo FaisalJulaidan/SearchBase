@@ -185,20 +185,19 @@ def generate():
     user_sabic = Role.query.filter(Role.Company == sabic).filter(Role.Name == "User").first()
 
     user_services.create(firstname='Sylvester', surname='Stallone', email='aa@aa.com', password='123', phone='43444236456',
-                         company=aramco, roleID=ownerRole.ID, verified=True)
+                         companyID=aramco.ID, roleID=ownerRole.ID, verified=True)
     user_services.create(firstname='Evg', surname='Test', email='evgeniy67@abv.bg', password='123', phone='43444236456',
-                         company=aramco, roleID=admin_aramco.ID, verified=True)
+                         companyID=aramco.ID, roleID=admin_aramco.ID, verified=True)
     user_services.create(firstname='firstname', surname='lastname', email='e2@e.com', password='123', phone='43444236456',
-                         company=aramco, roleID=admin_aramco.ID, verified=True)
+                         companyID=aramco.ID, roleID=admin_aramco.ID, verified=True)
     user_services.create(firstname='firstname', surname='lastname', email='e3@e.com', password='123', phone='43444236456',
-                         company=aramco, roleID=user_aramco.ID, verified=True)
+                         companyID=aramco.ID, roleID=user_aramco.ID, verified=True)
 
-    user_services.create(firstname='Ali', surname='Khalid', email='bb@bb.com', password='123', phone='43444236456', company=sabic,
-                         roleID=ownerRole.ID, verified=True)
-    user_services.create(firstname='firstname', surname='lastname', email='e5@e.com', password='123', phone='43444236456', company=sabic,
-                         roleID=admin_sabic.ID, verified=True)
-    user_services.create(firstname='Faisal', surname='Julaidan', email='julaidan.faisal@gmail.com', password='123', phone='43444236456', company=sabic,
-                         roleID=user_sabic.ID, verified=False)
+    user_services.create(firstname='Ali', surname='Khalid', email='bb@bb.com', password='123', phone='43444236456',
+                         companyID=sabic.ID, roleID=ownerRole.ID, verified=True)
+    user_services.create(firstname='firstname', surname='lastname', email='e5@e.com', password='123', phone='43444236456',
+                         companyID=sabic.ID, roleID=admin_sabic.ID, verified=True)
+
 
 
     # Chatbot Sessions

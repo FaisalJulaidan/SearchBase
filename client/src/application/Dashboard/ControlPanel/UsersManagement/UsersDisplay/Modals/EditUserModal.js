@@ -9,10 +9,10 @@ class EditUserModal extends React.Component {
 
     state = {};
 
-    handleSave = () => this.props.form.validateFields((err, values) => {
+    onSubmit = () => this.props.form.validateFields((err, values) => {
         this.props.form.validateFields((err, values) => {
             if (!err) {
-                this.props.handleSave(values);
+                this.props.handleSave(this.props.userData.user.ID, values);
             }
         });
     });
@@ -28,21 +28,21 @@ class EditUserModal extends React.Component {
         return (
             <Modal
                 width={500}
-                title="Add New User"
+                title="Edit User"
                 destroyOnClose={true}
                 visible={this.props.visible}
-                onOk={this.props.handleSave}
+                onOk={this.props.onSubmit}
                 onCancel={this.props.handleCancel}
                 footer={[
                     <Button key="Cancel" onClick={this.closeModal}>Cancel</Button>,
-                    <Button key="submit" type="primary" onClick={this.handleSave}>{"Add"}</Button>
+                    <Button key="submit" type="primary" onClick={this.onSubmit}>{"Add"}</Button>
                 ]}>
 
                 <Form layout='vertical'>
                     <FormItem
                         label="First name"
                         extra="Enter the name of the user">
-                        {getFieldDecorator('name', {
+                        {getFieldDecorator('firstname', {
                             initialValue: userData?.user.Firstname,
                             rules: [{
                                 required: true,

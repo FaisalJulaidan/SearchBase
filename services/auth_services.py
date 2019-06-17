@@ -36,8 +36,8 @@ def signup(details) -> Callback:
 
         # Roles
         # Create owner, admin, user roles for the new company
-        adminRole: Callback = role_services.create('Admin', True, True, True, False, company)
-        userRole: Callback = role_services.create('User', True, False, False, False, company)
+        adminRole: Callback = role_services.create('Admin', True, True, True, False, company.ID)
+        userRole: Callback = role_services.create('User', True, False, False, False, company.ID)
         if not (adminRole.Success or userRole.Success):
             return Callback(False, 'Could not create roles for the new user.')
 
@@ -48,7 +48,7 @@ def signup(details) -> Callback:
                                              details['email'],
                                              details['password'],
                                              details['telephone'],
-                                             company,
+                                             company.ID,
                                              2) # RoleID = 2 -> Owner
 
 

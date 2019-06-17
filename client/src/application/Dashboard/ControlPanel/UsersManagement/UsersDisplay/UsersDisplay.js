@@ -1,4 +1,5 @@
 import React from "react";
+import {store} from "store/store";
 import {usersManagementActions} from "store/actions";
 import {Button, Table, Divider, Tag, Modal} from 'antd';
 import {isEmpty} from "lodash";
@@ -54,7 +55,7 @@ class UsersDisplay extends React.Component {
             {
                 title: 'Last Access',
                 key: 'LastAccess',
-                render: (text, record) => (<p>{record.user.LastAccess}</p>),
+                render: (text, record) => (<p>{record.user.LastAccess || 'Never'}</p>),
             },
             {
                 title: 'Verified',
@@ -97,11 +98,11 @@ class UsersDisplay extends React.Component {
     }
 
     addUser = (user) => {
-        this.props.dispatch(usersManagementActions.addUser({user:user}));
+        store.dispatch(usersManagementActions.addUser({user:user}));
     };
 
     editUser = (userID, values) => {
-        this.props.dispatch(usersManagementActions.editUser(userID, values));
+        store.dispatch(usersManagementActions.editUser(userID, values));
     };
 
     deleteUser = (userID) => {

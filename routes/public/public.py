@@ -45,6 +45,11 @@ def reset_password(payload):
 def appointments_picker(payload):
     return serve()
 
+@public_router.route('/verify_account/<payload>')
+def verify_account_serve(payload):
+    return serve()
+
+
 @public_router.route('/dashboard', defaults={'path': ''})
 @public_router.route('/dashboard/<path:path>')
 def dashboard(path):
@@ -156,34 +161,3 @@ def sendEmail():
         msg.body = mailFirstname + " said: " + mailUserMessage + " their email is: " + mailUserEmail
         mail.send(msg)
         return render_template("index.html")
-
-# Account verification route
-@public_router.route("/account/verify/<payload>", methods=['GET'])
-def verify_account(payload):
-    if request.method == "GET":
-        try:
-            data = helpers.verificationSigner.loads(payload, salt='email-confirm-key')
-            email = data.split(";")[0]
-            user_callback: Callback = user_services.verifyByEmail(email)
-            if not user_callback.Success: raise Exception(user_callback.Message)
-
-            return redirect("/login")
-
-        except Exception as e:
-            print(e)
-            return redirect("/login")
-
-
-# Set Candidate meeting routes
-@public_router.route("/candidate-meeting/<payload>", methods=['GET', 'POST'])
-def candidate_meeting(payload):
-    if request.method == "GET":
-        data = helpers.verificationSigner.loads(payload, salt='email-confirm-key')
-        email = data.split(";")[0]
-        user_callback: Callback = user_services.verifyByEmail(email)
-        if not user_callback.Success: raise Exception(user_callback.Message)
-
-        return redirect("/login")
-
-    if request.method == "POST":
-        data = request.json

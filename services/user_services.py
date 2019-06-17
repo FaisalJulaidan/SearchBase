@@ -5,13 +5,13 @@ from utilities import helpers
 from sqlalchemy import and_
 
 
-def create(firstname, surname, email, password, phone, company: Company, roleID: int, verified=False) -> Callback:
+def create(firstname, surname, email, password, phone, companyID: int, roleID: int, verified=False) -> Callback:
     try:
+
 
         # Create a new user with its associated company and role
         newUser: User = User(Firstname=firstname, Surname=surname, Email=email.lower(), Verified=verified,
-                             Password=password, PhoneNumber=phone, Company=company,
-                             RoleID=roleID)
+                             Password=password, PhoneNumber=phone, CompanyID=companyID, RoleID=roleID)
         db.session.add(newUser)
         db.session.commit()
         return Callback(True, 'User has been created successfully!', newUser)
@@ -55,6 +55,19 @@ def getByEmail(email) -> User or None:
     except Exception as exc:
         return Callback(False, 'User with email ' + email + ' does not exist.')
 
+
+# this used to make sure the edited user is under this company
+def getByIDAndCompanyID(userID, companyID) -> Callback:
+    try:
+        # Get result and check if None then raise exception
+        result = db.session.query(User).filter(and_(User.ID == userID,User.CompanyID == companyID)).first()
+        if not result: raise Exception("User does not exist")
+
+        return Callback(True,'Users  retrieved successfully.', result)
+    except Exception as exc:
+        helpers.logError("user_services.getAllByCompanyID(): " + str(exc))
+        db.session.rollback()
+        return Callback(False, 'Users could not be retrieved.')
 
 def getAllByCompanyID(companyID) -> Callback:
     try:

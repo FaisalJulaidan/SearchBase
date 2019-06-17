@@ -33,7 +33,7 @@ export const GoogleFormItems = ({
             <div>
                 {loginWithGoogle("623652835897-tj9rf1v6hd1tak5bv5hr4bq9hrvjns95.apps.googleusercontent.com",
                                     "code",
-                                    "https://www.googleapis.com/auth/calendar.events",
+                                    "https://www.googleapis.com/auth/calendar",
                                     "http://localhost:3000/dashboard/marketplace?googleVerification=true")}
             </div>
         }

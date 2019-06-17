@@ -3,8 +3,8 @@ from datetime import datetime, timedelta
 import enums
 import requests
 import os
-import json
 import dateutil
+from sqlalchemy import exc
 
 #todo - csrf - if necessary
 #todo - need to get company id automatically
@@ -32,7 +32,6 @@ def getToken(type, companyID):
                 'refresh': cal.Auth['refresh']
             }
             cal.Auth = tokenInfo
-            db.session.save(cal)
             db.session.commit()
             return resp.json()['access_token']
         else:
@@ -50,7 +49,6 @@ def authorizeUser(code):
                                  'redirect_uri': os.environ['GOOGLE_CALENDAR_REDIRECT_URI'],
                                  'grant_type': 'authorization_code'
                              })
-        print(getToken(enums.Calendar.Google, 2))
         if 'error' in resp.json():
             raise Exception(resp.json()['error_description'])
         if 'refresh_token' not in resp.json():
@@ -66,5 +64,9 @@ def authorizeUser(code):
         db.session.add(cal)
         db.session.commit()
         return Callback(True, 'User authorized succesfully')
+    except exc.IntegrityError as e:
+        db.session.rollback()
+        return Callback(False, "You already have authorization data relating to your google calendar in the database, please remove these keys first.")
     except Exception as e:
+        print(e)
         return Callback(False, str(e))

@@ -274,11 +274,16 @@ class AutoPilot extends React.Component {
                             </Form>
                         }
 
+
+                        <Button type={'primary'} size={'large'} onClick={this.onSubmit}
+                                style={{marginTop:30}}>
+                            Save changes
+                        </Button>
+
                         <br />
                         <Divider/>
                         <Button type={'danger'} size={'large'} onClick={this.handleDelete}>Delete Auto Pilot</Button>
 
-                        <Button type={'primary'} size={'large'} onClick={this.onSubmit}>Save changes</Button>
 
                         {/*Blur Effect (Hidden) */}
                         <div style={{display: 'none'}}>

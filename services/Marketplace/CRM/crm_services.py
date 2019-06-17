@@ -4,8 +4,7 @@ from sqlalchemy.sql import and_
 
 from enums import CRM, UserType
 from models import db, Callback, Conversation, Assistant, CRM as CRM_Model, StoredFile
-from services.CRM import Adapt, Bullhorn, Vincere, Greenhouse
-from utilities import helpers
+from services.Marketplace.CRM import Greenhouse, Adapt, Bullhorn
 
 
 # Process chatbot session

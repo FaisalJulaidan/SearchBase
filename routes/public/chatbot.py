@@ -8,7 +8,7 @@ from werkzeug.utils import secure_filename
 
 from models import Callback, db, Conversation
 from services import conversation_services, flow_services, databases_services, stored_file_services, mail_services
-from services.CRM import crm_services
+from services.Marketplace.CRM import crm_services
 from utilities import helpers
 
 chatbot_router = Blueprint('chatbot_router', __name__, template_folder="../templates")

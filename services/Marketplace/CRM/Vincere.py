@@ -3,10 +3,11 @@ import json
 import logging
 
 import requests
-from sqlalchemy import and_
 
 from enums import DataType as DT
-from models import Callback, Conversation, db, CRM, StoredFile
+from models import Callback, Conversation, db, StoredFile
+from services import stored_file_services, databases_services
+from services.Marketplace import marketplace_helpers as helpers
 
 
 # Vincere Notes:
@@ -16,15 +17,11 @@ from models import Callback, Conversation, db, CRM, StoredFile
 # id_token (used to verify users when making queries), expires in 10 minutes(unconfirmed)
 # auth needs to contain client_id, redirect_uri, response_type=code (get request)
 # token needs client_id, code=auth_code, grant_type=authorization_code (post request)
-
 # To Do: login and token refresh
 # To Test: inserting
 
 
 # login requires: client_id
-from services import stored_file_services, databases_services
-
-
 def login(auth):
     try:
         authCopy = dict(auth)  # we took copy to delete domain later only from the copy
@@ -110,10 +107,9 @@ def retrieveRestToken(auth, companyID):
                 raise Exception(login_callback.Message)
             authCopy = dict(login_callback.Data)
 
-        # done here as cannot import crm_services while it is importing Vincere.py
-        crm = db.session.query(CRM).filter(and_(CRM.CompanyID == companyID, CRM.Type == "Vincere")).first()
-        crm.Auth = dict(authCopy)
-        db.session.commit()
+        saveAuth_callback: Callback = helpers.saveNewCRMAuth(authCopy, "Vincere", companyID)
+        if not saveAuth_callback.Success:
+            raise Exception(saveAuth_callback.Message)
 
         return Callback(True, 'Id Token Retrieved', {
             "id_token": authCopy.get("rest_token")
@@ -135,14 +131,14 @@ def sendQuery(auth, query, method, body, companyID, optionalParams=None):
         headers = {'Content-Type': 'application/json'}
 
         # test the BhRestToken (rest_token)
-        r = sendRequest(url, method, headers, json.dumps(body))
+        r = helpers.sendRequest(url, method, headers, json.dumps(body))
 
         if r.status_code == 401:  # wrong rest token
             callback: Callback = retrieveRestToken(auth, companyID)
             if callback.Success:
                 url = buildUrl(callback.Data, query, optionalParams)
 
-                r = sendRequest(url, method, headers, json.dumps(body))
+                r = helpers.sendRequest(url, method, headers, json.dumps(body))
                 if not r.ok:
                     raise Exception(r.text + ". Query could not be sent")
             else:
@@ -167,17 +163,6 @@ def buildUrl(rest_data, query, optionalParams=None):
             url += "&" + param
     # return the url
     return url
-
-
-def sendRequest(url, method, headers, data=None):
-    request = None
-    if method is "put":
-        request = requests.put(url, headers=headers, data=data)
-    elif method is "post":
-        request = requests.post(url, headers=headers, data=data)
-    elif method is "get":
-        request = requests.get(url, headers=headers, data=data)
-    return request
 
 
 def insertCandidate(auth, conversation: Conversation) -> Callback:

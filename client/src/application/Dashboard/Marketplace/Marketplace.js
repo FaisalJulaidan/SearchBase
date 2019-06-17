@@ -40,9 +40,8 @@ class Marketplace extends React.Component {
                 title: 'Outlook Calendar',
                 desc: `Calendar is the calendar and scheduling component of Outlook that is fully integrated with email, contacts, and other features.`,
                 image: getLink('/static/images/CRM/outlook-calendar.png'),
-                type: "outlook",
-                status: 'Comming Soon',
-                disabled: true
+                type: "Outlook",
+                status: 'NOT_CONNECTED'
             },
             {
                 title: 'Google Calendar',

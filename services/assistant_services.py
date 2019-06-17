@@ -1,13 +1,11 @@
 from models import db, Assistant, Callback
 from sqlalchemy import and_
 from utilities import helpers, json_schemas
-from services.CRM import crm_services
-from os.path import join
-from config import BaseConfig
-from services import flow_services, stored_file_services, auto_pilot_services
+from services.Marketplace.CRM import crm_services
+from services import stored_file_services, auto_pilot_services
 from jsonschema import validate
 from werkzeug.utils import secure_filename
-import logging, json
+import logging
 
 
 def create(name, desc, welcomeMessage, topBarText, companyID) -> Assistant or None:

@@ -7,6 +7,7 @@ import 'types/CRM_Types';
 import {AdaptFeatures, AdaptFormItems, AdaptHeader} from "./CrmForms/Adapt";
 import {BullhornFeatures, BullhornFormItems, BullhornHeader} from "./CrmForms/Bullhorn";
 import {GreenhouseFeatures, GreenhouseFormItem, GreenhouseHeader} from "./CrmForms/Greenhouse";
+import {OutlookFeatures, OutlookFormItems, OutlookHeader} from "./CrmForms/Outlook";
 import VincereFormItems from "./CrmForms/Vincere";
 import {connect} from 'react-redux';
 import {crmActions} from "store/actions";
@@ -99,6 +100,10 @@ class Crm extends React.Component {
                             crm.type === "Greenhouse" &&
                             <GreenhouseHeader/>
                         }
+                        {
+                            crm.type === "Outlook" &&
+                            <OutlookHeader/>
+                        }
                     </div>
                 </div>
 
@@ -141,6 +146,10 @@ class Crm extends React.Component {
                             {
                                 crm.type === "Greenhouse" &&
                                 <GreenhouseFeatures/>
+                            }
+                            {
+                                crm.type === "Outlook" &&
+                                <OutlookFeatures/>
                             }
                         </TabPane>
 
@@ -198,6 +207,20 @@ class Crm extends React.Component {
                                 {
                                     crm.type === "Greenhouse" &&
                                     <GreenhouseFormItem getFieldDecorator={getFieldDecorator}
+                                                        layout={layout}
+                                                        FormItem={FormItem}
+                                                        CRM={crm}
+                                                        isConnecting={this.props.isConnecting}
+                                                        isTesting={this.props.isTesting}
+                                                        isDisconnecting={this.props.isDisconnecting}
+                                                        disconnectCRM={this.disconnectCRM}
+                                                        connectCRM={this.connectCRM}
+                                                        testCRM={this.testCRM}/>
+                                }
+
+                                {
+                                    crm.type === "Outlook" &&
+                                    <OutlookFormItems getFieldDecorator={getFieldDecorator}
                                                         layout={layout}
                                                         FormItem={FormItem}
                                                         CRM={crm}

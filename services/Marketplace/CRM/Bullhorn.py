@@ -5,11 +5,11 @@ import urllib.parse
 from datetime import datetime
 
 import requests
-from sqlalchemy import and_
 
 from enums import DataType as DT
 from models import Callback, Conversation, db, CRM, StoredFile
 from services import databases_services, stored_file_services
+from services.Marketplace import marketplace_helpers as helpers
 
 
 # login requires: username, password
@@ -123,10 +123,9 @@ def retrieveRestToken(auth, companyID):
         authCopy["rest_token"] = result_body.get("BhRestToken")
         authCopy["rest_url"] = result_body.get("restUrl")
 
-        # done here as cannot import crm_services while it is importing Bullhorn.py
-        crm = db.session.query(CRM).filter(and_(CRM.CompanyID == companyID, CRM.Type == "Bullhorn")).first()
-        crm.Auth = dict(authCopy)
-        db.session.commit()
+        saveAuth_callback: Callback = helpers.saveNewCRMAuth(authCopy, "Bullhorn", companyID)
+        if not saveAuth_callback.Success:
+            raise Exception(saveAuth_callback.Message)
 
         return Callback(True, 'Rest Token Retrieved', {
             "rest_token": authCopy["rest_token"],
@@ -150,13 +149,13 @@ def sendQuery(auth, query, method, body, companyID, optionalParams=None):
         headers = {'Content-Type': 'application/json'}
 
         # test the BhRestToken (rest_token)
-        r = sendRequest(url, method, headers, json.dumps(body))
+        r = helpers.sendRequest(url, method, headers, json.dumps(body))
         if r.status_code == 401:  # wrong rest token
             callback: Callback = retrieveRestToken(auth, companyID)
             if callback.Success:
                 url = buildUrl(callback.Data, query, optionalParams)
 
-                r = sendRequest(url, method, headers, json.dumps(body))
+                r = helpers.sendRequest(url, method, headers, json.dumps(body))
                 if not r.ok:
                     raise Exception(r.text + ". Query could not be sent")
             else:
@@ -181,17 +180,6 @@ def buildUrl(rest_data, query, optionalParams=None):
             url += "&" + param
     # return the url
     return url
-
-
-def sendRequest(url, method, headers, data=None):
-    request = None
-    if method is "put":
-        request = requests.put(url, headers=headers, data=data)
-    elif method is "post":
-        request = requests.post(url, headers=headers, data=data)
-    elif method is "get":
-        request = requests.get(url, headers=headers, data=data)
-    return request
 
 
 def insertCandidate(auth, conversation: Conversation) -> Callback:
@@ -579,7 +567,7 @@ def produceRecruiterValueReport(crm: CRM, companyID) -> Callback:
             return result
 
         titles = ["User Assigned", "Date Added", "Title", "Client Corporation", "Salary", "Fee Arrangement",
-                            "Pipeline Value"]
+                  "Pipeline Value"]
 
         data = {}
         previousUser = None
@@ -595,7 +583,7 @@ def produceRecruiterValueReport(crm: CRM, companyID) -> Callback:
                 record["title"],
                 record["clientCorporation"].get("name"),
                 record["salary"],
-                str(float(record["feeArrangement"])*100) + "%",
+                str(float(record["feeArrangement"]) * 100) + "%",
                 float(record["salary"]) * float(record["feeArrangement"])
             ])
             previousUser = record["owner"]["firstName"] + " " + record["owner"]["lastName"]

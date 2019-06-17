@@ -1,10 +1,9 @@
-import logging
-
 from flask import Blueprint, request
 from flask_jwt_extended import jwt_required, get_jwt_identity
 
 from models import Callback
-from services.CRM import crm_services, Bullhorn, Outlook
+from services.Marketplace.CRM import crm_services
+from services.Marketplace.Mail import Outlook
 from utilities import helpers
 
 crm_router: Blueprint = Blueprint('crm_router', __name__, template_folder="../../templates")
@@ -106,7 +105,29 @@ def crm_callback():
     return str(request.url)
 
 
-# @crm_router.route("/custom_test", methods=['GET', 'POST', 'PUT'])
-# def test():
-#     if request.method == "POST":
-#         return Outlook.login().Message
+@crm_router.route("/outlook_callback", methods=['GET', 'POST', 'PUT'])
+def outlook_callback():
+    print("request.args: ", request.args)
+    print(": ", request.args.get("code"))
+    print("request.form: ", request.form)
+    print("request.json: ", request.json)
+    print("request.url: ", request.url)
+    print("method: ", request.method)
+
+    # auth code
+    if request.method == "GET":
+        args = request.args
+        if args.get("error") or (not args.get("code") or not args.get("state")):
+            return helpers.jsonResponse(False, 400, args.get("error_description") or "User error in request")
+
+        login_callback: Callback = Outlook.login(args)
+        if not login_callback.Success:
+            return helpers.jsonResponse(False, 400, login_callback.Message)
+
+    return helpers.jsonResponse(True, 200, "Success")
+
+
+@crm_router.route("/custom_test", methods=['GET', 'POST', 'PUT'])
+def test():
+    if request.method == "POST":
+        return Outlook.login({"username": "info thesearchbase", "password": "TH3T3CHBR@S"}).Message

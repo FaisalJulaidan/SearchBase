@@ -3,7 +3,6 @@ import {Redirect, Route, Switch, withRouter} from 'react-router-dom';
 import {connect} from 'react-redux';
 import {history} from './helpers';
 import {PrivateRoute} from './hoc';
-import {destroyMessage} from './helpers/alert';
 import SentryBoundary from "components/SentryBoundary/SentryBoundary";
 import styles from "./components/LoadingSpinner/LoadingSpinner.module.less";
 
@@ -34,6 +33,7 @@ class App extends Component {
                         <Route path="/forget_password" component={ForgetPassword}/>
                         <Route path="/reset_password/" component={NewResetPassword}/>
                         <Route path="/appointments_picker/" component={AppointmentsPicker}/>
+                        <Route path="/verify_account/" component={AppointmentsPicker}/>
                         <PrivateRoute path="/dashboard" component={Dashboard}/>
                         <Redirect to={{pathname: '/dashboard'}}/>
                     </Switch>

@@ -128,7 +128,6 @@ elif os.environ['FLASK_ENV'] == 'development':
     #                     helpers.verificationSigner.dumps(payload, salt='appointment-key')
     # )
 
-    # run_tasks('migrate_flow', 123123123123123123)
 
     print('Development mode running...')
 

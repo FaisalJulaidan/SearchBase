@@ -13,16 +13,16 @@ from datetime import datetime
 def create(name, desc, welcomeMessage, topBarText, companyID) -> Assistant or None:
     try:
 
-        # flow = None
-        # if template and template != 'none':
-        #     # Get json template
-        #     relative_path = join('static/assistant_templates', template + '.json')
-        #     absolute_path = join(BaseConfig.APP_ROOT, relative_path)
-        #     flow = json.load(open(absolute_path))
-        #     # Validate template
-        #     callback: Callback = flow_services.isValidFlow(flow)
-        #     if not callback.Success:
-        #         raise Exception(callback.Message)
+        flow = None
+        if template and template != 'none':
+            # Get json template
+            relative_path = join('static/assistant_templates', template + '.json')
+            absolute_path = join(BaseConfig.APP_ROOT, relative_path)
+            flow = json.load(open(absolute_path))
+            # Validate template
+            callback: Callback = flow_services.isValidFlow(flow)
+            if not callback.Success:
+                raise Exception(callback.Message)
 
         assistant = Assistant(Name=name,
                               Description=desc,

@@ -5,7 +5,7 @@ from flask import Flask, render_template, request
 from flask_api import status
 from models import db, Callback, Assistant
 from services.mail_services import mail
-from flask_script import Manager
+from flask_script import Manager, Command
 from flask_migrate import Migrate, MigrateCommand
 from sqlalchemy_utils import create_database, database_exists
 from services.auth_services import jwt
@@ -74,8 +74,8 @@ manager.add_command('db', MigrateCommand)
 
 # will be used for migration purposes
 @manager.command
-def run_tasks():
-    tasks.migrate_flow()
+def run_tasks(functionName):
+    getattr(tasks, functionName)()
 
 
 print("Run the server...")
@@ -127,6 +127,8 @@ elif os.environ['FLASK_ENV'] == 'development':
     #     appointmentLink=helpers.getDomain() + "/appointments_picker/" + \
     #                     helpers.verificationSigner.dumps(payload, salt='appointment-key')
     # )
+
+    # run_tasks('migrate_flow', 123123123123123123)
 
     print('Development mode running...')
 

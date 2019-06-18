@@ -6,7 +6,7 @@ import copy
 
 
 # NOTE: Make sure to take a backup of the database before running this function
-def migrate_flow():
+def migrateFlow():
     try:
         for assistant in db.session.query(Assistant).all():
             if assistant.Flow:

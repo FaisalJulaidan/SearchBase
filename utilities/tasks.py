@@ -94,3 +94,4 @@ def __migrateFlow(flow):
     except Exception as exc:
         print(exc.args)
         print("Flow migration failed :(")
+        return None

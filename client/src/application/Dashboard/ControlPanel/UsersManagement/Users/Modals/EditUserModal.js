@@ -44,6 +44,7 @@ class EditUserModal extends React.Component {
                         {getFieldDecorator('firstname', {
                             initialValue: userData?.user.Firstname,
                             rules: [{
+                                whitespace: true,
                                 required: true,
                                 message: 'Please enter your the new user\'s first name',
                             }],
@@ -57,6 +58,7 @@ class EditUserModal extends React.Component {
                         {getFieldDecorator('surname', {
                             initialValue: userData?.user.Surname,
                             rules: [{
+                                whitespace: true,
                                 required: true,
                                 message: 'Please enter the User\'s surname',
                             }],
@@ -85,6 +87,7 @@ class EditUserModal extends React.Component {
                         {getFieldDecorator('roleID', {
                             initialValue: userData?.role.ID,
                             rules: [{
+                                whitespace: true,
                                 required: true,
                                 message: 'Please select a user role',
                             }],

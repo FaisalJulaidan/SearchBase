@@ -19,38 +19,35 @@ class NewAutoPilotModal extends Component {
 
 
     render() {
-        const layout = {
-            labelCol: {span: 6},
-            wrapperCol: {span: 14},
-        };
+
         const {getFieldDecorator} = this.props.form;
         return (
             <Modal title="Add Auto Pilot" visible={this.props.visible}
                    onOk={this.onSubmit}
                    onCancel={this.props.closeModal}>
                 <Form layout='horizontal'>
-                    <FormItem label="Name"
-                              {...layout}>
+                    <FormItem label="Name">
                         {getFieldDecorator('name', {
+                            initialValue: '',
                             rules: [{
+                                whitespace: true,
                                 required: true,
-                                message: "Please add name or the name you entered is duplicated",
-                                validator: (_, value, callback) => {
-                                    const { /**@type AutoPilot[]*/ autoPilotsList} = this.props;
-                                    if (autoPilotsList.some(autoPilot => autoPilot.Name === value
-                                        && this.props.autoPilot.Name !== value))
-                                        return callback(value + ' is duplicated');
-                                    else
-                                        return callback()
-                                }
-                            }],
+                                message: "Please input a name for your Auto Pilot"},
+                                {validator: (_, value, callback) => {
+                                        const { /**@type AutoPilot[]*/ autoPilotsList} = this.props;
+                                        if (autoPilotsList.some(autoPilot => autoPilot.Name === value
+                                            && this.props.autoPilot.Name !== value))
+                                            return callback("Auto Pilot name already exists");
+                                        else
+                                            return callback()
+                                    }
+                                }],
                         })(
                             <Input type="text" placeholder="Name of the auto pilot"/>
                         )}
                     </FormItem>
 
-                    <FormItem label="Description"
-                              {...layout}>
+                    <FormItem label="Description">
                         {getFieldDecorator('description', {
                             rules: [{
                                 message: "Please add description",

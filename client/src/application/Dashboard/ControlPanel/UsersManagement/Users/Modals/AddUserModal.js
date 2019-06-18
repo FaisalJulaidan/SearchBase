@@ -35,6 +35,7 @@ class AddUserModal extends React.Component {
                         label="First Name">
                         {getFieldDecorator('firstname', {
                             rules: [{
+                                whitespace: true,
                                 required: true,
                                 message: 'Please enter your the new user\'s first name',
                             }],
@@ -47,6 +48,7 @@ class AddUserModal extends React.Component {
                         label="Surname">
                         {getFieldDecorator('surname', {
                             rules: [{
+                                whitespace: true,
                                 required: true,
                                 message: 'Please enter the User\'s surname',
                             }],
@@ -73,7 +75,9 @@ class AddUserModal extends React.Component {
                     <FormItem
                         label={"Phone Number:"}>
                         {getFieldDecorator("phoneNumber", {
-                            rules: [{required: false, message: "Please enter a valid email"},
+                            rules: [{whitespace: true,
+                                required: false,
+                                message: "Please enter a valid email"},
                                 {pattern: /^((\+\d{1,3}(-| )?\(?\d\)?(-| )?\d{1,3})|(\(?\d{2,3}\)?))(-| )?(\d{3,4})(-| )?(\d{4})(( x| ext)\d{1,5}){0,1}$/,
                                     message: 'Invalid phone number'}
                             ],
@@ -88,6 +92,7 @@ class AddUserModal extends React.Component {
                         extra="The role defines what permissions the User will have">
                         {getFieldDecorator('roleID', {
                             rules: [{
+                                whitespace: true,
                                 required: true,
                                 message: 'Please select a user role',
                             }],

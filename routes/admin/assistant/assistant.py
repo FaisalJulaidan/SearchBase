@@ -35,9 +35,10 @@ def assistants():
                                                        data.get('assistantDesc'),
                                                        data.get('welcomeMessage'),
                                                        data.get('topBarText'),
+                                                       data.get('template'),
                                                        user['companyID'])
         if not callback.Success:
-            return helpers.jsonResponse(False, 400, "Assistant didn't update successfully")
+            return helpers.jsonResponse(False, 400, "Couldn't create assistant. Please try again")
         return helpers.jsonResponse(True, 200, callback.Message, helpers.getDictFromSQLAlchemyObj(callback.Data))
 
 

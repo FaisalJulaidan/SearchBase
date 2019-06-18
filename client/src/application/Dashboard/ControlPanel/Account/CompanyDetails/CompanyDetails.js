@@ -38,6 +38,7 @@ class CompanyDetails extends React.Component {
                         {getFieldDecorator("companyName", {
                             initialValue: account?.company?.Name,
                             rules: [{
+                                whitespace: true,
                                 required: true,
                                 message: "Company name is required"
                             }],
@@ -50,7 +51,10 @@ class CompanyDetails extends React.Component {
                     help={`website URL will be used in emails sent on behalf of your company by us`}>
                         {getFieldDecorator('websiteURL', {
                             initialValue: account?.company?.URL,
-                            rules: [{required: true, message: "Please enter your company's website URL!"},
+                            rules: [{
+                                whitespace: true,
+                                required: true,
+                                message: "Please enter your company's website URL!"},
                                     {pattern: /[-a-zA-Z0-9@:%_\+.~#?&//=]{2,256}\.[a-z]{2,4}\b(\/[-a-zA-Z0-9@:%_\+.~#?&//=]*)?/,
                                         message: 'Sorry, enter a valid URL'}],
                         })(

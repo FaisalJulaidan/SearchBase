@@ -69,37 +69,41 @@ class AutoPilot extends React.Component {
     };
 
     onSubmit = () => this.props.form.validateFields((err, values) => {
-        const /**@type AutoPilot*/ autoPilot = this.props.autoPilot || {};
-        const {state, TimeSlotsRef} = this;
-        const timeSlots = TimeSlotsRef.current.state.weekDays;
 
-        let weekDays = [];
-        for (let i = 0; i < 7; i++) {
-            weekDays.push({
-                day: i,
-                from: [timeSlots[i].from.hours(), timeSlots[i].from.minutes()],
-                to: [timeSlots[i].to.hours(), timeSlots[i].to.minutes()],
-                duration: +TimeSlotsRef.current.state.duration.split('min')[0],
-                active: timeSlots[i].active
-            })
+        if(!err){
+            const /**@type AutoPilot*/ autoPilot = this.props.autoPilot || {};
+            const {state, TimeSlotsRef} = this;
+            const timeSlots = TimeSlotsRef.current.state.weekDays;
+
+            let weekDays = [];
+            for (let i = 0; i < 7; i++) {
+                weekDays.push({
+                    day: i,
+                    from: [timeSlots[i].from.hours(), timeSlots[i].from.minutes()],
+                    to: [timeSlots[i].to.hours(), timeSlots[i].to.minutes()],
+                    duration: +TimeSlotsRef.current.state.duration.split('min')[0],
+                    active: timeSlots[i].active
+                })
+            }
+
+            let payload = {
+                active: autoPilot.Active,
+                name: values.name,
+                description: values.description,
+                acceptApplications: state.acceptApplications,
+                rejectApplications: state.rejectApplications,
+                sendAcceptanceEmail: state.sendAcceptanceEmail,
+                sendRejectionEmail: state.sendRejectionEmail,
+                acceptanceScore: state.acceptanceScore / 100,
+                rejectionScore: state.rejectionScore / 100,
+                sendCandidatesAppointments: state.sendCandidatesAppointments,
+
+                openTimes: weekDays
+            };
+
+            this.props.dispatch(autoPilotActions.updateAutoPilotConfigs(autoPilot.ID, payload));
         }
 
-        let payload = {
-            active: autoPilot.Active,
-            name: values.name,
-            description: values.description,
-            acceptApplications: state.acceptApplications,
-            rejectApplications: state.rejectApplications,
-            sendAcceptanceEmail: state.sendAcceptanceEmail,
-            sendRejectionEmail: state.sendRejectionEmail,
-            acceptanceScore: state.acceptanceScore / 100,
-            rejectionScore: state.rejectionScore / 100,
-            sendCandidatesAppointments: state.sendCandidatesAppointments,
-
-            openTimes: weekDays
-        };
-
-        this.props.dispatch(autoPilotActions.updateAutoPilotConfigs(autoPilot.ID, payload));
     });
 
     render() {
@@ -142,7 +146,7 @@ class AutoPilot extends React.Component {
                                     {getFieldDecorator('name', {
                                         initialValue: autoPilot.Name,
                                         rules: [
-                                            {required: true, message: "Enter a name for your auto pilot"},
+                                            {whitespace: true, required: true, message: "Enter a name for your auto pilot"},
                                             {validator: (_, value, callback) => {
                                                 // check if the value equals any of the name from
                                                 // this.props.autoPilotsSlots

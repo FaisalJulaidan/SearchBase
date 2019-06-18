@@ -4,13 +4,13 @@ from utilities import helpers, json_schemas
 from services.CRM import crm_services
 from os.path import join
 from config import BaseConfig
-from services import stored_file_services, auto_pilot_services, conversation_services
+from services import auto_pilot_services, conversation_services, flow_services
 from jsonschema import validate
-from werkzeug.utils import secure_filename
 from datetime import datetime
+import json
 
 
-def create(name, desc, welcomeMessage, topBarText, companyID) -> Assistant or None:
+def create(name, desc, welcomeMessage, topBarText, template, companyID) -> Assistant or None:
     try:
 
         flow = None
@@ -26,6 +26,7 @@ def create(name, desc, welcomeMessage, topBarText, companyID) -> Assistant or No
 
         assistant = Assistant(Name=name,
                               Description=desc,
+                              Flow=flow,
                               Message=welcomeMessage,
                               TopBarText=topBarText,
                               SecondsUntilPopup=0,

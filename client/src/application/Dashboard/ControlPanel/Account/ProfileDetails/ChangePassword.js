@@ -52,7 +52,7 @@ class ChangePassword extends React.Component {
                 <FormItem
                     label={"Old Password:"}>
                     {getFieldDecorator('oldPassword', {
-                        rules: [{required: true, message: 'Please input your old password!'},],
+                        rules: [{whitespace: true, required: true, message: 'Please input your old password!'},],
                     })(
                         <Input prefix={<Icon type="lock" style={{color: 'rgba(0,0,0,.25)'}}/>}
                                type="password"
@@ -64,7 +64,7 @@ class ChangePassword extends React.Component {
                     label={"New Password:"}>
                     {getFieldDecorator('newPassword', {
                         rules: [
-                            {required: true, message: 'Please input your new password!'},
+                            {whitespace: true, required: true, message: 'Please input your new password!'},
                             {validator: this.validateToNextPassword},
                             {pattern: /^.{6,}$/, message: 'Minimum is 6 characters'}
                         ],
@@ -79,7 +79,7 @@ class ChangePassword extends React.Component {
                     label={"Confirm Password:"}>
                     {getFieldDecorator('confirmNewPassword', {
                         rules: [
-                            {required: true, message: 'Please confirm your new password!'},
+                            {whitespace: true, required: true, message: 'Please confirm your new password!'},
                             {validator: this.compareToFirstPassword}
                         ],
                     })(

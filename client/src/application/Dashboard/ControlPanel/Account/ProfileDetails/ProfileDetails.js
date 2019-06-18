@@ -34,6 +34,7 @@ class ProfileDetails extends React.Component {
                         {getFieldDecorator("firstname", {
                             initialValue: account?.user?.Firstname,
                             rules: [{
+                                whitespace: true,
                                 required: true,
                                 message: "Please enter your first"
                             }],
@@ -46,6 +47,7 @@ class ProfileDetails extends React.Component {
                         {getFieldDecorator("surname", {
                             initialValue: account?.user?.Surname,
                             rules: [{
+                                whitespace: true,
                                 required: true,
                                 message: "Please enter your surname"
                             }],
@@ -60,6 +62,7 @@ class ProfileDetails extends React.Component {
                         {getFieldDecorator("email", {
                             initialValue: account?.user?.Email,
                             rules: [{
+                                whitespace: true,
                                 required: true,
                                 message: "Please enter a valid email"
                             }],

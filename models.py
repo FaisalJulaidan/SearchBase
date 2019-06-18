@@ -1,20 +1,23 @@
-from sqlathanor import FlaskBaseModel, initialize_flask_sqlathanor
+import json
+import os
+from datetime import datetime
+from sqlite3 import Connection as SQLite3Connection
+
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import Enum, event, types
-from sqlalchemy.ext import mutable
-from datetime import datetime, timedelta
-import os
-import json
-import enums
-from sqlalchemy_utils import PasswordType, CurrencyType
-
 from sqlalchemy.engine import Engine
-from sqlite3 import Connection as SQLite3Connection
+from sqlalchemy.ext import mutable
 from sqlalchemy_utils import EncryptedType
+from sqlalchemy_utils import PasswordType, CurrencyType
 from sqlalchemy_utils.types.encrypted.encrypted_type import AesEngine
+from sqlathanor import FlaskBaseModel, initialize_flask_sqlathanor
+
+import enums
 
 db = SQLAlchemy(model_class=FlaskBaseModel)
 db = initialize_flask_sqlathanor(db)
+
+
 # Activate Foreign Keys
 @event.listens_for(Engine, "connect")
 def _set_sqlite_pragma(dbapi_connection, connection_record):
@@ -22,7 +25,6 @@ def _set_sqlite_pragma(dbapi_connection, connection_record):
         cursor = dbapi_connection.cursor()
         cursor.execute("PRAGMA foreign_keys=ON;")
         cursor.close()
-
 
 
 class JsonEncodedDict(types.TypeDecorator):
@@ -98,7 +100,6 @@ class User(db.Model):
     RoleID = db.Column(db.Integer, db.ForeignKey('role.ID', ondelete='SET NULL'))
     Role = db.relationship('Role', back_populates='Users')
 
-
     # __table_args__ = (db.UniqueConstraint('Email', name='uix1_user'),)
 
     def __repr__(self):
@@ -106,7 +107,6 @@ class User(db.Model):
 
 
 class Role(db.Model):
-
     ID = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
     Name = db.Column(db.String(64))
     EditChatbots = db.Column(db.Boolean(), nullable=False, default=False)
@@ -128,7 +128,6 @@ class Role(db.Model):
 
 
 class Assistant(db.Model):
-
     ID = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
     Name = db.Column(db.String(128), nullable=False)
     Description = db.Column(db.String(260), nullable=True)
@@ -173,7 +172,6 @@ class Assistant(db.Model):
 
 
 class Conversation(db.Model):
-
     ID = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
     Data = db.Column(MagicJSON, nullable=False)
     DateTime = db.Column(db.DateTime(), nullable=False, default=datetime.now)
@@ -183,13 +181,13 @@ class Conversation(db.Model):
     UserType = db.Column(Enum(enums.UserType), nullable=False)
 
     Completed = db.Column(db.Boolean, nullable=False, default=True)
-    ApplicationStatus = db.Column(Enum(enums.ApplicationStatus), nullable=False, default=enums.ApplicationStatus.Pending)
+    ApplicationStatus = db.Column(Enum(enums.ApplicationStatus), nullable=False,
+                                  default=enums.ApplicationStatus.Pending)
     Score = db.Column(db.Float(), nullable=False)
 
     AcceptanceEmailSentAt = db.Column(db.DateTime(), default=None)
     RejectionEmailSentAt = db.Column(db.DateTime(), default=None)
     AppointmentEmailSentAt = db.Column(db.DateTime(), default=None)
-
 
     AutoPilotStatus = db.Column(db.Boolean, nullable=False, default=False)
     AutoPilotResponse = db.Column(db.String(250), nullable=True)
@@ -209,7 +207,6 @@ class Conversation(db.Model):
 
 
 class AutoPilot(db.Model):
-
     ID = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
     Name = db.Column(db.String(128), nullable=False)
     Description = db.Column(db.String(260), nullable=True)
@@ -241,7 +238,6 @@ class AutoPilot(db.Model):
 
 
 class OpenTimeSlot(db.Model):
-
     ID = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
     Day = db.Column(db.Integer, nullable=False)
     From = db.Column(types.TIME, nullable=False)
@@ -255,10 +251,10 @@ class OpenTimeSlot(db.Model):
 
     # Constraints:
     __table_args__ = (
-        db.CheckConstraint(db.and_(Day >= 0, Day <= 6)), # 0 = Monday, 6 = Sunday
+        db.CheckConstraint(db.and_(Day >= 0, Day <= 6)),  # 0 = Monday, 6 = Sunday
         db.CheckConstraint(From < To),
         db.CheckConstraint(db.and_(Duration > 0, Duration <= 60)),
-        db.UniqueConstraint('Day','AutoPilotID', name='uix1_open_time_slot'),
+        db.UniqueConstraint('Day', 'AutoPilotID', name='uix1_open_time_slot'),
     )
 
     def __repr__(self):
@@ -266,7 +262,6 @@ class OpenTimeSlot(db.Model):
 
 
 class Appointment(db.Model):
-
     ID = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
     DateTime = db.Column(db.DateTime(), nullable=False, default=datetime.now)
 
@@ -277,13 +272,11 @@ class Appointment(db.Model):
     ConversationID = db.Column(db.Integer, db.ForeignKey('conversation.ID', ondelete='cascade'), nullable=False)
     Conversation = db.relationship('Conversation', back_populates='Appointment')
 
-
     # Constraints:
     __table_args__ = (db.UniqueConstraint('AssistantID', 'DateTime', name='uix1_appointment'),)
 
 
 class CRM(db.Model):
-
     ID = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
     Type = db.Column(Enum(enums.CRM), nullable=True)
     Auth = db.Column(EncryptedType(JsonEncodedDict, os.environ['SECRET_KEY_DB'], AesEngine, 'pkcs5'), nullable=True)
@@ -300,8 +293,6 @@ class CRM(db.Model):
 
     def __repr__(self):
         return '<CRM {}>'.format(self.ID)
-
-
 
 
 class Statistics(db.Model):
@@ -349,7 +340,6 @@ class Newsletter(db.Model):
 
 # Stored files for conversation
 class StoredFile(db.Model):
-
     ID = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
     FilePath = db.Column(db.String(250), nullable=True, default=None)
 
@@ -362,7 +352,6 @@ class StoredFile(db.Model):
 
 
 class Database(db.Model):
-
     ID = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
     Name = db.Column(db.String(64), nullable=False)
     Type = db.Column(Enum(enums.DatabaseType), nullable=False)
@@ -380,13 +369,12 @@ class Database(db.Model):
 
 
 class Candidate(db.Model):
-
     ID = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
     CandidateName = db.Column(db.String(64), nullable=True)
     CandidateEmail = db.Column(db.String(64), nullable=True)
     CandidateMobile = db.Column(db.String(20), nullable=True)
-    CandidateLocation = db.Column(db.String(64), nullable=False) # Required
-    CandidateSkills = db.Column(db.String(1080), nullable=False) # Required
+    CandidateLocation = db.Column(db.String(64), nullable=False)  # Required
+    CandidateSkills = db.Column(db.String(1080), nullable=False)  # Required
     CandidateLinkdinURL = db.Column(db.String(512), nullable=True)
     CandidateAvailability = db.Column(db.String(64), nullable=True)
     CandidateJobTitle = db.Column(db.String(120), nullable=True)
@@ -394,7 +382,6 @@ class Candidate(db.Model):
     CandidateYearsExperience = db.Column(db.Float(), nullable=True)
     CandidateDesiredSalary = db.Column(db.Float(), nullable=True)
     Currency = db.Column(CurrencyType)
-
 
     # Relationships:
     DatabaseID = db.Column(db.Integer, db.ForeignKey('database.ID', ondelete='cascade'), nullable=False)
@@ -404,13 +391,11 @@ class Candidate(db.Model):
         return '<Candidate {}>'.format(self.CandidateName)
 
 
-
 class Job(db.Model):
-
     ID = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
-    JobTitle = db.Column(db.String(64), nullable=False) # Required
+    JobTitle = db.Column(db.String(64), nullable=False)  # Required
     JobDescription = db.Column(db.String(5000), nullable=True)
-    JobLocation = db.Column(db.String(64), nullable=False) # Required
+    JobLocation = db.Column(db.String(64), nullable=False)  # Required
     JobType = db.Column(db.String(64), nullable=True)
     JobSalary = db.Column(db.Float(), nullable=True)
     Currency = db.Column(CurrencyType)
@@ -430,7 +415,6 @@ class Job(db.Model):
 
 
 class Calendar(db.Model):
-
     ID = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
     Type = db.Column(Enum(enums.Calendar), nullable=True)
     Auth = db.Column(EncryptedType(JsonEncodedDict, os.environ['SECRET_KEY_DB'], AesEngine, 'pkcs5'), nullable=True)
@@ -487,7 +471,6 @@ class Calendar(db.Model):
 # def receive_after_insert(mapper, connection, target):
 #     print("after_delete")
 #     print(target) # prints Conversation
-
 
 
 class Callback():

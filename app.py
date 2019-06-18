@@ -128,9 +128,6 @@ elif os.environ['FLASK_ENV'] == 'development':
     #                     helpers.verificationSigner.dumps(payload, salt='appointment-key')
     # )
 
-
-    # user_services.getAllByCompanyID(1)
-
     print('Development mode running...')
 
 else:

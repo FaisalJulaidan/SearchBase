@@ -35,7 +35,7 @@ class EditUserModal extends React.Component {
                 onCancel={this.props.handleCancel}
                 footer={[
                     <Button key="Cancel" onClick={this.closeModal}>Cancel</Button>,
-                    <Button key="submit" type="primary" onClick={this.onSubmit}>{"Add"}</Button>
+                    <Button key="submit" type="primary" onClick={this.onSubmit}>{"Save"}</Button>
                 ]}>
 
                 <Form layout='vertical'>

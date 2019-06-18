@@ -169,6 +169,7 @@ def getOpenTimes(assistantID) -> Callback:
         db.session.rollback()
         return Callback(False, 'Could not get the open times for this assistant.')
 
+
 # ----- Updaters ----- #
 def update(id, name, desc, message, topBarText, companyID)-> Callback:
     try:
@@ -314,60 +315,3 @@ def disconnectFromAutoPilot(assistantID, companyID):
         helpers.logError("assistant_services.disconnectFromAutoPilot(): " + str(exc))
         db.session.rollback()
         return Callback(False, 'Error in disconnecting assistant from AutoPilot.')
-
-
-# ----- Logo Operations ----- #
-def uploadLogo(assistantID, file, companyID):
-    try:
-
-        assistant: Assistant = db.session.query(Assistant) \
-            .filter(and_(Assistant.ID == assistantID, Assistant.CompanyID == companyID)).first()
-        if not assistant: raise Exception
-
-        # Generate unique name: hash_sessionIDEncrypted.extension
-        filename = helpers.encodeID(assistant.ID) + '.' + \
-                   secure_filename(file.filename).rsplit('.', 1)[1].lower()
-        assistant.LogoName = filename
-
-        # Upload file to cloud Space
-        upload_callback : Callback = stored_file_services.uploadFile(file,
-                                                                     filename,
-                                                                     stored_file_services.COMPANY_LOGOS_PATH,
-                                                                     public=True)
-        if not upload_callback.Success:
-            raise Exception(upload_callback.Message)
-
-        db.session.commit()
-
-        return Callback(True, 'Logo uploaded successfully.')
-
-    except Exception as exc:
-        helpers.logError("assistant_services.uploadLogo(): " + str(exc))
-        db.session.rollback()
-        return Callback(False, 'Error in uploading logo.')
-
-
-def deleteLogo(assistantID, companyID):
-    try:
-
-        assistant: Assistant = db.session.query(Assistant) \
-            .filter(and_(Assistant.ID == assistantID, Assistant.CompanyID == companyID)).first()
-        if not assistant: raise Exception
-
-        logoName = assistant.LogoName
-        if not logoName: return Callback(False, 'No logo to delete')
-
-        # Delete file from cloud Space and reference from database
-        assistant.LogoName = None
-        delete_callback : Callback = stored_file_services.deleteFile(logoName,
-                                                                     stored_file_services.COMPANY_LOGOS_PATH)
-        if not delete_callback.Success:
-            raise Exception(delete_callback.Message)
-
-        db.session.commit()
-        return Callback(True, 'Logo deleted successfully.')
-
-    except Exception as exc:
-        helpers.logError("assistant_services.deleteLogo(): " + str(exc))
-        db.session.rollback()
-        return Callback(False, 'Error in deleting logo.')

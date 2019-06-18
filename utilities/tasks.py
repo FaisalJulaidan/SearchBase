@@ -1,46 +1,43 @@
 from models import db, Assistant
-from utilities import json_schemas, helpers
+from utilities import json_schemas
 from jsonschema import validate
 import enums
-from services import flow_services
+import copy
 
 
+# NOTE: Make sure to take a backup of the database before running this function
 def migrate_flow():
     try:
-
-        # assistant.Flow = {'gggggg':'elkrjglkwerjglkewrj'}
-        # print(assistant.Flow)
-        # db.session.commit()
-
-
-
-        for i, assistant in enumerate(db.session.query(Assistant).all()):
-            assistant.Name = "A" + str(i)
+        for assistant in db.session.query(Assistant).all():
             if assistant.Flow:
-                newFlow = helpers.getDictFromSQLAlchemyObj(assistant)['Flow']
-                for group in newFlow['groups']:
-                    for block in group['blocks']:
-                        print(block)
-                        # if block['Type'] == "Solutions":
-                        block['SkipText'] = "DFFDDDFFDFFDDDFFDFFDDDFFDFFDDDFFDFFDDDFFDFFDDDFFDFFDDDFF"
-                        # validate block
-                        # validate(block.get('Content'), getattr(json_schemas, str(enums.BlockType(block.get('Type')).name)))
+                newFlow = copy.deepcopy(assistant.Flow) # deep clone is IMPORTANT
+                for group in newFlow['groups']: # loop groups
+                    for block in group['blocks']: # loop blocks
 
-                # print(newFlow)
+                        if block['Type'] == enums.BlockType.Question.value:
+                            for answer in block['Content']['answers']:
+                                answer['score']= 0
+
+                        if block['Type'] == enums.BlockType.UserInput.value:
+                            block['Content']['keywords']= []
+
+                        if block['Type'] == enums.BlockType.Solutions.value:
+                            pass
+
+                        if block['Type'] == enums.BlockType.FileUpload.value:
+                            pass
+
+                        # validate block content based on block type
+                        validate(block.get('Content'), getattr(json_schemas, str(enums.BlockType(block.get('Type')).name)))
 
                 # validate whole flow then update
-                # validate(newFlow, json_schemas.flow)
-                # assistant.Flow = newFlow
-                # callback = flow_services.updateFlow(newFlow, assistant)
-                # if not callback.Success:
-                #     print("lkjsdflkjsdflkgjsdflkgj")
-                #     return
+                validate(newFlow, json_schemas.flow)
 
+                # Update flow
                 assistant.Flow = newFlow
-        # print("Flow Before commit: ", assistants[0].Flow)
-        db.session.commit()
-        # print("Flow After commit: ", assistants[0].Flow)
 
+        # Save all changes
+        db.session.commit()
         print("Flow migration done successfully :)")
 
     except Exception as exc:

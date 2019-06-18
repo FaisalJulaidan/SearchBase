@@ -5,48 +5,38 @@ import {isEmpty} from "lodash";
 const FormItem = Form.Item;
 const Option = Select.Option;
 
-class EditUserModal extends React.Component {
+class AddUserModal extends React.Component {
 
-    state = {};
-
-    onSubmit = () => this.props.form.validateFields((err, values) => {
+    onSubmit = () => {
         this.props.form.validateFields((err, values) => {
             if (!err) {
-                this.props.handleSave(this.props.userData.user.ID, values);
+                this.props.handleSave(values);
             }
         });
-    });
-
-    closeModal = () => {
-        this.props.handleCancel();
     };
 
+
     render() {
-        const {userData, roles, form} = this.props;
+        const {roles, form} = this.props;
         const {getFieldDecorator} = form;
 
         return (
             <Modal
                 width={500}
-                title="Edit User"
+                title="Add New User"
                 destroyOnClose={true}
                 visible={this.props.visible}
-                onOk={this.props.onSubmit}
-                onCancel={this.props.handleCancel}
                 footer={[
-                    <Button key="Cancel" onClick={this.closeModal}>Cancel</Button>,
+                    <Button key="Cancel" onClick={this.props.handleCancel}>Cancel</Button>,
                     <Button key="submit" type="primary" onClick={this.onSubmit}>{"Add"}</Button>
                 ]}>
-
                 <Form layout='vertical'>
                     <FormItem
-                        label="First name"
-                        extra="Enter the name of the user">
+                        label="First Name">
                         {getFieldDecorator('firstname', {
-                            initialValue: userData?.user.Firstname,
                             rules: [{
                                 required: true,
-                                message: 'Please enter your the new user\'s name',
+                                message: 'Please enter your the new user\'s first name',
                             }],
                         })(
                             <Input placeholder="Ex: Wesley"/>
@@ -56,7 +46,6 @@ class EditUserModal extends React.Component {
                     <FormItem
                         label="Surname">
                         {getFieldDecorator('surname', {
-                            initialValue: userData?.user.Surname,
                             rules: [{
                                 required: true,
                                 message: 'Please enter the User\'s surname',
@@ -67,9 +56,23 @@ class EditUserModal extends React.Component {
                     </FormItem>
 
                     <FormItem
+                        label="Email"
+                        help={"A temporary password will to the user to login and change his password to whatever he likes"}>
+                        {getFieldDecorator('email', {
+                            rules: [
+                                {required: true, message: 'Please enter your the new user\'s email'},
+                                {pattern: /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/,
+                                    message: 'Sorry, enter a valid email'}
+                            ],
+                        })(
+                            <Input prefix={<Icon type="user" style={{color: 'rgba(0,0,0,.25)'}}/>}
+                                   placeholder="Wesley.Snipes@gmail.com"/>
+                        )}
+                    </FormItem>
+
+                    <FormItem
                         label={"Phone Number:"}>
                         {getFieldDecorator("phoneNumber", {
-                            initialValue: userData?.user.PhoneNumber,
                             rules: [{required: false, message: "Please enter a valid email"},
                                 {pattern: /^((\+\d{1,3}(-| )?\(?\d\)?(-| )?\d{1,3})|(\(?\d{2,3}\)?))(-| )?(\d{3,4})(-| )?(\d{4})(( x| ext)\d{1,5}){0,1}$/,
                                     message: 'Invalid phone number'}
@@ -82,15 +85,14 @@ class EditUserModal extends React.Component {
 
                     <FormItem
                         label="Role"
-                        extra="The type defines what permissions the User will have">
-                        {getFieldDecorator('role', {
-                            initialValue: userData?.role.ID,
+                        extra="The role defines what permissions the User will have">
+                        {getFieldDecorator('roleID', {
                             rules: [{
                                 required: true,
                                 message: 'Please select a user role',
                             }],
                         })(
-                            <Select onChange={this.changeTypeHandler}>
+                            <Select>
                                 {
                                     roles.map((role, i) => (
                                             <Option key={i} value={role.ID}>{role.Name}</Option>
@@ -106,4 +108,4 @@ class EditUserModal extends React.Component {
     }
 }
 
-export default Form.create()(EditUserModal)
+export default Form.create()(AddUserModal)

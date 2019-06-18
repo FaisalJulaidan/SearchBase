@@ -10,15 +10,13 @@ auth_router = Blueprint('auth_router', __name__)
 @auth_router.route("/auth", methods=['POST'])
 def authenticate():
     if request.method == "POST":
-        # os.command(['bash', 'deploy.sh'])
-        data = request.get_json(silent=True)
 
+        data = request.json
         callback: Callback = auth_services.authenticate(data.get('email'), data.get('password'))
-        if callback.Success:
-            return helpers.jsonResponse(True, 200, "Authorised!", callback.Data)
-        else:
-            print(callback.Message)
+
+        if not callback.Success:
             return helpers.jsonResponse(False, 401, callback.Message, callback.Data)
+        return helpers.jsonResponse(True, 200, "Authorised!", callback.Data)
 
 
 # Refresh token endpoint
@@ -41,7 +39,7 @@ def signup_process():
         return helpers.jsonResponse(True, 200, callback.Message, callback.Data)
 
 
-@auth_router.route("verify_account/<payload>", methods=['POST'])  # TODO
+@auth_router.route("/verify_account/<payload>", methods=['POST'])  # TODO
 def verify_account(payload):
     if request.method == "POST":
         try:

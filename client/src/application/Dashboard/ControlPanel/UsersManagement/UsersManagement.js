@@ -1,17 +1,17 @@
 import React from "react";
-import {Tabs, Modal, Typography, Spin} from "antd";
+import {Tabs, Typography} from "antd";
 import connect from "react-redux/es/connect/connect";
 
 import './UsersManagement.less';
 import styles from "./UsersManagement.module.less"
 
 import {usersManagementActions} from "store/actions";
-import UsersDisplay from "./UsersDisplay/UsersDisplay";
+import Users from "./Users/Users";
+import Roles from "./Roles/Roles";
 import NoHeaderPanel from 'components/NoHeaderPanel/NoHeaderPanel'
 
 const {Title, Paragraph} = Typography;
 const TabPane = Tabs.TabPane;
-const confirm = Modal.confirm;
 
 
 class UsersManagement extends React.Component {
@@ -22,10 +22,9 @@ class UsersManagement extends React.Component {
 
 
     render () {
-        const {usersList, roles} = this.props;
+        const {usersList, roles, isLoading} = this.props;
         return (
                 <>
-                    {this.props.isLoading ? <Spin/> :
                         <NoHeaderPanel>
                             <div className={styles.Header}>
                                 <Title className={styles.Title}>
@@ -37,27 +36,24 @@ class UsersManagement extends React.Component {
                             </div>
 
                             <div className={[styles.Body, 'usersTabs'].join(' ')}>
-                                {!usersList ? <Spin/> :
-
                                     <Tabs defaultActiveKey={'1'} size={"large"} animated={false}>
                                         <TabPane tab={"Users"} key={"1"}>
-                                            <UsersDisplay
+                                            <Users
                                                 users={usersList}
                                                 roles={roles}
-                                                addUser={this.addUser}
-                                                editUser={this.editUser}
-                                                deleteUser={this.deleteUser}
+                                                isLoading={isLoading}
                                             />
                                         </TabPane>
 
-                                        <TabPane disabled={true} tab={"Permissions (coming soon)"} key={"2"}>
-                                            Coming soon...
+                                        <TabPane tab={"Roles"} key={"2"}>
+                                            <Roles
+                                                roles={roles}
+                                                isLoading={isLoading}
+                                            />
                                         </TabPane>
                                     </Tabs>
-                                }
                             </div>
                         </NoHeaderPanel>
-                    }
                 </>
         )
     }

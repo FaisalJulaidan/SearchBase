@@ -40,9 +40,9 @@ def isAuthorised(operation, userID) -> bool:
         return False
 
 
-def create(name, editChatbots: bool, editUsers: bool, deleteUsers: bool, accessBilling: bool, companyID: int) -> Callback:
+def create(name, editChatbots: bool, addUsers: bool, editUsers: bool, deleteUsers: bool, accessBilling: bool, companyID: int) -> Callback:
     try:
-        newRole = Role(Name=name, EditChatbots=editChatbots, EditUsers=editUsers,
+        newRole = Role(Name=name, EditChatbots=editChatbots, AddUsers=addUsers, EditUsers=editUsers,
                     DeleteUsers=deleteUsers, AccessBilling=accessBilling, CompanyID=companyID)
         db.session.add(newRole)
 

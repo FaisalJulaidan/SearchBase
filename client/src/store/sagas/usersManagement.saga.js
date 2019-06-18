@@ -14,10 +14,10 @@ function* getUsers() {
     }
 }
 
-function* addUser(action) {
+function* addUser({values}) {
     try {
         loadingMessage('Adding new user...');
-        const res = yield http.post(`/users`, action.params.user);
+        const res = yield http.post(`/users`, values);
         yield put(usersManagementActions.addUserSuccess(res.message));
         yield put(usersManagementActions.getUsers());
         successMessage('New user added');

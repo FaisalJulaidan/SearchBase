@@ -22,10 +22,10 @@ const getUsersFailure = (error) => {
     };
 };
 
-const addUser = (params) => {
+const addUser = (values) => {
     return {
         type: actionTypes.ADD_USER_REQUEST,
-        params
+        values
     };
 };
 

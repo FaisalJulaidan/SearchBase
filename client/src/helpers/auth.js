@@ -16,6 +16,13 @@ export const getUser = () => {
     return user;
 };
 
+export const getRole = () => {
+    // return user from local storage
+    let role = JSON.parse(localStorage.getItem('role'));
+    if(!role){return null;}
+    return role;
+};
+
 // Update username in localStorage
 export const updateUsername = (firstname, surname) => {
     // get user from localStorage
@@ -28,6 +35,6 @@ export const updateUsername = (firstname, surname) => {
 
 
 export const checkAuthenticity = () => {
-    return (getUser() && authHeader());
+    return (getUser() && getRole() && authHeader());
 };
 

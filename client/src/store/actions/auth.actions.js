@@ -10,10 +10,11 @@ function login(email, password, prevPath) {
     };
 }
 
-function loginSuccess (user) {
+function loginSuccess (user, role) {
     return {
         type: actionTypes.LOGIN_SUCCESS,
-        user
+        user,
+        role
     };
 }
 

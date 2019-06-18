@@ -3,14 +3,14 @@ import {store} from "store/store";
 import {usersManagementActions} from "store/actions";
 import {Button, Table, Divider, Tag, Modal} from 'antd';
 import {isEmpty} from "lodash";
+import "./Users.less"
 import AddUserModal from "./Modals/AddUserModal";
 import EditUserModal from "./Modals/EditUserModal";
-import styles from "./UsersDisplay.less"
-import {getUser} from "helpers";
+import {getUser, getRole} from "helpers";
 
 const confirm = Modal.confirm;
 
-class UsersDisplay extends React.Component {
+class Users extends React.Component {
 
     state = {
         addUserModalVisible: false,
@@ -20,13 +20,15 @@ class UsersDisplay extends React.Component {
 
     constructor(props) {
         super(props);
+        this.currentUserRole = getRole();
+        this.currentUser = getUser();
         this.columns = [
             {
                 title: 'Role',
                 key: 'Role',
                 width: '5%',
                 render: (text, record) => (
-                    <Tag color={record.role.Name === 'Owner' ? 'purple' : null }>
+                    <Tag>
                         {record.role.Name}
                     </Tag>),
 
@@ -78,31 +80,45 @@ class UsersDisplay extends React.Component {
             {
                 title: 'Action',
                 key: 'action',
-                render: (text, record) => (
-                    <>
-                        {record.role.Name === 'Owner' ? null :
-                            <span>
-                                <a onClick={() => this.showEditUserModal(record)}>
+                render: (text, record) => {
+                    const isYou = this.currentUser.email === record.user.Email;
+                    return (
+                        <>
+                            {(record.role.Name === 'Owner' && !(this.currentUserRole.Name === 'Owner')) ? null :
+
+                                isYou ? <Tag color={'purple'}>You</Tag> :
+                                    <span>
+                                <Button type="link"
+                                        onClick={() => this.showEditUserModal(record)}
+                                        disabled={!this.currentUserRole.EditUsers ||
+                                        this.currentUser.email === record.user.Email}>
                                     Edit
-                                </a>
+                                </Button>
                                 <Divider type="vertical" />
-                                <a onClick={() => {this.deleteUser(record?.user.ID)}}>
+                                <Button type="link"
+                                        onClick={() => {this.deleteUser(record.user.ID)}}
+                                        disabled={!this.currentUserRole.DeleteUsers ||
+                                        this.currentUser.email === record.user.Email}>
                                     Delete
-                                </a>
+                                </Button>
                             </span>
-                        }
-                    </>
-                ),
+                            }
+                        </>
+                    )
+                }
+
             },
         ];
     }
 
     addUser = (user) => {
-        store.dispatch(usersManagementActions.addUser({user:user}));
+        store.dispatch(usersManagementActions.addUser(user));
+        this.hideAddUserModal()
     };
 
     editUser = (userID, values) => {
         store.dispatch(usersManagementActions.editUser(userID, values));
+        this.hideEditUserModal()
     };
 
     deleteUser = (userID) => {
@@ -110,7 +126,7 @@ class UsersDisplay extends React.Component {
             title: `Delete user confirmation`,
             content: `If you click OK, this user will be deleted and its associated details forever`,
             onOk: () => {
-                this.props.dispatch(usersManagementActions.deleteUser(userID));
+                store.dispatch(usersManagementActions.deleteUser(userID));
             }
         });
     };
@@ -125,41 +141,43 @@ class UsersDisplay extends React.Component {
 
 
     render() {
-        const {users, roles} = this.props;
+        const {users, roles, isLoading} = this.props;
         return (
             <>
                 <div style={{textAlign: "right"}}>
                     <Button style={{marginBottom: "10px"}} type="primary"
                             icon="plus"
-                            onClick={this.showAddUserModal}>
+                            onClick={this.showAddUserModal}
+                            disabled={!this.currentUserRole.AddUsers}>
                         Add User
                     </Button>
                 </div>
 
-                <Table
-                    bordered
-                    dataSource={users}
-                    columns={this.columns}
-                    scroll={{ x: 600 }}
+                < Table
+                bordered
+                dataSource={users}
+                columns={this.columns}
+                scroll={{x: 600}}
+                loading={isLoading}
                 />
 
                 <AddUserModal
-                    roles={roles}
-                    visible={this.state.addUserModalVisible}
-                    handleCancel={this.hideAddUserModal}
-                    handleSave={this.addUser}
+                roles={roles}
+                visible={this.state.addUserModalVisible}
+                handleCancel={this.hideAddUserModal}
+                handleSave={this.addUser}
                 />
 
                 <EditUserModal
-                    userData={this.state.userToEdit}
-                    roles={roles}
-                    visible={this.state.editUserModalVisible}
-                    handleCancel={this.hideEditUserModal}
-                    handleSave={this.editUser}
+                userData={this.state.userToEdit}
+                roles={roles}
+                visible={this.state.editUserModalVisible}
+                handleCancel={this.hideEditUserModal}
+                handleSave={this.editUser}
                 />
             </>
         );
     }
 }
 
-export default UsersDisplay;
+export default Users;

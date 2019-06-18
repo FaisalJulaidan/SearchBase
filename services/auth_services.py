@@ -16,12 +16,15 @@ def my_expired_token_callback(error):
 def signup(details) -> Callback:
 
     try:
+        email = details['email']
+        
         # Validate Email
-        if not helpers.isValidEmail(details['email']):
+        if not helpers.isValidEmail(email):
             return Callback(False, 'Invalid Email.')
+        
 
         # Check if user exists
-        user = user_services.getByEmail(details['email']).Data
+        user = user_services.getByEmail(email).Data
         if user:
             return Callback(False, 'User already exists.')
 
@@ -29,15 +32,15 @@ def signup(details) -> Callback:
         # Create a company plus the Stripe customer and link it with the company
         company_callback: Callback = company_services.create(name=details['companyName'],
                                                              url=details['websiteURL'],
-                                                             ownerEmail=details['email'])
+                                                             ownerEmail=email)
         if not company_callback.Success:
             return Callback(False, company_callback.Message)
         company = company_callback.Data
 
         # Roles
         # Create owner, admin, user roles for the new company
-        adminRole: Callback = role_services.create('Admin', True, True, True, False, company.ID)
-        userRole: Callback = role_services.create('User', True, False, False, False, company.ID)
+        adminRole: Callback = role_services.create('Admin', True, True, True, True, False, company.ID)
+        userRole: Callback = role_services.create('User', True, False, False, False, False, company.ID)
         if not (adminRole.Success or userRole.Success):
             return Callback(False, 'Could not create roles for the new user.')
 
@@ -45,7 +48,7 @@ def signup(details) -> Callback:
         # Create a new user with its associated company and owner role
         user_callback = user_services.create(details['firstName'],
                                              details['lastName'],
-                                             details['email'],
+                                             email,
                                              details['password'],
                                              details['telephone'],
                                              company.ID,
@@ -55,10 +58,20 @@ def signup(details) -> Callback:
         # Subscribe to basic plan with 14 trial days
         sub_callback: Callback = sub_services.subscribe(company=company, planID='plan_D3lpeLZ3EV8IfA', trialDays=14)
 
-        sendVerEmail_callback: Callback = mail_services.sendVerificationEmail(details["email"], details["companyName"])
+
+        tokenLink = helpers.getDomain() + "/verify_account/" + \
+                    helpers.verificationSigner.dumps(email + ";" + str(company.ID), salt='email-confirm-key')
+
+        email_callback: Callback = \
+            mail_services.send_email(email,
+                                     'Account Verification',
+                                     '/emails/account_verification.html',
+                                     companyName=company.Name,
+                                     userName= details['firstName'] + ' ' + details['lastName'],
+                                     verificationLink= tokenLink)
 
         # If subscription failed, remove the new created company and user
-        if not (user_callback.Success or sub_callback.Success or sendVerEmail_callback.Success):
+        if not (user_callback.Success or sub_callback.Success or email_callback.Success):
             # Removing the company will cascade and remove the new created user and roles as well.
             company_services.removeByName(details['companyName'])
             return sub_callback
@@ -103,7 +116,8 @@ def authenticate(email: str, password_to_check: str) -> Callback:
                          "lastAccess": user.LastAccess,
                          "phoneNumber": user.PhoneNumber,
                          # "plan": helpers.getPlanNickname(user.Company.SubID),
-                         }
+                         },
+                'role': helpers.getDictFromSQLAlchemyObj(user.Role)
                 }
 
         time_now = datetime.now()

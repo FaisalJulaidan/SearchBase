@@ -14,15 +14,16 @@ function* login({email, password, prevPath}) {
             headers: {'Content-Type': 'application/json'},
         });
 
-        const {user, token, refresh, expiresIn} = yield res.data.data;
+        const {user, role, token, refresh, expiresIn} = yield res.data.data;
         yield localStorage.setItem("user", JSON.stringify(user));
+        yield localStorage.setItem("role", JSON.stringify(role));
         yield localStorage.setItem("token", token);
         yield localStorage.setItem("refresh", refresh);
         yield localStorage.setItem("expiresIn", expiresIn);
 
         // Dispatch actions
         // yield put(profileActions.getProfile());
-        yield put(authActions.loginSuccess(user));
+        yield put(authActions.loginSuccess(user, role));
 
         // Redirect to dashboard page
         yield history.push(prevPath || '/dashboard');

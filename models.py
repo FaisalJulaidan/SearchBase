@@ -111,6 +111,7 @@ class Role(db.Model):
     ID = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
     Name = db.Column(db.String(64))
     EditChatbots = db.Column(db.Boolean(), nullable=False, default=False)
+    AddUsers = db.Column(db.Boolean(), nullable=False, default=False)
     EditUsers = db.Column(db.Boolean(), nullable=False, default=False)
     DeleteUsers = db.Column(db.Boolean(), nullable=False, default=False)
     AccessBilling = db.Column(db.Boolean(), nullable=False, default=False)

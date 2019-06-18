@@ -13,10 +13,11 @@ users_router: Blueprint = Blueprint('users_router', __name__, template_folder=".
 def users():
     user = get_jwt_identity()['user']
 
+    # Get all users and roles
     if request.method == "GET":
 
-        users_callback: Callback = user_services.getAllByCompanyID(user.get('companyID'))
-        roles_callback: Callback = role_services.getAllByCompanyID(user.get('companyID'))
+        users_callback: Callback = user_services.getAllByCompanyID(user.get('companyID')) # get users
+        roles_callback: Callback = role_services.getAllByCompanyID(user.get('companyID')) # get roles
         if not (users_callback.Success or roles_callback.Success):
             return helpers.jsonResponse(False, 400, "could not retrieve list of Users")
 
@@ -32,19 +33,23 @@ def users():
                                     "Users have been retrieved",
                                     {'users': users, 'roles': helpers.getListFromSQLAlchemyList(roles_callback.Data)})
 
+    # Add new user
     if request.method == "POST":
-
-        add_user_callback: Callback = user_management_services.addUser(request.form.get("name"),
-                                                                       request.form.get("email"),
-                                                                       request.form.get("type"),
-                                                                       user.get('id'))
-        if not add_user_callback.Success:
-            return helpers.jsonResponse(False, 400, add_user_callback.Message)
-
+        data = request.json
+        callback: Callback = user_management_services.addUser(data["firstname"],
+                                                              data["surname"],
+                                                              data["email"],
+                                                              data["phoneNumber"],
+                                                              data["roleID"],
+                                                              user['id'],
+                                                              user['companyID']
+                                                              )
+        if not callback.Success:
+            return helpers.jsonResponse(False, 400, callback.Message)
         return helpers.jsonResponse(True, 200,
-                                    "User has been added and an email with his login details is on its way to him")
+                                    "User has been added and an email with his login details is on its way to him",
+                                    helpers.getDictFromSQLAlchemyObj(callback.Data))
 
-        return helpers.jsonResponse(True, 200, "User updated successfully!")
 
 
 @users_router.route("/user/<int:user_id>", methods=['PUT','DELETE'])
@@ -52,6 +57,7 @@ def users():
 def user(user_id):
     user = get_jwt_identity()['user']
 
+    # Update user
     if request.method == "PUT":
         data = request.json
         callback: Callback = user_management_services.editUser(user_id,
@@ -63,12 +69,12 @@ def user(user_id):
                                                                user['companyID'])
         if not callback.Success:
             return helpers.jsonResponse(False, 400, callback.Message)
-        return helpers.jsonResponse(True, 200, "User updated successfully")
+        return helpers.jsonResponse(True, 200, "User updated successfully",
+                                    helpers.getDictFromSQLAlchemyObj(callback.Data))
 
+    # Delete user
     if request.method == "DELETE":
-
-        remove_callback: Callback = user_management_services.delete_user_with_permission(user_id, user.get("id"))
+        remove_callback: Callback = user_management_services.deleteUser(user_id, user['id'], user['companyID'])
         if not remove_callback.Success:
             return helpers.jsonResponse(False, 400, remove_callback.Message)
-
         return helpers.jsonResponse(True, 200, "User deleted successfully!")

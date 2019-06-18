@@ -12,7 +12,7 @@ def editUser(userID, firstname, surname, phoneNumber, newRoleID, editorUserID, e
 
         # Check if editorUser is authorised to do such an operation (returns boolean)
         if not role_services.isAuthorised('editUsers', editorUserID):
-            raise Exception('You are not authorised to edit users')
+            return Callback(False, 'You are not authorised to edit users')
 
 
         # Get and check if new role belongs to this company
@@ -32,13 +32,45 @@ def editUser(userID, firstname, surname, phoneNumber, newRoleID, editorUserID, e
         user.PhoneNumber = phoneNumber
         user.Role = newRole
 
+        db.session.commit()
+
+        return Callback(True, 'User updated successfully', user)
+
     except Exception as exc:
         helpers.logError("user_management_services.editUser(): " + str(exc))
         db.session.rollback()
         return Callback(False, "Couldn't update user.")
 
 
-def addUser(firstname, surname, email, givenRoleID, editorUserID, editorCompanyID):
+def deleteUser(userID, editorUserID, editorCompanyID):
+    try:
+
+        if userID == editorUserID:
+            return Callback(False, "You cannot delete yourself")
+
+        # Check if editorUser is authorised to do such an operation (returns boolean)
+        if not role_services.isAuthorised('deleteUsers', editorUserID):
+            return Callback(False, 'You are not authorised to delete users')
+
+        # Get user to be edited
+        callback: Callback = user_services.getByIDAndCompanyID(userID, editorCompanyID)
+        if not callback.Success:
+            return Callback(False, "You are not authorised to edit this user")
+        user: User = callback.Data
+
+        # Delete user and save changes
+        db.session.delete(user)
+        db.session.commit()
+
+        return Callback(True, 'User deleted successfully')
+
+    except Exception as exc:
+        helpers.logError("user_management_services.deleteUser(): " + str(exc))
+        db.session.rollback()
+        return Callback(False, "Couldn't delete user.")
+
+
+def addUser(firstname, surname, email, phoneNumber,  givenRoleID, editorUserID, editorCompanyID):
     try:
 
         if givenRoleID in [0,1]: # 0 = Staff, 1 = Owners
@@ -46,7 +78,7 @@ def addUser(firstname, surname, email, givenRoleID, editorUserID, editorCompanyI
 
         # Check if editorUser is authorised to do such an operation (returns boolean)
         if not role_services.isAuthorised('addUsers', editorUserID):
-            raise Exception('You are not authorised to add users')
+            return Callback(False, 'You are not authorised to add users')
 
         # Get and check if new role belongs to this company
         role_callback: Callback = role_services.getByIDAndCompanyID(givenRoleID, editorCompanyID)
@@ -57,28 +89,32 @@ def addUser(firstname, surname, email, givenRoleID, editorUserID, editorCompanyI
         # Check if email of new user already exist
         callback: Callback = user_services.getByEmail(email)
         if callback.Success:
-            return Callback(False, 'Email is already on use, maybe under your or another company')
+            return Callback(False, 'Email is already on use maybe under your or another company')
 
         # Get company
         callback: Callback = company_services.getByID(editorCompanyID)
-        if callback.Success:
-            return Callback(False, 'Email is already on use, maybe under your or another company')
+        if not callback.Success:
+            return Callback(False, 'Your company does not exist')
         company: Company = callback.Data
 
         # create random generated password
         password = ''.join(random.choice(string.ascii_letters + string.digits) for i in range(9))
 
         # Create the new user for the company
-        db.session.add(User(Firstname=firstname,
-                            Surname=surname,
-                            Email='aa@aa.com',
-                            Password=password,
-                            PhoneNumber='',
-                            CompanyID=editorCompanyID,
-                            Role=givenRole.ID,
-                            Verified=False))
+        newUser = User(Firstname=firstname,
+                    Surname=surname,
+                    Email=email,
+                    Password=password,
+                    PhoneNumber=phoneNumber,
+                    CompanyID=editorCompanyID,
+                    Role=givenRole,
+                    Verified=False)
+        db.session.add(newUser)
 
         # Send email invitation to verify his account
+        tokenLink = helpers.getDomain() + "/verify_account/" + \
+                helpers.verificationSigner.dumps(email + ";" + str(company.ID), salt='email-confirm-key')
+
         email_callback: Callback = \
             mail_services.send_email(email,
                                     'Account Invitation',
@@ -87,9 +123,7 @@ def addUser(firstname, surname, email, givenRoleID, editorUserID, editorCompanyI
                                     logoPath=company.LogoPath,
                                     userName= firstname + ' ' + surname,
                                     password=password,
-                                    accountVerifcationLink= helpers.getDomain() + "/verify_account/" + \
-                                                            helpers.verificationSigner.dumps(email + ";" + str(company.ID),
-                                                                                             salt='email-confirm-key')
+                                    verificationLink= tokenLink
                                     )
 
         if not email_callback.Success:
@@ -97,12 +131,12 @@ def addUser(firstname, surname, email, givenRoleID, editorUserID, editorCompanyI
 
         # Save changes
         db.session.commit()
-        return Callback(True, 'User has been created successfully!')
+        return Callback(True, 'User has been created successfully', newUser)
 
     except Exception as exc:
-        helpers.logError("user_services.addUser(): " + str(exc))
+        helpers.logError("user_management_services.addUser(): " + str(exc))
         db.session.rollback()
-        return Callback(False, 'Sorry, Could not add the user.')
+        return Callback(False, 'Could not add the user.')
 
 
 

@@ -31,6 +31,7 @@ http.interceptors.response.use(
     response => response,
     error => {
         // If token has expired then refresh the token using refreshToken
+        console.log(error.response)
         if (error.config && error.response) {
 
             if (error.response.status === 401) {
@@ -71,13 +72,16 @@ http.interceptors.response.use(
             if (error.response.status === 500) {
                 console.log('there is an error and going to notify Sentry');
                 errorHandler(error);
-                return;
+                return Promise.reject(error);
             }
 
             if (error.request.responseURL.includes('assistants')) {
                 console.log('there is an error with Assistants and will notify Sentry');
                 errorHandler(error);
+                return Promise.reject(error);
             }
+
+            return Promise.reject(error);
 
         } else {
             return Promise.reject(error);

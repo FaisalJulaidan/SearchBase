@@ -48,10 +48,8 @@ def getByEmail(email) -> User or None:
         # Get result and check if None then raise exception
         result = db.session.query(User).filter(User.Email == email.lower()).first()
         if not result: raise Exception
+        return Callback(True,'User with email ' + email + ' was successfully retrieved.', result)
 
-        return Callback(True,
-                        'User with email ' + email + ' was successfully retrieved.',
-                        result)
     except Exception as exc:
         return Callback(False, 'User with email ' + email + ' does not exist.')
 

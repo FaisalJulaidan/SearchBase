@@ -165,14 +165,14 @@ def generate():
 
 
     # Create Roles
-    db.session.add(Role(Name="Staff", EditChatbots=True, EditUsers=True, DeleteUsers=True, AccessBilling=True))
-    db.session.add(Role(Name="Owner", EditChatbots=True, EditUsers=True, DeleteUsers=True, AccessBilling=True))
+    db.session.add(Role(Name="Staff", EditChatbots=True, AddUsers=True, EditUsers=True, DeleteUsers=True, AccessBilling=True))
+    db.session.add(Role(Name="Owner", EditChatbots=True, AddUsers=True, EditUsers=True, DeleteUsers=True, AccessBilling=True))
 
-    db.session.add(Role(Name="Admin", Company= aramco, EditChatbots=True, EditUsers=True, DeleteUsers=True, AccessBilling=True))
-    db.session.add(Role(Name="User", Company= aramco, EditChatbots=False, EditUsers=False, DeleteUsers=False, AccessBilling=False))
+    db.session.add(Role(Name="Admin", Company= aramco, AddUsers=True, EditChatbots=True, EditUsers=True, DeleteUsers=True, AccessBilling=True))
+    db.session.add(Role(Name="User", Company= aramco, AddUsers=False, EditChatbots=True, EditUsers=False, DeleteUsers=False, AccessBilling=False))
 
-    db.session.add(Role(Name="Admin", Company= sabic, EditChatbots=True, EditUsers=True, DeleteUsers=True, AccessBilling=True))
-    db.session.add(Role(Name="User", Company= sabic, EditChatbots=False, EditUsers=False, DeleteUsers=False, AccessBilling=False))
+    db.session.add(Role(Name="Admin", Company= sabic, AddUsers=True, EditChatbots=True, EditUsers=True, DeleteUsers=True, AccessBilling=True))
+    db.session.add(Role(Name="User", Company= sabic, AddUsers=False, EditChatbots=True, EditUsers=False, DeleteUsers=False, AccessBilling=False))
 
 
     # Get Roles

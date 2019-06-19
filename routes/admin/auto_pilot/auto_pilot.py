@@ -16,45 +16,43 @@ def auto_pilots():
     # Authenticate
     user = get_jwt_identity()['user']
 
-    callback: Callback = Callback(False, 'Error!', None)
     if request.method == "GET":
         callback: Callback = auto_pilot_services.fetchAll(user['companyID'])
+        if not callback.Success:
+            return helpers.jsonResponse(False, 400, callback.Message, None)
+        return helpers.jsonResponse(True, 200, callback.Message, helpers.getListFromSQLAlchemyList(callback.Data))
 
     if request.method == "POST":
         callback: Callback = auto_pilot_services.create(request.json.get('name'),
                                                         request.json.get('description'),
                                                         user['companyID'])
-
-    if not callback.Success:
-        return helpers.jsonResponse(False, 400, callback.Message, None)
-    return helpers.jsonResponse(True, 200, callback.Message, callback.Data)
+        if not callback.Success:
+            return helpers.jsonResponse(False, 400, callback.Message, None)
+        return helpers.jsonResponse(True, 200, callback.Message, helpers.getDictFromSQLAlchemyObj(callback.Data))
 
 
 # Update & Delete auto pilots
-@auto_pilot_router.route("/auto_pilot/<int:autoPilotID>", methods=['DELETE', 'PUT'])
+@auto_pilot_router.route("/auto_pilot/<int:autoPilotID>", methods=['GET','DELETE', 'PUT'])
 @jwt_required
 def auto_pilot(autoPilotID):
     # Authenticate
     user = get_jwt_identity()['user']
 
-    callback: Callback = Callback(False, 'Error!', None)
+    # Get AutoPilot by ID
+    if request.method == "GET":
+        callback = auto_pilot_services.getByID(autoPilotID, user['companyID'])
+        if not callback.Success:
+            return helpers.jsonResponse(False, 400, callback.Message, None)
+        return helpers.jsonResponse(True, 200, callback.Message, auto_pilot_services.parseAutoPilot(callback.Data))
+
     # Update AutoPilot
     if request.method == "PUT":
         data = request.json
         callback: Callback = auto_pilot_services\
             .update(autoPilotID,
-                    data.get('name'),
-                    request.json.get('description'),
-                    data.get('active'),
-                    data.get('acceptApplications'),
-                    data.get('acceptanceScore'),
-                    data.get('sendAcceptanceEmail'),
-                    data.get('rejectApplications'),
-                    data.get('rejectionScore'),
-                    data.get('sendRejectionEmail'),
-                    data.get('sendCandidatesAppointments'),
-                    data.get('openTimeSlots'), # TODO OpenTimeSlots & Appointments Feature
-                    user['companyID'])
+                           data.get('name'),
+                           request.json.get('description'),
+                           user['companyID'])
         if not callback.Success:
             return helpers.jsonResponse(False, 400, callback.Message, None)
         return helpers.jsonResponse(True, 200, callback.Message, helpers.getDictFromSQLAlchemyObj(callback.Data))
@@ -65,6 +63,34 @@ def auto_pilot(autoPilotID):
         if not callback.Success:
             return helpers.jsonResponse(False, 400, callback.Message, None)
         return helpers.jsonResponse(True, 200, callback.Message, callback.Data)
+
+
+@auto_pilot_router.route("/auto_pilot/<int:autoPilotID>/configs", methods=['PUT'])
+@jwt_required
+def auto_pilot_configs(autoPilotID):
+    # Authenticate
+    user = get_jwt_identity()['user']
+
+    # Update AutoPilot extended configs
+    if request.method == "PUT":
+        data = request.json
+        callback: Callback = auto_pilot_services \
+            .updateConfigs(autoPilotID,
+                           data.get('name'),
+                           request.json.get('description'),
+                           data.get('active'),
+                           data.get('acceptApplications'),
+                           data.get('acceptanceScore'),
+                           data.get('sendAcceptanceEmail'),
+                           data.get('rejectApplications'),
+                           data.get('rejectionScore'),
+                           data.get('sendRejectionEmail'),
+                           data.get('sendCandidatesAppointments'),
+                           data.get('openTimeSlots'),  # TODO OpenTimeSlots & Appointments Feature
+                           user['companyID'])
+        if not callback.Success:
+            return helpers.jsonResponse(False, 400, callback.Message, None)
+        return helpers.jsonResponse(True, 200, callback.Message, auto_pilot_services.parseAutoPilot(callback.Data))
 
 
 @auto_pilot_router.route("/auto_pilot/<int:autoPilotID>/status", methods=['PUT'])

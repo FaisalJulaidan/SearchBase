@@ -8901,9 +8901,9 @@ jQuery.fn.extend( {
 
 
 jQuery.expr.filters.hidden = function( elem ) {
-	return !jQuery.expr.filters.visible( elem );
+	return !jQuery.expr.filters.newAutoPilotModalVisible( elem );
 };
-jQuery.expr.filters.visible = function( elem ) {
+jQuery.expr.filters.newAutoPilotModalVisible = function(elem ) {
 
 	// Support: Opera <= 12.12
 	// Opera reports offsetWidths and offsetHeights less than zero on some elements

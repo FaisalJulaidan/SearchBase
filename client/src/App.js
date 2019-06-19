@@ -24,7 +24,6 @@ class App extends Component {
     }
 
     render() {
-        console.log(process.env.REACT_APP_ENV);
         return (
             <SentryBoundary>
                 <Suspense fallback={<div className={styles.Loader}> Loading...</div>}>

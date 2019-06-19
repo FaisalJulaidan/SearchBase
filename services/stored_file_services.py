@@ -1,8 +1,7 @@
 import boto3
 import botocore
-import logging
 import os
-
+from utilities import helpers
 from models import db, Callback, StoredFile, Conversation
 
 PUBLIC_URL = "https://tsb.ams3.digitaloceanspaces.com/"
@@ -25,7 +24,7 @@ def getByID(id) -> StoredFile or None:
             raise Exception
     except Exception as exc:
         db.session.rollback()
-        logging.error("stored_file_services.getByID(): " + str(exc))
+        helpers.logError("stored_file_services.getByID(): " + str(exc))
         return Callback(False,
                         'Stored file with ID ' + str(id) + ' does not exist')
 
@@ -38,8 +37,7 @@ def getByConversation(conversation: Conversation) -> StoredFile or None:
         return Callback(True, 'StoredFile was successfully retrieved', result)
 
     except Exception as exc:
-        print("stored_file_services.getBySession() ERROR: ", exc)
-        logging.error("stored_file_services.getBySession(): " + str(exc))
+        helpers.logError("stored_file_services.getBySession(): " + str(exc))
         return Callback(False, 'StoredFile with ID ' + str(id) + ' does not exist')
 
 
@@ -51,7 +49,7 @@ def getAll():
 
     except Exception as exc:
         print("stored_file_services.getAll() ERROR: ", exc)
-        logging.error("stored_file_services.getAll(): " + str(exc))
+        helpers.logError("stored_file_services.getAll(): " + str(exc))
         db.session.rollback()
         return Callback(False, 'StoredFiles could not be retrieved/empty')
 
@@ -65,8 +63,7 @@ def createRef(filePath, conversation) -> StoredFile or None:
         return Callback(True, "Stored files reference was created successfully.", newStoredFile)
 
     except Exception as exc:
-        print("stored_file_services.create() ERROR: ", exc)
-        logging.error("stored_file_services.create(): " + str(exc))
+        helpers.logError("stored_file_services.create(): " + str(exc))
         db.session.rollback()
         return Callback(False, "Couldn't create a storedFile entity.")
 
@@ -78,8 +75,7 @@ def removeByID(id):
 
         return Callback(True, "StoredFile has been deleted")
     except Exception as exc:
-        print("stored_file_services.removeByID() ERROR: ", exc)
-        logging.error("stored_file_services.removeByID(): " + str(exc))
+        helpers.logError("stored_file_services.removeByID(): " + str(exc))
         db.session.rollback()
         return Callback(False, "StoredFile cold not be deleted")
 
@@ -104,8 +100,7 @@ def uploadFile(file, filename, path, public=False):
         return Callback(True, "File uploaded successfully")
 
     except Exception as exc:
-        print("stored_file_services.uploadFile() ERROR: ", exc)
-        logging.error("stored_file_services.uploadFile(): " + str(exc))
+        helpers.logError("stored_file_services.uploadFile(): " + str(exc))
         return Callback(False, "Couldn't upload file")
 
 
@@ -129,8 +124,7 @@ def downloadFile(path):
         return Callback(True, "File downloaded successfully", file)
 
     except Exception as exc:
-        print("stored_file_services.downloadFile() ERROR: ", exc)
-        logging.error("stored_file_services.uploadFile(): " + str(exc))
+        helpers.logError("stored_file_services.uploadFile(): " + str(exc))
         return Callback(False, "Couldn't upload file")
 
 
@@ -149,6 +143,5 @@ def deleteFile(filename, path):
         return Callback(True, "File deleted successfully")
 
     except Exception as exc:
-        print("stored_file_services.deleteFile() ERROR: ", exc)
-        logging.error("stored_file_services.deleteFile(): " + str(exc) + " >>> File Name: " + path + '/' + filename)
+        helpers.logError("stored_file_services.deleteFile(): " + str(exc) + " >>> File Name: " + path + '/' + filename)
         return Callback(False, "Couldn't delete file")

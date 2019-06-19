@@ -1,6 +1,6 @@
 import * as actionTypes from './actionTypes';
 
-// Fetch
+// Fetch All
 const fetchAutoPilots = () => {
     return {
         type: actionTypes.FETCH_AUTOPILOTS_REQUEST
@@ -17,6 +17,30 @@ const fetchAutoPilotsSuccess = (autoPilotsList) => {
 const fetchAutoPilotsFailure = (errorMsg) => {
     return {
         type: actionTypes.FETCH_AUTOPILOTS_FAILURE,
+        errorMsg
+    };
+};
+
+
+// Fetch
+const fetchAutoPilot = (autoPilotID) => {
+    return {
+        type: actionTypes.FETCH_AUTOPILOT_REQUEST,
+        meta: {thunk: true},
+        autoPilotID
+    };
+};
+
+const fetchAutoPilotSuccess = (autoPilot) => {
+    return {
+        type: actionTypes.FETCH_AUTOPILOT_SUCCESS,
+        autoPilot
+    };
+};
+
+const fetchAutoPilotFailure = (errorMsg) => {
+    return {
+        type: actionTypes.FETCH_AUTOPILOT_FAILURE,
         errorMsg
     };
 };
@@ -71,19 +95,44 @@ const updateAutoPilotFailure = (errorMsg) => {
     };
 };
 
-
-// Delete
-const deleteAutoPilot = (authPilotID) => {
+// Update
+const updateAutoPilotConfigs = (autoPilotID, updatedValues) => {
     return {
-        type: actionTypes.DELETE_AUTOPILOT_REQUEST,
-        authPilotID,
+        type: actionTypes.UPDATE_AUTOPILOT_CONFIGS_REQUEST,
+        autoPilotID,
+        updatedValues
     };
 };
 
-const deleteAutoPilotSuccess = (authPilotID, successMsg) => {
+const updateAutoPilotConfigsSuccess = (updatedAutoPilot, successMsg) => {
+    return {
+        type: actionTypes.UPDATE_AUTOPILOT_CONFIGS_SUCCESS,
+        updatedAutoPilot,
+        successMsg
+    };
+};
+
+const updateAutoPilotConfigsFailure = (errorMsg) => {
+    return {
+        type: actionTypes.UPDATE_AUTOPILOT_CONFIGS_FAILURE,
+        errorMsg
+    };
+};
+
+
+// Delete
+const deleteAutoPilot = (autoPilotID) => {
+    return {
+        type: actionTypes.DELETE_AUTOPILOT_REQUEST,
+        meta: {thunk: true},
+        autoPilotID,
+    };
+};
+
+const deleteAutoPilotSuccess = (autoPilotID, successMsg) => {
     return {
         type: actionTypes.DELETE_AUTOPILOT_SUCCESS,
-        authPilotID,
+        autoPilotID,
         successMsg
     };
 };
@@ -125,6 +174,10 @@ export const autoPilotActions = {
     fetchAutoPilotsSuccess,
     fetchAutoPilotsFailure,
 
+    fetchAutoPilot,
+    fetchAutoPilotSuccess,
+    fetchAutoPilotFailure,
+
     addAutoPilot,
     addAutoPilotSuccess,
     addAutoPilotFailure,
@@ -132,6 +185,10 @@ export const autoPilotActions = {
     updateAutoPilot,
     updateAutoPilotSuccess,
     updateAutoPilotFailure,
+
+    updateAutoPilotConfigs,
+    updateAutoPilotConfigsSuccess,
+    updateAutoPilotConfigsFailure,
 
     deleteAutoPilot,
     deleteAutoPilotSuccess,

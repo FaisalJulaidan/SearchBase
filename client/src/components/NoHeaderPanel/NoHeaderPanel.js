@@ -7,27 +7,10 @@ class NoHeaderPanel extends Component {
 
     constructor(props) {
         super(props);
-        this.updateElementsDimensions = this.updateElementsDimensions.bind(this)
     }
 
     TitleElementRef = {};
     BodyElementRef = {};
-
-    componentDidMount() {
-        // window.addEventListener('resize', this.updateElementsDimensions);
-        // setTimeout(
-        //     () => this.BodyElementRef.style.height = `calc(100% - ${this.TitleElementRef.clientHeight}px)`,
-        //     1
-        // );
-    }
-
-    componentWillUnmount() {
-        // window.removeEventListener('resize', this.updateElementsDimensions)
-    }
-
-    updateElementsDimensions() {
-        // this.BodyElementRef.style.height = `calc(100% - ${this.TitleElementRef.clientHeight}px)`
-    }
 
     render() {
         const TitleElement = React.Children.only(this.props.children[0]);

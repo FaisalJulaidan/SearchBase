@@ -32,14 +32,14 @@ class Calendar extends React.Component {
     };
 
     onCloseModal = () => {
-        this.setState({visible: false});
+        this.setState({newAutoPilotModalVisible: false});
     };
 
     onSelect = value => {
         const x = this.getListData(value);
 
         if (x.length)
-            this.setState({value, visible: true});
+            this.setState({value, newAutoPilotModalVisible: true});
         else
             this.setState({value});
     };

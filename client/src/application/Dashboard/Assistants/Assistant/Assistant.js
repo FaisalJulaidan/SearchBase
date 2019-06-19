@@ -1,13 +1,9 @@
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
-import { Prompt } from "react-router-dom";
-import {Button, Col, Row, Switch, Tabs, Typography, Spin, Modal} from 'antd';
+import {Prompt} from "react-router-dom";
+import {Breadcrumb, Col, Modal, Row, Spin, Switch, Tabs, Typography} from 'antd';
 import './Assistant.less';
 import styles from "./Assistant.module.less";
-import {Link} from "react-router-dom";
-import CRM from "./CRM/CRM";
-import SelectAutoPilotModal from "./SelectAutoPilotModal/SelectAutoPilotModal";
-import AuroraBlink from "components/AuroraBlink/AuroraBlink";
 
 import Conversations from "./Conversations/Conversations"
 import Settings from "./Settings/Settings"
@@ -16,15 +12,13 @@ import Analytics from "./Analytics/Analytics"
 import Flow from "./Flow/Flow"
 import Connections from "./Connections/Connections"
 
-import {getLink, history} from "helpers";
-import {store} from "store/store";
-import {assistantActions, crmActions} from "store/actions";
+import {history} from "helpers";
+import {assistantActions, crmActions, optionsActions} from "store/actions";
 import NoHeaderPanel from 'components/NoHeaderPanel/NoHeaderPanel'
-import {optionsActions} from "store/actions";
 
 
 const {Title, Paragraph, Text} = Typography;
-const { TabPane } = Tabs;
+const {TabPane} = Tabs;
 const confirm = Modal.confirm;
 
 class Assistant extends Component {
@@ -33,38 +27,51 @@ class Assistant extends Component {
         assistantSettingsVisible: false,
         CRMVisible: false,
         selectAutoPilotModalVisible: false,
-        isFlowSaved: true
+        isFlowSaved: true,
+        activeTab: 'Script'
     };
 
-    componentDidMount() {
+    firstHead = null;
+
+    componentWillMount() {
         this.props.dispatch(assistantActions.fetchAssistant(this.props.match.params.id))
-            .then(()=> {}).catch(() => history.push(`/dashboard/assistants`));
+            .then(() => {
+            }).catch(() => history.push(`/dashboard/assistants`));
 
         if (!this.props.options) this.props.dispatch(optionsActions.getOptions());
 
         this.props.dispatch(crmActions.getConnectedCRMs());
 
-        window.onbeforeunload = this.onPageExist
+        window.onbeforeunload = () => {
+            if (!this.state.isFlowSaved)
+                return "You are leaving the page";
+            else
+                return null
+        }
     }
 
-    onPageExist = (e) => {
-        window.onbeforeunload = () => undefined;
-        confirm({
-            title: `Save changes...?????`,
-            content: <p>Your Script change will be lost</p>,
-            onOk: () => {
-                return "lfkg;dlfgksdfl;gdsfl;g"
-            }
-        });
-        return void(0);
+    componentDidMount() {
+        setTimeout(() => {
+            this.firstHead = [...document.head.children];
+            console.log(this.firstHead)
+        }, 1000)
+    }
+     componentWillUnmount() {
+        this.removeChatbot()
+     }
+
+    onScriptTabChanges = () => {
+        if (!this.state.isFlowSaved)
+            Modal.warning({
+                title: `Your script is not saved`,
+                content: 'Please go back and save it'
+            });
     };
 
-    isAssistantNameValid = (name) => {
-        return !(this.props.assistantList.findIndex(assistant => assistant.Name.toLowerCase() === name.toLowerCase()) >= 0)
-    };
+    isAssistantNameValid = name => !(this.props.assistantList.findIndex(assistant => assistant.Name.toLowerCase() === name.toLowerCase()) >= 0);
 
     onActivateHandler = (checked) => {
-        if(!checked){
+        if (!checked) {
             confirm({
                 title: `Deactivate assistant`,
                 content: <p>Are you sure you want to deactivate this assistant</p>,
@@ -78,29 +85,59 @@ class Assistant extends Component {
     };
 
     onTabClick = (key, e) => {
-        // if (key !== 'Script'){
-        //     if (!this.state.isFlowSaved) {
-        //         console.log('reload?');
-        //         window.onbeforeunload = () => true
-        //     } else {
-        //         window.onbeforeunload = undefined
-        //     }
-        // }
+        // this.firstHead = [...document.head.children];
+        if (this.state.activeTab !== key)
+            this.removeChatbot();
+
+        if (this.state.activeTab !== key)
+            this.onScriptTabChanges();
     };
 
     setIsFlowSaved = (bool) => {
         this.setState({isFlowSaved: !!bool})
     };
 
+    removeChatbot = () => {
+        let oldBot = document.getElementById("TheSearchBase_Chatbot");
+        let oldBotScript = document.getElementById("oldBotScript");
+
+        if (oldBot && oldBotScript) {
+            console.log('removing the chatbot');
+
+            oldBot.remove();
+            oldBotScript.remove();
+            let newHead = document.head.children;
+            let elements = [];
+
+            // find all new css
+            for (const element of newHead)
+                if (!isNodeExist(element, this.firstHead))
+                    elements.push(element);
+
+            // remove all new css
+            for (let i = 0; i < elements.length; i++)
+                elements[i].remove();
+        }
+    };
 
     render() {
-        const {assistant, isAssistantLoading} = this.props;
-
+        const {assistant} = this.props;
         return (
-
             <>
                 <NoHeaderPanel>
                     <div className={styles.Header}>
+
+                        <div style={{marginBottom: 20}}>
+                            <Breadcrumb>
+                                <Breadcrumb.Item>
+                                    <a href={"javascript:void(0);"}
+                                       onClick={() => history.push('/dashboard/assistants')}>
+                                        Assistants
+                                    </a>
+                                </Breadcrumb.Item>
+                                <Breadcrumb.Item>{assistant?.Name}</Breadcrumb.Item>
+                            </Breadcrumb>
+                        </div>
 
                         <Row>
                             <Col span={20}>
@@ -118,69 +155,81 @@ class Assistant extends Component {
                                         onChange={this.onActivateHandler}
                                         style={{marginTop: '17%', marginLeft: '70%'}}/>
                             </Col>
-
                         </Row>
-
                     </div>
 
                     <div className={[styles.Body, 'assistantTabs'].join(' ')}>
                         {!assistant ? <Spin/> :
 
-                            <Tabs defaultActiveKey={'Script'} size={"large"} animated={false} onTabClick={this.onTabClick}>
+                            <Tabs defaultActiveKey={'Script'} size={"large"} animated={false}
+                                  onTabClick={this.onTabClick}>
                                 <TabPane tab="Analytics" key="Analytics">
                                     <Analytics assistant={assistant}/>
                                 </TabPane>
                                 <TabPane tab="Conversations" key="Conversations">
-                                    <Conversations assistant={assistant} />
+                                    <Conversations assistant={assistant}/>
                                 </TabPane>
 
                                 <TabPane tab="Script" key="Script">
                                     <Flow setIsFlowSaved={this.setIsFlowSaved}
                                           isFlowSaved={this.state.isFlowSaved}
-                                          assistant={assistant} />
+                                          assistant={assistant}/>
                                 </TabPane>
 
                                 <TabPane tab="Connections" key="Connections">
                                     <Connections assistant={assistant}
                                                  CRMsList={this.props.CRMsList}
-                                                 autoPilotsList={this.props.autoPilotsList} />
+                                                 autoPilotsList={this.props.autoPilotsList}/>
                                 </TabPane>
 
                                 <TabPane tab="Integration" key="Integration">
-                                    <Integration assistant={assistant}/>
+                                    <Integration assistant={assistant}
+                                                 removeChatbot={this.removeChatbot}/>
                                 </TabPane>
 
                                 <TabPane tab="Settings" key="Settings">
                                     <Settings assistant={assistant}
-                                              isAssistantNameValid={this.isAssistantNameValid} />
+                                              isAssistantNameValid={this.isAssistantNameValid}/>
                                 </TabPane>
                             </Tabs>
                         }
                     </div>
                 </NoHeaderPanel>
 
-                {/*<Prompt when={!this.state.isFlowSaved}*/}
-                        {/*message={() => `Your script is not saved are you sure you want leave without saving it?`}/>*/}
-
-                {/*<AssistantSettings assistant={assistant}*/}
-                                   {/*isAssistantNameValid={this.props.isAssistantNameValid}*/}
-                                   {/*hideModal={this.hideSettingsModal}*/}
-                                   {/*visible={this.state.assistantSettingsVisible}/>*/}
-
-                {/*<CRM assistant={assistant}*/}
-                     {/*CRMsList={this.props.CRMsList}*/}
-                     {/*hideModal={this.hideCRMModal}*/}
-                     {/*visible={this.state.CRMVisible}/>*/}
-
-                {/*<SelectAutoPilotModal*/}
-                    {/*assistant={assistant}*/}
-                    {/*hideModal={this.hideSelectAutoPilotModal}*/}
-                    {/*selectAutoPilotModalVisible={this.state.selectAutoPilotModalVisible}/>*/}
-
+                <Prompt when={!this.state.isFlowSaved}
+                        message={() => `Your script is not saved are you sure you want leave without saving it?`}/>
             </>
         )
     }
 }
+
+const isNodeExist = (element, inArray) => {
+    let isExist = false;
+    for (const inArray_element of inArray)
+        if (element.isEqualNode(inArray_element)) {
+            isExist = true;
+            break;
+        }
+    return isExist
+};
+
+
+(function (arr) {
+    arr.forEach(function (item) {
+        if (item.hasOwnProperty('remove')) {
+            return;
+        }
+        Object.defineProperty(item, 'remove', {
+            configurable: true,
+            enumerable: true,
+            writable: true,
+            value: function remove() {
+                this.parentNode.removeChild(this);
+            }
+        })
+    })
+})([Element.prototype, CharacterData.prototype, DocumentType.prototype]);
+
 
 function mapStateToProps(state) {
     return {

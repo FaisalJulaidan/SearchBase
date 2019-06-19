@@ -70,7 +70,10 @@ class Blocks extends Component {
 
     // DELETE BLOCK MODAL CONFIGS
     // this called from block.js & editBlockModal when you click on delete block button
-    handleDeleteBlock = deletedBlock => this.props.deleteBlock(deletedBlock);
+    handleDeleteBlock = deletedBlock => {
+        this.props.deleteBlock(deletedBlock, this.closeEditBlockModal);
+
+    };
 
 
 

@@ -1,13 +1,10 @@
 from flask import Blueprint, request, redirect
 from flask_jwt_extended import jwt_refresh_token_required
-from itsdangerous import URLSafeTimedSerializer
-
 from models import Callback
 from services import user_services, auth_services
 from utilities import helpers
 
 auth_router = Blueprint('auth_router', __name__)
-verificationSigner = URLSafeTimedSerializer(b'\xb7\xa8j\xfc\x1d\xb2S\\\xd9/\xa6y\xe0\xefC{\xb6k\xab\xa0\xcb\xdd\xdbV')
 
 
 @auth_router.route("/auth", methods=['POST'])
@@ -27,7 +24,7 @@ def authenticate():
 # Refresh token endpoint
 @auth_router.route('/auth/refresh', methods=['POST'])
 @jwt_refresh_token_required
-def refresh():
+def refresh_token():
     callback = auth_services.refreshToken()
     if callback.Success:
         return helpers.jsonResponse(True, 200, "Authorised!", callback.Data)
@@ -49,7 +46,7 @@ def signup_process():
 def verify_account(payload):
     if request.method == "GET":
         try:
-            data = verificationSigner.loads(payload)
+            data = helpers.verificationSigner.loads(payload)
             email = data.split(";")[0]
             user_callback: Callback = user_services.verifyByEmail(email)
             if not user_callback.Success:

@@ -2,10 +2,9 @@ import React, {Component} from 'react';
 import {Button, Modal, Form, Input} from 'antd';
 
 
-
 const FormItem = Form.Item;
 
-class EditModal extends Component {
+class EditAssistantModal extends Component {
 
     constructor(props) {
         super(props);
@@ -113,4 +112,4 @@ class EditModal extends Component {
     }
 }
 
-export default Form.create()(EditModal);
+export default Form.create()(EditAssistantModal);

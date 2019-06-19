@@ -152,7 +152,7 @@ class UploadModal extends Component {
         return (
             <Modal width={"80%"}
                    title="Upload New Database"
-                   visible={this.props.visible}
+                   visible={this.props.newAutoPilotModalVisible}
                    onCancel={this.props.hideNewAssistantModal}
                    destroyOnClose={true}
                    footer={null}>

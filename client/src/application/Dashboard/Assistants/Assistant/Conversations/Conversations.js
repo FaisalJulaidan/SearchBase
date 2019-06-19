@@ -365,13 +365,13 @@ class Conversations extends React.Component {
                             </Button>
 
 
-                            <Button hidden type="primary" icon="delete"
-                                    disabled={!!(!conversations?.conversationsList?.length)}
-                                    onClick={() => {
-                                        this.clearAllConversations(assistant.ID)
-                                    }} loading={this.props.isClearingAll}>
-                                Clear All
-                            </Button>
+                            {/*<Button hidden type="primary" icon="delete"*/}
+                                    {/*disabled={!!(!conversations?.conversationsList?.length)}*/}
+                                    {/*onClick={() => {*/}
+                                        {/*this.clearAllConversations(assistant.ID)*/}
+                                    {/*}} loading={this.props.isClearingAll}>*/}
+                                {/*Clear All*/}
+                            {/*</Button>*/}
                         </div>
 
                         <Table columns={columns}
@@ -380,8 +380,9 @@ class Conversations extends React.Component {
                                onChange={this.handleFilter}
                                loading={this.props.isLoading}
                                bordered={true}
-                               pagination={{position:'both'}}
+                               pagination={{position:'both', pageSize: 20}}
                                size='default'
+                               scroll={{ x: 1300 }}
                         />
 
                         {

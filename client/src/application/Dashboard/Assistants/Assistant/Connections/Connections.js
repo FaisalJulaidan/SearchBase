@@ -2,7 +2,7 @@ import React, {Component} from 'react';
 import {connect} from 'react-redux';
 import {store} from "store/store";
 
-import {Button, Select, Form, Divider} from "antd";
+import {Button, Select, Form, Divider, Row, Col} from "antd";
 import {assistantActions, crmActions} from "store/actions";
 import {history} from "helpers";
 
@@ -11,35 +11,105 @@ const Option = Select.Option;
 
 class Connections extends Component {
 
+    state = {
+        selectedCRM: undefined,
+        selectedAutoPilot: undefined,
+
+        defaultSelectedCRM: undefined,
+        defaultSelectedAutoPilot: undefined,
+    };
+
+    componentWillReceiveProps(nextProps, nextContext) {
+        const {assistant, CRMsList, autoPilotsList} = nextProps;
+        this.setState({
+            defaultSelectedCRM: CRMsList.find(crm => crm.ID === assistant.CRMID),
+            defaultSelectedAutoPilot: autoPilotsList.find(ap => ap.ID === assistant.autoPilotID)
+        })
+    }
+
+    handleConnectCRM = () => {
+        this.props.dispatch(assistantActions.connectAssistantCRM(this.state.selectedCRM.ID, this.props.assistant.ID))
+    };
+
+    handleDisconnectCRM = () => {
+        this.props.dispatch(assistantActions.disconnectAssistantCRM(this.props.assistant.ID))
+    };
+
+    handleConnectAutoPilot = () => {
+        this.props.dispatch(assistantActions.connectAutoPilot(this.state.selectedAutoPilot.ID, this.props.assistant.ID))
+    };
+
+    handleDisconnectAutoPilot = () => {
+        this.props.dispatch(assistantActions.disconnectAutoPilot(this.props.assistant.ID))
+    };
+
 
     render() {
-        const {getFieldDecorator} = this.props.form;
-        console.log(this.props.CRMsList);
+        const {CRMsList, autoPilotsList} = this.props;
+        const {defaultSelectedCRM, selectedCRM, defaultSelectedAutoPilot, selectedAutoPilot} = this.state;
         return (
             <>
-                <Form layout='vertical' wrapperCol={{span: 12}}>
+                <h2> CRM Connection:</h2>
+                <div>
+                    <Select
+                        style={{ width: 500, marginBottom: 10 }}
+                        placeholder="Select a CRM to be connected to this assistant"
+                        onChange={(CRMID) => this.setState({selectedCRM: CRMsList.find(crm => crm.ID === CRMID)})}
+                        value={selectedCRM ? selectedCRM?.ID : (defaultSelectedCRM?.ID || undefined) }
+                    >
+                        {this.props.CRMsList.map((crm, i) => {
+                            return <Option key={i} value={crm.ID}>{crm.Type}</Option>
+                        })}
+                    </Select>
+                </div>
+                <div>
+                    <Button
+                        type={'primary'}
+                        onClick={this.handleConnectCRM}
+                        disabled={!(selectedCRM && selectedCRM?.ID !== defaultSelectedCRM?.ID)}
+                    >
+                        Connect
+                    </Button>
+                    <Button type={'danger'}
+                            onClick={this.handleDisconnectCRM}
+                            disabled={!defaultSelectedCRM}
+                    >
+                        {!defaultSelectedCRM ? "Disconnect" : `Disconnect from ${defaultSelectedCRM.Type}`}
+                    </Button>
+                </div>
 
-                    <h2> Basic Settings:</h2>
-                    <Form.Item label="CRM">
-                        {getFieldDecorator('crmID', {
-                            rules: [{ required: true, message: 'Please select your gender!' }],
-                        })(
-                            <Select
-                                placeholder="Select a option and change input text above"
-                                onChange={this.handleSelectChange}
-                            >
-                                <Option value="male">male</Option>
-                                {this.props.CRMsList.map(crm => {
-                                    return <Option value="crm.ID">crm.Type</Option>
-                                })}
-                            </Select>,
-                        )}
-                    </Form.Item>
 
+                <br/>
+                <Divider/>
+                <h2> Auto Pilot Connection:</h2>
+                <div>
+                    <Select
+                        style={{ width: 500, marginBottom: 10 }}
+                        placeholder="Select an Auto Pilot to be connected to this assistant"
+                        onChange={(autoPilotID) => this.setState({selectedAutoPilot: autoPilotsList.find(ap => ap.ID === autoPilotID)})}
+                        value={selectedAutoPilot ? selectedAutoPilot?.ID : (defaultSelectedAutoPilot?.ID || undefined) }
+                    >
+                        {this.props.autoPilotsList.map((ap, i) => {
+                            return <Option key={i} value={ap.ID}>{ap.Name}</Option>
+                        })}
+                    </Select>
+                </div>
+                <div>
+                    <Button
+                        type={'primary'}
+                        onClick={this.handleConnectAutoPilot}
+                        disabled={!(selectedAutoPilot && selectedAutoPilot?.ID !== defaultSelectedAutoPilot?.ID)}
+                    >
+                        Connect
+                    </Button>
+                    <Button type={'danger'}
+                            onClick={this.handleDisconnectAutoPilot}
+                            disabled={!defaultSelectedAutoPilot}
+                    >
+                        {!defaultSelectedAutoPilot ? "Disconnect" : `Disconnect from ${defaultSelectedAutoPilot.Name}`}
+                    </Button>
+                </div>
 
-
-                    <Button type={'primary'} onClick={this.handleSave}>Save changes</Button>
-                </Form>
 
             </>
         );

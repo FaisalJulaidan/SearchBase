@@ -31,8 +31,8 @@ class NewDataCategoryModal extends Component {
             <Modal width={500}
                    style={{ top: 70 }}
                    title="Add New Data Category"
-                   visible={this.props.visible}
-                   onCancel={this.props.closeModal}
+                   visible={this.props.newAutoPilotModalVisible}
+                   onCancel={this.props.closeEditAutoPilotModal}
                    destroyOnClose={true}
                    footer={null}
             >

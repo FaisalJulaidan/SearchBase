@@ -3,31 +3,31 @@ import os
 import config
 from flask import Flask, render_template, request
 from flask_api import status
-from models import db
+from models import db, Callback, Assistant
 from services.mail_services import mail
 from flask_script import Manager
 from flask_migrate import Migrate, MigrateCommand
 from sqlalchemy_utils import create_database, database_exists
 from services.auth_services import jwt
-from utilities import helpers, tasks
+from utilities import helpers, tasks, dummy_data
 from flask_babel import Babel
-# from services import scheduler_services
+from services import scheduler_services, mail_services, assistant_services
+from datetime import datetime
 
 # Import all routers to register them as blueprints
 from routes.admin.routers import profile_router, analytics_router, sub_router, \
     conversation_router, users_router, flow_router, assistant_router,\
     database_router, options_router, crm_router, auto_pilot_router
-from routes.public.routers import public_router, resetPassword_router, chatbot_router, auth_router
+from routes.public.routers import public_router, reset_password_router, chatbot_router, auth_router, appointment_router
 
 app = Flask(__name__, static_folder='static')
-
 
 # Register Routes:
 app.register_blueprint(assistant_router, url_prefix='/api')
 app.register_blueprint(flow_router, url_prefix='/api')
 app.register_blueprint(crm_router, url_prefix='/api')
 app.register_blueprint(public_router)
-app.register_blueprint(resetPassword_router, url_prefix='/api')
+app.register_blueprint(reset_password_router, url_prefix='/api')
 app.register_blueprint(profile_router, url_prefix='/api')
 app.register_blueprint(sub_router)
 app.register_blueprint(analytics_router, url_prefix='/api')
@@ -38,6 +38,7 @@ app.register_blueprint(auth_router, url_prefix='/api')
 app.register_blueprint(database_router, url_prefix='/api')
 app.register_blueprint(auto_pilot_router, url_prefix='/api')
 app.register_blueprint(options_router, url_prefix='/api')
+app.register_blueprint(appointment_router, url_prefix='/api')
 
 @app.after_request
 def apply_caching(response):
@@ -92,7 +93,6 @@ if os.environ['FLASK_ENV'] in ['production', 'staging']:
         print('Create db tables')
         create_database(url)
         db.create_all()
-        helpers.seed()
 
     # Check if staging what to do
     # scheduler.start()
@@ -113,7 +113,7 @@ elif os.environ['FLASK_ENV'] == 'development':
         print('Reinitialize the database...')
         db.drop_all()
         db.create_all()
-        helpers.gen_dummy_data()
+        dummy_data.generate()
 
 
     print('Development mode running...')

@@ -6,9 +6,9 @@ import AssistantToolsModal from "./Tools/AssistantToolsModal"
 import {assistantActions} from "store/actions";
 import connect from "react-redux/es/connect/connect";
 import styles from "./Flow.module.less"
-import {Modal, Spin, Button} from "antd";
+import {Button, Modal, Spin} from "antd";
 import shortid from 'shortid';
-import {destroyMessage, successMessage, history, deepClone} from "helpers";
+import {deepClone, successMessage} from "helpers";
 
 const confirm = Modal.confirm;
 
@@ -17,21 +17,16 @@ class Flow extends Component {
 
     state = {
         currentGroup: {blocks: []},
-        assistant: {Flow: {groups:[]}},
+        assistant: {Flow: {groups: []}},
         assistantToolsBlockVisible: false,
-
     };
-
-    componentWillReceiveProps(nextProps, nextContext) {
-
-    }
 
 
     componentDidMount() {
         const {assistant} = this.props;
-        this.setState({assistant}, () =>{
-            if(this.state.assistant?.Flow?.groups.length)
-               this.selectGroup(this.state.assistant.Flow.groups[0])
+        this.setState({assistant}, () => {
+            if (this.state.assistant?.Flow?.groups.length)
+                this.selectGroup(this.state.assistant.Flow.groups[0])
         })
     }
 
@@ -48,7 +43,7 @@ class Flow extends Component {
     // GROUPS
     addGroup = newGroup => {
         const {updatedAssistant} = this.getUpdatableState();
-        if(!updatedAssistant.Flow)
+        if (!updatedAssistant.Flow)
             updatedAssistant.Flow = {groups: []};
 
         newGroup = {
@@ -65,7 +60,7 @@ class Flow extends Component {
             currentGroup: newGroup,
         });
 
-        destroyMessage();
+        this.props.setIsFlowSaved(false);
         successMessage('Group added!');
     };
 
@@ -167,7 +162,7 @@ class Flow extends Component {
         successMessage('Block updated!');
     };
 
-    deleteBlock = (deletedBlock) => {
+    deleteBlock = (deletedBlock, closeModalCallback) => {
         const {updatedAssistant, updatedGroup} = this.getUpdatableState();
         let counter = 0;
         updatedAssistant.Flow.groups.forEach((group) => {
@@ -213,6 +208,7 @@ class Flow extends Component {
                 });
                 this.props.setIsFlowSaved(false);
                 successMessage('Block deleted!');
+                closeModalCallback();
             }
         });
     };
@@ -257,7 +253,9 @@ class Flow extends Component {
 
     saveFlow = () => {
         this.props.dispatch(assistantActions.updateFlow(this.state.assistant))
-            .then( ()=> {this.props.setIsFlowSaved(true)});
+            .then(() => {
+                this.props.setIsFlowSaved(true)
+            });
     };
 
     // ASSISTANT TOOLS MODAL
@@ -270,9 +268,9 @@ class Flow extends Component {
         const {Flow} = assistant;
 
         return (
-            <Spin spinning={!(!!assistant)} style={{height: '100%'}}>
-
-                <>
+            !assistant ?
+                <Spin/>
+                : <>
 
                     <div className={styles.Header}>
                         <Button className={styles.Panel_Header_Button} type="primary" icon="tool"
@@ -289,27 +287,29 @@ class Flow extends Component {
                     </div>
 
                     <div style={{marginBottom: 15}}>
-                            {
-                                assistant && <Groups selectGroup={this.selectGroup}
-                                                isLoading={this.props.isLoading}
-                                                groupsList={Flow?.groups}
-                                                currentGroup={this.state.currentGroup}
-                                                addGroup={this.addGroup}
-                                                editGroup={this.editGroup}
-                                                deleteGroup={this.deleteGroup}/>
-                            }
+                        {
+                            assistant &&
+                            <Groups selectGroup={this.selectGroup}
+                                    isLoading={this.props.isLoading}
+                                    groupsList={Flow?.groups}
+                                    currentGroup={this.state.currentGroup}
+                                    addGroup={this.addGroup}
+                                    editGroup={this.editGroup}
+                                    deleteGroup={this.deleteGroup}/>
+                        }
                     </div>
 
                     <div>
-                            {
-                                assistant && <Blocks addBlock={this.addBlock}
-                                                editBlock={this.editBlock}
-                                                deleteBlock={this.deleteBlock}
-                                                reorderBlocks={this.reorderBlocks}
-                                                currentGroup={this.state.currentGroup}
-                                                allGroups={Flow?.groups}
-                                                options={this.props.options}/>
-                            }
+                        {
+                            assistant &&
+                            <Blocks addBlock={this.addBlock}
+                                    editBlock={this.editBlock}
+                                    deleteBlock={this.deleteBlock}
+                                    reorderBlocks={this.reorderBlocks}
+                                    currentGroup={this.state.currentGroup}
+                                    allGroups={Flow?.groups}
+                                    options={this.props.options}/>
+                        }
                     </div>
 
                     <AssistantToolsModal visible={this.state.assistantToolsBlockVisible}
@@ -317,8 +317,7 @@ class Flow extends Component {
 
 
                 </>
-            </Spin>
-        );
+        )
     }
 
 }

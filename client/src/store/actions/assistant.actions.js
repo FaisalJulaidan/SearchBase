@@ -189,49 +189,6 @@ const updateFlowFailure = (error) => {
     };
 };
 
-const selectAssistantCRM = (CRMID, assistantID) => {
-    return {
-        type: actionTypes.SELECT_ASSISTANT_CRM_REQUEST,
-        CRMID,
-        assistantID
-    };
-};
-
-const selectAssistantCRMSuccess = (msg) => {
-    return {
-        type: actionTypes.SELECT_ASSISTANT_CRM_SUCCESS,
-        msg
-    };
-};
-
-const selectAssistantCRMFailure = (error) => {
-    return {
-        type: actionTypes.SELECT_ASSISTANT_CRM_FAILURE,
-        error
-    };
-};
-
-const resetAssistantCRM = (assistantID) => {
-    return {
-        type: actionTypes.RESET_ASSISTANT_CRM_REQUEST,
-        assistantID
-    };
-};
-
-const resetAssistantCRMSuccess = (msg) => {
-    return {
-        type: actionTypes.RESET_ASSISTANT_CRM_SUCCESS,
-        msg
-    };
-};
-
-const resetAssistantCRMFailure = (error) => {
-    return {
-        type: actionTypes.RESET_ASSISTANT_CRM_FAILURE,
-        error
-    };
-};
-
 
 const uploadLogo = (assistantID, file) => {
     return {
@@ -277,49 +234,90 @@ const deleteLogoFailure = (error) => {
     };
 };
 
-
-const selectAutoPilot = (assistantID, autoPilotID) => {
+const connectAssistantCRM = (CRMID, assistantID) => {
     return {
-        type: actionTypes.SELECT_AUTO_PILOT_REQUEST,
-        assistantID,
-        autoPilotID
+        type: actionTypes.CONNECT_ASSISTANT_CRM_REQUEST,
+        CRMID,
+        assistantID
     };
 };
 
-const selectAutoPilotSuccess = (assistantID, autoPilotID) => {
+const connectAssistantCRMSuccess = (CRMID, msg) => {
     return {
-        type: actionTypes.SELECT_AUTO_PILOT_SUCCESS,
-        assistantID,
-        autoPilotID
+        type: actionTypes.CONNECT_ASSISTANT_CRM_SUCCESS,
+        CRMID,
+        msg
     };
 };
 
-const selectAutoPilotFailure = (error) => {
+const connectAssistantCRMFailure = (error) => {
     return {
-        type: actionTypes.SELECT_AUTO_PILOT_FAILURE,
+        type: actionTypes.CONNECT_ASSISTANT_CRM_FAILURE,
         error
     };
 };
 
-const disconnectAutoPilot = (assistantID, autoPilotID) => {
+// Connections
+const disconnectAssistantCRM = (assistantID) => {
     return {
-        type: actionTypes.DISCONNECT_AUTO_PILOT_REQUEST,
+        type: actionTypes.DISCONNECT_ASSISTANT_CRM_REQUEST,
+        assistantID
+    };
+};
+
+const disconnectAssistantCRMSuccess = (msg) => {
+    return {
+        type: actionTypes.DISCONNECT_ASSISTANT_CRM_SUCCESS,
+        msg
+    };
+};
+
+const disconnectAssistantCRMFailure = (error) => {
+    return {
+        type: actionTypes.DISCONNECT_ASSISTANT_CRM_FAILURE,
+        error
+    };
+};
+
+const connectAutoPilot = (autoPilotID, assistantID) => {
+    return {
+        type: actionTypes.CONNECT_ASSISTANT_AUTO_PILOT_REQUEST,
         assistantID,
         autoPilotID
     };
 };
 
-const disconnectAutoPilotSuccess = (assistantID, autoPilotID) => {
+const connectAutoPilotSuccess = (autoPilotID) => {
     return {
-        type: actionTypes.DISCONNECT_AUTO_PILOT_SUCCESS,
-        assistantID,
+        type: actionTypes.CONNECT_ASSISTANT_AUTO_PILOT_SUCCESS,
         autoPilotID
+    };
+};
+
+const connectAutoPilotFailure = (error) => {
+    return {
+        type: actionTypes.CONNECT_ASSISTANT_AUTO_PILOT_FAILURE,
+        error
+    };
+};
+
+const disconnectAutoPilot = (assistantID) => {
+    return {
+        type: actionTypes.DISCONNECT_ASSISTANT_AUTO_PILOT_REQUEST,
+        assistantID,
+    };
+};
+
+const disconnectAutoPilotSuccess = (msg) => {
+    return {
+        type: actionTypes.DISCONNECT_ASSISTANT_AUTO_PILOT_SUCCESS,
+        msg
     };
 };
 
 const disconnectAutoPilotFailure = (error) => {
     return {
-        type: actionTypes.DISCONNECT_AUTO_PILOT_FAILURE,
+        type: actionTypes.DISCONNECT_ASSISTANT_AUTO_PILOT_FAILURE,
         error
     };
 };
@@ -359,13 +357,13 @@ export const assistantActions = {
     updateFlowSuccess,
     updateFlowFailure,
 
-    selectAssistantCRM,
-    selectAssistantCRMSuccess,
-    selectAssistantCRMFailure,
+    connectAssistantCRM,
+    connectAssistantCRMSuccess,
+    connectAssistantCRMFailure,
 
-    resetAssistantCRM,
-    resetAssistantCRMSuccess,
-    resetAssistantCRMFailure,
+    disconnectAssistantCRM,
+    disconnectAssistantCRMSuccess,
+    disconnectAssistantCRMFailure,
 
     uploadLogo,
     uploadLogoSuccess,
@@ -375,16 +373,11 @@ export const assistantActions = {
     deleteLogoSuccess,
     deleteLogoFailure,
 
-    selectAutoPilot,
-    selectAutoPilotSuccess,
-    selectAutoPilotFailure,
+    connectAutoPilot,
+    connectAutoPilotSuccess,
+    connectAutoPilotFailure,
 
     disconnectAutoPilot,
     disconnectAutoPilotSuccess,
     disconnectAutoPilotFailure,
-
-
-
-
-
 };

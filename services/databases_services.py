@@ -41,8 +41,7 @@ def fetchDatabase(id, companyID: int, pageNumber: int) -> Callback:
                                    'databaseContent': databaseContent})
 
     except Exception as exc:
-        print(exc)
-        logging.error("databases_service.fetchDatabase(): " + str(exc))
+        helpers.logError("databases_service.fetchDatabase(): " + str(exc))
         db.session.rollback()
         return Callback(False, 'Could not fetch the database.')
 
@@ -56,11 +55,9 @@ def updateDatabase(id, newName, companyID) -> Callback:
         return Callback(True, newName + ' database updated successfully')
 
     except Exception as exc:
-        print(exc)
-        logging.error("databases_service.updateDatabase(): " + str(exc))
+        helpers.logError("databases_service.updateDatabase(): " + str(exc))
         db.session.rollback()
-        return Callback(False,
-                        "Couldn't update database ")
+        return Callback(False,"Couldn't update database ")
 
 
 # ----- Uploader ----- #
@@ -88,13 +85,13 @@ def uploadDatabase(data: dict, companyID: int) -> Callback:
         def createDatabase(name, type: DatabaseType):
             return Database(Name=name, Type=type, CompanyID=companyID)
 
-        def uploadCandidates(databaseData, newDatabase):
+        def uploadCandidates(databaseData, newDatabase: Database):
             candidates = []
             for record in databaseData["records"]:
                 candidates.append(Candidate(Database=newDatabase, **parseRecord(record)))
             db.session.add_all(candidates)
 
-        def uploadJobs(databaseData, newDatabase):
+        def uploadJobs(databaseData, newDatabase: Database):
             jobs = []
             for record in databaseData["records"]:
                 jobs.append(Job(Database=newDatabase, **parseRecord(record)))
@@ -116,8 +113,7 @@ def uploadDatabase(data: dict, companyID: int) -> Callback:
         db.session.commit()
         return Callback(True, "Databases was successfully uploaded!", newDatabase)
     except Exception as exc:
-        print(exc)
-        logging.error("databases_service.uploadDatabase(): " + str(exc))
+        helpers.logError("databases_service.uploadDatabase(): " + str(exc))
         return Callback(False, 'Could not upload the databases.')
 
 
@@ -129,8 +125,7 @@ def getDatabasesList(companyID: int) -> Callback:
         return Callback(True, "Databases list is here", databases)
 
     except Exception as exc:
-        print(exc)
-        logging.error("databases_service.getDatabasesList(): " + str(exc))
+        helpers.logError("databases_service.getDatabasesList(): " + str(exc))
         return Callback(False, 'Could not fetch the databases list.')
 
 
@@ -153,8 +148,7 @@ def getCandidate(candidateID):
         return Callback(True, "Candidate retrieved successfully.", candidate)
 
     except Exception as exc:
-        print("databases_services.getCandidate() Error: ", exc)
-        logging.error("databases_service.getCandidate(): " + str(exc))
+        helpers.logError("databases_service.getCandidate(): " + str(exc))
         db.session.rollback()
         return Callback(False, 'Could not retrieve the candidate.')
 
@@ -168,8 +162,7 @@ def getJob(jobID):
         return Callback(True, "Job retrieved successfully.", job)
 
     except Exception as exc:
-        print("databases_services.getJob() Error: ", exc)
-        logging.error("databases_service.getJob(): " + str(exc))
+        helpers.logError("databases_service.getJob(): " + str(exc))
         db.session.rollback()
         return Callback(False, 'Could not retrieve the job.')
 
@@ -191,8 +184,7 @@ def getAllCandidates(dbID, page) -> dict:
         return data
 
     except Exception as exc:
-        print("fetchCandidates() ERROR: ", exc)
-        logging.error("databases_service.getAllCandidates(): " + str(exc))
+        helpers.logError("databases_service.getAllCandidates(): " + str(exc))
         raise Exception
 
 
@@ -212,8 +204,7 @@ def getAllJobs(dbID, page) -> dict:
         return data
 
     except Exception as exc:
-        print("fetchCandidates() ERROR: ", exc)
-        logging.error("databases_service.getAllJobs(): " + str(exc))
+        helpers.logError("databases_service.getAllJobs(): " + str(exc))
         raise Exception('Error: getAllJobs()')
 
 
@@ -226,8 +217,7 @@ def deleteDatabase(databaseID, companyID) -> Callback:
         return Callback(True, 'Database has been deleted.')
 
     except Exception as exc:
-        print("Error in deleteDatabase(): ", exc)
-        logging.error("databases_service.deleteDatabase(): " + str(exc))
+        helpers.logError("databases_service.deleteDatabase(): " + str(exc))
         db.session.rollback()
         return Callback(False, 'Could not remove the database.')
 
@@ -258,8 +248,7 @@ def scan(session, assistantHashID):
             return Callback(False, "Database type is not recognised", None)
 
     except Exception as exc:
-        print("databases_service.scan() ERROR: ", exc)
-        logging.error("databases_service.scan(): " + str(exc))
+        helpers.logError("databases_service.scan(): " + str(exc))
         return Callback(False, 'Error while scanning the database')
 
 
@@ -366,8 +355,7 @@ def scanCandidates(session, dbIDs, extraCandidates=None):
         return Callback(True, '', data)
 
     except Exception as exc:
-        print("scanCandidates() ERROR: ", exc)
-        logging.error("databases_service.scanCandidates(): " + str(exc))
+        helpers.logError("databases_service.scanCandidates(): " + str(exc))
         return Callback(False, 'Error while search the database for matches!')
 
 
@@ -475,8 +463,7 @@ def scanJobs(session, dbIDs, extraJobs=None):
         return Callback(True, '', data)
 
     except Exception as exc:
-        print("scanJobs() ERROR: ", exc)
-        logging.error("databases_service.scanJobs(): " + str(exc))
+        helpers.logError("databases_service.scanJobs(): " + str(exc))
         return Callback(False, 'Error while search the database for matches!')
 
 

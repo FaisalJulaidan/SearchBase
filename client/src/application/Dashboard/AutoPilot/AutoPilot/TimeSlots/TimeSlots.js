@@ -1,5 +1,5 @@
 import React from 'react'
-import styles from "../AutoPilotConfigs.module.less";
+import styles from "../AutoPilot.module.less";
 import moment from "moment";
 import {Badge, Checkbox, Col, Form, List, Radio, Tag, TimePicker} from 'antd'
 import 'types/TimeSlots_Types'

@@ -1,11 +1,9 @@
-from datetime import datetime, timedelta
+from datetime import datetime
 from flask_jwt_extended import JWTManager, create_access_token, get_jwt_identity, create_refresh_token
 from models import Callback, User, db
 from services import user_services, role_services, sub_services, company_services, mail_services
 from utilities import helpers
 from config import BaseConfig
-import logging
-
 
 
 jwt = JWTManager()
@@ -63,7 +61,7 @@ def signup(details) -> Callback:
         # If subscription failed, remove the new created company and user
         if not sub_callback.Success or not sendVerEmail_callback.Success:
             # Removing the company will cascade and remove the new created user and roles as well.
-            print('remove company')
+
             company_services.removeByName(details['companyName'])
             return sub_callback
 
@@ -76,8 +74,7 @@ def signup(details) -> Callback:
         return Callback(True, 'Signed up successfully!')
 
     except Exception as exc:
-        print(exc)
-        logging.error("auth_services.signup(): " + str(exc))
+        helpers.logError("auth_services.signup(): " + str(exc))
         db.session.rollback()
         return Callback(False, "Failed to signup!", None)
 
@@ -86,19 +83,16 @@ def authenticate(email: str, password_to_check: str) -> Callback:
     try:
         # Login Exception Handling
         if not (email or password_to_check):
-            print("Invalid request: Email or password not received!")
             return Callback(False, "Email or password not received. Please try again!")
 
         user_callback: Callback = user_services.getByEmail(email.lower())
         # If user is not found
         if not user_callback.Success:
-            print("Invalid request: Email not found")
             return Callback(False, "Record with the current email or password was not found")
 
         # Get the user from the callback object
         user: User = user_callback.Data
         if not password_to_check == user.Password:
-            print("Invalid request: Incorrect Password")
             return Callback(False, "Record with the current email or password was not found")
 
         if not user.Verified:
@@ -110,7 +104,7 @@ def authenticate(email: str, password_to_check: str) -> Callback:
                          "username": user.Firstname + ' ' + user.Surname,
                          "lastAccess": user.LastAccess,
                          "phoneNumber": user.PhoneNumber,
-                         "plan": helpers.getPlanNickname(user.Company.SubID),
+                         # "plan": helpers.getPlanNickname(user.Company.SubID),
                          }
                 }
 
@@ -131,8 +125,7 @@ def authenticate(email: str, password_to_check: str) -> Callback:
 
         return Callback(True, "Authorised!", data)
     except Exception as exc:
-        print(exc)
-        logging.error("auth_services.authenticate(): " + str(exc))
+        helpers.logError("auth_services.authenticate(): " + str(exc))
         db.session.rollback()
         return Callback(False, "Unauthorised!", None)
 
@@ -155,5 +148,5 @@ def refreshToken() -> Callback:
                 'expiresIn': datetime.now() + BaseConfig.JWT_ACCESS_TOKEN_EXPIRES}
         return Callback(True, "Authorised!", data)
     except Exception as exc:
-        logging.error("auth_services.refreshToken(): " + str(exc))
+        helpers.logError("auth_services.refreshToken(): " + str(exc))
         return Callback(False, "Unauthorised!", None)

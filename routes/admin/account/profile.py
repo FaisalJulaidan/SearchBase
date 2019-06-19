@@ -90,7 +90,7 @@ def change_password():
     if request.method == "POST":
         data = request.json
         # Get user profile
-        callback: Callback = user_services.changePasswordByID(user.get('id', 0), data['newPassword'],
+        callback: Callback = user_services.updatePasswordByID(user.get('id', 0), data['newPassword'],
                                                               data['oldPassword'])
         if not callback.Success:
             return helpers.jsonResponse(False, 400, callback.Message, callback.Data)

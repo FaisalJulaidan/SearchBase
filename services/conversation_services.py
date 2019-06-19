@@ -16,6 +16,10 @@ from utilities import json_schemas, helpers
 # Process chatbot conversation data
 def processConversation(assistantHashID, data: dict) -> Callback:
     try:
+
+        if data['score'] > 1:
+            raise Exception("Score is corrupted")
+
         callback: Callback = assistant_services.getByHashID(assistantHashID)
         if not callback.Success:
             return Callback(False, "Assistant not found!")
@@ -29,6 +33,7 @@ def processConversation(assistantHashID, data: dict) -> Callback:
                 'databaseType': solution.get('databaseType')['enumName']
             })
 
+        # collectedData is an array
         collectedData = data['collectedData']
         conversationData = {
             'collectedData': collectedData,
@@ -38,10 +43,9 @@ def processConversation(assistantHashID, data: dict) -> Callback:
 
         # Validate submitted conversation after adding the modified version of selected solutions
         validate(conversationData, json_schemas.conversation)
-        if data['score'] > 1:
-            raise Exception("Score is corrupted")
 
-        # collectedData is an array, and timeSpent is in seconds.
+
+        # timeSpent is in seconds.
         conversation = Conversation(Data=conversationData,
                                     TimeSpent=data['timeSpent'],
                                     Completed=data['isConversationCompleted'],
@@ -91,8 +95,7 @@ def processConversation(assistantHashID, data: dict) -> Callback:
         return Callback(True, 'Chatbot data has been processed successfully!', conversation)
 
     except Exception as exc:
-        print("conversation_services.processConversation ERROR 1: " + str(exc))
-        logging.error("conversation_services.processConversation(): " + str(exc))
+        helpers.logError("conversation_services.processConversation(): " + str(exc))
         db.session.rollback()
         return Callback(False, "An error occurred while processing chatbot data.")
 
@@ -113,8 +116,7 @@ def getAllByAssistantID(assistantID):
         return Callback(True, "User inputs retrieved successfully.", conversations)
 
     except Exception as exc:
-        print("conversation_services.getAllByAssistantID() Error: ", exc)
-        logging.error("conversation_services.getAllByAssistantID(): " + str(exc))
+        helpers.logError("conversation_services.getAllByAssistantID(): " + str(exc))
         db.session.rollback()
         return Callback(False, 'Could not retrieve the data.')
 
@@ -133,8 +135,7 @@ def getByID(conversationID, assistantID):
         return Callback(True, "ChatbotConversation retrieved successfully.", conversation)
 
     except Exception as exc:
-        print("conversation_services.getByID() Error: ", exc)
-        logging.error("conversation_services.getByID(): " + str(exc))
+        helpers.logError("conversation_services.getByID(): " + str(exc))
         db.session.rollback()
         return Callback(False, 'Could not retrieve the conversation.')
 
@@ -150,9 +151,8 @@ def updateStatus(conversationID, assistantID, newStatus):
         return Callback(True, 'Status updated Successfully')
 
     except Exception as exc:
-        print(exc)
+        helpers.logError("conversation_services.updateStatus(): " + str(exc))
         db.session.rollback()
-        logging.error("conversation_services.updateStatus(): " + str(exc))
         return Callback(False, "Couldn't update status")
 
 
@@ -169,8 +169,7 @@ def getAllRecordsByAssistantIDInTheLast(hours, assistantID):
 
         return Callback(True, "Records retrieved", result)
     except Exception as exc:
-        print("conversation_services.getAllRecordsByAssistantIDInTheLast() ERROR / EMPTY: ", exc)
-        logging.error("conversation_services.getAllRecordsByAssistantIDInTheLast(): " + str(exc))
+        helpers.logError("conversation_services.getAllRecordsByAssistantIDInTheLast(): " + str(exc))
         db.session.rollback()
         return Callback(False, "Error in returning records for the last " + str(hours) +
                         " hours for assistant with ID: " + str(assistantID))
@@ -183,8 +182,7 @@ def deleteByID(conversationID):
         db.session.commit()
         return Callback(True, 'Record has been removed successfully.')
     except Exception as exc:
-        print("userInput_services.deleteByID() Error: ", exc)
-        logging.error("conversation_services.deleteByID(): " + str(exc))
+        helpers.logError("conversation_services.deleteByID(): " + str(exc))
         db.session.rollback()
         return Callback(False, 'Record could not be removed.')
 
@@ -195,7 +193,6 @@ def deleteAll(assistantID):
         db.session.commit()
         return Callback(True, 'Records have been removed successfully.')
     except Exception as exc:
-        print("userInput_services.deleteAll() Error: ", exc)
-        logging.error("conversation_services.deleteAll(): " + str(exc))
+        helpers.logError("conversation_services.deleteAll(): " + str(exc))
         db.session.rollback()
         return Callback(False, 'Records could not be removed.')

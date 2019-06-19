@@ -49,7 +49,8 @@ class BaseConfig(object):
     # Secret keys
     SECRET_KEY = os.urandom(24)
     CSRF_SESSION_KEY = os.urandom(24)
-    JWT_SECRET_KEY = os.urandom(24)
+    JWT_SECRET_KEY = b'\\P\xa1\t\xf2\x86\xc7\x906Z\xb1\x92i\xb0\xde\xa7\xad\xfab\xa0\xed\x10\xa6\xa2' \
+        if os.environ['FLASK_ENV'] == 'development' else os.urandom(24)
 
     # JWT tokens expires in
     JWT_ACCESS_TOKEN_EXPIRES = timedelta(minutes=15)
@@ -100,6 +101,8 @@ class ProductionConfig(BaseConfig):
     DEBUG = False
     TESTING = False
     USE_ENCRYPTION = True
+    SQLALCHEMY_POOL_RECYCLE = 499
+    SQLALCHEMY_POOL_TIMEOUT = 20
 
 
 class DevelopmentConfig(BaseConfig):

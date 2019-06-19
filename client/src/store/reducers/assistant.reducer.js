@@ -30,6 +30,7 @@ export const assistant = (state = initialState, action) => {
                 errorMsg: action.error
             });
 
+
         case actionTypes.FETCH_ASSISTANT_REQUEST:
             return updateObject(state, {
                 assistant: null,
@@ -67,7 +68,6 @@ export const assistant = (state = initialState, action) => {
                 isAdding: false,
                 errorMsg: action.error
             });
-
 
 
         // Update
@@ -173,62 +173,59 @@ export const assistant = (state = initialState, action) => {
                 updateFlowErrorMsg: action.error
             });
 
-
-        case actionTypes.SELECT_ASSISTANT_CRM_REQUEST:
+        // CRM Connection
+        case actionTypes.CONNECT_ASSISTANT_CRM_REQUEST:
             return updateObject(state, {
                 errorMsg: null,
             });
-        case actionTypes.SELECT_ASSISTANT_CRM_SUCCESS:
-            return updateObject(state, {});
-        case actionTypes.SELECT_ASSISTANT_CRM_FAILURE:
+        case actionTypes.CONNECT_ASSISTANT_CRM_SUCCESS:
+            return updateObject(state, {
+                assistant: {...state.assistant, CRMID: action.CRMID}
+            });
+        case actionTypes.CONNECT_ASSISTANT_CRM_FAILURE:
             return updateObject(state, {
                 errorMsg: action.error
             });
 
-        case actionTypes.RESET_ASSISTANT_CRM_REQUEST:
+        case actionTypes.DISCONNECT_ASSISTANT_CRM_REQUEST:
             return updateObject(state, {
                 errorMsg: null,
             });
-        case actionTypes.RESET_ASSISTANT_CRM_SUCCESS:
-            return updateObject(state, {});
-        case actionTypes.RESET_ASSISTANT_CRM_FAILURE:
+        case actionTypes.DISCONNECT_ASSISTANT_CRM_SUCCESS:
+            return updateObject(state, {
+                assistant: {...state.assistant, CRMID: null}
+            });
+
+        case actionTypes.DISCONNECT_ASSISTANT_CRM_FAILURE:
             return updateObject(state, {
                 errorMsg: action.error
             });
 
-        case actionTypes.SELECT_AUTO_PILOT_REQUEST:
+        // AutoPilot Connection
+        case actionTypes.CONNECT_ASSISTANT_AUTO_PILOT_REQUEST:
             return updateObject(state, {
                 errorMsg: null,
             });
-        case actionTypes.SELECT_AUTO_PILOT_SUCCESS:
-
-            assistantsCopy = deepClone(state.assistantList);
-            index = assistantsCopy.findIndex(x => x.ID === action.assistantID);
-            assistantsCopy[index].AutoPilotID = action.autoPilotID;
-
+        case actionTypes.CONNECT_ASSISTANT_AUTO_PILOT_SUCCESS:
+            console.log(action.autoPilotID);
             return updateObject(state, {
-                assistantList: assistantsCopy
+                assistant: {...state.assistant, autoPilotID: action.autoPilotID}
             });
-        case actionTypes.SELECT_AUTO_PILOT_FAILURE:
+        case actionTypes.CONNECT_ASSISTANT_AUTO_PILOT_FAILURE:
             return updateObject(state, {
                 errorMsg: action.error,
             });
 
 
-        case actionTypes.DISCONNECT_AUTO_PILOT_REQUEST:
+        case actionTypes.DISCONNECT_ASSISTANT_AUTO_PILOT_REQUEST:
             return updateObject(state, {
                 errorMsg: null,
             });
-        case actionTypes.DISCONNECT_AUTO_PILOT_SUCCESS:
-
-            assistantsCopy = deepClone(state.assistantList);
-            index = assistantsCopy.findIndex(x => x.ID === action.assistantID);
-            assistantsCopy[index].AutoPilotID = null;
-
+        case actionTypes.DISCONNECT_ASSISTANT_AUTO_PILOT_SUCCESS:
             return updateObject(state, {
-                assistantList: assistantsCopy
+                assistant: {...state.assistant, AutoPilotID: null}
             });
-        case actionTypes.DISCONNECT_AUTO_PILOT_FAILURE:
+        case actionTypes.DISCONNECT_ASSISTANT_AUTO_PILOT_FAILURE:
             return updateObject(state, {
                 errorMsg: action.error
             });

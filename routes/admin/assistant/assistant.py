@@ -22,8 +22,12 @@ def assistants():
             return helpers.jsonResponse(False, 404, "Cannot fetch Assistants")
         return helpers.jsonResponse(True, 200,
                                     "Assistants Returned!",
-                                    {"assistants": helpers.getDictFromLimitedQuery(['ID','Name', 'Description',
-                                                                                    'Message','TopBarText', 'Active'],
+                                    {"assistants": helpers.getDictFromLimitedQuery(['ID',
+                                                                                    'Name',
+                                                                                    'Description',
+                                                                                    'Message',
+                                                                                    'TopBarText',
+                                                                                    'Active'],
                                                                                    callback.Data)})
     if request.method == "POST":
         data = request.json
@@ -155,31 +159,6 @@ def assistant_auto_pilot_connect(assistantID):
     if request.method == "DELETE":
         callback: Callback = assistant_services.disconnectFromCRM(assistantID,
                                                                   user['companyID'])
-
-    if not callback.Success:
-        return helpers.jsonResponse(False, 400, callback.Message, None)
-    return helpers.jsonResponse(True, 200, callback.Message, None)
-
-
-
-@assistant_router.route("/assistant/<int:assistantID>/logo", methods=['POST', 'DELETE'])
-@jwt_required
-def assistant_logo(assistantID):
-
-    # Authenticate
-    user = get_jwt_identity()['user']
-
-    callback: Callback = Callback(False, 'Error!', None)
-    # Upload the logo
-    if request.method == 'POST':
-        if 'file' not in request.files:
-            return helpers.jsonResponse(False, 404, "No file part")
-
-        callback: Callback = assistant_services.uploadLogo(assistantID, request.files['file'], user['companyID'])
-
-    # Delete existing logo
-    if request.method == 'DELETE':
-        callback: Callback = assistant_services.deleteLogo(assistantID, user['companyID'])
 
     if not callback.Success:
         return helpers.jsonResponse(False, 400, callback.Message, None)

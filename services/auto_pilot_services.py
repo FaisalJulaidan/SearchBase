@@ -1,5 +1,5 @@
 from sqlalchemy import and_
-from models import db, Callback, AutoPilot, OpenTimeSlot, Conversation
+from models import db, Callback, AutoPilot, OpenTimes, Conversation
 from datetime import datetime, time
 import logging
 from utilities import helpers
@@ -40,6 +40,29 @@ def processConversation(conversation: Conversation, autoPilot: AutoPilot):
                     if callback.Success:
                         result['acceptanceEmailSentAt'] = datetime.now()
 
+
+                    # Process candidates appointment email if score is accepted
+                    if AutoPilot.SendCandidatesAppointments:
+                        payload = str(conversation.ID) + ";" +\
+                                  str(conversation.Assistant.ID) + ";" +\
+                                  str(autoPilot.CompanyID) + ";" +\
+                                  name
+
+                        callback: Callback = mail_services.send_email(
+                            email,
+                            'Appointment',
+                            '/emails/appointment_letter.html',
+                            companyName=autoPilot.Company.Name,
+                            logoPath=logoPath,
+                            userName=name,
+                            appointmentLink=helpers.getDomain() + "/appointments_picker/" + \
+                                                helpers.verificationSigner.dumps(payload, salt='appointment-key')
+                        )
+
+                        if callback.Success:
+                            result['appointmentEmailSentAt'] = datetime.now()
+
+
                 # Send Rejection Letters
                 elif status is ApplicationStatus.Rejected and AutoPilot.SendRejectionEmail:
                     callback: Callback = mail_services.send_email(
@@ -53,9 +76,7 @@ def processConversation(conversation: Conversation, autoPilot: AutoPilot):
                     if callback.Success:
                         result['rejectionEmailSentAt'] = datetime.now()
 
-                # Process candidates appointment email if score is accepted
-                elif status is ApplicationStatus.Rejected and AutoPilot.SendCandidatesAppointments:
-                    pass
+
 
             # Get application status
             result['applicationStatus'] = __getApplicationResult(conversation.Score, autoPilot)
@@ -68,8 +89,7 @@ def processConversation(conversation: Conversation, autoPilot: AutoPilot):
         return Callback(True, "Automation done via " + autoPilot.Name + " pilot successfully.", result)
 
     except Exception as exc:
-        print(exc)
-        logging.error("auto_pilot.processConversation(): " + str(exc))
+        helpers.logError("auto_pilot.processConversation(): " + str(exc))
         return Callback(False,
                         autoPilot.Name + " pilot failed to function. Please contact TSB support and let them know",
                         None)
@@ -83,21 +103,20 @@ def create(name, desc, companyID: int) -> Callback:
 
         # Create the AutoPilot with default open time slots
         default = {"From": time(8,30), "To": time(12,0), "Duration": 30, "AutoPilot": autoPilot, "Active": False}
-        openTimeSlots = [OpenTimeSlot(Day=0, **default), # Monday
-                         OpenTimeSlot(Day=1, **default),
-                         OpenTimeSlot(Day=2, **default),
-                         OpenTimeSlot(Day=3, **default),
-                         OpenTimeSlot(Day=4, **default),
-                         OpenTimeSlot(Day=5, **default),
-                         OpenTimeSlot(Day=6, **default), # Sunday
+        openTimeSlots = [OpenTimes(Day=0, **default),  # Monday
+                         OpenTimes(Day=1, **default),
+                         OpenTimes(Day=2, **default),
+                         OpenTimes(Day=3, **default),
+                         OpenTimes(Day=4, **default),
+                         OpenTimes(Day=5, **default),
+                         OpenTimes(Day=6, **default),  # Sunday
                          ]
         db.session.add_all(openTimeSlots)
         db.session.commit()
-        return Callback(True, "Got AutoPilot successfully.", __parseAutoPilot(autoPilot))
+        return Callback(True, "Got AutoPilot successfully.", autoPilot)
 
     except Exception as exc:
-        print(exc)
-        logging.error("auto_pilot.create(): " + str(exc))
+        helpers.logError("auto_pilot.create(): " + str(exc))
         db.session.rollback()
         return Callback(False, 'Could not create AutoPilot.')
 
@@ -113,29 +132,54 @@ def getByID(id: int, companyID: int) -> Callback:
         return Callback(True, "Got AutoPilot successfully.", result)
 
     except Exception as exc:
-        print(exc)
-        logging.error("auto_pilot.getByID(): " + str(exc))
+        helpers.logError("auto_pilot.getByID(): " + str(exc))
         return Callback(False, 'Could not get the AutoPilot.')
 
-# AutoPilots will be returned parsed
+
+# Get the list of autoPilots
 def fetchAll(companyID) -> Callback:
     try:
 
-        result: list = []
-        for autoPilot in db.session.query(AutoPilot).filter(AutoPilot.CompanyID == companyID).all():
-            result.append(__parseAutoPilot(autoPilot))
-
+        result = db.session.query(AutoPilot).filter(AutoPilot.CompanyID == companyID).all()
         return Callback(True, "Fetched all AutoPilots successfully.", result)
 
     except Exception as exc:
-        print(exc)
-        logging.error("auto_pilot.fetchAll(): " + str(exc))
+        helpers.logError("auto_pilot.fetchAll(): " + str(exc))
         return Callback(False, 'Could not fetch all the AutoPilots.')
 
 
+# Add openTimeSlots to the autoPilot object after parsing it
+def parseAutoPilot(autoPilot: AutoPilot) -> dict:
+    return {
+        **helpers.getDictFromSQLAlchemyObj(autoPilot),
+        "OpenTimeSlots": helpers.getListFromSQLAlchemyList(autoPilot.OpenTimeSlots)
+    }
+
 # ----- Updaters ----- #
-def update(id, name, desc, active, acceptApplications, acceptanceScore, sendAcceptanceEmail, rejectApplications,
-           rejectionScore, sendRejectionEmail, SendCandidatesAppointments, openTimeSlots, companyID: int) -> Callback:
+def update(id, name, desc, companyID: int) -> Callback:
+    try:
+
+        # Get AutoPilot
+        autoPilot_callback: Callback = getByID(id, companyID)
+        if not autoPilot_callback.Success: return autoPilot_callback
+        autoPilot = autoPilot_callback.Data
+
+        # Update the autoPilot
+        autoPilot.Name = name
+        autoPilot.Description = desc
+
+        # Save all changes
+        db.session.commit()
+        return Callback(True, "Updated the AutoPilot successfully.", autoPilot)
+
+    except Exception as exc:
+        helpers.logError("auto_pilot.update(): " + str(exc))
+        db.session.rollback()
+        return Callback(False, "Couldn't update the AutoPilot.")
+
+
+def updateConfigs(id, name, desc, active, acceptApplications, acceptanceScore, sendAcceptanceEmail, rejectApplications,
+                  rejectionScore, sendRejectionEmail, SendCandidatesAppointments, openTimeSlots, companyID: int) -> Callback:
     try:
 
         # TODO OpenTimeSlots & Appointments Feature
@@ -176,8 +220,7 @@ def update(id, name, desc, active, acceptApplications, acceptanceScore, sendAcce
         return Callback(True, "Updated the AutoPilot successfully.", autoPilot)
 
     except Exception as exc:
-        print(exc)
-        logging.error("auto_pilot.update(): " + str(exc))
+        helpers.logError("auto_pilot.update(): " + str(exc))
         db.session.rollback()
         return Callback(False, 'Could update the AutoPilot.')
 
@@ -192,8 +235,7 @@ def updateStatus(autoPilotID, newStatus, companyID):
         return Callback(True, 'AutoPilot status has been changed.')
 
     except Exception as exc:
-        print("Error in auto_pilot.changeStatus(): ", exc)
-        logging.error("auto_pilot.changeStatus(): " + str(exc))
+        helpers.logError("auto_pilot.changeStatus(): " + str(exc))
         db.session.rollback()
         return Callback(False, "Could not change the AutoPilot's status.")
 
@@ -205,19 +247,14 @@ def removeByID(id, companyID):
         return Callback(True, 'AutoPilot has been deleted.')
 
     except Exception as exc:
-        print("Error in auto_pilot.removeByID(): ", exc)
-        logging.error("auto_pilot.removeByID(): " + str(exc))
+        helpers.logError("auto_pilot.removeByID(): " + str(exc))
         db.session.rollback()
         return Callback(False, 'Error in deleting AutoPilot.')
 
 
 # ----- Private Functions (shouldn't be accessed from the outside) ----- #
 # It takes an autoPilot object and join all its children tables into one dict
-def __parseAutoPilot(autoPilot: AutoPilot) -> dict:
-    return {
-        **helpers.getDictFromSQLAlchemyObj(autoPilot),
-        "OpenTimeSlots": helpers.getListFromSQLAlchemyList(autoPilot.OpenTimeSlots)
-    }
+
 
 def __getApplicationResult(score, autoPilot: AutoPilot) -> ApplicationStatus:
     result = ApplicationStatus.Pending

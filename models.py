@@ -152,7 +152,7 @@ class Assistant(db.Model):
     CalendarID = db.Column(db.Integer, db.ForeignKey('calendar.ID'))
     Calendar = db.relationship('Calendar', back_populates='Assistants')
 
-    AutoPilotID = db.Column(db.Integer, db.ForeignKey('auto_pilot.ID'))
+    AutoPilotID = db.Column(db.Integer, db.ForeignKey('auto_pilot.ID'), ondelete='cascade')
     AutoPilot = db.relationship("AutoPilot", back_populates="Assistants")
 
     # NotifySchedulerJobID = db.Column(db.Integer, db.ForeignKey('apscheduler_jobs.FakeID', ondelete='cascade'), nullable=True, unique=True)
@@ -227,7 +227,7 @@ class AutoPilot(db.Model):
     Company = db.relationship('Company', back_populates='AutoPilots')
 
     Assistants = db.relationship('Assistant', back_populates='AutoPilot')
-    OpenTimeSlots = db.relationship('OpenTimeSlot', back_populates='AutoPilot')
+    OpenTimes = db.relationship('OpenTimes', back_populates='AutoPilot')
 
     # Constraints:
     # cannot have two auto pilot with the same name under one company
@@ -237,7 +237,8 @@ class AutoPilot(db.Model):
         return '<AutoPilot {}>'.format(self.ID)
 
 
-class OpenTimeSlot(db.Model):
+class OpenTimes(db.Model):
+
     ID = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
     Day = db.Column(db.Integer, nullable=False)
     From = db.Column(types.TIME, nullable=False)
@@ -247,7 +248,7 @@ class OpenTimeSlot(db.Model):
 
     # Relationships:
     AutoPilotID = db.Column(db.Integer, db.ForeignKey('auto_pilot.ID', ondelete='cascade'), nullable=False)
-    AutoPilot = db.relationship('AutoPilot', back_populates='OpenTimeSlots')
+    AutoPilot = db.relationship('AutoPilot', back_populates='OpenTimes')
 
     # Constraints:
     __table_args__ = (
@@ -258,7 +259,7 @@ class OpenTimeSlot(db.Model):
     )
 
     def __repr__(self):
-        return '<OpenTimeSlot {}>'.format(self.Day)
+        return '<OpenTime {}>'.format(self.Day)
 
 
 class Appointment(db.Model):

@@ -87,44 +87,50 @@ class Crm extends React.Component {
         const /** @type {CRM}*/crm = this.props.location.state?.crm || {};
         return (
             <NoHeaderPanel>
-                <div className={styles.Title}>
-                    <Avatar shape="square" src={crm.image} className={styles.Avatar}/>
-                    <div className={styles.DetailsWithAvatar}>
-                        <Title level={2}>{crm.type}</Title>
-                        {
-                            crm.type === "Adapt" &&
-                            <AdaptHeader/>
-                        }
-                        {
-                            crm.type === "Bullhorn" &&
-                            <BullhornHeader/>
-                        }
-                        {
-                            crm.type === "Greenhouse" &&
-                            <GreenhouseHeader/>
-                        }
-                        {
-                            crm.type === "gmail" &&
-                            <GoogleHeader/>
-                        }
-                        {
-                            crm.type === "Outlook" &&
-                            <OutlookHeader/>
-                        }
+
+                <div className={styles.Header}>
+
+                    <div style={{marginBottom: 20}}>
+                        <Breadcrumb>
+                            <Breadcrumb.Item>
+                                <a href={"javascript:void(0);"}
+                                   onClick={() => history.push('/dashboard/marketplace')}>
+                                    Marketplace
+                                </a>
+                            </Breadcrumb.Item>
+                            <Breadcrumb.Item>{crm.type}</Breadcrumb.Item>
+                        </Breadcrumb>
+                    </div>
+
+                    <div style={{display: "flex"}}>
+                        <Avatar shape="square" src={crm.image} className={styles.Avatar}/>
+                        <div className={styles.DetailsWithAvatar}>
+                            <Title level={2}>{crm.type}</Title>
+                            {
+                                crm.type === "Adapt" &&
+                                <AdaptHeader/>
+                            }
+                            {
+                                crm.type === "Bullhorn" &&
+                                <BullhornHeader/>
+                            }
+                            {
+                                crm.type === "Greenhouse" &&
+                                <GreenhouseHeader/>
+                            }
+                            {
+                                crm.type === "gmail" &&
+                                <GoogleHeader/>
+                            }
+                            {
+                                crm.type === "Outlook" &&
+                                <OutlookHeader/>
+                            }
+                        </div>
                     </div>
                 </div>
 
                 <div className={styles.Body}>
-                    <Breadcrumb>
-                        <Breadcrumb.Item>
-                            <a href={"javascript:void(0);"}
-                               onClick={() => history.push('/dashboard/marketplace')}>
-                                Marketplace
-                            </a>
-                        </Breadcrumb.Item>
-                        <Breadcrumb.Item>{crm.type}</Breadcrumb.Item>
-                    </Breadcrumb>
-
                     {
                         crm.type === "Bullhorn" ?
                             <>

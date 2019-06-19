@@ -1,9 +1,12 @@
-from models import db, Callback, Assistant
-from services import assistant_services
-from jsonschema import validate
-from utilities import json_schemas, helpers
+import logging
+
 from flask import request
-import logging, enums
+from jsonschema import validate
+
+import enums
+from models import db, Callback, Assistant
+from services import assistant_services, options_services
+from utilities import json_schemas, helpers
 
 
 # ----- Getters ----- #
@@ -32,14 +35,14 @@ def getChatbot(assistantHashID) -> Callback:
 
         data = {
             "assistant": assistant,
-            "isDisabled": False
+            "isDisabled": False,
+            "currencies": options_services.getOptions().Data['databases']['currencyCodes']
         }
 
         return Callback(True, '', data)
 
     except Exception as exc:
-        print(" flow_service.getChatbot() ERROR: ", exc)
-        logging.error("flow_service.getChatbot(): " + str(exc))
+        helpers.logError("flow_service.getChatbot(): " + str(exc))
         return Callback(False, 'Could not retrieve the chatbot flow. Contact TSB team please!')
 
 
@@ -57,8 +60,7 @@ def updateFlow(flow, assistant: Assistant) -> Callback:
         return Callback(True, "Flow updated successfully!")
 
     except Exception as exc:
-        print(exc.args)
-        logging.error("flow_service.updateFlow(): " + str(exc.args))
+        helpers.logError("flow_service.updateFlow(): " + str(exc.args))
         return Callback(False, "The submitted Flow doesn't follow the correct format")
 
 
@@ -93,8 +95,7 @@ def isValidFlow(flow):
         return Callback(True, "Flow is valid")
 
     except Exception as exc:
-        print(exc.args)
-        logging.error("flow_service.isValidFlow(): " + str(exc.args))
+        helpers.logError("flow_service.isValidFlow(): " + str(exc.args))
         return Callback(False, "The submitted Flow doesn't follow the correct format")
 
 
@@ -103,16 +104,14 @@ def isValidBlock(block: dict, blockType: str):
     try:
         validate(block.get('Content'), getattr(json_schemas, blockType))
     except Exception as exc:
-
-        print(exc.args[0])
-        logging.error("flow_service.getChatbot(): " + str(exc.args[0]))
-
+        helpers.logError("flow_service.getChatbot(): " + str(exc.args[0]))
         blockType = block.get('Type')
         msg = "Block data doesn't follow the correct format"
         if blockType:
             msg = "the Block with id '" + block.get('ID') + "' doesn't follow the correct format of " \
                   + str(enums.BlockType(blockType).value) + " block type"
         return Callback(False, msg, exc.args[0])
+
     return Callback(True, "Valid block")
 
 
@@ -124,4 +123,4 @@ def parseFlow(flow: dict):
             for block in group['blocks']:
                 block['DataType'] = enums.DataType[block['DataType']].value
     except Exception as exc:
-        logging.error("flow_service.parseFlow(): " + str(exc))
+        helpers.logError("flow_service.parseFlow(): " + str(exc))

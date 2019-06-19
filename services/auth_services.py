@@ -56,7 +56,7 @@ def signup(details) -> Callback:
 
 
         # Subscribe to basic plan with 14 trial days
-        sub_callback: Callback = sub_services.subscribe(company=company, planID='plan_D3lpeLZ3EV8IfA', trialDays=14)
+        # sub_callback: Callback = sub_services.subscribe(company=company, planID='plan_D3lpeLZ3EV8IfA', trialDays=14)
 
 
         tokenLink = helpers.getDomain() + "/verify_account/" + \
@@ -71,10 +71,10 @@ def signup(details) -> Callback:
                                      verificationLink= tokenLink)
 
         # If subscription failed, remove the new created company and user
-        if not (user_callback.Success or sub_callback.Success or email_callback.Success):
+        if not (user_callback.Success or email_callback.Success):
             # Removing the company will cascade and remove the new created user and roles as well.
             company_services.removeByName(details['companyName'])
-            return sub_callback
+            return user_callback
 
         # ###############
         # Just for testing, But to be REMOVED because user has to verify account manually

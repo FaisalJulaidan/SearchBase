@@ -35,7 +35,7 @@ def signup_process():
     if request.method == "POST":
         callback: Callback = auth_services.signup(request.json)
         if not callback.Success:
-            return helpers.jsonResponse(False, 401, callback.Message, callback.Data)
+            return helpers.jsonResponse(False, 401, "Couldn't sign you up", callback.Data)
         return helpers.jsonResponse(True, 200, callback.Message, callback.Data)
 
 

@@ -1,4 +1,4 @@
-from models import db, Role, Company, Assistant, Plan, Conversation, Database, Candidate, CRM, Appointment
+from models import db, Role, Company, Assistant, Conversation, Database, Candidate, CRM, Appointment
 from services import user_services, flow_services, auto_pilot_services, assistant_services, scheduler_services
 from datetime import datetime, timedelta, time
 from utilities import helpers

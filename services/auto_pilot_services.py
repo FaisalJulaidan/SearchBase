@@ -24,7 +24,7 @@ def processConversation(conversation: Conversation, autoPilot: AutoPilot):
 
             def __processSendingEmails (email, status: ApplicationStatus, autoPilot: AutoPilot):
 
-                name = " ".join(keywords.get(DataType.CandidateName.value['name'], [""])) # get user candidate name
+                name = " ".join(keywords.get(DataType.CandidateName.value['name'], [""])) # get candidate name
                 logoPath = sfs.PUBLIC_URL + sfs.UPLOAD_FOLDER + sfs.COMPANY_LOGOS_PATH + "/" + autoPilot.Company.LogoPath
 
                 # Send Acceptance Letters
@@ -51,7 +51,7 @@ def processConversation(conversation: Conversation, autoPilot: AutoPilot):
                         callback: Callback = mail_services.send_email(
                             email,
                             'Appointment',
-                            '/emails/appointment_letter.html',
+                            '/emails/appointment_picker.html',
                             companyName=autoPilot.Company.Name,
                             logoPath=logoPath,
                             userName=name,
@@ -75,7 +75,6 @@ def processConversation(conversation: Conversation, autoPilot: AutoPilot):
 
                     if callback.Success:
                         result['rejectionEmailSentAt'] = datetime.now()
-
 
 
             # Get application status

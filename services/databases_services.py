@@ -472,9 +472,10 @@ def scanJobs(session, dbIDs, extraJobs=None):
         return Callback(False, 'Error while search the database for matches!')
 
 
+
 def __wordsCounter(dataType: DT, dbColumn, keywords, df, x=1):
     if keywords.get(dataType.value['name']):
-        df['Score'] += x * df[dbColumn.name].str.count('|'.join(keywords[dataType.value['name']]),
+        df['Score'] += x * df[df[dbColumn.name].notnull()][dbColumn.name].str.count('|'.join(keywords[dataType.value['name']]),
                                                        flags=re.IGNORECASE) | 0
 
 

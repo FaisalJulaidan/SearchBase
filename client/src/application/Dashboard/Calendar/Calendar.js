@@ -13,7 +13,7 @@ class Calendar extends React.Component {
 
     state = {
         value: moment(),
-        visible: false,
+        appointmentModalVisible: false,
         appointments: [
             {
                 name: "Jamie Burns",
@@ -32,14 +32,14 @@ class Calendar extends React.Component {
     };
 
     onCloseModal = () => {
-        this.setState({newAutoPilotModalVisible: false});
+        this.setState({appointmentModalVisible: false});
     };
 
     onSelect = value => {
         const x = this.getListData(value);
 
         if (x.length)
-            this.setState({value, newAutoPilotModalVisible: true});
+            this.setState({value, appointmentModalVisible: true});
         else
             this.setState({value});
     };
@@ -118,7 +118,7 @@ class Calendar extends React.Component {
                            onOk={this.onCloseModal}
                            okText="Save"
                            cancelText="Cancel"
-                           visible={this.state.visible}>
+                           visible={this.state.appointmentModalVisible}>
                         {
                             this.state.appointments.map((a, index) =>
                                 <div key={index}>

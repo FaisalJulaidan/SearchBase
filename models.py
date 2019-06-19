@@ -154,11 +154,7 @@ class Assistant(db.Model):
     AutoPilotID = db.Column(db.Integer, db.ForeignKey('auto_pilot.ID', ondelete='cascade'))
     AutoPilot = db.relationship("AutoPilot", back_populates="Assistants")
 
-    # NotifySchedulerJobID = db.Column(db.Integer, db.ForeignKey('apscheduler_jobs.FakeID', ondelete='cascade'), nullable=True, unique=True)
-    # NotifySchedulerJob = db.relationship('ApschedulerJobs', foreign_keys=[NotifySchedulerJobID], back_populates='NotifySchedulerJob')
-
     # - Many to one
-    Statistics = db.relationship('Statistics', back_populates='Assistant')
     Conversations = db.relationship('Conversation', back_populates='Assistant')
     Appointments = db.relationship('Appointment', back_populates='Assistant')
 
@@ -278,14 +274,15 @@ class Appointment(db.Model):
 
 
     # Constraints:
-    __table_args__ = (db.UniqueConstraint('AssistantID', 'DateTime', name='uix1_appointment'),)
+    __table_args__ = (db.UniqueConstraint('AssistantID', 'DateTime', name='uix1_appointment'),
+                      db.UniqueConstraint('ConversationID', 'DateTime', name='uix2_appointment'),)
 
 
 class CRM(db.Model):
 
     ID = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
     Type = db.Column(Enum(enums.CRM), nullable=True)
-    Auth = db.Column(EncryptedType(JsonEncodedDict, os.environ['SECRET_KEY_DB'], AesEngine, 'pkcs5'), nullable=True)
+    Auth = db.Column(EncryptedType(JsonEncodedDict, os.environ['DB_SECRET_KEY'], AesEngine, 'pkcs5'), nullable=True)
 
     # Relationships:
     CompanyID = db.Column(db.Integer, db.ForeignKey('company.ID', ondelete='cascade'), nullable=False)
@@ -299,41 +296,6 @@ class CRM(db.Model):
 
     def __repr__(self):
         return '<CRM {}>'.format(self.ID)
-
-
-class Statistics(db.Model):
-    ID = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
-    Name = db.Column(db.String(128), nullable=False)
-    DateTime = db.Column(db.DateTime(), nullable=False, default=datetime.now)
-    Opened = db.Column(db.Integer, nullable=False, default=False)
-    QuestionsAnswered = db.Column(db.Integer, nullable=False, default=0)
-    SolutionsReturned = db.Column(db.Integer, nullable=False, default=0)
-
-    # Relationships:
-    AssistantID = db.Column(db.Integer, db.ForeignKey('assistant.ID', ondelete='cascade'), nullable=False)
-    Assistant = db.relationship('Assistant', back_populates='Statistics')
-
-    def __repr__(self):
-        return '<Statistics {}>'.format(self.Name)
-
-
-class Plan(db.Model):
-    ID = db.Column(db.String(25), primary_key=True, unique=True)
-    Nickname = db.Column(db.String(40), nullable=False, unique=True)
-    MaxSolutions = db.Column(db.Integer, nullable=False, default=0)
-    MaxBlocks = db.Column(db.Integer, nullable=False, default=0)
-    ActiveBotsCap = db.Column(db.Integer, nullable=False, default=0)
-    InactiveBotsCap = db.Column(db.Integer, nullable=False, default=0)
-    AdditionalUsersCap = db.Column(db.Integer, nullable=False, default=0)
-    ExtendedLogic = db.Column(db.Boolean, nullable=False, default=False)
-    ImportDatabase = db.Column(db.Boolean, nullable=False, default=False)
-    CompanyNameOnChatbot = db.Column(db.Boolean, nullable=False, default=False)
-
-    # Relationships:
-    ###
-
-    def __repr__(self):
-        return '<Plan {}>'.format(self.Nickname)
 
 
 class Newsletter(db.Model):
@@ -383,7 +345,7 @@ class Candidate(db.Model):
     CandidateEmail = db.Column(db.String(64), nullable=True)
     CandidateMobile = db.Column(db.String(20), nullable=True)
     CandidateLocation = db.Column(db.String(64), nullable=False) # Required
-    CandidateSkills = db.Column(db.String(1080), nullable=False) # Required
+    CandidateSkills = db.Column(db.String(5000), nullable=False) # Required
     CandidateLinkdinURL = db.Column(db.String(512), nullable=True)
     CandidateAvailability = db.Column(db.String(64), nullable=True)
     CandidateJobTitle = db.Column(db.String(120), nullable=True)
@@ -411,8 +373,8 @@ class Job(db.Model):
     JobType = db.Column(db.String(64), nullable=True)
     JobSalary = db.Column(db.Float(), nullable=True)
     Currency = db.Column(CurrencyType)
-    JobEssentialSkills = db.Column(db.String(512), nullable=True)
-    JobDesiredSkills = db.Column(db.String(512), nullable=True)
+    JobEssentialSkills = db.Column(db.String(5000), nullable=True)
+    JobDesiredSkills = db.Column(db.String(5000), nullable=True)
     JobYearsRequired = db.Column(db.Integer, nullable=True)
     JobStartDate = db.Column(db.DateTime(), nullable=True)
     JobEndDate = db.Column(db.DateTime(), nullable=True)

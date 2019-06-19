@@ -81,7 +81,7 @@ class Database extends React.Component {
                                    dataSource={databaseContent?.records}
                                    size='large'
                                    bordered={true}
-                                   loading={this.props.isLoading}
+                                   loading={this.props.isFetchedDatabaseLoading}
                                    pagination={{
                                        pageSize: databaseContent?.totalPerPage,
                                        current: this.state.currentPage,
@@ -103,6 +103,7 @@ function mapStateToProps(state) {
         databasesList: state.database.databasesList,
         database: state.database.fetchedDatabase,
         isLoading: state.database.isLoading,
+        isFetchedDatabaseLoading: state.database.isFetchedDatabaseLoading,
         options: state.options.options,
     };
 }

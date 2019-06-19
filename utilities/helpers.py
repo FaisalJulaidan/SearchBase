@@ -1,5 +1,5 @@
 from flask import json, after_this_request, request
-from models import db, Assistant, Plan, Job, Callback
+from models import db, Assistant, Job, Callback
 from services import flow_services, assistant_services
 from datetime import time
 from enum import Enum
@@ -23,7 +23,7 @@ geoIP = geoip2.webservice.Client(140914, 'cKrqAZ675SPb')
 # geoIP = geoip2.webservice.Client(140914, os.environ['GEOIP_KEY'])
 
 # Signer
-verificationSigner = URLSafeTimedSerializer(os.environ['SECRET_KEY_TEMP'])
+verificationSigner = URLSafeTimedSerializer(os.environ['TEMP_SECRET_KEY'])
 
 # Configure logging system
 logging.basicConfig(filename='logs/errors.log',
@@ -31,7 +31,7 @@ logging.basicConfig(filename='logs/errors.log',
                     format='%(asctime)s -- %(message)s')
 
 # Fernet for encryption
-fernet = Fernet(os.environ['SECRET_KEY_TEMP'])
+fernet = Fernet(os.environ['TEMP_SECRET_KEY'])
 
 # Currency converter by forex-python
 currencyConverter = CurrencyRates()

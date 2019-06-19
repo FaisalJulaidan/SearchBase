@@ -32,9 +32,8 @@ class App extends Component {
                         <Route path="/signup" component={Signup}/>
                         <Route path="/forget_password" component={ForgetPassword}/>
                         <Route path="/reset_password/" component={NewResetPassword}/>
-                        <Route path="/account_verification/" component={AccountVerification}/>
+                        <Route path="/verify_account/" component={AccountVerification}/>
                         <Route path="/appointments_picker/" component={AppointmentsPicker}/>
-                        <Route path="/verify_account/" component={AppointmentsPicker}/>
                         <PrivateRoute path="/dashboard" component={Dashboard}/>
                         <Redirect to={{pathname: '/dashboard'}}/>
                     </Switch>

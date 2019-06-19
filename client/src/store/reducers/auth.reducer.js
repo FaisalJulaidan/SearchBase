@@ -77,6 +77,19 @@ export const auth = (state = initialState, action) => {
                 user: null,
                 errorMsg: null
             });
+
+        case actionTypes.VALIDATE_ACCOUNT_REQUEST:
+            return updateObject(state, {
+                errorMsg: null,
+            });
+        case actionTypes.VALIDATE_ACCOUNT_SUCCESS:
+            return updateObject(state, {
+            });
+        case actionTypes.VALIDATE_ACCOUNT_FAILURE:
+            return updateObject(state, {
+                errorMsg: action.error
+            });
+
         default:
             return state
     }

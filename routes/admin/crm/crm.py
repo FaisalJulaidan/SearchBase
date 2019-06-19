@@ -4,7 +4,7 @@ from flask_jwt_extended import jwt_required, get_jwt_identity
 from models import Callback
 from services.Marketplace.CRM import crm_services, Bullhorn
 from services.Marketplace.CRM import crm_services
-from services.Marketplace.Mail import Outlook, Google
+from services.Marketplace.Calendar import Outlook, Google
 from utilities import helpers
 
 from datetime import datetime

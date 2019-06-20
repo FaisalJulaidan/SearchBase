@@ -1,6 +1,9 @@
 version: '3'
 
 
+volumes:
+  prod-data:
+
 services:
   mysql:
     image: mysql
@@ -14,6 +17,8 @@ services:
       - MYSQL_PASSWORD=password
     networks:
       - frontend
+    volumes:
+      - prod-data:/var/lib/mysql
 
   nginx:
     image: nginx:1.15-alpine

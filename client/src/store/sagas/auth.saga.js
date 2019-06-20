@@ -78,7 +78,7 @@ function* forgetPassword({data}) {
 function* newResetPassword({data}) {
     try {
         loadingMessage('Saving new password...', 0);
-        yield axios.post(`/api/reset_password/`+ data["payload"], {...data}, {
+        yield axios.post(`/api/reset_password/` + data["payload"], {...data}, {
             headers: {'Content-Type': 'application/json'},
         });
         yield put(authActions.newResetPasswordSuccess());
@@ -100,6 +100,25 @@ function* logout() {
     yield localStorage.clear();
     yield history.push('/login');
     successMessage('You have been logged out');
+}
+
+
+function* validateAccount({token, meta}) {
+    try {
+        const res = yield axios.post(`/api/verify_account/${token}`, {}, {
+            headers: {'Content-Type': 'application/json'},
+        });
+        successMessage(res.data?.msg || 'Account validated');
+        yield put({...authActions.validateAccountSuccess(res.data?.data), meta});
+    } catch (error) {
+        const msg = error.response?.data?.msg || 'Account validation is failed';
+        errorMessage(msg);
+        yield put({...authActions.validateAccountFailure(msg), meta});
+    }
+}
+
+function* watchValidateAccount() {
+    yield takeLatest(actionTypes.VALIDATE_ACCOUNT_REQUEST, validateAccount)
 }
 
 
@@ -130,6 +149,8 @@ export function* authSaga() {
         watchSignup(),
         watchForgetPassword(),
         watchLogout(),
-        watchNewResetPassword()
+        watchNewResetPassword(),
+        watchValidateAccount()
+
     ])
 }

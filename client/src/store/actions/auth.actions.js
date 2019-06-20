@@ -92,7 +92,30 @@ const logout = () => {
     return {
         type: actionTypes.LOGOUT
     };
+}
+
+const validateAccount = (token) => {
+    return {
+        type: actionTypes.VALIDATE_ACCOUNT_REQUEST,
+        meta: {thunk: true},
+        token
+    };
 };
+
+const validateAccountSuccess = (msg) => {
+    return {
+        type: actionTypes.VALIDATE_ACCOUNT_SUCCESS,
+        msg
+    };
+};
+
+const validateAccountFailure = (error) => {
+    return {
+        type: actionTypes.VALIDATE_ACCOUNT_FAILURE,
+        error
+    };
+};
+
 
 
 export const authActions = {
@@ -113,4 +136,9 @@ export const authActions = {
     newResetPasswordFailure,
 
     logout,
+
+    validateAccount,
+    validateAccountSuccess,
+    validateAccountFailure,
+
 };

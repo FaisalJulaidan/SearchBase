@@ -277,23 +277,11 @@ def scanCandidates(session, dbIDs, extraCandidates=None):
             df = df.append(extraCandidates, ignore_index=True)  # TODO
             # print("df: ", df["CandidateLocation"])
 
-        # Convert job salary to the submitted currency from chat (Format: "Greater Than 5000 GBP")
-        if keywords.get(DT.JobSalary.value['name']):
-            inputSplitted = keywords.get(DT.JobSalary.value['name'])[-1].split(' ')
-            df[Job.JobSalary.name] = df.apply(lambda x: helpers.currencyConverter.convert(x[Job.Currency.name], inputSplitted[3], x[Job.JobSalary.name]), axis=1)
-            df[Job.Currency.name] = inputSplitted[3]
-
-        elif keywords.get(DT.CandidateDesiredSalary.value['name']):
-            inputSplitted = keywords.get(DT.JobSalary.value['name'])[-1].split(' ')
-            df[Job.JobSalary.name] = df.apply(lambda x: helpers.currencyConverter.convert(x[Job.Currency.name], inputSplitted[3], x[Job.JobSalary.name]), axis=1)
-            df[Job.Currency.name] = inputSplitted[3]
-
-        # Desired Salary
-        __salary(DT.CandidateDesiredSalary, Candidate.CandidateDesiredSalary, keywords, df, 3)
-        __salary(DT.JobSalary, Candidate.CandidateDesiredSalary, keywords, df, 3)
+        # Salary comparision
+        df['Score'] += df.apply(lambda row: __salary(row, Candidate.CandidateDesiredSalary, Candidate.Currency, keywords, 8), axis=1)
 
         # Years of EXP
-        __numCounter(DT.CandidateYearsExperience, '<', Candidate.CandidateYearsExperience, keywords, df, 5)
+        df['Score'] += df.apply(lambda row: __numCounter(row, DT.CandidateYearsExperience, '<', Job.CandidateYearsExperience, keywords, 5), axis=1)
 
         # Education
         __wordsCounter(DT.CandidateEducation, Candidate.CandidateEducation, keywords, df, 1)
@@ -363,31 +351,19 @@ def scanJobs(session, dbIDs, extraJobs=None):
         df = df.drop('DatabaseID', axis=1)  # Drop column
 
         keywords = session['keywordsByDataType']
-        df['Score'] = 8  # Add column for tracking score
+        df['Score'] = 0  # Add column for tracking score
         df['Source'] = "Internal Database"  # Source of solution e.g. Bullhorn, Adapt...
 
         if extraJobs:
             df = df.append(extraJobs, ignore_index=True)
 
 
-        # Convert job salary to the submitted currency from chat
-        if keywords.get(DT.JobSalary.value['name']):
-            inputSplitted = keywords.get(DT.JobSalary.value['name'])[-1].split(' ') # (Format: "Greater Than 5000 GBP")
-            df[Job.JobSalary.name] = df.apply(lambda x: helpers.currencyConverter.convert(x[Job.Currency.name], inputSplitted[3], x[Job.JobSalary.name]), axis=1)
-            df[Job.Currency.name] = inputSplitted[3]
-
-        elif keywords.get(DT.CandidateDesiredSalary.value['name']):
-            inputSplitted = keywords.get(DT.JobSalary.value['name'])[-1].split(' ')
-            df[Job.JobSalary.name] = df.apply(lambda x: helpers.currencyConverter.convert(x[Job.Currency.name], inputSplitted[3], x[Job.JobSalary.name] or 0), axis=1)
-            df[Job.Currency.name] = inputSplitted[3]
-
-        # Salary
-        __salary(DT.JobSalary, Job.JobSalary, keywords, df, 8)
-        __salary(DT.CandidateDesiredSalary, Job.JobSalary, keywords, df, 8)
+        # Salary comparision
+        df['Score'] += df.apply(lambda row: __salary(row, Job.JobSalary, Job.Currency, keywords, 8), axis=1)
 
         # Year Required
-        __numCounter(DT.JobYearsRequired, '>', Job.JobYearsRequired, keywords, df, 5)
-        __numCounter(DT.CandidateYearsExperience, '>', Job.JobYearsRequired, keywords, df, 5)
+        df['Score'] += df.apply(lambda row: __numCounter(row, DT.JobYearsRequired, '>', Job.JobYearsRequired, keywords, 5), axis=1)
+        df['Score'] += df.apply(lambda row: __numCounter(row, DT.CandidateYearsExperience, '>', Job.JobYearsRequired, keywords, 5), axis=1)
 
         # Job Title
         __wordsCounter(DT.JobTitle, Job.JobTitle, keywords, df, 2)
@@ -411,6 +387,7 @@ def scanJobs(session, dbIDs, extraJobs=None):
         # Results
         topResults = json.loads(df[df['Score'] > 0].nlargest(session.get('showTop', 0), 'Score')
                                 .to_json(orient='records'))
+
 
         jobType = ["This role is a [jobType]", "This job is a [jobType]"]
         location = [" located in [location]. "]
@@ -479,22 +456,42 @@ def __wordsCounter(dataType: DT, dbColumn, keywords, df, x=1):
                                                        flags=re.IGNORECASE) | 0
 
 
-def __numCounter(dataType: DT, compare, dbColumn, keywords, df, plus=1):
-    if keywords.get(dataType.value['name']):
-        if compare == '>':
-            df.loc[df[dbColumn.name] <= float(keywords[dataType.value['name']][-1]), 'Score'] += plus
-        else: # '<'
-            df.loc[df[dbColumn.name] >= float(keywords[dataType.value['name']][-1]), 'Score'] += plus
+def __numCounter(row, dataType: DT, compareSign, dbColumn, keywords, plus=1):
+
+    userInputList: list = keywords.get(dataType.value['name'])
+    if not userInputList or len(userInputList) == 0: return 0 # only continue this function if there us user input
+    dbInput = row[dbColumn.name] or 0
+
+    userInput = userInputList[-1] # take last input in the chatbot of that data type
+    if dataType.JobYearsRequired or dataType.CandidateYearsExperience:
+        plus += 10 if int(userInput) > 10 else int(userInput) # add user's years of exp to the score (max=10)
+
+    # Compare
+    if compareSign == '>':
+        return plus if float(userInput) >= dbInput else 0
+    else: # '<'
+        return plus if float(userInput) <= dbInput else 0
 
 
-def __salary(dataType: DT, dbColumn, keywords, df, plus=1):
-    input = keywords.get(dataType.value['name'])
-    if input:
-        inputSplitted = input[-1].split(' ') # Less Than 5000 GBP
-        if inputSplitted[0] == 'Less':
-            df.loc[df[dbColumn.name] <= float(inputSplitted[2]), 'Score'] += plus
-        else: # Greater
-            df.loc[df[dbColumn.name] >= float(inputSplitted[2]), 'Score'] += plus
+
+def __salary(row, dbSalaryColumn: DT, dbCurrencyColumn: DT, keywords, plus=4):
+
+    userInput = keywords.get(DT.JobSalary.value['name'], keywords.get(DT.CandidateDesiredSalary.value['name']))
+    if not userInput: return 0 # only continue this function if there us user input
+    userSalary = userInput[-1].split(' ') # e.g. Less Than 5000 GBP
+
+    # Convert salary currency if did not match with user's entered currency
+    dbSalary = row[dbSalaryColumn.name] or 0
+    if (not row[dbCurrencyColumn.name] == userSalary[3]) and dbSalary > 0:
+        helpers.currencyConverter.convert(row[dbCurrencyColumn.name], userSalary[3], dbSalary)
+
+
+    # Compare salaries, if true then return 'plus' to be added to the score otherwise 0
+    if userSalary[0] == 'Less':
+        return plus if dbSalary <= float(userSalary[2]) else 0
+    else: # Greater
+        return plus if dbSalary >= float(userSalary[2]) else 0
+
 
 
 def createPandaCandidate(id, name, email, mobile, location, skills,

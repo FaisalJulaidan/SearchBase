@@ -1,4 +1,4 @@
-from models import db, Role, Company, Assistant, Conversation, Database, Candidate, CRM, Appointment
+from models import db, Role, Company, Assistant, Conversation, Database, Candidate, CRM, Appointment, Job
 from services import user_services, flow_services, auto_pilot_services, assistant_services, scheduler_services
 from datetime import datetime, timedelta, time
 from utilities import helpers
@@ -257,8 +257,11 @@ def generate():
     db1: Database = Database(Name='db1', Type=enums.DatabaseType.Candidates, Company=aramco)
     db2: Database = Database(Name='db2', Type=enums.DatabaseType.Candidates, Company=aramco)
 
+    db3: Database = Database(Name='db3', Type=enums.DatabaseType.Jobs, Company=aramco)
+
     db.session.add(db1)
     db.session.add(db2)
+    db.session.add(db3)
 
     db.session.add(addCandidate(db1, 'Faisal', 2000, "Software Engineer", "python, java, javascript, SQL",
                                 5, "London"))
@@ -269,11 +272,14 @@ def generate():
     db.session.add(addCandidate(db2, 'Ahmed', 1500, "Web Developer", "html,css, javascript",
                                 2, "Cardiff"))
 
+    db.session.add(addJob(db3, 'Python Developer', 'a job for someone who is good at python', 1500, 'London', Currency('USD')))
+    db.session.add(addJob(db3, 'Python Developer', None, None, 'London', Currency('GBP')))
+
     for i in list(range(120)):
         db.session.add(addCandidate(db1, 'Ahmed', 1500, "Web Developer", "html,css, javascript",
                                     2, "Cardiff"))
 
-    # Add CRM conncetion for aramco company
+    # Add CRM connection for aramco company
     db.session.add(CRM(Type=enums.CRM.Adapt, Company=aramco, Auth={
         "domain": "PartnerDomain9",
         "username": "SD9USR8",
@@ -309,3 +315,12 @@ def addCandidate(db, name, desiredSalary, jobTitle, skills, exp, location):
                      CandidateYearsExperience = exp,
                      CandidateLocation = location,
                      Currency= Currency('USD'))
+
+
+def addJob(db, title, description, salary, location, currency: Currency or None):
+    return Job(Database=db,
+               JobTitle=title,
+               JobDescription=description,
+               JobLocation=location,
+               JobSalary=salary,
+               Currency= currency)

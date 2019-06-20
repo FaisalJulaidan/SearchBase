@@ -352,7 +352,7 @@ class Candidate(db.Model):
     CandidateEducation = db.Column(db.String(64), nullable=True)
     CandidateYearsExperience = db.Column(db.Float(), nullable=True)
     CandidateDesiredSalary = db.Column(db.Float(), nullable=True)
-    Currency = db.Column(CurrencyType)
+    Currency = db.Column(CurrencyType, nullable=False) # Required
 
 
     # Relationships:
@@ -372,7 +372,7 @@ class Job(db.Model):
     JobLocation = db.Column(db.String(64), nullable=False) # Required
     JobType = db.Column(db.String(64), nullable=True)
     JobSalary = db.Column(db.Float(), nullable=True)
-    Currency = db.Column(CurrencyType)
+    Currency = db.Column(CurrencyType, nullable=False) # Required
     JobEssentialSkills = db.Column(db.String(5000), nullable=True)
     JobDesiredSkills = db.Column(db.String(5000), nullable=True)
     JobYearsRequired = db.Column(db.Integer, nullable=True)

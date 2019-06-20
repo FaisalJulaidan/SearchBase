@@ -94,24 +94,24 @@ const logout = () => {
     };
 }
 
-const validateAccount = (token) => {
+const verifyAccount = (token) => {
     return {
-        type: actionTypes.VALIDATE_ACCOUNT_REQUEST,
+        type: actionTypes.VERIFY_ACCOUNT_REQUEST,
         meta: {thunk: true},
         token
     };
 };
 
-const validateAccountSuccess = (msg) => {
+const verifyAccountSuccess = (msg) => {
     return {
-        type: actionTypes.VALIDATE_ACCOUNT_SUCCESS,
+        type: actionTypes.VERIFY_ACCOUNT_SUCCESS,
         msg
     };
 };
 
-const validateAccountFailure = (error) => {
+const verifyAccountFailure = (error) => {
     return {
-        type: actionTypes.VALIDATE_ACCOUNT_FAILURE,
+        type: actionTypes.VERIFY_ACCOUNT_FAILURE,
         error
     };
 };
@@ -137,8 +137,8 @@ export const authActions = {
 
     logout,
 
-    validateAccount,
-    validateAccountSuccess,
-    validateAccountFailure,
+    verifyAccount,
+    verifyAccountSuccess,
+    verifyAccountFailure,
 
 };

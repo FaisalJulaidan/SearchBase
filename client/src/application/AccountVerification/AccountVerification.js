@@ -13,20 +13,23 @@ class AccountVerification extends React.Component {
 
     requestToken = 'dummyText';
 
-    isSent = false;
-    isVerified = false;
+    state = {
+        isSent: false,
+        isVerified: false
+    };
 
     componentDidMount() {
+        this.setState({isSent: false, isVerified: false});
+
         this.requestToken = this.props.location.pathname.split('/')[2];
-        this.props.dispatch(authActions.validateAccount(this.requestToken))
+
+        this.props.dispatch(authActions.verifyAccount(this.requestToken))
             .then(() => {
-                this.isSent = true;
-                this.isVerified = true;
+                this.setState({isSent: true, isVerified: true});
                 setTimeout(() => history.push(`/login`), 5000)
             })
             .catch(() => {
-                this.isSent = true;
-                this.isVerified = false;
+                this.setState({isSent: true, isVerified: false});
                 setTimeout(() => window.location.href = 'http://thesearchbase.com', 5000)
             })
     }
@@ -48,23 +51,37 @@ class AccountVerification extends React.Component {
 
                 <div className={styles.Wrapper}>
 
-                    {/*<div style={{textAlign: 'center'}}>*/}
-                    {/*<img src={getLink('/static/images/undraw/success.svg')} alt="" height={300}/>*/}
-                    {/*<Typography.Title>*/}
-                    {/*Your account is verified*/}
-                    {/*</Typography.Title>*/}
-                    {/*</div>*/}
+                    {
+                        this.state.isSent &&
+                        this.state.isVerified &&
+                        <div style={{textAlign: 'center'}}>
+                            <img src={getLink('/static/images/undraw/success.svg')} alt="" height={300}/>
+                            <Typography.Title>
+                                Your account is verified
+                            </Typography.Title>
+                            <Paragraph type="secondary">
+                                You will be redirected to login page in seconds
+                            </Paragraph>
+                        </div>
+                    }
 
+                    {
+                        this.state.isSent &&
+                        !this.state.isVerified &&
+                        <div style={{textAlign: 'center'}}>
+                            <img src={getLink('/static/images/undraw/failed.svg')} alt="" height={300}/>
+                            <Title>
+                                Account verification is failed
+                            </Title>
+                            <Paragraph type="secondary">
+                                This might be the link is old, please contact us.
+                            </Paragraph>
+                            <Paragraph type="secondary">
+                                You will be redirected to home page in seconds
+                            </Paragraph>
+                        </div>
+                    }
 
-                    <div style={{textAlign: 'center'}}>
-                        <img src={getLink('/static/images/undraw/failed.svg')} alt="" height={300}/>
-                        <Title>
-                            Account verification is failed
-                        </Title>
-                        <Paragraph type="secondary">
-                            This might be the link is old, please contact us.
-                        </Paragraph>
-                    </div>
 
                 </div>
 

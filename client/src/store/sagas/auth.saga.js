@@ -103,22 +103,22 @@ function* logout() {
 }
 
 
-function* validateAccount({token, meta}) {
+function* verifyAccount({token, meta}) {
     try {
         const res = yield axios.post(`/api/verify_account/${token}`, {}, {
             headers: {'Content-Type': 'application/json'},
         });
-        successMessage(res.data?.msg || 'Account validated');
-        yield put({...authActions.validateAccountSuccess(res.data?.data), meta});
+        successMessage(res.data?.msg || 'Account verified');
+        yield put({...authActions.verifyAccountSuccess(res.data?.data), meta});
     } catch (error) {
         const msg = error.response?.data?.msg || 'Account validation is failed';
         errorMessage(msg);
-        yield put({...authActions.validateAccountFailure(msg), meta});
+        yield put({...authActions.verifyAccountFailure(msg), meta});
     }
 }
 
-function* watchValidateAccount() {
-    yield takeLatest(actionTypes.VALIDATE_ACCOUNT_REQUEST, validateAccount)
+function* watchVerifyAccount() {
+    yield takeLatest(actionTypes.VERIFY_ACCOUNT_REQUEST, verifyAccount)
 }
 
 
@@ -150,7 +150,7 @@ export function* authSaga() {
         watchForgetPassword(),
         watchLogout(),
         watchNewResetPassword(),
-        watchValidateAccount()
+        watchVerifyAccount()
 
     ])
 }

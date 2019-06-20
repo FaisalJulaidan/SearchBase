@@ -127,7 +127,7 @@ elif os.environ['FLASK_ENV'] == 'development':
     #     appointmentLink=helpers.getDomain() + "/appointments_picker/" + \
     #                     helpers.verificationSigner.dumps(payload, salt='appointment-key')
     # )
-    # print( <= 5)
+
     print('Development mode running...')
 
 else:

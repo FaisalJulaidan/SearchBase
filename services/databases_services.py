@@ -361,7 +361,8 @@ def scanJobs(session, dbIDs, extraJobs=None):
 
 
         # Salary comparision
-        df[['Score', Job.JobSalary.name, Job.Currency.name]] = df.apply(lambda row: __salary(row, Job.JobSalary, Job.Currency, keywords, 8),
+        df[['Score', Job.JobSalary.name, Job.Currency.name]] = \
+            df.apply(lambda row: __salary(row, Job.JobSalary, Job.Currency, keywords, 8),
                                                                         axis=1, result_type='expand')
 
         # Year Required

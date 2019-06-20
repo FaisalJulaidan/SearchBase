@@ -56,10 +56,10 @@ class Marketplace extends React.Component {
     };
 
     componentDidMount() {
-        let loc = this.props.location.search.replace("?", "").split("&")
-        let isGoogleAuthorize = loc.filter(e => e.substring(0, "googleVerification".length) === "googleVerification").length > 0
+        let loc = this.props.location.search.replace("?", "").split("&");
+        let isGoogleAuthorize = loc.filter(e => e.substring(0, "googleVerification".length) === "googleVerification").length > 0;
         if(isGoogleAuthorize){
-            let code = loc.filter(e => e.substr(0, 4) === "code")[0].replace("code=", "")
+            let code = loc.filter(e => e.substr(0, 4) === "code")[0].replace("code=", "");
             axios.post("/api/calendar/google/authorize", {code})
         }
         this.props.dispatch(crmActions.getConnectedCRMs())

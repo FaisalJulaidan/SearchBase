@@ -14,7 +14,6 @@ client_secret = os.environ['OUTLOOK_CLIENT_SECRET']
 
 def login(auth):
     try:
-        print("auth", auth)
 
         headers = {'Content-Type': 'application/x-www-form-urlencoded'}
 
@@ -84,7 +83,7 @@ def retrieveAccessToken(auth, companyID):
         return Callback(False, str(exc))
 
 
-def createEvent(assistant, eventDetails):
+def addEvent(auth, assistant, eventDetails):
     try:
         body = {
             "Subject": eventDetails.get("name"),
@@ -121,8 +120,7 @@ def createEvent(assistant, eventDetails):
             })
 
         # send query
-        sendQuery_callback: Callback = sendQuery(auth, "entity/Candidate", "put", body,
-                                                 conversation.Assistant.CompanyID)
+        sendQuery_callback: Callback = sendQuery(auth, "events", "post", body, assistant.CompanyID)
 
         if not sendQuery_callback.Success:
             raise Exception(sendQuery_callback.Message)

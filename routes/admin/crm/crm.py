@@ -4,7 +4,7 @@ from flask_jwt_extended import jwt_required, get_jwt_identity
 from models import Callback
 from services.Marketplace.CRM import crm_services, Bullhorn
 from services.Marketplace.CRM import crm_services
-from services.Marketplace.Calendar import Outlook, Google
+from services.Marketplace.Calendar import Outlook, Google, calendar_services
 from utilities import helpers
 
 from datetime import datetime
@@ -108,10 +108,10 @@ def crm_callback():
     return str(request.url)
 
 
-@crm_router.route("/calendar/<assistantID>/google/authorize", methods=['GET', 'POST'])
+@crm_router.route("/calendar/<hashedAssistantID>/google/authorize", methods=['GET', 'POST'])
 @jwt_required
 @helpers.validAssistant
-def calendar_auth(assistant):
+def calendar_auth(hashedAssistantID):
     params = request.get_json()
     callback: Callback = Google.authorizeUser(params['code'])
     if not callback.Success:
@@ -119,47 +119,37 @@ def calendar_auth(assistant):
     return helpers.jsonResponse(True, 200, callback.Message)
 
 
-#post method, only adds events
-@crm_router.route("/calendar/<assistantID>/google/event", methods=['POST'])
-@jwt_required
-@helpers.validAssistant
-def calendar_add_event(assistant):
-    body = request.json
-    callback: Callback = Google.addEvent(assistant.CompanyID,
-                                        body['eventName'],
-                                        body['eventDescription'],
-                                        body['startDate'],
-                                        body['endDate'])
-    if not callback.Success:
-        return helpers.jsonResponse(False, 400, callback.Message)
-    return helpers.jsonResponse(True, 200, callback.Message)
-    # Google.addEvent()
-    # Callback = Google.getToken("Google", 2)
-    # print(Callback)
-    # return helpers.jsonResponse(True, 200, 'hello', Callback)
+# post method, only adds events
+@crm_router.route("/calendar/<hashedAssistantID>/event", methods=['POST'])
+def calendar_add_event(hashedAssistantID):
+    if request.method == "POST":
+        body = request.json
+
+        callback: Callback = calendar_services.addEvent(body, assistantID=hashedAssistantID)
+        if not callback.Success:
+            return helpers.jsonResponse(False, 400, callback.Message)
+        return helpers.jsonResponse(True, 200, callback.Message)
 
 
+# TODO change to global callback with state as integration definer
 @crm_router.route("/outlook_callback", methods=['GET', 'POST', 'PUT'])
 def outlook_callback():
-    print("request.args: ", request.args)
-    print(": ", request.args.get("code"))
-    print("request.form: ", request.form)
-    print("request.json: ", request.json)
-    print("request.url: ", request.url)
-    print("method: ", request.method)
-
-    args = request.args
+    args = dict(request.args)
     if args.get("error") or (not args.get("code") or not args.get("state")):
         return helpers.jsonResponse(False, 400, args.get("error_description") or "User error in request")
 
-    login_callback: Callback = Outlook.login(args)
+    args["type"] = "Outlook"
+
+    login_callback: Callback = calendar_services.connect(args.get("state")[0], args)
+    print("login_callback.Success: ", login_callback.Success)
+    print("login_callback.Message: ", login_callback.Message)
     if not login_callback.Success:
         return helpers.jsonResponse(False, 400, login_callback.Message)
     print("login_callback.Data: ", login_callback.Data)
     return helpers.jsonResponse(True, 200, "Success")
 
 
-@crm_router.route("/custom_test", methods=['GET', 'POST', 'PUT'])
-def test():
-    if request.method == "POST":
-        return Outlook.login({"username": "info thesearchbase", "password": "TH3T3CHBR@S"}).Message
+# @crm_router.route("/custom_test", methods=['GET', 'POST', 'PUT'])
+# def test():
+#     if request.method == "POST":
+#         return Outlook.login({"username": "info thesearchbase", "password": "TH3T3CHBR@S"}).Message

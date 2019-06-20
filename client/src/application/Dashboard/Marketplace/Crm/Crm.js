@@ -27,8 +27,6 @@ class Crm extends React.Component {
         this.props.dispatch(crmActions.exportRecruiterValueReport({Name: crm.type}))
     }
 
-    googleAuthentication
-
     componentWillReceiveProps(nextProps) {
         const /** @type {CRM}*/crm = this.props.location.state?.crm || {};
         const index = nextProps.CRMsList.findIndex(serverCRM => serverCRM.Type === crm.type);
@@ -259,7 +257,8 @@ class Crm extends React.Component {
                                                         isDisconnecting={this.props.isDisconnecting}
                                                         disconnectCRM={this.disconnectCRM}
                                                         connectCRM={this.connectCRM}
-                                                        testCRM={this.testCRM}/>
+                                                        testCRM={this.testCRM}
+                                                        companyID={crm.companyid}/>
                                 }
 
                             </Form>

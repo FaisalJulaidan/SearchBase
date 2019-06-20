@@ -4,6 +4,7 @@ from sqlalchemy.sql import and_
 
 from enums import UserType, Calendar
 from models import db, Callback, Conversation, Assistant, Calendar as Calendar_Model, StoredFile
+from services import assistant_services
 from services.Marketplace.Calendar import Google, Outlook
 
 
@@ -18,11 +19,20 @@ from services.Marketplace.Calendar import Google, Outlook
 #         return Callback(False, "The data couldn't be synced with the Calendar due to lack of information" +
 #                         " whether user is a Candidate or Client ")
 
-def createEvent(assistant, eventDetails):
+def addEvent(eventDetails, assistant=None, assistantID=None):
+    if not (assistant or assistantID):
+        return Callback(False, "Assistant was not provided")
+
+    if assistantID:
+        assistant_callback: Callback = assistant_services.getByHashID(assistantID)
+        if not assistant_callback.Success:
+            return Callback(False, "Assistant could not be retrieved")
+        assistant = assistant_callback.Data
+
     if assistant.Calendar.Type is Calendar.Outlook:
-        return Outlook.createEvent(assistant, eventDetails)
+        return Outlook.addEvent(assistant.Calendar.Auth, assistant.CompanyID, eventDetails)
     elif assistant.Calendar.Type is Calendar.Google:
-        return Google.addEvent(assistant, eventDetails.get("name"), eventDetails.get("description"),
+        return Google.addEvent(assistant.CompanyID, eventDetails.get("name"), eventDetails.get("description"),
                                eventDetails.get("start"), eventDetails.get("end"))
     else:
         return Callback(False, "Could not retrieve the Calendar's Provider")
@@ -37,8 +47,10 @@ def connect(company_id, details) -> Callback:
         test_callback: Callback = testConnection(details, company_id)
         if not test_callback.Success:
             return test_callback
-
-        connection = Calendar_Model(Type=calendar_type, Auth=test_callback.Data, CompanyID=company_id)
+        print(calendar_type)
+        print(test_callback.Data)
+        print(company_id)
+        connection = Calendar_Model(Type=calendar_type, Auth=test_callback.Data, CompanyID=company_id, MetaData=None)
 
         # Save
         db.session.add(connection)
@@ -47,7 +59,8 @@ def connect(company_id, details) -> Callback:
         return Callback(True, 'Calendar has been connected successfully', connection)
 
     except Exception as exc:
-        logging.error("Calendar_services.connect(): " + str(exc))
+        print("calendar_services.connect(): " + str(exc))
+        logging.error("calendar_services.connect(): " + str(exc))
         db.session.rollback()
         return Callback(False, "Calendar connection failed")
 
@@ -77,7 +90,7 @@ def update(calendar_id, company_id, details) -> Callback:
         return Callback(True, 'Calendar has been updated successfully')
 
     except Exception as exc:
-        logging.error("Calendar_services.update(): " + str(exc))
+        logging.error("calendar_services.update(): " + str(exc))
         db.session.rollback()
         return Callback(False, "Update Calendar details failed.")
 
@@ -106,7 +119,7 @@ def updateByCompanyAndType(calendar_type, company_id, auth):
         return Callback(True, 'Calendar has been updated successfully')
 
     except Exception as exc:
-        logging.error("Calendar_services.update(): " + str(exc))
+        logging.error("calendar_services.update(): " + str(exc))
         db.session.rollback()
         return Callback(False, "Update Calendar details failed.")
 
@@ -115,24 +128,15 @@ def updateByCompanyAndType(calendar_type, company_id, auth):
 def testConnection(details, companyID) -> Callback:
     try:
         calendar_type: Calendar = Calendar[details['type']]
-        calendar_auth = details['auth']
 
-        # test connection
-        test_callback: Callback = Callback(False, 'Connection failure. Please check entered details')
-        if calendar_type == Calendar.Google:
-            test_callback = Google.login(calendar_auth)
-        elif calendar_type == Calendar.Outlook:
-            test_callback = Outlook.login(calendar_auth)
-
-        # When connection failed
-        if not test_callback.Success:
-            return test_callback
-
-        return Callback(True, 'Successful connection', test_callback.Data)
+        if calendar_type == Calendar.Outlook:
+            return Outlook.login(details)
+        else:
+            return Callback(False, "Could not match Calendar's type")
 
     except Exception as exc:
-        logging.error("Calendar_services.connect(): " + str(exc))
-        return Callback(False, "Calendar connection failed.")
+        logging.error("calendar_services.connect(): " + str(exc))
+        return Callback(False, "Calendar test failed.")
 
 
 def disconnect(calendar_id, company_id) -> Callback:
@@ -147,7 +151,7 @@ def disconnect(calendar_id, company_id) -> Callback:
         return Callback(True, 'Calendar has been disconnected successfully', calendar_id)
 
     except Exception as exc:
-        logging.error("Calendar_services.disconnect(): " + str(exc))
+        logging.error("calendar_services.disconnect(): " + str(exc))
         db.session.rollback()
         return Callback(False, "Calendar disconnection failed.")
 
@@ -164,7 +168,7 @@ def getCalendarByID(calendar_id, company_id):
         return Callback(True, "Calendar retrieved successfully.", Calendar)
 
     except Exception as exc:
-        logging.error("Calendar_services.getCalendarByCompanyID(): " + str(exc))
+        logging.error("calendar_services.getCalendarByCompanyID(): " + str(exc))
         return Callback(False, 'Could not retrieve Calendar.')
 
 
@@ -178,7 +182,7 @@ def getCalendarByType(calendar_type, company_id):
         return Callback(True, "Calendar retrieved successfully.", Calendar)
 
     except Exception as exc:
-        logging.error("Calendar_services.getCalendarByCompanyID(): " + str(exc))
+        logging.error("calendar_services.getCalendarByCompanyID(): " + str(exc))
         return Callback(False, 'Could not retrieve Calendar.')
 
 

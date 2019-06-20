@@ -1,14 +1,14 @@
-from models import db, Assistant, Callback, Appointment, AutoPilot
+from datetime import datetime
+
+from jsonschema import validate
 from sqlalchemy import and_
-from utilities import helpers, json_schemas
-from os.path import join
-from config import BaseConfig
+from werkzeug.utils import secure_filename
+
+from models import db, Assistant, Callback, Appointment, AutoPilot
 from services import stored_file_services, auto_pilot_services, conversation_services
 from services.Marketplace.CRM import crm_services
-from jsonschema import validate
-from werkzeug.utils import secure_filename
-from datetime import datetime
-import logging
+from services.Marketplace.Calendar import calendar_services
+from utilities import helpers, json_schemas
 
 
 def create(name, desc, welcomeMessage, topBarText, companyID) -> Assistant or None:
@@ -50,9 +50,9 @@ def addAppointment(conversationID, assistantID, dateTime):
 
         db.session.add(
             Appointment(
-            DateTime=datetime.strptime(dateTime, "%Y-%m-%d %H:%M"),
-            AssistantID= assistantID,
-            ConversationID= conversationID
+                DateTime=datetime.strptime(dateTime, "%Y-%m-%d %H:%M"),
+                AssistantID=assistantID,
+                ConversationID=conversationID
             )
         )
 
@@ -86,7 +86,7 @@ def getByHashID(hashID):
 def getByID(id: int, companyID: int) -> Callback:
     try:
         # Get result and check if None then raise exception
-        result = db.session.query(Assistant)\
+        result = db.session.query(Assistant) \
             .filter(and_(Assistant.ID == id, Assistant.CompanyID == companyID)).first()
         if not result: raise Exception
         return Callback(True, "Got assistant successfully.", result)
@@ -119,11 +119,11 @@ def getAll(companyID) -> Callback:
                                   Assistant.Description,
                                   Assistant.Message,
                                   Assistant.TopBarText,
-                                  Assistant.Active)\
+                                  Assistant.Active) \
             .filter(Assistant.CompanyID == companyID).all()
 
         if len(result) == 0:
-            return Callback(True,"No assistants  to be retrieved.", [])
+            return Callback(True, "No assistants  to be retrieved.", [])
 
         return Callback(True, "Got all assistants  successfully.", result)
 
@@ -137,7 +137,8 @@ def getAllWithEnabledNotifications(companyID) -> Callback:
     try:
         if companyID:
             # Get result and check if None then raise exception
-            result = db.session.query(Assistant).filter(and_(Assistant.CompanyID == companyID, Assistant.MailEnabled)).all()
+            result = db.session.query(Assistant).filter(
+                and_(Assistant.CompanyID == companyID, Assistant.MailEnabled)).all()
             if len(result) == 0:
                 return Callback(True, "No assistants  to be retrieved.", [])
 
@@ -160,18 +161,19 @@ def getOpenTimes(assistantID) -> Callback:
 
         # If the assistant is not connected to an autoPilot then return an empty array which means no open times
         if not connectedAutoPilot:
-            return Callback(True,"There are no open time slots", None)
+            return Callback(True, "There are no open time slots", None)
 
         # OpenTimes is an array of all open slots per day
-        return Callback(True,"Got open time slots successfully.", connectedAutoPilot.OpenTimes)
+        return Callback(True, "Got open time slots successfully.", connectedAutoPilot.OpenTimes)
 
     except Exception as exc:
         helpers.logError("assistant_services.getOpenTimes(): " + str(exc))
         db.session.rollback()
         return Callback(False, 'Could not get the open times for this assistant.')
 
+
 # ----- Updaters ----- #
-def update(id, name, desc, message, topBarText, companyID)-> Callback:
+def update(id, name, desc, message, topBarText, companyID) -> Callback:
     try:
         assistant: Assistant = db.session.query(Assistant) \
             .filter(and_(Assistant.ID == id, Assistant.CompanyID == companyID)) \
@@ -192,13 +194,13 @@ def update(id, name, desc, message, topBarText, companyID)-> Callback:
                         "Couldn't update assistant " + str(id))
 
 
-def updateConfigs(id, name, desc,  message, topBarText, secondsUntilPopup, notifyEvery, config, companyID)-> Callback:
+def updateConfigs(id, name, desc, message, topBarText, secondsUntilPopup, notifyEvery, config, companyID) -> Callback:
     try:
         # Validate the json config
         validate(config, json_schemas.assistant_config)
 
-        assistant: Assistant = db.session.query(Assistant)\
-            .filter(and_(Assistant.ID == id, Assistant.CompanyID == companyID))\
+        assistant: Assistant = db.session.query(Assistant) \
+            .filter(and_(Assistant.ID == id, Assistant.CompanyID == companyID)) \
             .first()
 
         assistant.Name = name
@@ -206,7 +208,7 @@ def updateConfigs(id, name, desc,  message, topBarText, secondsUntilPopup, notif
         assistant.Message = message
         assistant.TopBarText = topBarText
         assistant.SecondsUntilPopup = secondsUntilPopup
-        assistant.NotifyEvery = notifyEvery
+        assistant.NotifyEvery = None if notifyEvery == "null" else int(notifyEvery)
         assistant.Config = config
 
         db.session.commit()
@@ -234,6 +236,7 @@ def updateStatus(assistantID, newStatus, companyID):
         db.session.rollback()
         return Callback(False, "Could not change the assistant's status.")
 
+
 # ----- Deletion ----- #
 def removeByID(id, companyID) -> Callback:
     try:
@@ -252,6 +255,7 @@ def connectToCRM(assistantID, CRMID, companyID):
     try:
 
         crm_callback: Callback = crm_services.getCRMByID(CRMID, companyID)
+        print("crm_callback.Success: ", crm_callback.Success)
         if not crm_callback.Success:
             raise Exception(crm_callback.Message)
 
@@ -259,6 +263,7 @@ def connectToCRM(assistantID, CRMID, companyID):
             .update({"CRMID": CRMID})
 
         db.session.commit()
+
         return Callback(True, 'Assistant has been connected to CRM.')
 
     except Exception as exc:
@@ -272,6 +277,43 @@ def disconnectFromCRM(assistantID, companyID):
 
         db.session.query(Assistant).filter(and_(Assistant.ID == assistantID, Assistant.CompanyID == companyID)) \
             .update({"CRMID": None})
+
+        db.session.commit()
+        return Callback(True, 'Assistant has been disconnected from CRM.')
+
+    except Exception as exc:
+        helpers.logError("assistant_services.disconnectFromCRM(): " + str(exc))
+        db.session.rollback()
+        return Callback(False, 'Error in disconnecting assistant from CRM.')
+
+
+# ----- CRM Connection ----- #
+def connectToCalendar(assistantID, CalendarID, companyID):
+    try:
+
+        crm_callback: Callback = calendar_services.getCalendarByID(CalendarID, companyID)
+        print("crm_callback.Success: ", crm_callback.Success)
+        if not crm_callback.Success:
+            raise Exception(crm_callback.Message)
+
+        db.session.query(Assistant).filter(and_(Assistant.ID == assistantID, Assistant.CompanyID == companyID)) \
+            .update({"CalendarID": CalendarID})
+
+        db.session.commit()
+
+        return Callback(True, 'Assistant has been connected to CRM.')
+
+    except Exception as exc:
+        helpers.logError("assistant_services.connectToCRM(): " + str(exc))
+        db.session.rollback()
+        return Callback(False, 'Error in connecting assistant to CRM.')
+
+
+def disconnectFromCalendar(assistantID, companyID):
+    try:
+
+        db.session.query(Assistant).filter(and_(Assistant.ID == assistantID, Assistant.CompanyID == companyID)) \
+            .update({"CalendarID": None})
 
         db.session.commit()
         return Callback(True, 'Assistant has been disconnected from CRM.')
@@ -331,10 +373,10 @@ def uploadLogo(assistantID, file, companyID):
         assistant.LogoName = filename
 
         # Upload file to cloud Space
-        upload_callback : Callback = stored_file_services.uploadFile(file,
-                                                                     filename,
-                                                                     stored_file_services.COMPANY_LOGOS_PATH,
-                                                                     public=True)
+        upload_callback: Callback = stored_file_services.uploadFile(file,
+                                                                    filename,
+                                                                    stored_file_services.COMPANY_LOGOS_PATH,
+                                                                    public=True)
         if not upload_callback.Success:
             raise Exception(upload_callback.Message)
 
@@ -360,8 +402,8 @@ def deleteLogo(assistantID, companyID):
 
         # Delete file from cloud Space and reference from database
         assistant.LogoName = None
-        delete_callback : Callback = stored_file_services.deleteFile(logoName,
-                                                                     stored_file_services.COMPANY_LOGOS_PATH)
+        delete_callback: Callback = stored_file_services.deleteFile(logoName,
+                                                                    stored_file_services.COMPANY_LOGOS_PATH)
         if not delete_callback.Success:
             raise Exception(delete_callback.Message)
 

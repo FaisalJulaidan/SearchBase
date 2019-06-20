@@ -15,7 +15,8 @@ export const OutlookFormItems = ({
                                       testCRM,
                                       isConnecting,
                                       isTesting,
-                                      isDisconnecting
+                                      isDisconnecting,
+                                        companyID
                                   }) =>
     <div>
         {
@@ -23,7 +24,7 @@ export const OutlookFormItems = ({
             CRM.status !== "FAILED" &&
             <div>
                 {/*<a href={"https://login.microsoftonline.com/common/oauth2/v2.0/authorize?response_type=code&client_id=0978960c-c837-479f-97ef-a75be4bbacd4&redirect_uri=https://www.thesearchbase.com/crm_callback&scope=openid+Calendars.ReadWrite"} target="_blank">Click me</a>*/}
-                <a href="javascript:void(0);" NAME="Connect Outlook Account"  title=" Outlook Connection " onClick={() => {return window.open("https://login.microsoftonline.com/common/oauth2/v2.0/authorize?response_type=code&client_id=0978960c-c837-479f-97ef-a75be4bbacd4&redirect_uri=https://www.thesearchbase.com/api/outlook_callback&scope=openid+Calendars.ReadWrite+offline_access&state=1234","Ratting","width=600,height=400,0,top=40%,right=30%,status=0,")}}>Click here</a>
+                <a href="javascript:void(0);" NAME="Connect Outlook Account"  title=" Outlook Connection " onClick={() => {return window.open("https://login.microsoftonline.com/common/oauth2/v2.0/authorize?response_type=code&client_id=0978960c-c837-479f-97ef-a75be4bbacd4&redirect_uri=https://www.thesearchbase.com/api/outlook_callback&scope=openid+Calendars.ReadWrite+offline_access&state="+companyID,"Ratting","width=600,height=400,0,top=40%,right=30%,status=0,")}}>Click here</a>
             </div>
         }
 

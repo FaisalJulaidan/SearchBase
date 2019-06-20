@@ -18,7 +18,7 @@ from routes.admin.routers import account_router, analytics_router, sub_router, \
     conversation_router, users_router, flow_router, assistant_router,\
     database_router, options_router, crm_router, auto_pilot_router
 from routes.public.routers import public_router, reset_password_router, chatbot_router, auth_router, appointment_router
-
+import re
 app = Flask(__name__, static_folder='static')
 
 # Register Routes:
@@ -127,7 +127,7 @@ elif os.environ['FLASK_ENV'] == 'development':
     #     appointmentLink=helpers.getDomain() + "/appointments_picker/" + \
     #                     helpers.verificationSigner.dumps(payload, salt='appointment-key')
     # )
-
+    # print( <= 5)
     print('Development mode running...')
 
 else:

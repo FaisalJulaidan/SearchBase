@@ -64,7 +64,6 @@ def test_crm_123():
 
 
 # Server Setup
-db.app = app
 migrate_var = Migrate(app, db)
 manager = Manager(app)
 babel = Babel(app)
@@ -109,6 +108,7 @@ elif os.environ['FLASK_ENV'] == 'development':
     db.init_app(app)
     mail.init_app(app)
 
+
     url = os.environ['SQLALCHEMY_DATABASE_URI']  # get database URL
     if os.environ['REFRESH_DB_IN_DEV'] == 'yes':
         print('Reinitialize the database...')
@@ -127,7 +127,6 @@ elif os.environ['FLASK_ENV'] == 'development':
     #     appointmentLink=helpers.getDomain() + "/appointments_picker/" + \
     #                     helpers.verificationSigner.dumps(payload, salt='appointment-key')
     # )
-
 
     print('Development mode running...')
 

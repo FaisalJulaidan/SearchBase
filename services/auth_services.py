@@ -24,8 +24,7 @@ def signup(details) -> Callback:
         
 
         # Check if user exists
-        user = user_services.getByEmail(email).Data
-        if user:
+        if user_services.getByEmail(email).Data:
             return Callback(False, 'User already exists.')
 
         # Company
@@ -62,7 +61,7 @@ def signup(details) -> Callback:
         tokenLink = helpers.getDomain() + "/verify_account/" + \
                     helpers.verificationSigner.dumps(email + ";" + str(company.ID), salt='email-confirm-key')
 
-        email_callback: Callback = \
+        verify_callback: Callback = \
             mail_services.send_email(email,
                                      'Account Verification',
                                      '/emails/account_verification.html',
@@ -70,10 +69,16 @@ def signup(details) -> Callback:
                                      userName= details['firstName'] + ' ' + details['lastName'],
                                      verificationLink= tokenLink)
 
+        # Send us mail that someone has registered
+        notify_us_callback: Callback = mail_services.sendNewUserHasRegistered(details['firstName'] + details['lastName'],
+                                                                              email,
+                                                                              company.Name,
+                                                                              details['telephone'])
+
         # If subscription failed, remove the new created company and user
-        if not (user_callback.Success or email_callback.Success):
+        if not (user_callback.Success or verify_callback.Success or notify_us_callback.Success):
             # Removing the company will cascade and remove the new created user and roles as well.
-            company_services.removeByName(details['companyName'])
+            company_services.removeByName(company.Name)
             return user_callback
 
         # ###############

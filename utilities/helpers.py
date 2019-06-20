@@ -12,7 +12,7 @@ from sqlalchemy_utils import Currency
 from typing import List
 from flask_jwt_extended import get_jwt_identity
 from forex_python.converter import CurrencyRates
-import re, os, stripe, gzip, functools, logging, geoip2.webservice
+import re, os, stripe, gzip, functools, logging, geoip2.webservice, traceback
 
 
 
@@ -52,8 +52,8 @@ def getDomain():
 
 def logError(exception):
     if os.environ['FLASK_ENV'] == 'development':
-        print(exception)
-    logging.error(exception)
+        print(traceback.format_exc())
+    logging.error(traceback.format_exc() + exception + "\n \n" )
 
 
 # ID Hasher

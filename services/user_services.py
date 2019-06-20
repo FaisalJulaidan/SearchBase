@@ -270,20 +270,8 @@ def verifyByEmail(email: str):
         if not user: raise Exception
 
         user.Verified = True
-
-        # Get user's company
-        company_callback = company_services.getByID(user.CompanyID)
-        companyName = "Unknown"
-        if company_callback.Success:
-            companyName = company_callback.Data.Name
-
-        # Send us mail
-        mail_callback: Callback = mail_services.sendNewUserHasRegistered(user.Firstname + user.Surname, user.Email,
-                                                                         companyName, user.PhoneNumber)
-        if not mail_callback.Success:
-            helpers.logError("user_services.verifyByEmail(): Could not send us signed up user email")
-
         db.session.commit()
+
         return Callback(True, 'Account has been verified successfully')
 
     except Exception as exc:

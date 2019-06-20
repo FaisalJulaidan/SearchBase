@@ -278,10 +278,12 @@ def scanCandidates(session, dbIDs, extraCandidates=None):
             # print("df: ", df["CandidateLocation"])
 
         # Salary comparision
-        df['Score'] += df.apply(lambda row: __salary(row, Candidate.CandidateDesiredSalary, Candidate.Currency, keywords, 8), axis=1)
+        df[['Score', Candidate.CandidateDesiredSalary.name, Candidate.Currency.name]] = \
+            df.apply(lambda row: __salary(row, Candidate.CandidateDesiredSalary, Candidate.Currency, keywords, 8, True),
+                     axis=1, result_type='expand')
 
         # Years of EXP
-        df['Score'] += df.apply(lambda row: __numCounter(row, DT.CandidateYearsExperience, '<', Job.CandidateYearsExperience, keywords, 5), axis=1)
+        df['Score'] += df.apply(lambda row: __numCounter(row, DT.CandidateYearsExperience, '<', Candidate.CandidateYearsExperience, keywords, 5), axis=1)
 
         # Education
         __wordsCounter(DT.CandidateEducation, Candidate.CandidateEducation, keywords, df, 1)
@@ -359,7 +361,8 @@ def scanJobs(session, dbIDs, extraJobs=None):
 
 
         # Salary comparision
-        df['Score'] += df.apply(lambda row: __salary(row, Job.JobSalary, Job.Currency, keywords, 8), axis=1)
+        df[['Score', Job.JobSalary.name, Job.Currency.name]] = df.apply(lambda row: __salary(row, Job.JobSalary, Job.Currency, keywords, 8),
+                                                                        axis=1, result_type='expand')
 
         # Year Required
         df['Score'] += df.apply(lambda row: __numCounter(row, DT.JobYearsRequired, '>', Job.JobYearsRequired, keywords, 5), axis=1)
@@ -383,6 +386,7 @@ def scanJobs(session, dbIDs, extraJobs=None):
         __wordsCounter(DT.JobDesiredSkills, Job.JobDesiredSkills, keywords, df, 3)
         __wordsCounter(DT.CandidateSkills, Job.JobEssentialSkills, keywords, df, 3)
         __wordsCounter(DT.CandidateSkills, Job.JobDesiredSkills, keywords, df, 3)
+
 
         # Results
         topResults = json.loads(df[df['Score'] > 0].nlargest(session.get('showTop', 0), 'Score')
@@ -474,7 +478,7 @@ def __numCounter(row, dataType: DT, compareSign, dbColumn, keywords, plus=1):
 
 
 
-def __salary(row, dbSalaryColumn: DT, dbCurrencyColumn: DT, keywords, plus=4):
+def __salary(row, dbSalaryColumn: DT, dbCurrencyColumn: DT, keywords, plus=4, candidateScanning=False):
 
     userInput = keywords.get(DT.JobSalary.value['name'], keywords.get(DT.CandidateDesiredSalary.value['name']))
     if not userInput: return 0 # only continue this function if there us user input
@@ -483,14 +487,17 @@ def __salary(row, dbSalaryColumn: DT, dbCurrencyColumn: DT, keywords, plus=4):
     # Convert salary currency if did not match with user's entered currency
     dbSalary = row[dbSalaryColumn.name] or 0
     if (not row[dbCurrencyColumn.name] == userSalary[3]) and dbSalary > 0:
-        helpers.currencyConverter.convert(row[dbCurrencyColumn.name], userSalary[3], dbSalary)
+        dbSalary = helpers.currencyConverter.convert(row[dbCurrencyColumn.name], userSalary[3], dbSalary)
+        row[dbSalaryColumn.name] = dbSalary
 
+    # Add old score to new score if success
+    plus += row['Score']
 
     # Compare salaries, if true then return 'plus' to be added to the score otherwise 0
-    if userSalary[0] == 'Less':
-        return plus if dbSalary <= float(userSalary[2]) else 0
-    else: # Greater
-        return plus if dbSalary >= float(userSalary[2]) else 0
+    if userSalary[0] == 'Greater' and not (keywords.get(DT.JobSalary.value['name']) and candidateScanning):
+        return (plus if dbSalary >= float(userSalary[2]) else row['Score']), dbSalary, userSalary[3]
+    else: # Less
+        return (plus if dbSalary <= float(userSalary[2]) else row['Score']), dbSalary, userSalary[3]
 
 
 

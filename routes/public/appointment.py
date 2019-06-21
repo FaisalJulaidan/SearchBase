@@ -31,6 +31,7 @@ def candidate_appointment(payload):
             return helpers.jsonResponse(False, 404, "Couldn't load available time slots")
 
         data = {
+            "companyName": assistant.Company.Name,
             "companyLogoURL": assistant.Company.LogoPath,
             "openTimes": helpers.getListFromSQLAlchemyList(openTimes_callback.Data or []),
             "takenTimeSlots": helpers.getListFromSQLAlchemyList(assistant.Appointments),

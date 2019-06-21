@@ -43,27 +43,6 @@ def create(name, desc, welcomeMessage, topBarText, template, companyID) -> Assis
         return Callback(False, 'Failed to create the assistant', None)
 
 
-def addAppointment(conversationID, assistantID, dateTime):
-    try:
-        callback: Callback = conversation_services.getByID(conversationID, assistantID)
-        if not callback.Success: raise Exception("conversation does not exist anymore")
-
-        db.session.add(
-            Appointment(
-                DateTime=datetime.strptime(dateTime, "%Y-%m-%d %H:%M"),  # 2019-06-23 16:04
-                AssistantID=assistantID,
-                ConversationID=conversationID
-            )
-        )
-
-        db.session.commit()
-        return Callback(True, 'Appointment added successfully.')
-
-    except Exception as exc:
-        helpers.logError("assistant_services.addAppointment(): " + str(exc))
-        db.session.rollback()
-        return Callback(False, "Couldn't add the appointment")
-
 
 # ----- Getters ----- #
 def getByHashID(hashID):
@@ -160,7 +139,7 @@ def getOpenTimes(assistantID) -> Callback:
 
         # If the assistant is not connected to an autoPilot then return an empty array which means no open times
         if not connectedAutoPilot:
-            return Callback(True,"There are no open time slots", None)
+            return Callback(True,"There are no open time slots")
 
         # OpenTimes is an array of all open slots per day
         return Callback(True,"Got open time slots successfully.", connectedAutoPilot.OpenTimes)

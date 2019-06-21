@@ -116,17 +116,18 @@ elif os.environ['FLASK_ENV'] == 'development':
         db.create_all()
         dummy_data.generate()
 
-    # payload = str(5) + ";" + str(1) + ";" + str(1) + ";"  + "Faisal Jul"
-    # mail_services.send_email(
-    #     "Julaidan.faisal@gmail.com",
-    #     'Appointment',
-    #     '/emails/appointment_letter.html',
-    #     companyName="Company Name",
-    #     logoPath="f",
-    #     userName="Faisal Jula",
-    #     appointmentLink=helpers.getDomain() + "/appointments_picker/" + \
-    #                     helpers.verificationSigner.dumps(payload, salt='appointment-key')
-    # )
+
+    payload = {
+        'conversationID': 5,
+        'assistantID': 1,
+        'companyID': 1,
+        'email': 'julaidan.faisal@gmail.com',
+        'username': 'faisal julaidan',
+    }
+
+    token = helpers.verificationSigner.dumps(payload, salt='appointment-key')
+    print(token)
+    print(helpers.verificationSigner.loads(token, salt='appointment-key', max_age=432000))
 
     print('Development mode running...')
 

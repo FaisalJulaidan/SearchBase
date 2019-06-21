@@ -43,10 +43,14 @@ def processConversation(conversation: Conversation, autoPilot: AutoPilot):
 
                     # Process candidates appointment email if score is accepted
                     if AutoPilot.SendCandidatesAppointments:
-                        payload = str(conversation.ID) + ";" +\
-                                  str(conversation.Assistant.ID) + ";" +\
-                                  str(autoPilot.CompanyID) + ";" +\
-                                  name
+
+                        payload = {
+                            'conversationID': conversation.ID,
+                            'assistantID': conversation.Assistant.ID,
+                            'companyID': autoPilot.CompanyID,
+                            'email': email,
+                            'userName': name,
+                        }
 
                         callback: Callback = mail_services.send_email(
                             email,
@@ -102,14 +106,14 @@ def create(name, desc, companyID: int) -> Callback:
 
         # Create the AutoPilot with default open time slots
         default = {"From": time(8,30), "To": time(12,0), "Duration": 30, "AutoPilot": autoPilot, "Active": False}
-        openTimes = [OpenTimes(Day=0, **default),  # Monday
-                         OpenTimes(Day=1, **default),
-                         OpenTimes(Day=2, **default),
-                         OpenTimes(Day=3, **default),
-                         OpenTimes(Day=4, **default),
-                         OpenTimes(Day=5, **default),
-                         OpenTimes(Day=6, **default),  # Sunday
-                         ]
+        openTimes = [OpenTimes(Day=0, **default),  # Sunday
+                     OpenTimes(Day=1, **default),
+                     OpenTimes(Day=2, **default),
+                     OpenTimes(Day=3, **default),
+                     OpenTimes(Day=4, **default),
+                     OpenTimes(Day=5, **default),
+                     OpenTimes(Day=6, **default),  # Saturday
+                     ]
         db.session.add_all(openTimes)
         db.session.commit()
         return Callback(True, "Got AutoPilot successfully.", autoPilot)
@@ -250,8 +254,6 @@ def removeByID(id, companyID):
 
 
 # ----- Private Functions (shouldn't be accessed from the outside) ----- #
-# It takes an autoPilot object and join all its children tables into one dict
-
 
 def __getApplicationResult(score, autoPilot: AutoPilot) -> ApplicationStatus:
     result = ApplicationStatus.Pending

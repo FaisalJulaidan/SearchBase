@@ -107,6 +107,7 @@ elif os.environ['FLASK_ENV'] == 'development':
     jwt.init_app(app)
     db.init_app(app)
     mail.init_app(app)
+    app.app_context().push()
 
 
     url = os.environ['SQLALCHEMY_DATABASE_URI']  # get database URL

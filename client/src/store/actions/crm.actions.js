@@ -6,10 +6,11 @@ const getConnectedCRMs = () => {
     };
 };
 
-const getConnectedCRMsSuccess = (CRMsList, msg) => {
+const getConnectedCRMsSuccess = (CRMsList, companyID, msg) => {
     return {
         type: actionTypes.GET_CONNECTED_CRMS_SUCCESS,
         CRMsList,
+        companyID,
         msg
     };
 };

@@ -1,9 +1,44 @@
+import json
 import logging
 
 import requests
 from sqlalchemy import and_
 
-from models import db, Callback, CRM
+from enums import Calendar as Calendar_Enum, CRM as CRM_Enum
+from models import db, Callback, CRM, Calendar
+from services.Marketplace.CRM import crm_services
+from services.Marketplace.Calendar import calendar_services
+
+
+def processRedirect(args):
+    try:
+        args = dict(args)
+
+        state = json.loads(args.get("state")[0])
+        print("state: ", state)
+
+        if args.get("error") or not (args.get("code") and args.get("state")):
+            return Callback(False, args.get("error_description") or "Required parameters were not provided")
+
+        args["type"] = state.get("type")
+
+        if CRM_Enum.has_value(args["type"]):
+            print("1")
+            callback: Callback = crm_services.connect(int(state.get("companyID")), args)
+        elif Calendar_Enum.has_value(args["type"]):
+            print("2")
+            callback: Callback = calendar_services.connect(int(state.get("companyID")), args)
+        else:
+            print("3")
+            callback = Callback(False, "The Marketplace object did not match one on the system")
+
+        print("callback.Success: ", callback.Success)
+        print("callback.Message: ", callback.Message)
+        return callback
+
+    except Exception as exc:
+        logging.error("marketplace_helpers.processRedirect() ERROR: " + str(exc))
+        return Callback(False, str(exc))
 
 
 def sendRequest(url, method, headers, data=None):
@@ -26,18 +61,18 @@ def saveNewCRMAuth(auth, marketplaceItemName, companyID):
 
     except Exception as exc:
         db.session.rollback()
-        logging.error("CRM.Bullhorn.retrieveRestToken() ERROR: " + str(exc))
+        logging.error("marketplace_helpers.saveNewCRMAuth() ERROR: " + str(exc))
         return Callback(False, str(exc))
 
 
-def saveNewMailAuth(auth, marketplaceItemName, companyID):
+def saveNewCalendarAuth(auth, marketplaceItemName, companyID):
     try:
-        crm = db.session.query(CRM).filter(and_(CRM.CompanyID == companyID, CRM.Type == marketplaceItemName)).first()  # TODO
-        crm.Auth = dict(auth)
+        calendar = db.session.query(Calendar).filter(and_(Calendar.CompanyID == companyID, Calendar.Type == marketplaceItemName)).first()  # TODO
+        calendar.Auth = dict(auth)
         db.session.commit()
         return Callback(True, "New auth has been saved")
 
     except Exception as exc:
         db.session.rollback()
-        logging.error("CRM.Bullhorn.retrieveRestToken() ERROR: " + str(exc))
+        logging.error("marketplace_helpers.saveNewCalendarAuth() ERROR: " + str(exc))
         return Callback(False, str(exc))

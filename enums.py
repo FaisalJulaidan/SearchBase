@@ -20,16 +20,28 @@ class CRM(Enum):
     Vincere = 'Vincere'
     Greenhouse = 'Greenhouse'
 
+    @classmethod
+    def has_value(cls, value):
+        return any(value == item.value for item in cls)
+
 @unique
 class Calendar(Enum):
     Google = 'Google'
     Outlook = 'Outlook'
+
+    @classmethod
+    def has_value(cls, value):
+        return any(value == item.value for item in cls)
 
 @unique
 class ApplicationStatus(Enum):
     Pending = 'Pending'
     Accepted = 'Accepted'
     Rejected = 'Rejected'
+
+    @classmethod
+    def has_value(cls, value):
+        return any(value == item.value for item in cls)
 
 @unique
 class BlockType(Enum):
@@ -39,6 +51,10 @@ class BlockType(Enum):
     Solutions = 'Solutions'
     RawText = 'Raw Text'
 
+    @classmethod
+    def has_value(cls, value):
+        return any(value == item.value for item in cls)
+
 @unique
 class BlockAction(Enum):
     GoToNextBlock = 'Go To Next Block'
@@ -46,17 +62,29 @@ class BlockAction(Enum):
     GoToGroup = 'Go To Group'
     EndChat = 'End Chat'
 
+    @classmethod
+    def has_value(cls, value):
+        return any(value == item.value for item in cls)
+
 @unique
 class UserType(Enum):
     Unknown = 'Unknown'
     Candidate = 'Candidate'
     Client = 'Client'
 
+    @classmethod
+    def has_value(cls, value):
+        return any(value == item.value for item in cls)
+
 @unique
 class DatabaseType(Enum):
     # multiplying userTypes by 3 will help detect the user type in the chatbot
     Candidates = {'enumName': 'Candidates', 'name': 'Candidates', 'userTypes': [UserType.Client.value] * 5}
     Jobs = {'enumName': 'Jobs', 'name': 'Jobs', 'userTypes': [UserType.Candidate.value] * 5}
+
+    @classmethod
+    def has_value(cls, value):
+        return any(value == item.value for item in cls)
 
 
 @unique
@@ -66,6 +94,10 @@ class DataTypeSection(Enum):
     Company = 'Company'
     Candidate = 'Candidate'
     Job = 'Job'
+
+    @classmethod
+    def has_value(cls, value):
+        return any(value == item.value for item in cls)
 
 
 @unique
@@ -80,6 +112,10 @@ class ValidationType(Enum):
     Date = 'Date'
     DateTime = 'DateTime'
     Salary = 'Salary'
+
+    @classmethod
+    def has_value(cls, value):
+        return any(value == item.value for item in cls)
 
 
 # === Data Types Stuff === #

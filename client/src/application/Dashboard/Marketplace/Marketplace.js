@@ -32,6 +32,13 @@ class Marketplace extends React.Component {
                 status: 'NOT_CONNECTED',
             },
             {
+                title: 'Vincere',
+                desc: `Vincere provides customer relationship management, applicant tracking system and operations software for the staffing industry.`,
+                image: getLink('/static/images/CRM/vincere.png'),
+                type: "Vincere",
+                status: 'NOT_CONNECTED',
+            },
+            {
                 title: 'Greenhouse',
                 desc: `Greenhouse works seamlessly with over 220 partners and third-party apps and technologies, enabling you to solve specific problems.`,
                 image: getLink('/static/images/CRM/greenhouse.png'),
@@ -50,7 +57,7 @@ class Marketplace extends React.Component {
                 desc: `Google Calendar is a time-management and scheduling calendar service lets you keep track of important events, share your schedule.`,
                 image: getLink('/static/images/CRM/gmail.jpg'),
                 type: "gmail",
-                status: 'Comming Soon'
+                status: 'NOT_CONNECTED'
             },
         ]
     };
@@ -76,14 +83,14 @@ class Marketplace extends React.Component {
                         return 0;
 
                     if (index === -1) {
-                        // if there is not crm from the server
+                        // if there is not marketplace from the server
                         crm.status = 'NOT_CONNECTED';
                         delete crm.ID;
                     } else {
-                        // if there is a crm, check if it is failed or connected
+                        // if there is a marketplace, check if it is failed or connected
                         // and add the ID
                         crm.status = nextProps.CRMsList[index].Status ? "CONNECTED" : "FAILED";
-                        crm.ID = nextProps.CRMsList[index].ID
+                        crm.ID = nextProps.CRMsList[index].ID;
                     }
                 }
             )
@@ -116,7 +123,7 @@ class Marketplace extends React.Component {
                                 <Spin spinning={this.props.isLoadingCrms}>
                                     <Link to={{
                                         pathname: `/dashboard/marketplace/${crm.type}`,
-                                        state: {crm: crm}
+                                        state: {crm: crm, companyID:this.props.companyID}
                                     }}>
                                         <AuroraCardAvatar title={crm.title}
                                                           desc={crm.desc}
@@ -139,6 +146,7 @@ class Marketplace extends React.Component {
 function mapStateToProps(state) {
     return {
         CRMsList: state.crm.CRMsList,
+        companyID: state.crm.companyID,
         isLoadingCrms: state.crm.isLoadingCrms
     };
 }

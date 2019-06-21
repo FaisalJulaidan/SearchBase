@@ -21,7 +21,7 @@ def login(auth):
             "grant_type": "authorization_code",
             "client_id": client_id,
             "client_secret": client_secret,
-            "redirect_uri": "https://www.thesearchbase.com/api/outlook_callback",
+            "redirect_uri": "https://www.thesearchbase.com/api/marketplace_callback",
             "code": auth.get("code")
         }
 
@@ -55,7 +55,7 @@ def retrieveAccessToken(auth, companyID):
             "grant_type": "refresh_token",
             "client_id": client_id,
             "client_secret": client_secret,
-            "redirect_uri": "https://www.thesearchbase.com/api/outlook_callback",
+            "redirect_uri": "https://www.thesearchbase.com/api/marketplace_callback",
             "refresh_token": auth.get("refresh_token")
         }
 
@@ -71,7 +71,7 @@ def retrieveAccessToken(auth, companyID):
             auth = dict(auth)
             auth["refresh_token"] = result_body.get("refresh_token")
 
-        saveAuth_callback: Callback = helpers.saveNewMailAuth(auth, "Outlook", companyID)
+        saveAuth_callback: Callback = helpers.saveNewCalendarAuth(auth, "Outlook", companyID)
         if not saveAuth_callback.Success:
             raise Exception(saveAuth_callback.Message)
 

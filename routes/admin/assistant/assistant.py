@@ -123,7 +123,7 @@ def assistant_status(assistantID):
 
 
 # Connect assistant to CRM
-@assistant_router.route("/assistant/<int:assistantID>/crm", methods=['POST', 'DELETE'])
+@assistant_router.route("/assistant/<int:assistantID>/marketplace", methods=['POST', 'DELETE'])
 @jwt_required
 def assistant_crm_connect(assistantID):
 

@@ -21,8 +21,8 @@ conversation_router: Blueprint = conversation_router
 from .assistant.flow import flow_router
 flow_router: Blueprint = flow_router
 
-from routes.admin.crm.crm import crm_router
-crm_router: Blueprint = crm_router
+from routes.admin.marketplace.marketplace import marketplace_router
+marketplace_router: Blueprint = marketplace_router
 
 from .account.users import users_router
 users_router: Blueprint = users_router

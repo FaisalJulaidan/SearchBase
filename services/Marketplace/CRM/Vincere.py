@@ -1,6 +1,7 @@
 import base64
 import json
 import logging
+import os
 
 import requests
 
@@ -20,60 +21,39 @@ from services.Marketplace import marketplace_helpers as helpers
 # To Do: login and token refresh
 # To Test: inserting
 
+client_id = os.environ['VINCERE_CLIENT_ID']
+
 
 # login requires: client_id
 def login(auth):
     try:
-        authCopy = dict(auth)  # we took copy to delete domain later only from the copy
-
-        headers = {'Content-Type': 'application/json'}
-
-        code_url = "https://" + authCopy.get("domain", "") + ".vincere.io/api/v2/oauth2/authorize?" + \
-                   "response_type=code" + \
-                   "&redirect_uri=https://www.thesearchbase.com/api/bullhorn_callback" + \
-                   "&CLIENT_ID=" + authCopy.get("client_id", "")
-        # "&action=Login" + \
-        # "&username=" + authCopy.get("username", "") + \
-        # "&password=" + urllib.parse.quote(authCopy.get("password", ""))
-
-        # get the authorization code
-        code_request = requests.get(code_url, headers=headers)
-
-        if not code_request.ok:
-            raise Exception(code_request.text)
-        print("HEADERS: ", code_request.headers)
-        print("TEXT: ", code_request.text)
-
-        # if length isnt 2 it means the "invalid credentials" log in page has been returned
-        if len(code_request.text.split("?code=")) != 2:  # TODO
-            raise Exception("Invalid credentials")
-
-        # retrieve the auth code from the url string
-        authorization_code = code_request.text.split("?code=")[1].split("&client_id=")[0]  # TODO
-
-        access_token_url = "https://" + authCopy.get("domain", "") + ".vincere.io/api/v2/oauth2/authorize?" + \
+        headers = {'Content-Type': 'application/x-www-form-urlencoded'}
+        print("auth: ", auth)
+        access_token_url = "https://id.vincere.io/oauth2/token?" + \
                            "&grant_type=authorization_code" + \
-                           "&client_id=" + authCopy.get("client_id", "") + \
-                           "&code=" + authorization_code
+                           "&client_id=" + client_id + \
+                           "&code=" + auth.get("code")[0]
 
         # get the access token and refresh token
         access_token_request = requests.post(access_token_url, headers=headers)
 
         if not access_token_request.ok:
             raise Exception(access_token_request.text)
-
+        print(access_token_request.text)
+        print(access_token_request.status_code)
         result_body = json.loads(access_token_request.text)
 
-        authCopy["access_token"] = result_body.get("ACCESS_TOKEN")
-        authCopy["refresh_token"] = result_body.get("REFRESH_TOKEN")
-        authCopy["rest_token"] = result_body.get("ID_TOKEN")
-
         # Logged in successfully
-        return Callback(True, 'Logged in successfully', authCopy)
+        return Callback(True, 'Logged in successfully',
+                        {
+                            "access_token": result_body.get("ACCESS_TOKEN"),
+                            "refresh_token": result_body.get("REFRESH_TOKEN"),
+                            "rest_token": result_body.get("ID_TOKEN")
+                        })
 
     except Exception as exc:
         logging.error("CRM.Vincere.login() ERROR: " + str(exc))
-        print(exc)
+        print("login error: ", exc)
         return Callback(False, str(exc))
 
 
@@ -85,11 +65,11 @@ def retrieveRestToken(auth, companyID):
         # check if refresh_token exists
         # if it does use it to generate access_token and refresh_token
         if authCopy.get("refresh_token"):
-            url = "https://" + authCopy.get("domain", "") + ".vincere.io/api/v2/oauth2/authorize?"
+            url = "https://id.vincere.io/oauth2/token?"
             body = {
                 "grant_type": "refresh_token",
                 "refresh_token": authCopy.get("refresh_token"),
-                "CLIENT_ID=": authCopy.get("client_id")
+                "client_id": authCopy.get("client_id")
             }
 
             get_tokens = requests.put(url, headers=headers, data=json.dumps(body))

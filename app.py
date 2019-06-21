@@ -17,7 +17,7 @@ from datetime import datetime
 # Import all routers to register them as blueprints
 from routes.admin.routers import profile_router, analytics_router, sub_router, \
     conversation_router, users_router, flow_router, assistant_router,\
-    database_router, options_router, crm_router, auto_pilot_router
+    database_router, options_router, marketplace_router, auto_pilot_router
 from routes.public.routers import public_router, reset_password_router, chatbot_router, auth_router, appointment_router
 
 app = Flask(__name__, static_folder='static')
@@ -25,7 +25,7 @@ app = Flask(__name__, static_folder='static')
 # Register Routes:
 app.register_blueprint(assistant_router, url_prefix='/api')
 app.register_blueprint(flow_router, url_prefix='/api')
-app.register_blueprint(crm_router, url_prefix='/api')
+app.register_blueprint(marketplace_router, url_prefix='/api')
 app.register_blueprint(public_router)
 app.register_blueprint(reset_password_router, url_prefix='/api')
 app.register_blueprint(profile_router, url_prefix='/api')
@@ -57,7 +57,7 @@ def page_not_found(e):
         return render_template('errors/404.html'), status.HTTP_404_NOT_FOUND
 
 
-@crm_router.route("/bullhorn_callback", methods=['GET', 'POST', 'PUT'])
+@marketplace_router.route("/bullhorn_callback", methods=['GET', 'POST', 'PUT'])
 def test_crm_123():
     print("got something here", request)
     return request

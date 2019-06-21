@@ -20,7 +20,9 @@ db = SQLAlchemy()
 @event.listens_for(Engine, "connect")
 def _set_sqlite_pragma(dbapi_connection, connection_record):
     cursor = dbapi_connection.cursor()
-    cursor.execute('SET wait_timeout=31536000;')
+
+    if not isinstance(dbapi_connection, SQLite3Connection):
+        cursor.execute('SET wait_timeout=31536000;')
 
     if isinstance(dbapi_connection, SQLite3Connection):
         cursor.execute("PRAGMA foreign_keys=ON;")

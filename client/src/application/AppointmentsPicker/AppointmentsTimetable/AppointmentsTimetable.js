@@ -2,7 +2,7 @@ import moment from "moment";
 import React from 'react'
 import styles from "../AppointmentsPicker.module.less";
 
-import {Button, Skeleton, Typography} from 'antd'
+import {Button, Popconfirm, Typography} from 'antd'
 
 const {Title, Paragraph} = Typography;
 
@@ -289,13 +289,28 @@ class AppointmentsTimetable extends React.Component {
                     </div>
 
 
-                            <div style={{width: '100%'}}>
+                    <div style={{width: '100%'}}>
+                        {
+                            !this.state.selectedTimeSlot ?
                                 <Button type={'primary'}
                                         disabled={!this.state.selectedTimeSlot}
-                                        onClick={() => this.props.onSubmit(this.state.selectedTimeSlot)}
                                         style={{marginTop: 10, float: 'right'}}
                                         size={'large'}>Submit</Button>
-                            </div>
+                                :
+                                <Popconfirm
+                                    title="Are you sure to select this date?"
+                                    onConfirm={() => this.props.onSubmit(this.state.selectedTimeSlot)}
+                                    okText="Yes"
+                                    cancelText="No"
+                                >
+                                    <Button type={'primary'}
+                                            disabled={!this.state.selectedTimeSlot}
+                                            style={{marginTop: 10, float: 'right'}}
+                                            size={'large'}>Submit</Button>
+                                </Popconfirm>
+                        }
+                    </div>
+
                 </div>
             </>
         )

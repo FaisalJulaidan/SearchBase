@@ -39,6 +39,10 @@ class AppointmentsPicker extends React.Component {
                 <Typography.Title>
                     Thanks for your selection
                 </Typography.Title>
+                <h3>
+                    Your appointment will be confirmed when the recruiter confrims the appointment
+                    You will be notified by email
+                </h3>
             </div>
         );
 

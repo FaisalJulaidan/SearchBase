@@ -58,8 +58,8 @@ def signup(details) -> Callback:
         # sub_callback: Callback = sub_services.subscribe(company=company, planID='plan_D3lpeLZ3EV8IfA', trialDays=14)
 
 
-        tokenLink = helpers.getDomain() + "/verify_account/" + \
-                    helpers.verificationSigner.dumps(email + ";" + str(company.ID), salt='email-confirm-key')
+        verificationLink = helpers.getDomain() + "/verify_account/" + \
+                    helpers.verificationSigner.dumps({'email': email, 'companyID': company.ID}, salt='account-verify-key')
 
         verify_callback: Callback = \
             mail_services.send_email(email,
@@ -67,7 +67,7 @@ def signup(details) -> Callback:
                                      '/emails/account_verification.html',
                                      companyName=company.Name,
                                      userName= details['firstName'] + ' ' + details['lastName'],
-                                     verificationLink= tokenLink)
+                                     verificationLink= verificationLink)
 
         # Send us mail that someone has registered
         notify_us_callback: Callback = mail_services.sendNewUserHasRegistered(details['firstName'] + details['lastName'],

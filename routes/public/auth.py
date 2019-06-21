@@ -43,11 +43,9 @@ def signup_process():
 def verify_account(payload):
     if request.method == "POST":
         try:
-            data = helpers.verificationSigner.loads(payload, salt='email-confirm-key')
-            print(data)
-            email = data.split(";")[0]
+            data = helpers.verificationSigner.loads(payload, salt='account-verify-key')
 
-            callback: Callback = user_services.verifyByEmail(email)
+            callback: Callback = user_services.verifyByEmail(data['email'])
             if not callback.Success:
                 raise Exception("Couldn't verify your account")
 

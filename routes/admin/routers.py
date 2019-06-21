@@ -35,3 +35,6 @@ options_router: Blueprint = options_router
 
 from .auto_pilot.auto_pilot import auto_pilot_router
 auto_Pilot_router: Blueprint = auto_pilot_router
+
+from .appointment.appointment import appointment_router
+appointment_router: Blueprint = appointment_router

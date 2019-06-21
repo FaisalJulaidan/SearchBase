@@ -1,14 +1,28 @@
 from flask import Blueprint, request
-from models import Callback, Assistant, Conversation, Appointment
-from services import assistant_services, appointment_services, conversation_services
+from services import assistant_services
+from models import Callback, Assistant
 from utilities import helpers
+from flask_jwt_extended import jwt_required, get_jwt_identity
 
-appointment_router = Blueprint('appointment_router', __name__, template_folder="../templates", static_folder='static')
+
+appointment_router: Blueprint = Blueprint('appointment_router', __name__, template_folder="../../templates")
+
+
+@appointment_router.route("/appointments", methods=['GET'])
+@jwt_required
+def appointments():
+
+    # Authenticate
+    user = get_jwt_identity()['user']
+
+    if request.method == "GET":
+        pass
+
 
 
 # Appointment routes
-@appointment_router.route("/appointments/<payload>", methods=['GET', 'POST'])
-def candidate_appointment(payload):
+@appointment_router.route("/open_times/<payload>", methods=['GET', 'POST'])
+def open_times(payload):
 
     try:
         # Token expires in 5 days
@@ -59,13 +73,9 @@ def candidate_appointment(payload):
         # Add new appointment
         appointment_callback: Callback = appointment_services.add(data['conversationID'],
                                                                   data['assistantID'],
-                                                                  request.json.get('pickedTimeSlot'))
-
-        # TODO send an email to the user about his appointment
-        # Send confirmation email
-
+                                                                  request.json.get('pickedTimeSlot'),
+                                                                  confirmed=False)
 
         if not appointment_callback.Success:
             return helpers.jsonResponse(False, 400, "Sorry, we couldn't add your appointment")
         return helpers.jsonResponse(True, 200, "Appointment has been added. You should receive a confirmation email")
-

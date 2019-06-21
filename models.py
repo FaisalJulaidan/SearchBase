@@ -7,15 +7,13 @@ import os
 import json
 import enums
 from sqlalchemy_utils import PasswordType, CurrencyType
-
 from sqlalchemy.engine import Engine
 from sqlite3 import Connection as SQLite3Connection
 from pymysql import Connection as MySQLConnection
 from sqlalchemy_utils import EncryptedType
 from sqlalchemy_utils.types.encrypted.encrypted_type import AesEngine
 
-db = SQLAlchemy(model_class=FlaskBaseModel)
-db = initialize_flask_sqlathanor(db)
+db = SQLAlchemy()
 
 
 # Activate Foreign Keys
@@ -27,9 +25,6 @@ def _set_sqlite_pragma(dbapi_connection, connection_record):
     if isinstance(dbapi_connection, SQLite3Connection):
         cursor.execute("PRAGMA foreign_keys=ON;")
         cursor.close()
-
-
-
 
 
 class JsonEncodedDict(types.TypeDecorator):
@@ -55,6 +50,7 @@ mutable.MutableDict.associate_with(JsonEncodedDict)
 # ============= Models ===================
 
 class Company(db.Model):
+
     ID = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
     Name = db.Column(db.String(80), nullable=False)
     URL = db.Column(db.String(250), nullable=False)
@@ -136,6 +132,11 @@ class Role(db.Model):
 
 class Assistant(db.Model):
 
+    @property
+    def appointments(self):
+        q = Appointment.query.join(Conversation).filter(Conversation.Assistant == self)
+        return q.all()
+
     ID = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
     Name = db.Column(db.String(128), nullable=False)
     Description = db.Column(db.String(260), nullable=True)
@@ -161,7 +162,6 @@ class Assistant(db.Model):
 
     # - Many to one
     Conversations = db.relationship('Conversation', back_populates='Assistant')
-    Appointments = db.relationship('Appointment', back_populates='Assistant')
 
     # Constraints:
     # cannot have two assistants with the same name under one company
@@ -269,18 +269,15 @@ class Appointment(db.Model):
 
     ID = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
     DateTime = db.Column(db.DateTime(), nullable=False, default=datetime.now)
+    Confirmed = db.Column(db.Boolean, nullable=False, default=False)
 
-    # Relationships:
-    AssistantID = db.Column(db.Integer, db.ForeignKey('assistant.ID', ondelete='cascade'), nullable=False)
-    Assistant = db.relationship('Assistant', back_populates='Appointments')
-
-    ConversationID = db.Column(db.Integer, db.ForeignKey('conversation.ID', ondelete='cascade'), nullable=False)
+    ConversationID = db.Column(db.Integer, db.ForeignKey('conversation.ID', ondelete='cascade'),
+                               nullable=False, unique=True)
     Conversation = db.relationship('Conversation', back_populates='Appointment')
 
 
     # Constraints:
-    __table_args__ = (db.UniqueConstraint('AssistantID', 'DateTime', name='uix1_appointment'),
-                      db.UniqueConstraint('ConversationID', 'DateTime', name='uix2_appointment'),)
+    __table_args__ = (db.UniqueConstraint('ConversationID', 'DateTime', name='uix2_appointment'),)
 
 
 class CRM(db.Model):

@@ -298,8 +298,7 @@ def generate():
     reader_a.AutoPilot = auto_pilot_services.getByID(1,1).Data
 
     # Add Appointment
-    a = Appointment(DateTime=datetime.now() + timedelta(days=5),
-                    Conversation=conversation1, Assistant=reader_a)
+    a = Appointment(DateTime=datetime.now() + timedelta(days=5), Conversation=conversation1)
 
     db.session.add(a)
     db.session.commit()

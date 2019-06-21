@@ -107,7 +107,7 @@ elif os.environ['FLASK_ENV'] == 'development':
     jwt.init_app(app)
     db.init_app(app)
     mail.init_app(app)
-
+    app.app_context().push()
 
     url = os.environ['SQLALCHEMY_DATABASE_URI']  # get database URL
     if os.environ['REFRESH_DB_IN_DEV'] == 'yes':
@@ -122,7 +122,7 @@ elif os.environ['FLASK_ENV'] == 'development':
         'assistantID': 1,
         'companyID': 1,
         'email': 'julaidan.faisal@gmail.com',
-        'username': 'faisal julaidan',
+        'userName': 'Faisal',
     }
 
     token = helpers.verificationSigner.dumps(payload, salt='appointment-key')

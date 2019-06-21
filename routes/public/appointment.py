@@ -1,4 +1,5 @@
 from flask import Blueprint, request
+
 from models import Callback, Assistant, Conversation, Appointment
 from services import assistant_services, appointment_services, conversation_services
 from utilities import helpers
@@ -53,7 +54,7 @@ def candidate_appointment(payload):
         if appointment:
             return helpers.jsonResponse(False, 404,
                                         "Sorry, but your already have an appointment on " +
-                                        '{0:%Y-%m-%d %H:%M:%S}'.format(appointment))
+                                        '{0:%Y-%m-%d %H:%M:%S}'.format(appointment.DateTime))
 
         # Add new appointment
         appointment_callback: Callback = appointment_services.add(data['conversationID'],

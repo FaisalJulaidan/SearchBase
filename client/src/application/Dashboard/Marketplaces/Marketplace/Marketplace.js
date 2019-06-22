@@ -18,7 +18,6 @@ class Marketplace extends React.Component {
     };
 
     componentDidMount() {
-
     }
 
 

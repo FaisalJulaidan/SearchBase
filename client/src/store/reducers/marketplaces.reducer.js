@@ -15,17 +15,17 @@ export const marketplace = (state = initialState, action) => {
     let tState = {};
 
     switch (action.type) {
-        case actionTypes.GET_CONNECTED_CRMS_REQUEST:
+        case actionTypes.GET_MARKETPLACES_REQUEST:
             return updateObject(state, {
                 isLoadingMarketplaces: true,
             });
-        case actionTypes.GET_CONNECTED_CRMS_SUCCESS:
+        case actionTypes.GET_MARKETPLACES_SUCCESS:
             return updateObject(state, {
                 isLoadingMarketplaces: false,
                 marketplacesList: action.marketplacesList["crms"],
                 companyID: action.marketplacesList["companyID"],
             });
-        case actionTypes.GET_CONNECTED_CRMS_FAILURE:
+        case actionTypes.GET_MARKETPLACES_FAILURE:
             return updateObject(state, {
                 isLoadingMarketplaces: false,
                 errorMsg: action.error

@@ -2,13 +2,13 @@ import * as actionTypes from './actionTypes';
 
 const getConnectedCRMs = () => {
     return {
-        type: actionTypes.GET_CONNECTED_CRMS_REQUEST,
+        type: actionTypes.GET_MARKETPLACES_REQUEST,
     };
 };
 
 const getConnectedCRMsSuccess = (marketplacesList, companyID, msg) => {
     return {
-        type: actionTypes.GET_CONNECTED_CRMS_SUCCESS,
+        type: actionTypes.GET_MARKETPLACES_SUCCESS,
         marketplacesList,
         companyID,
         msg
@@ -17,7 +17,7 @@ const getConnectedCRMsSuccess = (marketplacesList, companyID, msg) => {
 
 const getConnectedCRMsFailure = (error) => {
     return {
-        type: actionTypes.GET_CONNECTED_CRMS_FAILURE,
+        type: actionTypes.GET_MARKETPLACES_FAILURE,
         error
     };
 };

@@ -3,7 +3,7 @@ import * as actionTypes from '../actions/actionTypes';
 import {marketplacesActions} from "../actions";
 import {destroyMessage, errorMessage, http, loadingMessage, successMessage} from "helpers";
 
-function* fetchCRMs() {
+function* fetchMarketplaces() {
     try {
         const res = yield http.get(`/crm`);
         yield put(marketplacesActions.getConnectedCRMsSuccess(res.data?.data));
@@ -65,8 +65,8 @@ function* exportRecruiterValueReport({connectedCRM_Type}) {
     }
 }
 
-function* watchFetchCRMs() {
-    yield takeEvery(actionTypes.GET_CONNECTED_CRMS_REQUEST, fetchCRMs)
+function* watchFetchMarketplaces() {
+    yield takeEvery(actionTypes.GET_MARKETPLACES_REQUEST, fetchMarketplaces)
 }
 
 function* watchConnectCrm() {
@@ -88,7 +88,7 @@ function* watchExportRecruiterValueReport() {
 
 export function* marketplacesSaga() {
     yield all([
-        watchFetchCRMs(),
+        watchFetchMarketplaces(),
         watchConnectCrm(),
         watchTestCrm(),
         watchDisconnectCrm(),

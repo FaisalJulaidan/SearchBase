@@ -75,6 +75,8 @@ self = "*"
 boto3 = "*"
 geoip2 = "*"
 forex-python = "*"
+msal = "*"
+authlib = "*"
 
 [requires]
 python_version = "3.7"

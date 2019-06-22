@@ -48,7 +48,6 @@ def getAll():
         return Callback(True, 'StoredFiles were successfully retrieved', result)
 
     except Exception as exc:
-        print("stored_file_services.getAll() ERROR: ", exc)
         helpers.logError("stored_file_services.getAll(): " + str(exc))
         db.session.rollback()
         return Callback(False, 'StoredFiles could not be retrieved/empty')

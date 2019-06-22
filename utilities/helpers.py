@@ -19,8 +19,7 @@ import re, os, stripe, gzip, functools, logging, geoip2.webservice, traceback
 # ======== Global Variables ======== #
 
 # GeoIP Client
-geoIP = geoip2.webservice.Client(140914, 'cKrqAZ675SPb')
-# geoIP = geoip2.webservice.Client(140914, os.environ['GEOIP_KEY'])
+geoIP = geoip2.webservice.Client(140914, os.environ['GEOIP_KEY'])
 
 # Signer
 verificationSigner = URLSafeTimedSerializer(os.environ['TEMP_SECRET_KEY'])
@@ -35,7 +34,6 @@ fernet = Fernet(os.environ['TEMP_SECRET_KEY'])
 
 # Currency converter by forex-python
 currencyConverter = CurrencyRates()
-
 
 # ======== Helper Functions ======== #
 
@@ -60,8 +58,11 @@ def logError(exception):
 # ID Hasher
 # IMPORTANT: don't you ever make changes to the hash values before consulting Faisal Julaidan
 hashids = Hashids(salt=BaseConfig.HASH_IDS_SALT, min_length=5)
+
+
 def encodeID(id):
     return hashids.encrypt(id)
+
 
 def decodeID(id):
     return hashids.decrypt(id)
@@ -69,13 +70,14 @@ def decodeID(id):
 
 # Encryptors
 def encrypt(value, isDict=False):
-    if isDict: value=json.dumps(value)
+    if isDict: value = json.dumps(value)
     return fernet.encrypt(bytes((value.encode('utf-8'))))
 
+
 def decrypt(token, isDict=False, isBtye=False):
-    if not isBtye: token=bytes(token.encode('utf-8'))
+    if not isBtye: token = bytes(token.encode('utf-8'))
     value = fernet.decrypt(token)
-    if isDict: value=json.loads(value)
+    if isDict: value = json.loads(value)
     return value
 
 
@@ -99,7 +101,6 @@ def isValidEmail(email: str) -> bool:
     if not re.match("^[A-Za-z0-9\.\+_-]+@[A-Za-z0-9\._-]+\.[a-zA-Z]*$", email):
         return False
     return True
-
 
 
 def jsonResponse(success: bool, http_code: int, msg: str, data=None):
@@ -150,6 +151,7 @@ def validAssistant(func):
             return jsonResponse(False, 404, "Assistant not found.", None)
         assistant: Assistant = callback.Data
         return func(assistant)
+
     return wrapperValidAssistant
 
 
@@ -189,8 +191,8 @@ def getDictFromSQLAlchemyObj(obj) -> dict:
 """Provide a list of keys (e.g ['id', 'name']) and the list of tuples"""
 """provided by sqlalchemy when querying for specific columns"""
 """this func will work for enums as well."""
-def getDictFromLimitedQuery(columnsList, tupleList: List[tuple]):
 
+def getDictFromLimitedQuery(columnsList, tupleList: List[tuple]):
     if not isinstance(tupleList, list):
         raise Exception("Provided list of tuples is empty. (Check data being returned from db)")
 
@@ -199,7 +201,7 @@ def getDictFromLimitedQuery(columnsList, tupleList: List[tuple]):
         return []
 
     # When tupleList is not empty, then the number of items in each tuple must match the number of items in columnsList
-    if len(columnsList) != len(tupleList[0]) :
+    if len(columnsList) != len(tupleList[0]):
         raise Exception("List of indexes provided must match in length to the items in each of the tuples")
 
     d = []
@@ -214,11 +216,44 @@ def getDictFromLimitedQuery(columnsList, tupleList: List[tuple]):
     return d
 
 
-
 """Convert a SQLAlchemy list of objects to a list of dicts"""
+
+
 def getListFromSQLAlchemyList(SQLAlchemyList):
     return list(map(getDictFromSQLAlchemyObj, SQLAlchemyList))
 
+    return view_func
 
 
+# Check if the logged in user owns the accessed assistant for security
+def validAssistant(func):
+    def wrapper(assistantID):
+        user = get_jwt_identity()['user']
+        callback: Callback = assistant_services.getByID(assistantID, user['companyID'])
+        if not callback.Success:
+            return jsonResponse(False, 404, "Assistant not found.", None)
+        assistant: Assistant = callback.Data
+        return func(assistant)
 
+    wrapper.__name__ = func.__name__
+    return wrapper
+
+
+def findIndexOfKeyInArray(key, value, array):
+    for item, idx in array:
+        if item.key == value:
+            return idx
+    return False
+
+
+# Helpful printer, so you can find out where a print if you forget about it and want to remove it
+def HPrint(message):
+    callerframerecord = inspect.stack()[1]
+    frame = callerframerecord[0]
+    info = inspect.getframeinfo(frame)
+    filenamearr = info.filename.split('\\')
+    filename = filenamearr[len(filenamearr) - 1]
+
+    print(message + " - (%s, line %s)" % (filename, info.lineno))
+
+# def csrf():

@@ -9,6 +9,8 @@ import AuroraCardAvatar from "components/AuroraCardAvatar/AuroraCardAvatar";
 import NoHeaderPanel from 'components/NoHeaderPanel/NoHeaderPanel'
 import {Link} from "react-router-dom";
 
+import axios from 'axios'
+
 const {Title, Paragraph, Text} = Typography;
 
 class Marketplace extends React.Component {
@@ -30,6 +32,13 @@ class Marketplace extends React.Component {
                 status: 'NOT_CONNECTED',
             },
             {
+                title: 'Vincere',
+                desc: `Vincere provides customer relationship management, applicant tracking system and operations software for the staffing industry.`,
+                image: getLink('/static/images/CRM/vincere.png'),
+                type: "Vincere",
+                status: 'NOT_CONNECTED',
+            },
+            {
                 title: 'Greenhouse',
                 desc: `Greenhouse works seamlessly with over 220 partners and third-party apps and technologies, enabling you to solve specific problems.`,
                 image: getLink('/static/images/CRM/greenhouse.png'),
@@ -40,22 +49,26 @@ class Marketplace extends React.Component {
                 title: 'Outlook Calendar',
                 desc: `Calendar is the calendar and scheduling component of Outlook that is fully integrated with email, contacts, and other features.`,
                 image: getLink('/static/images/CRM/outlook-calendar.png'),
-                type: "outlook",
-                status: 'Comming Soon',
-                disabled: true
+                type: "Outlook",
+                status: 'NOT_CONNECTED'
             },
             {
                 title: 'Google Calendar',
                 desc: `Google Calendar is a time-management and scheduling calendar service lets you keep track of important events, share your schedule.`,
                 image: getLink('/static/images/CRM/gmail.jpg'),
                 type: "gmail",
-                status: 'Comming Soon',
-                disabled: true
+                status: 'NOT_CONNECTED'
             },
         ]
     };
 
     componentDidMount() {
+        let loc = this.props.location.search.replace("?", "").split("&");
+        let isGoogleAuthorize = loc.filter(e => e.substring(0, "googleVerification".length) === "googleVerification").length > 0;
+        if(isGoogleAuthorize){
+            let code = loc.filter(e => e.substr(0, 4) === "code")[0].replace("code=", "");
+            axios.post("/api/calendar/google/authorize", {code})
+        }
         this.props.dispatch(crmActions.getConnectedCRMs())
     }
 
@@ -70,14 +83,14 @@ class Marketplace extends React.Component {
                         return 0;
 
                     if (index === -1) {
-                        // if there is not crm from the server
+                        // if there is not marketplace from the server
                         crm.status = 'NOT_CONNECTED';
                         delete crm.ID;
                     } else {
-                        // if there is a crm, check if it is failed or connected
+                        // if there is a marketplace, check if it is failed or connected
                         // and add the ID
                         crm.status = nextProps.CRMsList[index].Status ? "CONNECTED" : "FAILED";
-                        crm.ID = nextProps.CRMsList[index].ID
+                        crm.ID = nextProps.CRMsList[index].ID;
                     }
                 }
             )
@@ -110,7 +123,7 @@ class Marketplace extends React.Component {
                                 <Spin spinning={this.props.isLoadingCrms}>
                                     <Link to={{
                                         pathname: `/dashboard/marketplace/${crm.type}`,
-                                        state: {crm: crm}
+                                        state: {crm: crm, companyID:this.props.companyID}
                                     }}>
                                         <AuroraCardAvatar title={crm.title}
                                                           desc={crm.desc}
@@ -133,6 +146,7 @@ class Marketplace extends React.Component {
 function mapStateToProps(state) {
     return {
         CRMsList: state.crm.CRMsList,
+        companyID: state.crm.companyID,
         isLoadingCrms: state.crm.isLoadingCrms
     };
 }

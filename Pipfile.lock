@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "2204fa0feec2aa6333fb105acd167ef486c1e65506fcbd0887dd4259a7c61533"
+            "sha256": "cf8ec44ae8956674ba628ebde7f75d2c083affe368ebd9e1167e8e2e6498adf0"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -318,13 +318,6 @@
             "index": "pypi",
             "version": "==1.2.3"
         },
-        "forex-python": {
-            "hashes": [
-                "sha256:928951a0be8bf1139a07d21da0437ba111ef69a4d6c59b9252083611036548d5"
-            ],
-            "index": "pypi",
-            "version": "==1.5"
-        },
         "geoip2": {
             "hashes": [
                 "sha256:a37ddac2d200ffb97c736da8b8ba9d5d8dc47da6ec0f162a461b681ecac53a14",
@@ -592,6 +585,9 @@
             "version": "==2.18"
         },
         "pyjwt": {
+            "extras": [
+                "crypto"
+            ],
             "hashes": [
                 "sha256:30b1380ff43b55441283cc2b2676b755cca45693ae3097325dea01f3d110628c",
                 "sha256:4ee413b357d53fd3fb44704577afac88e72e878716116270d722723d65b42176"

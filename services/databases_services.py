@@ -12,7 +12,7 @@ from sqlalchemy_utils import Currency
 from enums import DatabaseType, DataType as DT
 from models import db, Callback, Database, Candidate, Assistant, Job
 from services import assistant_services
-from services.CRM import crm_services
+from services.Marketplace.CRM import crm_services
 from utilities import helpers
 
 

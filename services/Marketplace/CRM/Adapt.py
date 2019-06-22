@@ -1,11 +1,10 @@
-import requests
-from models import Callback, Conversation
 import json
-import logging
 
 import requests
 
 from enums import DataType as DT
+from models import Callback, Conversation
+from utilities import helpers
 
 
 def login(auth):
@@ -26,9 +25,9 @@ def login(auth):
         return Callback(True, 'Logged in successfully', r.json()['SID'])
 
     except Exception as exc:
-        logging.error("CRM.Adapt.login() ERROR: " + str(exc)
-                      + " Username: " + auth.get('username', 'Unknown')
-                      + " Domain: " + auth.get('domain', 'Unknown'))
+        helpers.logError("CRM.Adapt.login() ERROR: " + str(exc)
+                         + " Username: " + auth.get('username', 'Unknown')
+                         + " Domain: " + auth.get('domain', 'Unknown'))
         return Callback(False, str(exc))
 
 
@@ -82,9 +81,9 @@ def insertCandidate(auth, session: Conversation) -> Callback:
         return Callback(True, r.text)
 
     except Exception as exc:
-        logging.error("CRM.Adapt.insertCandidate() ERROR: " + str(exc)
-                      + " Username: " + auth.get('username', 'Unknown')
-                      + " Domain: " + auth.get('domain', 'Unknown'))
+        helpers.logError("CRM.Adapt.insertCandidate() ERROR: " + str(exc)
+                         + " Username: " + auth.get('username', 'Unknown')
+                         + " Domain: " + auth.get('domain', 'Unknown'))
         return Callback(False, str(exc))
 
 
@@ -129,7 +128,7 @@ def insertClient(auth, session: Conversation) -> Callback:
         return Callback(True, r.text)
 
     except Exception as exc:
-        logging.error("CRM.Adapt.insertClient() ERROR: " + str(exc)
-                      + " Username: " + auth.get('username', 'Unknown')
-                      + " Domain: " + auth.get('domain', 'Unknown'))
+        helpers.logError("CRM.Adapt.insertClient() ERROR: " + str(exc)
+                         + " Username: " + auth.get('username', 'Unknown')
+                         + " Domain: " + auth.get('domain', 'Unknown'))
         return Callback(False, str(exc))

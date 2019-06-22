@@ -9,7 +9,7 @@ from sqlalchemy.sql import desc
 from enums import UserType, ApplicationStatus
 from models import db, Callback, Conversation, Assistant
 from services import assistant_services, stored_file_services, auto_pilot_services, mail_services
-from services.CRM import crm_services
+from services.Marketplace.CRM import crm_services
 from utilities import json_schemas, helpers
 
 
@@ -73,7 +73,13 @@ def processConversation(assistantHashID, data: dict) -> Callback:
                 conversation.CRMSynced = True
             conversation.CRMResponse = crm_callback.Message
 
+        # immediate notification
+        if assistant.NotifyEvery == 0:
+            assistant.LastNotificationDate = datetime.now()
+            # notify via email ?
+
         db.session.add(conversation)
+        # db.session.save(assistant)
         db.session.commit()
 
         # Notify company about the new chatbot session

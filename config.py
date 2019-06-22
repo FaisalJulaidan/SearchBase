@@ -66,7 +66,7 @@ class BaseConfig(object):
     # Hashids Salt
     HASH_IDS_SALT = 'b9iLXiAa' # Never change it
 
-    # Mail Config
+    # Calendar Config
     MAIL_SERVER = 'smtp.gmail.com'
     MAIL_PORT = 465
     MAIL_USE_SSL = True
@@ -74,7 +74,7 @@ class BaseConfig(object):
     MAIL_PASSWORD = 'pilbvnczzdgxkyzy'
     MAIL_SUPPRESS_SEND = False
 
-    # # Mail Config
+    # # Calendar Config
     # MAIL_SERVER = 'smtp.office365.com'
     # MAIL_PORT = 587
     # MAIL_USE_TLS = True

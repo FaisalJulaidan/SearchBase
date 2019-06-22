@@ -1,10 +1,13 @@
-from models import db, Assistant, Callback, Appointment, AutoPilot
 from sqlalchemy import and_
+from werkzeug.utils import secure_filename
+
+from models import db, Assistant, Callback, Appointment, AutoPilot
+from services import stored_file_services, auto_pilot_services, conversation_services, flow_services
+from services.Marketplace.CRM import crm_services
+from services.Marketplace.Calendar import calendar_services
 from utilities import helpers, json_schemas
-from services.CRM import crm_services
 from os.path import join
 from config import BaseConfig
-from services import auto_pilot_services, conversation_services, flow_services
 from jsonschema import validate
 from datetime import datetime
 import json
@@ -102,7 +105,7 @@ def getAll(companyID) -> Callback:
             .filter(Assistant.CompanyID == companyID).all()
 
         if len(result) == 0:
-            return Callback(True,"No assistants  to be retrieved.", [])
+            return Callback(True, "No assistants  to be retrieved.", [])
 
         return Callback(True, "Got all assistants  successfully.", result)
 
@@ -116,7 +119,8 @@ def getAllWithEnabledNotifications(companyID) -> Callback:
     try:
         if companyID:
             # Get result and check if None then raise exception
-            result = db.session.query(Assistant).filter(and_(Assistant.CompanyID == companyID, Assistant.MailEnabled)).all()
+            result = db.session.query(Assistant).filter(
+                and_(Assistant.CompanyID == companyID, Assistant.MailEnabled)).all()
             if len(result) == 0:
                 return Callback(True, "No assistants  to be retrieved.", [])
 
@@ -142,7 +146,7 @@ def getOpenTimes(assistantID) -> Callback:
             return Callback(True,"There are no open time slots")
 
         # OpenTimes is an array of all open slots per day
-        return Callback(True,"Got open time slots successfully.", connectedAutoPilot.OpenTimes)
+        return Callback(True, "Got open time slots successfully.", connectedAutoPilot.OpenTimes)
 
     except Exception as exc:
         helpers.logError("assistant_services.getOpenTimes(): " + str(exc))
@@ -151,7 +155,7 @@ def getOpenTimes(assistantID) -> Callback:
 
 
 # ----- Updaters ----- #
-def update(id, name, desc, message, topBarText, companyID)-> Callback:
+def update(id, name, desc, message, topBarText, companyID) -> Callback:
     try:
         assistant: Assistant = db.session.query(Assistant) \
             .filter(and_(Assistant.ID == id, Assistant.CompanyID == companyID)) \
@@ -172,13 +176,13 @@ def update(id, name, desc, message, topBarText, companyID)-> Callback:
                         "Couldn't update assistant " + str(id))
 
 
-def updateConfigs(id, name, desc,  message, topBarText, secondsUntilPopup, notifyEvery, config, companyID)-> Callback:
+def updateConfigs(id, name, desc, message, topBarText, secondsUntilPopup, notifyEvery, config, companyID) -> Callback:
     try:
         # Validate the json config
         validate(config, json_schemas.assistant_config)
 
         assistant: Assistant = db.session.query(Assistant)\
-            .filter(and_(Assistant.ID == id, Assistant.CompanyID == companyID))\
+            .filter(and_(Assistant.ID == id, Assistant.CompanyID == companyID)) \
             .first()
 
         assistant.Name = name
@@ -186,7 +190,7 @@ def updateConfigs(id, name, desc,  message, topBarText, secondsUntilPopup, notif
         assistant.Message = message
         assistant.TopBarText = topBarText
         assistant.SecondsUntilPopup = secondsUntilPopup
-        assistant.NotifyEvery = notifyEvery
+        assistant.NotifyEvery = None if notifyEvery == "null" else int(notifyEvery)
         assistant.Config = config
 
         db.session.commit()
@@ -214,6 +218,7 @@ def updateStatus(assistantID, newStatus, companyID):
         db.session.rollback()
         return Callback(False, "Could not change the assistant's status.")
 
+
 # ----- Deletion ----- #
 def removeByID(id, companyID) -> Callback:
     try:
@@ -239,6 +244,7 @@ def connectToCRM(assistantID, CRMID, companyID):
             .update({"CRMID": CRMID})
 
         db.session.commit()
+
         return Callback(True, 'Assistant has been connected to CRM.')
 
     except Exception as exc:
@@ -260,6 +266,42 @@ def disconnectFromCRM(assistantID, companyID):
         helpers.logError("assistant_services.disconnectFromCRM(): " + str(exc))
         db.session.rollback()
         return Callback(False, 'Error in disconnecting assistant from CRM.')
+
+
+# ----- Calendar Connection ----- #
+def connectToCalendar(assistantID, CalendarID, companyID):
+    try:
+
+        crm_callback: Callback = calendar_services.getCalendarByID(CalendarID, companyID)
+        if not crm_callback.Success:
+            raise Exception(crm_callback.Message)
+
+        db.session.query(Assistant).filter(and_(Assistant.ID == assistantID, Assistant.CompanyID == companyID)) \
+            .update({"CalendarID": CalendarID})
+
+        db.session.commit()
+
+        return Callback(True, 'Assistant has been connected to the Calendar.')
+
+    except Exception as exc:
+        helpers.logError("assistant_services.connectToCalendar(): " + str(exc))
+        db.session.rollback()
+        return Callback(False, 'Error in connecting assistant to Calendar.')
+
+
+def disconnectFromCalendar(assistantID, companyID):
+    try:
+
+        db.session.query(Assistant).filter(and_(Assistant.ID == assistantID, Assistant.CompanyID == companyID)) \
+            .update({"CalendarID": None})
+
+        db.session.commit()
+        return Callback(True, 'Assistant has been disconnected from Calendar.')
+
+    except Exception as exc:
+        helpers.logError("assistant_services.disconnectFromCalendar(): " + str(exc))
+        db.session.rollback()
+        return Callback(False, 'Error in disconnecting assistant from Calendar.')
 
 
 # ----- AutoPilot Connection ----- #

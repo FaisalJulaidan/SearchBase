@@ -6,8 +6,10 @@ import styles from './Crm.module.less'
 import 'types/CRM_Types';
 import {AdaptFeatures, AdaptFormItems, AdaptHeader} from "./CrmForms/Adapt";
 import {BullhornFeatures, BullhornFormItems, BullhornHeader} from "./CrmForms/Bullhorn";
+import {VincereFeatures, VincereFormItems, VincereHeader} from "./CrmForms/Vincere";
 import {GreenhouseFeatures, GreenhouseFormItem, GreenhouseHeader} from "./CrmForms/Greenhouse";
-import VincereFormItems from "./CrmForms/Vincere";
+import {GoogleFeatures, GoogleFormItems, GoogleHeader} from './CrmForms/Google'
+import {OutlookFeatures, OutlookFormItems, OutlookHeader} from "./CrmForms/Outlook";
 import {connect} from 'react-redux';
 import {crmActions} from "store/actions";
 import {CSVLink} from "react-csv";
@@ -20,7 +22,7 @@ class Crm extends React.Component {
 
     componentWillMount() {
         if (!this.props.location.state)
-            return history.push('/dashboard/crmlist');
+            return history.push('/dashboard/marketplace');
         const /** @type {CRM}*/crm = this.props.location.state?.crm || {};
         this.props.dispatch(crmActions.exportRecruiterValueReport({Name: crm.type}))
     }
@@ -29,16 +31,17 @@ class Crm extends React.Component {
         const /** @type {CRM}*/crm = this.props.location.state?.crm || {};
         const index = nextProps.CRMsList.findIndex(serverCRM => serverCRM.Type === crm.type);
         if (index === -1) {
-            // if there is not crm from the server
+            // if there is not marketplace from the server
             crm.status = 'NOT_CONNECTED';
+            crm.companyID = nextProps.companyID;
             delete crm.ID;
         } else {
-            // if there is a crm, check if it is failed or connected
+            // if there is a marketplace, check if it is failed or connected
             // and add the ID
             crm.status = nextProps.CRMsList[index].Status ? "CONNECTED" : "FAILED";
             crm.ID = nextProps.CRMsList[index].ID;
         }
-        if(nextProps.exportData){
+        if (nextProps.exportData) {
             crm.exportData = nextProps.exportData;
         }
     }
@@ -81,6 +84,7 @@ class Crm extends React.Component {
             wrapperCol: {span: 14},
         };
         const /** @type {CRM}*/crm = this.props.location.state?.crm || {};
+
         return (
             <NoHeaderPanel>
 
@@ -111,13 +115,23 @@ class Crm extends React.Component {
                                 <BullhornHeader/>
                             }
                             {
+                                crm.type === "Vincere" &&
+                                <VincereHeader/>
+                            }
+                            {
                                 crm.type === "Greenhouse" &&
                                 <GreenhouseHeader/>
                             }
+                            {
+                                crm.type === "gmail" &&
+                                <GoogleHeader/>
+                            }
+                            {
+                                crm.type === "Outlook" &&
+                                <OutlookHeader/>
+                            }
                         </div>
                     </div>
-
-
                 </div>
 
                 <div className={styles.Body}>
@@ -147,8 +161,20 @@ class Crm extends React.Component {
                                 <BullhornFeatures/>
                             }
                             {
+                                crm.type === "Vincere" &&
+                                <VincereFeatures/>
+                            }
+                            {
                                 crm.type === "Greenhouse" &&
                                 <GreenhouseFeatures/>
+                            }
+                            {
+                                crm.type === "gmail" &&
+                                <GoogleFeatures/>
+                            }
+                            {
+                                crm.type === "Outlook" &&
+                                <OutlookFeatures/>
                             }
                         </TabPane>
 
@@ -199,7 +225,8 @@ class Crm extends React.Component {
                                                       isDisconnecting={this.props.isDisconnecting}
                                                       disconnectCRM={this.disconnectCRM}
                                                       connectCRM={this.connectCRM}
-                                                      testCRM={this.testCRM}/>
+                                                      testCRM={this.testCRM}
+                                                      companyID={this.props.location.state.companyID}/>
 
                                 }
 
@@ -215,6 +242,34 @@ class Crm extends React.Component {
                                                         disconnectCRM={this.disconnectCRM}
                                                         connectCRM={this.connectCRM}
                                                         testCRM={this.testCRM}/>
+                                }
+                                {
+                                    crm.type === "gmail" &&
+                                    <GoogleFormItems getFieldDecorator={getFieldDecorator}
+                                                     layout={layout}
+                                                     FormItem={FormItem}
+                                                     CRM={crm}
+                                                     isConnecting={this.props.isConnecting}
+                                                     isTesting={this.props.isTesting}
+                                                     isDisconnecting={this.props.isDisconnecting}
+                                                     disconnectCRM={this.disconnectCRM}
+                                                     connectCRM={this.connectCRM}
+                                                     testCRM={this.testCRM}/>
+                                }
+
+                                {
+                                    crm.type === "Outlook" &&
+                                    <OutlookFormItems getFieldDecorator={getFieldDecorator}
+                                                      layout={layout}
+                                                      FormItem={FormItem}
+                                                      CRM={crm}
+                                                      isConnecting={this.props.isConnecting}
+                                                      isTesting={this.props.isTesting}
+                                                      isDisconnecting={this.props.isDisconnecting}
+                                                      disconnectCRM={this.disconnectCRM}
+                                                      connectCRM={this.connectCRM}
+                                                      testCRM={this.testCRM}
+                                                      companyID={this.props.location.state.companyID}/>
                                 }
 
                             </Form>
@@ -236,7 +291,8 @@ function mapStateToProps(state) {
         isTesting: state.crm.isTesting,
         isDisconnecting: state.crm.isDisconnecting,
         isLoading: state.crm.isLoading,
-        exportData: state.crm.exportData
+        exportData: state.crm.exportData,
+        companyID: state.companyID
     };
 }
 

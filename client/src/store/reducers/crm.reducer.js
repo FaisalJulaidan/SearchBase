@@ -22,7 +22,8 @@ export const crm = (state = initialState, action) => {
         case actionTypes.GET_CONNECTED_CRMS_SUCCESS:
             return updateObject(state, {
                 isLoadingCrms: false,
-                CRMsList: action.CRMsList,
+                CRMsList: action.CRMsList["crms"],
+                companyID: action.CRMsList["companyID"],
             });
         case actionTypes.GET_CONNECTED_CRMS_FAILURE:
             return updateObject(state, {

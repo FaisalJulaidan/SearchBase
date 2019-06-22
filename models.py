@@ -1,15 +1,13 @@
-from sqlathanor import FlaskBaseModel, initialize_flask_sqlathanor
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import Enum, event, types
 from sqlalchemy.ext import mutable
-from datetime import datetime, timedelta
+from datetime import datetime
 import os
 import json
 import enums
 from sqlalchemy_utils import PasswordType, CurrencyType
 from sqlalchemy.engine import Engine
 from sqlite3 import Connection as SQLite3Connection
-from pymysql import Connection as MySQLConnection
 from sqlalchemy_utils import EncryptedType
 from sqlalchemy_utils.types.encrypted.encrypted_type import AesEngine
 
@@ -22,7 +20,7 @@ def _set_sqlite_pragma(dbapi_connection, connection_record):
     cursor = dbapi_connection.cursor()
 
     if not isinstance(dbapi_connection, SQLite3Connection):
-        cursor.execute('SET wait_timeout=31536000;')
+        cursor.execute("SET wait_timeout=31536000;")
 
     if isinstance(dbapi_connection, SQLite3Connection):
         cursor.execute("PRAGMA foreign_keys=ON;")
@@ -389,7 +387,7 @@ class Job(db.Model):
 class Calendar(db.Model):
     ID = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
     Type = db.Column(Enum(enums.Calendar), nullable=True)
-    Auth = db.Column(EncryptedType(JsonEncodedDict, os.environ['SECRET_KEY_DB'], AesEngine, 'pkcs5'), nullable=True)
+    Auth = db.Column(EncryptedType(JsonEncodedDict, os.environ['DB_SECRET_KEY'], AesEngine, 'pkcs5'), nullable=True)
     MetaData = db.Column(MagicJSON, nullable=True)
 
     # Relationships:

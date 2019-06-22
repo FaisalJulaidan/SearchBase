@@ -84,7 +84,7 @@ class Settings extends Component {
 
         return (
             <>
-                <Form layout='vertical' wrapperCol={{span: 10}}>
+                <Form layout='vertical' wrapperCol={{span: 15}}>
 
                     <h2>Basic Settings</h2>
                     <FormItem
@@ -186,6 +186,8 @@ class Settings extends Component {
                         </Radio.Group>
                         {this.state.isManualNotify ?
                             <InputNumber placeholder="Amount of time between notifications, in hours"
+                                         min={1}
+                                         style={{marginTop: 10, width: "100%"}}
                                          defaultValue={assistant.NotifyEvery}
                                          onChange={(val) => {this.setState({notifyEvery:val})}}/>
                             : null}

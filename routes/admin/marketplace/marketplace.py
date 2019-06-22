@@ -4,6 +4,7 @@ from flask import Blueprint, request
 from flask_jwt_extended import jwt_required, get_jwt_identity
 
 from models import Callback
+from services import assistant_services
 from services.Marketplace import marketplace_helpers
 from services.Marketplace.CRM import crm_services, Bullhorn
 from services.Marketplace.CRM import crm_services
@@ -144,3 +145,9 @@ def outlook_callback():
         return helpers.jsonResponse(False, 400, callback.Message)
 
     return helpers.jsonResponse(True, 200, "Success")
+
+
+@marketplace_router.route("/marketplace_test", methods=['GET', 'POST', 'PUT'])
+def testtss():
+    assistant = assistant_services.getByID(1, 1).Data
+    return Outlook.addEvent(assistant.Calendar.Auth, assistant, assistant.CompanyID).Message

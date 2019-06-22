@@ -48,7 +48,7 @@ def login(auth):
 
 def retrieveAccessToken(auth, companyID):
     try:
-
+        print(auth.get("refresh_token"))
         headers = {'Content-Type': 'application/x-www-form-urlencoded'}
 
         body = {
@@ -61,7 +61,7 @@ def retrieveAccessToken(auth, companyID):
 
         url = "https://login.microsoftonline.com/common/oauth2/v2.0/token"
 
-        get_access_token = requests.post(url, headers=headers, data=json.dumps(body))
+        get_access_token = requests.post(url, headers=headers, data=body)
         if not get_access_token.ok:
             raise Exception(get_access_token.text)
 
@@ -101,6 +101,7 @@ def addCalendar(auth, companyID):
         return Callback(True, sendQuery_callback.Data.text)
 
     except Exception as exc:
+        print(exc)
         logging.error("CRM.Outlook.login() ERROR: " + str(exc))
         return Callback(False, str(exc))
 
@@ -108,11 +109,11 @@ def addCalendar(auth, companyID):
 # TODO remove auth, take it from assistant.Calendar - check for others too
 def addEvent(auth, assistant, eventDetails):
     try:
-        if not assistant.Calendar.MetaData.get("calendarID"):
+        if not assistant.Calendar.MetaData:
             createCalendar_callback: Callback = addCalendar(auth, assistant.CompanyID)
             if not createCalendar_callback.Success:
                 raise Exception("Could not create TheSearchBase calendar to add the event to")
-
+        # TODO if it doesnt find TSB calendar add it to the main one
         body = {
             "Subject": eventDetails.get("name"),
             "Body": {
@@ -158,9 +159,9 @@ def sendQuery(auth, query, method, body, companyID, optionalParams=None):
     try:
         # get url
         url = buildUrl(query, optionalParams)
-
+        print("auth: ", auth)
         # set headers
-        headers = {'Content-Type': 'application/json'}
+        headers = {'Content-Type': 'application/json', "Authorization": "Bearer " + auth.get("access_token")}
 
         # test the BhRestToken (rest_token)
         r = helpers.sendRequest(url, method, headers, json.dumps(body))
@@ -170,6 +171,7 @@ def sendQuery(auth, query, method, body, companyID, optionalParams=None):
                 url = buildUrl(query, optionalParams)
 
                 r = helpers.sendRequest(url, method, headers, json.dumps(body))
+                print(r.status_code)
                 if not r.ok:
                     raise Exception(r.text + ". Query could not be sent")
             else:

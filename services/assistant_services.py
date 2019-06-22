@@ -286,7 +286,7 @@ def disconnectFromCRM(assistantID, companyID):
         return Callback(False, 'Error in disconnecting assistant from CRM.')
 
 
-# ----- CRM Connection ----- #
+# ----- Calendar Connection ----- #
 def connectToCalendar(assistantID, CalendarID, companyID):
     try:
 
@@ -299,12 +299,12 @@ def connectToCalendar(assistantID, CalendarID, companyID):
 
         db.session.commit()
 
-        return Callback(True, 'Assistant has been connected to CRM.')
+        return Callback(True, 'Assistant has been connected to the Calendar.')
 
     except Exception as exc:
-        helpers.logError("assistant_services.connectToCRM(): " + str(exc))
+        helpers.logError("assistant_services.connectToCalendar(): " + str(exc))
         db.session.rollback()
-        return Callback(False, 'Error in connecting assistant to CRM.')
+        return Callback(False, 'Error in connecting assistant to Calendar.')
 
 
 def disconnectFromCalendar(assistantID, companyID):
@@ -314,12 +314,12 @@ def disconnectFromCalendar(assistantID, companyID):
             .update({"CalendarID": None})
 
         db.session.commit()
-        return Callback(True, 'Assistant has been disconnected from CRM.')
+        return Callback(True, 'Assistant has been disconnected from Calendar.')
 
     except Exception as exc:
-        helpers.logError("assistant_services.disconnectFromCRM(): " + str(exc))
+        helpers.logError("assistant_services.disconnectFromCalendar(): " + str(exc))
         db.session.rollback()
-        return Callback(False, 'Error in disconnecting assistant from CRM.')
+        return Callback(False, 'Error in disconnecting assistant from Calendar.')
 
 
 # ----- AutoPilot Connection ----- #

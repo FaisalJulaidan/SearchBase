@@ -23,8 +23,6 @@ def candidate_appointment(payload):
             return helpers.jsonResponse(False, 404, "Assistant not found.")
         assistant: Assistant = assistant_callback.Data
 
-
-
         if request.method == "GET":
             openTimes_callback: Callback = assistant_services.getOpenTimes(assistantID)
             if not openTimes_callback.Success:
@@ -38,8 +36,6 @@ def candidate_appointment(payload):
             }
 
             return helpers.jsonResponse(True, 200, "", data)
-
-
 
         if request.method == "POST":
             callback: Callback = assistant_services.addAppointment(conversationID,

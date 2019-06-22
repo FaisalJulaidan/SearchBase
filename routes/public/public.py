@@ -157,6 +157,7 @@ def sendEmail():
         mail.send(msg)
         return render_template("index.html")
 
+
 # Account verification route
 @public_router.route("/account/verify/<payload>", methods=['GET'])
 def verify_account(payload):

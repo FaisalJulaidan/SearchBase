@@ -8,6 +8,8 @@ from models import Callback
 from services.Marketplace import marketplace_helpers as helpers
 
 # Client ID and secret
+from services.Marketplace.Calendar import calendar_services
+
 client_id = os.environ['OUTLOOK_CLIENT_ID']
 client_secret = os.environ['OUTLOOK_CLIENT_SECRET']
 
@@ -83,8 +85,38 @@ def retrieveAccessToken(auth, companyID):
         return Callback(False, str(exc))
 
 
+def addCalendar(auth, companyID):
+    try:
+        body ={
+            "Name": "TheSearchBase"
+        }
+
+        # send query
+        sendQuery_callback: Callback = sendQuery(auth, "calendars", "post", body, companyID)
+
+        if not sendQuery_callback.Success:
+            raise Exception(sendQuery_callback.Message)
+
+        result_body = json.loads(sendQuery_callback.Data.text)
+
+        calendar_services.updateByCompanyAndType("Outlook", companyID, auth, {"calendarID": result_body["Id"]})
+
+        return Callback(True, sendQuery_callback.Data.text)
+
+    except Exception as exc:
+        print("ERROR:", exc)
+        logging.error("CRM.Outlook.login() ERROR: " + str(exc))
+        return Callback(False, str(exc))
+
+
+# TODO remove auth, take it from assistant.Calendar - check for others too
 def addEvent(auth, assistant, eventDetails):
     try:
+        if not assistant.Calendar.MetaData.get("calendarID"):
+            createCalendar_callback: Callback = addCalendar(auth, assistant.CompanyID)
+            if not createCalendar_callback.Success:
+                raise Exception("Could not create TheSearchBase calendar to add the event to")
+
         body = {
             "Subject": eventDetails.get("name"),
             "Body": {
@@ -99,15 +131,7 @@ def addEvent(auth, assistant, eventDetails):
                 "DateTime": eventDetails.get("end"),  # "2014-02-02T19:00:00"
                 "TimeZone": "Pacific Standard Time"
             },
-            "Attendees": [
-                # {
-                #     # "EmailAddress": {
-                #     #     "Address": "janets@a830edad9050849NDA1.onmicrosoft.com",
-                #     #     "Name": "Janet Schorr"
-                #     # },
-                #     # "Type": "Required"
-                # }
-            ]
+            "Attendees": []
         }
 
         for attendee in eventDetails.get("attendees"):
@@ -120,7 +144,9 @@ def addEvent(auth, assistant, eventDetails):
             })
 
         # send query
-        sendQuery_callback: Callback = sendQuery(auth, "events", "post", body, assistant.CompanyID)
+        sendQuery_callback: Callback = sendQuery(auth,
+                                                 "calendars/"+str(assistant.Calendar.MetaData["calendarID"])+"events",
+                                                 "post", body, assistant.CompanyID)
 
         if not sendQuery_callback.Success:
             raise Exception(sendQuery_callback.Message)

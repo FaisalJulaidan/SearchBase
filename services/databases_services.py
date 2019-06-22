@@ -267,7 +267,8 @@ def scanCandidates(session, dbIDs, extraCandidates=None):
     try:
 
         df = pandas.read_sql(db.session.query(Candidate).filter(Candidate.DatabaseID.in_(dbIDs)).statement,
-                             con=db.session.bind).fillna(value=0)
+                             con=db.session.bind)
+
         df = df.drop('DatabaseID', axis=1)  # Drop column
 
         keywords = session['keywordsByDataType']
@@ -276,6 +277,9 @@ def scanCandidates(session, dbIDs, extraCandidates=None):
         if extraCandidates:
             df = df.append(extraCandidates, ignore_index=True)  # TODO
             # print("df: ", df["CandidateLocation"])
+
+        # Fill None values with 0 for numeric columns and with empty string for string columns
+        df = df.fillna({Candidate.CandidateDesiredSalary.name: 0, Candidate.CandidateYearsExperience: 0}).fillna('')
 
         # Salary comparision for JobSalary (LessThan is forced)
         salaryInputs: list = keywords.get(DT.JobSalary.value['name'])
@@ -357,16 +361,22 @@ def scanJobs(session, dbIDs, extraJobs=None):
     try:
 
         df = pandas.read_sql(db.session.query(Job).filter(Job.DatabaseID.in_(dbIDs)).statement,
-                             con=db.session.bind).fillna(value=0)
+                             con=db.session.bind)\
+            .fillna({Job.JobSalary.name: 0, Job.JobYearsRequired.name: 0})\
+            .fillna('')
+
+
         df = df.drop('DatabaseID', axis=1)  # Drop column
 
         keywords = session['keywordsByDataType']
-        df['Score'] = 0  # Add column for tracking score
+        df['Score'] = 1  # Add column for tracking score
         df['Source'] = "Internal Database"  # Source of solution e.g. Bullhorn, Adapt...
 
         if extraJobs:
             df = df.append(extraJobs, ignore_index=True)
 
+        # Fill None values with 0 for numeric columns and with empty string for string columns
+        df = df.fillna({Job.JobSalary.name: 0, Job.JobYearsRequired.name: 0}).fillna('')
 
         # Salary comparision
         salaryInputs: list = keywords.get(DT.JobSalary.value['name'], keywords.get(DT.CandidateDesiredSalary.value['name']))
@@ -399,7 +409,6 @@ def scanJobs(session, dbIDs, extraJobs=None):
         __wordsCounter(DT.JobDesiredSkills, Job.JobDesiredSkills, keywords, df, 3)
         __wordsCounter(DT.CandidateSkills, Job.JobEssentialSkills, keywords, df, 3)
         __wordsCounter(DT.CandidateSkills, Job.JobDesiredSkills, keywords, df, 3)
-
 
         # Results
         topResults = json.loads(df[df['Score'] > 0].nlargest(session.get('showTop', 0), 'Score')
@@ -469,14 +478,18 @@ def scanJobs(session, dbIDs, extraJobs=None):
 
 def __wordsCounter(dataType: DT, dbColumn, keywords, df, x=1):
     if keywords.get(dataType.value['name']):
-        df['Score'] += x * df[df[dbColumn.name].notnull()][dbColumn.name].str.count('|'.join(keywords[dataType.value['name']]),
+        df['Score'] += x * df[dbColumn.name].str.count('|'.join(keywords[dataType.value['name']]),
                                                        flags=re.IGNORECASE) | 0
 
 
 def __numCounter(dbColumn, compareSign, dataType: DT, keywords, df, plus=1, addInputToScore=False):
     if keywords.get(dataType.value['name']):
         numberInput = int(keywords.get(dataType.value['name'])[-1])
-        plus += 7 if numberInput > 7 else numberInput # it is good for years of exp to be added to the score
+
+        # it is good for years of exp to be added to the score
+        if addInputToScore:
+            plus += 7 if numberInput > 7 else numberInput
+
         # Compare
         if compareSign == '>':
             df.loc[df[dbColumn.name] >=
@@ -511,38 +524,38 @@ def createPandaCandidate(id, name, email, mobile, location, skills,
                          linkdinURL, availability, jobTitle, education,
                          yearsExperience: int, desiredSalary: float, currency, source):
     return {"ID": id,
-            "CandidateName": name,
-            "CandidateEmail": email,
-            "CandidateMobile": mobile,
-            "CandidateLocation": location,
-            "CandidateSkills": skills,
-            "CandidateLinkdinURL": linkdinURL,
-            "CandidateAvailability": availability,
-            "CandidateJobTitle": jobTitle,
-            "CandidateEducation": education,
-            "CandidateYearsExperience": yearsExperience,
-            "CandidateDesiredSalary": desiredSalary,
-            "Currency": currency,
+            "CandidateName": name or '',
+            "CandidateEmail": email or '',
+            "CandidateMobile": mobile or '',
+            "CandidateLocation": location or '',
+            "CandidateSkills": skills or '',
+            "CandidateLinkdinURL": linkdinURL or '',
+            "CandidateAvailability": availability or '',
+            "CandidateJobTitle": jobTitle or '',
+            "CandidateEducation": education or '',
+            "CandidateYearsExperience": yearsExperience or 0,
+            "CandidateDesiredSalary": desiredSalary or 0,
+            "Currency": currency or '',
             "Score": 0,
-            "Source": source,
+            "Source": source or '',
             }
 
 
 def createPandaJob(id, title, desc, location, type, salary: float, essentialSkills, desiredSkills, yearsRequired,
                    startDate, endDate, linkURL, currency, source):
     return {"ID": id,
-            "JobTitle": title,
-            "JobDescription": desc,
-            "JobLocation": location,
-            "JobType": type,
-            "JobSalary": salary,
-            "JobEssentialSkills": essentialSkills,
-            "JobDesiredSkills": desiredSkills,
-            "JobYearsRequired": yearsRequired,
-            "JobStartDate": startDate,
+            "JobTitle": title or '',
+            "JobDescription": desc or '',
+            "JobLocation": location or '',
+            "JobType": type or '',
+            "JobSalary": salary or 0,
+            "JobEssentialSkills": essentialSkills or '',
+            "JobDesiredSkills": desiredSkills or '',
+            "JobYearsRequired": yearsRequired or 0,
+            "JobStartDate": startDate or '',
             "JobEndDate": endDate,
             "JobLinkURL": linkURL,
-            "Currency": currency,
+            "Currency": currency or '',
             "Score": 0,
-            "Source": source,
+            "Source": source or '',
             }

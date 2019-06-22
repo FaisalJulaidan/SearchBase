@@ -52,7 +52,8 @@ def getDomain():
 
 def logError(exception):
     if os.environ['FLASK_ENV'] == 'development':
-        print(traceback.format_exc())
+        print(exception)
+        # print(traceback.format_exc())
     logging.error(traceback.format_exc() + exception + "\n \n" )
 
 

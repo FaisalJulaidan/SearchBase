@@ -119,17 +119,17 @@ elif os.environ['FLASK_ENV'] == 'development':
 
     # appointment_services.getAllByCompanyID(1)
 
-    payload = {
-        'conversationID': 5,
-        'assistantID': 1,
-        'companyID': 1,
-        'email': 'julaidan.faisal@gmail.com',
-        'userName': 'Faisal',
-    }
-
-    token = helpers.verificationSigner.dumps(payload, salt='appointment-key')
-    print(token)
-    print(helpers.verificationSigner.loads(token, salt='appointment-key', max_age=432000))
+    # payload = {
+    #     'conversationID': 5,
+    #     'assistantID': 1,
+    #     'companyID': 1,
+    #     'email': 'julaidan.faisal@gmail.com',
+    #     'userName': 'Faisal',
+    # }
+    #
+    # token = helpers.verificationSigner.dumps(payload, salt='appointment-key')
+    # print(token)
+    # print(helpers.verificationSigner.loads(token, salt='appointment-key', max_age=432000))
 
     print('Development mode running...')
 

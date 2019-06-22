@@ -1,9 +1,9 @@
 import React from 'react'
 import {Icon, Spin, Typography} from 'antd';
 import styles from './Marketplaces.module.less'
-import 'types/CRM_Types';
+import 'types/Marketplaces_Types';
 import {getLink} from "helpers";
-import {crmActions} from "store/actions";
+import {marketplacesActions} from "store/actions";
 import {connect} from 'react-redux';
 import AuroraCardAvatar from "components/AuroraCardAvatar/AuroraCardAvatar";
 import NoHeaderPanel from 'components/NoHeaderPanel/NoHeaderPanel'
@@ -15,8 +15,8 @@ const {Title, Paragraph, Text} = Typography;
 
 class Marketplaces extends React.Component {
     state = {
-        /** @type {CRM[]} */
-        CRMs: [
+        /** @type {Marketplace[]} */
+        marketplaces: [
             {
                 title: 'Adapt',
                 desc: `Bond Adapt, specialist portfolio of recruitment software applications has earned a reputation for increasing business growth.`,
@@ -69,28 +69,28 @@ class Marketplaces extends React.Component {
             let code = loc.filter(e => e.substr(0, 4) === "code")[0].replace("code=", "");
             axios.post("/api/calendar/google/authorize", {code})
         }
-        this.props.dispatch(crmActions.getConnectedCRMs())
+        this.props.dispatch(marketplacesActions.getConnectedCRMs())
     }
 
     componentWillReceiveProps(nextProps) {
         // check the status
         this.setState(
-            state => state.CRMs.map(
-                crm => {
-                    const index = nextProps.CRMsList.findIndex(serverCRM => serverCRM.Type === crm.type);
+            state => state.marketplaces.map(
+                marketplaces => {
+                    const index = nextProps.marketplacesList.findIndex(serverCRM => serverCRM.Type === marketplaces.type);
 
-                    if (crm.status === 'Comming Soon')
+                    if (marketplaces.status === 'Comming Soon')
                         return 0;
 
                     if (index === -1) {
                         // if there is not marketplace from the server
-                        crm.status = 'NOT_CONNECTED';
-                        delete crm.ID;
+                        marketplaces.status = 'NOT_CONNECTED';
+                        delete marketplaces.ID;
                     } else {
                         // if there is a marketplace, check if it is failed or connected
                         // and add the ID
-                        crm.status = nextProps.CRMsList[index].Status ? "CONNECTED" : "FAILED";
-                        crm.ID = nextProps.CRMsList[index].ID;
+                        marketplaces.status = nextProps.marketplacesList[index].Status ? "CONNECTED" : "FAILED";
+                        marketplaces.ID = nextProps.marketplacesList[index].ID;
                     }
                 }
             )
@@ -118,18 +118,18 @@ class Marketplaces extends React.Component {
 
                 <div className={styles.Body}>
                     {
-                        this.state.CRMs.map((crm, i) =>
+                        this.state.marketplaces.map((marketplace, i) =>
                             <div className={styles.CardFrame} key={i}>
-                                <Spin spinning={this.props.isLoadingCrms}>
+                                <Spin spinning={this.props.isLoadingMarketplaces}>
                                     <Link to={{
-                                        pathname: `/dashboard/marketplace/${crm.type}`,
-                                        state: {crm: crm, companyID: this.props.companyID}
+                                        pathname: `/dashboard/marketplaces/${marketplace.type}`,
+                                        state: {marketplace: marketplace, companyID: this.props.companyID}
                                     }}>
-                                        <AuroraCardAvatar title={crm.title}
-                                                          desc={crm.desc}
-                                                          image={crm.image}
-                                                          status={crm.status}
-                                                          disabled={crm.disabled}
+                                        <AuroraCardAvatar title={marketplace.title}
+                                                          desc={marketplace.desc}
+                                                          image={marketplace.image}
+                                                          status={marketplace.status}
+                                                          disabled={marketplace.disabled}
                                         />
                                     </Link>
                                 </Spin>
@@ -145,9 +145,9 @@ class Marketplaces extends React.Component {
 
 function mapStateToProps(state) {
     return {
-        CRMsList: state.crm.CRMsList,
-        companyID: state.crm.companyID,
-        isLoadingCrms: state.crm.isLoadingCrms
+        marketplacesList: state.marketplace.marketplacesList,
+        companyID: state.marketplace.companyID,
+        isLoadingMarketplaces: state.marketplace.isLoadingMarketplaces
     };
 }
 

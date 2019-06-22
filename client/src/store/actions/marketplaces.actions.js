@@ -6,10 +6,10 @@ const getConnectedCRMs = () => {
     };
 };
 
-const getConnectedCRMsSuccess = (CRMsList, companyID, msg) => {
+const getConnectedCRMsSuccess = (marketplacesList, companyID, msg) => {
     return {
         type: actionTypes.GET_CONNECTED_CRMS_SUCCESS,
-        CRMsList,
+        marketplacesList,
         companyID,
         msg
     };
@@ -108,7 +108,7 @@ const exportRecruiterValueReportFailure = (error) => {
 };
 
 
-export const crmActions = {
+export const marketplacesActions = {
     getConnectedCRMs,
     getConnectedCRMsSuccess,
     getConnectedCRMsFailure,

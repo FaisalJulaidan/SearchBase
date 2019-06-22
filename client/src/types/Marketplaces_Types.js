@@ -1,6 +1,6 @@
 /**
  * Date type
- @typedef CRM
+ @typedef Marketplace
  @type {Object}
  @property {string} ID - The ID of the CRM from DB
  @property {string} title

@@ -2,32 +2,32 @@ import * as actionTypes from '../actions/actionTypes';
 import {updateObject} from '../utility';
 
 const initialState = {
-    CRMsList: [],
+    marketplacesList: [],
     errorMsg: null,
     currentCRM: {},
-    isLoadingCrms: false,
+    isLoadingMarketplaces: false,
     isConnecting: false,
     isTesting: false,
     isDisconnecting: false
 };
 
-export const crm = (state = initialState, action) => {
+export const marketplace = (state = initialState, action) => {
     let tState = {};
 
     switch (action.type) {
         case actionTypes.GET_CONNECTED_CRMS_REQUEST:
             return updateObject(state, {
-                isLoadingCrms: true,
+                isLoadingMarketplaces: true,
             });
         case actionTypes.GET_CONNECTED_CRMS_SUCCESS:
             return updateObject(state, {
-                isLoadingCrms: false,
-                CRMsList: action.CRMsList["crms"],
-                companyID: action.CRMsList["companyID"],
+                isLoadingMarketplaces: false,
+                marketplacesList: action.marketplacesList["crms"],
+                companyID: action.marketplacesList["companyID"],
             });
         case actionTypes.GET_CONNECTED_CRMS_FAILURE:
             return updateObject(state, {
-                isLoadingCrms: false,
+                isLoadingMarketplaces: false,
                 errorMsg: action.error
             });
 
@@ -39,11 +39,11 @@ export const crm = (state = initialState, action) => {
             });
         case actionTypes.CONNECT_CRM_SUCCESS:
             tState = {...state};
-            tState.CRMsList.push(action.connectedCRM);
+            tState.marketplacesList.push(action.connectedCRM);
             return updateObject(state, {
                 isConnecting: false,
                 connectedCRM_ID: action.connectedCRM,
-                CRMsList: tState.CRMsList
+                marketplacesList: tState.marketplacesList
             });
         case actionTypes.CONNECT_CRM_FAILURE:
             return updateObject(state, {
@@ -77,7 +77,7 @@ export const crm = (state = initialState, action) => {
             return updateObject(state, {
                 isDisconnecting: false,
                 connectedCRM_ID: action.connectedCRM_ID,
-                CRMsList: tState.CRMsList.filter(x => x.ID !== action.connectedCRM_ID)
+                marketplacesList: tState.marketplacesList.filter(x => x.ID !== action.connectedCRM_ID)
             });
         case actionTypes.DISCONNECT_CRM_FAILURE:
             return updateObject(state, {

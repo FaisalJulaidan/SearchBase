@@ -5,7 +5,7 @@ export * from "./account.actions";
 export * from "./conversation.actions";
 export * from "./usersManagement.actions";
 export * from "./options.actions";
-export * from "./crm.actions";
+export * from "./marketplaces.actions";
 export * from "./autoPilot.actions";
 export * from "./analytics.actions";
 export * from "./appointmentsPicker.actions";

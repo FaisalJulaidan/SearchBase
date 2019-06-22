@@ -3,7 +3,7 @@ import {connect} from 'react-redux';
 import {store} from "store/store";
 
 import {Button, Select, Form, Divider, Row, Col} from "antd";
-import {assistantActions, crmActions} from "store/actions";
+import {assistantActions, marketplacesActions} from "store/actions";
 import {history} from "helpers";
 
 const Option = Select.Option;

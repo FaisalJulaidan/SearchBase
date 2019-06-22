@@ -1,13 +1,13 @@
 import {all, put, takeEvery, takeLatest} from 'redux-saga/effects'
 import * as actionTypes from '../actions/actionTypes';
-import {assistantActions, crmActions, flowActions} from "../actions";
+import {assistantActions, marketplacesActions, flowActions} from "../actions";
 import {errorMessage, flow, http, loadingMessage, successMessage} from "helpers";
 
 function* fetchAssistants() {
     try {
         const res = yield http.get(`/assistants`);
         yield put(assistantActions.fetchAssistantsSuccess(res.data?.data.assistants));
-        yield put(crmActions.getConnectedCRMs());
+        yield put(marketplacesActions.getConnectedCRMs());
     } catch (error) {
         const msg = error.response?.data?.msg || "Couldn't load assistants";
         errorMessage(msg);
@@ -18,7 +18,7 @@ function* fetchAssistants() {
 function* fetchAssistant({assistantID, meta}) {
     try {
         const res = yield http.get(`/assistant/${assistantID}`);
-        // yield put(crmActions.getConnectedCRMs());
+        // yield put(marketplacesActions.getConnectedCRMs());
         yield put({...assistantActions.fetchAssistantSuccess(res.data?.data), meta});
     } catch (error) {
         const msg = error.response?.data?.msg || "Couldn't load assistants";

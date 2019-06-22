@@ -3,7 +3,7 @@ import {history} from "helpers";
 import NoHeaderPanel from 'components/NoHeaderPanel/NoHeaderPanel'
 import {Avatar, Breadcrumb, Button, Form, Tabs, Typography} from 'antd';
 import styles from './Crm.module.less'
-import 'types/CRM_Types';
+import 'types/Marketplaces_Types';
 import {AdaptFeatures, AdaptFormItems, AdaptHeader} from "./CrmForms/Adapt";
 import {BullhornFeatures, BullhornFormItems, BullhornHeader} from "./CrmForms/Bullhorn";
 import {VincereFeatures, VincereFormItems, VincereHeader} from "./CrmForms/Vincere";
@@ -11,7 +11,7 @@ import {GreenhouseFeatures, GreenhouseFormItem, GreenhouseHeader} from "./CrmFor
 import {GoogleFeatures, GoogleFormItems, GoogleHeader} from './CrmForms/Google'
 import {OutlookFeatures, OutlookFormItems, OutlookHeader} from "./CrmForms/Outlook";
 import {connect} from 'react-redux';
-import {crmActions} from "store/actions";
+import {marketplacesActions} from "store/actions";
 import {CSVLink} from "react-csv";
 
 const TabPane = Tabs.TabPane;
@@ -24,7 +24,7 @@ class Crm extends React.Component {
         if (!this.props.location.state)
             return history.push('/dashboard/marketplace');
         const /** @type {CRM}*/crm = this.props.location.state?.crm || {};
-        this.props.dispatch(crmActions.exportRecruiterValueReport({Name: crm.type}))
+        this.props.dispatch(marketplacesActions.exportRecruiterValueReport({Name: crm.type}))
     }
 
     componentWillReceiveProps(nextProps) {
@@ -50,7 +50,7 @@ class Crm extends React.Component {
         if (err) return;
         const /** @type {CRM}*/crm = this.props.location.state?.crm || {};
         this.props.dispatch(
-            crmActions.connectCrm(
+            marketplacesActions.connectCrm(
                 {
                     type: crm.type,
                     auth: {...values}
@@ -63,7 +63,7 @@ class Crm extends React.Component {
         if (err) return;
         const /** @type {CRM}*/crm = this.props.location.state?.crm || {};
         this.props.dispatch(
-            crmActions.testCrm(
+            marketplacesActions.testCrm(
                 {
                     type: crm.type,
                     auth: {...values}
@@ -74,7 +74,7 @@ class Crm extends React.Component {
 
     disconnectCRM = () => {
         const /** @type {CRM}*/crm = this.props.location.state?.crm || {};
-        this.props.dispatch(crmActions.disconnectCrm({ID: crm.ID}))
+        this.props.dispatch(marketplacesActions.disconnectCrm({ID: crm.ID}))
     };
 
     render() {

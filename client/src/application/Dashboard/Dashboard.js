@@ -14,6 +14,7 @@ import {CSSTransition, TransitionGroup} from "react-transition-group";
 
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
 import {faCloud} from '@fortawesome/free-solid-svg-icons'
+import Marketplace from "./Marketplaces/Marketplace/Marketplace";
 
 const Home = lazy(() => import('./Home/Home'));
 const Assistants = lazy(() => import('./Assistants/Assistants'));
@@ -257,7 +258,8 @@ class Dashboard extends Component {
                                             <Route path={`${match.path}/assistants/:id`} component={Assistant} exact/>
 
                                             <Route path={`${match.path}/marketplaces`} component={Marketplaces} exact/>
-                                            <Route path={`${match.path}/marketplaces/:crm`} component={Crm} exact/>
+                                            <Route path={`${match.path}/marketplaces/:type`} component={Marketplace}
+                                                   exact/>
 
                                             <Route path={`${match.path}/databases`} component={Databases} exact/>
                                             <Route path={`${match.path}/databases/:id`} component={Database} exact/>

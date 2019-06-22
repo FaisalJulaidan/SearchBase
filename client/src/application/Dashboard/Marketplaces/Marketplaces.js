@@ -1,6 +1,6 @@
 import React from 'react'
 import {Icon, Spin, Typography} from 'antd';
-import styles from './Marketplace.module.less'
+import styles from './Marketplaces.module.less'
 import 'types/CRM_Types';
 import {getLink} from "helpers";
 import {crmActions} from "store/actions";
@@ -13,7 +13,7 @@ import axios from 'axios'
 
 const {Title, Paragraph, Text} = Typography;
 
-class Marketplace extends React.Component {
+class Marketplaces extends React.Component {
     state = {
         /** @type {CRM[]} */
         CRMs: [
@@ -151,4 +151,4 @@ function mapStateToProps(state) {
     };
 }
 
-export default connect(mapStateToProps)(Marketplace);
+export default connect(mapStateToProps)(Marketplaces);

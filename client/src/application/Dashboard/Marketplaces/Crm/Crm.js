@@ -103,7 +103,6 @@ class Crm extends React.Component {
                     </div>
 
                     <div style={{display: "flex"}}>
-                        <Avatar shape="square" src={crm.image} className={styles.Avatar}/>
                         <div className={styles.DetailsWithAvatar}>
                             <Title level={2}>{crm.type}</Title>
                             {

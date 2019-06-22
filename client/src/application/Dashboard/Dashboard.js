@@ -25,10 +25,10 @@ const Billing = lazy(() => import('./ControlPanel/Billing/Billing'));
 const UsersManagement = lazy(() => import('./ControlPanel/UsersManagement/UsersManagement'));
 const Documentation = lazy(() => import('./Documentation/Documentation'));
 const Calendar = lazy(() => import('./Calendar/Calendar'));
-const AutoPilots = lazy(() => import('./AutoPilot/AutoPilots'));
-const AutoPilot = lazy(() => import('./AutoPilot/AutoPilot/AutoPilot'));
-const Marketplace = lazy(() => import('./Marketplace/Marketplace'));
-const Crm = lazy(() => import('./Marketplace/Crm/Crm'));
+const AutoPilots = lazy(() => import('./AutoPilots/AutoPilots'));
+const AutoPilot = lazy(() => import('./AutoPilots/AutoPilot/AutoPilot'));
+const Marketplaces = lazy(() => import('./Marketplaces/Marketplaces'));
+const Crm = lazy(() => import('./Marketplaces/Crm/Crm'));
 
 
 const {SubMenu} = Menu;
@@ -111,7 +111,7 @@ class Dashboard extends Component {
 
         const newLayoutRoutes = [
             "/dashboard/assistants",
-            "/dashboard/marketplace",
+            "/dashboard/marketplaces",
             "/dashboard/calendar",
             "/dashboard/auto_pilot",
             "/dashboard/databases",
@@ -174,9 +174,9 @@ class Dashboard extends Component {
                             <span>Auto Pilot</span>
                         </Menu.Item>
 
-                        <Menu.Item key="marketplace">
+                        <Menu.Item key="marketplaces">
                             <Icon type="interation"/>
-                            <span>Marketplace</span>
+                            <span>Marketplaces</span>
                         </Menu.Item>
 
                         <Menu.Item key="databases">
@@ -256,8 +256,8 @@ class Dashboard extends Component {
                                             <Route path={`${match.path}/assistants`} component={Assistants} exact/>
                                             <Route path={`${match.path}/assistants/:id`} component={Assistant} exact/>
 
-                                            <Route path={`${match.path}/marketplace`} component={Marketplace} exact/>
-                                            <Route path={`${match.path}/marketplace/:crm`} component={Crm} exact/>
+                                            <Route path={`${match.path}/marketplaces`} component={Marketplaces} exact/>
+                                            <Route path={`${match.path}/marketplaces/:crm`} component={Crm} exact/>
 
                                             <Route path={`${match.path}/databases`} component={Databases} exact/>
                                             <Route path={`${match.path}/databases/:id`} component={Database} exact/>

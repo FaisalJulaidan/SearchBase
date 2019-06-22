@@ -42,7 +42,7 @@ def getToken(type, companyID):
         else:
             return cal.Auth['access']
     except Exception as e:
-        print(e)
+        return None
 
 
 def authorizeUser(code):
@@ -76,7 +76,6 @@ def authorizeUser(code):
         return Callback(False,
                         "You already have authorization data relating to your google calendar in the database, please remove these keys first.")
     except Exception as e:
-        print(e)
         return Callback(False, str(e))
 
 
@@ -143,7 +142,6 @@ def verifyCalendarExists(id, token):
     try:
         auth = {'Authorization': 'Bearer ' + token}
         resp = requests.get("https://www.googleapis.com/calendar/v3/users/me/calendarList", headers=auth)
-        print(resp.json())
         if 'error' in resp.json():
             raise Exception(resp.json()['error'])
         else:

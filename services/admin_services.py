@@ -26,6 +26,7 @@ def render(template, **context):
     else:
         return redirect("login")
 
+
 def convertForJinja(toConvert, convertType):
     try:
         if type(toConvert) is convertType:
@@ -34,5 +35,4 @@ def convertForJinja(toConvert, convertType):
             result = helpers.getListFromSQLAlchemyList(toConvert)
         return Callback(True, 'Data converted', result)
     except Exception as exc:
-        print("convertForJinja() Error: ", exc)
         return Callback(False, 'Data could not be converted')

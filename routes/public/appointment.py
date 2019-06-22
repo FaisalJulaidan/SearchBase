@@ -51,5 +51,4 @@ def candidate_appointment(payload):
             return helpers.jsonResponse(True, 200, callback.Message)
 
     except Exception as e:
-        print(e)
         return helpers.jsonResponse(False, 400, "Couldn't load available appointments")

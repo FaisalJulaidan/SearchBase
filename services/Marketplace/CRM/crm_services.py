@@ -130,18 +130,14 @@ def produceRecruiterValueReport(companyID, crmName):
 # details is a dict that has {auth, type}
 def connect(company_id, details) -> Callback:
     try:
-        print(11)
         crm_type: CRM = CRM[details['type']]
         # test connection
-        print(12)
         test_callback: Callback = testConnection(company_id, details)
         if not test_callback.Success:
             return test_callback
 
-        print(13)
         connection = CRM_Model(Type=crm_type, Auth=test_callback.Data, CompanyID=company_id)
 
-        print(14)
         # Save
         db.session.add(connection)
         db.session.commit()
@@ -149,7 +145,6 @@ def connect(company_id, details) -> Callback:
         return Callback(True, 'CRM has been connected successfully', connection)
 
     except Exception as exc:
-        print("CRM_services.connect(): " + str(exc))
         logging.error("CRM_services.connect(): " + str(exc))
         db.session.rollback()
         return Callback(False, "CRM connection failed")
@@ -238,7 +233,6 @@ def testConnection(companyID, details) -> Callback:
         return Callback(True, 'Successful connection', test_callback.Data)
 
     except Exception as exc:
-        print("TEST ERROR: ", exc)
         logging.error("CRM_services.connect(): " + str(exc))
         return Callback(False, "CRM testing failed.")
 

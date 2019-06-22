@@ -255,7 +255,6 @@ def connectToCRM(assistantID, CRMID, companyID):
     try:
 
         crm_callback: Callback = crm_services.getCRMByID(CRMID, companyID)
-        print("crm_callback.Success: ", crm_callback.Success)
         if not crm_callback.Success:
             raise Exception(crm_callback.Message)
 
@@ -292,7 +291,6 @@ def connectToCalendar(assistantID, CalendarID, companyID):
     try:
 
         crm_callback: Callback = calendar_services.getCalendarByID(CalendarID, companyID)
-        print("crm_callback.Success: ", crm_callback.Success)
         if not crm_callback.Success:
             raise Exception(crm_callback.Message)
 

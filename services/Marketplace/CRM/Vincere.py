@@ -28,7 +28,7 @@ client_id = os.environ['VINCERE_CLIENT_ID']
 def login(auth):
     try:
         headers = {'Content-Type': 'application/x-www-form-urlencoded'}
-        print("auth: ", auth)
+
         access_token_url = "https://id.vincere.io/oauth2/token?" + \
                            "&grant_type=authorization_code" + \
                            "&client_id=" + client_id + \
@@ -39,10 +39,8 @@ def login(auth):
 
         if not access_token_request.ok:
             raise Exception(access_token_request.text)
-        print(access_token_request.text)
-        print(access_token_request.status_code)
+
         result_body = json.loads(access_token_request.text)
-        print(result_body)
 
         # Logged in successfully
         return Callback(True, 'Logged in successfully',
@@ -54,13 +52,11 @@ def login(auth):
 
     except Exception as exc:
         logging.error("CRM.Vincere.login() ERROR: " + str(exc))
-        print("login error: ", exc)
         return Callback(False, str(exc))
 
 
 def testConnection(auth, companyID):
     try:
-        print("auth test: ", auth)
         if auth.get("refresh_token"):
             callback: Callback = retrieveRestToken(auth, companyID)
         else:

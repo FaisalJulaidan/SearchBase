@@ -17,7 +17,6 @@ def authenticate():
         if callback.Success:
             return helpers.jsonResponse(True, 200, "Authorised!", callback.Data)
         else:
-            print(callback.Message)
             return helpers.jsonResponse(False, 401, callback.Message, callback.Data)
 
 
@@ -55,5 +54,4 @@ def verify_account(payload):
             return redirect("/login")
 
         except Exception as e:
-            print(e)
             return redirect("/login")

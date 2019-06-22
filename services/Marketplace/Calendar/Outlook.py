@@ -6,7 +6,6 @@ import requests
 
 from models import Callback
 from services.Marketplace import marketplace_helpers as helpers
-
 # Client ID and secret
 from services.Marketplace.Calendar import calendar_services
 
@@ -43,7 +42,6 @@ def login(auth):
                         })
 
     except Exception as exc:
-        print("ERROR:", exc)
         logging.error("CRM.Outlook.login() ERROR: " + str(exc))
         return Callback(False, "Error in logging you in. Please try again")
 
@@ -80,14 +78,13 @@ def retrieveAccessToken(auth, companyID):
         return Callback(True, "Access Token retrieved", auth)
 
     except Exception as exc:
-        print("ERROR:", exc)
         logging.error("CRM.Outlook.login() ERROR: " + str(exc))
         return Callback(False, str(exc))
 
 
 def addCalendar(auth, companyID):
     try:
-        body ={
+        body = {
             "Name": "TheSearchBase"
         }
 
@@ -104,7 +101,6 @@ def addCalendar(auth, companyID):
         return Callback(True, sendQuery_callback.Data.text)
 
     except Exception as exc:
-        print("ERROR:", exc)
         logging.error("CRM.Outlook.login() ERROR: " + str(exc))
         return Callback(False, str(exc))
 
@@ -145,7 +141,8 @@ def addEvent(auth, assistant, eventDetails):
 
         # send query
         sendQuery_callback: Callback = sendQuery(auth,
-                                                 "calendars/"+str(assistant.Calendar.MetaData["calendarID"])+"events",
+                                                 "calendars/" + str(
+                                                     assistant.Calendar.MetaData["calendarID"]) + "events",
                                                  "post", body, assistant.CompanyID)
 
         if not sendQuery_callback.Success:
@@ -153,7 +150,6 @@ def addEvent(auth, assistant, eventDetails):
 
         return Callback(True, sendQuery_callback.Data.text)
     except Exception as exc:
-        print("ERROR:", exc)
         logging.error("CRM.Outlook.login() ERROR: " + str(exc))
         return Callback(False, str(exc))
 

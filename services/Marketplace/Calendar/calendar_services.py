@@ -47,9 +47,7 @@ def connect(company_id, details) -> Callback:
         test_callback: Callback = testConnection(details, company_id)
         if not test_callback.Success:
             return test_callback
-        print(calendar_type)
-        print(test_callback.Data)
-        print(company_id)
+
         connection = Calendar_Model(Type=calendar_type, Auth=test_callback.Data, CompanyID=company_id, MetaData=None)
 
         # Save
@@ -59,7 +57,6 @@ def connect(company_id, details) -> Callback:
         return Callback(True, 'Calendar has been connected successfully', connection)
 
     except Exception as exc:
-        print("calendar_services.connect(): " + str(exc))
         logging.error("calendar_services.connect(): " + str(exc))
         db.session.rollback()
         return Callback(False, "Calendar connection failed")

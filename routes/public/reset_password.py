@@ -48,5 +48,4 @@ def reset_password_verify(payload):
 
             return helpers.jsonResponse(True, 200, resetPassword_callback.Message)
         except Exception as e:
-            print(e)
             return helpers.jsonResponse(False, 400, "Could not update your password")

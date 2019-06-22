@@ -170,7 +170,6 @@ def verify_account(payload):
             return redirect("/login")
 
         except Exception as e:
-            print(e)
             return redirect("/login")
 
 

@@ -15,7 +15,6 @@ def processRedirect(args):
         args = dict(args)
 
         state = json.loads(args.get("state")[0])
-        print("state: ", state)
 
         if args.get("error") or not (args.get("code") and args.get("state")):
             return Callback(False, args.get("error_description") or "Required parameters were not provided")
@@ -23,17 +22,12 @@ def processRedirect(args):
         args["type"] = state.get("type")
 
         if CRM_Enum.has_value(args["type"]):
-            print("1")
             callback: Callback = crm_services.connect(int(state.get("companyID")), args)
         elif Calendar_Enum.has_value(args["type"]):
-            print("2")
             callback: Callback = calendar_services.connect(int(state.get("companyID")), args)
         else:
-            print("3")
             callback = Callback(False, "The Marketplace object did not match one on the system")
 
-        print("callback.Success: ", callback.Success)
-        print("callback.Message: ", callback.Message)
         return callback
 
     except Exception as exc:

@@ -51,7 +51,7 @@ def getNextInterval(assistantID=None):
                     or record['LastNotificationDate'] == None:
                 db.session.query(Assistant).filter(Assistant.ID == record['AssistantID']).update({'LastNotificationDate': now})
     except Exception as e:
-        print(e)
+        pass
 
 
 scheduler.add_job(getNextInterval, 'cron', hour='*/1', id='hourly', replace_existing=True)

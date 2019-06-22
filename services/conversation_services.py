@@ -73,10 +73,8 @@ def processConversation(assistantHashID, data: dict) -> Callback:
                 conversation.CRMSynced = True
             conversation.CRMResponse = crm_callback.Message
 
-
-        #immediate notification
+        # immediate notification
         if assistant.NotifyEvery == 0:
-            print("notify via email")
             assistant.LastNotificationDate = datetime.now()
             # notify via email ?
 

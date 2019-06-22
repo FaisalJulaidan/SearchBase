@@ -177,6 +177,11 @@ const CandidateColumns = [{
     key: 'Currency',
     dataIndex: 'Currency',
     render: (text, record, index) => (<p>{record.Currency}</p>),
+}, {
+    title: 'Pay Period',
+    key: 'PayPeriod',
+    dataIndex: 'PayPeriod',
+    render: (text, record, index) => (<p>{record.PayPeriod}</p>),
 }];
 
 // Job Columns
@@ -215,6 +220,11 @@ const JobColumns = [{
     key: 'Currency',
     dataIndex: 'Currency',
     render: (text, record, index) => (<p>{record.Currency}</p>),
+}, {
+    title: 'Pay Period',
+    key: 'PayPeriod',
+    dataIndex: 'PayPeriod',
+    render: (text, record, index) => (<p>{record.PayPeriod}</p>),
 }, {
     title: 'Essential Skills',
     key: 'JobEssentialSkills',

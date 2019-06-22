@@ -28,6 +28,14 @@ class ApplicationStatus(Enum):
     Rejected = 'Rejected'
 
 @unique
+class Period(Enum):
+    Annually = 'Annually'
+    Monthly = 'Monthly'
+    Weekly = 'Weekly'
+    Daily = 'Daily'
+    Hourly = 'Hourly'
+
+@unique
 class BlockType(Enum):
     UserInput = 'User Input'
     Question = 'Question'

@@ -70,6 +70,8 @@ def uploadDatabase(data: dict, companyID: int) -> Callback:
                 if data:
                     if key in [Candidate.Currency.name, Job.Currency.name]:
                         parsed[key] = Currency(data)
+                    elif key in [Candidate.PayPeriod.name, Job.PayPeriod.name]:
+                        parsed[key] = enums.Period[data]
                     elif key in [Job.JobStartDate.name, Job.JobEndDate.name]:
                         parsed[key] = datetime(year=data['year'],
                                                month=data['month'],
@@ -100,17 +102,23 @@ def uploadDatabase(data: dict, companyID: int) -> Callback:
 
         databaseData = data.get('newDatabase')
         databaseName = databaseData["databaseName"]
+
+        # Upload Candidates database
         if databaseData['databaseType'] == enums.DatabaseType.Candidates.name:
             newDatabase = createDatabase(databaseName, DatabaseType.Candidates)
             uploadCandidates(databaseData, newDatabase)
+
+        # Upload Jobs database
         elif databaseData['databaseType'] == enums.DatabaseType.Jobs.name:
             newDatabase = createDatabase(databaseName, DatabaseType.Jobs)
             uploadJobs(databaseData, newDatabase)
         else:
             return Callback(False, "Database type is not recognised")
+
         # After finishing from uploading database without errors, save changes
         db.session.commit()
         return Callback(True, "Databases was successfully uploaded!", newDatabase)
+
     except Exception as exc:
         helpers.logError("databases_service.uploadDatabase(): " + str(exc))
         return Callback(False, 'Could not upload the databases.')
@@ -292,7 +300,8 @@ def scanCandidates(session, dbIDs, extraCandidates=None):
         salaryInputs: list = keywords.get(DT.CandidateDesiredSalary.value['name'])
         if salaryInputs and len(salaryInputs):
             df[['Score', Candidate.CandidateDesiredSalary.name, Candidate.Currency.name]] = \
-                df.apply(lambda row: __salary(row, Candidate.CandidateDesiredSalary, Candidate.Currency,
+                df.apply(lambda row: __salary(row, Candidate.CandidateDesiredSalary,
+                                              Candidate.Currency, Candidate.PayPeriod,
                                               salaryInputs[-1], plus=8, forceLessThan=False), axis=1, result_type='expand')
 
         # Years of EXP
@@ -382,7 +391,7 @@ def scanJobs(session, dbIDs, extraJobs=None):
         salaryInputs: list = keywords.get(DT.JobSalary.value['name'], keywords.get(DT.CandidateDesiredSalary.value['name']))
         if salaryInputs and len(salaryInputs):
             df[['Score', Job.JobSalary.name, Job.Currency.name]] = \
-                df.apply(lambda row: __salary(row, Job.JobSalary, Job.Currency, salaryInputs[-1], 8),
+                df.apply(lambda row: __salary(row, Job.JobSalary, Job.Currency, Job.PayPeriod, salaryInputs[-1], 8),
                                                                             axis=1, result_type='expand')
 
         # Job Year Required
@@ -499,13 +508,17 @@ def __numCounter(dbColumn, compareSign, dataType: DT, keywords, df, plus=1, addI
                    int(numberInput), 'Score'] += plus
 
 
-def __salary(row, dbSalaryColumn: DT, dbCurrencyColumn: DT, salaryInput: str, plus=4, forceLessThan=False):
+def __salary(row, dbSalaryColumn, dbCurrencyColumn, dbPayPeriodColumn, salaryInput: str, plus=4, forceLessThan=False):
 
-    userSalary = salaryInput.split(' ') # e.g. Less Than 5000 GBP
+    userSalary = salaryInput.split(' ') # e.g. Less Than 5000 GBP Annually
 
     # Convert salary currency if did not match with user's entered currency
     dbSalary = row[dbSalaryColumn.name] or 0
     if (not row[dbCurrencyColumn.name] == userSalary[3]) and dbSalary > 0:
+        dbSalary = helpers.currencyConverter.convert(row[dbCurrencyColumn.name], userSalary[3], dbSalary)
+        row[dbSalaryColumn.name] = dbSalary
+
+    if (not row[dbPayPeriodColumn.name] == userSalary[4]) and dbSalary > 0:
         dbSalary = helpers.currencyConverter.convert(row[dbCurrencyColumn.name], userSalary[3], dbSalary)
         row[dbSalaryColumn.name] = dbSalary
 

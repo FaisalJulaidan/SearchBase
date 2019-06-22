@@ -357,6 +357,7 @@ class Candidate(db.Model):
     CandidateYearsExperience = db.Column(db.Float(), nullable=True)
     CandidateDesiredSalary = db.Column(db.Float(), nullable=True)
     Currency = db.Column(CurrencyType, nullable=False) # Required
+    PayPeriod = db.Column(Enum(enums.Period), nullable=False) # Required
 
 
     # Relationships:
@@ -374,9 +375,10 @@ class Job(db.Model):
     JobTitle = db.Column(db.String(64), nullable=False) # Required
     JobDescription = db.Column(db.String(5000), nullable=True)
     JobLocation = db.Column(db.String(64), nullable=False) # Required
-    JobType = db.Column(db.String(64), nullable=True)
     JobSalary = db.Column(db.Float(), nullable=True)
     Currency = db.Column(CurrencyType, nullable=False) # Required
+    PayPeriod = db.Column(Enum(enums.Period), nullable=False) # Required
+    JobType = db.Column(db.String(64), nullable=True)
     JobEssentialSkills = db.Column(db.String(5000), nullable=True)
     JobDesiredSkills = db.Column(db.String(5000), nullable=True)
     JobYearsRequired = db.Column(db.Integer, nullable=True)

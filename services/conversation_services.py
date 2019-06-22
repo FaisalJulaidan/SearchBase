@@ -81,7 +81,7 @@ def processConversation(assistantHashID, data: dict) -> Callback:
             # notify via email ?
 
         db.session.add(conversation)
-        db.session.save(assistant)
+        # db.session.save(assistant)
         db.session.commit()
 
         # Notify company about the new chatbot session

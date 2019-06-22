@@ -42,18 +42,37 @@ def login(auth):
         print(access_token_request.text)
         print(access_token_request.status_code)
         result_body = json.loads(access_token_request.text)
+        print(result_body)
 
         # Logged in successfully
         return Callback(True, 'Logged in successfully',
                         {
-                            "access_token": result_body.get("ACCESS_TOKEN"),
-                            "refresh_token": result_body.get("REFRESH_TOKEN"),
-                            "rest_token": result_body.get("ID_TOKEN")
+                            "access_token": result_body.get("access_token"),
+                            "refresh_token": result_body.get("refresh_token"),
+                            "rest_token": result_body.get("id_token")
                         })
 
     except Exception as exc:
         logging.error("CRM.Vincere.login() ERROR: " + str(exc))
         print("login error: ", exc)
+        return Callback(False, str(exc))
+
+
+def testConnection(auth, companyID):
+    try:
+        print("auth test: ", auth)
+        if auth.get("refresh_token"):
+            callback: Callback = retrieveRestToken(auth, companyID)
+        else:
+            callback: Callback = login(auth)
+
+        if not callback.Success:
+            raise Exception("Testing failed")
+
+        return Callback(True, 'Logged in successfully', callback.Data)
+
+    except Exception as exc:
+        logging.error("CRM.Bullhorn.testConnection() ERROR: " + str(exc))
         return Callback(False, str(exc))
 
 
@@ -75,9 +94,9 @@ def retrieveRestToken(auth, companyID):
             get_tokens = requests.put(url, headers=headers, data=json.dumps(body))
             if get_tokens.ok:
                 result_body = json.loads(get_tokens.text)
-                authCopy["access_token"] = result_body.get("ACCESS_TOKEN")
-                authCopy["refresh_token"] = result_body.get("REFRESH_TOKEN")
-                authCopy["id_token"] = result_body.get("ID_TOKEN")
+                authCopy["access_token"] = result_body.get("access_token")
+                authCopy["refresh_token"] = result_body.get("refresh_token")
+                authCopy["id_token"] = result_body.get("id_token")
             else:
                 raise Exception("CRM not set up properly")
         # else if not go through login again with the saved auth

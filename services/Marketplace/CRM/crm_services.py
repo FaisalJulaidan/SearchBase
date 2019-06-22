@@ -229,7 +229,7 @@ def testConnection(companyID, details) -> Callback:
         elif crm_type == CRM.Greenhouse:
             test_callback = Greenhouse.login(crm_auth)
         elif crm_type == CRM.Vincere:
-            test_callback = Vincere.login(crm_auth)
+            test_callback = Vincere.testConnection(crm_auth, companyID)
 
         # When connection failed
         if not test_callback.Success:

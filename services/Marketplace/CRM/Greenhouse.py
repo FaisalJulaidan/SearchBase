@@ -14,6 +14,9 @@ from services import databases_services, stored_file_services
 
 
 # login requires: API key
+from utilities.helpers import logError
+
+
 def login(auth):
     try:
         # encode to base64
@@ -37,7 +40,7 @@ def login(auth):
         return Callback(True, 'Logged in successfully', authCopy)
 
     except Exception as exc:
-        logging.error("CRM.Greenhouse.login() ERROR: " + str(exc))
+        logError("CRM.Greenhouse.login() ERROR: " + str(exc))
         return Callback(False, str(exc))
 
 
@@ -60,7 +63,7 @@ def sendQuery(auth, query, method, body, optionalParams=None):
         return Callback(True, "Query was successful", r)
 
     except Exception as exc:
-        logging.error("CRM.Greenhouse.sendQuery() ERROR: " + str(exc))
+        logError("CRM.Greenhouse.sendQuery() ERROR: " + str(exc))
         return Callback(False, str(exc))
 
 
@@ -126,7 +129,7 @@ def sendRequest(url, method, headers, data=None):
 #         return Callback(True, sendQuery_callback.Data.text)
 #
 #     except Exception as exc:
-#         logging.error("CRM.Greenhouse.insertCandidate() ERROR: " + str(exc))
+#         logError("CRM.Greenhouse.insertCandidate() ERROR: " + str(exc))
 #         return Callback(False, str(exc))
 
 
@@ -166,7 +169,7 @@ def uploadFile(auth, storedFile: StoredFile):
         return Callback(True, sendQuery_callback.Data.text)
 
     except Exception as exc:
-        logging.error("CRM.Greenhouse.insertCandidate() ERROR: " + str(exc))
+        logError("CRM.Greenhouse.insertCandidate() ERROR: " + str(exc))
         return Callback(False, str(exc))
 
 
@@ -208,7 +211,7 @@ def searchCandidates(auth) -> Callback:
         return Callback(True, sendQuery_callback.Message, result)
 
     except Exception as exc:
-        logging.error("CRM.Greenhouse.searchCandidates() ERROR: " + str(exc))
+        logError("CRM.Greenhouse.searchCandidates() ERROR: " + str(exc))
         return Callback(False, str(exc))
 
 
@@ -262,7 +265,7 @@ def searchJobs(auth, conversation) -> Callback:
         return Callback(True, sendQuery_callback.Message, result)
 
     except Exception as exc:
-        logging.error("CRM.Greenhouse.searchJobs() ERROR: " + str(exc))
+        logError("CRM.Greenhouse.searchJobs() ERROR: " + str(exc))
         return Callback(False, str(exc))
 
 
@@ -304,7 +307,7 @@ def getAllCandidates(auth) -> Callback:
         return Callback(True, sendQuery_callback.Message, result)
 
     except Exception as exc:
-        logging.error("CRM.Greenhouse.getAllCandidates() ERROR: " + str(exc))
+        logError("CRM.Greenhouse.getAllCandidates() ERROR: " + str(exc))
         return Callback(False, str(exc))
 
 
@@ -349,5 +352,5 @@ def getAllJobs(auth) -> Callback:
         return Callback(True, sendQuery_callback.Message, result)
 
     except Exception as exc:
-        logging.error("CRM.Greenhouse.getAllJobs() ERROR: " + str(exc))
+        logError("CRM.Greenhouse.getAllJobs() ERROR: " + str(exc))
         return Callback(False, str(exc))

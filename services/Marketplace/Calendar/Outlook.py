@@ -8,6 +8,7 @@ from models import Callback
 from services.Marketplace import marketplace_helpers as helpers
 # Client ID and secret
 from services.Marketplace.Calendar import calendar_services
+from utilities.helpers import logError
 
 client_id = os.environ['OUTLOOK_CLIENT_ID']
 client_secret = os.environ['OUTLOOK_CLIENT_SECRET']
@@ -42,7 +43,7 @@ def login(auth):
                         })
 
     except Exception as exc:
-        logging.error("CRM.Outlook.login() ERROR: " + str(exc))
+        logError("CRM.Outlook.login() ERROR: " + str(exc))
         return Callback(False, "Error in logging you in. Please try again")
 
 
@@ -78,7 +79,7 @@ def retrieveAccessToken(auth, companyID):
         return Callback(True, "Access Token retrieved", auth)
 
     except Exception as exc:
-        logging.error("CRM.Outlook.login() ERROR: " + str(exc))
+        logError("CRM.Outlook.login() ERROR: " + str(exc))
         return Callback(False, str(exc))
 
 
@@ -101,8 +102,7 @@ def addCalendar(auth, companyID):
         return Callback(True, sendQuery_callback.Data.text)
 
     except Exception as exc:
-        print(exc)
-        logging.error("CRM.Outlook.login() ERROR: " + str(exc))
+        logError("CRM.Outlook.login() ERROR: " + str(exc))
         return Callback(False, str(exc))
 
 
@@ -151,7 +151,7 @@ def addEvent(auth, assistant, eventDetails):
 
         return Callback(True, sendQuery_callback.Data.text)
     except Exception as exc:
-        logging.error("CRM.Outlook.login() ERROR: " + str(exc))
+        logError("CRM.Outlook.login() ERROR: " + str(exc))
         return Callback(False, str(exc))
 
 
@@ -182,7 +182,7 @@ def sendQuery(auth, query, method, body, companyID, optionalParams=None):
         return Callback(True, "Query was successful", r)
 
     except Exception as exc:
-        logging.error("CRM.Bullhorn.sendQuery() ERROR: " + str(exc))
+        logError("CRM.Bullhorn.sendQuery() ERROR: " + str(exc))
         return Callback(False, str(exc))
 
 

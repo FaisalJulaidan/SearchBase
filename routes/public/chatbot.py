@@ -10,6 +10,7 @@ from models import Callback, db, Conversation
 from services import conversation_services, flow_services, databases_services, stored_file_services, mail_services
 from services.Marketplace.CRM import crm_services
 from utilities import helpers
+from utilities.helpers import logError
 
 chatbot_router = Blueprint('chatbot_router', __name__, template_folder="../templates")
 CORS(chatbot_router)
@@ -106,7 +107,7 @@ def chatbot_upload_files(assistantIDAsHash, sessionID):
             # Store filePaths in the DB as reference
             dbRef_callback: Callback = stored_file_services.createRef(filenames, session)
             if not dbRef_callback.Success:
-                logging.error("Couldn't Save Stored Files Reference For: " + str(filenames))
+                logError("Couldn't Save Stored Files Reference For: " + str(filenames))
                 raise Exception(dbRef_callback.Message)
 
             # Save changes

@@ -1,21 +1,26 @@
-from flask import json, after_this_request, request
-from models import db, Assistant, Plan, Job, Callback
-from services import flow_services, assistant_services
+import functools
+import geoip2.webservice
+import gzip
+import inspect
+import logging
+import os
+import re
+import stripe
 from datetime import time
 from enum import Enum
-from hashids import Hashids
-from config import BaseConfig
 from io import BytesIO
-from itsdangerous import URLSafeTimedSerializer
-from cryptography.fernet import Fernet
-from sqlalchemy_utils import Currency
 from typing import List
+
+from cryptography.fernet import Fernet
+from flask import json, after_this_request, request
 from flask_jwt_extended import get_jwt_identity
-import enums, re, os, stripe, gzip, functools, logging, geoip2.webservice
-from utilities import tasks
-import inspect
+from hashids import Hashids
+from itsdangerous import URLSafeTimedSerializer
+from sqlalchemy_utils import Currency
 
-
+from config import BaseConfig
+from models import Assistant, Job, Callback
+from services import flow_services, assistant_services
 
 # ======== Global Variables ======== #
 
@@ -32,8 +37,6 @@ logging.basicConfig(filename='logs/errors.log',
 
 # Fernet for encryption
 fernet = Fernet(os.environ['SECRET_KEY_TEMP'])
-
-
 
 
 # ======== Helper Functions ======== #
@@ -58,8 +61,11 @@ def logError(exception):
 # ID Hasher
 # IMPORTANT: don't you ever make changes to the hash values before consulting Faisal Julaidan
 hashids = Hashids(salt=BaseConfig.HASH_IDS_SALT, min_length=5)
+
+
 def encodeID(id):
     return hashids.encrypt(id)
+
 
 def decodeID(id):
     return hashids.decrypt(id)
@@ -67,13 +73,14 @@ def decodeID(id):
 
 # Encryptors
 def encrypt(value, isDict=False):
-    if isDict: value=json.dumps(value)
+    if isDict: value = json.dumps(value)
     return fernet.encrypt(bytes((value.encode('utf-8'))))
 
+
 def decrypt(token, isDict=False, isBtye=False):
-    if not isBtye: token=bytes(token.encode('utf-8'))
+    if not isBtye: token = bytes(token.encode('utf-8'))
     value = fernet.decrypt(token)
-    if isDict: value=json.loads(value)
+    if isDict: value = json.loads(value)
     return value
 
 
@@ -97,7 +104,6 @@ def isValidEmail(email: str) -> bool:
     if not re.match("^[A-Za-z0-9\.\+_-]+@[A-Za-z0-9\._-]+\.[a-zA-Z]*$", email):
         return False
     return True
-
 
 
 def jsonResponse(success: bool, http_code: int, msg: str, data=None):
@@ -148,14 +154,16 @@ def validAssistant(func):
             return jsonResponse(False, 404, "Assistant not found.", None)
         assistant: Assistant = callback.Data
         return func(assistant)
+
     return wrapperValidAssistant
 
 
 # -------- SQLAlchemy Converters -------- #
 """Convert a SQLAlchemy object to a single dict """
-def getDictFromSQLAlchemyObj(obj, excludedColumns: list = None) -> dict:
 
-    dict = {} # Results
+
+def getDictFromSQLAlchemyObj(obj, excludedColumns: list = None) -> dict:
+    dict = {}  # Results
     if not obj: return dict
 
     # A nested for loop for joining two tables
@@ -163,20 +171,20 @@ def getDictFromSQLAlchemyObj(obj, excludedColumns: list = None) -> dict:
         key = attr.name
         if key not in ['Password']:
             dict[key] = getattr(obj, key)
-            if isinstance(dict[key], Enum): # Convert Enums
+            if isinstance(dict[key], Enum):  # Convert Enums
                 dict[key] = dict[key].value
 
-            if isinstance(dict[key], time): # Convert Times
+            if isinstance(dict[key], time):  # Convert Times
                 dict[key] = str(dict[key])
 
-            if isinstance(dict[key], Currency): # Convert Currencies
+            if isinstance(dict[key], Currency):  # Convert Currencies
                 dict[key] = dict[key].code
 
-            if key in [Job.JobStartDate.name, Job.JobEndDate.name] and dict[key]: # Convert Datetime only for Jobs
+            if key in [Job.JobStartDate.name, Job.JobEndDate.name] and dict[key]:  # Convert Datetime only for Jobs
                 dict[key] = '/'.join(map(str, [dict[key].year, dict[key].month, dict[key].day]))
 
-            if key == Assistant.Flow.name and dict[key]: # Parse Flow !!
-                flow_services.parseFlow(dict[key]) # pass by reference
+            if key == Assistant.Flow.name and dict[key]:  # Parse Flow !!
+                flow_services.parseFlow(dict[key])  # pass by reference
 
     if hasattr(obj, "FilePath"):
         dict["FilePath"] = obj.FilePath
@@ -187,8 +195,9 @@ def getDictFromSQLAlchemyObj(obj, excludedColumns: list = None) -> dict:
 """Provide a list of keys (e.g ['id', 'name']) and the list of tuples"""
 """provided by sqlalchemy when querying for specific columns"""
 """this func will work for enums as well."""
-def getDictFromLimitedQuery(columnsList, tupleList: List[tuple]):
 
+
+def getDictFromLimitedQuery(columnsList, tupleList: List[tuple]):
     if not isinstance(tupleList, list):
         raise Exception("Provided list of tuples is empty. (Check data being returned from db)")
 
@@ -197,7 +206,7 @@ def getDictFromLimitedQuery(columnsList, tupleList: List[tuple]):
         return []
 
     # When tupleList is not empty, then the number of items in each tuple must match the number of items in columnsList
-    if len(columnsList) != len(tupleList[0]) :
+    if len(columnsList) != len(tupleList[0]):
         raise Exception("List of indexes provided must match in length to the items in each of the tuples")
 
     d = []
@@ -212,12 +221,11 @@ def getDictFromLimitedQuery(columnsList, tupleList: List[tuple]):
     return d
 
 
-
 """Convert a SQLAlchemy list of objects to a list of dicts"""
+
+
 def getListFromSQLAlchemyList(SQLAlchemyList):
     return list(map(getDictFromSQLAlchemyObj, SQLAlchemyList))
-
-
 
     return view_func
 
@@ -231,8 +239,10 @@ def validAssistant(func):
             return jsonResponse(False, 404, "Assistant not found.", None)
         assistant: Assistant = callback.Data
         return func(assistant)
+
     wrapper.__name__ = func.__name__
     return wrapper
+
 
 def findIndexOfKeyInArray(key, value, array):
     for item, idx in array:
@@ -240,13 +250,14 @@ def findIndexOfKeyInArray(key, value, array):
             return idx
     return False
 
-#Helpful printer, so you can find out where a print if you forget about it and want to remove it
+
+# Helpful printer, so you can find out where a print if you forget about it and want to remove it
 def HPrint(message):
     callerframerecord = inspect.stack()[1]
     frame = callerframerecord[0]
     info = inspect.getframeinfo(frame)
     filenamearr = info.filename.split('\\')
-    filename = filenamearr[len(filenamearr)-1]
+    filename = filenamearr[len(filenamearr) - 1]
 
     print(message + " - (%s, line %s)" % (filename, info.lineno))
 

@@ -8,7 +8,7 @@ from services.Marketplace.CRM import Greenhouse, Adapt, Bullhorn, Vincere
 
 
 # Process chatbot session
-from utilities.helpers import logError
+from utilities import helpers
 
 
 def processConversation(assistant: Assistant, conversation: Conversation) -> Callback:
@@ -148,7 +148,7 @@ def connect(company_id, details) -> Callback:
         return Callback(True, 'CRM has been connected successfully', connection)
 
     except Exception as exc:
-        logError("CRM_services.connect(): " + str(exc))
+        helpers.logError("CRM_services.connect(): " + str(exc))
         db.session.rollback()
         return Callback(False, "CRM connection failed")
 
@@ -178,7 +178,7 @@ def update(crm_id, company_id, details) -> Callback:
         return Callback(True, 'CRM has been updated successfully')
 
     except Exception as exc:
-        logError("CRM_services.update(): " + str(exc))
+        helpers.logError("CRM_services.update(): " + str(exc))
         db.session.rollback()
         return Callback(False, "Update CRM details failed.")
 
@@ -207,7 +207,7 @@ def updateByCompanyAndType(crm_type, company_id, auth):
         return Callback(True, 'CRM has been updated successfully')
 
     except Exception as exc:
-        logError("CRM_services.update(): " + str(exc))
+        helpers.logError("CRM_services.update(): " + str(exc))
         db.session.rollback()
         return Callback(False, "Update CRM details failed.")
 
@@ -236,7 +236,7 @@ def testConnection(companyID, details) -> Callback:
         return Callback(True, 'Successful connection', test_callback.Data)
 
     except Exception as exc:
-        logError("CRM_services.connect(): " + str(exc))
+        helpers.logError("CRM_services.connect(): " + str(exc))
         return Callback(False, "CRM testing failed.")
 
 
@@ -252,7 +252,7 @@ def disconnect(crm_id, company_id) -> Callback:
         return Callback(True, 'CRM has been disconnected successfully', crm_id)
 
     except Exception as exc:
-        logError("CRM_services.disconnect(): " + str(exc))
+        helpers.logError("CRM_services.disconnect(): " + str(exc))
         db.session.rollback()
         return Callback(False, "CRM disconnection failed.")
 
@@ -269,7 +269,7 @@ def getCRMByID(crm_id, company_id):
         return Callback(True, "CRM retrieved successfully.", crm)
 
     except Exception as exc:
-        logError("CRM_services.getCRMByCompanyID(): " + str(exc))
+        helpers.logError("CRM_services.getCRMByCompanyID(): " + str(exc))
         return Callback(False, 'Could not retrieve CRM.')
 
 
@@ -283,7 +283,7 @@ def getCRMByType(crm_type, company_id):
         return Callback(True, "CRM retrieved successfully.", crm)
 
     except Exception as exc:
-        logError("CRM_services.getCRMByCompanyID(): " + str(exc))
+        helpers.logError("CRM_services.getCRMByCompanyID(): " + str(exc))
         return Callback(False, 'Could not retrieve CRM.')
 
 
@@ -293,5 +293,5 @@ def getAll(companyID) -> Callback:
         return Callback(True, "fetched all CRMs  successfully.", result)
 
     except Exception as exc:
-        logError("crm_services.getAll(): " + str(exc))
+        helpers.logError("crm_services.getAll(): " + str(exc))
         return Callback(False, 'Could not fetch all CRMs.')

@@ -6,6 +6,7 @@ from enums import UserType, Calendar as Calendar_Enum
 from models import db, Callback, Conversation, Assistant, Calendar as Calendar_Model, StoredFile
 from services import assistant_services
 from services.Marketplace.Calendar import Google, Outlook
+from utilities import helpers
 
 
 # Process chatbot session
@@ -18,8 +19,6 @@ from services.Marketplace.Calendar import Google, Outlook
 #     else:
 #         return Callback(False, "The data couldn't be synced with the Calendar due to lack of information" +
 #                         " whether user is a Candidate or Client ")
-from utilities.helpers import logError
-
 
 def addEvent(eventDetails, assistant=None, assistantID=None):
     if not (assistant or assistantID):
@@ -59,7 +58,7 @@ def connect(company_id, details) -> Callback:
         return Callback(True, 'Calendar has been connected successfully', connection)
 
     except Exception as exc:
-        logError("calendar_services.connect(): " + str(exc))
+        helpers.logError("calendar_services.connect(): " + str(exc))
         db.session.rollback()
         return Callback(False, "Calendar connection failed")
 
@@ -89,7 +88,7 @@ def update(calendar_id, company_id, details) -> Callback:
         return Callback(True, 'Calendar has been updated successfully')
 
     except Exception as exc:
-        logError("calendar_services.update(): " + str(exc))
+        helpers.logError("calendar_services.update(): " + str(exc))
         db.session.rollback()
         return Callback(False, "Update Calendar details failed.")
 
@@ -119,7 +118,7 @@ def updateByCompanyAndType(calendar_type, company_id, auth, metaData):
         return Callback(True, 'Calendar has been updated successfully')
 
     except Exception as exc:
-        logError("calendar_services.update(): " + str(exc))
+        helpers.logError("calendar_services.update(): " + str(exc))
         db.session.rollback()
         return Callback(False, "Update Calendar details failed.")
 
@@ -135,7 +134,7 @@ def testConnection(details, companyID) -> Callback:
             return Callback(False, "Could not match Calendar's type")
 
     except Exception as exc:
-        logError("calendar_services.connect(): " + str(exc))
+        helpers.logError("calendar_services.connect(): " + str(exc))
         return Callback(False, "Calendar test failed.")
 
 
@@ -151,7 +150,7 @@ def disconnect(calendar_id, company_id) -> Callback:
         return Callback(True, 'Calendar has been disconnected successfully', calendar_id)
 
     except Exception as exc:
-        logError("calendar_services.disconnect(): " + str(exc))
+        helpers.logError("calendar_services.disconnect(): " + str(exc))
         db.session.rollback()
         return Callback(False, "Calendar disconnection failed.")
 
@@ -168,7 +167,7 @@ def getCalendarByID(calendar_id, company_id):
         return Callback(True, "Calendar retrieved successfully.", Calendar)
 
     except Exception as exc:
-        logError("calendar_services.getCalendarByCompanyID(): " + str(exc))
+        helpers.logError("calendar_services.getCalendarByCompanyID(): " + str(exc))
         return Callback(False, 'Could not retrieve Calendar.')
 
 
@@ -182,7 +181,7 @@ def getCalendarByType(calendar_type, company_id):
         return Callback(True, "Calendar retrieved successfully.", Calendar)
 
     except Exception as exc:
-        logError("calendar_services.getCalendarByCompanyID(): " + str(exc))
+        helpers.logError("calendar_services.getCalendarByCompanyID(): " + str(exc))
         return Callback(False, 'Could not retrieve Calendar.')
 
 
@@ -192,5 +191,5 @@ def getAll(companyID) -> Callback:
         return Callback(True, "fetched all Calendars  successfully.", result)
 
     except Exception as exc:
-        logError("calendar_services.getAll(): " + str(exc))
+        helpers.logError("calendar_services.getAll(): " + str(exc))
         return Callback(False, 'Could not fetch all Calendars.')

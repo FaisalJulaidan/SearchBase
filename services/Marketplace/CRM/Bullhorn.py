@@ -22,7 +22,7 @@ from services.Marketplace import marketplace_helpers as helpers
 # BhRestToken (rest_token) (used to verify users when making queries), expires in 10 minutes
 # submitting a new candidate has no required* fields
 # auth needs to contain auth data + rest_token, rest_url, access_token, refresh_token (retrieved upon connecting)
-from utilities.helpers import logError
+from utilities import helpers
 
 
 def testConnection(auth, companyID):
@@ -38,7 +38,7 @@ def testConnection(auth, companyID):
         return Callback(True, 'Logged in successfully', callback.Data)
 
     except Exception as exc:
-        logError("CRM.Bullhorn.testConnection() ERROR: " + str(exc))
+        helpers.logError("CRM.Bullhorn.testConnection() ERROR: " + str(exc))
         return Callback(False, str(exc))
 
 
@@ -90,7 +90,7 @@ def login(auth):
         return Callback(True, 'Logged in successfully', authCopy)
 
     except Exception as exc:
-        logError("CRM.Bullhorn.login() ERROR: " + str(exc))
+        helpers.logError("CRM.Bullhorn.login() ERROR: " + str(exc))
         return Callback(False, str(exc))
 
 
@@ -136,7 +136,7 @@ def retrieveRestToken(auth, companyID):
 
     except Exception as exc:
         db.session.rollback()
-        logError("CRM.Bullhorn.retrieveRestToken() ERROR: " + str(exc))
+        helpers.logError("CRM.Bullhorn.retrieveRestToken() ERROR: " + str(exc))
         return Callback(False, str(exc))
 
 
@@ -167,7 +167,7 @@ def sendQuery(auth, query, method, body, companyID, optionalParams=None):
         return Callback(True, "Query was successful", r)
 
     except Exception as exc:
-        logError("CRM.Bullhorn.sendQuery() ERROR: " + str(exc))
+        helpers.logError("CRM.Bullhorn.sendQuery() ERROR: " + str(exc))
         return Callback(False, str(exc))
 
 
@@ -227,7 +227,7 @@ def insertCandidate(auth, conversation: Conversation) -> Callback:
         return Callback(True, sendQuery_callback.Data.text)
 
     except Exception as exc:
-        logError("CRM.Bullhorn.insertCandidate() ERROR: " + str(exc))
+        helpers.logError("CRM.Bullhorn.insertCandidate() ERROR: " + str(exc))
         return Callback(False, str(exc))
 
 
@@ -271,7 +271,7 @@ def uploadFile(auth, storedFile: StoredFile):
         return Callback(True, sendQuery_callback.Data.text)
 
     except Exception as exc:
-        logError("CRM.Bullhorn.insertCandidate() ERROR: " + str(exc))
+        helpers.logError("CRM.Bullhorn.insertCandidate() ERROR: " + str(exc))
         return Callback(False, str(exc))
 
 
@@ -290,7 +290,7 @@ def insertClient(auth, conversation: Conversation) -> Callback:
         return Callback(True, insertClient_callback.Message)
 
     except Exception as exc:
-        logError("CRM.Bullhorn.insertClient() ERROR: " + str(exc))
+        helpers.logError("CRM.Bullhorn.insertClient() ERROR: " + str(exc))
         return Callback(False, str(exc))
 
 
@@ -328,7 +328,7 @@ def insertClientContact(auth, conversation: Conversation, bhCompanyID) -> Callba
         return Callback(True, sendQuery_callback.Data.text)
 
     except Exception as exc:
-        logError("CRM.Bullhorn.insertClientContact() ERROR: " + str(exc))
+        helpers.logError("CRM.Bullhorn.insertClientContact() ERROR: " + str(exc))
         return Callback(False, str(exc))
 
 
@@ -352,7 +352,7 @@ def insertCompany(auth, conversation: Conversation) -> Callback:
         return Callback(True, sendQuery_callback.Message, return_body)
 
     except Exception as exc:
-        logError("CRM.Bullhorn.insertCompany() ERROR: " + str(exc))
+        helpers.logError("CRM.Bullhorn.insertCompany() ERROR: " + str(exc))
         return Callback(False, str(exc))
 
 
@@ -408,7 +408,7 @@ def searchCandidates(auth, companyID, conversation, fields=None) -> Callback:
         return Callback(True, sendQuery_callback.Message, result)
 
     except Exception as exc:
-        logError("CRM.Bullhorn.searchCandidates() ERROR: " + str(exc))
+        helpers.logError("CRM.Bullhorn.searchCandidates() ERROR: " + str(exc))
         return Callback(False, str(exc))
 
 
@@ -470,7 +470,7 @@ def searchJobs(auth, companyID, conversation, fields=None) -> Callback:
         return Callback(True, sendQuery_callback.Message, result)
 
     except Exception as exc:
-        logError("CRM.Bullhorn.searchJobs() ERROR: " + str(exc))
+        helpers.logError("CRM.Bullhorn.searchJobs() ERROR: " + str(exc))
         return Callback(False, str(exc))
 
 
@@ -497,7 +497,7 @@ def searchJobsCustomQuery(auth, companyID, query, fields=None) -> Callback:
         return Callback(True, sendQuery_callback.Message, return_body)
 
     except Exception as exc:
-        logError("CRM.Bullhorn.searchJobs() ERROR: " + str(exc))
+        helpers.logError("CRM.Bullhorn.searchJobs() ERROR: " + str(exc))
         return Callback(False, str(exc))
 
 
@@ -517,7 +517,7 @@ def getAllCandidates(auth, companyID, fields=None) -> Callback:
         return Callback(True, sendQuery_callback.Message, return_body)
 
     except Exception as exc:
-        logError("CRM.Bullhorn.getAllCandidates() ERROR: " + str(exc))
+        helpers.logError("CRM.Bullhorn.getAllCandidates() ERROR: " + str(exc))
         return Callback(False, str(exc))
 
 
@@ -538,7 +538,7 @@ def getAllJobs(auth, companyID, fields=None) -> Callback:
         return Callback(True, sendQuery_callback.Message, return_body)
 
     except Exception as exc:
-        logError("CRM.Bullhorn.getAllJobs() ERROR: " + str(exc))
+        helpers.logError("CRM.Bullhorn.getAllJobs() ERROR: " + str(exc))
         return Callback(False, str(exc))
 
 
@@ -605,5 +605,5 @@ def produceRecruiterValueReport(crm: CRM, companyID) -> Callback:
         return Callback(True, "Report information has been retrieved", nestedList)
 
     except Exception as exc:
-        logError("CRM.Bullhorn.produceRecruiterValueReport() ERROR: " + str(exc))
+        helpers.logError("CRM.Bullhorn.produceRecruiterValueReport() ERROR: " + str(exc))
         return Callback(False, "Error in creating report")

@@ -8,7 +8,7 @@ from enums import Calendar as Calendar_Enum, CRM as CRM_Enum
 from models import db, Callback, CRM, Calendar
 from services.Marketplace.CRM import crm_services
 from services.Marketplace.Calendar import calendar_services
-from utilities.helpers import logError
+from utilities import helpers
 
 
 def processRedirect(args):
@@ -32,7 +32,7 @@ def processRedirect(args):
         return callback
 
     except Exception as exc:
-        logError("marketplace_helpers.processRedirect() ERROR: " + str(exc))
+        helpers.logError("marketplace_helpers.processRedirect() ERROR: " + str(exc))
         return Callback(False, str(exc))
 
 
@@ -56,7 +56,7 @@ def saveNewCRMAuth(auth, marketplaceItemName, companyID):
 
     except Exception as exc:
         db.session.rollback()
-        logError("marketplace_helpers.saveNewCRMAuth() ERROR: " + str(exc))
+        helpers.logError("marketplace_helpers.saveNewCRMAuth() ERROR: " + str(exc))
         return Callback(False, str(exc))
 
 
@@ -69,5 +69,5 @@ def saveNewCalendarAuth(auth, marketplaceItemName, companyID):
 
     except Exception as exc:
         db.session.rollback()
-        logError("marketplace_helpers.saveNewCalendarAuth() ERROR: " + str(exc))
+        helpers.logError("marketplace_helpers.saveNewCalendarAuth() ERROR: " + str(exc))
         return Callback(False, str(exc))

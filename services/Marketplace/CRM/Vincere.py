@@ -20,7 +20,7 @@ from services.Marketplace import marketplace_helpers as helpers
 # token needs client_id, code=auth_code, grant_type=authorization_code (post request)
 # To Do: login and token refresh
 # To Test: inserting
-from utilities.helpers import logError
+from utilities import helpers
 
 client_id = os.environ['VINCERE_CLIENT_ID']
 
@@ -52,7 +52,7 @@ def login(auth):
                         })
 
     except Exception as exc:
-        logError("CRM.Vincere.login() ERROR: " + str(exc))
+        helpers.logError("CRM.Vincere.login() ERROR: " + str(exc))
         return Callback(False, str(exc))
 
 
@@ -69,7 +69,7 @@ def testConnection(auth, companyID):
         return Callback(True, 'Logged in successfully', callback.Data)
 
     except Exception as exc:
-        logError("CRM.Bullhorn.testConnection() ERROR: " + str(exc))
+        helpers.logError("CRM.Bullhorn.testConnection() ERROR: " + str(exc))
         return Callback(False, str(exc))
 
 
@@ -113,7 +113,7 @@ def retrieveRestToken(auth, companyID):
 
     except Exception as exc:
         db.session.rollback()
-        logError("CRM.Vincere.retrieveRestToken() ERROR: " + str(exc))
+        helpers.logError("CRM.Vincere.retrieveRestToken() ERROR: " + str(exc))
         return Callback(False, str(exc))
 
 
@@ -145,7 +145,7 @@ def sendQuery(auth, query, method, body, companyID, optionalParams=None):
         return Callback(True, "Query was successful", r)
 
     except Exception as exc:
-        logError("CRM.Vincere.sendQuery() ERROR: " + str(exc))
+        helpers.logError("CRM.Vincere.sendQuery() ERROR: " + str(exc))
         return Callback(False, str(exc))
 
 
@@ -198,7 +198,7 @@ def insertCandidate(auth, conversation: Conversation) -> Callback:
         return Callback(True, sendQuery_callback.Data.text)
 
     except Exception as exc:
-        logError("CRM.Vincere.insertCandidate() ERROR: " + str(exc))
+        helpers.logError("CRM.Vincere.insertCandidate() ERROR: " + str(exc))
         return Callback(False, str(exc))
 
 
@@ -243,7 +243,7 @@ def uploadFile(auth, storedFile: StoredFile):
         return Callback(True, sendQuery_callback.Data.text)
 
     except Exception as exc:
-        logError("CRM.Vincere.insertCandidate() ERROR: " + str(exc))
+        helpers.logError("CRM.Vincere.insertCandidate() ERROR: " + str(exc))
         return Callback(False, str(exc))
 
 
@@ -262,7 +262,7 @@ def insertClient(auth, conversation: Conversation) -> Callback:
         return Callback(True, insertClient_callback.Message)
 
     except Exception as exc:
-        logError("CRM.Vincere.insertClient() ERROR: " + str(exc))
+        helpers.logError("CRM.Vincere.insertClient() ERROR: " + str(exc))
         return Callback(False, str(exc))
 
 
@@ -294,7 +294,7 @@ def insertClientContact(auth, conversation: Conversation, vincCompanyID) -> Call
         return Callback(True, sendQuery_callback.Data.text)
 
     except Exception as exc:
-        logError("CRM.Vincere.insertClientContact() ERROR: " + str(exc))
+        helpers.logError("CRM.Vincere.insertClientContact() ERROR: " + str(exc))
         return Callback(False, str(exc))
 
 
@@ -318,7 +318,7 @@ def insertCompany(auth, conversation: Conversation) -> Callback:
         return Callback(True, sendQuery_callback.Message, return_body)
 
     except Exception as exc:
-        logError("CRM.Vincere.insertCompany() ERROR: " + str(exc))
+        helpers.logError("CRM.Vincere.insertCompany() ERROR: " + str(exc))
         return Callback(False, str(exc))
 
 
@@ -373,7 +373,7 @@ def searchCandidates(auth, companyID, conversation) -> Callback:
         return Callback(True, sendQuery_callback.Message, result)
 
     except Exception as exc:
-        logError("CRM.Vincere.searchCandidates() ERROR: " + str(exc))
+        helpers.logError("CRM.Vincere.searchCandidates() ERROR: " + str(exc))
         return Callback(False, str(exc))
 
 
@@ -443,7 +443,7 @@ def searchJobs(auth, companyID, conversation) -> Callback:
         return Callback(True, sendQuery_callback.Message, result)
 
     except Exception as exc:
-        logError("CRM.Vincere.searchJobs() ERROR: " + str(exc))
+        helpers.logError("CRM.Vincere.searchJobs() ERROR: " + str(exc))
         return Callback(False, str(exc))
 
 
@@ -465,7 +465,7 @@ def getAllCandidates(auth, companyID) -> Callback:
         return Callback(True, sendQuery_callback.Message, return_body)
 
     except Exception as exc:
-        logError("CRM.Vincere.getAllCandidates() ERROR: " + str(exc))
+        helpers.logError("CRM.Vincere.getAllCandidates() ERROR: " + str(exc))
         return Callback(False, str(exc))
 
 
@@ -481,5 +481,5 @@ def getAllJobs(auth, companyID) -> Callback:
         return Callback(True, sendQuery_callback.Message, return_body)
 
     except Exception as exc:
-        logError("CRM.Vincere.getAllJobs() ERROR: " + str(exc))
+        helpers.logError("CRM.Vincere.getAllJobs() ERROR: " + str(exc))
         return Callback(False, str(exc))

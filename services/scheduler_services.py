@@ -50,6 +50,7 @@ def getNextInterval(assistantID=None):
             if ((now - record['LastNotificationDate']).total_seconds()/86400) > record['NotifyEvery'] \
                     or record['LastNotificationDate'] == None:
                 db.session.query(Assistant).filter(Assistant.ID == record['AssistantID']).update({'LastNotificationDate': now})
+
     except Exception as e:
         pass
 

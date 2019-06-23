@@ -3,13 +3,14 @@ import os
 from threading import Thread
 
 from flask import render_template, current_app
-from flask_mail import Mail, Message
-from werkzeug.datastructures import FileStorage
-
+from flask_mail import Mail, Message, MIMEBase, Attachment
+from werkzeug.datastructures import FileStorage, FileMultiDict
+from typing import List
 from config import BaseConfig
 from models import Callback
 from services import user_services, stored_file_services as sfs
 from utilities import helpers
+import io
 
 mail = Mail()
 
@@ -196,51 +197,42 @@ def sendSolutionAlert(record, solutions):
 #         return Callback(False, "Error in notifying for new chatbot conversation")
 
 
-def notifyNewConversation(assistant, conversation, file: FileStorage = None):
+def notifyNewConversation(assistant, conversation, files= None):
     try:
-        if "immediately" not in assistant.NotifyEvery:
-            return Callback(False, "Assistant is not set to receive instant notification!")
+
         users_callback: Callback = user_services.getAllByCompanyIDWithEnabledNotifications(assistant.CompanyID)
         if not users_callback.Success:
             return Callback(False, "Users not found!")
 
         fileInfo = None
-        if file:
-            # file_callback = sfs.getByConversation(conversation)
-            # if not file_callback.Success:
-            #     raise Exception(file_callback.Message)
-            #
-            # print(file_callback.Data.FilePath)
-            # file_callback = sfs.downloadFile(file_callback.Data.FilePath)
-            # if not file_callback.Success:
-            #     raise Exception(file_callback.Message)
-            #
-            # file = file_callback.Data
-            # file_content = file.read()
-            savePath = os.path.join(BaseConfig.USER_FILES, file.filename)
-            file.save(savePath)
-            with current_app.open_resource(savePath) as fp:
-                file_content = fp.read()
-            os.remove(savePath)
-            fileInfo = {"filename": file.filename, "file_content": file_content}
+        # if files:
+        #
+        #     savePath = os.path.join(BaseConfig.USER_FILES, file.filename)
+        #     file.save(savePath)
+        #     with current_app.open_resource(savePath) as fp:
+        #         file_content = fp.read()
+        #     os.remove(savePath)
+        #     fileInfo = {"filename": file.filename, "file_content": file_content}
 
         logoPath = sfs.PUBLIC_URL + sfs.UPLOAD_FOLDER + sfs.COMPANY_LOGOS_PATH + "/" + (
                     assistant.Company.LogoPath or "")
 
-        completedConversation = "No"
-        if conversation.Completed:
-            completedConversation = "Yes"
-
-        information = {"assistantName": assistant.Name, "records": [conversation.Data], "assistantID": assistant.ID,
-                       "logoPath": logoPath, "userType": conversation.UserType.name,
-                       "companyName": assistant.Company.Name, "conversationCompleted": completedConversation}
         # TODO FILE
         # send emails, jobs applied for
         for user in users_callback.Data:
             email_callback: Callback = send_email(to=user.Email,
-                                                  subject='Your new ' + conversation.UserType.name,
-                                                  template='emails/new_record_notification.html', file=fileInfo,
-                                                  data=information)
+                                                  subject='New ' + conversation.UserType.name
+                                                          + " has engaged with "
+                                                          + assistant.Name + " assistant",
+                                                  template='emails/new_conversation_notification.html',
+                                                  files=files,
+                                                  assistantName = assistant.Name,
+                                                  assistantID = assistant.ID,
+                                                  conversation = conversation.Data,
+                                                  logPath = logoPath,
+                                                  userType = conversation.UserType.name,
+                                                  companyName = assistant.Company.Name,
+                                                  conversationCompleted = "Yes" if conversation.Completed else "No")
             if not email_callback.Success:
                 return Callback(False, email_callback.Message)
 
@@ -257,7 +249,7 @@ def send_async_email(app, msg):
         mail.send(msg)
 
 
-def send_email(to, subject, template, file=None, **kwargs):
+def send_email(to, subject, template, files: List[FileStorage]=None, **kwargs):
     try:
         # create Message with the Email: title, recipients and sender
         msg = Message(subject, recipients=[to], sender=tsbEmail)
@@ -276,8 +268,9 @@ def send_email(to, subject, template, file=None, **kwargs):
             with app.app_context():
                 msg.html = render_template(template, **kwargs)
 
-        if file:
-            msg.attach(file.get("filename"), 'application/octect-stream', file.get("file_content"))
+        if files:
+            for file in files:
+                msg.attach(file.filename, 'application/octect-stream', file.read())
 
         # create and start the Thread of the email sending
         thr = Thread(target=send_async_email, args=[app, msg])

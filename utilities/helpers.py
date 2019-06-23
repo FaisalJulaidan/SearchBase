@@ -1,5 +1,5 @@
 from flask import json, after_this_request, request
-from models import db, Assistant, Job, Callback
+from models import db, Assistant, Job, Callback, Role
 from services import flow_services, assistant_services
 from datetime import time
 from enum import Enum
@@ -12,6 +12,7 @@ from sqlalchemy_utils import Currency
 from typing import List
 from flask_jwt_extended import get_jwt_identity
 from forex_python.converter import CurrencyRates
+from enums import Period
 import re, os, stripe, gzip, functools, logging, geoip2.webservice, traceback
 
 
@@ -80,6 +81,12 @@ def decrypt(token, isDict=False, isBtye=False):
     if isDict: value = json.loads(value)
     return value
 
+def seed():
+    # Create universal Roles
+    db.session.add(Role(Name="Staff", EditChatbots=True, AddUsers=True, EditUsers=True, DeleteUsers=True, AccessBilling=True))
+    db.session.add(Role(Name="Owner", EditChatbots=True, AddUsers=True, EditUsers=True, DeleteUsers=True, AccessBilling=True))
+    db.session.commit()
+
 
 def getPlanNickname(SubID=None):
     try:
@@ -143,6 +150,7 @@ def gzipped(f):
 
 
 # Check if the logged in user owns the accessed assistant for security
+# Wrapper function
 def validAssistant(func):
     def wrapperValidAssistant(assistantID):
         user = get_jwt_identity()['user']
@@ -153,6 +161,37 @@ def validAssistant(func):
         return func(assistant)
 
     return wrapperValidAssistant
+
+
+# Note: Hourly is not supported because it varies and number of working hours is required
+def convertSalaryPeriod(salary, fromPeriod: Period, toPeriod: Period):
+
+    if fromPeriod == Period.Annually:
+        if toPeriod == Period.Monthly:
+            return salary / 12
+        elif toPeriod == Period.Weekly:
+            return salary / 52.1429
+        else:
+            return salary
+
+    elif fromPeriod == Period.Monthly:
+        if toPeriod == Period.Annually:
+            return salary * 12
+        elif toPeriod == Period.Weekly:
+            return salary / 4
+        else:
+            return salary
+
+    elif fromPeriod == Period.Weekly:
+        if toPeriod == Period.Annually:
+            return salary * 52.1429
+        elif toPeriod == Period.Monthly:
+            return salary * 4.33
+        else:
+            return salary
+
+    else:
+        raise Exception("helpers.convertSalaryPeriod(): Not supported Period")
 
 
 # -------- SQLAlchemy Converters -------- #

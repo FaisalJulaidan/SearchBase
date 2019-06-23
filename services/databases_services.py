@@ -9,7 +9,7 @@ from typing import List
 from sqlalchemy import and_
 from sqlalchemy_utils import Currency
 
-from enums import DatabaseType, DataType as DT
+from enums import DatabaseType, DataType as DT, Period
 from models import db, Callback, Database, Candidate, Assistant, Job
 from services import assistant_services
 from services.Marketplace.CRM import crm_services
@@ -292,14 +292,15 @@ def scanCandidates(session, dbIDs, extraCandidates=None):
         # Salary comparision for JobSalary (LessThan is forced)
         salaryInputs: list = keywords.get(DT.JobSalary.value['name'])
         if salaryInputs and len(salaryInputs):
-            df[['Score', Candidate.CandidateDesiredSalary.name, Candidate.Currency.name]] = \
-                df.apply(lambda row: __salary(row, Candidate.CandidateDesiredSalary, Candidate.Currency,
+            df[['Score', Candidate.CandidateDesiredSalary.name, Candidate.Currency.name, Job.PayPeriod.name]] = \
+                df.apply(lambda row: __salary(row, Candidate.CandidateDesiredSalary,
+                                              Candidate.Currency, Candidate.PayPeriod,
                                               salaryInputs[-1], plus=8, forceLessThan=True), axis=1, result_type='expand')
 
         # Salary comparision for CandidateDesiredSalary
         salaryInputs: list = keywords.get(DT.CandidateDesiredSalary.value['name'])
         if salaryInputs and len(salaryInputs):
-            df[['Score', Candidate.CandidateDesiredSalary.name, Candidate.Currency.name]] = \
+            df[['Score', Candidate.CandidateDesiredSalary.name, Candidate.Currency.name, Job.PayPeriod.name]] = \
                 df.apply(lambda row: __salary(row, Candidate.CandidateDesiredSalary,
                                               Candidate.Currency, Candidate.PayPeriod,
                                               salaryInputs[-1], plus=8, forceLessThan=False), axis=1, result_type='expand')
@@ -378,7 +379,7 @@ def scanJobs(session, dbIDs, extraJobs=None):
         df = df.drop('DatabaseID', axis=1)  # Drop column
 
         keywords = session['keywordsByDataType']
-        df['Score'] = 1  # Add column for tracking score
+        df['Score'] = 0  # Add column for tracking score
         df['Source'] = "Internal Database"  # Source of solution e.g. Bullhorn, Adapt...
 
         if extraJobs:
@@ -390,7 +391,7 @@ def scanJobs(session, dbIDs, extraJobs=None):
         # Salary comparision
         salaryInputs: list = keywords.get(DT.JobSalary.value['name'], keywords.get(DT.CandidateDesiredSalary.value['name']))
         if salaryInputs and len(salaryInputs):
-            df[['Score', Job.JobSalary.name, Job.Currency.name]] = \
+            df[['Score', Job.JobSalary.name, Job.Currency.name, Job.PayPeriod.name]] = \
                 df.apply(lambda row: __salary(row, Job.JobSalary, Job.Currency, Job.PayPeriod, salaryInputs[-1], 8),
                                                                             axis=1, result_type='expand')
 
@@ -418,6 +419,7 @@ def scanJobs(session, dbIDs, extraJobs=None):
         __wordsCounter(DT.JobDesiredSkills, Job.JobDesiredSkills, keywords, df, 3)
         __wordsCounter(DT.CandidateSkills, Job.JobEssentialSkills, keywords, df, 3)
         __wordsCounter(DT.CandidateSkills, Job.JobDesiredSkills, keywords, df, 3)
+
 
         # Results
         topResults = json.loads(df[df['Score'] > 0].nlargest(session.get('showTop', 0), 'Score')
@@ -460,8 +462,15 @@ def scanJobs(session, dbIDs, extraJobs=None):
 
             if record[Job.JobSalary.name]:
                 currency = record[Job.Currency.name] or '' # it could be a Currency object e.g. {code: 'USD'...}
-                if isinstance(record[Job.Currency.name], dict): currency = currency['code']
-                subTitles.append("Salary: " + str(int(record[Job.JobSalary.name])) + ' ' + currency)
+                payPeriod = record[Job.PayPeriod.name] or '' # it could be a Period object e.g. {name: 'Annual'...}
+
+                if isinstance(currency, dict): currency = currency['code']
+                if isinstance(payPeriod, dict): payPeriod = payPeriod['name']
+
+                subTitles.append("Salary: "
+                                 + str(int(record[Job.JobSalary.name]))
+                                 + ' ' + currency
+                                 + ' ' + payPeriod)
 
             if record[Job.JobEssentialSkills.name]:
                 subTitles.append("Essential Skills: " + record[Job.JobEssentialSkills.name])
@@ -518,24 +527,24 @@ def __salary(row, dbSalaryColumn, dbCurrencyColumn, dbPayPeriodColumn, salaryInp
         dbSalary = helpers.currencyConverter.convert(row[dbCurrencyColumn.name], userSalary[3], dbSalary)
         row[dbSalaryColumn.name] = dbSalary
 
+    # Convert salary rate if did not match with user's entered pay period e.g. Annually to Monthly...
     if (not row[dbPayPeriodColumn.name] == userSalary[4]) and dbSalary > 0:
-        dbSalary = helpers.currencyConverter.convert(row[dbCurrencyColumn.name], userSalary[3], dbSalary)
-        row[dbSalaryColumn.name] = dbSalary
+        dbSalary = helpers.convertSalaryPeriod(dbSalary, row[dbPayPeriodColumn.name], Period[userSalary[4]])
 
     # Add old score to new score if success
     plus += row['Score']
 
     # Compare salaries, if true then return 'plus' to be added to the score otherwise old score
     if userSalary[0] == 'Greater' and not (forceLessThan):
-        return (plus if dbSalary >= float(userSalary[2]) else row['Score']), dbSalary, userSalary[3]
+        return (plus if dbSalary >= float(userSalary[2]) else row['Score']), dbSalary, userSalary[3], userSalary[4]
     else: # Less
-        return (plus if dbSalary <= float(userSalary[2]) else row['Score']), dbSalary, userSalary[3]
+        return (plus if dbSalary <= float(userSalary[2]) else row['Score']), dbSalary, userSalary[3], userSalary[4]
 
 
 
 def createPandaCandidate(id, name, email, mobile, location, skills,
                          linkdinURL, availability, jobTitle, education,
-                         yearsExperience: int, desiredSalary: float, currency, source):
+                         yearsExperience: int, desiredSalary: float, currency: Currency, payPeriod: Period, source):
     return {"ID": id,
             "CandidateName": name or '',
             "CandidateEmail": email or '',
@@ -548,14 +557,15 @@ def createPandaCandidate(id, name, email, mobile, location, skills,
             "CandidateEducation": education or '',
             "CandidateYearsExperience": yearsExperience or 0,
             "CandidateDesiredSalary": desiredSalary or 0,
-            "Currency": currency or '',
+            "Currency": currency,
+            "PayPeriod": payPeriod,
             "Score": 0,
             "Source": source or '',
             }
 
 
 def createPandaJob(id, title, desc, location, type, salary: float, essentialSkills, desiredSkills, yearsRequired,
-                   startDate, endDate, linkURL, currency, source):
+                   startDate, endDate, linkURL, currency: Currency, payPeriod: Period, source):
     return {"ID": id,
             "JobTitle": title or '',
             "JobDescription": desc or '',
@@ -568,7 +578,8 @@ def createPandaJob(id, title, desc, location, type, salary: float, essentialSkil
             "JobStartDate": startDate or '',
             "JobEndDate": endDate,
             "JobLinkURL": linkURL,
-            "Currency": currency or '',
+            "Currency": currency,
+            "PayPeriod": payPeriod,
             "Score": 0,
             "Source": source or '',
             }

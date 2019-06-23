@@ -13,7 +13,7 @@ from utilities import helpers, tasks, dummy_data
 from flask_babel import Babel
 from services import appointment_services
 from datetime import datetime
-
+import enums
 # Import all routers to register them as blueprints
 from routes.admin.routers import account_router, analytics_router, sub_router, \
     conversation_router, users_router, flow_router, assistant_router,\
@@ -92,6 +92,7 @@ if os.environ['FLASK_ENV'] in ['production', 'staging']:
         print('Create db tables')
         create_database(url)
         db.create_all()
+        helpers.seed()
 
     # Check if staging what to do
     # scheduler.start()

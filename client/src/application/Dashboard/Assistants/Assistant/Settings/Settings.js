@@ -174,7 +174,8 @@ class Settings extends Component {
                     <Form.Item label="Alert Me Every:"
                                extra="Select how often you would like to be notified via email of new chats">
                         <Radio.Group style={{width:'100%'}}
-                                     defaultValue={this.state.isManualNotify ? "custom" : assistant.NotifyEvery}
+                                     defaultValue={this.state.isManualNotify ? "custom" : (assistant.NotifyEvery === null ? "null" : assistant.NotifyEvery)
+                                     }
                                      onChange={(e) => {if(e.target.value !== "custom"){this.setState({notifyEvery: e.target.value, isManualNotify: false})}}}>
                             <Radio.Button value={"null"}>Never</Radio.Button>
                             <Radio.Button value={0} >Immediately</Radio.Button>

@@ -192,7 +192,7 @@ def sendSolutionAlert(record, solutions):
 #         return Callback(False, "Error in notifying for new chatbot conversation")
 
 
-def notifyNewConversations(assistant: Assistant):
+def notifyNewConversations(assistant: Assistant, conversations, lastNotificationDate):
     pass
 
 

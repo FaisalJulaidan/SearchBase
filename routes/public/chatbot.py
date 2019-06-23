@@ -95,10 +95,13 @@ def chatbot_upload_files(assistantIDAsHash, sessionID):
                            secure_filename(file.filename).rsplit('.', 1)[1].lower()
 
 
+
                 # Upload file to DigitalOcean Space
                 upload_callback: Callback = stored_file_services.uploadFile(file, filename,
                                                                             stored_file_services.USER_FILES_PATH,
                                                                             True)
+
+
 
                 if not upload_callback.Success:
                     filename = 'fileCorrupted'
@@ -115,12 +118,13 @@ def chatbot_upload_files(assistantIDAsHash, sessionID):
                 logError("Couldn't Save Stored Files Reference For: " + str(filenames))
                 raise Exception(dbRef_callback.Message)
 
+
             # Save changes
             db.session.commit()
 
             # Notify company of new conversation
             if assistant.NotifyEvery == 0:
-                mail_services.notifyNewConversation(assistant, conversation, files)
+                mail_services.notifyNewConversation(assistant, conversation)
 
             if assistant.CRM:
                 # Send through CRM
@@ -131,6 +135,5 @@ def chatbot_upload_files(assistantIDAsHash, sessionID):
                     raise Exception("Could not submit file to CRM")
 
         except Exception as exc:
-            return helpers.jsonResponse(False, 404, "Couldn't save the file")
-
+            return helpers.jsonResponse(False, 404, "I am having difficulties saving your uploaded the files :(")
         return helpers.jsonResponse(True, 200, "File uploaded successfully!!")

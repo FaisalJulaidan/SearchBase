@@ -84,7 +84,6 @@ def getAllByCompanyIDWithEnabledNotifications(companyID) -> Callback:
         # Get result and check if None then raise exception
         result = db.session.query(User) \
             .filter(and_(User.CompanyID == companyID, User.ChatbotNotifications, User.Verified)).all()
-        if not result: raise Exception
 
         return Callback(True, 'Users were successfully retrieved.', result)
     except Exception as exc:

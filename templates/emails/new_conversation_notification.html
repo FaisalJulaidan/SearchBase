@@ -5,36 +5,70 @@
 {% endblock %}
 
 {% block content_title %}
-    {{ userType }}
+    Conversation Details
     <br/>
     <span style="font-size: 11px;color:grey">
-        Any files submitted by the {{ userType }} have also been attached to this email.
+        Any file links will expire a month from the time you received this email.
     </span>
 {% endblock %}
 
 {% block content_body %}
 
-    <span style="color:black"> <b>Completed Chatbot:</b> {{ conversationCompleted }}</span><br/>
-    {% for key, value in conversation["keywordsByDataType"].items() %}
-        {% if not "&FILE_UPLOAD&" in value %}
-           <span style="color:black"> <b>{{ key.replace(userType, "") }}:</b>  {{ " ".join(value) }}</span><br/>
+
+    {# Contuter functionaility for file upload link #}
+    {% set counters = {} %}
+    {% macro increment(dct, key, inc=1)%}
+        {% if dct.update({key: dct[key] + inc}) %} {% endif %}
+    {% endmacro %}
+
+
+    {% for conversation in conversations %}
+
+        {# Each conversation will has its own counter for its files URLs #}
+        {% do counters.update({loop.index: 0}) %}
+
+        <span style="font-size: 24px;color:black;"> {{ conversation.userType }} </span><br/>
+
+        <span style="color:black"> <b>Completed Chatbot:</b> {{ conversation.completed }}</span><br/>
+        {% for key, value in conversation.data["keywordsByDataType"].items() %}
+
+            {% if "&FILE_UPLOAD&" in value %}
+                <span style="color:black">
+
+                    <b>{{ key.replace(conversation.userType, "") }}:</b>
+                    <a href="{{ conversation.fileURLsSinged[counters[loop.index]]}}"> Download File</a>
+
+                    {# increment the counter assocaited for its incement function#}
+                    {{ increment(counters, loop.index) }}
+
+                </span>
+                <br/>
+
+            {% else %}
+                <span style="color:black">
+                    <b>{{ key.replace(conversation.userType, "") }}:</b>  {{ " ".join(value) }}
+                </span>
+                <br/>
+            {% endif %}
+        {% endfor %}
+
+        {% if conversation.data.get("selectedSolutions") %}
+            <tr>
+                <td class="hero-subheader__title"
+                    style="font-size: 23px; font-weight: bold; padding: 15px 0 15px 0;"
+                    align="left">
+                    They are also interested in the following solutions:<br/>
+                </td>
+            </tr>
+
+            <tr>
+                <td style="font-size: 15px;">
+                    {{ conversation.data.get("selectedSolutions") }}
+                </td>
+            </tr>
         {% endif %}
+
     {% endfor %}
 
-    {% if conversation.get("selectedSolutions") %}
-        <tr>
-            <td class="hero-subheader__title"
-                style="font-size: 23px; font-weight: bold; padding: 15px 0 15px 0;"
-                align="left">
-                They are also interested in the following solutions:<br/>
-            </td>
-        </tr>
-
-        <tr>
-            <td style="font-size: 15px;">
-                {{ conversation.get("selectedSolutions") }}
-            </td>
-        </tr>
-    {% endif %}
 
 {% endblock %}

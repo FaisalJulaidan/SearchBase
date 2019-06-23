@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import {Button, Col, Icon, Modal, Progress, Row, Tabs, Typography} from "antd";
-import {errorMessage, http, loadingMessage, successMessage} from "helpers";
+import {errorMessage, http, loadingMessage, successMessage ,destroyMessage} from "helpers";
 import saveAs from 'file-saver';
 import Profile from '../Profile/Profile'
 import Conversation from '../Conversation/Conversation'
@@ -45,8 +45,7 @@ class ViewsModal extends Component {
 
     downloadFileHandler = (filenameIndex) => {
         // Get file name by index
-        let fileName = this.props.conversation.FilePath.split(',')[filenameIndex];
-
+        let fileName = this.props.conversation?.FilePath?.split(',')[filenameIndex];
 
         if (!fileName){
             errorMessage("File doesn't exist!");
@@ -55,18 +54,17 @@ class ViewsModal extends Component {
 
         loadingMessage("Downloading file...", 0);
         this.setState({isDownloadingFile: true});
-        http({
-            url: `/assistant/${this.props.assistant.ID}/conversation/${fileName}`,
-            method: 'GET',
-            responseType: 'blob', // important
-        }).then((response) => {
-            saveAs(new Blob([response.data]), fileName);
-            successMessage("File downloaded successfully!");
-            this.setState({isDownloadingFile: false});
-        }).catch(error => {
-            errorMessage("File is corrupted!");
-            this.setState({isDownloadingFile: false});
-        });
+
+        // Get the pre singed generated url to download from DigitalOcean
+        http.get(`/assistant/${this.props.assistant.ID}/conversation/${fileName}`)
+            .then((response) => {
+                window.open(response.data.data.url);
+                this.setState({isDownloadingFile: false});
+                destroyMessage()
+            }).catch(error => {
+                errorMessage("File is corrupted!");
+                this.setState({isDownloadingFile: false});
+            });
 
     };
 

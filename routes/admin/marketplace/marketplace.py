@@ -28,8 +28,8 @@ def get_crms():
             return helpers.jsonResponse(False, 400, callback.Message)
 
         crms = helpers.getListFromSQLAlchemyList(callback.Data)
-        for crm in crms:
-            crm['Status'] = crm_services.testConnection(user.get("companyID"), {'auth': crm['Auth'], 'type': crm['Type']}).Success
+        # for crm in crms:
+        #     crm['Status'] = crm_services.testConnection(user.get("companyID"), {'auth': crm['Auth'], 'type': crm['Type']}).Success
         data = {"crms": crms, "companyID": user.get("companyID")}
 
         return helpers.jsonResponse(True, 200, callback.Message, data)

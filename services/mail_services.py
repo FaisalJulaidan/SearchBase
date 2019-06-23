@@ -1,16 +1,11 @@
-import logging
-import os
 from threading import Thread
 
 from flask import render_template, current_app
-from flask_mail import Mail, Message, MIMEBase, Attachment
-from werkzeug.datastructures import FileStorage, FileMultiDict
-from typing import List
-from config import BaseConfig
-from models import Callback
+from flask_mail import Mail, Message
+from models import Callback, Assistant, Conversation
 from services import user_services, stored_file_services as sfs
 from utilities import helpers
-import io
+
 
 mail = Mail()
 
@@ -197,27 +192,39 @@ def sendSolutionAlert(record, solutions):
 #         return Callback(False, "Error in notifying for new chatbot conversation")
 
 
-def notifyNewConversation(assistant, conversation, files= None):
+def notifyNewConversations(assistant: Assistant):
+    pass
+
+
+def notifyNewConversation(assistant: Assistant, conversation: Conversation):
     try:
 
         users_callback: Callback = user_services.getAllByCompanyIDWithEnabledNotifications(assistant.CompanyID)
         if not users_callback.Success:
             return Callback(False, "Users not found!")
 
-        fileInfo = None
-        # if files:
-        #
-        #     savePath = os.path.join(BaseConfig.USER_FILES, file.filename)
-        #     file.save(savePath)
-        #     with current_app.open_resource(savePath) as fp:
-        #         file_content = fp.read()
-        #     os.remove(savePath)
-        #     fileInfo = {"filename": file.filename, "file_content": file_content}
+        if len(users_callback.Data) == 0:
+            return Callback(True, "No user has notifications enabled")
 
+        # Company logo
         logoPath = sfs.PUBLIC_URL + sfs.UPLOAD_FOLDER + sfs.COMPANY_LOGOS_PATH + "/" + (
                     assistant.Company.LogoPath or "")
 
-        # TODO FILE
+        # Get pre singed url to download the file if there are files
+        fileURLsSinged = []
+        if conversation.StoredFile:
+            fileURLs :str = conversation.StoredFile.FilePath
+            if fileURLs:
+                for urls in fileURLs.split(','):
+                    fileURLsSinged.append(sfs.genPresigendURL(urls, sfs.USER_FILES_PATH, 2592000).Data) # Expires in a month
+
+        conversations = [{
+            'userType': conversation.UserType.name,
+            'data': conversation.Data,
+            'fileURLsSinged': fileURLsSinged,
+            'completed': "Yes" if conversation.Completed else "No"
+        }]
+
         # send emails, jobs applied for
         for user in users_callback.Data:
             email_callback: Callback = send_email(to=user.Email,
@@ -225,14 +232,12 @@ def notifyNewConversation(assistant, conversation, files= None):
                                                           + " has engaged with "
                                                           + assistant.Name + " assistant",
                                                   template='emails/new_conversation_notification.html',
-                                                  files=files,
                                                   assistantName = assistant.Name,
                                                   assistantID = assistant.ID,
-                                                  conversation = conversation.Data,
+                                                  conversations = conversations,
                                                   logPath = logoPath,
-                                                  userType = conversation.UserType.name,
                                                   companyName = assistant.Company.Name,
-                                                  conversationCompleted = "Yes" if conversation.Completed else "No")
+                                                  )
             if not email_callback.Success:
                 return Callback(False, email_callback.Message)
 
@@ -249,7 +254,7 @@ def send_async_email(app, msg):
         mail.send(msg)
 
 
-def send_email(to, subject, template, files: List[FileStorage]=None, **kwargs):
+def send_email(to, subject, template, files=None, **kwargs):
     try:
         # create Message with the Email: title, recipients and sender
         msg = Message(subject, recipients=[to], sender=tsbEmail)

@@ -69,6 +69,7 @@ manager = Manager(app)
 babel = Babel(app)
 # scheduler = APScheduler()
 manager.add_command('db', MigrateCommand)
+app.jinja_env.add_extension('jinja2.ext.do') # Add 'do' extension to Jinja engine
 
 
 # will be used for migration purposes

@@ -1,5 +1,5 @@
 import React from 'react'
-import {Breadcrumb, Form, Tabs, Typography} from 'antd';
+import {Breadcrumb, Button, Form, Tabs, Typography} from 'antd';
 import 'types/Marketplaces_Types';
 import {history} from "helpers";
 import NoHeaderPanel from 'components/NoHeaderPanel/NoHeaderPanel'
@@ -11,6 +11,7 @@ import {VincereFeatures, VincereFormItems, VincereHeader} from "../Crm/CrmForms/
 import {GreenhouseFeatures, GreenhouseFormItem, GreenhouseHeader} from "../Crm/CrmForms/Greenhouse";
 import {GoogleFeatures, GoogleFormItems, GoogleHeader} from '../Crm/CrmForms/Google'
 import {OutlookFeatures, OutlookFormItems, OutlookHeader} from "../Crm/CrmForms/Outlook";
+import data from '../Marketplaces.json'
 import {connect} from 'react-redux';
 
 const TabPane = Tabs.TabPane;
@@ -21,14 +22,11 @@ class Marketplace extends React.Component {
 
     state = {};
 
-    /**
-     * @return {Marketplace | {}}
-     */
-    getMarketplaceObj = () => this.props.location.state?.marketplace || {};
+    /**@return {Marketplace}*/
+    getMarketplaceObj = () => data.Marketplaces.find(marketplace => marketplace.type === this.props.match.params.type);
+
 
     componentWillMount() {
-        if (!this.props.location.state)
-            return history.push('/dashboard/marketplace');
         const marketplace = this.getMarketplaceObj();
         this.props.dispatch(marketplacesActions.exportRecruiterValueReport({Name: marketplace.type}))
     }
@@ -177,12 +175,19 @@ class Marketplace extends React.Component {
                         </Breadcrumb>
                     </div>
 
-                    <div style={{display: "flex"}}>
-                        <div className={styles.DetailsWithAvatar}>
+                    <div className={styles.HeadBar}>
+                        <div className={styles.Title}>
                             <Title level={2}>{type}</Title>
-                            {this.getMarketplaceComponent(type, 'header')}
+                        </div>
+                        <div className={styles.Buttons}>
+                            <Button>Connect</Button>
                         </div>
                     </div>
+
+                    <div className={styles.Desc}>
+                        {this.getMarketplaceComponent(type, 'header')}
+                    </div>
+
                 </div>
 
                 <div className={styles.Body}>

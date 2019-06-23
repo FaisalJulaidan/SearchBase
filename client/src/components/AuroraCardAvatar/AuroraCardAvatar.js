@@ -1,9 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import styles from "./AuroraCardAvatar.module.less"
-import {Avatar, Divider, Icon, Tag, Tooltip, Typography} from 'antd';
+import {Icon, Tag, Tooltip, Typography} from 'antd';
 
-const {Title, Text} = Typography;
+const {Title, Paragraph} = Typography;
 
 class AuroraCardAvatar extends React.Component {
     render() {
@@ -30,16 +30,17 @@ class AuroraCardAvatar extends React.Component {
                     className={[styles.SelectButton, styles.Unbuttonized, this.props.selected ? styles.Selected : ''].join(' ')}
                     onClick={this.props.onClick}>
                     <div className={styles.Main}>
-                        <Avatar shape="square" style={{width: 100, height: 80}} src={this.props.image}/>
+                        <img src={this.props.image} width={100} style={{
+                            float: 'left',
+                            marginLeft: 20
+                        }}/>
                         <div className={styles.Desc}>
                             <Typography>
                                 <Title level={4}>{this.props.title}</Title>
-                                <Text type="secondary">
+                                <Paragraph type="secondary" ellipsis={{rows: 3}}>
                                     {this.props.desc}
-                                </Text>
+                                </Paragraph>
                             </Typography>
-                            <Divider/>
-                            {getTag(this.props.status)}
                         </div>
                     </div>
                 </button>

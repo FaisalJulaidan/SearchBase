@@ -3,7 +3,7 @@ from pytz import utc
 from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.jobstores.sqlalchemy import SQLAlchemyJobStore
 from apscheduler.executors.pool import ThreadPoolExecutor, ProcessPoolExecutor
-from models import db, Callback, Assistant, User
+from models import db, Callback, Assistant, User, Conversation
 # import dateutil
 from utilities import helpers
 from datetime import date, datetime
@@ -34,7 +34,6 @@ scheduler = BackgroundScheduler(jobstores=jobstores, executors=executors, job_de
 # If assistantID is supplied, it will only look for data relating to that assistant
 def getNextInterval(assistantID=None):
     try:
-        helpers.HPrint('kek')
         now = datetime.now()
         query = db.session.query(Assistant.ID, Assistant.NotifyEvery, Assistant.Name, User.Email, Assistant.LastNotificationDate) \
             .filter(Assistant.NotifyEvery != None) \
@@ -46,10 +45,11 @@ def getNextInterval(assistantID=None):
         monthlyUses = helpers.getDictFromLimitedQuery(["AssistantID", "NotifyEvery", "Name", "Email", "LastNotificationDate"],
                          query.all())
 
-        for record in monthlyUses:
-            if ((now - record['LastNotificationDate']).total_seconds()/86400) > record['NotifyEvery'] \
-                    or record['LastNotificationDate'] == None:
-                db.session.query(Assistant).filter(Assistant.ID == record['AssistantID']).update({'LastNotificationDate': now})
+        for assistant in monthlyUses:
+            if (now - assistant['LastNotificationDate']).total_seconds()/86400 > assistant['NotifyEvery'] :
+                conversations = db.session.query(Conversation).filter(Conversation.DateTime > assistant['LastNotificationDate']).all()
+                # FAISALFUNCTION(assistant, conversations, assistant['LastNotificationDate'])
+                db.session.query(Assistant).filter(Assistant.ID == assistant['AssistantID']).update({'LastNotificationDate': now})
     except Exception as e:
         pass
 

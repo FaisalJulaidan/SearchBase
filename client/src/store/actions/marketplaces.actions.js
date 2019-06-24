@@ -22,66 +22,66 @@ const getConnectedCRMsFailure = (error) => {
     };
 };
 
-const connectCrm = (connectedCRM) => {
+const connectMarketplace = (connectedCRM) => {
     return {
-        type: actionTypes.CONNECT_CRM_REQUEST,
+        type: actionTypes.CONNECT_MARKETPLACE_REQUEST,
         connectedCRM
     };
 };
 
-const connectCrmSuccess = (connectedCRM, msg) => {
+const connectMarketplaceSuccess = (connectedCRM, msg) => {
     return {
-        type: actionTypes.CONNECT_CRM_SUCCESS,
+        type: actionTypes.CONNECT_MARKETPLACE_SUCCESS,
         connectedCRM,
         msg
     };
 };
 
-const connectCrmFailure = (error) => {
+const connectMarketplaceFailure = (error) => {
     return {
-        type: actionTypes.CONNECT_CRM_FAILURE,
+        type: actionTypes.CONNECT_MARKETPLACE_FAILURE,
         error
     };
 };
 
-const testCrm = (testedCRM) => {
+const testMarketplace = (testedCRM) => {
     return {
-        type: actionTypes.TEST_CRM_REQUEST,
+        type: actionTypes.TEST_MARKETPLACE_REQUEST,
         testedCRM
     };
 };
 
-const testCrmSuccess = () => {
+const testMarketplaceSuccess = () => {
     return {
-        type: actionTypes.TEST_CRM_SUCCESS,
+        type: actionTypes.TEST_MARKETPLACE_SUCCESS,
     };
 };
 
-const testCrmFailure = (error) => {
+const testMarketplaceFailure = (error) => {
     return {
-        type: actionTypes.TEST_CRM_FAILURE,
+        type: actionTypes.TEST_MARKETPLACE_FAILURE,
         error
     };
 };
 
-const disconnectCrm = (disconnectedCRMID) => {
+const disconnectMarketplace = (disconnectedCRMID) => {
     return {
-        type: actionTypes.DISCONNECT_CRM_REQUEST,
+        type: actionTypes.DISCONNECT_MARKETPLACE_REQUEST,
         disconnectedCRMID
     };
 };
 
-const disconnectCrmSuccess = (connectedCRM_ID, msg) => {
+const disconnectMarketplaceSuccess = (connectedCRM_ID, msg) => {
     return {
-        type: actionTypes.DISCONNECT_CRM_SUCCESS,
+        type: actionTypes.DISCONNECT_MARKETPLACE_SUCCESS,
         connectedCRM_ID,
         msg
     };
 };
 
-const disconnectCrmFailure = (error) => {
+const disconnectMarketplaceFailure = (error) => {
     return {
-        type: actionTypes.DISCONNECT_CRM_FAILURE,
+        type: actionTypes.DISCONNECT_MARKETPLACE_FAILURE,
         error
     };
 };
@@ -113,17 +113,17 @@ export const marketplacesActions = {
     getConnectedCRMsSuccess,
     getConnectedCRMsFailure,
 
-    connectCrm,
-    connectCrmSuccess,
-    connectCrmFailure,
+    connectMarketplace,
+    connectMarketplaceSuccess,
+    connectMarketplaceFailure,
 
-    testCrm,
-    testCrmSuccess,
-    testCrmFailure,
+    testMarketplace,
+    testMarketplaceSuccess,
+    testMarketplaceFailure,
 
-    disconnectCrm,
-    disconnectCrmSuccess,
-    disconnectCrmFailure,
+    disconnectMarketplace,
+    disconnectMarketplaceSuccess,
+    disconnectMarketplaceFailure,
 
     exportRecruiterValueReport,
     exportRecruiterValueReportSuccess,

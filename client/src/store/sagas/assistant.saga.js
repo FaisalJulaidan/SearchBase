@@ -166,7 +166,7 @@ function* watchSelectAutoPilot() {
 }
 
 function* watchResetAssistantCrm() {
-    yield takeEvery(actionTypes.DISCONNECT_ASSISTANT_CRM_REQUEST, disconnectAssistantCRM)
+    yield takeEvery(actionTypes.DISCONNECT_ASSISTANT_MARKETPLACE_REQUEST, disconnectAssistantCRM)
 }
 
 function* watchUpdateStatus() {
@@ -202,7 +202,7 @@ function* watchDeleteAssistant() {
 }
 
 function* watchSelectAssistantCrm() {
-    yield takeEvery(actionTypes.CONNECT_ASSISTANT_CRM_REQUEST, connectAssistantCRM)
+    yield takeEvery(actionTypes.CONNECT_ASSISTANT_MARKETPLACE_REQUEST, connectAssistantCRM)
 }
 
 

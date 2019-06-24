@@ -55,7 +55,7 @@ class Marketplace extends React.Component {
         if (err) return;
         const marketplace = this.getMarketplaceObj();
         this.props.dispatch(
-            marketplacesActions.connectCrm(
+            marketplacesActions.connectMarketplace(
                 {
                     type: marketplace.type,
                     auth: {...values}
@@ -68,7 +68,7 @@ class Marketplace extends React.Component {
         if (err) return;
         const marketplace = this.getMarketplaceObj();
         this.props.dispatch(
-            marketplacesActions.testCrm(
+            marketplacesActions.testMarketplace(
                 {
                     type: marketplace.type,
                     auth: {...values}
@@ -77,7 +77,7 @@ class Marketplace extends React.Component {
         );
     });
 
-    disconnectMarketplace = () => this.props.dispatch(marketplacesActions.disconnectCrm({ID: this.getMarketplaceObj().ID}));
+    disconnectMarketplace = () => this.props.dispatch(marketplacesActions.disconnectMarketplace({ID: this.getMarketplaceObj().ID}));
 
 
     showModal = () => {
@@ -112,9 +112,9 @@ class Marketplace extends React.Component {
             isTesting: this.props.isTesting,
             isDisconnecting: this.props.isDisconnecting,
             openModal: this.showModal,
-            disconnectCRM: this.disconnectMarketplace,
+            disconnectMarketplace: this.disconnectMarketplace,
             connectCRM: this.connectMarketplace,
-            testCRM: this.testMarketplace,
+            testMarketplace: this.testMarketplace,
         };
         const buttonsOptions = {
             disconnectMarketplace: this.disconnectMarketplace,

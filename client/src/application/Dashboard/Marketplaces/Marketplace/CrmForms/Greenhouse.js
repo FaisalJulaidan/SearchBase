@@ -1,6 +1,5 @@
 import React from 'react';
-import {Button, Col, Icon, Input, Popconfirm, Typography} from "antd";
-import styles from "../../Crm/Crm.module.less";
+import {Button, Icon, Input, Typography} from "antd";
 import {getLink} from "helpers";
 
 const {Title, Paragraph, Text} = Typography;
@@ -10,9 +9,9 @@ export const GreenhouseFormItem = ({
                                        layout,
                                        getFieldDecorator,
                                        marketplace,
-                                       disconnectCRM,
-                                       connectCRM,
-                                       testCRM,
+                                       disconnectMarketplace,
+                                       connectMarketplace,
+                                       testMarketplace,
                                        isConnecting,
                                        isTesting,
                                    }) =>
@@ -57,8 +56,8 @@ export const GreenhouseFormItem = ({
                     marketplace.status === "NOT_CONNECTED" &&
                     <>
                         <Button type="primary" disabled={isConnecting || isTesting}
-                                onClick={connectCRM}>Connect</Button>
-                        <Button onClick={testCRM} disabled={isConnecting || isTesting}>Test</Button>
+                                onClick={connectMarketplace}>Connect</Button>
+                        <Button onClick={testMarketplace} disabled={isConnecting || isTesting}>Test</Button>
                     </>
                 }
 

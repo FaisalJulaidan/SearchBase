@@ -14,42 +14,42 @@ function* fetchMarketplaces() {
     }
 }
 
-function* connectCrm({connectedCRM}) {
+function* connectMarketplace({connectedCRM}) {
     try {
         loadingMessage('Connecting to ' + connectedCRM.type, 0);
         const res = yield http.post(`/crm/connect`, {type: connectedCRM.type, auth: connectedCRM.auth});
         successMessage(res.data?.msg || `${connectedCRM.type} connected successfully`);
-        yield put(marketplacesActions.connectCrmSuccess(res.data.data));
+        yield put(marketplacesActions.connectMarketplaceSuccess(res.data.data));
     } catch (error) {
         const msg = error.response?.data?.msg || "Couldn't Connect CRM";
         errorMessage(msg);
-        yield put(marketplacesActions.connectCrmFailure(msg));
+        yield put(marketplacesActions.connectMarketplaceFailure(msg));
     }
 }
 
-function* testCrm({testedCRM}) {
+function* testMarketplace({testedCRM}) {
     const defaultMsg = "Couldn't Test CRM";
     try {
         loadingMessage('Connecting to ' + testedCRM.type, 0);
         const res = yield http.post(`/crm/test`, {type: testedCRM.type, auth: testedCRM.auth});
         destroyMessage();
         successMessage(res.data?.msg || defaultMsg);
-        yield put(marketplacesActions.testCrmSuccess());
+        yield put(marketplacesActions.testMarketplaceSuccess());
     } catch (error) {
         const msg = error.response?.data?.msg || "Test CRM connection failed";
         errorMessage(msg);
-        yield put(marketplacesActions.testCrmFailure(msg));
+        yield put(marketplacesActions.testMarketplaceFailure(msg));
     }
 }
 
-function* disconnectCrm({disconnectedCRMID}) {
+function* disconnectMarketplace({disconnectedCRMID}) {
     try {
         const res = yield http.delete(`/crm/${disconnectedCRMID.ID}`);
         successMessage(res.data.msg || 'CRM Disconnected');
-        yield put(marketplacesActions.disconnectCrmSuccess(res.data.data));
+        yield put(marketplacesActions.disconnectMarketplaceSuccess(res.data.data));
     } catch (error) {
         const msg = error.response?.data?.msg || "Couldn't disconnect";
-        yield put(marketplacesActions.disconnectCrmFailure(msg));
+        yield put(marketplacesActions.disconnectMarketplaceFailure(msg));
         errorMessage(msg);
     }
 }
@@ -69,16 +69,16 @@ function* watchFetchMarketplaces() {
     yield takeEvery(actionTypes.GET_MARKETPLACES_REQUEST, fetchMarketplaces)
 }
 
-function* watchConnectCrm() {
-    yield takeEvery(actionTypes.CONNECT_CRM_REQUEST, connectCrm)
+function* watchConnectMarketplace() {
+    yield takeEvery(actionTypes.CONNECT_MARKETPLACE_REQUEST, connectMarketplace)
 }
 
-function* watchTestCrm() {
-    yield takeEvery(actionTypes.TEST_CRM_REQUEST, testCrm)
+function* watchTestMarketplace() {
+    yield takeEvery(actionTypes.TEST_MARKETPLACE_REQUEST, testMarketplace)
 }
 
-function* watchDisconnectCrm() {
-    yield takeEvery(actionTypes.DISCONNECT_CRM_REQUEST, disconnectCrm)
+function* watchDisconnectMarketplace() {
+    yield takeEvery(actionTypes.DISCONNECT_MARKETPLACE_REQUEST, disconnectMarketplace)
 }
 
 function* watchExportRecruiterValueReport() {
@@ -89,9 +89,9 @@ function* watchExportRecruiterValueReport() {
 export function* marketplacesSaga() {
     yield all([
         watchFetchMarketplaces(),
-        watchConnectCrm(),
-        watchTestCrm(),
-        watchDisconnectCrm(),
+        watchConnectMarketplace(),
+        watchTestMarketplace(),
+        watchDisconnectMarketplace(),
         watchExportRecruiterValueReport()
 
     ])

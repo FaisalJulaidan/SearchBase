@@ -9,9 +9,9 @@ export const BullhornFormItems = ({
                                       layout,
                                       getFieldDecorator,
                                       marketplace,
-                                      disconnectCRM,
-                                      connectCRM,
-                                      testCRM,
+                                      disconnectMarketplace,
+                                      connectMarketplace,
+                                      testMarketplace,
                                       isConnecting,
                                       isTesting,
                                   }) =>
@@ -59,8 +59,8 @@ export const BullhornFormItems = ({
                     marketplace.status === "NOT_CONNECTED" &&
                     <>
                         <Button type="primary" disabled={isConnecting || isTesting}
-                                onClick={connectCRM}>Connect</Button>
-                        <Button onClick={testCRM} disabled={isConnecting || isTesting}>Test</Button>
+                                onClick={connectMarketplace}>Connect</Button>
+                        <Button onClick={testMarketplace} disabled={isConnecting || isTesting}>Test</Button>
                     </>
                 }
 

@@ -10,9 +10,8 @@ export const AdaptFormItems = ({
                                    layout,
                                    getFieldDecorator,
                                    marketplace,
-                                   disconnectCRM,
-                                   connectCRM,
-                                   testCRM,
+                                   connectMarketplace,
+                                   testMarketplace,
                                    isConnecting,
                                    isTesting,
                                }) =>
@@ -140,8 +139,8 @@ export const AdaptFormItems = ({
                     marketplace.status === "NOT_CONNECTED" &&
                     <>
                         <Button type="primary" disabled={isConnecting || isTesting}
-                                onClick={connectCRM}>Connect</Button>
-                        <Button onClick={testCRM} disabled={isConnecting || isTesting}>Test</Button>
+                                onClick={connectMarketplace}>Connect</Button>
+                        <Button onClick={testMarketplace} disabled={isConnecting || isTesting}>Test</Button>
                     </>
                 }
             </div>

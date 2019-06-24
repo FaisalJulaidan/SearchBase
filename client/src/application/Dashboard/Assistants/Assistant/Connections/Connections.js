@@ -31,7 +31,7 @@ class Connections extends Component {
         this.props.dispatch(assistantActions.connectAssistantCRM(this.state.selectedCRM.ID, this.props.assistant.ID))
     };
 
-    handleDisconnectCRM = () => {
+    handleDisconnectMarketplace = () => {
         this.props.dispatch(assistantActions.disconnectAssistantCRM(this.props.assistant.ID))
     };
 
@@ -71,7 +71,7 @@ class Connections extends Component {
                         Connect
                     </Button>
                     <Button type={'danger'}
-                            onClick={this.handleDisconnectCRM}
+                            onClick={this.handleDisconnectMarketplace}
                             disabled={!defaultSelectedCRM}
                     >
                         {!defaultSelectedCRM ? "Disconnect" : `Disconnect from ${defaultSelectedCRM.Type}`}

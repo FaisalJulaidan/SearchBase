@@ -29,7 +29,6 @@ const Calendar = lazy(() => import('./Calendar/Calendar'));
 const AutoPilots = lazy(() => import('./AutoPilots/AutoPilots'));
 const AutoPilot = lazy(() => import('./AutoPilots/AutoPilot/AutoPilot'));
 const Marketplaces = lazy(() => import('./Marketplaces/Marketplaces'));
-const Crm = lazy(() => import('./Marketplaces/Crm/Crm'));
 
 
 const {SubMenu} = Menu;

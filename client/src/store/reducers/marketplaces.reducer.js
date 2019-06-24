@@ -33,11 +33,11 @@ export const marketplace = (state = initialState, action) => {
 
 
         // CONNECT CRM
-        case actionTypes.CONNECT_CRM_REQUEST:
+        case actionTypes.CONNECT_MARKETPLACE_REQUEST:
             return updateObject(state, {
                 isConnecting: true,
             });
-        case actionTypes.CONNECT_CRM_SUCCESS:
+        case actionTypes.CONNECT_MARKETPLACE_SUCCESS:
             tState = {...state};
             tState.marketplacesList.push(action.connectedCRM);
             return updateObject(state, {
@@ -45,41 +45,41 @@ export const marketplace = (state = initialState, action) => {
                 connectedCRM_ID: action.connectedCRM,
                 marketplacesList: tState.marketplacesList
             });
-        case actionTypes.CONNECT_CRM_FAILURE:
+        case actionTypes.CONNECT_MARKETPLACE_FAILURE:
             return updateObject(state, {
                 isConnecting: false,
                 errorMsg: action.error
             });
 
         // TEST CRM
-        case actionTypes.TEST_CRM_REQUEST:
+        case actionTypes.TEST_MARKETPLACE_REQUEST:
             return updateObject(state, {
                 isTesting: true,
             });
-        case actionTypes.TEST_CRM_SUCCESS:
+        case actionTypes.TEST_MARKETPLACE_SUCCESS:
             return updateObject(state, {
                 isTesting: false,
             });
-        case actionTypes.TEST_CRM_FAILURE:
+        case actionTypes.TEST_MARKETPLACE_FAILURE:
             return updateObject(state, {
                 isTesting: false,
                 errorMsg: action.error
             });
 
         // DISCONNECT CRM
-        case actionTypes.DISCONNECT_CRM_REQUEST:
+        case actionTypes.DISCONNECT_MARKETPLACE_REQUEST:
             return updateObject(state, {
                 isDisconnecting: false,
                 errorMsg: null,
             });
-        case actionTypes.DISCONNECT_CRM_SUCCESS:
+        case actionTypes.DISCONNECT_MARKETPLACE_SUCCESS:
             tState = {...state};
             return updateObject(state, {
                 isDisconnecting: false,
                 connectedCRM_ID: action.connectedCRM_ID,
                 marketplacesList: tState.marketplacesList.filter(x => x.ID !== action.connectedCRM_ID)
             });
-        case actionTypes.DISCONNECT_CRM_FAILURE:
+        case actionTypes.DISCONNECT_MARKETPLACE_FAILURE:
             return updateObject(state, {
                 isDisconnecting: false,
                 errorMsg: action.error

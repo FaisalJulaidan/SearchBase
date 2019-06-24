@@ -13,11 +13,14 @@ appointment_router: Blueprint = Blueprint('appointment_router', __name__, templa
 @jwt_required
 def appointments():
 
-    # Authenticate
     user = get_jwt_identity()['user']
+    callback = appointment_services.get_appointments(user['companyID'])
 
-    if request.method == "GET":
-        pass
+    if callback.Success:
+        return helpers.jsonResponse(True, 200, callback.Message, callback.Data)
+    else:
+        return helpers.jsonResponse(False, 404, callback.Message)
+
 
 '''
 POST REQUEST EXAMPLE:

@@ -57,3 +57,8 @@ def set_appointment_status(appointmentID, status):
     except Exception as exc:
         print(exc)
         return Callback(False, 'Could not set appointment status.')
+
+def get_appointments(companyID):
+    assistants = db.session.query(Assistant).filter(Assistant.CompanyID == companyID).all()
+    for assistant in assistants:
+        print(assistant.appointments())

@@ -57,7 +57,7 @@ def conversationsNotifications(assistantID=None):
                         .update({'LastNotificationDate': now})
 
                 # Check if NotifyEvery hours have passed
-                elif ((now - assistant['LastNotificationDate']).total_seconds()/86400) + 1 > assistant['NotifyEvery'] :
+                elif ((now - assistant['LastNotificationDate']).total_seconds()/86400) > assistant['NotifyEvery'] :
 
                     # Fetch conversation that happen after LastNotificationDate
                     conversations = db.session.query(Conversation)\

@@ -3,6 +3,7 @@ from sqlalchemy import and_
 from utilities import helpers
 from services import conversation_services
 from datetime import datetime
+import enums
 
 
 def add(conversationID, assistantID, dateTime, confirmed=False):
@@ -43,3 +44,16 @@ def getAllByCompanyID(companyID):
         helpers.logError("appointment_services.getAllByCompanyID(): " + str(exc))
         db.session.rollback()
         return Callback(False, 'Could not get the appointments')
+
+def set_appointment_status(appointmentID, status):
+    try:
+        appointment = db.session.query(Appointment).filter(Appointment.ID == appointmentID).first()
+        if appointment.Status != enums.ApplicationStatus.Pending:
+          return Callback(False, "Appointment status is {} and cannot be modified.".format(appointment.Status.value))
+        appointment.Status = status
+        db.session.commit()
+        return Callback(False, "Appointment status has been succesgfully set to {}.".format(appointment.Status.value))
+
+    except Exception as exc:
+        print(exc)
+        return Callback(False, 'Could not set appointment status.')

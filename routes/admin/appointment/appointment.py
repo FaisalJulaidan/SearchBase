@@ -2,6 +2,7 @@ from flask import Blueprint, request
 from services import assistant_services, conversation_services, appointment_services
 from models import Callback, Assistant, Conversation, Appointment
 from utilities import helpers
+
 from flask_jwt_extended import jwt_required, get_jwt_identity
 
 
@@ -18,6 +19,25 @@ def appointments():
     if request.method == "GET":
         pass
 
+'''
+POST REQUEST EXAMPLE:
+{
+    "appointmentID": 1,
+    "status": "Accepted"
+}
+
+'''
+
+@appointment_router.route("/appointments/set_status", methods=['POST'])
+# @jwt_required
+def set_appointment_status():
+    data = request.get_json()
+    callback = appointment_services.set_appointment_status(data['appointmentID'], data['status'])
+
+    if callback.Success:
+        return helpers.jsonResponse(True, 200, callback.Message)
+    else:
+        return helpers.jsonResponse(False, 404, callback.Message)
 
 
 # Get all open times for a user to pick up from, it uses the payload to know for which company and other details...

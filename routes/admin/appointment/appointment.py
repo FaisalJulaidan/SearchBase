@@ -29,7 +29,7 @@ POST REQUEST EXAMPLE:
 '''
 
 @appointment_router.route("/appointments/set_status", methods=['POST'])
-# @jwt_required
+@jwt_required
 def set_appointment_status():
     data = request.get_json()
     callback = appointment_services.set_appointment_status(data['appointmentID'], data['status'])

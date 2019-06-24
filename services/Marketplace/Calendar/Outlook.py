@@ -5,7 +5,7 @@ import os
 import requests
 
 from models import Callback
-from services.Marketplace import marketplace_helpers as helpers
+from services.Marketplace import marketplace_helpers
 # Client ID and secret
 from services.Marketplace.Calendar import calendar_services
 from utilities import helpers
@@ -72,7 +72,7 @@ def retrieveAccessToken(auth, companyID):
             auth = dict(auth)
             auth["refresh_token"] = result_body.get("refresh_token")
 
-        saveAuth_callback: Callback = helpers.saveNewCalendarAuth(auth, "Outlook", companyID)
+        saveAuth_callback: Callback = marketplace_helpers.saveNewCalendarAuth(auth, "Outlook", companyID)
         if not saveAuth_callback.Success:
             raise Exception(saveAuth_callback.Message)
 
@@ -106,11 +106,10 @@ def addCalendar(auth, companyID):
         return Callback(False, str(exc))
 
 
-# TODO remove auth, take it from assistant.Calendar - check for others too
-def addEvent(auth, assistant, eventDetails):
+def addEvent(calendar, eventDetails):
     try:
-        if not assistant.Calendar.MetaData:
-            createCalendar_callback: Callback = addCalendar(auth, assistant.CompanyID)
+        if not calendar.MetaData:
+            createCalendar_callback: Callback = addCalendar(calendar.Auth, calendar.CompanyID)
             if not createCalendar_callback.Success:
                 raise Exception("Could not create TheSearchBase calendar to add the event to")
         # TODO if it doesnt find TSB calendar add it to the main one
@@ -141,10 +140,10 @@ def addEvent(auth, assistant, eventDetails):
             })
 
         # send query
-        sendQuery_callback: Callback = sendQuery(auth,
+        sendQuery_callback: Callback = sendQuery(calendar.Auth,
                                                  "calendars/" + str(
-                                                     assistant.Calendar.MetaData["calendarID"]) + "events",
-                                                 "post", body, assistant.CompanyID)
+                                                     calendar.MetaData["calendarID"]) + "events",
+                                                 "post", body, calendar.CompanyID)
 
         if not sendQuery_callback.Success:
             raise Exception(sendQuery_callback.Message)
@@ -164,19 +163,20 @@ def sendQuery(auth, query, method, body, companyID, optionalParams=None):
         headers = {'Content-Type': 'application/json', "Authorization": "Bearer " + auth.get("access_token")}
 
         # test the BhRestToken (rest_token)
-        r = helpers.sendRequest(url, method, headers, json.dumps(body))
+        r = marketplace_helpers.sendRequest(url, method, headers, json.dumps(body))
         if r.status_code == 401:  # wrong access token
             callback: Callback = retrieveAccessToken(auth, companyID)
             if callback.Success:
                 url = buildUrl(query, optionalParams)
 
-                r = helpers.sendRequest(url, method, headers, json.dumps(body))
+                r = marketplace_helpers.sendRequest(url, method, headers, json.dumps(body))
                 print(r.status_code)
                 if not r.ok:
                     raise Exception(r.text + ". Query could not be sent")
             else:
                 raise Exception("Access token could not be retrieved")
         elif not r.ok:
+            print(r.text)
             raise Exception("Unexpected error occurred when calling the API")
 
         return Callback(True, "Query was successful", r)
@@ -188,7 +188,7 @@ def sendQuery(auth, query, method, body, companyID, optionalParams=None):
 
 def buildUrl(query, optionalParams=None):
     # set up initial url
-    url = "https://outlook.office.com/api/v2.0/me/" + query
+    url = "https://graph.microsoft.com/api/v2.0/me/" + query
     # add additional params
     if optionalParams:
         for param in optionalParams:

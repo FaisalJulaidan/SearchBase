@@ -85,15 +85,16 @@ def retrieveRestToken(auth, companyID):
             body = {
                 "grant_type": "refresh_token",
                 "refresh_token": authCopy.get("refresh_token"),
-                "client_id": authCopy.get("client_id")
+                "client_id": client_id
             }
 
-            get_tokens = requests.put(url, headers=headers, data=json.dumps(body))
+            get_tokens = requests.post(url, headers=headers, data=body)
+
             if get_tokens.ok:
                 result_body = json.loads(get_tokens.text)
-                authCopy["access_token"] = result_body.get("access_token")
-                authCopy["refresh_token"] = result_body.get("refresh_token")
-                authCopy["id_token"] = result_body.get("id_token")
+                authCopy["access_token"] = result_body["access_token"]
+                authCopy["refresh_token"] = result_body["refresh_token"]
+                authCopy["id_token"] = result_body["id_token"]
             else:
                 raise Exception("CRM not set up properly")
         # else if not go through login again with the saved auth

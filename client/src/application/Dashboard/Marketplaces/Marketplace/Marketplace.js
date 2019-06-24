@@ -28,8 +28,8 @@ class Marketplace extends React.Component {
 
 
     componentWillMount() {
-        const marketplace = this.getMarketplaceObj();
-        this.props.dispatch(marketplacesActions.exportRecruiterValueReport({Name: marketplace.type}))
+        // const marketplace = this.getMarketplaceObj();
+        // this.props.dispatch(marketplacesActions.exportRecruiterValueReport({Name: marketplace.type}))
     }
 
     componentWillReceiveProps(nextProps) {
@@ -236,7 +236,7 @@ class Marketplace extends React.Component {
                     </div>
                 </NoHeaderPanel>
                 <Modal
-                    title="Basic Modal"
+                    title="Connection Modal"
                     visible={this.state.visible}
                     onCancel={this.handleCancel}
                     footer={null}>

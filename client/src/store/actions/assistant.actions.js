@@ -236,7 +236,7 @@ const deleteLogoFailure = (error) => {
 
 const connectAssistantCRM = (CRMID, assistantID) => {
     return {
-        type: actionTypes.CONNECT_ASSISTANT_CRM_REQUEST,
+        type: actionTypes.CONNECT_ASSISTANT_MARKETPLACE_REQUEST,
         CRMID,
         assistantID
     };
@@ -244,7 +244,7 @@ const connectAssistantCRM = (CRMID, assistantID) => {
 
 const connectAssistantCRMSuccess = (CRMID, msg) => {
     return {
-        type: actionTypes.CONNECT_ASSISTANT_CRM_SUCCESS,
+        type: actionTypes.CONNECT_ASSISTANT_MARKETPLACE_SUCCESS,
         CRMID,
         msg
     };
@@ -252,7 +252,7 @@ const connectAssistantCRMSuccess = (CRMID, msg) => {
 
 const connectAssistantCRMFailure = (error) => {
     return {
-        type: actionTypes.CONNECT_ASSISTANT_CRM_FAILURE,
+        type: actionTypes.CONNECT_ASSISTANT_MARKETPLACE_FAILURE,
         error
     };
 };
@@ -260,21 +260,21 @@ const connectAssistantCRMFailure = (error) => {
 // Connections
 const disconnectAssistantCRM = (assistantID) => {
     return {
-        type: actionTypes.DISCONNECT_ASSISTANT_CRM_REQUEST,
+        type: actionTypes.DISCONNECT_ASSISTANT_MARKETPLACE_REQUEST,
         assistantID
     };
 };
 
 const disconnectAssistantCRMSuccess = (msg) => {
     return {
-        type: actionTypes.DISCONNECT_ASSISTANT_CRM_SUCCESS,
+        type: actionTypes.DISCONNECT_ASSISTANT_MARKETPLACE_SUCCESS,
         msg
     };
 };
 
 const disconnectAssistantCRMFailure = (error) => {
     return {
-        type: actionTypes.DISCONNECT_ASSISTANT_CRM_FAILURE,
+        type: actionTypes.DISCONNECT_ASSISTANT_MARKETPLACE_FAILURE,
         error
     };
 };

@@ -1,16 +1,16 @@
 import React from 'react'
-import {Breadcrumb, Button, Form, Tabs, Typography} from 'antd';
+import {Breadcrumb, Button, Form, Modal, Popconfirm, Tabs, Typography} from 'antd';
 import 'types/Marketplaces_Types';
 import {history} from "helpers";
 import NoHeaderPanel from 'components/NoHeaderPanel/NoHeaderPanel'
 import {marketplacesActions} from "store/actions";
 import styles from './Marketplace.module.less'
-import {AdaptFeatures, AdaptFormItems, AdaptHeader} from "../Crm/CrmForms/Adapt";
-import {BullhornFeatures, BullhornFormItems, BullhornHeader} from "../Crm/CrmForms/Bullhorn";
-import {VincereFeatures, VincereFormItems, VincereHeader} from "../Crm/CrmForms/Vincere";
-import {GreenhouseFeatures, GreenhouseFormItem, GreenhouseHeader} from "../Crm/CrmForms/Greenhouse";
-import {GoogleFeatures, GoogleFormItems, GoogleHeader} from '../Crm/CrmForms/Google'
-import {OutlookFeatures, OutlookFormItems, OutlookHeader} from "../Crm/CrmForms/Outlook";
+import {AdaptFeatures, AdaptFormItems, AdaptHeader} from "./CrmForms/Adapt";
+import {BullhornFeatures, BullhornFormItems, BullhornHeader} from "./CrmForms/Bullhorn";
+import {VincereFeatures, VincereFormItems, VincereHeader} from "./CrmForms/Vincere";
+import {GreenhouseFeatures, GreenhouseFormItem, GreenhouseHeader} from "./CrmForms/Greenhouse";
+import {GoogleFeatures, GoogleFormItems, GoogleHeader} from './CrmForms/Google'
+import {OutlookFeatures, OutlookFormItems, OutlookHeader} from "./CrmForms/Outlook";
 import data from '../Marketplaces.json'
 import {connect} from 'react-redux';
 
@@ -20,7 +20,7 @@ const {Title, Paragraph, Text} = Typography;
 
 class Marketplace extends React.Component {
 
-    state = {};
+    state = {visible: false};
 
     /**@return {Marketplace}*/
     getMarketplaceObj = () => data.Marketplaces.find(marketplace => marketplace.type === this.props.match.params.type);
@@ -79,9 +79,28 @@ class Marketplace extends React.Component {
     disconnectMarketplace = () => this.props.dispatch(marketplacesActions.disconnectCrm({ID: this.getMarketplaceObj().ID}));
 
 
+    showModal = () => {
+        this.setState({
+            visible: true,
+        });
+    };
+
+    handleOk = e => {
+        this.setState({
+            visible: false,
+        });
+    };
+
+    handleCancel = e => {
+        this.setState({
+            visible: false,
+        });
+    };
+
+
     /**
      * @param {string} type
-     * @param {'header'|'features'|'form'} place
+     * @param {'header'|'features'|'form'|'buttons'} place
      * */
     getMarketplaceComponent = (type, place) => {
         const {getFieldDecorator} = this.props.form;
@@ -92,11 +111,12 @@ class Marketplace extends React.Component {
         const options = {
             getFieldDecorator,
             layout,
-            CRM: this.getMarketplaceObj,
+            marketplace: this.getMarketplaceObj(),
             FormItem: FormItem,
             isConnecting: this.props.isConnecting,
             isTesting: this.props.isTesting,
             isDisconnecting: this.props.isDisconnecting,
+            openModal: this.showModal,
             disconnectCRM: this.disconnectMarketplace,
             connectCRM: this.connectMarketplace,
             testCRM: this.testMarketplace,
@@ -160,50 +180,75 @@ class Marketplace extends React.Component {
 
     render() {
         const type = this.getMarketplaceObj().type;
+        const status = this.getMarketplaceObj().status;
         return (
-            <NoHeaderPanel>
-                <div className={styles.Header}>
-                    <div style={{marginBottom: 20}}>
-                        <Breadcrumb>
-                            <Breadcrumb.Item>
-                                <a href={"javascript:void(0);"}
-                                   onClick={() => history.push('/dashboard/marketplaces')}>
-                                    Marketplace
-                                </a>
-                            </Breadcrumb.Item>
-                            <Breadcrumb.Item>{type}</Breadcrumb.Item>
-                        </Breadcrumb>
-                    </div>
-
-                    <div className={styles.HeadBar}>
-                        <div className={styles.Title}>
-                            <Title level={2}>{type}</Title>
+            <>
+                <NoHeaderPanel>
+                    <div className={styles.Header}>
+                        <div style={{marginBottom: 20}}>
+                            <Breadcrumb>
+                                <Breadcrumb.Item>
+                                    <a href={"javascript:void(0);"}
+                                       onClick={() => history.push('/dashboard/marketplaces')}>
+                                        Marketplace
+                                    </a>
+                                </Breadcrumb.Item>
+                                <Breadcrumb.Item>{type}</Breadcrumb.Item>
+                            </Breadcrumb>
                         </div>
-                        <div className={styles.Buttons}>
-                            <Button>Connect</Button>
+
+                        <div className={styles.HeadBar}>
+                            <div className={styles.Title}>
+                                <Title level={2}>{type}</Title>
+                            </div>
+                            <div className={styles.Buttons}>
+
+                                {
+                                    (status === "CONNECTED" || status === "FAILED")
+                                    &&
+                                    <Popconfirm
+                                        placement={'bottomRight'}
+                                        title="Chatbot conversations will no longer be synced with Adapt account"
+                                        onConfirm={this.disconnectMarketplace}
+                                        okType={'danger'}
+                                        okText="Disconnect"
+                                        cancelText="No"
+                                    >
+                                        <Button type="danger" disabled={this.props.isDisconnecting}>Disconnect</Button>
+                                    </Popconfirm>
+                                }
+
+                                {
+                                    status === "NOT_CONNECTED" &&
+                                    <Button type="primary" onClick={this.showModal}>Connect</Button>
+                                }
+                            </div>
                         </div>
+
+                        <div className={styles.Desc}>
+                            {this.getMarketplaceComponent(type, 'header')}
+                        </div>
+
                     </div>
 
-                    <div className={styles.Desc}>
-                        {this.getMarketplaceComponent(type, 'header')}
+                    <div className={styles.Body}>
+                        <Tabs defaultActiveKey="1">
+                            <TabPane tab="Feature" key="1">
+                                {this.getMarketplaceComponent(type, 'features')}
+                            </TabPane>
+                        </Tabs>
                     </div>
-
-                </div>
-
-                <div className={styles.Body}>
-                    <Tabs defaultActiveKey="1">
-                        <TabPane tab="Feature" key="1">
-                            {this.getMarketplaceComponent(type, 'features')}
-                        </TabPane>
-
-                        <TabPane tab="Connection" key="2" style={{padding: '0 60px'}}>
-                            <Form layout='horizontal'>
-                                {this.getMarketplaceComponent(type, 'form')}
-                            </Form>
-                        </TabPane>
-                    </Tabs>
-                </div>
-            </NoHeaderPanel>
+                </NoHeaderPanel>
+                <Modal
+                    title="Basic Modal"
+                    visible={this.state.visible}
+                    onCancel={this.handleCancel}
+                    footer={null}>
+                    <Form layout='horizontal'>
+                        {this.getMarketplaceComponent(type, 'form')}
+                    </Form>
+                </Modal>
+            </>
         )
     }
 }

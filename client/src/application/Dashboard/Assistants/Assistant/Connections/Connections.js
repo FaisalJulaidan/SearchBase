@@ -20,9 +20,9 @@ class Connections extends Component {
     };
 
     componentWillReceiveProps(nextProps, nextContext) {
-        const {assistant, CRMsList, autoPilotsList} = nextProps;
+        const {assistant, marketplacesList, autoPilotsList} = nextProps;
         this.setState({
-            defaultSelectedCRM: CRMsList.find(crm => crm.ID === assistant.CRMID),
+            defaultSelectedCRM: marketplacesList.find(crm => crm.ID === assistant.CRMID),
             defaultSelectedAutoPilot: autoPilotsList.find(ap => ap.ID === assistant.autoPilotID)
         })
     }
@@ -45,7 +45,7 @@ class Connections extends Component {
 
 
     render() {
-        const {CRMsList, autoPilotsList} = this.props;
+        const {marketplacesList, autoPilotsList} = this.props;
         const {defaultSelectedCRM, selectedCRM, defaultSelectedAutoPilot, selectedAutoPilot} = this.state;
         return (
             <>
@@ -54,10 +54,10 @@ class Connections extends Component {
                     <Select
                         style={{ width: 500, marginBottom: 10 }}
                         placeholder="Select a CRM to be connected to this assistant"
-                        onChange={(CRMID) => this.setState({selectedCRM: CRMsList.find(crm => crm.ID === CRMID)})}
+                        onChange={(CRMID) => this.setState({selectedCRM: marketplacesList.find(crm => crm.ID === CRMID)})}
                         value={selectedCRM ? selectedCRM?.ID : (defaultSelectedCRM?.ID || undefined) }
                     >
-                        {this.props.CRMsList.map((crm, i) => {
+                        {this.props.marketplacesList.map((crm, i) => {
                             return <Option key={i} value={crm.ID}>{crm.Type}</Option>
                         })}
                     </Select>

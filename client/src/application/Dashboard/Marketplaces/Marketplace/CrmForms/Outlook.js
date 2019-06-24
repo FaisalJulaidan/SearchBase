@@ -1,6 +1,6 @@
 import React from 'react';
 import {Button, Col, Icon, Input, Popconfirm, Typography} from "antd";
-import styles from "../Crm.module.less";
+import styles from "../../Crm/Crm.module.less";
 import {getLink} from "helpers";
 
 const {Title, Paragraph, Text} = Typography;
@@ -9,7 +9,7 @@ export const OutlookFormItems = ({
                                       FormItem,
                                       layout,
                                       getFieldDecorator,
-                                      CRM,
+                                      marketplace,
                                       disconnectCRM,
                                       connectCRM,
                                       testCRM,
@@ -20,8 +20,8 @@ export const OutlookFormItems = ({
                                   }) =>
     <div>
         {
-            CRM.status !== "CONNECTED" &&
-            CRM.status !== "FAILED" &&
+            marketplace.status !== "CONNECTED" &&
+            marketplace.status !== "FAILED" &&
             <div>
                 {/*<a href={"https://login.microsoftonline.com/common/oauth2/v2.0/authorize?response_type=code&client_id=0978960c-c837-479f-97ef-a75be4bbacd4&redirect_uri=https://www.thesearchbase.com/crm_callback&scope=openid+Calendars.ReadWrite"} target="_blank">Click me</a>*/}
                 <a href="javascript:void(0);" NAME="Connect Outlook Account"  title=" Outlook Connection " onClick={() => {return window.open("https://login.microsoftonline.com/common/oauth2/v2.0/authorize?response_type=code&client_id=0978960c-c837-479f-97ef-a75be4bbacd4&redirect_uri=https://www.thesearchbase.com/api/marketplace_callback&scope=openid+Calendars.ReadWrite+offline_access&state={\"type\":\"Outlook\",\"companyID\":\""+companyID+"\"}","Ratting","width=600,height=400,0,top=40%,right=30%,status=0,")}}>Click here</a>
@@ -29,24 +29,24 @@ export const OutlookFormItems = ({
         }
 
         {
-            CRM.status === "CONNECTED" &&
+            marketplace.status === "CONNECTED" &&
             <div style={{textAlign: 'center'}}>
                 <img src={getLink('/static/images/undraw/success.svg')} alt="" height={300}/>
                 <Typography.Title>
-                    {CRM.type} is connected
+                    {marketplace.type} is connected
                 </Typography.Title>
             </div>
         }
 
         {
-            CRM.status === "FAILED" &&
+            marketplace.status === "FAILED" &&
             <div style={{textAlign: 'center'}}>
                 <img src={getLink('/static/images/undraw/failed.svg')} alt="" height={300}/>
                 <Title>
-                    {CRM.type} is failed
+                    {marketplace.type} is failed
                 </Title>
                 <Paragraph type="secondary">
-                    {CRM.type} is failing this is usually not from us, please contact the CRM provider
+                    {marketplace.type} is failing this is usually not from us, please contact the CRM provider
                 </Paragraph>
             </div>
         }
@@ -54,7 +54,7 @@ export const OutlookFormItems = ({
         <Col span={16} offset={4}>
             <div className={styles.Buttons}>
                 {
-                    (CRM.status === "CONNECTED" || CRM.status === "FAILED")
+                    (marketplace.status === "CONNECTED" || marketplace.status === "FAILED")
                     &&
                     <Popconfirm
                         title="Chatbot conversations will no longer be synced with Outlook account"
@@ -68,7 +68,7 @@ export const OutlookFormItems = ({
                 }
 
                 {
-                    CRM.status === "NOT_CONNECTED" &&
+                    marketplace.status === "NOT_CONNECTED" &&
                     <>
                         <Button type="primary" disabled={isConnecting || isTesting}
                                 onClick={connectCRM}>Connect</Button>

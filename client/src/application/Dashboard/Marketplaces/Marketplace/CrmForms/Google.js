@@ -1,6 +1,5 @@
 import React from 'react';
-import {Button, Col, Icon, Input, Popconfirm, Typography} from "antd";
-import styles from "../Crm.module.less";
+import {Typography} from "antd";
 import {getLink} from "helpers";
 
 const {Title, Paragraph, Text} = Typography;
@@ -18,18 +17,13 @@ export const GoogleFormItems = ({
                                     FormItem,
                                     layout,
                                     getFieldDecorator,
-                                    CRM,
-                                    disconnectCRM,
-                                    connectCRM,
-                                    testCRM,
-                                    isConnecting,
-                                    isTesting,
-                                    isDisconnecting
+                                    marketplace,
+
                                 }) =>
     <div>
         {
-            CRM.status !== "CONNECTED" &&
-            CRM.status !== "FAILED" &&
+            marketplace.status !== "CONNECTED" &&
+            marketplace.status !== "FAILED" &&
             <div>
                 {loginWithGoogle("623652835897-tj9rf1v6hd1tak5bv5hr4bq9hrvjns95.apps.googleusercontent.com",
                     "code",
@@ -39,47 +33,27 @@ export const GoogleFormItems = ({
         }
 
         {
-            CRM.status === "CONNECTED" &&
+            marketplace.status === "CONNECTED" &&
             <div style={{textAlign: 'center'}}>
                 <img src={getLink('/static/images/undraw/success.svg')} alt="" height={300}/>
                 <Typography.Title>
-                    {CRM.type} is connected
+                    {marketplace.type} is connected
                 </Typography.Title>
             </div>
         }
 
         {
-            CRM.status === "FAILED" &&
+            marketplace.status === "FAILED" &&
             <div style={{textAlign: 'center'}}>
                 <img src={getLink('/static/images/undraw/failed.svg')} alt="" height={300}/>
                 <Title>
-                    {CRM.type} is failed
+                    {marketplace.type} is failed
                 </Title>
                 <Paragraph type="secondary">
-                    {CRM.type} is failing this is usually not from us, please contact the CRM provider
+                    {marketplace.type} is failing this is usually not from us, please contact the CRM provider
                 </Paragraph>
             </div>
         }
-
-        <Col span={16} offset={4}>
-            <div className={styles.Buttons}>
-                {
-                    (CRM.status === "CONNECTED" || CRM.status === "FAILED")
-                    &&
-                    <Popconfirm
-                        title="Chatbot conversations will no longer be synced with Bullhorn account"
-                        onConfirm={disconnectCRM}
-                        okType={'danger'}
-                        okText="Disconnect"
-                        cancelText="No"
-                    >
-                        <Button type="danger" disabled={isDisconnecting}>Disconnect</Button>
-                    </Popconfirm>
-                }
-
-            </div>
-        </Col>
-
     </div>;
 
 export const GoogleFeatures = () =>

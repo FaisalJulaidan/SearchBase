@@ -178,7 +178,7 @@ class Assistant extends Component {
 
                                 <TabPane tab="Connections" key="Connections">
                                     <Connections assistant={assistant}
-                                                 CRMsList={this.props.CRMsList}
+                                                 marketplacesList={this.props.marketplacesList}
                                                  autoPilotsList={this.props.autoPilotsList}/>
                                 </TabPane>
 
@@ -240,7 +240,7 @@ function mapStateToProps(state) {
         isLoading: state.assistant.isLoading,
         isStatusChanging: state.assistant.isStatusChanging,
 
-        CRMsList: state.crm.CRMsList,
+        marketplacesList: state.marketplace.marketplacesList,
         autoPilotsList: state.autoPilot.autoPilotsList,
     };
 }

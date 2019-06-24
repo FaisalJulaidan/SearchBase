@@ -1,6 +1,6 @@
 import React from 'react';
 import {Button, Col, Icon, Input, Popconfirm, Typography} from "antd";
-import styles from "../Crm.module.less";
+import styles from "../../Crm/Crm.module.less";
 import {getLink} from "helpers";
 
 const {Title, Paragraph, Text} = Typography;
@@ -9,18 +9,17 @@ export const GreenhouseFormItem = ({
                                        FormItem,
                                        layout,
                                        getFieldDecorator,
-                                       CRM,
+                                       marketplace,
                                        disconnectCRM,
                                        connectCRM,
                                        testCRM,
                                        isConnecting,
                                        isTesting,
-                                       isDisconnecting
                                    }) =>
     <div>
         {
-            CRM.status !== "CONNECTED" &&
-            CRM.status !== "FAILED" &&
+            marketplace.status !== "CONNECTED" &&
+            marketplace.status !== "FAILED" &&
             <div>
                 <FormItem label="User ID"
                           {...layout}>
@@ -53,59 +52,41 @@ export const GreenhouseFormItem = ({
                                placeholder={"API Key"} type="password"/>
                     )}
                 </FormItem>
-            </div>
-        }
-
-        {
-            CRM.status === "CONNECTED" &&
-            <div style={{textAlign: 'center'}}>
-                <img src={getLink('/static/images/undraw/success.svg')} alt="" height={300}/>
-                <Typography.Title>
-                    {CRM.type} is connected
-                </Typography.Title>
-            </div>
-        }
-
-        {
-            CRM.status === "FAILED" &&
-            <div style={{textAlign: 'center'}}>
-                <img src={getLink('/static/images/undraw/failed.svg')} alt="" height={300}/>
-                <Title>
-                    {CRM.type} is failed
-                </Title>
-                <Paragraph type="secondary">
-                    {CRM.type} is failing this is usually not from us, please contact the CRM provider
-                </Paragraph>
-            </div>
-        }
-
-        <Col span={16} offset={4}>
-            <div className={styles.Buttons}>
-                {
-                    (CRM.status === "CONNECTED" || CRM.status === "FAILED")
-                    &&
-                    <Popconfirm
-                        title="Chatbot conversations will no longer be synced with Greenhouse account"
-                        onConfirm={disconnectCRM}
-                        okType={'danger'}
-                        okText="Disconnect"
-                        cancelText="No"
-                    >
-                        <Button type="danger" disabled={isDisconnecting}>Disconnect</Button>
-                    </Popconfirm>
-                }
 
                 {
-                    CRM.status === "NOT_CONNECTED" &&
+                    marketplace.status === "NOT_CONNECTED" &&
                     <>
                         <Button type="primary" disabled={isConnecting || isTesting}
                                 onClick={connectCRM}>Connect</Button>
                         <Button onClick={testCRM} disabled={isConnecting || isTesting}>Test</Button>
                     </>
                 }
-            </div>
-        </Col>
 
+            </div>
+        }
+
+        {
+            marketplace.status === "CONNECTED" &&
+            <div style={{textAlign: 'center'}}>
+                <img src={getLink('/static/images/undraw/success.svg')} alt="" height={300}/>
+                <Typography.Title>
+                    {marketplace.type} is connected
+                </Typography.Title>
+            </div>
+        }
+
+        {
+            marketplace.status === "FAILED" &&
+            <div style={{textAlign: 'center'}}>
+                <img src={getLink('/static/images/undraw/failed.svg')} alt="" height={300}/>
+                <Title>
+                    {marketplace.type} is failed
+                </Title>
+                <Paragraph type="secondary">
+                    {marketplace.type} is failing this is usually not from us, please contact the CRM provider
+                </Paragraph>
+            </div>
+        }
     </div>;
 
 export const GreenhouseFeatures = () =>

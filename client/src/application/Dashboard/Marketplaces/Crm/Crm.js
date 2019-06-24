@@ -4,12 +4,12 @@ import NoHeaderPanel from 'components/NoHeaderPanel/NoHeaderPanel'
 import {Avatar, Breadcrumb, Button, Form, Tabs, Typography} from 'antd';
 import styles from './Crm.module.less'
 import 'types/Marketplaces_Types';
-import {AdaptFeatures, AdaptFormItems, AdaptHeader} from "./CrmForms/Adapt";
-import {BullhornFeatures, BullhornFormItems, BullhornHeader} from "./CrmForms/Bullhorn";
-import {VincereFeatures, VincereFormItems, VincereHeader} from "./CrmForms/Vincere";
-import {GreenhouseFeatures, GreenhouseFormItem, GreenhouseHeader} from "./CrmForms/Greenhouse";
-import {GoogleFeatures, GoogleFormItems, GoogleHeader} from './CrmForms/Google'
-import {OutlookFeatures, OutlookFormItems, OutlookHeader} from "./CrmForms/Outlook";
+import {AdaptFeatures, AdaptFormItems, AdaptHeader} from "../Marketplace/CrmForms/Adapt";
+import {BullhornFeatures, BullhornFormItems, BullhornHeader} from "../Marketplace/CrmForms/Bullhorn";
+import {VincereFeatures, VincereFormItems, VincereHeader} from "../Marketplace/CrmForms/Vincere";
+import {GreenhouseFeatures, GreenhouseFormItem, GreenhouseHeader} from "../Marketplace/CrmForms/Greenhouse";
+import {GoogleFeatures, GoogleFormItems, GoogleHeader} from '../Marketplace/CrmForms/Google'
+import {OutlookFeatures, OutlookFormItems, OutlookHeader} from "../Marketplace/CrmForms/Outlook";
 import {connect} from 'react-redux';
 import {marketplacesActions} from "store/actions";
 import {CSVLink} from "react-csv";

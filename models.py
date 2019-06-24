@@ -185,8 +185,8 @@ class Conversation(db.Model):
     UserType = db.Column(Enum(enums.UserType), nullable=False)
 
     Completed = db.Column(db.Boolean, nullable=False, default=True)
-    ApplicationStatus = db.Column(Enum(enums.ApplicationStatus), nullable=False,
-                                  default=enums.ApplicationStatus.Pending)
+    ApplicationStatus = db.Column(Enum(enums.Status), nullable=False,
+                                  default=enums.Status.Pending)
     Score = db.Column(db.Float(), nullable=False)
 
     AcceptanceEmailSentAt = db.Column(db.DateTime(), default=None)

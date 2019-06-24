@@ -46,9 +46,9 @@ def conversationsNotifications(assistantID=None):
             if assistantID != None:
                 assistantsQuery.filter(Assistant.ID == assistantID)
 
-            assistants = helpers.getDictFromLimitedQuery(["ID", "CompanyID", "CompanyName", "LogoPath", "NotifyEvery",
+            assistants = helpers.getListFromLimitedQuery(["ID", "CompanyID", "CompanyName", "LogoPath", "NotifyEvery",
                                                            "Name", "LastNotificationDate"],
-                                                          assistantsQuery.all())
+                                                         assistantsQuery.all())
 
             for assistant in assistants:
                 # Assistant will not get notified in the first passed hour after their notification set active

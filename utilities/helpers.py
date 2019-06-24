@@ -149,20 +149,6 @@ def gzipped(f):
     return view_func
 
 
-# Check if the logged in user owns the accessed assistant for security
-# Wrapper function
-def validAssistant(func):
-    def wrapperValidAssistant(assistantID):
-        user = get_jwt_identity()['user']
-        callback: Callback = assistant_services.getByID(assistantID, user['companyID'])
-        if not callback.Success:
-            return jsonResponse(False, 404, "Assistant not found.", None)
-        assistant: Assistant = callback.Data
-        return func(assistant)
-
-    return wrapperValidAssistant
-
-
 # Note: Hourly is not supported because it varies and number of working hours is required
 def convertSalaryPeriod(salary, fromPeriod: Period, toPeriod: Period):
 
@@ -231,7 +217,8 @@ def getDictFromSQLAlchemyObj(obj) -> dict:
 """provided by sqlalchemy when querying for specific columns"""
 """this func will work for enums as well."""
 
-def getDictFromLimitedQuery(columnsList, tupleList: List[tuple]):
+# For a list of SQLAlchemy objects
+def getListFromLimitedQuery(columnsList, tupleList: List[tuple]) -> list:
     if not isinstance(tupleList, list):
         raise Exception("Provided list of tuples is empty. (Check data being returned from db)")
 
@@ -255,13 +242,12 @@ def getDictFromLimitedQuery(columnsList, tupleList: List[tuple]):
     return d
 
 
+
+
+
 """Convert a SQLAlchemy list of objects to a list of dicts"""
-
-
 def getListFromSQLAlchemyList(SQLAlchemyList):
     return list(map(getDictFromSQLAlchemyObj, SQLAlchemyList))
-
-    return view_func
 
 
 # Check if the logged in user owns the accessed assistant for security

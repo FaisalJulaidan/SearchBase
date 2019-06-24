@@ -6,7 +6,7 @@ from jsonschema import validate
 from sqlalchemy.sql import and_
 from sqlalchemy.sql import desc
 
-from enums import UserType, ApplicationStatus
+from enums import UserType, Status
 from models import db, Callback, Conversation, Assistant
 from services import assistant_services, stored_file_services, auto_pilot_services, mail_services
 from services.Marketplace.CRM import crm_services
@@ -138,7 +138,7 @@ def updateStatus(conversationID, assistantID, newStatus):
     try:
         db.session.query(Conversation) \
             .filter(and_(Conversation.AssistantID == assistantID, Conversation.ID == conversationID)) \
-            .update({'ApplicationStatus': ApplicationStatus[newStatus]})
+            .update({'ApplicationStatus': Status[newStatus]})
 
         db.session.commit()
         return Callback(True, 'Status updated Successfully')

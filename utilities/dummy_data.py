@@ -237,12 +237,12 @@ def generate():
     conversation1 = Conversation(Data=data, DateTime=datetime.now(),
                                  TimeSpent=55, SolutionsReturned=2, QuestionsAnswered=3,
                                  UserType=enums.UserType.Candidate, Score= 1,
-                                 ApplicationStatus=enums.ApplicationStatus.Accepted, Assistant=reader_a)
+                                 ApplicationStatus=enums.Status.Accepted, Assistant=reader_a)
     db.session.add(conversation1)
     db.session.add(Conversation(Data=data, DateTime=datetime.now(),
                                 TimeSpent=120, SolutionsReturned=20, QuestionsAnswered=7,
                                 UserType=enums.UserType.Client, Score= 0.05, Completed=False,
-                                ApplicationStatus=enums.ApplicationStatus.Rejected, Assistant=reader_a))
+                                ApplicationStatus=enums.Status.Rejected, Assistant=reader_a))
 
     # add chatbot session in bulk
     for i in range(50):

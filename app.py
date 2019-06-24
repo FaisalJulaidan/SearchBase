@@ -11,7 +11,7 @@ from sqlalchemy_utils import create_database, database_exists
 from services.auth_services import jwt
 from utilities import helpers, tasks, dummy_data
 from flask_babel import Babel
-from services import appointment_services, scheduler_services
+from services import appointment_services, scheduler_services, flow_services
 from datetime import datetime
 import enums
 # Import all routers to register them as blueprints
@@ -115,6 +115,8 @@ elif os.environ['FLASK_ENV'] == 'development':
         db.drop_all()
         db.create_all()
         dummy_data.generate()
+
+    flow_services.getChatbot(helpers.encodeID(1))
 
     # appointment_services.getAllByCompanyID(1)
 

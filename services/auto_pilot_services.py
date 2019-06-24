@@ -4,13 +4,13 @@ from datetime import datetime, time
 import logging
 from utilities import helpers
 from services import mail_services, stored_file_services as sfs
-from enums import UserType, DataType, ApplicationStatus
+from enums import UserType, DataType, Status
 
 
 def processConversation(conversation: Conversation, autoPilot: AutoPilot):
     try:
         result = {
-            "applicationStatus": ApplicationStatus.Pending,
+            "applicationStatus": Status.Pending,
             "appointmentEmailSentAt": None,
             "acceptanceEmailSentAt": None,
             "rejectionEmailSentAt": None,
@@ -22,14 +22,14 @@ def processConversation(conversation: Conversation, autoPilot: AutoPilot):
             keywords = conversation.Data.get('keywordsByDataType')
             email = keywords.get(DataType.CandidateEmail.value['name'], [""])[0]
 
-            def __processSendingEmails (email, status: ApplicationStatus, autoPilot: AutoPilot):
+            def __processSendingEmails (email, status: Status, autoPilot: AutoPilot):
 
                 userName = " ".join(keywords.get(DataType.CandidateName.value['name'], [""])) # get candidate name
                 logoPath = sfs.PUBLIC_URL + sfs.UPLOAD_FOLDER + sfs.COMPANY_LOGOS_PATH + "/" + autoPilot.Company.LogoPath
                 companyName = autoPilot.Company.Name
 
                 # Send Acceptance Letters
-                if status is ApplicationStatus.Accepted and AutoPilot.SendAcceptanceEmail:
+                if status is Status.Accepted and AutoPilot.SendAcceptanceEmail:
 
                     acceptance_callback: Callback = \
                         mail_services.sendAcceptanceEmail(userName, email, logoPath, companyName)
@@ -55,7 +55,7 @@ def processConversation(conversation: Conversation, autoPilot: AutoPilot):
 
 
                 # Send Rejection Letters
-                elif status is ApplicationStatus.Rejected and AutoPilot.SendRejectionEmail:
+                elif status is Status.Rejected and AutoPilot.SendRejectionEmail:
 
                     rejection_callback: Callback = \
                         mail_services.sendRejectionEmail(userName, email, logoPath, companyName)
@@ -238,12 +238,12 @@ def removeByID(id, companyID):
 
 # ----- Private Functions (shouldn't be accessed from the outside) ----- #
 
-def __getApplicationResult(score, autoPilot: AutoPilot) -> ApplicationStatus:
-    result = ApplicationStatus.Pending
+def __getApplicationResult(score, autoPilot: AutoPilot) -> Status:
+    result = Status.Pending
     if autoPilot.AcceptApplications and (score > autoPilot.AcceptanceScore):
-        result = ApplicationStatus.Accepted
+        result = Status.Accepted
     if autoPilot.RejectApplications and (score < autoPilot.RejectionScore):
-        result = ApplicationStatus.Rejected
+        result = Status.Rejected
     return result
 
 

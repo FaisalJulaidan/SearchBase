@@ -217,7 +217,7 @@ def testConnection(companyID, details) -> Callback:
     try:
         crm_type: CRM = CRM[details['type']]
         crm_auth = details.get('auth') or details  # if it comes from the callback route
-        
+
         # test connection
         test_callback: Callback = Callback(False, 'Connection failure. Please check entered details')
         if crm_type == CRM.Adapt:

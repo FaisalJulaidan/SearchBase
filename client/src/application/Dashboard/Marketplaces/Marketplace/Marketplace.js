@@ -1,16 +1,17 @@
 import React from 'react'
-import {Breadcrumb, Button, Form, Modal, Popconfirm, Tabs, Typography} from 'antd';
+import {Breadcrumb, Form, Modal, Tabs, Typography} from 'antd';
 import 'types/Marketplaces_Types';
-import {history} from "helpers";
+import {getLink, history} from "helpers";
 import NoHeaderPanel from 'components/NoHeaderPanel/NoHeaderPanel'
 import {marketplacesActions} from "store/actions";
 import styles from './Marketplace.module.less'
+import {DefaultButton} from './CrmForms/Common'
 import {AdaptFeatures, AdaptFormItems, AdaptHeader} from "./CrmForms/Adapt";
 import {BullhornFeatures, BullhornFormItems, BullhornHeader} from "./CrmForms/Bullhorn";
-import {VincereFeatures, VincereFormItems, VincereHeader} from "./CrmForms/Vincere";
+import {VincereButtons, VincereFeatures, VincereHeader} from "./CrmForms/Vincere";
 import {GreenhouseFeatures, GreenhouseFormItem, GreenhouseHeader} from "./CrmForms/Greenhouse";
-import {GoogleFeatures, GoogleFormItems, GoogleHeader} from './CrmForms/Google'
-import {OutlookFeatures, OutlookFormItems, OutlookHeader} from "./CrmForms/Outlook";
+import {GoogleButton, GoogleFeatures, GoogleHeader} from './CrmForms/Google'
+import {OutlookButton, OutlookFeatures, OutlookHeader} from "./CrmForms/Outlook";
 import data from '../Marketplaces.json'
 import {connect} from 'react-redux';
 
@@ -85,12 +86,6 @@ class Marketplace extends React.Component {
         });
     };
 
-    handleOk = e => {
-        this.setState({
-            visible: false,
-        });
-    };
-
     handleCancel = e => {
         this.setState({
             visible: false,
@@ -100,7 +95,7 @@ class Marketplace extends React.Component {
 
     /**
      * @param {string} type
-     * @param {'header'|'features'|'form'|'buttons'} place
+     * @param {'header'|'features'|'form'|'button'} place
      * */
     getMarketplaceComponent = (type, place) => {
         const {getFieldDecorator} = this.props.form;
@@ -108,7 +103,7 @@ class Marketplace extends React.Component {
             labelCol: {span: 6},
             wrapperCol: {span: 14},
         };
-        const options = {
+        const formOptions = {
             getFieldDecorator,
             layout,
             marketplace: this.getMarketplaceObj(),
@@ -121,6 +116,15 @@ class Marketplace extends React.Component {
             connectCRM: this.connectMarketplace,
             testCRM: this.testMarketplace,
         };
+        const buttonsOptions = {
+            disconnectMarketplace: this.disconnectMarketplace,
+            isDisconnecting: this.props.isDisconnecting,
+            showModal: this.showModal,
+            type: this.getMarketplaceObj().type,
+            status: this.getMarketplaceObj().status,
+            companyID: this.props.companyID
+        };
+
         switch (type) {
             case "Adapt":
                 if (place === 'header')
@@ -128,7 +132,9 @@ class Marketplace extends React.Component {
                 if (place === 'features')
                     return <AdaptFeatures/>;
                 if (place === 'form')
-                    return <AdaptFormItems {...options}/>;
+                    return <AdaptFormItems {...formOptions}/>;
+                if (place === 'button')
+                    return <DefaultButton {...buttonsOptions}/>;
                 break;
 
             case "Bullhorn":
@@ -137,7 +143,9 @@ class Marketplace extends React.Component {
                 if (place === 'features')
                     return <BullhornFeatures/>;
                 if (place === 'form')
-                    return <BullhornFormItems {...options}/>;
+                    return <BullhornFormItems {...formOptions}/>;
+                if (place === 'button')
+                    return <DefaultButton {...buttonsOptions}/>;
                 break;
 
             case "Vincere":
@@ -145,8 +153,8 @@ class Marketplace extends React.Component {
                     return <VincereHeader/>;
                 if (place === 'features')
                     return <VincereFeatures/>;
-                if (place === 'form')
-                    return <VincereFormItems {...options}/>;
+                if (place === 'button')
+                    return <VincereButtons {...buttonsOptions}/>;
                 break;
 
             case "Greenhouse":
@@ -155,7 +163,9 @@ class Marketplace extends React.Component {
                 if (place === 'features')
                     return <GreenhouseFeatures/>;
                 if (place === 'form')
-                    return <GreenhouseFormItem {...options}/>;
+                    return <GreenhouseFormItem {...formOptions}/>;
+                if (place === 'button')
+                    return <DefaultButton {...buttonsOptions}/>;
                 break;
 
             case "gmail":
@@ -163,8 +173,8 @@ class Marketplace extends React.Component {
                     return <GoogleHeader/>;
                 if (place === 'features')
                     return <GoogleFeatures/>;
-                if (place === 'form')
-                    return <GoogleFormItems {...options}/>;
+                if (place === 'button')
+                    return <GoogleButton {...buttonsOptions}/>;
                 break;
 
             case "Outlook":
@@ -172,15 +182,14 @@ class Marketplace extends React.Component {
                     return <OutlookHeader/>;
                 if (place === 'features')
                     return <OutlookFeatures/>;
-                if (place === 'form')
-                    return <OutlookFormItems {...options}/>;
+                if (place === 'button')
+                    return <OutlookButton {...buttonsOptions}/>;
                 break;
         }
     };
 
     render() {
-        const type = this.getMarketplaceObj().type;
-        const status = this.getMarketplaceObj().status;
+        const {title, image, type} = this.getMarketplaceObj();
         return (
             <>
                 <NoHeaderPanel>
@@ -199,29 +208,16 @@ class Marketplace extends React.Component {
 
                         <div className={styles.HeadBar}>
                             <div className={styles.Title}>
-                                <Title level={2}>{type}</Title>
+                                <img src={getLink(image)} width={100}
+                                     alt={'company logo'}
+                                     style={{
+                                         float: 'left',
+                                         marginRight: 20
+                                     }}/>
+                                <Title style={{fontSize: '55pt', margin: 0}}>{title}</Title>
                             </div>
                             <div className={styles.Buttons}>
-
-                                {
-                                    (status === "CONNECTED" || status === "FAILED")
-                                    &&
-                                    <Popconfirm
-                                        placement={'bottomRight'}
-                                        title="Chatbot conversations will no longer be synced with Adapt account"
-                                        onConfirm={this.disconnectMarketplace}
-                                        okType={'danger'}
-                                        okText="Disconnect"
-                                        cancelText="No"
-                                    >
-                                        <Button type="danger" disabled={this.props.isDisconnecting}>Disconnect</Button>
-                                    </Popconfirm>
-                                }
-
-                                {
-                                    status === "NOT_CONNECTED" &&
-                                    <Button type="primary" onClick={this.showModal}>Connect</Button>
-                                }
+                                {this.getMarketplaceComponent(type, 'button')}
                             </div>
                         </div>
 

@@ -1,84 +1,45 @@
 import React from 'react';
-import {Button, Col, Icon, Input, Popconfirm, Typography} from "antd";
-import styles from "../../Crm/Crm.module.less";
-import {getLink} from "helpers";
+import {Button, Icon, Popconfirm, Typography} from "antd";
+import {OutlookIcon} from "components/SVGs";
 
 const {Title, Paragraph, Text} = Typography;
 
-export const OutlookFormItems = ({
-                                      FormItem,
-                                      layout,
-                                      getFieldDecorator,
-                                      marketplace,
-                                      disconnectCRM,
-                                      connectCRM,
-                                      testCRM,
-                                      isConnecting,
-                                      isTesting,
-                                      isDisconnecting,
-                                        companyID
-                                  }) =>
-    <div>
-        {
-            marketplace.status !== "CONNECTED" &&
-            marketplace.status !== "FAILED" &&
-            <div>
-                {/*<a href={"https://login.microsoftonline.com/common/oauth2/v2.0/authorize?response_type=code&client_id=0978960c-c837-479f-97ef-a75be4bbacd4&redirect_uri=https://www.thesearchbase.com/crm_callback&scope=openid+Calendars.ReadWrite"} target="_blank">Click me</a>*/}
-                <a href="javascript:void(0);" NAME="Connect Outlook Account"  title=" Outlook Connection " onClick={() => {return window.open("https://login.microsoftonline.com/common/oauth2/v2.0/authorize?response_type=code&client_id=0978960c-c837-479f-97ef-a75be4bbacd4&redirect_uri=https://www.thesearchbase.com/api/marketplace_callback&scope=openid+Calendars.ReadWrite+offline_access&state={\"type\":\"Outlook\",\"companyID\":\""+companyID+"\"}","Ratting","width=600,height=400,0,top=40%,right=30%,status=0,")}}>Click here</a>
-            </div>
-        }
 
-        {
-            marketplace.status === "CONNECTED" &&
-            <div style={{textAlign: 'center'}}>
-                <img src={getLink('/static/images/undraw/success.svg')} alt="" height={300}/>
-                <Typography.Title>
-                    {marketplace.type} is connected
-                </Typography.Title>
-            </div>
-        }
+export const OutlookButton = ({
+                                  disconnectMarketplace, isDisconnecting, status, showModal
+                              }) => {
+    return (
+        <>
+            {
+                status === "NOT_CONNECTED" &&
+                <Button type="primary"
+                        onClick={showModal}
+                        style={{width: 'auto'}}
+                        size={'large'}><Icon component={() => <OutlookIcon/>}/> Connect with Outlook</Button>
+            }
 
-        {
-            marketplace.status === "FAILED" &&
-            <div style={{textAlign: 'center'}}>
-                <img src={getLink('/static/images/undraw/failed.svg')} alt="" height={300}/>
-                <Title>
-                    {marketplace.type} is failed
-                </Title>
-                <Paragraph type="secondary">
-                    {marketplace.type} is failing this is usually not from us, please contact the CRM provider
-                </Paragraph>
-            </div>
-        }
-
-        <Col span={16} offset={4}>
-            <div className={styles.Buttons}>
-                {
-                    (marketplace.status === "CONNECTED" || marketplace.status === "FAILED")
-                    &&
-                    <Popconfirm
-                        title="Chatbot conversations will no longer be synced with Outlook account"
-                        onConfirm={disconnectCRM}
-                        okType={'danger'}
-                        okText="Disconnect"
-                        cancelText="No"
-                    >
-                        <Button type="danger" disabled={isDisconnecting}>Disconnect</Button>
-                    </Popconfirm>
-                }
-
-                {
-                    marketplace.status === "NOT_CONNECTED" &&
-                    <>
-                        <Button type="primary" disabled={isConnecting || isTesting}
-                                onClick={connectCRM}>Connect</Button>
-                        <Button onClick={testCRM} disabled={isConnecting || isTesting}>Test</Button>
-                    </>
-                }
-            </div>
-        </Col>
-
-    </div>;
+            {
+                (status === "CONNECTED" || status === "FAILED")
+                &&
+                <Popconfirm placement={'bottomRight'}
+                            title="Chatbot conversations will no longer be synced with Adapt account"
+                            onConfirm={disconnectMarketplace}
+                            okType={'danger'}
+                            okText="Disconnect"
+                            cancelText="No">
+                    <Button type="danger"
+                            style={{width: 'auto'}}
+                            size={'large'}
+                            disabled={isDisconnecting}>
+                        {
+                            status === "FAILED" ? '(Failed) click to disconnect' : 'Disconnect'
+                        }
+                    </Button>
+                </Popconfirm>
+            }
+        </>
+    )
+};
 
 export const OutlookFeatures = () =>
     <Typography style={{padding: '0 60px'}}>

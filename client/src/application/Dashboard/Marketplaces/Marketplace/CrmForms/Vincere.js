@@ -1,62 +1,41 @@
 import React from 'react';
-import {Button, Col, Popconfirm, Typography} from "antd";
-import styles from "../../Crm/Crm.module.less";
-import {getLink} from "helpers";
+import {Button, Popconfirm, Typography} from "antd";
 
 const {Title, Paragraph, Text} = Typography;
 
-export const VincereFormItems = ({
-                                     FormItem,
-                                     layout,
-                                     getFieldDecorator,
-                                     marketplace,
-                                     disconnectCRM,
-                                     connectCRM,
-                                     testCRM,
-                                     isConnecting,
-                                     isTesting,
-                                     isDisconnecting,
-                                     companyID
-                                 }) =>
-    <div>
+export const VincereButtons = ({type, companyID, status, disconnectMarketplace, isDisconnecting}) =>
+    <>
         {
-            marketplace.status !== "CONNECTED" &&
-            marketplace.status !== "FAILED" &&
-            <div>
-                <a href="javascript:void(0);" name="Connect Vincere Account" title=" Vincere Connection "
-                   onClick={() => {
-                       return window.open("https://id.vincere.io/oauth2/authorize?client_id=9829f4ad-3ff3-4d00-8ecf-e5d7fa2983d1&response_type=code&redirect_uri=https://www.thesearchbase.com/api/marketplace_callback&state=%7B%22type%22%3A%22Vincere%22%2C%22companyID%22%3A%22"+companyID+"%22%7D", "Ratting", "width=600,height=400,0,top=40%,right=30%,status=0,")
-                   }}>Click here</a>
-
-
-            </div>
+            status !== "CONNECTED" &&
+            status !== "FAILED" &&
+            <Button type="primary"
+                    icon={'login'}
+                    style={{width: 'auto'}}
+                    onClick={() => {
+                        return window.open("https://id.vincere.io/oauth2/authorize?client_id=9829f4ad-3ff3-4d00-8ecf-e5d7fa2983d1&response_type=code&redirect_uri=https://www.thesearchbase.com/api/marketplace_callback&state=%7B%22type%22%3A%22Vincere%22%2C%22companyID%22%3A%22" + companyID + "%22%7D", "Ratting", "width=600,height=400,0,top=40%,right=30%,status=0,")
+                    }}
+                    size={'large'}>Connect Vincere</Button>
         }
-
         {
-            marketplace.status === "CONNECTED" &&
-            <div style={{textAlign: 'center'}}>
-                <img src={getLink('/static/images/undraw/success.svg')} alt="" height={300}/>
-                <Typography.Title>
-                    {marketplace.type} is connected
-                </Typography.Title>
-            </div>
+            (status === "CONNECTED" || status === "FAILED")
+            &&
+            <Popconfirm placement={'bottomRight'}
+                        title="Chatbot conversations will no longer be synced with Adapt account"
+                        onConfirm={disconnectMarketplace}
+                        okType={'danger'}
+                        okText="Disconnect"
+                        cancelText="No">
+                <Button type="danger"
+                        style={{width: 'auto'}}
+                        size={'large'}
+                        disabled={isDisconnecting}>
+                    {
+                        status === "FAILED" ? '(Failed) click to disconnect' : 'Disconnect'
+                    }
+                </Button>
+            </Popconfirm>
         }
-
-        {
-            marketplace.status === "FAILED" &&
-            <div style={{textAlign: 'center'}}>
-                <img src={getLink('/static/images/undraw/failed.svg')} alt="" height={300}/>
-                <Title>
-                    {marketplace.type} is failed
-                </Title>
-                <Paragraph type="secondary">
-                    {marketplace.type} is failing this is usually not from us, please contact the CRM provider
-                </Paragraph>
-            </div>
-        }
-
-
-    </div>;
+    </>;
 
 export const VincereFeatures = () =>
     <Typography style={{padding: '0 60px'}}>

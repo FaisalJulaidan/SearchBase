@@ -1,5 +1,5 @@
 import React from 'react';
-import {Button, Icon, Input, Popconfirm, Select, Typography,Col} from "antd";
+import {Button, Icon, Input, Select, Typography} from "antd";
 import {getLink} from "helpers";
 
 const {Option} = Select;
@@ -170,29 +170,7 @@ export const AdaptFormItems = ({
                 </Paragraph>
             </div>
         }
-
-
     </>;
-
-export const AdaptButtons = ({
-                                 marketplace,
-                                 disconnectCRM,
-                                 connectCRM,
-                                 testCRM,
-                                 openModal,
-                                 isConnecting,
-                                 isTesting,
-                                 isDisconnecting
-                             }) => (
-    <>
-
-
-        {
-            marketplace.status === "NOT_CONNECTED" &&
-            <Button type="primary" onClick={openModal}>Connect</Button>
-        }
-    </>
-);
 
 export const AdaptFeatures = ({}) =>
     <Typography style={{padding: '0 60px'}}>

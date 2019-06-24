@@ -1,10 +1,8 @@
-import logging
-
 from flask import request
 from jsonschema import validate
 
 import enums
-from models import db, Callback, Assistant
+from models import db, Callback, Assistant, Company
 from services import assistant_services, options_services
 from utilities import json_schemas, helpers
 
@@ -17,6 +15,7 @@ def getChatbot(assistantHashID) -> Callback:
         callback: Callback = assistant_services.getByHashID(assistantHashID)
         if not callback.Success:
             return Callback(False, "Assistant not found!")
+        company: Company = callback.Data.Company
         assistant = helpers.getDictFromSQLAlchemyObj(callback.Data)
 
         if not assistant['Active']:

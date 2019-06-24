@@ -16,57 +16,73 @@ def my_expired_token_callback(error):
 def signup(details) -> Callback:
 
     try:
+        email = details['email']
+        
         # Validate Email
-        if not helpers.isValidEmail(details['email']):
+        if not helpers.isValidEmail(email):
             return Callback(False, 'Invalid Email.')
+        
 
         # Check if user exists
-        user = user_services.getByEmail(details['email']).Data
-        if user:
+        if user_services.getByEmail(email).Data:
             return Callback(False, 'User already exists.')
 
         # Company
         # Create a company plus the Stripe customer and link it with the company
         company_callback: Callback = company_services.create(name=details['companyName'],
                                                              url=details['websiteURL'],
-                                                             ownerEmail=details['email'])
+                                                             ownerEmail=email)
         if not company_callback.Success:
             return Callback(False, company_callback.Message)
         company = company_callback.Data
 
         # Roles
         # Create owner, admin, user roles for the new company
-        ownerRole: Callback = role_services.create('Owner', True, True, True, True, company)
-        adminRole: Callback = role_services.create('Admin', True, True, True, False, company)
-        userRole: Callback = role_services.create('User', True, False, False, False, company)
-        if not (ownerRole.Success or adminRole.Success or userRole.Success):
+        adminRole: Callback = role_services.create('Admin', True, True, True, True, False, company.ID)
+        userRole: Callback = role_services.create('User', True, False, False, False, False, company.ID)
+        if not (adminRole.Success or userRole.Success):
             return Callback(False, 'Could not create roles for the new user.')
 
         # User
         # Create a new user with its associated company and owner role
         user_callback = user_services.create(details['firstName'],
                                              details['lastName'],
-                                             details['email'],
+                                             email,
                                              details['password'],
                                              details['telephone'],
-                                             company,
-                                             ownerRole.Data)
+                                             company.ID,
+                                             2) # RoleID = 2 -> Owner
 
 
         # Subscribe to basic plan with 14 trial days
-        sub_callback: Callback = sub_services.subscribe(company=company, planID='plan_D3lpeLZ3EV8IfA', trialDays=14)
+        # sub_callback: Callback = sub_services.subscribe(company=company, planID='plan_D3lpeLZ3EV8IfA', trialDays=14)
 
-        sendVerEmail_callback: Callback = mail_services.sendVerificationEmail(details["email"], details["companyName"])
+
+        verificationLink = helpers.getDomain() + "/verify_account/" + \
+                    helpers.verificationSigner.dumps({'email': email, 'companyID': company.ID}, salt='account-verify-key')
+
+        verify_callback: Callback = \
+            mail_services.send_email(email,
+                                     'Account Verification',
+                                     '/emails/account_verification.html',
+                                     companyName=company.Name,
+                                     userName= details['firstName'] + ' ' + details['lastName'],
+                                     verificationLink= verificationLink)
+
+        # Send us mail that someone has registered
+        notify_us_callback: Callback = mail_services.sendNewUserHasRegistered(details['firstName'] + details['lastName'],
+                                                                              email,
+                                                                              company.Name,
+                                                                              details['telephone'])
 
         # If subscription failed, remove the new created company and user
-        if not sub_callback.Success or not sendVerEmail_callback.Success:
+        if not (user_callback.Success or verify_callback.Success or notify_us_callback.Success):
             # Removing the company will cascade and remove the new created user and roles as well.
-
-            company_services.removeByName(details['companyName'])
-            return sub_callback
+            company_services.removeByName(company.Name)
+            return user_callback
 
         # ###############
-        # Just for testing, But to be REMOVED because user has to verify this manually
+        # Just for testing, But to be REMOVED because user has to verify account manually
         # user_services.verifyByEmail(email)
         # ###############
 
@@ -105,12 +121,13 @@ def authenticate(email: str, password_to_check: str) -> Callback:
                          "lastAccess": user.LastAccess,
                          "phoneNumber": user.PhoneNumber,
                          # "plan": helpers.getPlanNickname(user.Company.SubID),
-                         }
+                         },
+                'role': helpers.getDictFromSQLAlchemyObj(user.Role)
                 }
 
         time_now = datetime.now()
         # for security, hide them in the token
-        tokenData = {'user': {"id": user.ID, "companyID": user.CompanyID, "email": user.Email, "log_time": str(time_now)}}
+        tokenData = {'user': {"id": user.ID, "companyID": user.CompanyID, "email": user.Email, "roleID": user.RoleID}}
 
         # Create the JWT token
         access_token = create_access_token(identity=tokenData)

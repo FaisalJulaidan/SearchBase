@@ -1,32 +1,35 @@
-from datetime import datetime
-
-from jsonschema import validate
 from sqlalchemy import and_
 from werkzeug.utils import secure_filename
 
 from models import db, Assistant, Callback, Appointment, AutoPilot
-from services import stored_file_services, auto_pilot_services, conversation_services
+from services import stored_file_services, auto_pilot_services, conversation_services, flow_services
 from services.Marketplace.CRM import crm_services
 from services.Marketplace.Calendar import calendar_services
 from utilities import helpers, json_schemas
+from os.path import join
+from config import BaseConfig
+from jsonschema import validate
+from datetime import datetime
+import json
 
 
-def create(name, desc, welcomeMessage, topBarText, companyID) -> Assistant or None:
+def create(name, desc, welcomeMessage, topBarText, template, companyID) -> Assistant or None:
     try:
 
-        # flow = None
-        # if template and template != 'none':
-        #     # Get json template
-        #     relative_path = join('static/assistant_templates', template + '.json')
-        #     absolute_path = join(BaseConfig.APP_ROOT, relative_path)
-        #     flow = json.load(open(absolute_path))
-        #     # Validate template
-        #     callback: Callback = flow_services.isValidFlow(flow)
-        #     if not callback.Success:
-        #         raise Exception(callback.Message)
+        flow = None
+        if template and template != 'none':
+            # Get json template
+            relative_path = join('static/assistant_templates', template + '.json')
+            absolute_path = join(BaseConfig.APP_ROOT, relative_path)
+            flow = json.load(open(absolute_path))
+            # Validate template
+            callback: Callback = flow_services.isValidFlow(flow)
+            if not callback.Success:
+                raise Exception(callback.Message)
 
         assistant = Assistant(Name=name,
                               Description=desc,
+                              Flow=flow,
                               Message=welcomeMessage,
                               TopBarText=topBarText,
                               SecondsUntilPopup=0,
@@ -42,27 +45,6 @@ def create(name, desc, welcomeMessage, topBarText, companyID) -> Assistant or No
         db.session.rollback()
         return Callback(False, 'Failed to create the assistant', None)
 
-
-def addAppointment(conversationID, assistantID, dateTime):
-    try:
-        callback: Callback = conversation_services.getByID(conversationID, assistantID)
-        if not callback.Success: raise Exception("conversation does not exist anymore")
-
-        db.session.add(
-            Appointment(
-                DateTime=datetime.strptime(dateTime, "%Y-%m-%d %H:%M"),
-                AssistantID=assistantID,
-                ConversationID=conversationID
-            )
-        )
-
-        db.session.commit()
-        return Callback(True, 'Appointment added successfully.')
-
-    except Exception as exc:
-        helpers.logError("assistant_services.addAppointment(): " + str(exc))
-        db.session.rollback()
-        return Callback(False, "Couldn't add the appointment")
 
 
 # ----- Getters ----- #
@@ -86,7 +68,7 @@ def getByHashID(hashID):
 def getByID(id: int, companyID: int) -> Callback:
     try:
         # Get result and check if None then raise exception
-        result = db.session.query(Assistant) \
+        result = db.session.query(Assistant)\
             .filter(and_(Assistant.ID == id, Assistant.CompanyID == companyID)).first()
         if not result: raise Exception
         return Callback(True, "Got assistant successfully.", result)
@@ -119,7 +101,7 @@ def getAll(companyID) -> Callback:
                                   Assistant.Description,
                                   Assistant.Message,
                                   Assistant.TopBarText,
-                                  Assistant.Active) \
+                                  Assistant.Active)\
             .filter(Assistant.CompanyID == companyID).all()
 
         if len(result) == 0:
@@ -161,7 +143,7 @@ def getOpenTimes(assistantID) -> Callback:
 
         # If the assistant is not connected to an autoPilot then return an empty array which means no open times
         if not connectedAutoPilot:
-            return Callback(True, "There are no open time slots", None)
+            return Callback(True,"There are no open time slots")
 
         # OpenTimes is an array of all open slots per day
         return Callback(True, "Got open time slots successfully.", connectedAutoPilot.OpenTimes)
@@ -199,7 +181,7 @@ def updateConfigs(id, name, desc, message, topBarText, secondsUntilPopup, notify
         # Validate the json config
         validate(config, json_schemas.assistant_config)
 
-        assistant: Assistant = db.session.query(Assistant) \
+        assistant: Assistant = db.session.query(Assistant)\
             .filter(and_(Assistant.ID == id, Assistant.CompanyID == companyID)) \
             .first()
 
@@ -355,60 +337,3 @@ def disconnectFromAutoPilot(assistantID, companyID):
         helpers.logError("assistant_services.disconnectFromAutoPilot(): " + str(exc))
         db.session.rollback()
         return Callback(False, 'Error in disconnecting assistant from AutoPilot.')
-
-
-# ----- Logo Operations ----- #
-def uploadLogo(assistantID, file, companyID):
-    try:
-
-        assistant: Assistant = db.session.query(Assistant) \
-            .filter(and_(Assistant.ID == assistantID, Assistant.CompanyID == companyID)).first()
-        if not assistant: raise Exception
-
-        # Generate unique name: hash_sessionIDEncrypted.extension
-        filename = helpers.encodeID(assistant.ID) + '.' + \
-                   secure_filename(file.filename).rsplit('.', 1)[1].lower()
-        assistant.LogoName = filename
-
-        # Upload file to cloud Space
-        upload_callback: Callback = stored_file_services.uploadFile(file,
-                                                                    filename,
-                                                                    stored_file_services.COMPANY_LOGOS_PATH,
-                                                                    public=True)
-        if not upload_callback.Success:
-            raise Exception(upload_callback.Message)
-
-        db.session.commit()
-
-        return Callback(True, 'Logo uploaded successfully.')
-
-    except Exception as exc:
-        helpers.logError("assistant_services.uploadLogo(): " + str(exc))
-        db.session.rollback()
-        return Callback(False, 'Error in uploading logo.')
-
-
-def deleteLogo(assistantID, companyID):
-    try:
-
-        assistant: Assistant = db.session.query(Assistant) \
-            .filter(and_(Assistant.ID == assistantID, Assistant.CompanyID == companyID)).first()
-        if not assistant: raise Exception
-
-        logoName = assistant.LogoName
-        if not logoName: return Callback(False, 'No logo to delete')
-
-        # Delete file from cloud Space and reference from database
-        assistant.LogoName = None
-        delete_callback: Callback = stored_file_services.deleteFile(logoName,
-                                                                    stored_file_services.COMPANY_LOGOS_PATH)
-        if not delete_callback.Success:
-            raise Exception(delete_callback.Message)
-
-        db.session.commit()
-        return Callback(True, 'Logo deleted successfully.')
-
-    except Exception as exc:
-        helpers.logError("assistant_services.deleteLogo(): " + str(exc))
-        db.session.rollback()
-        return Callback(False, 'Error in deleting logo.')

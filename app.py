@@ -5,21 +5,21 @@ from flask import Flask, render_template, request
 from flask_api import status
 from models import db, Callback, Assistant
 from services.mail_services import mail
-from flask_script import Manager
+from flask_script import Manager, Command
 from flask_migrate import Migrate, MigrateCommand
 from sqlalchemy_utils import create_database, database_exists
 from services.auth_services import jwt
 from utilities import helpers, tasks, dummy_data
 from flask_babel import Babel
-from services import scheduler_services, mail_services, assistant_services
+from services import appointment_services
 from datetime import datetime
 
 # Import all routers to register them as blueprints
-from routes.admin.routers import profile_router, analytics_router, sub_router, \
+from routes.admin.routers import account_router, analytics_router, sub_router, \
     conversation_router, users_router, flow_router, assistant_router,\
-    database_router, options_router, marketplace_router, auto_pilot_router
-from routes.public.routers import public_router, reset_password_router, chatbot_router, auth_router, appointment_router
-
+    database_router, options_router, marketplace_router, auto_pilot_router, appointment_router
+from routes.public.routers import public_router, reset_password_router, chatbot_router, auth_router
+import re
 app = Flask(__name__, static_folder='static')
 
 # Register Routes:
@@ -28,7 +28,7 @@ app.register_blueprint(flow_router, url_prefix='/api')
 app.register_blueprint(marketplace_router, url_prefix='/api')
 app.register_blueprint(public_router)
 app.register_blueprint(reset_password_router, url_prefix='/api')
-app.register_blueprint(profile_router, url_prefix='/api')
+app.register_blueprint(account_router, url_prefix='/api')
 app.register_blueprint(sub_router)
 app.register_blueprint(analytics_router, url_prefix='/api')
 app.register_blueprint(conversation_router, url_prefix='/api')
@@ -64,7 +64,6 @@ def test_crm_123():
 
 
 # Server Setup
-db.app = app
 migrate_var = Migrate(app, db)
 manager = Manager(app)
 babel = Babel(app)
@@ -74,8 +73,8 @@ manager.add_command('db', MigrateCommand)
 
 # will be used for migration purposes
 @manager.command
-def run_tasks():
-    tasks.migrate_flow()
+def run_tasks(functionName):
+    getattr(tasks, functionName)()
 
 
 print("Run the server...")
@@ -107,6 +106,8 @@ elif os.environ['FLASK_ENV'] == 'development':
     jwt.init_app(app)
     db.init_app(app)
     mail.init_app(app)
+    app.app_context().push()
+
 
     url = os.environ['SQLALCHEMY_DATABASE_URI']  # get database URL
     if os.environ['REFRESH_DB_IN_DEV'] == 'yes':
@@ -115,6 +116,19 @@ elif os.environ['FLASK_ENV'] == 'development':
         db.create_all()
         dummy_data.generate()
 
+    # appointment_services.getAllByCompanyID(1)
+
+    # payload = {
+    #     'conversationID': 5,
+    #     'assistantID': 1,
+    #     'companyID': 1,
+    #     'email': 'julaidan.faisal@gmail.com',
+    #     'userName': 'Faisal',
+    # }
+    #
+    # token = helpers.verificationSigner.dumps(payload, salt='appointment-key')
+    # print(token)
+    # print(helpers.verificationSigner.loads(token, salt='appointment-key', max_age=432000))
 
     print('Development mode running...')
 

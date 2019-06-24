@@ -69,37 +69,41 @@ class AutoPilot extends React.Component {
     };
 
     onSubmit = () => this.props.form.validateFields((err, values) => {
-        const /**@type AutoPilot*/ autoPilot = this.props.autoPilot || {};
-        const {state, TimeSlotsRef} = this;
-        const timeSlots = TimeSlotsRef.current.state.weekDays;
 
-        let weekDays = [];
-        for (let i = 0; i < 7; i++) {
-            weekDays.push({
-                day: i,
-                from: [timeSlots[i].from.hours(), timeSlots[i].from.minutes()],
-                to: [timeSlots[i].to.hours(), timeSlots[i].to.minutes()],
-                duration: +TimeSlotsRef.current.state.duration.split('min')[0],
-                active: timeSlots[i].active
-            })
+        if(!err){
+            const /**@type AutoPilot*/ autoPilot = this.props.autoPilot || {};
+            const {state, TimeSlotsRef} = this;
+            const timeSlots = TimeSlotsRef.current.state.weekDays;
+
+            let weekDays = [];
+            for (let i = 0; i < 7; i++) {
+                weekDays.push({
+                    day: i,
+                    from: [timeSlots[i].from.hours(), timeSlots[i].from.minutes()],
+                    to: [timeSlots[i].to.hours(), timeSlots[i].to.minutes()],
+                    duration: +TimeSlotsRef.current.state.duration.split('min')[0],
+                    active: timeSlots[i].active
+                })
+            }
+
+            let payload = {
+                active: autoPilot.Active,
+                name: values.name,
+                description: values.description,
+                acceptApplications: state.acceptApplications,
+                rejectApplications: state.rejectApplications,
+                sendAcceptanceEmail: state.sendAcceptanceEmail,
+                sendRejectionEmail: state.sendRejectionEmail,
+                acceptanceScore: state.acceptanceScore / 100,
+                rejectionScore: state.rejectionScore / 100,
+                sendCandidatesAppointments: state.sendCandidatesAppointments,
+
+                openTimes: weekDays
+            };
+
+            this.props.dispatch(autoPilotActions.updateAutoPilotConfigs(autoPilot.ID, payload));
         }
 
-        let payload = {
-            active: autoPilot.Active,
-            name: values.name,
-            description: values.description,
-            acceptApplications: state.acceptApplications,
-            rejectApplications: state.rejectApplications,
-            sendAcceptanceEmail: state.sendAcceptanceEmail,
-            sendRejectionEmail: state.sendRejectionEmail,
-            acceptanceScore: state.acceptanceScore / 100,
-            rejectionScore: state.rejectionScore / 100,
-            sendCandidatesAppointments: state.sendCandidatesAppointments,
-
-            openTimeSlots: weekDays
-        };
-
-        this.props.dispatch(autoPilotActions.updateAutoPilotConfigs(autoPilot.ID, payload));
     });
 
     render() {
@@ -125,7 +129,7 @@ class AutoPilot extends React.Component {
                             </Breadcrumb>
                         </div>
 
-                        <div className={styles.Details}>
+                        <div className={styles.Title}>
                             <Title>{autoPilot?.Name}</Title>
                             <Paragraph type="secondary">
                                 {autoPilot?.Description}
@@ -135,14 +139,14 @@ class AutoPilot extends React.Component {
 
                     <div className={styles.Body}>
                         {!autoPilot ? <Spin/> :
-                            <Form layout='vertical' wrapperCol = {{span: 12}} style={{width: '100%'}}>
+                            <Form layout='vertical' wrapperCol = {{span: 10}} style={{width: '100%'}}>
                                 <FormItem
                                     label="Name"
                                     >
                                     {getFieldDecorator('name', {
                                         initialValue: autoPilot.Name,
                                         rules: [
-                                            {required: true, message: "Enter a name for your auto pilot"},
+                                            {whitespace: true, required: true, message: "Enter a name for your auto pilot"},
                                             {validator: (_, value, callback) => {
                                                 // check if the value equals any of the name from
                                                 // this.props.autoPilotsSlots
@@ -170,9 +174,6 @@ class AutoPilot extends React.Component {
                                         <Input placeholder="Auto Pilot Description"/>
                                     )}
                                 </FormItem>
-
-                                <br />
-                                <Button type={'primary'} onClick={this.onSubmit}>Save changes</Button>
 
                                 <br />
                                 <Divider/>
@@ -215,11 +216,9 @@ class AutoPilot extends React.Component {
                                 </FormItem>
 
                                 <br />
-                                <Button type={'primary'} onClick={this.onSubmit}>Save changes</Button>
-
-                                <br />
                                 <Divider/>
-                                <h2> Applications Rejection Automation:</h2>
+                                <h2> Applications Rejection Automation</h2>
+
                                 <Form.Item label="Auto reject applicants "
                                            help="Select the percentage to auto reject the applicants">
                                     {getFieldDecorator('rejectApplications', {
@@ -254,13 +253,12 @@ class AutoPilot extends React.Component {
                                 </FormItem>
 
                                 <br />
-                                <Button type={'primary'} onClick={this.onSubmit}>Save changes</Button>
-
-                                <br />
                                 <Divider/>
                                 <h2> Manage Appointments Automation:</h2>
                                 <FormItem label="Auto manage candidates appointments"
-                                          help="Accepted candidates will receive an email (if provided) to pick a time slot"
+                                          help="Accepted candidates will receive an email (if provided) to pick
+                                           a time slot for an appointment. You can then confirm these
+                                           appointments from the Calendar page"
 
                                 >
                                     {getFieldDecorator('sendCandidatesAppointments', {
@@ -279,20 +277,19 @@ class AutoPilot extends React.Component {
                                            autoPilot={autoPilot}
                                            layout={layout}
                                            showSetAppointment={this.state.sendCandidatesAppointments}/>
-
-
-
-                                <br/>
-                                <br />
-                                <Button type={'primary'} onClick={this.onSubmit}>Save changes</Button>
-
                             </Form>
                         }
 
+
+                        <Button type={'primary'} size={'large'} onClick={this.onSubmit}
+                                style={{marginTop:30}}>
+                            Save changes
+                        </Button>
+
                         <br />
                         <Divider/>
-                        <h2> Delete Auto Pilot:</h2>
-                        <Button type={'danger'} onClick={this.handleDelete}>Delete</Button>
+                        <Button type={'danger'} size={'large'} onClick={this.handleDelete}>Delete Auto Pilot</Button>
+
 
                         {/*Blur Effect (Hidden) */}
                         <div style={{display: 'none'}}>

@@ -1,5 +1,5 @@
 from utilities import helpers
-from models import Callback, db, Plan, Company
+from models import Callback, db, Company
 import stripe
 
 

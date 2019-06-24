@@ -25,7 +25,6 @@ class Settings extends Component {
     };
 
     componentDidMount() {
-        console.log(this.props.assistant)
         this.setState({
             inputValue: this.props.assistant.SecondsUntilPopup
         });
@@ -58,7 +57,7 @@ class Settings extends Component {
             values.config = {
                 restrictedCountries: values.restrictedCountries || []
             };
-            console.log(values)
+
             delete values.restrictedCountries;
             values.notifyEvery = this.state.notifyEvery || this.props.assistant.NotifyEvery
             store.dispatch(assistantActions.updateAssistantConfigs(this.props.assistant.ID, values))
@@ -75,20 +74,19 @@ class Settings extends Component {
             }
         });
     };
+
     render() {
         const alertsKeys = Object.keys(this.state.alertOptions);
         const maxAlertsLength = parseInt(alertsKeys[alertsKeys.length - 1]);
         const {getFieldDecorator} = this.props.form;
         const {assistant} = this.props;
-
         const countriesOptions = [...countries.map(country => <Option key={country.code}>{country.name}</Option>)];
 
-        console.log(this.state.notifyEvery)
         return (
             <>
-                <Form layout='vertical' wrapperCol={{span: 12}}>
+                <Form layout='vertical' wrapperCol={{span: 15}}>
 
-                    <h2> Basic Settings:</h2>
+                    <h2>Basic Settings</h2>
                     <FormItem
                         label="Assistant Name"
                         extra="Enter a name for your assistant to easily identify it in the dashboard"
@@ -154,12 +152,12 @@ class Settings extends Component {
                             )
                         }
                     </FormItem>
-                    <Button type={'primary'} onClick={this.handleSave}>Save changes</Button>
+                    <Button type={'primary'} size={'large'} onClick={this.handleSave}>Save changes</Button>
 
                     {/* ================================ */}
                     <br />
                     <Divider/>
-                    <h2> Advanced Settings:</h2>
+                    <h2>Advanced Settings</h2>
 
                     <FormItem
                         label="Pop up after"
@@ -188,6 +186,8 @@ class Settings extends Component {
                         </Radio.Group>
                         {this.state.isManualNotify ?
                             <InputNumber placeholder="Amount of time between notifications, in hours"
+                                         min={1}
+                                         style={{marginTop: 10, width: "100%"}}
                                          defaultValue={assistant.NotifyEvery}
                                          onChange={(val) => {this.setState({notifyEvery:val})}}/>
                             : null}
@@ -238,13 +238,12 @@ class Settings extends Component {
 
 
 
-                    <Button type={'primary'} onClick={this.handleSave}>Save changes</Button>
+                    <Button type={'primary'} size={'large'} onClick={this.handleSave}>Save changes</Button>
                 </Form>
 
                 <br />
                 <Divider/>
-                <h2> Delete Assistant:</h2>
-                <Button type={'danger'} onClick={this.handleDelete}>Delete</Button>
+                <Button type={'danger'} size={'large'} onClick={this.handleDelete}>Delete Assistant</Button>
 
             </>
         );

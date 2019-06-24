@@ -7,10 +7,11 @@ const getUsers = () => {
     };
 };
 
-const getUsersSuccess = (usersData) => {
+const getUsersSuccess = (usersList, roles) => {
     return {
         type: actionTypes.GET_USERS_SUCCESS,
-        usersData
+        usersList,
+        roles
     };
 };
 
@@ -21,10 +22,10 @@ const getUsersFailure = (error) => {
     };
 };
 
-const addUser = (params) => {
+const addUser = (values) => {
     return {
         type: actionTypes.ADD_USER_REQUEST,
-        params
+        values
     };
 };
 
@@ -42,10 +43,11 @@ const addUserFailure = (error) => {
     };
 };
 
-const editUser = (params) => {
+const editUser = (userID, values) => {
     return {
         type: actionTypes.EDIT_USER_REQUEST,
-        params
+        userID,
+        values
     };
 };
 
@@ -63,10 +65,10 @@ const editUserFailure = (error) => {
     };
 };
 
-const deleteUser = (params) => {
+const deleteUser = (userID) => {
     return {
         type: actionTypes.DELETE_USER_REQUEST,
-        params
+        userID
     };
 };
 

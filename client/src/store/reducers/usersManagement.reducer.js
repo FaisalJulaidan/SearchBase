@@ -1,24 +1,27 @@
 import * as actionTypes from '../actions/actionTypes';
 import {updateObject} from '../utility';
 
-const initialState = {usersList: [], isLoading: false, errorMsg: null};
+const initialState = {usersList: [], roles:[], isLoading: false, errorMsg: null};
 
 export const usersManagement = (state = initialState, action) => {
     switch (action.type) {
         case actionTypes.GET_USERS_REQUEST:
             return updateObject(state, {
                 usersList: [],
+                roles:[],
                 errorMsg: null,
                 isLoading: true
             });
         case actionTypes.GET_USERS_SUCCESS:
             return updateObject(state, {
-                usersList: action.usersData,
+                usersList: action.usersList,
+                roles: action.roles,
                 isLoading: false
             });
         case actionTypes.GET_USERS_FAILURE:
             return updateObject(state, {
                 usersList: [],
+                roles: [],
                 isLoading: false,
                 errorMsg: action.error
             });

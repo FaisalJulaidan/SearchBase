@@ -124,7 +124,7 @@ def getByID(conversationID, assistantID):
         conversation = db.session.query(Conversation) \
             .filter(and_(Conversation.AssistantID == assistantID, Conversation.ID == conversationID)).first()
         if not conversation:
-            raise Exception
+            return Callback(False, "Conversation does not exist")
 
         storedFile_callback: Callback = stored_file_services.getByConversation(conversation)
         if storedFile_callback.Success:

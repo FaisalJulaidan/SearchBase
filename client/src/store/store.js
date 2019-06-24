@@ -1,21 +1,21 @@
-import {createStore, applyMiddleware, compose} from 'redux';
-import thunk from 'redux-thunk'
+import {applyMiddleware, compose, createStore} from 'redux';
 import createSagaMiddleware from 'redux-saga';
-import { persistStore, persistReducer } from 'redux-persist'
+import {persistReducer, persistStore} from 'redux-persist'
 import storage from 'redux-persist/lib/storage'
 import rootReducer from './reducers';
-import { middleware as thunkMiddleware } from 'redux-saga-thunk'
+import {middleware as thunkMiddleware} from 'redux-saga-thunk'
 import {
-    assistantSaga,
     analyticsSaga,
+    appointmentsPickerSaga,
+    assistantSaga,
     authSaga,
-    profileSaga,
+    autoPilotSaga,
     conversationSaga,
-    usersManagementSaga,
+    crmSaga,
     databaseSaga,
     optionsSaga,
-    crmSaga,
-    autoPilotSaga
+    accountSaga,
+    usersManagementSaga
 } from './sagas'
 
 const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
@@ -38,7 +38,7 @@ const persistor = persistStore(store);
 
 sagaMiddleware.run(assistantSaga);
 sagaMiddleware.run(authSaga);
-sagaMiddleware.run(profileSaga);
+sagaMiddleware.run(accountSaga);
 sagaMiddleware.run(conversationSaga);
 sagaMiddleware.run(usersManagementSaga);
 sagaMiddleware.run(databaseSaga);
@@ -46,6 +46,7 @@ sagaMiddleware.run(optionsSaga);
 sagaMiddleware.run(crmSaga);
 sagaMiddleware.run(autoPilotSaga);
 sagaMiddleware.run(analyticsSaga);
+sagaMiddleware.run(appointmentsPickerSaga);
 
 
 export { store, persistor }

@@ -24,7 +24,7 @@ def processConversation(conversation: Conversation, autoPilot: AutoPilot):
 
             def __processSendingEmails (email, status: ApplicationStatus, autoPilot: AutoPilot):
 
-                name = " ".join(keywords.get(DataType.CandidateName.value['name'], [""])) # get user candidate name
+                name = " ".join(keywords.get(DataType.CandidateName.value['name'], [""])) # get candidate name
                 logoPath = sfs.PUBLIC_URL + sfs.UPLOAD_FOLDER + sfs.COMPANY_LOGOS_PATH + "/" + autoPilot.Company.LogoPath
 
                 # Send Acceptance Letters
@@ -43,15 +43,19 @@ def processConversation(conversation: Conversation, autoPilot: AutoPilot):
 
                     # Process candidates appointment email if score is accepted
                     if AutoPilot.SendCandidatesAppointments:
-                        payload = str(conversation.ID) + ";" +\
-                                  str(conversation.Assistant.ID) + ";" +\
-                                  str(autoPilot.CompanyID) + ";" +\
-                                  name
+
+                        payload = {
+                            'conversationID': conversation.ID,
+                            'assistantID': conversation.Assistant.ID,
+                            'companyID': autoPilot.CompanyID,
+                            'email': email,
+                            'userName': name,
+                        }
 
                         callback: Callback = mail_services.send_email(
                             email,
                             'Appointment',
-                            '/emails/appointment_letter.html',
+                            '/emails/appointment_picker.html',
                             companyName=autoPilot.Company.Name,
                             logoPath=logoPath,
                             userName=name,
@@ -75,7 +79,6 @@ def processConversation(conversation: Conversation, autoPilot: AutoPilot):
 
                     if callback.Success:
                         result['rejectionEmailSentAt'] = datetime.now()
-
 
 
             # Get application status
@@ -103,20 +106,20 @@ def create(name, desc, companyID: int) -> Callback:
 
         # Create the AutoPilot with default open time slots
         default = {"From": time(8,30), "To": time(12,0), "Duration": 30, "AutoPilot": autoPilot, "Active": False}
-        openTimeSlots = [OpenTimes(Day=0, **default),  # Monday
-                         OpenTimes(Day=1, **default),
-                         OpenTimes(Day=2, **default),
-                         OpenTimes(Day=3, **default),
-                         OpenTimes(Day=4, **default),
-                         OpenTimes(Day=5, **default),
-                         OpenTimes(Day=6, **default),  # Sunday
-                         ]
-        db.session.add_all(openTimeSlots)
+        openTimes = [OpenTimes(Day=0, **default),  # Sunday
+                     OpenTimes(Day=1, **default),
+                     OpenTimes(Day=2, **default),
+                     OpenTimes(Day=3, **default),
+                     OpenTimes(Day=4, **default),
+                     OpenTimes(Day=5, **default),
+                     OpenTimes(Day=6, **default),  # Saturday
+                     ]
+        db.session.add_all(openTimes)
         db.session.commit()
         return Callback(True, "Got AutoPilot successfully.", autoPilot)
 
     except Exception as exc:
-        helpers.logError("auto_pilot.create(): " + str(exc))
+        helpers.logError("auto_pilot_services.create(): " + str(exc))
         db.session.rollback()
         return Callback(False, 'Could not create AutoPilot.')
 
@@ -132,7 +135,7 @@ def getByID(id: int, companyID: int) -> Callback:
         return Callback(True, "Got AutoPilot successfully.", result)
 
     except Exception as exc:
-        helpers.logError("auto_pilot.getByID(): " + str(exc))
+        helpers.logError("auto_pilot_services.getByID(): " + str(exc))
         return Callback(False, 'Could not get the AutoPilot.')
 
 
@@ -144,15 +147,15 @@ def fetchAll(companyID) -> Callback:
         return Callback(True, "Fetched all AutoPilots successfully.", result)
 
     except Exception as exc:
-        helpers.logError("auto_pilot.fetchAll(): " + str(exc))
+        helpers.logError("auto_pilot_services.fetchAll(): " + str(exc))
         return Callback(False, 'Could not fetch all the AutoPilots.')
 
 
-# Add openTimeSlots to the autoPilot object after parsing it
+# Add openTimes to the autoPilot object after parsing it
 def parseAutoPilot(autoPilot: AutoPilot) -> dict:
     return {
         **helpers.getDictFromSQLAlchemyObj(autoPilot),
-        "OpenTimeSlots": helpers.getListFromSQLAlchemyList(autoPilot.OpenTimeSlots)
+        "OpenTimes": helpers.getListFromSQLAlchemyList(autoPilot.OpenTimes)
     }
 
 # ----- Updaters ----- #
@@ -179,12 +182,11 @@ def update(id, name, desc, companyID: int) -> Callback:
 
 
 def updateConfigs(id, name, desc, active, acceptApplications, acceptanceScore, sendAcceptanceEmail, rejectApplications,
-                  rejectionScore, sendRejectionEmail, SendCandidatesAppointments, openTimeSlots, companyID: int) -> Callback:
+                  rejectionScore, sendRejectionEmail, SendCandidatesAppointments, openTimes, companyID: int) -> Callback:
     try:
 
-        # TODO OpenTimeSlots & Appointments Feature
-        # Check all OpenTimeSlots are given
-        # if len(openTimeSlots) != 7: raise Exception("Number of open time slots should be 7")
+        # Check all OpenTimes are given
+        if len(openTimes) != 7: raise Exception("Number of open time slots should be 7")
 
         # Get AutoPilot
         autoPilot_callback: Callback = getByID(id, companyID)
@@ -206,9 +208,8 @@ def updateConfigs(id, name, desc, active, acceptApplications, acceptanceScore, s
 
         autoPilot.SendCandidatesAppointments = SendCandidatesAppointments
 
-        # TODO OpenTimeSlots & Appointments Feature
-        # Update the openTimeSlots
-        for (oldSlot, newSlot) in zip(autoPilot_temp.OpenTimeSlots, openTimeSlots):
+        # Update the openTimes
+        for (oldSlot, newSlot) in zip(autoPilot_temp.OpenTimes, openTimes):
             if oldSlot.Day == newSlot['day']:
                 oldSlot.Active = newSlot['active']
                 oldSlot.From = time(newSlot['from'][0], newSlot['from'][1])
@@ -253,8 +254,6 @@ def removeByID(id, companyID):
 
 
 # ----- Private Functions (shouldn't be accessed from the outside) ----- #
-# It takes an autoPilot object and join all its children tables into one dict
-
 
 def __getApplicationResult(score, autoPilot: AutoPilot) -> ApplicationStatus:
     result = ApplicationStatus.Pending

@@ -7,34 +7,34 @@ const {Title, Paragraph, Text} = Typography;
 
 //api/calendar/google/authorize
 const loginWithGoogle = (clientID, responseType, scope, redirectURI) => {
-    return (<a href={`https://accounts.google.com/o/oauth2/v2/auth?client_id=${clientID}&response_type=${responseType}&scope=${scope}&redirect_uri=${redirectURI}&access_type=offline`}>
-        <img src={"https://developers.google.com/identity/images/btn_google_signin_light_normal_web.png"} />
-    </a>)
-}
-
+    return (
+        <a href={`https://accounts.google.com/o/oauth2/v2/auth?client_id=${clientID}&response_type=${responseType}&scope=${scope}&redirect_uri=${redirectURI}&access_type=offline`}>
+            <img src={"https://developers.google.com/identity/images/btn_google_signin_light_normal_web.png"}/>
+        </a>)
+};
 
 
 export const GoogleFormItems = ({
-                                      FormItem,
-                                      layout,
-                                      getFieldDecorator,
-                                      CRM,
-                                      disconnectCRM,
-                                      connectCRM,
-                                      testCRM,
-                                      isConnecting,
-                                      isTesting,
-                                      isDisconnecting
-                                  }) =>
+                                    FormItem,
+                                    layout,
+                                    getFieldDecorator,
+                                    CRM,
+                                    disconnectCRM,
+                                    connectCRM,
+                                    testCRM,
+                                    isConnecting,
+                                    isTesting,
+                                    isDisconnecting
+                                }) =>
     <div>
         {
             CRM.status !== "CONNECTED" &&
             CRM.status !== "FAILED" &&
             <div>
                 {loginWithGoogle("623652835897-tj9rf1v6hd1tak5bv5hr4bq9hrvjns95.apps.googleusercontent.com",
-                                    "code",
-                                    "https://www.googleapis.com/auth/calendar",
-                                    "http://localhost:3000/dashboard/marketplace?googleVerification=true")}
+                    "code",
+                    "https://www.googleapis.com/auth/calendar",
+                    getLink("/dashboard/marketplace?googleVerification=true"))}
             </div>
         }
 

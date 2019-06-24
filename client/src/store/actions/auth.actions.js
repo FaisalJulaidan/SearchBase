@@ -10,10 +10,11 @@ function login(email, password, prevPath) {
     };
 }
 
-function loginSuccess (user) {
+function loginSuccess (user, role) {
     return {
         type: actionTypes.LOGIN_SUCCESS,
-        user
+        user,
+        role
     };
 }
 
@@ -91,7 +92,30 @@ const logout = () => {
     return {
         type: actionTypes.LOGOUT
     };
+}
+
+const verifyAccount = (token) => {
+    return {
+        type: actionTypes.VERIFY_ACCOUNT_REQUEST,
+        meta: {thunk: true},
+        token
+    };
 };
+
+const verifyAccountSuccess = (msg) => {
+    return {
+        type: actionTypes.VERIFY_ACCOUNT_SUCCESS,
+        msg
+    };
+};
+
+const verifyAccountFailure = (error) => {
+    return {
+        type: actionTypes.VERIFY_ACCOUNT_FAILURE,
+        error
+    };
+};
+
 
 
 export const authActions = {
@@ -112,4 +136,9 @@ export const authActions = {
     newResetPasswordFailure,
 
     logout,
+
+    verifyAccount,
+    verifyAccountSuccess,
+    verifyAccountFailure,
+
 };

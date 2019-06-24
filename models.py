@@ -1,28 +1,28 @@
-import json
-import os
-from datetime import datetime
-from sqlite3 import Connection as SQLite3Connection
-
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import Enum, event, types
-from sqlalchemy.engine import Engine
 from sqlalchemy.ext import mutable
-from sqlalchemy_utils import EncryptedType
-from sqlalchemy_utils import PasswordType, CurrencyType
-from sqlalchemy_utils.types.encrypted.encrypted_type import AesEngine
-from sqlathanor import FlaskBaseModel, initialize_flask_sqlathanor
-
+from datetime import datetime
+import os
+import json
 import enums
+from sqlalchemy_utils import PasswordType, CurrencyType
+from sqlalchemy.engine import Engine
+from sqlite3 import Connection as SQLite3Connection
+from sqlalchemy_utils import EncryptedType
+from sqlalchemy_utils.types.encrypted.encrypted_type import AesEngine
 
-db = SQLAlchemy(model_class=FlaskBaseModel)
-db = initialize_flask_sqlathanor(db)
+db = SQLAlchemy()
 
 
 # Activate Foreign Keys
 @event.listens_for(Engine, "connect")
 def _set_sqlite_pragma(dbapi_connection, connection_record):
+    cursor = dbapi_connection.cursor()
+
+    if not isinstance(dbapi_connection, SQLite3Connection):
+        cursor.execute("SET wait_timeout=31536000;")
+
     if isinstance(dbapi_connection, SQLite3Connection):
-        cursor = dbapi_connection.cursor()
         cursor.execute("PRAGMA foreign_keys=ON;")
         cursor.close()
 
@@ -50,12 +50,17 @@ mutable.MutableDict.associate_with(JsonEncodedDict)
 # ============= Models ===================
 
 class Company(db.Model):
+
     ID = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
     Name = db.Column(db.String(80), nullable=False)
     URL = db.Column(db.String(250), nullable=False)
     LogoPath = db.Column(db.String(64), nullable=True)
-    StripeID = db.Column(db.String(68), unique=True, nullable=False, )
+    StripeID = db.Column(db.String(68), unique=True, nullable=False)
     SubID = db.Column(db.String(68), unique=True, default=None)
+
+    TrackingData = db.Column(db.Boolean, nullable=False, default=False)
+    TechnicalSupport = db.Column(db.Boolean, nullable=False, default=True)
+    AccountSpecialist = db.Column(db.Boolean, nullable=False, default=False)
 
     # Relationships:
     Users = db.relationship('User', back_populates='Company')
@@ -83,13 +88,9 @@ class User(db.Model):
         ],
         deprecated=['md5_crypt']
     ))
+
     Verified = db.Column(db.Boolean(), nullable=False, default=False)
-
-    TrackingData = db.Column(db.Boolean, nullable=False, default=False)
-    TechnicalSupport = db.Column(db.Boolean, nullable=False, default=False)
-    AccountSpecialist = db.Column(db.Boolean, nullable=False, default=False)
-    UserInputNotifications = db.Column(db.Boolean, nullable=False, default=False)
-
+    ChatbotNotifications = db.Column(db.Boolean, nullable=False, default=False)
     LastAccess = db.Column(db.DateTime(), nullable=True)
     CreatedOn = db.Column(db.DateTime(), nullable=False, default=datetime.now)
 
@@ -97,10 +98,11 @@ class User(db.Model):
     CompanyID = db.Column(db.Integer, db.ForeignKey('company.ID', ondelete='cascade'), nullable=False)
     Company = db.relationship('Company', back_populates='Users')
 
-    RoleID = db.Column(db.Integer, db.ForeignKey('role.ID', ondelete='SET NULL'))
+    RoleID = db.Column(db.Integer, db.ForeignKey('role.ID'), nullable=False)
     Role = db.relationship('Role', back_populates='Users')
 
-    # __table_args__ = (db.UniqueConstraint('Email', name='uix1_user'),)
+    # Constraints:
+    __table_args__ = (db.UniqueConstraint('Email', name='uix1_user'),)
 
     def __repr__(self):
         return '<User {}>'.format(self.Email)
@@ -110,12 +112,13 @@ class Role(db.Model):
     ID = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
     Name = db.Column(db.String(64))
     EditChatbots = db.Column(db.Boolean(), nullable=False, default=False)
+    AddUsers = db.Column(db.Boolean(), nullable=False, default=False)
     EditUsers = db.Column(db.Boolean(), nullable=False, default=False)
     DeleteUsers = db.Column(db.Boolean(), nullable=False, default=False)
     AccessBilling = db.Column(db.Boolean(), nullable=False, default=False)
 
     # Relationships:
-    CompanyID = db.Column(db.Integer, db.ForeignKey('company.ID', ondelete='cascade'), nullable=False)
+    CompanyID = db.Column(db.Integer, db.ForeignKey('company.ID', ondelete='cascade'), nullable=True)
     Company = db.relationship('Company', back_populates='Roles')
 
     Users = db.relationship('User', back_populates="Role")
@@ -128,6 +131,12 @@ class Role(db.Model):
 
 
 class Assistant(db.Model):
+
+    @property
+    def appointments(self):
+        q = Appointment.query.join(Conversation).filter(Conversation.Assistant == self)
+        return q.all()
+
     ID = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
     Name = db.Column(db.String(128), nullable=False)
     Description = db.Column(db.String(260), nullable=True)
@@ -155,13 +164,8 @@ class Assistant(db.Model):
     AutoPilotID = db.Column(db.Integer, db.ForeignKey('auto_pilot.ID', ondelete='cascade'))
     AutoPilot = db.relationship("AutoPilot", back_populates="Assistants")
 
-    # NotifySchedulerJobID = db.Column(db.Integer, db.ForeignKey('apscheduler_jobs.FakeID', ondelete='cascade'), nullable=True, unique=True)
-    # NotifySchedulerJob = db.relationship('ApschedulerJobs', foreign_keys=[NotifySchedulerJobID], back_populates='NotifySchedulerJob')
-
     # - Many to one
-    Statistics = db.relationship('Statistics', back_populates='Assistant')
     Conversations = db.relationship('Conversation', back_populates='Assistant')
-    Appointments = db.relationship('Appointment', back_populates='Assistant')
 
     # Constraints:
     # cannot have two assistants with the same name under one company
@@ -252,7 +256,7 @@ class OpenTimes(db.Model):
 
     # Constraints:
     __table_args__ = (
-        db.CheckConstraint(db.and_(Day >= 0, Day <= 6)),  # 0 = Monday, 6 = Sunday
+        db.CheckConstraint(db.and_(Day >= 0, Day <= 6)),  # 0 = Sunday, 6 = Saturday
         db.CheckConstraint(From < To),
         db.CheckConstraint(db.and_(Duration > 0, Duration <= 60)),
         db.UniqueConstraint('Day', 'AutoPilotID', name='uix1_open_time_slot'),
@@ -265,22 +269,20 @@ class OpenTimes(db.Model):
 class Appointment(db.Model):
     ID = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
     DateTime = db.Column(db.DateTime(), nullable=False, default=datetime.now)
+    Confirmed = db.Column(db.Boolean, nullable=False, default=False)
 
-    # Relationships:
-    AssistantID = db.Column(db.Integer, db.ForeignKey('assistant.ID', ondelete='cascade'), nullable=False)
-    Assistant = db.relationship('Assistant', back_populates='Appointments')
-
-    ConversationID = db.Column(db.Integer, db.ForeignKey('conversation.ID', ondelete='cascade'), nullable=False)
+    ConversationID = db.Column(db.Integer, db.ForeignKey('conversation.ID', ondelete='cascade'),
+                               nullable=False, unique=True)
     Conversation = db.relationship('Conversation', back_populates='Appointment')
 
     # Constraints:
-    __table_args__ = (db.UniqueConstraint('AssistantID', 'DateTime', name='uix1_appointment'),)
+    __table_args__ = (db.UniqueConstraint('ConversationID', 'DateTime', name='uix2_appointment'),)
 
 
 class CRM(db.Model):
     ID = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
     Type = db.Column(Enum(enums.CRM), nullable=True)
-    Auth = db.Column(EncryptedType(JsonEncodedDict, os.environ['SECRET_KEY_DB'], AesEngine, 'pkcs5'), nullable=True)
+    Auth = db.Column(EncryptedType(JsonEncodedDict, os.environ['DB_SECRET_KEY'], AesEngine, 'pkcs5'), nullable=True)
 
     # Relationships:
     CompanyID = db.Column(db.Integer, db.ForeignKey('company.ID', ondelete='cascade'), nullable=False)
@@ -294,41 +296,6 @@ class CRM(db.Model):
 
     def __repr__(self):
         return '<CRM {}>'.format(self.ID)
-
-
-class Statistics(db.Model):
-    ID = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
-    Name = db.Column(db.String(128), nullable=False)
-    DateTime = db.Column(db.DateTime(), nullable=False, default=datetime.now)
-    Opened = db.Column(db.Integer, nullable=False, default=False)
-    QuestionsAnswered = db.Column(db.Integer, nullable=False, default=0)
-    SolutionsReturned = db.Column(db.Integer, nullable=False, default=0)
-
-    # Relationships:
-    AssistantID = db.Column(db.Integer, db.ForeignKey('assistant.ID', ondelete='cascade'), nullable=False)
-    Assistant = db.relationship('Assistant', back_populates='Statistics')
-
-    def __repr__(self):
-        return '<Statistics {}>'.format(self.Name)
-
-
-class Plan(db.Model):
-    ID = db.Column(db.String(25), primary_key=True, unique=True)
-    Nickname = db.Column(db.String(40), nullable=False, unique=True)
-    MaxSolutions = db.Column(db.Integer, nullable=False, default=0)
-    MaxBlocks = db.Column(db.Integer, nullable=False, default=0)
-    ActiveBotsCap = db.Column(db.Integer, nullable=False, default=0)
-    InactiveBotsCap = db.Column(db.Integer, nullable=False, default=0)
-    AdditionalUsersCap = db.Column(db.Integer, nullable=False, default=0)
-    ExtendedLogic = db.Column(db.Boolean, nullable=False, default=False)
-    ImportDatabase = db.Column(db.Boolean, nullable=False, default=False)
-    CompanyNameOnChatbot = db.Column(db.Boolean, nullable=False, default=False)
-
-    # Relationships:
-    ###
-
-    def __repr__(self):
-        return '<Plan {}>'.format(self.Nickname)
 
 
 class Newsletter(db.Model):
@@ -374,15 +341,16 @@ class Candidate(db.Model):
     CandidateName = db.Column(db.String(64), nullable=True)
     CandidateEmail = db.Column(db.String(64), nullable=True)
     CandidateMobile = db.Column(db.String(20), nullable=True)
-    CandidateLocation = db.Column(db.String(64), nullable=False)  # Required
-    CandidateSkills = db.Column(db.String(1080), nullable=False)  # Required
+    CandidateLocation = db.Column(db.String(64), nullable=False) # Required
+    CandidateSkills = db.Column(db.String(5000), nullable=False) # Required
     CandidateLinkdinURL = db.Column(db.String(512), nullable=True)
     CandidateAvailability = db.Column(db.String(64), nullable=True)
     CandidateJobTitle = db.Column(db.String(120), nullable=True)
     CandidateEducation = db.Column(db.String(64), nullable=True)
     CandidateYearsExperience = db.Column(db.Float(), nullable=True)
     CandidateDesiredSalary = db.Column(db.Float(), nullable=True)
-    Currency = db.Column(CurrencyType)
+    Currency = db.Column(CurrencyType, nullable=False) # Required
+    PayPeriod = db.Column(Enum(enums.Period), nullable=False) # Required
 
     # Relationships:
     DatabaseID = db.Column(db.Integer, db.ForeignKey('database.ID', ondelete='cascade'), nullable=False)
@@ -394,14 +362,15 @@ class Candidate(db.Model):
 
 class Job(db.Model):
     ID = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
-    JobTitle = db.Column(db.String(64), nullable=False)  # Required
+    JobTitle = db.Column(db.String(64), nullable=False) # Required
     JobDescription = db.Column(db.String(5000), nullable=True)
-    JobLocation = db.Column(db.String(64), nullable=False)  # Required
-    JobType = db.Column(db.String(64), nullable=True)
+    JobLocation = db.Column(db.String(64), nullable=False) # Required
     JobSalary = db.Column(db.Float(), nullable=True)
-    Currency = db.Column(CurrencyType)
-    JobEssentialSkills = db.Column(db.String(512), nullable=True)
-    JobDesiredSkills = db.Column(db.String(512), nullable=True)
+    Currency = db.Column(CurrencyType, nullable=False) # Required
+    PayPeriod = db.Column(Enum(enums.Period), nullable=False) # Required
+    JobType = db.Column(db.String(64), nullable=True)
+    JobEssentialSkills = db.Column(db.String(5000), nullable=True)
+    JobDesiredSkills = db.Column(db.String(5000), nullable=True)
     JobYearsRequired = db.Column(db.Integer, nullable=True)
     JobStartDate = db.Column(db.DateTime(), nullable=True)
     JobEndDate = db.Column(db.DateTime(), nullable=True)
@@ -418,7 +387,7 @@ class Job(db.Model):
 class Calendar(db.Model):
     ID = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
     Type = db.Column(Enum(enums.Calendar), nullable=True)
-    Auth = db.Column(EncryptedType(JsonEncodedDict, os.environ['SECRET_KEY_DB'], AesEngine, 'pkcs5'), nullable=True)
+    Auth = db.Column(EncryptedType(JsonEncodedDict, os.environ['DB_SECRET_KEY'], AesEngine, 'pkcs5'), nullable=True)
     MetaData = db.Column(MagicJSON, nullable=True)
 
     # Relationships:

@@ -51,10 +51,7 @@ class Assistant extends Component {
     }
 
     componentDidMount() {
-        setTimeout(() => {
-            this.firstHead = [...document.head.children];
-            console.log(this.firstHead)
-        }, 1000)
+        setTimeout(() => this.firstHead = [...document.head.children], 1000)
     }
      componentWillUnmount() {
         this.removeChatbot()

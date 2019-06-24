@@ -210,7 +210,8 @@ class Crm extends React.Component {
                                                        isDisconnecting={this.props.isDisconnecting}
                                                        disconnectCRM={this.disconnectCRM}
                                                        connectCRM={this.connectCRM}
-                                                       testCRM={this.testCRM}/>
+                                                       testCRM={this.testCRM}
+                                                      companyID={this.props.location.state.companyID}/>
 
                                 }
 

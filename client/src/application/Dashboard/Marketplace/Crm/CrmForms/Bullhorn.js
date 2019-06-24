@@ -15,47 +15,18 @@ export const BullhornFormItems = ({
                                       testCRM,
                                       isConnecting,
                                       isTesting,
-                                      isDisconnecting
+                                      isDisconnecting,
+                                        companyID
                                   }) =>
     <div>
         {
             CRM.status !== "CONNECTED" &&
             CRM.status !== "FAILED" &&
             <div>
-                <FormItem label="Username"
-                          {...layout}>
-                    {getFieldDecorator('username', {
-                        initialValue: 'thesearchbase.api',
-                        rules: [{
-                            required: true,
-                            max: 20,
-                            message: "Username is required, and should be less than or 20 character",
-                        }],
-                    })(
-                        // To readOnly to avoid autocomplete
-                        <Input readOnly
-                               onFocus={elem => elem.target.removeAttribute('readonly')}
-                               placeholder={'Login of user to use for authentication'}/>
-                    )}
-                </FormItem>
-
-                <FormItem label="Password"
-                          {...layout}>
-                    {getFieldDecorator('password', {
-                        initialValue: 'j)GV.WS2e#6Y(fUh',
-                        rules: [{
-                            required: true,
-                            max: 32,
-                            message: "Password is required, and should be less than or 32 character",
-                        }],
-                    })(
-                        // To readOnly to avoid autocomplete
-                        <Input readOnly
-                               onFocus={elem => elem.target.removeAttribute('readonly')}
-                               prefix={<Icon type="lock" style={{color: 'rgba(0,0,0,.25)'}}/>}
-                               placeholder={"User's password"} type="password"/>
-                    )}
-                </FormItem>
+                <a href="javascript:void(0);" name="Connect Bullhorn Account" title=" Bullhorn Connection "
+                   onClick={() => {
+                       return window.open("https://auth.bullhornstaffing.com/oauth/authorize?response_type=code&redirect_uri=https://www.thesearchbase.com/api/bullhorn_callback&client_id=7719607b-7fe7-4715-b723-809cc57e2714&state={\"type\":\"Bullhorn\",\"companyID\":\"" + companyID + "\"}", "Ratting", "width=600,height=600,0,top=40%,right=30%,status=0,")
+                   }}>Click here</a>
             </div>
         }
 

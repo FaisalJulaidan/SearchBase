@@ -48,33 +48,12 @@ def login(auth):
 
         headers = {'Content-Type': 'application/json'}
 
-        code_url = "https://auth.bullhornstaffing.com/oauth/authorize?" + \
-                   "response_type=code" + \
-                   "&redirect_uri=https://www.thesearchbase.com/api/bullhorn_callback" + \
-                   "&action=Login" + \
-                   "&client_id=7719607b-7fe7-4715-b723-809cc57e2714" \
-                   "&username=" + authCopy.get("username", "") + \
-                   "&password=" + urllib.parse.quote(authCopy.get("password", ""))
-
-        # get the authorization code
-        code_request = requests.post(code_url, headers=headers)
-
-        if not code_request.ok:
-            raise Exception(code_request.text)
-
-        # if length isnt 2 it means the "invalid credentials" log in page has been returned
-        if len(code_request.text.split("?code=")) != 2:
-            raise Exception("Invalid credentials")
-
-        # retrieve the auth code from the url string
-        authorization_code = code_request.text.split("?code=")[1].split("&client_id=")[0]
-
         access_token_url = "https://auth9.bullhornstaffing.com/oauth/token?" + \
                            "&grant_type=authorization_code" + \
                            "&redirect_uri=https://www.thesearchbase.com/api/bullhorn_callback" + \
                            "&client_id=7719607b-7fe7-4715-b723-809cc57e2714" + \
                            "&client_secret=0ZiVSILQ7CY0bf054LPiX4kN" + \
-                           "&code=" + authorization_code
+                           "&code=" + authCopy.get("code")[0]
 
         # get the access token and refresh token
         access_token_request = requests.post(access_token_url, headers=headers)

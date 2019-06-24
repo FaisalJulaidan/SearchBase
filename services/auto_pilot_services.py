@@ -24,60 +24,43 @@ def processConversation(conversation: Conversation, autoPilot: AutoPilot):
 
             def __processSendingEmails (email, status: ApplicationStatus, autoPilot: AutoPilot):
 
-                name = " ".join(keywords.get(DataType.CandidateName.value['name'], [""])) # get candidate name
+                userName = " ".join(keywords.get(DataType.CandidateName.value['name'], [""])) # get candidate name
                 logoPath = sfs.PUBLIC_URL + sfs.UPLOAD_FOLDER + sfs.COMPANY_LOGOS_PATH + "/" + autoPilot.Company.LogoPath
+                companyName = autoPilot.Company.Name
 
                 # Send Acceptance Letters
                 if status is ApplicationStatus.Accepted and AutoPilot.SendAcceptanceEmail:
-                    callback: Callback = mail_services.send_email(
-                        email,
-                        'Acceptance Letter',
-                        '/emails/acceptance_letter.html',
-                        companyName=autoPilot.Company.Name,
-                        logoPath=logoPath,
-                        userName=name)
 
-                    if callback.Success:
+                    acceptance_callback: Callback = \
+                        mail_services.sendAcceptanceEmail(userName, email, logoPath, companyName)
+
+                    if acceptance_callback.Success:
                         result['acceptanceEmailSentAt'] = datetime.now()
 
-
-                    # Process candidates appointment email if score is accepted
+                    # Process candidates appointment email only if score is accepted
                     if AutoPilot.SendCandidatesAppointments:
 
-                        payload = {
-                            'conversationID': conversation.ID,
-                            'assistantID': conversation.Assistant.ID,
-                            'companyID': autoPilot.CompanyID,
-                            'email': email,
-                            'userName': name,
-                        }
+                        appointments_callback: Callback = \
+                            mail_services.sendAppointmentsPicker(
+                                email,
+                                userName,
+                                logoPath,
+                                conversation.ID,
+                                conversation.Assistant.ID,
+                                companyName,
+                                autoPilot.CompanyID)
 
-                        callback: Callback = mail_services.send_email(
-                            email,
-                            'Appointment',
-                            '/emails/appointment_picker.html',
-                            companyName=autoPilot.Company.Name,
-                            logoPath=logoPath,
-                            userName=name,
-                            appointmentLink=helpers.getDomain() + "/appointments_picker/" + \
-                                                helpers.verificationSigner.dumps(payload, salt='appointment-key')
-                        )
-
-                        if callback.Success:
+                        if appointments_callback.Success:
                             result['appointmentEmailSentAt'] = datetime.now()
 
 
                 # Send Rejection Letters
                 elif status is ApplicationStatus.Rejected and AutoPilot.SendRejectionEmail:
-                    callback: Callback = mail_services.send_email(
-                        email,
-                        'Rejection Letter',
-                        '/emails/rejection_letter.html',
-                        companyName=autoPilot.Company.Name,
-                        logoPath=logoPath,
-                        userName=name)
 
-                    if callback.Success:
+                    rejection_callback: Callback = \
+                        mail_services.sendRejectionEmail(userName, email, logoPath, companyName)
+
+                    if rejection_callback.Success:
                         result['rejectionEmailSentAt'] = datetime.now()
 
 

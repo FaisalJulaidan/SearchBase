@@ -111,23 +111,13 @@ def addUser(firstname, surname, email, phoneNumber,  givenRoleID, editorUserID, 
                     Verified=False)
         db.session.add(newUser)
 
-        # Send email invitation to verify his account
-        tokenLink = helpers.getDomain() + "/verify_account/" + \
-                helpers.verificationSigner.dumps(email + ";" + str(company.ID), salt='email-confirm-key')
+        # Send account invitation email to new user
+        email_callback: Callback = mail_services.sendAccountInvitation(firstname, surname, email, password,
+                                                                       company.Name, company.LogoPath, company.ID)
 
-        email_callback: Callback = \
-            mail_services.send_email(email,
-                                    'Account Invitation',
-                                    '/emails/account_invitation.html',
-                                    companyName=company.Name,
-                                    logoPath=company.LogoPath,
-                                    userName= firstname + ' ' + surname,
-                                    password=password,
-                                    verificationLink= tokenLink
-                                    )
 
         if not email_callback.Success:
-            return Callback(False, 'Could not send new user an invitation email; therefore, all operations are discarded')
+            return Callback(False, 'Could not send new user an invitation email. All operations are discarded')
 
         # Save changes
         db.session.commit()

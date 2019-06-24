@@ -192,8 +192,61 @@ def sendSolutionAlert(record, solutions):
 #         return Callback(False, "Error in notifying for new chatbot conversation")
 
 
-def notifyNewConversations(assistant: Assistant, conversations, lastNotificationDate):
-    pass
+def notifyNewConversations(assistant: dict, conversations, lastNotificationDate):
+    try:
+
+        users_callback: Callback = user_services.getAllByCompanyIDWithEnabledNotifications(assistant["CompanyID"])
+        if not users_callback.Success:
+            return Callback(False, "Users not found!")
+
+        if len(users_callback.Data) == 0:
+            return Callback(True, "No user has notifications enabled")
+
+        print(users_callback.Data)
+        print(assistant)
+        print(conversations)
+        conversationsList = []
+        for conversation in conversations:
+            # Get pre singed url to download the file if there are files
+            fileURLsSinged = []
+            if conversation.StoredFile:
+                fileURLs :str = conversation.StoredFile.FilePath
+                if fileURLs:
+                    for urls in fileURLs.split(','):
+                        fileURLsSinged.append(sfs.genPresigendURL(urls, sfs.USER_FILES_PATH, 2592000).Data) # Expires in a month
+
+            conversationsList.append({
+                'userType': conversation.UserType.name,
+                'data': conversation.Data,
+                'status': conversation.ApplicationStatus.name,
+                'fileURLsSinged': fileURLsSinged,
+                'completed': "Yes" if conversation.Completed else "No"
+            })
+
+        if not len(conversationsList) > 0:
+            return Callback(True, "No new conversation to send")
+
+        # send emails, jobs applied for
+        for user in users_callback.Data:
+            email_callback: Callback = send_email(to=user.Email,
+                                                  subject="New users has engaged with your "
+                                                          + assistant["Name"] + " assistant",
+                                                  template='emails/new_conversations_notification.html',
+                                                  assistantName = assistant["Name"],
+                                                  assistantID = assistant["ID"],
+                                                  conversations = conversationsList,
+                                                  logoPath = sfs.PUBLIC_URL + sfs.UPLOAD_FOLDER + sfs.COMPANY_LOGOS_PATH + "/" + (
+                                                          assistant["LogoPath"] or ""),
+                                                  companyName = assistant["CompanyName"],
+                                                  )
+            if not email_callback.Success:
+                return Callback(False, email_callback.Message)
+
+        return Callback(True, "Emails have been sent")
+
+    except Exception as exc:
+        helpers.logError("mail_service.notifyNewChatbotSession(): " + str(exc))
+        return Callback(False, "Error in notifying for new chatbot session")
 
 
 def notifyNewConversation(assistant: Assistant, conversation: Conversation):
@@ -231,7 +284,7 @@ def notifyNewConversation(assistant: Assistant, conversation: Conversation):
                                                   subject='New ' + conversation.UserType.name
                                                           + " has engaged with "
                                                           + assistant.Name + " assistant",
-                                                  template='emails/new_conversation_notification.html',
+                                                  template='emails/new_conversations_notification.html',
                                                   assistantName = assistant.Name,
                                                   assistantID = assistant.ID,
                                                   conversations = conversations,

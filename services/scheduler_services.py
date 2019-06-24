@@ -1,9 +1,10 @@
 from pytz import utc
-
+from sqlalchemy import and_
 from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.jobstores.sqlalchemy import SQLAlchemyJobStore
 from apscheduler.executors.pool import ThreadPoolExecutor, ProcessPoolExecutor
-from models import db, Callback, Assistant, User, Conversation
+from models import db, Callback, Assistant, User, Conversation, Company
+from services import mail_services
 # import dateutil
 from utilities import helpers
 from datetime import date, datetime
@@ -24,35 +25,60 @@ job_defaults = {
 ''' 
 Types
 Null - Never notify
-0 - Immediately notify
-any other number - notify after x hours
+0 - Immediately notify but it should not because conversation are already been notified
+Any other number - notify after x hours
 '''
 
 
 scheduler = BackgroundScheduler(jobstores=jobstores, executors=executors, job_defaults=job_defaults, timezone=utc)
 
 # If assistantID is supplied, it will only look for data relating to that assistant
-def getNextInterval(assistantID=None):
+def conversationsNotifications(assistantID=None):
     try:
-        now = datetime.now()
-        query = db.session.query(Assistant.ID, Assistant.NotifyEvery, Assistant.Name, User.Email, Assistant.LastNotificationDate) \
-            .filter(Assistant.NotifyEvery != None) \
-            .filter(Assistant.CompanyID == User.CompanyID)
+        from app import app
+        with app.app_context():
 
-        if assistantID != None:
-            query.filter(Assistant.ID == assistantID)
+            now = datetime.now()
+            assistantsQuery = db.session.query(Assistant.ID, Assistant.CompanyID, Company.Name ,Company.LogoPath, Assistant.NotifyEvery, Assistant.Name, Assistant.LastNotificationDate) \
+                .join(Company)\
+                .filter(and_(Assistant.NotifyEvery))
 
-        monthlyUses = helpers.getDictFromLimitedQuery(["AssistantID", "NotifyEvery", "Name", "Email", "LastNotificationDate"],
-                         query.all())
+            if assistantID != None:
+                assistantsQuery.filter(Assistant.ID == assistantID)
 
-        for assistant in monthlyUses:
-            if (now - assistant['LastNotificationDate']).total_seconds()/86400 > assistant['NotifyEvery'] :
-                conversations = db.session.query(Conversation).filter(Conversation.DateTime > assistant['LastNotificationDate']).all()
-                # FAISALFUNCTION(assistant, conversations, assistant['LastNotificationDate'])
-                db.session.query(Assistant).filter(Assistant.ID == assistant['AssistantID']).update({'LastNotificationDate': now})
+            assistants = helpers.getDictFromLimitedQuery(["ID", "CompanyID", "CompanyName", "LogoPath", "NotifyEvery",
+                                                           "Name", "LastNotificationDate"],
+                                                          assistantsQuery.all())
+
+            for assistant in assistants:
+                # Assistant will not get notified in the first passed hour after their notification set active
+                if not assistant['LastNotificationDate']:
+                    db.session.query(Assistant).filter(Assistant.ID == assistant['ID'])\
+                        .update({'LastNotificationDate': now})
+
+                # Check if NotifyEvery hours have passed
+                elif ((now - assistant['LastNotificationDate']).total_seconds()/86400) + 1 > assistant['NotifyEvery'] :
+
+                    # Fetch conversation that happen after LastNotificationDate
+                    conversations = db.session.query(Conversation)\
+                        .filter(and_(Conversation.DateTime > assistant['LastNotificationDate'],
+                                     Conversation.AssistantID == assistant['ID']))\
+                        .all()
+
+                    if len(conversations) > 0:
+                        callback: Callback = mail_services.notifyNewConversations(assistant, conversations, assistant['LastNotificationDate'])
+                        if not callback.Success:
+                            raise Exception(callback.Message)
+
+                    db.session.query(Assistant).filter(Assistant.ID == assistant['ID'])\
+                        .update({'LastNotificationDate': now})
+
+            # Save changes to the db
+            db.session.commit()
+
     except Exception as e:
-        pass
+        helpers.logError(str(e))
 
 
-scheduler.add_job(getNextInterval, 'cron', hour='*/1', id='hourly', replace_existing=True)
-scheduler.start()
+scheduler.add_job(conversationsNotifications, 'cron', hour='*/1', id='hourly', replace_existing=True)
+# scheduler.start()

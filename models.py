@@ -207,7 +207,7 @@ class Conversation(db.Model):
     Appointment = db.relationship('Appointment', uselist=False, back_populates='Conversation')
 
     def __repr__(self):
-        return '<Conversation {}>'.format(self.Data)
+        return '<Conversation {} with AssistantID {}>'.format(self.ID, self.AssistantID)
 
 
 class AutoPilot(db.Model):

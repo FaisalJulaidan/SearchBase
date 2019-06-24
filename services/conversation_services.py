@@ -78,7 +78,7 @@ def processConversation(assistantHashID, data: dict) -> Callback:
         db.session.add(conversation)
         db.session.commit()
 
-        # Notify company about the new chatbot session only if set as immediate notification
+        # Notify company about the new chatbot session only if set as immediate -> NotifyEvery=0
         # Note: if there is a file upload the /file route in chatbot.py will handle the notification instead
         if assistant.NotifyEvery == 0:
             assistant.LastNotificationDate = datetime.now()

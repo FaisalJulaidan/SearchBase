@@ -202,9 +202,6 @@ def notifyNewConversations(assistant: dict, conversations, lastNotificationDate)
         if len(users_callback.Data) == 0:
             return Callback(True, "No user has notifications enabled")
 
-        print(users_callback.Data)
-        print(assistant)
-        print(conversations)
         conversationsList = []
         for conversation in conversations:
             # Get pre singed url to download the file if there are files
@@ -220,7 +217,8 @@ def notifyNewConversations(assistant: dict, conversations, lastNotificationDate)
                 'data': conversation.Data,
                 'status': conversation.ApplicationStatus.name,
                 'fileURLsSinged': fileURLsSinged,
-                'completed': "Yes" if conversation.Completed else "No"
+                'completed': "Yes" if conversation.Completed else "No",
+                'dateTime': conversation.DateTime
             })
 
         if not len(conversationsList) > 0:

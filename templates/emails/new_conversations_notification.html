@@ -21,7 +21,6 @@
         {% if dct.update({key: dct[key] + inc}) %} {% endif %}
     {% endmacro %}
 
-
     {% for conversation in conversations %}
 
         {# Each conversation will has its own counter for its files URLs #}
@@ -29,7 +28,6 @@
         {% do counters.update({outer_loop.index: 0}) %}
 
         <br/>
-
         {# User type with application status #}
         {% if conversations|length > 1 %}
             <span style="font-size: 24px;color:black;font-weight: bold">
@@ -71,22 +69,24 @@
 
         {# Selected solutions list #}
         {% if conversation.data.get("selectedSolutions") %}
-            <tr>
-                <td class="hero-subheader__title"
-                    style="font-size: 23px; font-weight: bold; padding: 15px 0 15px 0;"
-                    align="left">
-                    They are also interested in the following solutions:<br/>
-                </td>
-            </tr>
+            {% for solution in conversation.data["selectedSolutions"] %}
+                {% if solution["databaseType"] == 'Jobs' %}
+                    <span style="font-size: 18px;color:black;font-weight: bold; padding-top: 10px; display:block;">
+                    He also applied for
+                        <span style="font-weight: bold; color: #9254de">{{ solution|length }} Job(s)</span>
+                </span>
+                {% else %}
+                    <span style="font-size: 18px;color:black;font-weight: bold; padding-top: 10px; display:block;">
+                        He also enquired for
+                        <span style="font-weight: bold; color: #9254de">{{ solution|length }} Candidates(s)</span>
+                </span>
+                {% endif %}
 
-            <tr>
-                <td style="font-size: 15px;">
-                    {{ conversation.data.get("selectedSolutions") }}
-                </td>
-            </tr>
+            {% endfor %}
         {% endif %}
+        <span>{{ conversation.dateTime }}</span>
         <br/>
+        {# End of one conversation #}
     {% endfor %}
-
 
 {% endblock %}

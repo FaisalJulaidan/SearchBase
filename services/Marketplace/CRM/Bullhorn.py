@@ -3,6 +3,7 @@ import json
 from datetime import datetime
 
 import requests
+from sqlalchemy_utils import Currency
 
 from enums import DataType as DT
 from models import Callback, Conversation, db, CRM, StoredFile
@@ -380,8 +381,8 @@ def searchCandidates(auth, companyID, conversation, fields=None) -> Callback:
                                                                   yearsExperience=0,
                                                                   desiredSalary=record.get("salary") or
                                                                                 record.get("dayRate", 0) * 365,
-                                                                  # payPeriod="Annually",
-                                                                  currency="GBP",
+                                                                  # payPeriod=PayPeriod("Annually"),
+                                                                  currency=Currency("GBP"),
                                                                   source="Bullhorn"))
 
         return Callback(True, sendQuery_callback.Message, result)
@@ -443,7 +444,7 @@ def searchJobs(auth, companyID, conversation, fields=None) -> Callback:
                                                             startDate=record.get("startDate"),
                                                             endDate=record.get("dateEnd"),
                                                             linkURL=None,
-                                                            currency=None,
+                                                            currency=Currency("GBP"),
                                                             source="Bullhorn"))
 
         return Callback(True, sendQuery_callback.Message, result)

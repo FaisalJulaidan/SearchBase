@@ -45,8 +45,8 @@ def appointments_picker(payload):
     return serve()
 
 
-@public_router.route('/chatbot_directlink/<payload>')
-def chatbot_directlink(payload):
+@public_router.route('/chatbot_direct_link/<payload>')
+def chatbot_direct_link(payload):
     return serve()
 
 @public_router.route('/verify_account/<payload>')

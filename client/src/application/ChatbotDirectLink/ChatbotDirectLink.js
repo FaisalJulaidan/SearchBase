@@ -1,10 +1,10 @@
 import React from 'react'
-import styles from './ChatbotDirectlink.module.less'
+import styles from './ChatbotDirectLink.module.less'
 import {faCloud} from '@fortawesome/free-solid-svg-icons'
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
 
 
-class ChatbotDirectlink extends React.Component {
+class ChatbotDirectLink extends React.Component {
 
     componentDidMount() {
         if (this.props.location.pathname.split('/')[2]) {
@@ -41,4 +41,4 @@ class ChatbotDirectlink extends React.Component {
     }
 }
 
-export default ChatbotDirectlink;
+export default ChatbotDirectLink;

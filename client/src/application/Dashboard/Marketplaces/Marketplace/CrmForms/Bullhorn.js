@@ -27,7 +27,7 @@ export const BullhornButton = ({type, companyID, status, disconnectMarketplace, 
             (status === "CONNECTED" || status === "FAILED")
             &&
             <Popconfirm placement={'bottomRight'}
-                        title="Chatbot conversations will no longer be synced with Adapt account"
+                        title="Chatbot conversations will no longer be synced with Bullhorn account"
                         onConfirm={disconnectMarketplace}
                         okType={'danger'}
                         okText="Disconnect"

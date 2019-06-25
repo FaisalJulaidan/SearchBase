@@ -198,25 +198,12 @@ def sendSolutionAlert(record, solutions):
 
 def notifyNewConversation(assistant, conversation, file: FileStorage = None):
     try:
-        if "immediately" not in assistant.NotifyEvery:
-            return Callback(False, "Assistant is not set to receive instant notification!")
         users_callback: Callback = user_services.getAllByCompanyIDWithEnabledNotifications(assistant.CompanyID)
         if not users_callback.Success:
             return Callback(False, "Users not found!")
 
         fileInfo = None
         if file:
-            # file_callback = sfs.getByConversation(conversation)
-            # if not file_callback.Success:
-            #     raise Exception(file_callback.Message)
-            #
-            # print(file_callback.Data.FilePath)
-            # file_callback = sfs.downloadFile(file_callback.Data.FilePath)
-            # if not file_callback.Success:
-            #     raise Exception(file_callback.Message)
-            #
-            # file = file_callback.Data
-            # file_content = file.read()
             savePath = os.path.join(BaseConfig.USER_FILES, file.filename)
             file.save(savePath)
             with current_app.open_resource(savePath) as fp:

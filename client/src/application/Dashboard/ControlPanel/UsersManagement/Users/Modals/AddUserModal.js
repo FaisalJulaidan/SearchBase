@@ -92,7 +92,6 @@ class AddUserModal extends React.Component {
                         extra="The role defines what permissions the User will have">
                         {getFieldDecorator('roleID', {
                             rules: [{
-                                whitespace: true,
                                 required: true,
                                 message: 'Please select a user role',
                             }],

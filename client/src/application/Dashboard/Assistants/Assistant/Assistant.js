@@ -119,6 +119,7 @@ class Assistant extends Component {
 
     render() {
         const {assistant} = this.props;
+
         return (
             <>
                 <NoHeaderPanel>
@@ -158,7 +159,7 @@ class Assistant extends Component {
                     <div className={[styles.Body, 'assistantTabs'].join(' ')}>
                         {!assistant ? <Spin/> :
 
-                            <Tabs defaultActiveKey={'Script'} size={"large"} animated={false}
+                            <Tabs defaultActiveKey={'Analytics'} size={"large"} animated={false}
                                   onTabClick={this.onTabClick}>
                                 <TabPane tab="Analytics" key="Analytics">
                                     <Analytics assistant={assistant}/>

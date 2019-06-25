@@ -3,11 +3,14 @@ import botocore
 import os
 from utilities import helpers
 from models import db, Callback, StoredFile, Conversation
+from botocore.exceptions import ClientError
+
 
 PUBLIC_URL = "https://tsb.ams3.digitaloceanspaces.com/"
 UPLOAD_FOLDER = os.environ['FLASK_ENV']
 COMPANY_LOGOS_PATH = '/company_logos'
 USER_FILES_PATH = '/user_files'
+BUCKET= 'tsb'
 
 
 def getByID(id) -> StoredFile or None:
@@ -85,17 +88,23 @@ def uploadFile(file, filename, path, public=False):
         ExtraArgs = {}
         if public: ExtraArgs['ACL'] = 'public-read'
 
-        # Connect to DigitalOcean Space
-        session = boto3.session.Session()
-        s3 = session.client('s3',
-                            region_name='ams3',
-                            endpoint_url=os.environ['SERVER_SPACES'],
-                            aws_access_key_id=os.environ['PUBLIC_KEY_SPACES'],
-                            aws_secret_access_key=os.environ['SECRET_KEY_SPACES'])
+        try:
+            # Connect to DigitalOcean Space
+            session = boto3.session.Session()
+            s3 = session.client('s3',
+                                region_name='ams3',
+                                endpoint_url=os.environ['SPACES_SERVER_URI'],
+                                aws_access_key_id=os.environ['SPACES_PUBLIC_KEY'],
+                                aws_secret_access_key=os.environ['SPACES_SECRET_KEY'])
 
-        # Upload file
-        s3.upload_fileobj(file, 'tsb', UPLOAD_FOLDER + path + '/' + filename,
-                          ExtraArgs=ExtraArgs)
+            # Upload file
+            s3.upload_fileobj(file, BUCKET, UPLOAD_FOLDER + path + '/' + filename,
+                              ExtraArgs=ExtraArgs)
+
+        except ClientError as e:
+            raise Exception("DigitalOcean Error")
+
+
         return Callback(True, "File uploaded successfully")
 
     except Exception as exc:
@@ -103,7 +112,8 @@ def uploadFile(file, filename, path, public=False):
         return Callback(False, "Couldn't upload file")
 
 
-def downloadFile(path):
+
+def downloadFile(filename, path):
     try:
         # Connect to DigitalOcean Space
         session = boto3.session.Session()
@@ -112,12 +122,12 @@ def downloadFile(path):
                               endpoint_url=os.environ['SPACES_SERVER_URI'],
                               aws_access_key_id=os.environ['SPACES_PUBLIC_KEY'],
                               aws_secret_access_key=os.environ['SPACES_SECRET_KEY'])
-        file = s3.Object('tsb', UPLOAD_FOLDER + path)
+        file = s3.Object(BUCKET, UPLOAD_FOLDER  + path + '/' + filename)
 
         # Check if file exists
         try:
             file.load()
-        except botocore.exceptions.ClientError as e:
+        except ClientError as e:
             return Callback(False, "File not found")
 
         return Callback(True, "File downloaded successfully", file)
@@ -127,17 +137,46 @@ def downloadFile(path):
         return Callback(False, "Couldn't upload file")
 
 
-def deleteFile(filename, path):
+def genPresigendURL(filename, path, expireIn=None):
     try:
         # Connect to DigitalOcean Space
         session = boto3.session.Session()
-        s3 = session.resource('s3',
-                              region_name='ams3',
-                              endpoint_url=os.environ['SPACES_SERVER_URI'],
-                              aws_access_key_id=os.environ['SPACES_PUBLIC_KEY'],
-                              aws_secret_access_key=os.environ['SPACES_SECRET_KEY'])
-        # Delete file
-        s3.Object('tsb', UPLOAD_FOLDER + path + '/' + filename).delete()
+        s3 = session.client('s3',
+                            region_name='ams3',
+                            endpoint_url=os.environ['SPACES_SERVER_URI'],
+                            aws_access_key_id=os.environ['SPACES_PUBLIC_KEY'],
+                            aws_secret_access_key=os.environ['SPACES_SECRET_KEY'])
+
+        try:
+            url = s3.generate_presigned_url('get_object',
+                                                 Params={
+                                                    'Bucket': BUCKET,
+                                                    'Key': UPLOAD_FOLDER + path + '/' + filename
+                                                 })
+        except ClientError as e:
+            raise Exception("---> DigitalOcean Error" + str(e))
+
+        return Callback(True, "File downloaded successfully", url)
+
+    except Exception as exc:
+        helpers.logError("stored_file_services.uploadFile(): " + str(exc))
+        return Callback(False, "File is corrupted", None)
+
+
+def deleteFile(filename, path):
+    try:
+        # Connect to DigitalOcean Space
+        try:
+            session = boto3.session.Session()
+            s3 = session.resource('s3',
+                                  region_name='ams3',
+                                  endpoint_url=os.environ['SPACES_SERVER_URI'],
+                                  aws_access_key_id=os.environ['SPACES_PUBLIC_KEY'],
+                                  aws_secret_access_key=os.environ['SPACES_SECRET_KEY'])
+            # Delete file
+            s3.Object(BUCKET, UPLOAD_FOLDER + path + '/' + filename).delete()
+        except ClientError as e:
+            raise Exception("DigitalOcean Error")
 
         return Callback(True, "File deleted successfully")
 

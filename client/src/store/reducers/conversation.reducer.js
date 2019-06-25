@@ -9,7 +9,8 @@ export const conversation = (state = initialState, action) => {
         case actionTypes.FETCH_CONVERSATIONS_REQUEST:
             return updateObject(state, {
                 errorMsg: null,
-                isLoading: true
+                isLoading: true,
+                conversations: []
             });
         case actionTypes.FETCH_CONVERSATIONS_SUCCESS:
             return updateObject(state, {
@@ -90,4 +91,4 @@ export const conversation = (state = initialState, action) => {
         default:
             return state
     }
-}
+};

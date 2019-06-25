@@ -73,22 +73,17 @@ def processConversation(assistantHashID, data: dict) -> Callback:
                 conversation.CRMSynced = True
             conversation.CRMResponse = crm_callback.Message
 
-        # immediate notification
-        if assistant.NotifyEvery == 0:
-            assistant.LastNotificationDate = datetime.now()
-            # notify via email ?
 
+        # Save conversation data
         db.session.add(conversation)
-        # db.session.save(assistant)
         db.session.commit()
 
-        # Notify company about the new chatbot session
-        fileUpload = False
-        for key, value in conversation.Data['keywordsByDataType'].items():
-            if "&FILE_UPLOAD&" in value:
-                fileUpload = True
-        if not fileUpload:
-            mail_services.notifyNewConversation(assistant, conversation)
+        # Notify company about the new chatbot session only if set as immediate -> NotifyEvery=0
+        # Note: if there is a file upload the /file route in chatbot.py will handle the notification instead
+        if assistant.NotifyEvery == 0:
+            assistant.LastNotificationDate = datetime.now()
+            if not data['hasFiles']:
+                mail_services.notifyNewConversation(assistant, conversation)
 
         return Callback(True, 'Chatbot data has been processed successfully!', conversation)
 
@@ -111,7 +106,7 @@ def getAllByAssistantID(assistantID):
             if storedFile_callback.Success:
                 filePaths = storedFile_callback.Data.FilePath
             conversation.FilePath = filePaths
-        return Callback(True, "User inputs retrieved successfully.", conversations)
+        return Callback(True, "Conversations retrieved successfully.", conversations)
 
     except Exception as exc:
         helpers.logError("conversation_services.getAllByAssistantID(): " + str(exc))

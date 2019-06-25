@@ -28,11 +28,11 @@ class Conversations extends React.Component {
         this.columns = [
             {
                 title: '#',
+                key: '#',
                 render: (text, record, index) => (<p>{index + 1}</p>),
 
             }, {
                 title: 'User Type',
-                dataIndex: 'UserType',
                 key: 'UserType',
                 filters: [
                     {text: 'Candidate', value: 'Candidate'},
@@ -43,14 +43,12 @@ class Conversations extends React.Component {
 
             }, {
                 title: 'Name',
-                dataIndex: 'Name',
                 key: 'Name',
                 render: (text, record) => (
                     <p style={{textTransform: 'capitalize'}}>{this.findUserName(record.Data.keywordsByDataType, record.UserType)}</p>),
 
             }, {
                 title: 'Time Spent',
-                dataIndex: 'TimeSpent',
                 key: 'TimeSpent',
                 sorter: (a, b) => a.TimeSpent - b.TimeSpent,
                 render: (_, record) => {
@@ -65,14 +63,13 @@ class Conversations extends React.Component {
                 }
             }, {
                 title: 'Date & Time',
-                dataIndex: 'DateTime',
                 key: 'DateTime',
                 sorter: (a, b) => new Date(a.DateTime).valueOf() - new Date(b.DateTime).valueOf(),
                 render: (text, record) => (<p>{record.DateTime}</p>),
 
             }, {
                 title: 'Score',
-                dataIndex: 'Score',
+                key: 'Score',
                 sorter: (a, b) => a.Score - b.Score,
                 render: (text, record) => {
                     return (
@@ -85,7 +82,6 @@ class Conversations extends React.Component {
 
             }, {
                 title: 'Application Status',
-                dataIndex: 'ApplicationStatus',
                 key: 'ApplicationStatus',
                 // filters: [
                 //     {text: 'Completed', value: 'Completed'},
@@ -128,7 +124,6 @@ class Conversations extends React.Component {
 
             },{
                 title: 'Conversation',
-                dataIndex: 'Completed',
                 key: 'Completed',
                 // filters: [
                 //     {text: 'Completed', value: 'Completed'},
@@ -167,7 +162,12 @@ class Conversations extends React.Component {
         this.props.dispatch(conversationActions.fetchConversations(this.props.assistant.ID))
     }
 
+
     componentWillReceiveProps(nextProps) {
+
+        if (nextProps.conversations !== this.props.conversations)
+            this.populateDownloadData(this.props.conversations);
+
         if (nextProps.conversations?.conversationsList && this.state.selectedConversation){
             const updatedConversation = nextProps.conversations.conversationsList
                 .find(c => this.state.selectedConversation.ID === c.ID);
@@ -175,7 +175,6 @@ class Conversations extends React.Component {
             if (updatedConversation)
                 this.setState({selectedConversation: updatedConversation })
         }
-
     }
 
     refreshConversations = () => {
@@ -186,7 +185,6 @@ class Conversations extends React.Component {
 
 
     handleFilter = (pagination, filters, sorter) => {
-        console.log('Various parameters', pagination, filters, sorter);
         this.setState({
             filteredInfo: filters,
             sortedInfo: sorter,
@@ -256,7 +254,7 @@ class Conversations extends React.Component {
     };
 
     // get the conversation to be rendered and save them in the state in format which can be downloaded by the CSV
-    populateDownloadData(Conversations){
+    populateDownloadData = Conversations => {
         const conversationsList = Conversations.conversationsList;
 
         let data = [["ID", "User Type", "Name", "Questions Answered", "Solutions Returned", "Time Spent", "Date & Time",
@@ -316,10 +314,9 @@ class Conversations extends React.Component {
             data.push(dataRecord);
         });}
 
-
         // put the data in the state and set refresh to false
         this.setState({downloadData:data, ConversationsRefreshed:false});
-    }
+    };
 
     findUserName = (keywords, userType) => {
         if ('Client Name' in keywords && userType === 'Client')
@@ -349,8 +346,6 @@ class Conversations extends React.Component {
 
     render() {
         const {assistant, conversations, options} = this.props;
-
-        if(this.state.ConversationsRefreshed){this.populateDownloadData(conversations)}
 
         return (
                     <>

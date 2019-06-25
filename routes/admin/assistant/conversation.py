@@ -32,8 +32,6 @@ def conversation(assistantID):
         return helpers.jsonResponse(True, 200, s_callback.Message,
                                     {'conversationsList': helpers.getListFromSQLAlchemyList(s_callback.Data),
                                      'userTypes': [ut.value for ut in UserType],
-                                     'dataTypes': [dt.value for dt in DataType],
-                                     # 'filesPath': BaseConfig.USER_FILES
                                      })
 
 

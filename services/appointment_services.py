@@ -45,20 +45,28 @@ def getAllByCompanyID(companyID):
         db.session.rollback()
         return Callback(False, 'Could not get the appointments')
 
-def set_appointment_status(appointmentID, status):
+def setAppointmentStatus(appointmentID, status):
     try:
         appointment = db.session.query(Appointment).filter(Appointment.ID == appointmentID).first()
         if appointment.Status != enums.ApplicationStatus.Pending:
           return Callback(False, "Appointment status is {} and cannot be modified.".format(appointment.Status.value))
         appointment.Status = status
         db.session.commit()
-        return Callback(False, "Appointment status has been succesgfully set to {}.".format(appointment.Status.value))
+        return Callback(True, "Appointment status has been set to {}.".format(appointment.Status.value))
 
     except Exception as exc:
         print(exc)
         return Callback(False, 'Could not set appointment status.')
 
-def get_appointments(companyID):
-    assistants = db.session.query(Assistant).filter(Assistant.CompanyID == companyID).all()
-    for assistant in assistants:
-        print(assistant.appointments())
+def getAppointments(companyID):
+    try:
+        assistants = db.session.query(Assistant).filter(Assistant.CompanyID == companyID).all()
+        appointments = []
+        for assistant in assistants:
+            for idx, appointment in enumerate(helpers.getListFromSQLAlchemyList(assistant.appointments)):
+                appointment['Conversation'] = assistant.appointments[idx].Conversation.Data
+                appointments.append(appointment)
+        return Callback(True, 'Succesfully gathered appointments.', appointments)
+    except Exception as exc:
+        print(exc)
+        return Callback(False, 'Could not get appointments.')

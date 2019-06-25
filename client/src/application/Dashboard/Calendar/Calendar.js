@@ -2,7 +2,7 @@ import React from 'react';
 import {connect} from 'react-redux';
 import styles from './Calendar.module.less'
 import NoHeaderPanel from 'components/NoHeaderPanel/NoHeaderPanel'
-import {Badge, Calendar as AntdCalendar, Col, Divider, Icon, Input, Modal, Row, Typography} from 'antd';
+import {Badge, Calendar as AntdCalendar, Col, Divider, Icon, Input, Modal, Row, Typography, List} from 'antd';
 import moment from 'moment';
 import {appointmentActions} from "store/actions";
 import './Calendar.less'
@@ -17,21 +17,7 @@ class Calendar extends React.Component {
         this.state = {
             value: moment(),
             appointmentModalVisible: false,
-            appointments: [
-                {
-                    name: "Jamie Burns",
-                    dateTime: 'Mon, 27 May 2019 23:13:45 GMT',
-                    notes: "This is a good candidate and fits very well in big projects"
-                }, {
-                    name: "Emilio Blake",
-                    dateTime: 'Mon, 27 May 2019 23:13:45 GMT',
-                    notes: null
-                }, {
-                    name: "Marvin Williamson",
-                    dateTime: 'Mon, 27 May 2019 23:13:45 GMT',
-                    notes: null
-                },
-            ]
+            appointments: []
         };
     }
 
@@ -117,9 +103,27 @@ class Calendar extends React.Component {
                 </div>
 
                 <div>
+                    { this.props.appointments ?
+                    <List
+                        style={{width: "30%"}}
+                        dataSource={this.props.appointments}
+                        renderItem={appointment => {
+                            //temp
+                            let name = appointment.Conversation.keywordsByDataType.Email[0]
+                            return (
+                                <List.Item>
+                                    <List.Item.Meta
+                                        title={`Appointment for ${name}`}
+                                    />
+                                    <button onClick={() => {this.props.dispatch(appointmentActions.setAppointmentStatusRequest(appointment.ID, 'Accepted'))}}>Accept</button>
+                                    <button onClick={() => {this.props.dispatch(appointmentActions.setAppointmentStatusRequest(appointment.ID, 'Rejected'))}}>Reject</button>
+                                </List.Item>
+                            )
+                        }}/>
+                        : null }
+
                     <AntdCalendar value={value} onSelect={this.onSelect} onPanelChange={this.onPanelChange}
                                   dateCellRender={this.dateCellRender} monthCellRender={this.monthCellRender}/>
-
                     <Modal title="Appointments Details"
                            width={640}
                            className={'custom_calendar'}
@@ -161,9 +165,10 @@ class Calendar extends React.Component {
 }
 
 function mapStateToProps(state) {
+    console.log('what')
     return {
         assistant: state.assistant.assistant,
-
+        appointments: state.appointment.appointments,
     };
 }
 

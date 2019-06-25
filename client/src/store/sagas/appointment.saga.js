@@ -16,12 +16,28 @@ function* fetchAppointments({assistantID}) {
     }
 }
 
+function* setAppointmentStatus({appointmentID, status}) {
+    try {
+        const res = yield http.post('/appointments/set_status', {appointmentID, status});
+        yield put(appointmentActions.fetchAppointmentsSuccess(res.data?.data))
+    } catch (error) {
+        const msg = error.response?.data?.msg || "Couldn't set appointment status";
+        yield put(appointmentActions.setAppointmentStatusFailure(msg));
+        errorMessage(msg);
+    }
+}
+
 function* watchfetchAppointments() {
     yield takeEvery(actionTypes.FETCH_APPOINTMENTS_REQUEST, fetchAppointments)
+}
+
+function* watchSetAppointmentStatus() {
+    yield takeEvery(actionTypes.SET_APPOINTMENT_STATUS_REQUEST, setAppointmentStatus)
 }
 
 export function* appointmentSaga() {
     yield all([
         watchfetchAppointments(),
+        watchSetAppointmentStatus()
     ])
 }

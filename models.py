@@ -137,6 +137,7 @@ class Assistant(db.Model):
         q = Appointment.query.join(Conversation).filter(Conversation.Assistant == self)
         return q.all()
 
+
     ID = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
     Name = db.Column(db.String(128), nullable=False)
     Description = db.Column(db.String(260), nullable=True)

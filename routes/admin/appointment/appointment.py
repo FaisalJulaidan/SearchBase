@@ -14,7 +14,7 @@ appointment_router: Blueprint = Blueprint('appointment_router', __name__, templa
 def appointments():
 
     user = get_jwt_identity()['user']
-    callback = appointment_services.get_appointments(user['companyID'])
+    callback = appointment_services.getAppointments(user['companyID'])
 
     if callback.Success:
         return helpers.jsonResponse(True, 200, callback.Message, callback.Data)
@@ -35,7 +35,7 @@ POST REQUEST EXAMPLE:
 @jwt_required
 def set_appointment_status():
     data = request.get_json()
-    callback = appointment_services.set_appointment_status(data['appointmentID'], data['status'])
+    callback = appointment_services.setAppointmentStatus(data['appointmentID'], data['status'])
 
     if callback.Success:
         return helpers.jsonResponse(True, 200, callback.Message)

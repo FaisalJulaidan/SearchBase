@@ -106,7 +106,7 @@ def getAllByAssistantID(assistantID):
             if storedFile_callback.Success:
                 filePaths = storedFile_callback.Data.FilePath
             conversation.FilePath = filePaths
-        return Callback(True, "User inputs retrieved successfully.", conversations)
+        return Callback(True, "Conversations retrieved successfully.", conversations)
 
     except Exception as exc:
         helpers.logError("conversation_services.getAllByAssistantID(): " + str(exc))

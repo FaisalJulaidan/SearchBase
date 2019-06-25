@@ -116,7 +116,6 @@ elif os.environ['FLASK_ENV'] == 'development':
         db.create_all()
         dummy_data.generate()
 
-    flow_services.getChatbot(helpers.encodeID(1))
 
     # appointment_services.getAllByCompanyID(1)
 

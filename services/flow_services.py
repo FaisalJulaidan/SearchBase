@@ -6,17 +6,13 @@ from models import db, Callback, Assistant, Company
 from services import assistant_services, options_services
 from utilities import json_schemas, helpers
 
-
 # ----- Getters ----- #
 # Get the chatbot for the public to use
 def getChatbot(assistantHashID) -> Callback:
     try:
 
         assistantID = helpers.decodeID(assistantHashID)
-        print(assistantID)
-
-        if assistantID: print("YES")
-        if len(assistantID) == 0:
+        if not assistantID:
             return Callback(False, "Assistant not found!", None)
 
         assistant: Assistant = db.session.query(Assistant.Name, Assistant.Flow, Assistant.Message, Assistant.TopBarText,
@@ -37,7 +33,8 @@ def getChatbot(assistantHashID) -> Callback:
                     return Callback(True, '', {'isDisabled': True})
 
         data = {
-            "assistant": helpers.getDictFromSQLAlchemyObj(assistant),
+            "assistant": helpers.getDictFromLimitedQuery(['Name', 'Flow', 'Message', 'TopBarText', 'Active', 'Config',
+                                                         'CompanyName', 'LogoPath'], assistant),
             "isDisabled": False,
             "currencies": options_services.getOptions().Data['databases']['currencyCodes']
         }

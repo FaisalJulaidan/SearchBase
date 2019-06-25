@@ -59,8 +59,6 @@ def logError(exception):
 # ID Hasher
 # IMPORTANT: don't you ever make changes to the hash values before consulting Faisal Julaidan
 hashids = Hashids(salt=BaseConfig.HASH_IDS_SALT, min_length=5)
-
-
 def encodeID(id):
     return hashids.encrypt(id)
 
@@ -80,6 +78,7 @@ def decrypt(token, isDict=False, isBtye=False):
     value = fernet.decrypt(token)
     if isDict: value = json.loads(value)
     return value
+
 
 def seed():
     # Create universal Roles
@@ -211,6 +210,9 @@ def getDictFromSQLAlchemyObj(obj) -> dict:
         dict["FilePath"] = obj.FilePath
     return dict
 
+"""Convert a SQLAlchemy list of objects to a list of dicts"""
+def getListFromSQLAlchemyList(SQLAlchemyList):
+    return list(map(getDictFromSQLAlchemyObj, SQLAlchemyList))
 
 """Used when you want to only gather specific data from a table (columns)"""
 """Provide a list of keys (e.g ['id', 'name']) and the list of tuples"""
@@ -242,12 +244,25 @@ def getListFromLimitedQuery(columnsList, tupleList: List[tuple]) -> list:
     return d
 
 
+# For a list of SQLAlchemy objects
+def getDictFromLimitedQuery(columnsList, tuple) -> dict:
 
+    # When tupleList is not empty, then the number of items in each tuple must match the number of items in columnsList
+    if len(columnsList) != len(tuple):
+        raise Exception("List of indexes provided must match in length to the items in each of the tuples")
 
+    dict = {}
+    for idx, i in enumerate(tuple):
+        if isinstance(i, Enum): # Convert Enum
+            dict[columnsList[idx]] = i.value
 
-"""Convert a SQLAlchemy list of objects to a list of dicts"""
-def getListFromSQLAlchemyList(SQLAlchemyList):
-    return list(map(getDictFromSQLAlchemyObj, SQLAlchemyList))
+        elif isinstance(i, time): # Convert Times
+            dict[columnsList[idx]] = str(i)
+
+        else:
+            dict[columnsList[idx]] = i
+
+    return dict
 
 
 # Check if the logged in user owns the accessed assistant for security

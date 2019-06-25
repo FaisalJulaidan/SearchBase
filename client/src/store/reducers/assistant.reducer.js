@@ -174,29 +174,29 @@ export const assistant = (state = initialState, action) => {
             });
 
         // CRM Connection
-        case actionTypes.CONNECT_ASSISTANT_CRM_REQUEST:
+        case actionTypes.CONNECT_ASSISTANT_MARKETPLACE_REQUEST:
             return updateObject(state, {
                 errorMsg: null,
             });
-        case actionTypes.CONNECT_ASSISTANT_CRM_SUCCESS:
+        case actionTypes.CONNECT_ASSISTANT_MARKETPLACE_SUCCESS:
             return updateObject(state, {
                 assistant: {...state.assistant, CRMID: action.CRMID}
             });
-        case actionTypes.CONNECT_ASSISTANT_CRM_FAILURE:
+        case actionTypes.CONNECT_ASSISTANT_MARKETPLACE_FAILURE:
             return updateObject(state, {
                 errorMsg: action.error
             });
 
-        case actionTypes.DISCONNECT_ASSISTANT_CRM_REQUEST:
+        case actionTypes.DISCONNECT_ASSISTANT_MARKETPLACE_REQUEST:
             return updateObject(state, {
                 errorMsg: null,
             });
-        case actionTypes.DISCONNECT_ASSISTANT_CRM_SUCCESS:
+        case actionTypes.DISCONNECT_ASSISTANT_MARKETPLACE_SUCCESS:
             return updateObject(state, {
                 assistant: {...state.assistant, CRMID: null}
             });
 
-        case actionTypes.DISCONNECT_ASSISTANT_CRM_FAILURE:
+        case actionTypes.DISCONNECT_ASSISTANT_MARKETPLACE_FAILURE:
             return updateObject(state, {
                 errorMsg: action.error
             });

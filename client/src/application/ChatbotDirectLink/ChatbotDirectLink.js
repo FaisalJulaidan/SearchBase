@@ -1,40 +1,42 @@
 import React from 'react'
 import styles from './ChatbotDirectLink.module.less'
-import {faCloud} from '@fortawesome/free-solid-svg-icons'
-import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
-
+import PublicNavbar from "components/PublicNavbar/PublicNavbar";
+import axios from "axios";
+import {getLink} from "helpers";
 
 class ChatbotDirectLink extends React.Component {
 
+    state = {
+        logoPath: null
+    };
+
     componentDidMount() {
-        if (this.props.location.pathname.split('/')[2]) {
+        const assistantID = this.props.location.pathname.split('/')[2];
+        if (assistantID) {
             const script = document.createElement("script");
-            script.src = "http://localhost:9000/dist/chatbot.js";
+            script.src = getLink("/static/widgets/chatbot.js");
             script.async = true;
             script.defer = true;
             script.setAttribute('data-directLink', '');
             script.setAttribute('data-name', 'tsb-widget');
-            script.setAttribute('data-id', this.props.location.pathname.split('/')[2]);
+            script.setAttribute('data-id', assistantID);
             script.setAttribute('data-circle', '#9254de');
-            script.setAttribute('dev', '');
             document.body.appendChild(script);
+
+            axios.get(`/api/assistant/${assistantID}/chatbot`)
+                .then(res => {
+                    const data = res.data.data;
+                    this.setState({
+                        logoPath: data.assistant.LogoPath,
+                    });
+                })
         }
     }
 
     render() {
         return (
             <div style={{height: '100%'}}>
-                <div className={styles.Navbar}>
-                    <div>
-                        <FontAwesomeIcon size="2x" icon={faCloud} style={{color: '#9254de'}}/>
-                        <div style={{
-                            lineHeight: '40px',
-                            marginLeft: 18,
-                            color: "#9254de"
-                        }}>TheSearchBase
-                        </div>
-                    </div>
-                </div>
+                <PublicNavbar companyLogo={this.state.logoPath}/>
                 <div id="directlink" className={styles.Wrapper}></div>
             </div>
         )

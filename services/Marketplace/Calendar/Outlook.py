@@ -49,6 +49,7 @@ def login(auth):
 
 def retrieveAccessToken(auth, companyID):
     try:
+        auth = dict(auth)
         print(auth.get("refresh_token"))
         headers = {'Content-Type': 'application/x-www-form-urlencoded'}
 
@@ -68,6 +69,7 @@ def retrieveAccessToken(auth, companyID):
 
         result_body = json.loads(get_access_token.text)
 
+        auth["access_token"] = result_body.get("access_token")
         if result_body.get("refresh_token"):
             auth = dict(auth)
             auth["refresh_token"] = result_body.get("refresh_token")
@@ -96,6 +98,9 @@ def addCalendar(auth, companyID):
         if not sendQuery_callback.Success:
             raise Exception(sendQuery_callback.Message)
         print(3)
+
+        if sendQuery_callback.Data.status_code == 409:
+            pass  # GET THE CALENDAR ID
 
         result_body = json.loads(sendQuery_callback.Data.text)
 
@@ -169,8 +174,9 @@ def sendQuery(auth, query, method, body, companyID, optionalParams=None):
         headers = {'Content-Type': 'application/json', "Authorization": "Bearer " + auth.get("access_token")}
         print("url: ", url)
         print("body: ", body)
-        # test the BhRestToken (rest_token)
         r = marketplace_helpers.sendRequest(url, method, headers, json.dumps(body))
+        print("r.status_code: ", r.status_code)
+        print(r.text)
         if r.status_code == 401:  # wrong access token
             callback: Callback = retrieveAccessToken(auth, companyID)
             if callback.Success:
@@ -180,7 +186,7 @@ def sendQuery(auth, query, method, body, companyID, optionalParams=None):
                     raise Exception(r.text + ". Query could not be sent")
             else:
                 raise Exception("Access token could not be retrieved")
-        elif not r.ok:
+        elif not r.ok and not r.status_code == 409:
             print(r.text)
             raise Exception("Unexpected error occurred when calling the API")
 
@@ -193,7 +199,7 @@ def sendQuery(auth, query, method, body, companyID, optionalParams=None):
 
 def buildUrl(query, optionalParams=None):
     # set up initial url
-    url = "https://outlook.office.com/api/v2.0/me/" + query
+    url = "https://graph.microsoft.com/v1.0/me/" + query
     # add additional params
     if optionalParams:
         for param in optionalParams:

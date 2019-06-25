@@ -1,7 +1,5 @@
 import base64
 import json
-import logging
-import urllib.parse
 from datetime import datetime
 
 import requests
@@ -10,11 +8,6 @@ from enums import DataType as DT
 from models import Callback, Conversation, db, CRM, StoredFile
 from services import databases_services, stored_file_services
 from services.Marketplace import marketplace_helpers as helpers
-
-
-# login requires: username, password
-
-
 # Bullhorn Notes:
 # access_token (used to generate rest_token) lasts 10 minutes, needs to be requested by using the auth from the client
 # refresh_token (can be used to generate access_token) - generated with access_token on auth, ...
@@ -23,6 +16,9 @@ from services.Marketplace import marketplace_helpers as helpers
 # submitting a new candidate has no required* fields
 # auth needs to contain auth data + rest_token, rest_url, access_token, refresh_token (retrieved upon connecting)
 from utilities import helpers
+
+
+# login requires: username, password
 
 
 def testConnection(auth, companyID):
@@ -339,7 +335,7 @@ def searchCandidates(auth, companyID, conversation, fields=None) -> Callback:
     try:
         query = "query="
         if not fields:
-            fields = "fields=id,name,email,mobile,address,primarySkills,status,educations,dayRate"
+            fields = "fields=id,name,email,mobile,address,primarySkills,status,educations,dayRate,salary"
         keywords = conversation['keywordsByDataType']
 
         # populate filter
@@ -380,8 +376,10 @@ def searchCandidates(auth, companyID, conversation, fields=None) -> Callback:
                                                                   education="".join(
                                                                       record.get("educations", {}).get("data")),
                                                                   yearsExperience=0,
-                                                                  desiredSalary=record.get("dayRate", 0) * 365,
-                                                                  currency=None,
+                                                                  desiredSalary=record.get("salary") or
+                                                                                record.get("dayRate", 0) * 365,
+                                                                  # payPeriod="Annually",
+                                                                  currency="GBP",
                                                                   source="Bullhorn"))
 
         return Callback(True, sendQuery_callback.Message, result)

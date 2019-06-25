@@ -7,7 +7,7 @@ import {marketplacesActions} from "store/actions";
 import styles from './Marketplace.module.less'
 import {DefaultButton} from './CrmForms/Common'
 import {AdaptFeatures, AdaptFormItems, AdaptHeader} from "./CrmForms/Adapt";
-import {BullhornFeatures, BullhornFormItems, BullhornHeader} from "./CrmForms/Bullhorn";
+import {BullhornFeatures, BullhornButton, BullhornHeader} from "./CrmForms/Bullhorn";
 import {VincereButtons, VincereFeatures, VincereHeader} from "./CrmForms/Vincere";
 import {GreenhouseFeatures, GreenhouseFormItem, GreenhouseHeader} from "./CrmForms/Greenhouse";
 import {GoogleButton, GoogleFeatures, GoogleHeader} from './CrmForms/Google'
@@ -30,6 +30,7 @@ class Marketplace extends React.Component {
     componentWillMount() {
         // const marketplace = this.getMarketplaceObj();
         // this.props.dispatch(marketplacesActions.exportRecruiterValueReport({Name: marketplace.type}))
+        this.props.dispatch(marketplacesActions.getConnectedCRMs())
     }
 
     componentWillReceiveProps(nextProps) {
@@ -114,7 +115,7 @@ class Marketplace extends React.Component {
             openModal: this.showModal,
             disconnectMarketplace: this.disconnectMarketplace,
             connectCRM: this.connectMarketplace,
-            testMarketplace: this.testMarketplace,
+            testMarketplace: this.testMarketplace
         };
         const buttonsOptions = {
             disconnectMarketplace: this.disconnectMarketplace,
@@ -142,10 +143,8 @@ class Marketplace extends React.Component {
                     return <BullhornHeader/>;
                 if (place === 'features')
                     return <BullhornFeatures/>;
-                if (place === 'form')
-                    return <BullhornFormItems {...formOptions}/>;
                 if (place === 'button')
-                    return <DefaultButton {...buttonsOptions}/>;
+                    return <BullhornButton {...buttonsOptions}/>;
                 break;
 
             case "Vincere":

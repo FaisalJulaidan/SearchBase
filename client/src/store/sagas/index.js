@@ -9,4 +9,4 @@ export * from './marketplaces.saga';
 export * from './autoPilot.saga';
 export * from './analytics.saga';
 export * from './appointmentsPicker.saga';
-export * from './appointment.saga'
+export * from './appointment.saga';

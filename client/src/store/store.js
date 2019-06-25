@@ -15,7 +15,8 @@ import {
     databaseSaga,
     optionsSaga,
     accountSaga,
-    usersManagementSaga
+    usersManagementSaga,
+    appointmentSaga
 } from './sagas'
 
 const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
@@ -47,6 +48,7 @@ sagaMiddleware.run(marketplacesSaga);
 sagaMiddleware.run(autoPilotSaga);
 sagaMiddleware.run(analyticsSaga);
 sagaMiddleware.run(appointmentsPickerSaga);
+sagaMiddleware.run(appointmentSaga);
 
 
 export { store, persistor }

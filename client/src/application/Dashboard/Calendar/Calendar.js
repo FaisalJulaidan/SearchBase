@@ -4,6 +4,7 @@ import styles from './Calendar.module.less'
 import NoHeaderPanel from 'components/NoHeaderPanel/NoHeaderPanel'
 import {Badge, Calendar as AntdCalendar, Col, Divider, Icon, Input, Modal, Row, Typography} from 'antd';
 import moment from 'moment';
+import {appointmentActions} from "store/actions";
 import './Calendar.less'
 
 const {Title, Paragraph} = Typography;
@@ -11,25 +12,33 @@ const { TextArea } = Input;
 
 class Calendar extends React.Component {
 
-    state = {
-        value: moment(),
-        appointmentModalVisible: false,
-        appointments: [
-            {
-                name: "Jamie Burns",
-                dateTime: 'Mon, 27 May 2019 23:13:45 GMT',
-                notes: "This is a good candidate and fits very well in big projects"
-            }, {
-                name: "Emilio Blake",
-                dateTime: 'Mon, 27 May 2019 23:13:45 GMT',
-                notes: null
-            }, {
-                name: "Marvin Williamson",
-                dateTime: 'Mon, 27 May 2019 23:13:45 GMT',
-                notes: null
-            },
-        ]
-    };
+    constructor(props){
+        super(props)
+        this.state = {
+            value: moment(),
+            appointmentModalVisible: false,
+            appointments: [
+                {
+                    name: "Jamie Burns",
+                    dateTime: 'Mon, 27 May 2019 23:13:45 GMT',
+                    notes: "This is a good candidate and fits very well in big projects"
+                }, {
+                    name: "Emilio Blake",
+                    dateTime: 'Mon, 27 May 2019 23:13:45 GMT',
+                    notes: null
+                }, {
+                    name: "Marvin Williamson",
+                    dateTime: 'Mon, 27 May 2019 23:13:45 GMT',
+                    notes: null
+                },
+            ]
+        };
+    }
+
+    componentDidMount() {
+        const {assistant} = this.props;
+        this.props.dispatch(appointmentActions.fetchAppointments(assistant.ID))
+    }
 
     onCloseModal = () => {
         this.setState({appointmentModalVisible: false});
@@ -152,7 +161,10 @@ class Calendar extends React.Component {
 }
 
 function mapStateToProps(state) {
-    return {};
+    return {
+        assistant: state.assistant.assistant,
+
+    };
 }
 
 export default connect(mapStateToProps)(Calendar);

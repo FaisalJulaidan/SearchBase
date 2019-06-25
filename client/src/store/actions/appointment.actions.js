@@ -3,20 +3,20 @@ import * as actionTypes from './actionTypes';
 
 const fetchAppointments = () => {
     return {
-        type: actionTypes.FETCH_ASSISTANTS_REQUEST
+        type: actionTypes.FETCH_APPOINTMENTS_REQUEST
     };
 };
 
 const fetchAppointmentsSuccess = (appointments) => {
     return {
-        type: actionTypes.FETCH_ASSISTANTS_SUCCESS,
+        type: actionTypes.FETCH_APPOINTMENTS_SUCCESS,
         appointments
     };
 };
 
 const fetchAppointmentsFailure = (error) => {
     return {
-        type: actionTypes.FETCH_ASSISTANTS_FAILURE,
+        type: actionTypes.FETCH_APPOINTMENTS_FAILURE,
         error
     };
 };

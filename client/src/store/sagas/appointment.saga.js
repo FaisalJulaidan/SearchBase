@@ -8,10 +8,10 @@ import {errorMessage, http} from "helpers";
 function* fetchAppointments({assistantID}) {
     try {
         const res = yield http.get(`/appointments`);
-        yield put(appointmentActions.fetchAnalyticsSuccess(res.data?.data));
+        yield put(appointmentActions.fetchAppointmentsSuccess(res.data?.data));
     } catch (error) {
         const msg = error.response?.data?.msg || "Couldn't fetch appointments";
-        yield put(appointmentActions.fetchAnalyticsFailure(msg));
+        yield put(appointmentActions.fetchAppointmentsFailure(msg));
         errorMessage(msg);
     }
 }

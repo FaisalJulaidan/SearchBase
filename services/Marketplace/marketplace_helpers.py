@@ -16,11 +16,13 @@ def processRedirect(args):
         args = dict(args)
 
         state = json.loads(args.get("state")[0])
+        print("args: ", args)
 
         if args.get("error") or not (args.get("code") and args.get("state")):
             return Callback(False, args.get("error_description") or "Required parameters were not provided")
 
         args["type"] = state.get("type")
+        print("state: ", state)
 
         if CRM_Enum.has_value(args["type"]):
             callback: Callback = crm_services.connect(int(state.get("companyID")), args)

@@ -79,12 +79,13 @@ def retrieveAccessToken(auth, companyID):
         return Callback(True, "Access Token retrieved", auth)
 
     except Exception as exc:
-        helpers.logError("CRM.Outlook.login() ERROR: " + str(exc))
+        helpers.logError("CRM.Outlook.retrieveAccessToken() ERROR: " + str(exc))
         return Callback(False, str(exc))
 
 
 def addCalendar(auth, companyID):
     try:
+        print(2)
         body = {
             "Name": "TheSearchBase"
         }
@@ -94,25 +95,30 @@ def addCalendar(auth, companyID):
 
         if not sendQuery_callback.Success:
             raise Exception(sendQuery_callback.Message)
+        print(3)
 
         result_body = json.loads(sendQuery_callback.Data.text)
 
         calendar_services.updateByCompanyAndType("Outlook", companyID, auth, {"calendarID": result_body["Id"]})
 
+        print(4)
         return Callback(True, sendQuery_callback.Data.text)
 
     except Exception as exc:
-        helpers.logError("CRM.Outlook.login() ERROR: " + str(exc))
+        helpers.logError("CRM.Outlook.addCalendar() ERROR: " + str(exc))
         return Callback(False, str(exc))
 
 
 def addEvent(calendar, eventDetails):
     try:
-        if not calendar.MetaData:
+        print(1)
+        if not calendar.MetaData:  # TODO if already has TSB calendar in the email dont make a new one
             createCalendar_callback: Callback = addCalendar(calendar.Auth, calendar.CompanyID)
             if not createCalendar_callback.Success:
                 raise Exception("Could not create TheSearchBase calendar to add the event to")
+        print(5)
         # TODO if it doesnt find TSB calendar add it to the main one
+        print("eventDetails: ", eventDetails)
         body = {
             "Subject": eventDetails.get("name"),
             "Body": {
@@ -150,7 +156,7 @@ def addEvent(calendar, eventDetails):
 
         return Callback(True, sendQuery_callback.Data.text)
     except Exception as exc:
-        helpers.logError("CRM.Outlook.login() ERROR: " + str(exc))
+        helpers.logError("CRM.Outlook.addEvent() ERROR: " + str(exc))
         return Callback(False, str(exc))
 
 
@@ -161,14 +167,13 @@ def sendQuery(auth, query, method, body, companyID, optionalParams=None):
         print("auth: ", auth)
         # set headers
         headers = {'Content-Type': 'application/json', "Authorization": "Bearer " + auth.get("access_token")}
-
+        print("url: ", url)
+        print("body: ", body)
         # test the BhRestToken (rest_token)
         r = marketplace_helpers.sendRequest(url, method, headers, json.dumps(body))
         if r.status_code == 401:  # wrong access token
             callback: Callback = retrieveAccessToken(auth, companyID)
             if callback.Success:
-                url = buildUrl(query, optionalParams)
-
                 r = marketplace_helpers.sendRequest(url, method, headers, json.dumps(body))
                 print(r.status_code)
                 if not r.ok:
@@ -188,7 +193,7 @@ def sendQuery(auth, query, method, body, companyID, optionalParams=None):
 
 def buildUrl(query, optionalParams=None):
     # set up initial url
-    url = "https://graph.microsoft.com/api/v2.0/me/" + query
+    url = "https://outlook.office.com/api/v2.0/me/" + query
     # add additional params
     if optionalParams:
         for param in optionalParams:

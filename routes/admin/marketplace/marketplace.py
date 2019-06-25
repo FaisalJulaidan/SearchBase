@@ -137,17 +137,17 @@ def calendar_auth(assistantID):
 
 
 @marketplace_router.route("/marketplace_callback", methods=['GET', 'POST', 'PUT'])
-def outlook_callback():
+def marketplace_callback():
 
     callback: Callback = marketplace_helpers.processRedirect(request.args)
 
     if not callback.Success:
-        return helpers.jsonResponse(False, 400, callback.Message)
+        return "Authorisation failed. Please try again later."
 
-    return helpers.jsonResponse(True, 200, "Success")
+    return "Authorisation has been successful. You can now close this window."
 
 
 @marketplace_router.route("/marketplace_test", methods=['GET', 'POST', 'PUT'])
 def testtss():
     assistant = assistant_services.getByID(1, 1).Data
-    return Outlook.addEvent(assistant.Calendar.Auth, assistant, assistant.CompanyID).Message
+    return Outlook.addEvent(assistant.Calendar, request.json).Message

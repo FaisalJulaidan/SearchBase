@@ -1,93 +1,46 @@
 import React from 'react';
-import {Button, Icon, Input, Typography} from "antd";
+import {Button, Popconfirm, Typography} from "antd";
 import {getLink} from "helpers";
 
 const {Title, Paragraph, Text} = Typography;
 
-export const BullhornFormItems = ({
-                                      FormItem,
-                                      layout,
-                                      getFieldDecorator,
-                                      marketplace,
-                                      disconnectMarketplace,
-                                      connectMarketplace,
-                                      testMarketplace,
-                                      isConnecting,
-                                      isTesting,
-                                  }) =>
+export const BullhornButton = ({type, companyID, status, disconnectMarketplace, isDisconnecting}) =>
     <>
         {
-            marketplace.status !== "CONNECTED" &&
-            marketplace.status !== "FAILED" &&
+            status !== "CONNECTED" &&
+            status !== "FAILED" &&
             <>
-                <FormItem label="Username"
-                          {...layout}>
-                    {getFieldDecorator('username', {
-                        initialValue: 'thesearchbase.api',
-                        rules: [{
-                            required: true,
-                            max: 20,
-                            message: "Username is required, and should be less than or 20 character",
-                        }],
-                    })(
-                        // To readOnly to avoid autocomplete
-                        <Input readOnly
-                               onFocus={elem => elem.target.removeAttribute('readonly')}
-                               placeholder={'Login of user to use for authentication'}/>
-                    )}
-                </FormItem>
-
-                <FormItem label="Password"
-                          {...layout}>
-                    {getFieldDecorator('password', {
-                        initialValue: 'j)GV.WS2e#6Y(fUh',
-                        rules: [{
-                            required: true,
-                            max: 32,
-                            message: "Password is required, and should be less than or 32 character",
-                        }],
-                    })(
-                        // To readOnly to avoid autocomplete
-                        <Input readOnly
-                               onFocus={elem => elem.target.removeAttribute('readonly')}
-                               prefix={<Icon type="lock" style={{color: 'rgba(0,0,0,.25)'}}/>}
-                               placeholder={"User's password"} type="password"/>
-                    )}
-                </FormItem>
-
                 {
-                    marketplace.status === "NOT_CONNECTED" &&
+                    status === "NOT_CONNECTED" &&
                     <>
-                        <Button type="primary" disabled={isConnecting || isTesting}
-                                onClick={connectMarketplace}>Connect</Button>
-                        <Button onClick={testMarketplace} disabled={isConnecting || isTesting}>Test</Button>
+                        <Button type="primary"
+                        icon={'login'}
+                        style={{width: 'auto'}}
+                        onClick={() => {
+                        return window.open("https://auth.bullhornstaffing.com/oauth/authorize?response_type=code&redirect_uri=https://www.thesearchbase.com/api/bullhorn_callback&client_id=7719607b-7fe7-4715-b723-809cc57e2714&state={\"type\":\"Bullhorn\",\"companyID\":\"" + companyID + "\"}", "Ratting", "width=600,height=600,0,top=40%,right=30%,status=0,")
+                        }} size={'large'}>Connect Bullhorn</Button>
                     </>
                 }
-
             </>
         }
-
         {
-            marketplace.status === "CONNECTED" &&
-            <div style={{textAlign: 'center'}}>
-                <img src={getLink('/static/images/undraw/success.svg')} alt="" height={300}/>
-                <Typography.Title>
-                    {marketplace.type} is connected
-                </Typography.Title>
-            </div>
-        }
-
-        {
-            marketplace.status === "FAILED" &&
-            <div style={{textAlign: 'center'}}>
-                <img src={getLink('/static/images/undraw/failed.svg')} alt="" height={300}/>
-                <Title>
-                    {marketplace.type} is failed
-                </Title>
-                <Paragraph type="secondary">
-                    {marketplace.type} is failing this is usually not from us, please contact the CRM provider
-                </Paragraph>
-            </div>
+            (status === "CONNECTED" || status === "FAILED")
+            &&
+            <Popconfirm placement={'bottomRight'}
+                        title="Chatbot conversations will no longer be synced with Bullhorn account"
+                        onConfirm={disconnectMarketplace}
+                        okType={'danger'}
+                        okText="Disconnect"
+                        cancelText="No">
+                <Button type="danger"
+                        style={{width: 'auto'}}
+                        size={'large'}
+                        disabled={isDisconnecting}>
+                    {
+                        status === "FAILED" ? '(Failed) click to disconnect' : 'Disconnect'
+                    }
+                </Button>
+            </Popconfirm>
         }
     </>;
 

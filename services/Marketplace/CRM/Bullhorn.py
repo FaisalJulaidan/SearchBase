@@ -1,20 +1,14 @@
 import base64
 import json
-import logging
-import urllib.parse
 from datetime import datetime
 
 import requests
+from sqlalchemy_utils import Currency
 
 from enums import DataType as DT
 from models import Callback, Conversation, db, CRM, StoredFile
 from services import databases_services, stored_file_services
-from services.Marketplace import marketplace_helpers as helpers
-
-
-# login requires: username, password
-
-
+from services.Marketplace import marketplace_helpers
 # Bullhorn Notes:
 # access_token (used to generate rest_token) lasts 10 minutes, needs to be requested by using the auth from the client
 # refresh_token (can be used to generate access_token) - generated with access_token on auth, ...
@@ -23,6 +17,9 @@ from services.Marketplace import marketplace_helpers as helpers
 # submitting a new candidate has no required* fields
 # auth needs to contain auth data + rest_token, rest_url, access_token, refresh_token (retrieved upon connecting)
 from utilities import helpers
+
+
+# login requires: username, password
 
 
 def testConnection(auth, companyID):
@@ -38,7 +35,7 @@ def testConnection(auth, companyID):
         return Callback(True, 'Logged in successfully', callback.Data)
 
     except Exception as exc:
-        helpers.logError("CRM.Bullhorn.testConnection() ERROR: " + str(exc))
+        helpers.logError("Marketplace.CRM.Bullhorn.testConnection() ERROR: " + str(exc))
         return Callback(False, str(exc))
 
 
@@ -48,33 +45,12 @@ def login(auth):
 
         headers = {'Content-Type': 'application/json'}
 
-        code_url = "https://auth.bullhornstaffing.com/oauth/authorize?" + \
-                   "response_type=code" + \
-                   "&redirect_uri=https://www.thesearchbase.com/api/bullhorn_callback" + \
-                   "&action=Login" + \
-                   "&client_id=7719607b-7fe7-4715-b723-809cc57e2714" \
-                   "&username=" + authCopy.get("username", "") + \
-                   "&password=" + urllib.parse.quote(authCopy.get("password", ""))
-
-        # get the authorization code
-        code_request = requests.post(code_url, headers=headers)
-
-        if not code_request.ok:
-            raise Exception(code_request.text)
-
-        # if length isnt 2 it means the "invalid credentials" log in page has been returned
-        if len(code_request.text.split("?code=")) != 2:
-            raise Exception("Invalid credentials")
-
-        # retrieve the auth code from the url string
-        authorization_code = code_request.text.split("?code=")[1].split("&client_id=")[0]
-
         access_token_url = "https://auth9.bullhornstaffing.com/oauth/token?" + \
                            "&grant_type=authorization_code" + \
                            "&redirect_uri=https://www.thesearchbase.com/api/bullhorn_callback" + \
                            "&client_id=7719607b-7fe7-4715-b723-809cc57e2714" + \
                            "&client_secret=0ZiVSILQ7CY0bf054LPiX4kN" + \
-                           "&code=" + authorization_code
+                           "&code=" + authCopy.get("code")[0]
 
         # get the access token and refresh token
         access_token_request = requests.post(access_token_url, headers=headers)
@@ -90,7 +66,7 @@ def login(auth):
         return Callback(True, 'Logged in successfully', authCopy)
 
     except Exception as exc:
-        helpers.logError("CRM.Bullhorn.login() ERROR: " + str(exc))
+        helpers.logError("Marketplace.CRM.Bullhorn.login() ERROR: " + str(exc))
         return Callback(False, str(exc))
 
 
@@ -106,6 +82,7 @@ def retrieveRestToken(auth, companyID):
               "&client_id=7719607b-7fe7-4715-b723-809cc57e2714" + \
               "&client_secret=0ZiVSILQ7CY0bf054LPiX4kN"
         get_access_token = requests.post(url, headers=headers)
+
         if get_access_token.ok:
             result_body = json.loads(get_access_token.text)
             access_token = result_body.get("access_token")
@@ -124,7 +101,7 @@ def retrieveRestToken(auth, companyID):
         authCopy["rest_token"] = result_body.get("BhRestToken")
         authCopy["rest_url"] = result_body.get("restUrl")
 
-        saveAuth_callback: Callback = helpers.saveNewCRMAuth(authCopy, "Bullhorn", companyID)
+        saveAuth_callback: Callback = marketplace_helpers.saveNewCRMAuth(authCopy, "Bullhorn", companyID)
         if not saveAuth_callback.Success:
             raise Exception(saveAuth_callback.Message)
 
@@ -136,7 +113,7 @@ def retrieveRestToken(auth, companyID):
 
     except Exception as exc:
         db.session.rollback()
-        helpers.logError("CRM.Bullhorn.retrieveRestToken() ERROR: " + str(exc))
+        helpers.logError("Marketplace.CRM.Bullhorn.retrieveRestToken() ERROR: " + str(exc))
         return Callback(False, str(exc))
 
 
@@ -150,13 +127,13 @@ def sendQuery(auth, query, method, body, companyID, optionalParams=None):
         headers = {'Content-Type': 'application/json'}
 
         # test the BhRestToken (rest_token)
-        r = helpers.sendRequest(url, method, headers, json.dumps(body))
+        r = marketplace_helpers.sendRequest(url, method, headers, json.dumps(body))
         if r.status_code == 401:  # wrong rest token
             callback: Callback = retrieveRestToken(auth, companyID)
             if callback.Success:
                 url = buildUrl(callback.Data, query, optionalParams)
 
-                r = helpers.sendRequest(url, method, headers, json.dumps(body))
+                r = marketplace_helpers.sendRequest(url, method, headers, json.dumps(body))
                 if not r.ok:
                     raise Exception(r.text + ". Query could not be sent")
             else:
@@ -167,7 +144,7 @@ def sendQuery(auth, query, method, body, companyID, optionalParams=None):
         return Callback(True, "Query was successful", r)
 
     except Exception as exc:
-        helpers.logError("CRM.Bullhorn.sendQuery() ERROR: " + str(exc))
+        helpers.logError("Marketplace.CRM.Bullhorn.sendQuery() ERROR: " + str(exc))
         return Callback(False, str(exc))
 
 
@@ -186,21 +163,21 @@ def buildUrl(rest_data, query, optionalParams=None):
 def insertCandidate(auth, conversation: Conversation) -> Callback:
     try:
         # New candidate details
-        emails = conversation.Data.get('keywordsByDataType').get(DT.CandidateEmail.value['name'], [""])
+        emails = conversation.Data.get('keywordsByDataType').get(DT.CandidateEmail.value['name'], [" "])
 
         # availability, yearsExperience
         body = {
             "name": "".join(
-                conversation.Data.get('keywordsByDataType').get(DT.CandidateName.value['name'], [""])),
+                conversation.Data.get('keywordsByDataType').get(DT.CandidateName.value['name'], [" "])),
             "mobile":
-                conversation.Data.get('keywordsByDataType').get(DT.CandidateMobile.value['name'], [""])[0],
+                conversation.Data.get('keywordsByDataType').get(DT.CandidateMobile.value['name'], [" "])[0],
             "address": {
                 "city": "".join(
-                    conversation.Data.get('keywordsByDataType').get(DT.CandidateLocation.value['name'], [""])),
+                    conversation.Data.get('keywordsByDataType').get(DT.CandidateLocation.value['name'], [" "])),
             },
             "email": emails[0],
             "primarySkills": "".join(
-                conversation.Data.get('keywordsByDataType').get(DT.CandidateSkills.value['name'], [""])),
+                conversation.Data.get('keywordsByDataType').get(DT.CandidateSkills.value['name'], [" "])),
             "educations": {
                 "data": conversation.Data.get('keywordsByDataType').get(DT.CandidateEducation.value['name'], [])
             },
@@ -227,7 +204,7 @@ def insertCandidate(auth, conversation: Conversation) -> Callback:
         return Callback(True, sendQuery_callback.Data.text)
 
     except Exception as exc:
-        helpers.logError("CRM.Bullhorn.insertCandidate() ERROR: " + str(exc))
+        helpers.logError("Marketplace.CRM.Bullhorn.insertCandidate() ERROR: " + str(exc))
         return Callback(False, str(exc))
 
 
@@ -271,7 +248,7 @@ def uploadFile(auth, storedFile: StoredFile):
         return Callback(True, sendQuery_callback.Data.text)
 
     except Exception as exc:
-        helpers.logError("CRM.Bullhorn.insertCandidate() ERROR: " + str(exc))
+        helpers.logError("Marketplace.CRM.Bullhorn.insertCandidate() ERROR: " + str(exc))
         return Callback(False, str(exc))
 
 
@@ -290,20 +267,20 @@ def insertClient(auth, conversation: Conversation) -> Callback:
         return Callback(True, insertClient_callback.Message)
 
     except Exception as exc:
-        helpers.logError("CRM.Bullhorn.insertClient() ERROR: " + str(exc))
+        helpers.logError("Marketplace.CRM.Bullhorn.insertClient() ERROR: " + str(exc))
         return Callback(False, str(exc))
 
 
 def insertClientContact(auth, conversation: Conversation, bhCompanyID) -> Callback:
     try:
         # New candidate details
-        emails = conversation.Data.get('keywordsByDataType').get(DT.ClientEmail.value['name'], [""])
+        emails = conversation.Data.get('keywordsByDataType').get(DT.ClientEmail.value['name'], [" "])
 
         body = {
             "name": " ".join(
                 conversation.Data.get('keywordsByDataType').get(DT.ClientName.value['name'], [])),
             "mobile":
-                conversation.Data.get('keywordsByDataType').get(DT.ClientTelephone.value['name'], [""])[0],
+                conversation.Data.get('keywordsByDataType').get(DT.ClientTelephone.value['name'], [" "])[0],
             "address": {
                 "city": " ".join(
                     conversation.Data.get('keywordsByDataType').get(DT.ClientLocation.value['name'], [])),
@@ -328,7 +305,7 @@ def insertClientContact(auth, conversation: Conversation, bhCompanyID) -> Callba
         return Callback(True, sendQuery_callback.Data.text)
 
     except Exception as exc:
-        helpers.logError("CRM.Bullhorn.insertClientContact() ERROR: " + str(exc))
+        helpers.logError("Marketplace.CRM.Bullhorn.insertClientContact() ERROR: " + str(exc))
         return Callback(False, str(exc))
 
 
@@ -352,7 +329,7 @@ def insertCompany(auth, conversation: Conversation) -> Callback:
         return Callback(True, sendQuery_callback.Message, return_body)
 
     except Exception as exc:
-        helpers.logError("CRM.Bullhorn.insertCompany() ERROR: " + str(exc))
+        helpers.logError("Marketplace.CRM.Bullhorn.insertCompany() ERROR: " + str(exc))
         return Callback(False, str(exc))
 
 
@@ -360,7 +337,7 @@ def searchCandidates(auth, companyID, conversation, fields=None) -> Callback:
     try:
         query = "query="
         if not fields:
-            fields = "fields=id,name,email,mobile,address,primarySkills,status,educations,dayRate"
+            fields = "fields=id,name,email,mobile,address,primarySkills,status,educations,dayRate,salary"
         keywords = conversation['keywordsByDataType']
 
         # populate filter
@@ -401,14 +378,16 @@ def searchCandidates(auth, companyID, conversation, fields=None) -> Callback:
                                                                   education="".join(
                                                                       record.get("educations", {}).get("data")),
                                                                   yearsExperience=0,
-                                                                  desiredSalary=record.get("dayRate", 0) * 365,
-                                                                  currency=None,
+                                                                  desiredSalary=record.get("salary") or
+                                                                                record.get("dayRate", 0) * 365,
+                                                                  # payPeriod=PayPeriod("Annually"),
+                                                                  currency=Currency("GBP"),
                                                                   source="Bullhorn"))
 
         return Callback(True, sendQuery_callback.Message, result)
 
     except Exception as exc:
-        helpers.logError("CRM.Bullhorn.searchCandidates() ERROR: " + str(exc))
+        helpers.logError("Marketplace.CRM.Bullhorn.searchCandidates() ERROR: " + str(exc))
         return Callback(False, str(exc))
 
 
@@ -464,13 +443,13 @@ def searchJobs(auth, companyID, conversation, fields=None) -> Callback:
                                                             startDate=record.get("startDate"),
                                                             endDate=record.get("dateEnd"),
                                                             linkURL=None,
-                                                            currency=None,
+                                                            currency=Currency("GBP"),
                                                             source="Bullhorn"))
 
         return Callback(True, sendQuery_callback.Message, result)
 
     except Exception as exc:
-        helpers.logError("CRM.Bullhorn.searchJobs() ERROR: " + str(exc))
+        helpers.logError("Marketplace.CRM.Bullhorn.searchJobs() ERROR: " + str(exc))
         return Callback(False, str(exc))
 
 
@@ -497,7 +476,7 @@ def searchJobsCustomQuery(auth, companyID, query, fields=None) -> Callback:
         return Callback(True, sendQuery_callback.Message, return_body)
 
     except Exception as exc:
-        helpers.logError("CRM.Bullhorn.searchJobs() ERROR: " + str(exc))
+        helpers.logError("Marketplace.CRM.Bullhorn.searchJobs() ERROR: " + str(exc))
         return Callback(False, str(exc))
 
 
@@ -517,7 +496,7 @@ def getAllCandidates(auth, companyID, fields=None) -> Callback:
         return Callback(True, sendQuery_callback.Message, return_body)
 
     except Exception as exc:
-        helpers.logError("CRM.Bullhorn.getAllCandidates() ERROR: " + str(exc))
+        helpers.logError("Marketplace.CRM.Bullhorn.getAllCandidates() ERROR: " + str(exc))
         return Callback(False, str(exc))
 
 
@@ -538,7 +517,7 @@ def getAllJobs(auth, companyID, fields=None) -> Callback:
         return Callback(True, sendQuery_callback.Message, return_body)
 
     except Exception as exc:
-        helpers.logError("CRM.Bullhorn.getAllJobs() ERROR: " + str(exc))
+        helpers.logError("Marketplace.CRM.Bullhorn.getAllJobs() ERROR: " + str(exc))
         return Callback(False, str(exc))
 
 
@@ -605,5 +584,5 @@ def produceRecruiterValueReport(crm: CRM, companyID) -> Callback:
         return Callback(True, "Report information has been retrieved", nestedList)
 
     except Exception as exc:
-        helpers.logError("CRM.Bullhorn.produceRecruiterValueReport() ERROR: " + str(exc))
+        helpers.logError("Marketplace.CRM.Bullhorn.produceRecruiterValueReport() ERROR: " + str(exc))
         return Callback(False, "Error in creating report")

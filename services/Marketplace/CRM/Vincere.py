@@ -8,7 +8,7 @@ import requests
 from enums import DataType as DT
 from models import Callback, Conversation, db, StoredFile
 from services import stored_file_services, databases_services
-from services.Marketplace import marketplace_helpers as helpers
+from services.Marketplace import marketplace_helpers
 
 
 # Vincere Notes:
@@ -103,7 +103,7 @@ def retrieveRestToken(auth, companyID):
                 raise Exception(login_callback.Message)
             authCopy = dict(login_callback.Data)
 
-        saveAuth_callback: Callback = helpers.saveNewCRMAuth(authCopy, "Vincere", companyID)
+        saveAuth_callback: Callback = marketplace_helpers.saveNewCRMAuth(authCopy, "Vincere", companyID)
         if not saveAuth_callback.Success:
             raise Exception(saveAuth_callback.Message)
 
@@ -127,14 +127,14 @@ def sendQuery(auth, query, method, body, companyID, optionalParams=None):
         headers = {'Content-Type': 'application/json'}
 
         # test the BhRestToken (rest_token)
-        r = helpers.sendRequest(url, method, headers, json.dumps(body))
+        r = marketplace_helpers.sendRequest(url, method, headers, json.dumps(body))
 
         if r.status_code == 401:  # wrong rest token
             callback: Callback = retrieveRestToken(auth, companyID)
             if callback.Success:
                 url = buildUrl(callback.Data, query, optionalParams)
 
-                r = helpers.sendRequest(url, method, headers, json.dumps(body))
+                r = marketplace_helpers.sendRequest(url, method, headers, json.dumps(body))
                 if not r.ok:
                     raise Exception(r.text + ". Query could not be sent")
             else:
@@ -164,21 +164,21 @@ def buildUrl(rest_data, query, optionalParams=None):
 def insertCandidate(auth, conversation: Conversation) -> Callback:
     try:
         # New candidate details
-        emails = conversation.Data.get('keywordsByDataType').get(DT.CandidateEmail.value['name'], [""])
+        emails = conversation.Data.get('keywordsByDataType').get(DT.CandidateEmail.value['name'], [" "])
 
         # availability, yearsExperience
         body = {
-            "first_name": conversation.Data.get('keywordsByDataType').get(DT.CandidateName.value['name'], [""])[0],
-            "last_name": conversation.Data.get('keywordsByDataType').get(DT.CandidateName.value['name'], [""])[-1],
+            "first_name": conversation.Data.get('keywordsByDataType').get(DT.CandidateName.value['name'], [" "])[0],
+            "last_name": conversation.Data.get('keywordsByDataType').get(DT.CandidateName.value['name'], [" "])[-1],
             "mobile":
-                conversation.Data.get('keywordsByDataType').get(DT.CandidateMobile.value['name'], [""])[0],
+                conversation.Data.get('keywordsByDataType').get(DT.CandidateMobile.value['name'], [" "])[0],
             "address": {
                 "city": "".join(
-                    conversation.Data.get('keywordsByDataType').get(DT.CandidateLocation.value['name'], [""])),
+                    conversation.Data.get('keywordsByDataType').get(DT.CandidateLocation.value['name'], [" "])),
             },
             "email": emails[0],
             "skills": "".join(
-                conversation.Data.get('keywordsByDataType').get(DT.CandidateSkills.value['name'], [""])),
+                conversation.Data.get('keywordsByDataType').get(DT.CandidateSkills.value['name'], [" "])),
             "education_summary": "".join(
                 conversation.Data.get('keywordsByDataType').get(DT.CandidateEducation.value['name'], [])),
             "desired_salary":
@@ -269,13 +269,13 @@ def insertClient(auth, conversation: Conversation) -> Callback:
 def insertClientContact(auth, conversation: Conversation, vincCompanyID) -> Callback:
     try:
         # New candidate details
-        emails = conversation.Data.get('keywordsByDataType').get(DT.ClientEmail.value['name'], [""])
+        emails = conversation.Data.get('keywordsByDataType').get(DT.ClientEmail.value['name'], [" "])
 
         body = {
             "first_name": conversation.Data.get('keywordsByDataType').get(DT.ClientName.value['name'], [])[0],
             "last_name": conversation.Data.get('keywordsByDataType').get(DT.ClientName.value['name'], [])[-1],
             "mobile":
-                conversation.Data.get('keywordsByDataType').get(DT.ClientTelephone.value['name'], [""])[0],
+                conversation.Data.get('keywordsByDataType').get(DT.ClientTelephone.value['name'], [" "])[0],
             "address": {
                 "city": " ".join(
                     conversation.Data.get('keywordsByDataType').get(DT.ClientLocation.value['name'], [])),

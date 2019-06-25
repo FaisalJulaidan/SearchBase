@@ -103,16 +103,6 @@ def recruiter_value_report():
         return helpers.jsonResponse(True, 200, data_callback.Message, data_callback.Data)
 
 
-@marketplace_router.route("/bullhorn_callback", methods=['GET', 'POST', 'PUT'])
-def bullhorn_callback():
-    return str(request.url)
-
-
-@marketplace_router.route("/crm_callback", methods=['GET', 'POST', 'PUT'])
-def crm_callback():
-    return str(request.url)
-
-
 @marketplace_router.route("/calendar/<assistantID>/google/authorize", methods=['GET', 'POST'])
 @jwt_required
 @helpers.validAssistant
@@ -136,18 +126,29 @@ def calendar_auth(assistantID):
 #         return helpers.jsonResponse(True, 200, callback.Message)
 
 
-@marketplace_router.route("/marketplace_callback", methods=['GET', 'POST', 'PUT'])
-def outlook_callback():
+@marketplace_router.route("/bullhorn_callback", methods=['GET', 'POST', 'PUT'])
+def bullhorn_callback():
 
     callback: Callback = marketplace_helpers.processRedirect(request.args)
 
     if not callback.Success:
-        return helpers.jsonResponse(False, 400, callback.Message)
+        return "Retrieving authorisation code failed. Please try again later."
 
-    return helpers.jsonResponse(True, 200, "Success")
+    return "Authorisation completed. You can now close this window."
 
 
-@marketplace_router.route("/marketplace_test", methods=['GET', 'POST', 'PUT'])
-def testtss():
-    assistant = assistant_services.getByID(1, 1).Data
-    return Outlook.addEvent(assistant.Calendar.Auth, assistant, assistant.CompanyID).Message
+@marketplace_router.route("/marketplace_callback", methods=['GET', 'POST', 'PUT'])
+def marketplace_callback():
+
+    callback: Callback = marketplace_helpers.processRedirect(request.args)
+
+    if not callback.Success:
+        return "Retrieving authorisation code failed. Please try again later."
+
+    return "Authorisation completed. You can now close this window."
+
+
+# @marketplace_router.route("/marketplace_test", methods=['GET', 'POST', 'PUT'])
+# def testtss():
+#     assistant = assistant_services.getByID(1, 1).Data
+#     return Outlook.addEvent(assistant.Calendar.Auth, assistant, assistant.CompanyID).Message

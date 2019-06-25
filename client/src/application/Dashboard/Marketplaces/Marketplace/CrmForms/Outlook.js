@@ -6,23 +6,32 @@ const {Title, Paragraph, Text} = Typography;
 
 
 export const OutlookButton = ({
-                                  disconnectMarketplace, isDisconnecting, status, showModal
+                                  disconnectMarketplace, isDisconnecting, status, showModal, companyID
                               }) => {
     return (
         <>
             {
-                status === "NOT_CONNECTED" &&
-                <Button type="primary"
-                        onClick={showModal}
-                        style={{width: 'auto'}}
-                        size={'large'}><Icon component={() => <OutlookIcon/>}/> Connect with Outlook</Button>
+                status !== "CONNECTED" &&
+                status !== "FAILED" &&
+                <>
+                    {
+                        status === "NOT_CONNECTED" &&
+                        <>
+                            <Button type="primary"
+                            icon={'login'}
+                            style={{width: 'auto'}}
+                            onClick={() => {
+                            return window.open("https://login.microsoftonline.com/common/oauth2/v2.0/authorize?response_type=code&client_id=0978960c-c837-479f-97ef-a75be4bbacd4&redirect_uri=https://www.thesearchbase.com/api/marketplace_callback&response_mode=query&scope=openid+https%3A%2F%2Fgraph.microsoft.com%2Fcalendars.readwrite%20+offline_access&state={\"type\":\"Outlook\",\"companyID\":\""+companyID+"\"}","Ratting","width=600,height=400,0,top=40%,right=30%,status=0,")
+                            }} size={'large'}>Connect Bullhorn</Button>
+                        </>
+                    }
+                </>
             }
-
             {
                 (status === "CONNECTED" || status === "FAILED")
                 &&
                 <Popconfirm placement={'bottomRight'}
-                            title="Chatbot conversations will no longer be synced with Adapt account"
+                            title="Chatbot conversations will no longer be synced with Bullhorn account"
                             onConfirm={disconnectMarketplace}
                             okType={'danger'}
                             okText="Disconnect"

@@ -19,12 +19,12 @@ def processConversation(conversation: Conversation, autoPilot: AutoPilot):
 
         # Do automation only if the autoPilot is active
         if autoPilot.Active:
-            keywords = conversation.Data.get('keywordsByDataType')
-            email = keywords.get(DataType.CandidateEmail.value['name'], [""])[0]
+
+            email = conversation.Email
 
             def __processSendingEmails (email, status: Status, autoPilot: AutoPilot):
 
-                userName = " ".join(keywords.get(DataType.CandidateName.value['name'], [""])) # get candidate name
+                userName = conversation.Name # get candidate name
                 logoPath = sfs.PUBLIC_URL + sfs.UPLOAD_FOLDER + sfs.COMPANY_LOGOS_PATH + "/" + autoPilot.Company.LogoPath
                 companyName = autoPilot.Company.Name
 

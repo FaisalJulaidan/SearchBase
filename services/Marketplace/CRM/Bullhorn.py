@@ -74,7 +74,6 @@ def login(auth):
 def retrieveRestToken(auth, companyID):
     try:
         authCopy = dict(auth)
-        print(authCopy)
         headers = {'Content-Type': 'application/json'}
 
         # use refresh_token to generate access_token and refresh_token
@@ -83,7 +82,7 @@ def retrieveRestToken(auth, companyID):
               "&client_id=7719607b-7fe7-4715-b723-809cc57e2714" + \
               "&client_secret=0ZiVSILQ7CY0bf054LPiX4kN"
         get_access_token = requests.post(url, headers=headers)
-        print(get_access_token.text)
+
         if get_access_token.ok:
             result_body = json.loads(get_access_token.text)
             access_token = result_body.get("access_token")

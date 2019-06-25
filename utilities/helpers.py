@@ -1,26 +1,20 @@
-import functools
-import geoip2.webservice
-import gzip
-import inspect
-import logging
-import os
-import re
-import stripe
+from flask import json, after_this_request, request
+from models import db, Assistant, Job, Callback
+from services import flow_services, assistant_services
 from datetime import time
 from enum import Enum
-from io import BytesIO
-from typing import List
-
-from cryptography.fernet import Fernet
-from flask import json, after_this_request, request
-from flask_jwt_extended import get_jwt_identity
 from hashids import Hashids
-from itsdangerous import URLSafeTimedSerializer
-from sqlalchemy_utils import Currency
-
 from config import BaseConfig
-from models import Assistant, Job, Callback
-from services import flow_services, assistant_services
+from io import BytesIO
+from itsdangerous import URLSafeTimedSerializer
+from cryptography.fernet import Fernet
+from sqlalchemy_utils import Currency
+from typing import List
+from flask_jwt_extended import get_jwt_identity
+from forex_python.converter import CurrencyRates
+import re, os, stripe, gzip, functools, logging, geoip2.webservice, traceback
+
+
 
 # ======== Global Variables ======== #
 
@@ -28,7 +22,7 @@ from services import flow_services, assistant_services
 geoIP = geoip2.webservice.Client(140914, os.environ['GEOIP_KEY'])
 
 # Signer
-verificationSigner = URLSafeTimedSerializer(os.environ['SECRET_KEY_TEMP'])
+verificationSigner = URLSafeTimedSerializer(os.environ['TEMP_SECRET_KEY'])
 
 # Configure logging system
 logging.basicConfig(filename='logs/errors.log',
@@ -36,8 +30,10 @@ logging.basicConfig(filename='logs/errors.log',
                     format='%(asctime)s -- %(message)s')
 
 # Fernet for encryption
-fernet = Fernet(os.environ['SECRET_KEY_TEMP'])
+fernet = Fernet(os.environ['TEMP_SECRET_KEY'])
 
+# Currency converter by forex-python
+currencyConverter = CurrencyRates()
 
 # ======== Helper Functions ======== #
 
@@ -55,7 +51,8 @@ def getDomain():
 def logError(exception):
     if os.environ['FLASK_ENV'] == 'development':
         print(exception)
-    logging.error(exception)
+        # print(traceback.format_exc())
+    logging.error(traceback.format_exc() + exception + "\n \n" )
 
 
 # ID Hasher
@@ -160,10 +157,9 @@ def validAssistant(func):
 
 # -------- SQLAlchemy Converters -------- #
 """Convert a SQLAlchemy object to a single dict """
+def getDictFromSQLAlchemyObj(obj) -> dict:
 
-
-def getDictFromSQLAlchemyObj(obj, excludedColumns: list = None) -> dict:
-    dict = {}  # Results
+    dict = {} # Results
     if not obj: return dict
 
     # A nested for loop for joining two tables
@@ -171,20 +167,20 @@ def getDictFromSQLAlchemyObj(obj, excludedColumns: list = None) -> dict:
         key = attr.name
         if key not in ['Password']:
             dict[key] = getattr(obj, key)
-            if isinstance(dict[key], Enum):  # Convert Enums
+            if isinstance(dict[key], Enum): # Convert Enums
                 dict[key] = dict[key].value
 
-            if isinstance(dict[key], time):  # Convert Times
+            if isinstance(dict[key], time): # Convert Times
                 dict[key] = str(dict[key])
 
-            if isinstance(dict[key], Currency):  # Convert Currencies
+            if isinstance(dict[key], Currency): # Convert Currencies
                 dict[key] = dict[key].code
 
-            if key in [Job.JobStartDate.name, Job.JobEndDate.name] and dict[key]:  # Convert Datetime only for Jobs
+            if key in [Job.JobStartDate.name, Job.JobEndDate.name] and dict[key]: # Convert Datetime only for Jobs
                 dict[key] = '/'.join(map(str, [dict[key].year, dict[key].month, dict[key].day]))
 
-            if key == Assistant.Flow.name and dict[key]:  # Parse Flow !!
-                flow_services.parseFlow(dict[key])  # pass by reference
+            if key == Assistant.Flow.name and dict[key]: # Parse Flow !!
+                flow_services.parseFlow(dict[key]) # pass by reference
 
     if hasattr(obj, "FilePath"):
         dict["FilePath"] = obj.FilePath
@@ -195,7 +191,6 @@ def getDictFromSQLAlchemyObj(obj, excludedColumns: list = None) -> dict:
 """Provide a list of keys (e.g ['id', 'name']) and the list of tuples"""
 """provided by sqlalchemy when querying for specific columns"""
 """this func will work for enums as well."""
-
 
 def getDictFromLimitedQuery(columnsList, tupleList: List[tuple]):
     if not isinstance(tupleList, list):

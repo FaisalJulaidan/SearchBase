@@ -1,122 +1,142 @@
-from models import Callback, db, User
-from services import user_services, role_services, mail_services
+from models import Callback, db, User, Role, Company
+from services import user_services, role_services, mail_services, company_services
 from utilities import helpers
-import random, string, logging
+import random, string
 
 
-def add_user_with_permission(name, email, role, admin_id):
+def editUser(userID, firstname, surname, phoneNumber, newRoleID, editorUserID, editorCompanyID):
     try:
-        # Get the admin user who is logged in and wants to create a new user.
-        user_callback: Callback = user_services.getByID(admin_id)
-        if not user_callback.Success:
-            return Callback(False, user_callback.Message)
 
-        # check if the user can edit users, the email is valid and the role of the new user is valid
-        if not user_callback.Data.Role.EditUsers \
-                or (role != "Admin" and role != "User") \
-                or not helpers.isValidEmail(email):
-            return Callback(False, "Please make sure you entered all data correctly and have the necessary permission" +
-                                   " to do this action")
+        if newRoleID in [0,1]: # 0 = Staff, 1 = Owners
+            raise Exception('Someone is trying to hack the system')
 
-        admin_user = user_callback.Data
+        # Check if editorUser is authorised to do such an operation (returns boolean)
+        if not role_services.isAuthorised('editUsers', editorUserID):
+            return Callback(False, 'You are not authorised to edit users')
 
-        # removed empty spaces around the strings and split the full name into first name and surname
-        names = name.strip().split(" ")
-        email = email.strip()
-        first_name = names[0]
-        surname = names[-1]
 
-        # Check if email is already used
-        test_callback: Callback = user_services.getByEmail(email)
-        if test_callback.Success:
-            return Callback(False, 'Email is already on use.')
-
-        # Get the role to be assigned for the user
-        role_callback: Callback = role_services.getByNameAndCompanyID(role, admin_user.CompanyID)
+        # Get and check if new role belongs to this company
+        role_callback: Callback = role_services.getByIDAndCompanyID(newRoleID, editorCompanyID)
         if not role_callback.Success:
-            return Callback(False, role_callback.Message)
+            raise Exception('Role does not exist')
+        newRole: Role = role_callback.Data
+
+        # Get user to be edited
+        callback: Callback = user_services.getByIDAndCompanyID(userID, editorCompanyID)
+        if not callback.Success:
+            return Callback(False, "You are not authorised to edit this user")
+        user: User = callback.Data
+
+        user.Firstname = firstname
+        user.Surname = surname
+        user.PhoneNumber = phoneNumber
+        user.Role = newRole
+
+        db.session.commit()
+
+        return Callback(True, 'User updated successfully', user)
+
+    except Exception as exc:
+        helpers.logError("user_management_services.editUser(): " + str(exc))
+        db.session.rollback()
+        return Callback(False, "Couldn't update user.")
+
+
+def deleteUser(userID, editorUserID, editorCompanyID):
+    try:
+
+        if userID == editorUserID:
+            return Callback(False, "You cannot delete yourself")
+
+        # Check if editorUser is authorised to do such an operation (returns boolean)
+        if not role_services.isAuthorised('deleteUsers', editorUserID):
+            return Callback(False, 'You are not authorised to delete users')
+
+        # Get user to be edited
+        callback: Callback = user_services.getByIDAndCompanyID(userID, editorCompanyID)
+        if not callback.Success:
+            return Callback(False, "You are not authorised to edit this user")
+        user: User = callback.Data
+
+        # Delete user and save changes
+        db.session.delete(user)
+        db.session.commit()
+
+        return Callback(True, 'User deleted successfully')
+
+    except Exception as exc:
+        helpers.logError("user_management_services.deleteUser(): " + str(exc))
+        db.session.rollback()
+        return Callback(False, "Couldn't delete user.")
+
+
+def addUser(firstname, surname, email, phoneNumber,  givenRoleID, editorUserID, editorCompanyID):
+    try:
+
+        if givenRoleID in [0,1]: # 0 = Staff, 1 = Owners
+            raise Exception('Someone is trying to hack the system')
+
+        # Check if editorUser is authorised to do such an operation (returns boolean)
+        if not role_services.isAuthorised('addUsers', editorUserID):
+            return Callback(False, 'You are not authorised to add users')
+
+        # Get and check if new role belongs to this company
+        role_callback: Callback = role_services.getByIDAndCompanyID(givenRoleID, editorCompanyID)
+        if not role_callback.Success:
+            raise Exception('Role does not exist')
+        givenRole: Role = role_callback.Data
+
+        # Check if email of new user already exist
+        callback: Callback = user_services.getByEmail(email)
+        if callback.Success:
+            return Callback(False, 'Email is already on use maybe under your or another company')
+
+        # Get company
+        callback: Callback = company_services.getByID(editorCompanyID)
+        if not callback.Success:
+            return Callback(False, 'Your company does not exist')
+        company: Company = callback.Data
 
         # create random generated password
         password = ''.join(random.choice(string.ascii_letters + string.digits) for i in range(9))
 
         # Create the new user for the company
-        create_callback: Callback = user_services.create(first_name, surname, email, password, "00000000000", 
-                                                         admin_user.Company, role_callback.Data, verified=True)
-        if not create_callback.Success:
-            return Callback(False, create_callback.Message)
+        newUser = User(Firstname=firstname,
+                    Surname=surname,
+                    Email=email,
+                    Password=password,
+                    PhoneNumber=phoneNumber,
+                    CompanyID=editorCompanyID,
+                    Role=givenRole,
+                    Verified=False)
+        db.session.add(newUser)
 
-        email_callback: Callback = mail_services.addedNewUserEmail(admin_user.Email, email, password)
+        # Send email invitation to verify his account
+        tokenLink = helpers.getDomain() + "/verify_account/" + \
+                helpers.verificationSigner.dumps(email + ";" + str(company.ID), salt='email-confirm-key')
+
+        email_callback: Callback = \
+            mail_services.send_email(email,
+                                    'Account Invitation',
+                                    '/emails/account_invitation.html',
+                                    companyName=company.Name,
+                                    logoPath=company.LogoPath,
+                                    userName= firstname + ' ' + surname,
+                                    password=password,
+                                    verificationLink= tokenLink
+                                    )
+
         if not email_callback.Success:
-            remove_callback: Callback = user_services.removeByID(create_callback.Data.ID)
-            if not remove_callback.Success:
-                raise Exception(remove_callback.Message)
-            return Callback(False, "Failed to send email with password to user. Addition has been aborted")
+            return Callback(False, 'Could not send new user an invitation email; therefore, all operations are discarded')
 
-        return Callback(True, 'User has been created successfully!')
-
-    except Exception as exc:
-        helpers.logError("user_services.add_user_with_permission(): " + str(exc))
-        db.session.rollback()
-        return Callback(False, 'Sorry, Could not create the user.')
-
-
-def update_user_with_permission(user_id, first_name, surname, email, role, admin_id) -> Callback:
-    try:
-        # Get the admin user who is logged in and wants to edit.
-        user_callback: Callback = user_services.getByID(admin_id)
-        if not user_callback.Success:
-            return Callback(False, user_callback.Message)
-
-        # check if the email is valid and if the user has permission to edit users and if his new role is valid
-        if not helpers.isValidEmail(email) or not user_callback.Data.Role.EditUsers \
-                or (role != "Admin" and role != "User"):
-            return Callback(False, "Please make sure you entered all data correctly and have the necessary permission" +
-                                   " to do this action")
-
-        user_callback: Callback = user_services.getByID(user_id)
-        if not user_callback.Success:
-            return Callback(False, "Could not find user's records")
-        user: User = user_callback.Data
-
-        # Get the role to be assigned for the userToUpdate
-        role_callback: Callback = role_services.getByNameAndCompanyID(role, user.CompanyID)
-        if not role_callback.Success:
-            return Callback(False, role_callback.Message)
-
-        # Update user
-        user.Firstname = first_name.strip()
-        user.Surname = surname.strip()
-        user.Email = email.strip().lower()
-        user.Role = role_callback.Data
-
+        # Save changes
         db.session.commit()
-        return Callback(True, 'User has been edited successfully!')
+        return Callback(True, 'User has been created successfully', newUser)
 
     except Exception as exc:
-        helpers.logError("user_services.update_user_with_permission(): " + str(exc))
+        helpers.logError("user_management_services.addUser(): " + str(exc))
         db.session.rollback()
-        return Callback(False, 'Sorry, Could not update the user.')
+        return Callback(False, 'Could not add the user.')
 
 
-def delete_user_with_permission(user_id, admin_id):
-    try:
-        # Get the admin user who is logged in and wants to delete.
-        user_callback: Callback = user_services.getByID(admin_id)
-        if not user_callback.Success:
-            return Callback(False, user_callback.Message)
 
-        # Check if the admin user is authorised for such an operation.
-        if not user_callback.Data.Role.DeleteUsers:
-            return Callback(False, "You're not authorised to delete users")
-
-        # Delete the user
-        remove_callback: Callback = user_services.removeByID(user_id)
-        if not remove_callback.Success:
-            return Callback(False, remove_callback.Message)
-
-        return Callback(True, 'User has been deleted successfully!')
-
-    except Exception as exc:
-        helpers.logError("user_services.delete_user_with_permission(): " + str(exc))
-        db.session.rollback()
-        return Callback(False, 'Sorry, Could not delete the user.')

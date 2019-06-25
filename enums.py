@@ -44,6 +44,14 @@ class ApplicationStatus(Enum):
         return any(value == item.value for item in cls)
 
 @unique
+class Period(Enum):
+    Annually = 'Annually'
+    Monthly = 'Monthly'
+    Weekly = 'Weekly'
+    Daily = 'Daily'
+    Hourly = 'Hourly'
+
+@unique
 class BlockType(Enum):
     UserInput = 'User Input'
     Question = 'Question'
@@ -78,7 +86,7 @@ class UserType(Enum):
 
 @unique
 class DatabaseType(Enum):
-    # multiplying userTypes by 3 will help detect the user type in the chatbot
+    # multiplying userTypes by x will help detect the user type in the chatbot
     Candidates = {'enumName': 'Candidates', 'name': 'Candidates', 'userTypes': [UserType.Client.value] * 5}
     Jobs = {'enumName': 'Jobs', 'name': 'Jobs', 'userTypes': [UserType.Candidate.value] * 5}
 

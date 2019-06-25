@@ -17,7 +17,7 @@ import {assistantActions, crmActions, optionsActions} from "store/actions";
 import NoHeaderPanel from 'components/NoHeaderPanel/NoHeaderPanel'
 
 
-const {Title, Paragraph, Text} = Typography;
+const {Title, Paragraph} = Typography;
 const {TabPane} = Tabs;
 const confirm = Modal.confirm;
 

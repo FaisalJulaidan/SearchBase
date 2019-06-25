@@ -48,9 +48,9 @@ class EditAssistantModal extends Component {
                         extra="Enter a name for your assistant">
                         {
                             getFieldDecorator('assistantName', {
-                                initialValue: assistant?.Name,
+                                initialValue: assistant?.Name || '',
                                 rules: [
-                                    {required: true, message: 'Please input your assistant name'},
+                                    {whitespace: true, required: true, message: 'Please input your assistant name'},
                                     {validator: this.checkName}
                                 ]
                             })
@@ -80,6 +80,7 @@ class EditAssistantModal extends Component {
                             getFieldDecorator('welcomeMessage', {
                                 initialValue: assistant?.Message,
                                 rules: [{
+                                    whitespace: true,
                                     required: true,
                                     message: 'Please input your welcome message',
                                 }],
@@ -96,6 +97,7 @@ class EditAssistantModal extends Component {
                             getFieldDecorator('topBarText', {
                                 initialValue: assistant?.TopBarText,
                                 rules: [{
+                                    whitespace: true,
                                     required: true,
                                     message: 'Please input your header title',
                                 }],

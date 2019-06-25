@@ -65,7 +65,7 @@ class Marketplace extends React.Component {
     componentDidMount() {
         let loc = this.props.location.search.replace("?", "").split("&");
         let isGoogleAuthorize = loc.filter(e => e.substring(0, "googleVerification".length) === "googleVerification").length > 0;
-        if(isGoogleAuthorize){
+        if (isGoogleAuthorize) {
             let code = loc.filter(e => e.substr(0, 4) === "code")[0].replace("code=", "");
             axios.post("/api/calendar/google/authorize", {code})
         }
@@ -123,7 +123,7 @@ class Marketplace extends React.Component {
                                 <Spin spinning={this.props.isLoadingCrms}>
                                     <Link to={{
                                         pathname: `/dashboard/marketplace/${crm.type}`,
-                                        state: {crm: crm, companyID:this.props.companyID}
+                                        state: {crm: crm, companyID: this.props.companyID}
                                     }}>
                                         <AuroraCardAvatar title={crm.title}
                                                           desc={crm.desc}

@@ -11,6 +11,3 @@ chatbot_router: Blueprint = chatbot_router
 
 from .auth import auth_router
 auth_router: Blueprint = auth_router
-
-from .appointment import appointment_router
-appointment_router: Blueprint = appointment_router

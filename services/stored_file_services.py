@@ -109,9 +109,9 @@ def downloadFile(path):
         session = boto3.session.Session()
         s3 = session.resource('s3',
                               region_name='ams3',
-                              endpoint_url=os.environ['SERVER_SPACES'],
-                              aws_access_key_id=os.environ['PUBLIC_KEY_SPACES'],
-                              aws_secret_access_key=os.environ['SECRET_KEY_SPACES'])
+                              endpoint_url=os.environ['SPACES_SERVER_URI'],
+                              aws_access_key_id=os.environ['SPACES_PUBLIC_KEY'],
+                              aws_secret_access_key=os.environ['SPACES_SECRET_KEY'])
         file = s3.Object('tsb', UPLOAD_FOLDER + path)
 
         # Check if file exists
@@ -133,9 +133,9 @@ def deleteFile(filename, path):
         session = boto3.session.Session()
         s3 = session.resource('s3',
                               region_name='ams3',
-                              endpoint_url='https://ams3.digitaloceanspaces.com',
-                              aws_access_key_id=os.environ['PUBLIC_KEY_SPACES'],
-                              aws_secret_access_key=os.environ['SECRET_KEY_SPACES'])
+                              endpoint_url=os.environ['SPACES_SERVER_URI'],
+                              aws_access_key_id=os.environ['SPACES_PUBLIC_KEY'],
+                              aws_secret_access_key=os.environ['SPACES_SECRET_KEY'])
         # Delete file
         s3.Object('tsb', UPLOAD_FOLDER + path + '/' + filename).delete()
 

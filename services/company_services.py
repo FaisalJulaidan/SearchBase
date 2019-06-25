@@ -101,14 +101,30 @@ def getByStripeID(id) -> Callback:
         return Callback(False, 'Could not get the assistant by nickname.')
 
 
-def updateCompany(companyName, companyID):
+def update(companyName, websiteURL, trackData: bool, techSupport: bool, accountSpecailst: bool, companyID):
     try:
+
+        if not (companyName
+                and websiteURL
+                and isinstance(trackData, bool)
+                and isinstance(techSupport, bool)
+                and isinstance(accountSpecailst, bool)):
+            raise Exception("Did not provide all required fields")
+
         callback: Callback = getByCompanyID(companyID)
         if not callback.Success: return Callback(False, "Could not find company")
-        callback.Data.Name = companyName
+        company: Company = callback.Data
+
+        company.Name = companyName
+        company.URL = websiteURL
+        company.TrackingData = trackData
+        company.TechnicalSupport = techSupport
+        company.AccountSpecialist = accountSpecailst
+
         db.session.commit()
 
         return Callback(True, "Company has been updated")
+
     except Exception as exc:
         helpers.logError("company_service.updateCompany(): " + str(exc))
         db.session.rollback()

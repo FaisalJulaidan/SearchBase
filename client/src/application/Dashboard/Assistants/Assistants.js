@@ -58,6 +58,7 @@ class Assistants extends Component {
 
 
     isAssistantNameValid = (name) => {
+        console.log(name);
         return !(this.props.assistantList.findIndex(assistant => assistant.Name.toLowerCase() === name.toLowerCase()) >= 0)
     };
 

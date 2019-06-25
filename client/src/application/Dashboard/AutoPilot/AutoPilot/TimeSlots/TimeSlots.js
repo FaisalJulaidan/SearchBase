@@ -12,11 +12,11 @@ class TimeSlots extends React.Component {
     componentDidMount() {
         const /**@type AutoPilot*/x = this.props.autoPilot;
         this.setState(state => {
-            state.duration = x.OpenTimeSlots[0].Duration + 'min';
+            state.duration = x.OpenTimes[0].Duration + 'min';
             state.weekDays.forEach((weekDay, i) => {
-                weekDay.active = x.OpenTimeSlots[i].Active;
-                weekDay.from = moment(x.OpenTimeSlots[i].From, "HHmmss");
-                weekDay.to = moment(x.OpenTimeSlots[i].To, "HHmmss");
+                weekDay.active = x.OpenTimes[i].Active;
+                weekDay.from = moment(x.OpenTimes[i].From, "HHmmss");
+                weekDay.to = moment(x.OpenTimes[i].To, "HHmmss");
             })
         })
     }
@@ -105,8 +105,9 @@ class TimeSlots extends React.Component {
                 const totalHalfHours = (minutes / 30) + (hours * 2); // 1 + 6 = 7
 
                 if (this.state.duration === "60min")
-                    if (totalHalfHours < 2)
-                        return 0;
+                    if (totalHalfHours < 2) {
+                        return 'Non';
+                    }
                     else
                         return Math.ceil(totalHalfHours / 2);
                 else

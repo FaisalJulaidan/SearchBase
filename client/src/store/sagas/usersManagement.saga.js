@@ -6,7 +6,7 @@ import {errorMessage, http, loadingMessage, successMessage} from "helpers";
 function* getUsers() {
     try {
         const res = yield http.get(`/users`);
-        return yield put(usersManagementActions.getUsersSuccess(res.data.data))
+        return yield put(usersManagementActions.getUsersSuccess(res.data?.data?.users, res.data?.data?.roles))
     } catch (error) {
         const msg = error.response?.data?.msg || "Couldn't load users";
         yield put(usersManagementActions.getUsersFailure(msg));
@@ -14,10 +14,10 @@ function* getUsers() {
     }
 }
 
-function* addUser(action) {
+function* addUser({values}) {
     try {
         loadingMessage('Adding new user...');
-        const res = yield http.post(`/users`, action.params.user);
+        const res = yield http.post(`/users`, values);
         yield put(usersManagementActions.addUserSuccess(res.message));
         yield put(usersManagementActions.getUsers());
         successMessage('New user added');
@@ -29,10 +29,10 @@ function* addUser(action) {
     }
 }
 
-function* editUser(action) {
+function* editUser({userID, values}) {
     try {
         loadingMessage('Editing user...');
-        const res = yield http.put(`/users`, action.params.user);
+        const res = yield http.put(`/user/${userID}`, values);
         yield put(usersManagementActions.editUserSuccess(res.message));
         yield put(usersManagementActions.getUsers());
         successMessage('User edited');
@@ -44,11 +44,10 @@ function* editUser(action) {
     }
 }
 
-function* deleteUser(action) {
+function* deleteUser({userID}) {
     try {
         loadingMessage('Deleting user...');
-        const user = action.params.user;
-        const res = yield http.delete(`/user/` + user.ID);
+        const res = yield http.delete(`/user/${userID}`);
         yield put(usersManagementActions.deleteUserSuccess(res.message));
         yield put(usersManagementActions.getUsers());
         successMessage('User deleted');

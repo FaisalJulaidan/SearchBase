@@ -91,7 +91,7 @@ class Signup extends React.Component {
                                         {getFieldDecorator('websiteURL', {
                                             rules: [{required: true, message: 'Please input company website URL!'},
                                                 {pattern: /[-a-zA-Z0-9@:%_\+.~#?&//=]{2,256}\.[a-z]{2,4}\b(\/[-a-zA-Z0-9@:%_\+.~#?&//=]*)?/,
-                                                    message: 'Sorry, input a valid URL'}],
+                                                    message: 'Please, enter a valid URL'}],
                                         })(
                                             <Input prefix={<Icon type="global" style={{color: 'rgba(0,0,0,.25)'}}/>}
                                                    placeholder="Website URL" addonBefore={selectBeforeURL}/>

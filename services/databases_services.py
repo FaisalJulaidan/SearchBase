@@ -1,6 +1,5 @@
 import enums
 import json
-import logging
 import pandas
 import random
 import re
@@ -71,6 +70,8 @@ def uploadDatabase(data: dict, companyID: int) -> Callback:
                 if data:
                     if key in [Candidate.Currency.name, Job.Currency.name]:
                         parsed[key] = Currency(data)
+                    elif key in [Candidate.PayPeriod.name, Job.PayPeriod.name]:
+                        parsed[key] = enums.Period[data]
                     elif key in [Job.JobStartDate.name, Job.JobEndDate.name]:
                         parsed[key] = datetime(year=data['year'],
                                                month=data['month'],
@@ -101,17 +102,23 @@ def uploadDatabase(data: dict, companyID: int) -> Callback:
 
         databaseData = data.get('newDatabase')
         databaseName = databaseData["databaseName"]
+
+        # Upload Candidates database
         if databaseData['databaseType'] == enums.DatabaseType.Candidates.name:
             newDatabase = createDatabase(databaseName, DatabaseType.Candidates)
             uploadCandidates(databaseData, newDatabase)
+
+        # Upload Jobs database
         elif databaseData['databaseType'] == enums.DatabaseType.Jobs.name:
             newDatabase = createDatabase(databaseName, DatabaseType.Jobs)
             uploadJobs(databaseData, newDatabase)
         else:
             return Callback(False, "Database type is not recognised")
+
         # After finishing from uploading database without errors, save changes
         db.session.commit()
         return Callback(True, "Databases was successfully uploaded!", newDatabase)
+
     except Exception as exc:
         helpers.logError("databases_service.uploadDatabase(): " + str(exc))
         return Callback(False, 'Could not upload the databases.')
@@ -269,6 +276,7 @@ def scanCandidates(session, dbIDs, extraCandidates=None):
 
         df = pandas.read_sql(db.session.query(Candidate).filter(Candidate.DatabaseID.in_(dbIDs)).statement,
                              con=db.session.bind)
+
         df = df.drop('DatabaseID', axis=1)  # Drop column
 
         keywords = session['keywordsByDataType']
@@ -278,46 +286,45 @@ def scanCandidates(session, dbIDs, extraCandidates=None):
             df = df.append(extraCandidates, ignore_index=True)  # TODO
             # print("df: ", df["CandidateLocation"])
 
-        def wordsCounter(dataType: DT, dbColumn, x=1):
-            if keywords.get(dataType.value['name']):
-                df['Score'] += x * df[dbColumn.name].str.count('|'.join(keywords[dataType.value['name']]),
-                                                               flags=re.IGNORECASE) | 0
+        # Fill None values with 0 for numeric columns and with empty string for string columns
+        df = df.fillna({Candidate.CandidateDesiredSalary.name: 0, Candidate.CandidateYearsExperience: 0}).fillna('')
 
-        def greaterCounter(dataType: DT, dbColumn, plus=1):
-            if keywords.get(dataType.value['name']):
-                df.loc[df[dbColumn.name] <=
-                       float(keywords[dataType.value['name']][-1]), 'Score'] += plus
+        # Salary comparision for JobSalary (LessThan is forced)
+        salaryInputs: list = keywords.get(DT.JobSalary.value['name'])
+        if salaryInputs and len(salaryInputs):
+            df[['Score', Candidate.CandidateDesiredSalary.name, Candidate.Currency.name]] = \
+                df.apply(lambda row: __salary(row, Candidate.CandidateDesiredSalary, Candidate.Currency,
+                                              salaryInputs[-1], plus=8, forceLessThan=True), axis=1, result_type='expand')
 
-        def lessCounter(dataType: DT, dbColumn, plus=1):
-            if keywords.get(dataType.value['name']):
-                df.loc[df[dbColumn.name] >=
-                       float(keywords[dataType.value['name']][-1]), 'Score'] += plus
-
-        # Desired Salary
-        greaterCounter(DT.CandidateDesiredSalary, Candidate.CandidateDesiredSalary, 3)
-        greaterCounter(DT.JobSalary, Candidate.CandidateDesiredSalary, 3)
+        # Salary comparision for CandidateDesiredSalary
+        salaryInputs: list = keywords.get(DT.CandidateDesiredSalary.value['name'])
+        if salaryInputs and len(salaryInputs):
+            df[['Score', Candidate.CandidateDesiredSalary.name, Candidate.Currency.name]] = \
+                df.apply(lambda row: __salary(row, Candidate.CandidateDesiredSalary,
+                                              Candidate.Currency, Candidate.PayPeriod,
+                                              salaryInputs[-1], plus=8, forceLessThan=False), axis=1, result_type='expand')
 
         # Years of EXP
-        lessCounter(DT.CandidateYearsExperience, Candidate.CandidateYearsExperience, 5)
+        __numCounter(Candidate.CandidateYearsExperience, '>', DT.CandidateYearsExperience, keywords, df, plus=5, addInputToScore=True)
 
         # Education
-        wordsCounter(DT.CandidateEducation, Candidate.CandidateEducation)
+        __wordsCounter(DT.CandidateEducation, Candidate.CandidateEducation, keywords, df, 1)
 
         # Location
-        wordsCounter(DT.JobLocation, Candidate.CandidateLocation, 6)
-        wordsCounter(DT.CandidateLocation, Candidate.CandidateLocation, 6)
+        __wordsCounter(DT.JobLocation, Candidate.CandidateLocation, keywords, df, 6)
+        __wordsCounter(DT.CandidateLocation, Candidate.CandidateLocation, keywords, df, 6)
 
         # JobTitle
-        wordsCounter(DT.CandidateJobTitle, Candidate.CandidateJobTitle)
-        wordsCounter(DT.JobTitle, Candidate.CandidateJobTitle)
+        __wordsCounter(DT.CandidateJobTitle, Candidate.CandidateJobTitle, keywords, df, 1)
+        __wordsCounter(DT.JobTitle, Candidate.CandidateJobTitle, keywords, df, 1)
 
         # Skills
-        wordsCounter(DT.CandidateSkills, Candidate.CandidateSkills, 2)
-        wordsCounter(DT.JobDesiredSkills, Candidate.CandidateSkills, 2)
-        wordsCounter(DT.JobEssentialSkills, Candidate.CandidateSkills, 2)
+        __wordsCounter(DT.CandidateSkills, Candidate.CandidateSkills, keywords, df, 2)
+        __wordsCounter(DT.JobDesiredSkills, Candidate.CandidateSkills, keywords, df, 2)
+        __wordsCounter(DT.JobEssentialSkills, Candidate.CandidateSkills, keywords, df, 2)
 
         # Availability
-        wordsCounter(DT.CandidateAvailability, Candidate.CandidateAvailability)
+        __wordsCounter(DT.CandidateAvailability, Candidate.CandidateAvailability, keywords, df, 1)
 
         topResults = json.loads(df[df['Score'] > 0].nlargest(session.get('showTop', 2), 'Score')
                                 .to_json(orient='records'))
@@ -363,56 +370,59 @@ def scanJobs(session, dbIDs, extraJobs=None):
     try:
 
         df = pandas.read_sql(db.session.query(Job).filter(Job.DatabaseID.in_(dbIDs)).statement,
-                             con=db.session.bind)
+                             con=db.session.bind)\
+            .fillna({Job.JobSalary.name: 0, Job.JobYearsRequired.name: 0})\
+            .fillna('')
+
+
         df = df.drop('DatabaseID', axis=1)  # Drop column
 
         keywords = session['keywordsByDataType']
-        df['Score'] = 0  # Add column for tracking score
+        df['Score'] = 1  # Add column for tracking score
         df['Source'] = "Internal Database"  # Source of solution e.g. Bullhorn, Adapt...
 
         if extraJobs:
             df = df.append(extraJobs, ignore_index=True)
 
-        def wordsCounter(dataType: DT, dbColumn, x=1):
-            if keywords.get(dataType.value['name']):
-                df['Score'] += x * df[dbColumn.name].str.count('|'.join(keywords[dataType.value['name']]),
-                                                               flags=re.IGNORECASE) | 0
+        # Fill None values with 0 for numeric columns and with empty string for string columns
+        df = df.fillna({Job.JobSalary.name: 0, Job.JobYearsRequired.name: 0}).fillna('')
 
-        def greaterCounter(dataType: DT, dbColumn, plus=1):
-            if keywords.get(dataType.value['name']):
-                df.loc[df[dbColumn.name] <=
-                       float(keywords[dataType.value['name']][-1]), 'Score'] += plus
+        # Salary comparision
+        salaryInputs: list = keywords.get(DT.JobSalary.value['name'], keywords.get(DT.CandidateDesiredSalary.value['name']))
+        if salaryInputs and len(salaryInputs):
+            df[['Score', Job.JobSalary.name, Job.Currency.name]] = \
+                df.apply(lambda row: __salary(row, Job.JobSalary, Job.Currency, Job.PayPeriod, salaryInputs[-1], 8),
+                                                                            axis=1, result_type='expand')
 
-        def lessCounter(dataType: DT, dbColumn, plus=1):
-            if keywords.get(dataType.value['name']):
-                df.loc[df[dbColumn.name] >=
-                       float(keywords[dataType.value['name']][-1]), 'Score'] += plus
+        # Job Year Required
+        __numCounter(Job.JobYearsRequired, '<', DT.JobYearsRequired, keywords, df, plus=5, addInputToScore=True)
 
-        # Salary
-        lessCounter(DT.JobSalary, Job.JobSalary, 3)
-        lessCounter(DT.CandidateDesiredSalary, Job.JobSalary, 3)
-        # Year Required
-        greaterCounter(DT.JobYearsRequired, Job.JobYearsRequired, 5)
-        greaterCounter(DT.CandidateYearsExperience, Job.JobYearsRequired, 5)
+        # Job Year Required
+        __numCounter(Job.JobYearsRequired, '<', DT.CandidateYearsExperience, keywords, df, plus=5, addInputToScore=True)
+
         # Job Title
-        wordsCounter(DT.JobTitle, Job.JobTitle, 2)
-        wordsCounter(DT.JobTitle, Job.JobDescription, 2)
-        wordsCounter(DT.CandidateSkills, Job.JobTitle, 2)
-        wordsCounter(DT.CandidateSkills, Job.JobDescription, 2)
+        __wordsCounter(DT.JobTitle, Job.JobTitle, keywords, df, 2)
+        __wordsCounter(DT.JobTitle, Job.JobDescription, keywords, df, 2)
+        __wordsCounter(DT.CandidateSkills, Job.JobTitle, keywords, df, 2)
+        __wordsCounter(DT.CandidateSkills, Job.JobDescription, keywords, df, 2)
+
         # Type
-        wordsCounter(DT.JobType, Job.JobType, 2)
+        __wordsCounter(DT.JobType, Job.JobType, keywords, df, 2)
+
         # Location
-        wordsCounter(DT.JobLocation, Job.JobLocation, 3)
-        wordsCounter(DT.CandidateLocation, Job.JobLocation, 3)
+        __wordsCounter(DT.JobLocation, Job.JobLocation, keywords, df, 3)
+        __wordsCounter(DT.CandidateLocation, Job.JobLocation, keywords, df, 3)
+
         # Skills
-        wordsCounter(DT.JobEssentialSkills, Job.JobEssentialSkills, 3)
-        wordsCounter(DT.JobDesiredSkills, Job.JobDesiredSkills, 3)
-        wordsCounter(DT.CandidateSkills, Job.JobEssentialSkills, 3)
-        wordsCounter(DT.CandidateSkills, Job.JobDesiredSkills, 3)
+        __wordsCounter(DT.JobEssentialSkills, Job.JobEssentialSkills, keywords, df, 3)
+        __wordsCounter(DT.JobDesiredSkills, Job.JobDesiredSkills, keywords, df, 3)
+        __wordsCounter(DT.CandidateSkills, Job.JobEssentialSkills, keywords, df, 3)
+        __wordsCounter(DT.CandidateSkills, Job.JobDesiredSkills, keywords, df, 3)
 
         # Results
         topResults = json.loads(df[df['Score'] > 0].nlargest(session.get('showTop', 0), 'Score')
                                 .to_json(orient='records'))
+
 
         jobType = ["This role is a [jobType]", "This job is a [jobType]"]
         location = [" located in [location]. "]
@@ -447,8 +457,15 @@ def scanJobs(session, dbIDs, extraJobs=None):
             subTitles = []
             if record[Job.JobLocation.name]:
                 subTitles.append("Location: " + record[Job.JobLocation.name])
+
+            if record[Job.JobSalary.name]:
+                currency = record[Job.Currency.name] or '' # it could be a Currency object e.g. {code: 'USD'...}
+                if isinstance(record[Job.Currency.name], dict): currency = currency['code']
+                subTitles.append("Salary: " + str(int(record[Job.JobSalary.name])) + ' ' + currency)
+
             if record[Job.JobEssentialSkills.name]:
                 subTitles.append("Essential Skills: " + record[Job.JobEssentialSkills.name])
+
 
             data.append({
                 "id": record["ID"],
@@ -467,42 +484,91 @@ def scanJobs(session, dbIDs, extraJobs=None):
         return Callback(False, 'Error while search the database for matches!')
 
 
+
+def __wordsCounter(dataType: DT, dbColumn, keywords, df, x=1):
+    if keywords.get(dataType.value['name']):
+        df['Score'] += x * df[dbColumn.name].str.count('|'.join(keywords[dataType.value['name']]),
+                                                       flags=re.IGNORECASE) | 0
+
+
+def __numCounter(dbColumn, compareSign, dataType: DT, keywords, df, plus=1, addInputToScore=False):
+    if keywords.get(dataType.value['name']):
+        numberInput = int(keywords.get(dataType.value['name'])[-1])
+
+        # it is good for years of exp to be added to the score
+        if addInputToScore:
+            plus += 7 if numberInput > 7 else numberInput
+
+        # Compare
+        if compareSign == '>':
+            df.loc[df[dbColumn.name] >=
+                   int(numberInput), 'Score'] += plus
+        else: # '<'
+            df.loc[df[dbColumn.name] <=
+                   int(numberInput), 'Score'] += plus
+
+
+def __salary(row, dbSalaryColumn, dbCurrencyColumn, dbPayPeriodColumn, salaryInput: str, plus=4, forceLessThan=False):
+
+    userSalary = salaryInput.split(' ') # e.g. Less Than 5000 GBP Annually
+
+    # Convert salary currency if did not match with user's entered currency
+    dbSalary = row[dbSalaryColumn.name] or 0
+    if (not row[dbCurrencyColumn.name] == userSalary[3]) and dbSalary > 0:
+        dbSalary = helpers.currencyConverter.convert(row[dbCurrencyColumn.name], userSalary[3], dbSalary)
+        row[dbSalaryColumn.name] = dbSalary
+
+    if (not row[dbPayPeriodColumn.name] == userSalary[4]) and dbSalary > 0:
+        dbSalary = helpers.currencyConverter.convert(row[dbCurrencyColumn.name], userSalary[3], dbSalary)
+        row[dbSalaryColumn.name] = dbSalary
+
+    # Add old score to new score if success
+    plus += row['Score']
+
+    # Compare salaries, if true then return 'plus' to be added to the score otherwise old score
+    if userSalary[0] == 'Greater' and not (forceLessThan):
+        return (plus if dbSalary >= float(userSalary[2]) else row['Score']), dbSalary, userSalary[3]
+    else: # Less
+        return (plus if dbSalary <= float(userSalary[2]) else row['Score']), dbSalary, userSalary[3]
+
+
+
 def createPandaCandidate(id, name, email, mobile, location, skills,
                          linkdinURL, availability, jobTitle, education,
                          yearsExperience: int, desiredSalary: float, currency, source):
     return {"ID": id,
-            "CandidateName": name,
-            "CandidateEmail": email,
-            "CandidateMobile": mobile,
-            "CandidateLocation": location,
-            "CandidateSkills": skills,
-            "CandidateLinkdinURL": linkdinURL,
-            "CandidateAvailability": availability,
-            "CandidateJobTitle": jobTitle,
-            "CandidateEducation": education,
-            "CandidateYearsExperience": yearsExperience,
-            "CandidateDesiredSalary": desiredSalary,
-            "Currency": currency,
+            "CandidateName": name or '',
+            "CandidateEmail": email or '',
+            "CandidateMobile": mobile or '',
+            "CandidateLocation": location or '',
+            "CandidateSkills": skills or '',
+            "CandidateLinkdinURL": linkdinURL or '',
+            "CandidateAvailability": availability or '',
+            "CandidateJobTitle": jobTitle or '',
+            "CandidateEducation": education or '',
+            "CandidateYearsExperience": yearsExperience or 0,
+            "CandidateDesiredSalary": desiredSalary or 0,
+            "Currency": currency or '',
             "Score": 0,
-            "Source": source,
+            "Source": source or '',
             }
 
 
 def createPandaJob(id, title, desc, location, type, salary: float, essentialSkills, desiredSkills, yearsRequired,
                    startDate, endDate, linkURL, currency, source):
     return {"ID": id,
-            "JobTitle": title,
-            "JobDescription": desc,
-            "JobLocation": location,
-            "JobType": type,
-            "JobSalary": salary,
-            "JobEssentialSkills": essentialSkills,
-            "JobDesiredSkills": desiredSkills,
-            "JobYearsRequired": yearsRequired,
-            "JobStartDate": startDate,
+            "JobTitle": title or '',
+            "JobDescription": desc or '',
+            "JobLocation": location or '',
+            "JobType": type or '',
+            "JobSalary": salary or 0,
+            "JobEssentialSkills": essentialSkills or '',
+            "JobDesiredSkills": desiredSkills or '',
+            "JobYearsRequired": yearsRequired or 0,
+            "JobStartDate": startDate or '',
             "JobEndDate": endDate,
             "JobLinkURL": linkURL,
-            "Currency": currency,
+            "Currency": currency or '',
             "Score": 0,
-            "Source": source,
+            "Source": source or '',
             }

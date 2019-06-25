@@ -74,6 +74,7 @@ babel = "*"
 self = "*"
 boto3 = "*"
 geoip2 = "*"
+forex-python = "*"
 msal = "*"
 authlib = "*"
 

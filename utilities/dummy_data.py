@@ -1,4 +1,4 @@
-from models import db, Role, Company, Assistant, Plan, Conversation, Database, Candidate, CRM, Appointment
+from models import db, Role, Company, Assistant, Conversation, Database, Candidate, CRM, Appointment, Job
 from services import user_services, flow_services, auto_pilot_services, assistant_services, scheduler_services
 from datetime import datetime, timedelta, time
 from utilities import helpers
@@ -165,40 +165,39 @@ def generate():
 
 
     # Create Roles
-    db.session.add(Role(Name="Owner", Company= aramco, EditChatbots=True, EditUsers=True, DeleteUsers=True, AccessBilling=True))
-    db.session.add(Role(Name="Admin", Company= aramco, EditChatbots=True, EditUsers=True, DeleteUsers=True, AccessBilling=True))
-    db.session.add(Role(Name="User", Company= aramco, EditChatbots=False, EditUsers=False, DeleteUsers=False, AccessBilling=False))
+    db.session.add(Role(Name="Staff", EditChatbots=True, AddUsers=True, EditUsers=True, DeleteUsers=True, AccessBilling=True))
+    db.session.add(Role(Name="Owner", EditChatbots=True, AddUsers=True, EditUsers=True, DeleteUsers=True, AccessBilling=True))
 
-    db.session.add(Role(Name="Owner", Company= sabic, EditChatbots=True, EditUsers=True, DeleteUsers=True, AccessBilling=True))
-    db.session.add(Role(Name="Admin", Company= sabic, EditChatbots=True, EditUsers=True, DeleteUsers=True, AccessBilling=True))
-    db.session.add(Role(Name="User", Company= sabic, EditChatbots=False, EditUsers=False, DeleteUsers=False, AccessBilling=False))
+    db.session.add(Role(Name="Admin", Company= aramco, AddUsers=True, EditChatbots=True, EditUsers=True, DeleteUsers=True, AccessBilling=True))
+    db.session.add(Role(Name="User", Company= aramco, AddUsers=False, EditChatbots=True, EditUsers=False, DeleteUsers=False, AccessBilling=False))
+
+    db.session.add(Role(Name="Admin", Company= sabic, AddUsers=True, EditChatbots=True, EditUsers=True, DeleteUsers=True, AccessBilling=True))
+    db.session.add(Role(Name="User", Company= sabic, AddUsers=False, EditChatbots=True, EditUsers=False, DeleteUsers=False, AccessBilling=False))
 
 
     # Get Roles
-    owner_aramco = Role.query.filter(Role.Company == aramco).filter(Role.Name == "Owner").first()
+    ownerRole = Role.query.filter(Role.Name == "Owner").first()
+
     admin_aramco = Role.query.filter(Role.Company == aramco).filter(Role.Name == "Admin").first()
     user_aramco = Role.query.filter(Role.Company == aramco).filter(Role.Name == "User").first()
 
-    owner_sabic = Role.query.filter(Role.Company == sabic).filter(Role.Name == "Owner").first()
     admin_sabic = Role.query.filter(Role.Company == sabic).filter(Role.Name == "Admin").first()
     user_sabic = Role.query.filter(Role.Company == sabic).filter(Role.Name == "User").first()
 
-    # Create Users
-    user_services.create(firstname='Sylvester', surname='Stallone', email='aa@aa.com', password='123', phone='4344423',
-                         company=aramco, role=owner_aramco, verified=True)
-    user_services.create(firstname='Evg', surname='Test', email='evgeniy67@abv.bg', password='123', phone='4344423',
-                         company=aramco, role=admin_aramco, verified=True)
-    user_services.create(firstname='firstname', surname='lastname', email='e2@e.com', password='123', phone='4344423', company=aramco,
-                         role=admin_aramco, verified=True)
-    user_services.create(firstname='firstname', surname='lastname', email='e3@e.com', password='123', phone='4344423', company=aramco,
-                         role=user_aramco, verified=True)
+    user_services.create(firstname='Sylvester', surname='Stallone', email='aa@aa.com', password='123', phone='43444236456',
+                         companyID=aramco.ID, roleID=ownerRole.ID, verified=True)
+    user_services.create(firstname='Evg', surname='Test', email='evgeniy67@abv.bg', password='123', phone='43444236456',
+                         companyID=aramco.ID, roleID=admin_aramco.ID, verified=True)
+    user_services.create(firstname='firstname', surname='lastname', email='e2@e.com', password='123', phone='43444236456',
+                         companyID=aramco.ID, roleID=admin_aramco.ID, verified=True)
+    user_services.create(firstname='firstname', surname='lastname', email='e3@e.com', password='123', phone='43444236456',
+                         companyID=aramco.ID, roleID=user_aramco.ID, verified=True)
 
-    user_services.create(firstname='Ali', surname='Khalid', email='bb@bb.com', password='123', phone='4344423', company=sabic,
-                         role=owner_sabic, verified=True)
-    user_services.create(firstname='firstname', surname='lastname', email='e5@e.com', password='123', phone='4344423', company=sabic,
-                         role=admin_sabic, verified=True)
-    user_services.create(firstname='Faisal', surname='Julaidan', email='julaidan.faisal@gmail.com', password='123', phone='4344423', company=sabic,
-                         role=user_sabic, verified=False)
+    user_services.create(firstname='Ali', surname='Khalid', email='bb@bb.com', password='123', phone='43444236456',
+                         companyID=sabic.ID, roleID=ownerRole.ID, verified=True)
+    user_services.create(firstname='firstname', surname='lastname', email='e5@e.com', password='123', phone='43444236456',
+                         companyID=sabic.ID, roleID=admin_sabic.ID, verified=True)
+
 
 
     # Chatbot Sessions
@@ -258,8 +257,11 @@ def generate():
     db1: Database = Database(Name='db1', Type=enums.DatabaseType.Candidates, Company=aramco)
     db2: Database = Database(Name='db2', Type=enums.DatabaseType.Candidates, Company=aramco)
 
+    db3: Database = Database(Name='db3', Type=enums.DatabaseType.Jobs, Company=aramco)
+
     db.session.add(db1)
     db.session.add(db2)
+    db.session.add(db3)
 
     db.session.add(addCandidate(db1, 'Faisal', 2000, "Software Engineer", "python, java, javascript, SQL",
                                 5, "London"))
@@ -270,11 +272,14 @@ def generate():
     db.session.add(addCandidate(db2, 'Ahmed', 1500, "Web Developer", "html,css, javascript",
                                 2, "Cardiff"))
 
+    db.session.add(addJob(db3, 'Python Developer', 'a job for someone who is good at python', 1500, 'London', Currency('USD')))
+    db.session.add(addJob(db3, 'Python Developer', None, None, 'London', Currency('GBP')))
+
     for i in list(range(120)):
         db.session.add(addCandidate(db1, 'Ahmed', 1500, "Web Developer", "html,css, javascript",
                                     2, "Cardiff"))
 
-    # Add CRM conncetion for aramco company
+    # Add CRM connection for aramco company
     db.session.add(CRM(Type=enums.CRM.Adapt, Company=aramco, Auth={
         "domain": "PartnerDomain9",
         "username": "SD9USR8",
@@ -293,8 +298,7 @@ def generate():
     reader_a.AutoPilot = auto_pilot_services.getByID(1,1).Data
 
     # Add Appointment
-    a = Appointment(DateTime=datetime.now() + timedelta(days=5),
-                    Conversation=conversation1, Assistant=reader_a)
+    a = Appointment(DateTime=datetime.now() + timedelta(days=5), Conversation=conversation1)
 
     db.session.add(a)
     db.session.commit()
@@ -309,4 +313,15 @@ def addCandidate(db, name, desiredSalary, jobTitle, skills, exp, location):
                      CandidateSkills =skills,
                      CandidateYearsExperience = exp,
                      CandidateLocation = location,
-                     Currency= Currency('USD'))
+                     Currency= Currency('USD'),
+                     PayPeriod= enums.Period.Annually)
+
+
+def addJob(db, title, description, salary, location, currency: Currency or None):
+    return Job(Database=db,
+               JobTitle=title,
+               JobDescription=description,
+               JobLocation=location,
+               JobSalary=salary,
+               Currency= currency,
+               PayPeriod= enums.Period.Annually)

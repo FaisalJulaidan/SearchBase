@@ -10,6 +10,7 @@ class NewGroup extends Component {
     handleSave = () => this.props.form.validateFields((err, values) => {
         if (!err)
             this.props.handleSave(values)
+        console.log(values);
     });
 
     render() {
@@ -52,8 +53,9 @@ class NewGroup extends Component {
                         extra="Just a description for you"
                         {...formItemLayout}>
                         {getFieldDecorator('description', {
+                            initialValue: '',
                             rules: [{
-                                required: true,
+                                required: false,
                                 message: 'Please add description to your group name',
                             }],
                         })(

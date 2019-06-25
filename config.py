@@ -60,6 +60,8 @@ class BaseConfig(object):
     USE_ENCRYPTION = True
     SQLALCHEMY_DATABASE_URI = os.environ['SQLALCHEMY_DATABASE_URI']
     SQLALCHEMY_TRACK_MODIFICATIONS = False
+    SQLALCHEMY_POOL_RECYCLE = 22000
+
 
     # Hashids Salt
     HASH_IDS_SALT = 'b9iLXiAa' # Never change it
@@ -67,7 +69,7 @@ class BaseConfig(object):
     # Calendar Config
     MAIL_SERVER = 'smtp.gmail.com'
     MAIL_PORT = 465
-    MAIL_USE_SSL = True,
+    MAIL_USE_SSL = True
     MAIL_USERNAME = 'thesearchbase@gmail.com'
     MAIL_PASSWORD = 'pilbvnczzdgxkyzy'
     MAIL_SUPPRESS_SEND = False
@@ -101,8 +103,6 @@ class ProductionConfig(BaseConfig):
     DEBUG = False
     TESTING = False
     USE_ENCRYPTION = True
-    SQLALCHEMY_POOL_RECYCLE = 499
-    SQLALCHEMY_POOL_TIMEOUT = 20
 
 
 class DevelopmentConfig(BaseConfig):
@@ -110,6 +110,9 @@ class DevelopmentConfig(BaseConfig):
     DEBUG = True
     TESTING = True
     USE_ENCRYPTION = False
+
+
+
 
 
 class TestingConfig(BaseConfig):

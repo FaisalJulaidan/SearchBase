@@ -1,20 +1,18 @@
 from sqlalchemy.sql import exists
 from models import db, Callback, User, Company, Role
-from services import mail_services, company_services, newsletter_services, role_services
+from services import mail_services, company_services, newsletter_services
 from utilities import helpers
 from sqlalchemy import and_
-import logging
 
 
-def create(firstname, surname, email, password, phone, company: Company, role: Role, verified=False) -> Callback:
+def create(firstname, surname, email, password, phone, companyID: int, roleID: int, verified=False) -> Callback:
     try:
+
+
         # Create a new user with its associated company and role
         newUser: User = User(Firstname=firstname, Surname=surname, Email=email.lower(), Verified=verified,
-                             Password=password, PhoneNumber=phone, Company=company,
-                             Role=role)
+                             Password=password, PhoneNumber=phone, CompanyID=companyID, RoleID=roleID)
         db.session.add(newUser)
-        db.session.flush()
-
         db.session.commit()
         return Callback(True, 'User has been created successfully!', newUser)
 
@@ -50,35 +48,42 @@ def getByEmail(email) -> User or None:
         # Get result and check if None then raise exception
         result = db.session.query(User).filter(User.Email == email.lower()).first()
         if not result: raise Exception
+        return Callback(True,'User with email ' + email + ' was successfully retrieved.', result)
 
-        return Callback(True,
-                        'User with email ' + email + ' was successfully retrieved.',
-                        result)
     except Exception as exc:
         return Callback(False, 'User with email ' + email + ' does not exist.')
 
+
+# this used to make sure the edited user is under this company
+def getByIDAndCompanyID(userID, companyID) -> Callback:
+    try:
+        # Get result and check if None then raise exception
+        result = db.session.query(User).filter(and_(User.ID == userID,User.CompanyID == companyID)).first()
+        if not result: raise Exception("User does not exist")
+
+        return Callback(True,'Users  retrieved successfully.', result)
+    except Exception as exc:
+        helpers.logError("user_services.getAllByCompanyID(): " + str(exc))
+        db.session.rollback()
+        return Callback(False, 'Users could not be retrieved.')
 
 def getAllByCompanyID(companyID) -> Callback:
     try:
         # Get result and check if None then raise exception
         result = db.session.query(User).filter(User.CompanyID == companyID).all()
-        if not result: raise Exception
 
-        return Callback(True,
-                        'Users with company ID ' + str(companyID) + ' were successfully retrieved.',
-                        result)
+        return Callback(True,'Users  retrieved successfully.', result)
     except Exception as exc:
         helpers.logError("user_services.getAllByCompanyID(): " + str(exc))
         db.session.rollback()
-        return Callback(False,
-                        'Users with company ID ' + str(companyID) + ' could not be retrieved.')
+        return Callback(False, 'Users could not be retrieved.')
 
 
 def getAllByCompanyIDWithEnabledNotifications(companyID) -> Callback:
     try:
         # Get result and check if None then raise exception
         result = db.session.query(User) \
-            .filter(and_(User.CompanyID == companyID, User.UserInputNotifications)).all()
+            .filter(and_(User.CompanyID == companyID, User.ChatbotNotifications)).all()
         if not result: raise Exception
 
         return Callback(True,
@@ -115,7 +120,7 @@ def getProfile(userID):
         profile = {
             'user': helpers.getDictFromSQLAlchemyObj(result),
             'company': helpers.getDictFromSQLAlchemyObj(result.Company),
-            'newsletters': newsletter_services.checkForNewsletter(result.Email).Success
+            'newsletters': newsletter_services.check(result.Email).Success
         }
 
         # For security purposes IMPORTANT!
@@ -131,35 +136,6 @@ def getProfile(userID):
         helpers.logError("user_services.getProfile(): " + str(exc))
         db.session.rollback()
         return Callback(False, 'User settings for this user does not exist.')
-
-
-def getUsersWithRolesByCompanyID(companyID):
-    try:
-        # Get users and check if None then raise exception
-        users = db.session.query(User).filter(User.CompanyID == companyID).all()
-        if not users:
-            raise Exception("No Records")
-
-        # Get roles
-        role_callback: Callback = role_services.getAllByCompanyID(companyID)
-        if not role_callback.Success:
-            raise Exception("Roles could not be retrieved")
-
-        # Convert to lists
-        users = helpers.getListFromSQLAlchemyList(users)
-        roles = helpers.getListFromSQLAlchemyList(role_callback.Data)
-
-        # Put the user's role in his user record
-        for user in users:
-            user["Role"] = next((x for x in roles if x["ID"] == user["RoleID"]), [None])
-
-        result = {"users": users, "roles": roles}
-
-        return Callback(True, 'Users with company ID ' + str(companyID) + ' were successfully retrieved.', result)
-    except Exception as exc:
-        helpers.logError("user_services.getUsersWithRolesByCompanyID(): " + str(exc))
-        db.session.rollback()
-        return Callback(False, 'Users with company ID ' + str(companyID) + ' could not be retrieved.')
 
 
 # ----- Updaters ----- #
@@ -210,18 +186,37 @@ def updateStripeID(email, cusID: str):
         return Callback(False, 'Could not update subID for ' + email)
 
 
-def updateUser(firstname, surname, newEmail, userID):
+def updateUser(firstname, surname, phoneNumber, chatbotNotifications: bool, newsletters: bool, userID):
     try:
+
+        if not (firstname
+                and surname
+                and isinstance(phoneNumber, str)
+                and isinstance(chatbotNotifications, bool)
+                and isinstance(newsletters, bool)):
+            raise Exception("Did not provide all required fields")
+
         callback: Callback = getByID(userID)
         if not callback: return Callback(False, "Could not find user")
+        user: User = callback.Data
 
-        callback.Data.Firstname = firstname
-        callback.Data.Surname = surname
-        callback.Data.Email = newEmail
+        user.Firstname = firstname
+        user.Surname = surname
+        user.PhoneNumber = phoneNumber
+        user.ChatbotNotifications = chatbotNotifications
 
+        if newsletters:
+            newsletters_callback: Callback = newsletter_services.add(user.Email)
+        else:
+            newsletters_callback: Callback = newsletter_services.remove(user.Email)
+
+        if not newsletters_callback.Success:
+            raise Exception(newsletters_callback.Message)
+
+        # Save
         db.session.commit()
 
-        return Callback(True, "User has been updated")
+        return Callback(True, "User has been updated", user)
     except Exception as exc:
         helpers.logError("user_services.updateUser(): " + str(exc))
         db.session.rollback()
@@ -240,7 +235,7 @@ def updatePasswordByID(userID, newPassword, oldPassword=None):
 
         result.Password = newPassword
         db.session.commit()
-        return Callback(True, "Password has been changed.")
+        return Callback(True, "Password updated successfully.")
 
     except Exception as exc:
         helpers.logError("user_services.changePasswordByID(): " + str(exc))
@@ -275,20 +270,8 @@ def verifyByEmail(email: str):
         if not user: raise Exception
 
         user.Verified = True
-
-        # Get user's company
-        company_callback = company_services.getByID(user.CompanyID)
-        companyName = "Unknown"
-        if company_callback.Success:
-            companyName = company_callback.Data.Name
-
-        # Send us mail
-        mail_callback: Callback = mail_services.sendNewUserHasRegistered(user.Firstname + user.Surname, user.Email,
-                                                                         companyName, user.PhoneNumber)
-        if not mail_callback.Success:
-            helpers.logError("user_services.verifyByEmail(): Could not send us signed up user email")
-
         db.session.commit()
+
         return Callback(True, 'Account has been verified successfully')
 
     except Exception as exc:

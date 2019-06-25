@@ -10,14 +10,13 @@ auth_router = Blueprint('auth_router', __name__)
 @auth_router.route("/auth", methods=['POST'])
 def authenticate():
     if request.method == "POST":
-        # os.command(['bash', 'deploy.sh'])
-        data = request.get_json(silent=True)
 
+        data = request.json
         callback: Callback = auth_services.authenticate(data.get('email'), data.get('password'))
-        if callback.Success:
-            return helpers.jsonResponse(True, 200, "Authorised!", callback.Data)
-        else:
+
+        if not callback.Success:
             return helpers.jsonResponse(False, 401, callback.Message, callback.Data)
+        return helpers.jsonResponse(True, 200, "Authorised!", callback.Data)
 
 
 # Refresh token endpoint
@@ -35,23 +34,23 @@ def refresh_token():
 def signup_process():
     if request.method == "POST":
         callback: Callback = auth_services.signup(request.json)
-        if callback.Success:
-            return helpers.jsonResponse(True, 200, callback.Message, callback.Data)
-        else:
-            return helpers.jsonResponse(False, 401, callback.Message, callback.Data)
+        if not callback.Success:
+            return helpers.jsonResponse(False, 401, "Couldn't sign you up", callback.Data)
+        return helpers.jsonResponse(True, 200, callback.Message, callback.Data)
 
 
-@auth_router.route("/account/verify/<payload>", methods=['GET'])  # TODO
+@auth_router.route("/verify_account/<payload>", methods=['POST'])  # TODO
 def verify_account(payload):
-    if request.method == "GET":
+    if request.method == "POST":
         try:
-            data = helpers.verificationSigner.loads(payload)
-            email = data.split(";")[0]
-            user_callback: Callback = user_services.verifyByEmail(email)
-            if not user_callback.Success:
-                raise Exception(user_callback.Message)
+            data = helpers.verificationSigner.loads(payload, salt='account-verify-key')
 
-            return redirect("/login")
+            callback: Callback = user_services.verifyByEmail(data['email'])
+            if not callback.Success:
+                raise Exception("Couldn't verify your account")
 
-        except Exception as e:
-            return redirect("/login")
+            return helpers.jsonResponse(True, 200, callback.Message, callback.Data)
+
+        except Exception as exc:
+            helpers.logError("auth_router.verify_account(): ====> " + str(exc))
+            return helpers.jsonResponse(False, 400, "Couldn't verify your account")

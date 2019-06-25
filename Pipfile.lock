@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "cf8ec44ae8956674ba628ebde7f75d2c083affe368ebd9e1167e8e2e6498adf0"
+            "sha256": "828614e283c4f3a5926b3af4d4ba1a58447ccf99ad878347a6e962725ec17123"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -39,6 +39,14 @@
             ],
             "index": "pypi",
             "version": "==0.24.0"
+        },
+        "authlib": {
+            "hashes": [
+                "sha256:3a226f231e962a16dd5f6fcf0c113235805ba206e294717a64fa8e04ae3ad9c4",
+                "sha256:9741db6de2950a0a5cefbdb72ec7ab12f7e9fd530ff47219f1530e79183cbaaf"
+            ],
+            "index": "pypi",
+            "version": "==0.11"
         },
         "babel": {
             "hashes": [
@@ -105,18 +113,18 @@
         },
         "boto3": {
             "hashes": [
-                "sha256:58ae308e4539264754e4e2a21bfec71b2fbffe02e86a77e680077e10b7c0ed54",
-                "sha256:9d8bd0ca309b01265793b7e8d7b88c1df439737d77c8725988f0277bbf58d169"
+                "sha256:73b65793f12141e14393a4f321861f3f33b68f9dfe4f14b7e65cdbfda5c7ccdb",
+                "sha256:e6472861a88d0bb47844c7d03764b730c7fb9ab393a5f0a29f6b4dc0b20bee3d"
             ],
             "index": "pypi",
-            "version": "==1.9.169"
+            "version": "==1.9.174"
         },
         "botocore": {
             "hashes": [
-                "sha256:22e7d079b62562591bc5b00a4fa97e0626b6ffb1b605929c7b023171c33a548a",
-                "sha256:25b44c3253b5ed1c9093efb57ffca440c5099a2d62fa793e8b6c52e72f54b01e"
+                "sha256:3356e72901d5a4259b8858785e415a895641454971e3fa67b4076b4c9bed543d",
+                "sha256:f7220c6dd551724d4af796fb7ddfef6d423bade92e78c3cc2282953b38dfb259"
             ],
-            "version": "==1.12.169"
+            "version": "==1.12.174"
         },
         "certifi": {
             "hashes": [
@@ -318,6 +326,13 @@
             "index": "pypi",
             "version": "==1.2.3"
         },
+        "forex-python": {
+            "hashes": [
+                "sha256:928951a0be8bf1139a07d21da0437ba111ef69a4d6c59b9252083611036548d5"
+            ],
+            "index": "pypi",
+            "version": "==1.5"
+        },
         "geoip2": {
             "hashes": [
                 "sha256:a37ddac2d200ffb97c736da8b8ba9d5d8dc47da6ec0f162a461b681ecac53a14",
@@ -493,6 +508,14 @@
             ],
             "index": "pypi",
             "version": "==0.9.1"
+        },
+        "msal": {
+            "hashes": [
+                "sha256:5adce2fd019b1bac51a6dfd7a2f917bfdebb6c3712524b67cb5c7baf8573c830",
+                "sha256:bf219535507cb4f777e8fdb60ef15413aa5006bab628a047617cae25b8d74127"
+            ],
+            "index": "pypi",
+            "version": "==0.4.1"
         },
         "numpy": {
             "hashes": [

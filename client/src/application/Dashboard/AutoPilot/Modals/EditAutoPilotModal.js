@@ -17,10 +17,6 @@ class EditAutoPilotModal extends Component {
 
 
     render() {
-        const layout = {
-            labelCol: {span: 6},
-            wrapperCol: {span: 14},
-        };
         const {autoPilot, form} = this.props;
         const {getFieldDecorator} = form;
 
@@ -29,11 +25,11 @@ class EditAutoPilotModal extends Component {
                    onOk={this.onSubmit}
                    onCancel={this.props.closeModal}>
                 <Form layout='horizontal'>
-                    <FormItem label="Name"
-                              {...layout}>
+                    <FormItem label="Name">
                         {getFieldDecorator('name', {
-                            initialValue: autoPilot?.Name,
+                            initialValue: autoPilot?.Name || '',
                             rules: [{
+                                whitespace: true,
                                 required: true,
                                 message: "Please add name or the name you entered is duplicated",
                                 validator: (_, value, callback) => {
@@ -50,8 +46,7 @@ class EditAutoPilotModal extends Component {
                         )}
                     </FormItem>
 
-                    <FormItem label="Description"
-                              {...layout}>
+                    <FormItem label="Description">
                         {getFieldDecorator('description', {
                             initialValue: autoPilot?.Description,
                             rules: [{

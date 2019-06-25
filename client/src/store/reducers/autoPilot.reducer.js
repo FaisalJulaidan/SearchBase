@@ -6,8 +6,6 @@ const initialState = {autoPilotsList: [], autoPilot: null, isLoading: false, err
 
 export const autoPilot = (state = initialState, action) => {
 
-    let autoPilotsListCopy;
-
     switch (action.type) {
         // Fetch All
         case actionTypes.FETCH_AUTOPILOTS_REQUEST:
@@ -118,7 +116,7 @@ export const autoPilot = (state = initialState, action) => {
             return updateObject(state, {
                 successMsg: action.successMsg,
                 isDeleting: false,
-                autoPilotList: [...state.autoPilotsList].filter(autoPilot => autoPilot.ID !== action.autoPilotID),
+                autoPilotsList: [...state.autoPilotsList].filter(autoPilot => autoPilot.ID !== action.autoPilotID),
                 autoPilot: null
             });
 

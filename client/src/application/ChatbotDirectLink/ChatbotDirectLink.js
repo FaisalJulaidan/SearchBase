@@ -7,7 +7,8 @@ import {getLink} from "helpers";
 class ChatbotDirectLink extends React.Component {
 
     state = {
-        logoPath: null
+        logoPath: null,
+        CompanyName: null
     };
 
     componentDidMount() {
@@ -27,7 +28,8 @@ class ChatbotDirectLink extends React.Component {
                 .then(res => {
                     const data = res.data.data;
                     this.setState({
-                        logoPath: data.assistant.LogoPath,
+                        LogoPath: data.assistant.LogoPath,
+                        CompanyName: data.assistant.CompanyName,
                     });
                 })
         }
@@ -36,7 +38,7 @@ class ChatbotDirectLink extends React.Component {
     render() {
         return (
             <div style={{height: '100%'}}>
-                <PublicNavbar companyLogo={this.state.logoPath}/>
+                <PublicNavbar companyLogo={this.state.LogoPath} CompanyName={this.state.CompanyName}/>
                 <div id="directlink" className={styles.Wrapper}></div>
             </div>
         )

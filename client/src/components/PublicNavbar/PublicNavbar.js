@@ -5,7 +5,7 @@ import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
 import {faCloud} from '@fortawesome/free-solid-svg-icons'
 import styles from './PublicNavbar.module.less'
 
-const PublicNavbar = ({companyLogo}) => {
+const PublicNavbar = ({companyLogo, CompanyName}) => {
 
     return (
         <div>
@@ -14,7 +14,16 @@ const PublicNavbar = ({companyLogo}) => {
                     <div style={{display: 'flex'}}>
                         {
                             companyLogo ?
-                                <img src={companyLogo} alt="company logo" height={40}/>
+                                <div>
+                                    <img src={companyLogo} alt="company logo" height={40}/>
+                                    <div style={{
+                                        lineHeight: '40px',
+                                        marginLeft: 18,
+                                        color: "#9254de"
+                                    }}>
+                                        {CompanyName}
+                                    </div>
+                                </div>
                                 :
                                 <>
                                     <FontAwesomeIcon size="2x" icon={faCloud} style={{color: '#9254de'}}/>

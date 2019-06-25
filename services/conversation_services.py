@@ -44,14 +44,16 @@ def processConversation(assistantHashID, data: dict) -> Callback:
         # Validate submitted conversation after adding the modified version of selected solutions
         validate(conversationData, json_schemas.conversation)
 
-
         # timeSpent is in seconds.
         conversation = Conversation(Data=conversationData,
+                                    Name=data['name'],
+                                    Email=data['email'],
+                                    PhoneNumber=data['phone'],
                                     TimeSpent=data['timeSpent'],
                                     Completed=data['isConversationCompleted'],
                                     SolutionsReturned=data['solutionsReturned'],
                                     QuestionsAnswered=len(collectedData),
-                                    UserType=UserType[data['userType'].replace(" ", "")],
+                                    UserType=UserType[data['userType']],
                                     Score=round(data['score'], 2),
                                     Assistant=assistant)
 

@@ -45,7 +45,19 @@ class Conversations extends React.Component {
                 title: 'Name',
                 key: 'Name',
                 render: (text, record) => (
-                    <p style={{textTransform: 'capitalize'}}>{this.findUserName(record.Data.keywordsByDataType, record.UserType)}</p>),
+                    <p style={{textTransform: 'capitalize'}}>{record.Name}</p>),
+
+            }, {
+                title: 'Email',
+                key: 'Email',
+                render: (text, record) => (
+                    <p>{record.Email}</p>),
+
+            }, {
+                title: 'Phone',
+                key: 'PhoneNumber',
+                render: (text, record) => (
+                    <p>{record.PhoneNumber}</p>),
 
             }, {
                 title: 'Time Spent',
@@ -272,8 +284,7 @@ class Conversations extends React.Component {
             conversation = "";
 
             // Conversations Page Base Table
-            dataRecord = [record["ID"], record["UserType"], this.findUserName(record["Data"]["keywordsByDataType"],
-                record["UserType"] ), record["QuestionsAnswered"], record["SolutionsReturned"],
+            dataRecord = [record["ID"], record["UserType"], record['Name'], record["QuestionsAnswered"], record["SolutionsReturned"],
                 record["TimeSpent"], record["DateTime"], record["Score"] * 100 + "%", record["ApplicationStatus"]];
 
             // Conversation Questions and Answers   ex. "What is your name? : Bob House (Name)"
@@ -316,14 +327,6 @@ class Conversations extends React.Component {
 
         // put the data in the state and set refresh to false
         this.setState({downloadData:data, ConversationsRefreshed:false});
-    };
-
-    findUserName = (keywords, userType) => {
-        if ('Client Name' in keywords && userType === 'Client')
-            return keywords['Client Name'].join(' ');
-        else if ('Candidate Name' in keywords && userType === 'Candidate')
-            return keywords['Candidate Name'].join(' ');
-        return 'Unavailable';
     };
 
     updateStatus = (newStatus, conversation) => {
@@ -402,9 +405,10 @@ class Conversations extends React.Component {
 }
 
 const mapStateToProps = state =>  {
-    const {conversation} = state;
+    const {conversation, options} = state;
     return {
         conversations: conversation.conversations,
+        options: options.options,
         isLoading: conversation.isLoading,
         errorMsg: conversation.errorMsg,
         isClearingAll: conversation.isClearingAll,

@@ -122,5 +122,6 @@ def parseFlow(flow: dict):
         for group in flow['groups']:
             for block in group['blocks']:
                 block['DataType'] = enums.DataType[block['DataType']].value
+        return flow
     except Exception as exc:
         helpers.logError("flow_service.parseFlow(): " + str(exc))

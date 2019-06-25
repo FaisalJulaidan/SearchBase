@@ -177,6 +177,11 @@ class Assistant(db.Model):
 
 class Conversation(db.Model):
     ID = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
+
+    Name = db.Column(db.String(64), nullable=True)
+    Email = db.Column(db.String(64), nullable=True)
+    PhoneNumber = db.Column(db.String(30), nullable=True)
+
     Data = db.Column(MagicJSON, nullable=False)
     DateTime = db.Column(db.DateTime(), nullable=False, default=datetime.now)
     TimeSpent = db.Column(db.Integer, nullable=False, default=0)

@@ -30,9 +30,7 @@ def conversation(assistantID):
         if not s_callback.Success:
             return helpers.jsonResponse(False, 400, "Error in retrieving conversation.")
         return helpers.jsonResponse(True, 200, s_callback.Message,
-                                    {'conversationsList': helpers.getListFromSQLAlchemyList(s_callback.Data),
-                                     'userTypes': [ut.value for ut in UserType],
-                                     })
+                                    {'conversationsList': helpers.getListFromSQLAlchemyList(s_callback.Data)})
 
 
     # Clear all user inputs/chatbot conversation

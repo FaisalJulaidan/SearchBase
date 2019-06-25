@@ -233,14 +233,8 @@ def getListFromLimitedQuery(columnsList, tupleList: List[tuple]) -> list:
         raise Exception("List of indexes provided must match in length to the items in each of the tuples")
 
     d = []
-    for item in tupleList:
-        dict = {}
-        for idx, i in enumerate(item):
-            if isinstance(i, Enum):
-                dict[columnsList[idx]] = i.value
-            else:
-                dict[columnsList[idx]] = i
-        d.append(dict)
+    for tuple in tupleList:
+        d.append(getDictFromLimitedQuery(columnsList, tuple))
     return d
 
 
@@ -252,16 +246,25 @@ def getDictFromLimitedQuery(columnsList, tuple) -> dict:
         raise Exception("List of indexes provided must match in length to the items in each of the tuples")
 
     dict = {}
-    for idx, i in enumerate(tuple):
-        if isinstance(i, Enum): # Convert Enum
-            dict[columnsList[idx]] = i.value
+    for idx, v in enumerate(tuple):
+        key = columnsList[idx]
+        if isinstance(v, Enum): # Convert Enum
+            dict[key] = v.value
 
-        elif isinstance(i, time): # Convert Times
-            dict[columnsList[idx]] = str(i)
+        elif isinstance(v, time): # Convert Times
+            dict[key] = str(v)
+
+        elif isinstance(v, Currency): # Convert Currencies
+            dict[key] = v.code
+
+        elif key in [Job.JobStartDate.name, Job.JobEndDate.name] and v: # Convert Datetime only for Jobs
+            dict[key] = '/'.join(map(str, [v.year, v.month, v.day]))
+
+        elif key in ['Flow', 'AssistantFlow'] and v: # Parse Flow
+            dict[key] = flow_services.parseFlow(v)
 
         else:
-            dict[columnsList[idx]] = i
-
+            dict[key] = v
     return dict
 
 

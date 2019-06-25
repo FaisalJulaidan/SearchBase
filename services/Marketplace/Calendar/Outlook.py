@@ -43,7 +43,7 @@ def login(auth):
                         })
 
     except Exception as exc:
-        helpers.logError("CRM.Outlook.login() ERROR: " + str(exc))
+        helpers.logError("Marketplace.Calendar.Outlook.login() ERROR: " + str(exc))
         return Callback(False, "Error in logging you in. Please try again")
 
 
@@ -81,9 +81,71 @@ def retrieveAccessToken(auth, companyID):
         return Callback(True, "Access Token retrieved", auth)
 
     except Exception as exc:
-        helpers.logError("CRM.Outlook.retrieveAccessToken() ERROR: " + str(exc))
+        helpers.logError("Marketplace.Calendar.Outlook.retrieveAccessToken() ERROR: " + str(exc))
         return Callback(False, str(exc))
 
+
+def sendQuery(auth, query, method, body, companyID, optionalParams=None):
+    try:
+        # get url
+        url = buildUrl(query, optionalParams)
+        print("auth: ", auth)
+        # set headers
+        headers = {'Content-Type': 'application/json', "Authorization": "Bearer " + auth.get("access_token")}
+        print("url: ", url)
+        print("body: ", body)
+        r = marketplace_helpers.sendRequest(url, method, headers, json.dumps(body))
+        print("r.status_code: ", r.status_code)
+        print(r.text)
+        if r.status_code == 401:  # wrong access token
+            callback: Callback = retrieveAccessToken(auth, companyID)
+            headers["Authorization"] = "Bearer " + callback.Data.get("access_token")
+            if callback.Success:
+                r = marketplace_helpers.sendRequest(url, method, headers, json.dumps(body))
+                print(r.status_code)
+                if not r.ok:
+                    raise Exception(r.text + ". Query could not be sent")
+            else:
+                raise Exception("Access token could not be retrieved")
+        elif not r.ok and not r.status_code == 409:
+            print(r.text)
+            raise Exception("Unexpected error occurred when calling the API")
+
+        return Callback(True, "Query was successful", r)
+
+    except Exception as exc:
+        helpers.logError("Marketplace.Calendar.Bullhorn.sendQuery() ERROR: " + str(exc))
+        return Callback(False, str(exc))
+
+
+def buildUrl(query, optionalParams=None):
+    # set up initial url
+    url = "https://graph.microsoft.com/v1.0/me/" + query
+    # add additional params
+    if optionalParams:
+        for param in optionalParams:
+            url += "&" + param
+    # return the url
+    return url
+
+
+def getCalendars(auth, companyID):
+    try:
+
+        # send query
+        sendQuery_callback: Callback = sendQuery(auth, "calendars", "get", {}, companyID)
+
+        if not sendQuery_callback.Success:
+            raise Exception(sendQuery_callback.Message)
+
+        result_body = json.loads(sendQuery_callback.Data.text)
+        print("result_body: ", result_body)
+
+        return Callback(True, sendQuery_callback.Data.text, result_body)
+    except Exception as exc:
+        helpers.logError("Marketplace.Calendar.Outlook.getCalendars() ERROR: " + str(exc))
+        return Callback(False, str(exc))
+        
 
 def addCalendar(auth, companyID):
     try:
@@ -100,9 +162,11 @@ def addCalendar(auth, companyID):
         print(3)
 
         if sendQuery_callback.Data.status_code == 409:
-            pass  # GET THE CALENDAR ID
-
-        result_body = json.loads(sendQuery_callback.Data.text)
+            calendars_callback: Callback = getCalendars(auth, companyID)
+            if not calendars_callback.Success:
+                raise Exception(calendars_callback.Message)
+        else:
+            result_body = json.loads(sendQuery_callback.Data.text)
 
         calendar_services.updateByCompanyAndType("Outlook", companyID, auth, {"calendarID": result_body["Id"]})
 
@@ -110,8 +174,8 @@ def addCalendar(auth, companyID):
         return Callback(True, sendQuery_callback.Data.text)
 
     except Exception as exc:
-        helpers.logError("CRM.Outlook.addCalendar() ERROR: " + str(exc))
-        return Callback(False, str(exc))
+        helpers.logError("Marketplace.Calendar.Outlook.addCalendar() ERROR: " + str(exc))
+        return Callback(False, "Could not add calendar")
 
 
 def addEvent(calendar, eventDetails):
@@ -161,48 +225,5 @@ def addEvent(calendar, eventDetails):
 
         return Callback(True, sendQuery_callback.Data.text)
     except Exception as exc:
-        helpers.logError("CRM.Outlook.addEvent() ERROR: " + str(exc))
+        helpers.logError("Marketplace.Calendar.Outlook.addEvent() ERROR: " + str(exc))
         return Callback(False, str(exc))
-
-
-def sendQuery(auth, query, method, body, companyID, optionalParams=None):
-    try:
-        # get url
-        url = buildUrl(query, optionalParams)
-        print("auth: ", auth)
-        # set headers
-        headers = {'Content-Type': 'application/json', "Authorization": "Bearer " + auth.get("access_token")}
-        print("url: ", url)
-        print("body: ", body)
-        r = marketplace_helpers.sendRequest(url, method, headers, json.dumps(body))
-        print("r.status_code: ", r.status_code)
-        print(r.text)
-        if r.status_code == 401:  # wrong access token
-            callback: Callback = retrieveAccessToken(auth, companyID)
-            if callback.Success:
-                r = marketplace_helpers.sendRequest(url, method, headers, json.dumps(body))
-                print(r.status_code)
-                if not r.ok:
-                    raise Exception(r.text + ". Query could not be sent")
-            else:
-                raise Exception("Access token could not be retrieved")
-        elif not r.ok and not r.status_code == 409:
-            print(r.text)
-            raise Exception("Unexpected error occurred when calling the API")
-
-        return Callback(True, "Query was successful", r)
-
-    except Exception as exc:
-        helpers.logError("CRM.Bullhorn.sendQuery() ERROR: " + str(exc))
-        return Callback(False, str(exc))
-
-
-def buildUrl(query, optionalParams=None):
-    # set up initial url
-    url = "https://graph.microsoft.com/v1.0/me/" + query
-    # add additional params
-    if optionalParams:
-        for param in optionalParams:
-            url += "&" + param
-    # return the url
-    return url

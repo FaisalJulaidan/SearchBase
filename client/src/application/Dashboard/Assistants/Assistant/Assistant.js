@@ -159,7 +159,7 @@ class Assistant extends Component {
                     <div className={[styles.Body, 'assistantTabs'].join(' ')}>
                         {!assistant ? <Spin/> :
 
-                            <Tabs defaultActiveKey={'Analytics'} size={"large"} animated={false}
+                            <Tabs defaultActiveKey={'Settings'} size={"large"} animated={false}
                                   onTabClick={this.onTabClick}>
                                 <TabPane tab="Analytics" key="Analytics">
                                     <Analytics assistant={assistant}/>

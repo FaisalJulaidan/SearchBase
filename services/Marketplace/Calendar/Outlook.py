@@ -1,12 +1,10 @@
 import json
-import logging
 import os
 
 import requests
 
 from models import Callback
 from services.Marketplace import marketplace_helpers
-# Client ID and secret
 from services.Marketplace.Calendar import calendar_services
 from utilities import helpers
 
@@ -88,7 +86,6 @@ def retrieveAccessToken(auth, companyID):
 
         auth["access_token"] = result_body.get("access_token")
         if result_body.get("refresh_token"):
-            auth = dict(auth)
             auth["refresh_token"] = result_body.get("refresh_token")
 
         saveAuth_callback: Callback = marketplace_helpers.saveNewCalendarAuth(auth, "Outlook", companyID)
@@ -99,7 +96,7 @@ def retrieveAccessToken(auth, companyID):
 
     except Exception as exc:
         helpers.logError("Marketplace.Calendar.Outlook.retrieveAccessToken() ERROR: " + str(exc))
-        return Callback(False, str(exc))
+        return Callback(False, "Could not retrieve access token")
 
 
 def sendQuery(auth, query, method, body, companyID, optionalParams=None):
@@ -114,21 +111,22 @@ def sendQuery(auth, query, method, body, companyID, optionalParams=None):
         print("r.status_code: ", r.status_code)
         if r.status_code == 401:  # wrong access token
             callback: Callback = retrieveAccessToken(auth, companyID)
+            if not callback.Success:
+                raise Exception(callback.Message)
+
             headers["Authorization"] = "Bearer " + callback.Data.get("access_token")
-            if callback.Success:
-                r = marketplace_helpers.sendRequest(url, method, headers, json.dumps(body))
-                if not r.ok:
-                    raise Exception(r.text + ". Query could not be sent")
-            else:
-                raise Exception("Access token could not be retrieved")
+            r = marketplace_helpers.sendRequest(url, method, headers, json.dumps(body))
+            if not r.ok and not r.status_code == 409:
+                raise Exception(r.text + ". Query could not be sent")
+
         elif not r.ok and not r.status_code == 409:
-            raise Exception("Unexpected error occurred when calling the API")
+            raise Exception(r.text + ". Unexpected error occurred when calling the API")
 
         return Callback(True, "Query was successful", r)
 
     except Exception as exc:
         helpers.logError("Marketplace.Calendar.Bullhorn.sendQuery() ERROR: " + str(exc))
-        return Callback(False, str(exc))
+        return Callback(False, "Query could not be sent")
 
 
 def buildUrl(query, optionalParams=None):
@@ -156,8 +154,8 @@ def getCalendars(auth, companyID):
         return Callback(True, sendQuery_callback.Data.text, result_body)
     except Exception as exc:
         helpers.logError("Marketplace.Calendar.Outlook.getCalendars() ERROR: " + str(exc))
-        return Callback(False, str(exc))
-        
+        return Callback(False, "Could not retrieve calendars")
+
 
 def addCalendar(auth, companyID):
     try:
@@ -167,20 +165,21 @@ def addCalendar(auth, companyID):
 
         # send query
         sendQuery_callback: Callback = sendQuery(auth, "calendars", "post", body, companyID)
-
         if not sendQuery_callback.Success:
             raise Exception(sendQuery_callback.Message)
-        if sendQuery_callback.Data.status_code == 409:
+
+        if sendQuery_callback.Data.status_code == 409:  # calendar already exists - needs to be retrieved
             calendars_callback: Callback = getCalendars(auth, companyID)
             if not calendars_callback.Success:
                 raise Exception(calendars_callback.Message)
 
-            record = helpers.objectListContains(calendars_callback.Data["value"], lambda x: x["name"] == "TheSearchBase")
+            record = helpers.objectListContains(calendars_callback.Data["value"],
+                                                lambda x: x["name"] == "TheSearchBase")
 
             if not record:
                 raise Exception("Could not get the existing TheSearchBase calendar")
             calendarID = record["id"]
-        else:
+        else:  # calendar was created
             result_body = json.loads(sendQuery_callback.Data.text)
             calendarID = result_body["Id"]
 

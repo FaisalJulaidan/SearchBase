@@ -24,14 +24,14 @@ def addEvent(eventDetails, assistant=None, assistantID=None):
     if not (assistant or assistantID):
         return Callback(False, "Assistant was not provided")
 
-    if assistantID:
+    if not assistant:
         assistant_callback: Callback = assistant_services.getByHashID(assistantID)
         if not assistant_callback.Success:
             return Callback(False, "Assistant could not be retrieved")
         assistant = assistant_callback.Data
 
     if assistant.Calendar.Type is Calendar_Enum.Outlook:
-        return Outlook.addEvent(assistant.Calendar.Auth, assistant.CompanyID, eventDetails)
+        return Outlook.addEvent(assistant.Calendar, eventDetails)
     elif assistant.Calendar.Type is Calendar_Enum.Google:
         return Google.addEvent(assistant.CompanyID, eventDetails.get("name"), eventDetails.get("description"),
                                eventDetails.get("start"), eventDetails.get("end"))

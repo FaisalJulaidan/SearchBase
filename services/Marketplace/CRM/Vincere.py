@@ -8,7 +8,7 @@ import requests
 from enums import DataType as DT
 from models import Callback, Conversation, db, StoredFile
 from services import stored_file_services, databases_services
-from services.Marketplace import marketplace_helpers as helpers
+from services.Marketplace import marketplace_helpers
 
 
 # Vincere Notes:
@@ -104,7 +104,7 @@ def retrieveRestToken(auth, companyID):
                 raise Exception(login_callback.Message)
             authCopy = dict(login_callback.Data)
 
-        saveAuth_callback: Callback = helpers.saveNewCRMAuth(authCopy, "Vincere", companyID)
+        saveAuth_callback: Callback = marketplace_helpers.saveNewCRMAuth(authCopy, "Vincere", companyID)
         if not saveAuth_callback.Success:
             raise Exception(saveAuth_callback.Message)
 
@@ -128,18 +128,19 @@ def sendQuery(auth, query, method, body, companyID, optionalParams=None):
         headers = {'Content-Type': 'application/json'}
 
         # test the BhRestToken (rest_token)
-        r = helpers.sendRequest(url, method, headers, json.dumps(body))
+        r = marketplace_helpers.sendRequest(url, method, headers, json.dumps(body))
 
         if r.status_code == 401:  # wrong rest token
             callback: Callback = retrieveRestToken(auth, companyID)
-            if callback.Success:
-                url = buildUrl(callback.Data, query, optionalParams)
-
-                r = helpers.sendRequest(url, method, headers, json.dumps(body))
-                if not r.ok:
-                    raise Exception(r.text + ". Query could not be sent")
-            else:
+            if not callback.Success:
                 raise Exception("Rest token could not be retrieved")
+
+            url = buildUrl(callback.Data, query, optionalParams)
+
+            r = marketplace_helpers.sendRequest(url, method, headers, json.dumps(body))
+            if not r.ok:
+                raise Exception(r.text + ". Query could not be sent")
+
         elif str(r.status_code)[:1] != "2":  # check if error code is in the 200s
             raise Exception("Rest url for query is incorrect")
 

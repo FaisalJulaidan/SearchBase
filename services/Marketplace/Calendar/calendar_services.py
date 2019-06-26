@@ -1,9 +1,7 @@
-import logging
-
 from sqlalchemy.sql import and_
 
-from enums import UserType, Calendar as Calendar_Enum
-from models import db, Callback, Conversation, Assistant, Calendar as Calendar_Model, StoredFile
+from enums import Calendar as Calendar_Enum
+from models import db, Callback, Calendar as Calendar_Model
 from services import assistant_services
 from services.Marketplace.Calendar import Google, Outlook
 from utilities import helpers

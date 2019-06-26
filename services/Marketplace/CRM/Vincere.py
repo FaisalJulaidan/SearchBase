@@ -1,6 +1,5 @@
 import base64
 import json
-import logging
 import os
 
 import requests
@@ -9,8 +8,6 @@ from enums import DataType as DT
 from models import Callback, Conversation, db, StoredFile
 from services import stored_file_services, databases_services
 from services.Marketplace import marketplace_helpers
-
-
 # Vincere Notes:
 # access_token (used to generate rest_token) lasts 10 minutes, needs to be requested by using the auth from the client
 # refresh_token (can be used to generate access_token) - generated with access_token on auth, ...

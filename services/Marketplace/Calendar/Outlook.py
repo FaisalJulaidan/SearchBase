@@ -108,7 +108,7 @@ def sendQuery(auth, query, method, body, companyID, optionalParams=None):
         headers = {'Content-Type': 'application/json', "Authorization": "Bearer " + auth.get("access_token")}
 
         r = marketplace_helpers.sendRequest(url, method, headers, json.dumps(body))
-        print("r.status_code: ", r.status_code)
+        
         if r.status_code == 401:  # wrong access token
             callback: Callback = retrieveAccessToken(auth, companyID)
             if not callback.Success:

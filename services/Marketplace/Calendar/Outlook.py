@@ -111,7 +111,7 @@ def sendQuery(auth, query, method, body, companyID, optionalParams=None):
         headers = {'Content-Type': 'application/json', "Authorization": "Bearer " + auth.get("access_token")}
 
         r = marketplace_helpers.sendRequest(url, method, headers, json.dumps(body))
-
+        print("r.status_code: ", r.status_code)
         if r.status_code == 401:  # wrong access token
             callback: Callback = retrieveAccessToken(auth, companyID)
             headers["Authorization"] = "Bearer " + callback.Data.get("access_token")
@@ -170,7 +170,6 @@ def addCalendar(auth, companyID):
 
         if not sendQuery_callback.Success:
             raise Exception(sendQuery_callback.Message)
-
         if sendQuery_callback.Data.status_code == 409:
             calendars_callback: Callback = getCalendars(auth, companyID)
             if not calendars_callback.Success:

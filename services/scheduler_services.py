@@ -3,11 +3,10 @@ from sqlalchemy import and_
 from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.jobstores.sqlalchemy import SQLAlchemyJobStore
 from apscheduler.executors.pool import ThreadPoolExecutor, ProcessPoolExecutor
-from models import db, Callback, Assistant, User, Conversation, Company
+from models import db, Callback, Assistant, Conversation, Company
 from services import mail_services
-# import dateutil
 from utilities import helpers
-from datetime import date, datetime
+from datetime import datetime
 import os
 
 jobstores = {
@@ -22,18 +21,19 @@ job_defaults = {
     'max_instances': 1
 }
 
-''' 
-Types
-Null - Never notify
-0 - Immediately notify but it should not because conversation are already been notified
-Any other number - notify after x hours
-'''
-
 
 scheduler = BackgroundScheduler(jobstores=jobstores, executors=executors, job_defaults=job_defaults, timezone=utc)
 
+
+''' 
+Types:
+ Null - Never notify
+ 0 - Immediately: notify but it should not because conversation are already been notified immediately
+ Any other number - Notify after x hours
+'''
+
 # If assistantID is supplied, it will only look for data relating to that assistant
-def conversationsNotifications(assistantID=None):
+def sendConversationsNotifications(assistantID=None):
     try:
         from app import app
         with app.app_context():
@@ -80,5 +80,20 @@ def conversationsNotifications(assistantID=None):
         helpers.logError(str(e))
 
 
-scheduler.add_job(conversationsNotifications, 'cron', hour='*/1', id='hourly', replace_existing=True)
-# scheduler.start()
+''' 
+This function is to fix the constant lose of database connection after the wait_timeout has passed.
+It will make the simplest query to the database every while to make sure the connection is alive
+'''
+def pingDatabaseConnection():
+    try:
+        from app import app
+        with app.app_context():
+            db.engine.execute("SELECT NOW();")
+    except Exception as e:
+        helpers.logError("Ping! Database Connection ERROR: " + str(e))
+
+
+# Run scheduled tasks
+scheduler.add_job(sendConversationsNotifications, 'cron', hour='*/1', id='sendConversationsNotifications', replace_existing=True)
+scheduler.add_job(pingDatabaseConnection, 'cron', hour='*/7', id='pingDatabaseConnection', replace_existing=True)
+scheduler.start()

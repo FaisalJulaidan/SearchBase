@@ -167,7 +167,7 @@ class Marketplace extends React.Component {
                     return <DefaultButton {...buttonsOptions}/>;
                 break;
 
-            case "gmail":
+            case "Google":
                 if (place === 'header')
                     return <GoogleHeader/>;
                 if (place === 'features')

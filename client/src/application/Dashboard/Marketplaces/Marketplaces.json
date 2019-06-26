@@ -36,10 +36,10 @@
       "status": "NOT_CONNECTED"
     },
     {
-      "title": "Gmail",
+      "title": "Google",
       "desc": "Google Calendar is a time-management and scheduling calendar service lets you keep track of important events, share your schedule.",
       "image": "/static/images/CRM/gmail.svg",
-      "type": "gmail",
+      "type": "Google",
       "status": "NOT_CONNECTED"
     }
   ]

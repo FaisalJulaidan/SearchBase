@@ -103,7 +103,7 @@ def recruiter_value_report():
         return helpers.jsonResponse(True, 200, data_callback.Message, data_callback.Data)
 
 
-@marketplace_router.route("/calendar/<assistantID>/google/authorize", methods=['GET', 'POST'])
+@marketplace_router.route("/calendar/<assistantID>/Google/authorize", methods=['GET', 'POST'])
 @jwt_required
 @helpers.validAssistant
 def calendar_auth(assistantID):

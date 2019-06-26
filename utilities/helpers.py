@@ -246,6 +246,14 @@ def findIndexOfKeyInArray(key, value, array):
     return False
 
 
+# example: objectListContains(myList, lambda x: x.n == 3)  # True if any element has .n==3
+def objectListContains(list, filter):
+    for x in list:
+        if filter(x):
+            return x
+    return False
+
+
 # Helpful printer, so you can find out where a print if you forget about it and want to remove it
 def HPrint(message):
     callerframerecord = inspect.stack()[1]

@@ -25,19 +25,21 @@ def processConversation(conversation: Conversation, autoPilot: AutoPilot):
             def __processSendingEmails (email, status: Status, autoPilot: AutoPilot):
 
                 userName = conversation.Name # get candidate name
-                logoPath = sfs.PUBLIC_URL + sfs.UPLOAD_FOLDER + sfs.COMPANY_LOGOS_PATH + "/" + autoPilot.Company.LogoPath
+                logoPath = autoPilot.Company.LogoPath
+                if logoPath:
+                    logoPath = sfs.PUBLIC_URL\
+                           + sfs.UPLOAD_FOLDER + sfs.COMPANY_LOGOS_PATH\
+                           + "/" + logoPath
+
                 companyName = autoPilot.Company.Name
 
+                # ======================
                 # Send Acceptance Letters
                 if status is Status.Accepted and AutoPilot.SendAcceptanceEmail:
 
-                    acceptance_callback: Callback = \
-                        mail_services.sendAcceptanceEmail(userName, email, logoPath, companyName)
 
-                    if acceptance_callback.Success:
-                        result['acceptanceEmailSentAt'] = datetime.now()
-
-                    # Process candidates appointment email only if score is accepted
+                    # NOTE: Send appointment email before acceptance email if automatic appoitment manger set to active
+                    # Process candidates Appointment email only if score is accepted
                     if AutoPilot.SendCandidatesAppointments:
 
                         appointments_callback: Callback = \
@@ -54,6 +56,15 @@ def processConversation(conversation: Conversation, autoPilot: AutoPilot):
                             result['appointmentEmailSentAt'] = datetime.now()
 
 
+                    # Process candidates Acceptance email
+                    acceptance_callback: Callback = \
+                        mail_services.sendAcceptanceEmail(userName, email, logoPath, companyName)
+
+                    if acceptance_callback.Success:
+                        result['acceptanceEmailSentAt'] = datetime.now()
+
+
+                # ======================
                 # Send Rejection Letters
                 elif status is Status.Rejected and AutoPilot.SendRejectionEmail:
 

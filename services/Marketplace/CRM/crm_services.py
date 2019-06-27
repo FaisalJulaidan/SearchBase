@@ -250,3 +250,16 @@ def getAll(companyID) -> Callback:
     except Exception as exc:
         helpers.logError("crm_services.getAll(): " + str(exc))
         return Callback(False, 'Could not fetch all CRMs.')
+
+
+def updateByType(type, newAuth, companyID):
+    try:
+        crm = db.session.query(CRM).filter(and_(CRM.CompanyID == companyID, CRM.Type == type)).first()
+        crm.Auth = dict(newAuth)
+        db.session.commit()
+        return Callback(True, "New auth has been saved")
+
+    except Exception as exc:
+        db.session.rollback()
+        helpers.logError("Marketplace.marketplace_helpers.saveNewCRMAuth() ERROR: " + str(exc))
+        return Callback(False, str(exc))

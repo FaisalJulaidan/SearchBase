@@ -48,14 +48,13 @@ def connect():
 
 # ===== Ping Connection & Disconnect ===== #
 # Get and ping connection & Disconnect a marketplace
-
 @marketplace_router.route("/marketplace/<type>", methods=["GET", "DELETE"])
 @jwt_required
 def crm(type):
     # Authenticate
     user = get_jwt_identity()['user']
 
-    # Get a crm and test the connection before return
+    # Get and test the connection before return
     if request.method == "GET":
         callback: Callback = marketplace_helpers.testConnection(type, user.get("companyID"))
         if not callback.Success:
@@ -63,68 +62,12 @@ def crm(type):
         return helpers.jsonResponse(True, 200, callback.Message, callback.Data)
 
 
-    # Get a crm and test the connection before return
+    # Get and test the connection before return
     if request.method == "DELETE":
         callback: Callback = marketplace_helpers.testConnection(type, user.get("companyID"))
         if not callback.Success:
             return helpers.jsonResponse(False, 400, callback.Message)
         return helpers.jsonResponse(True, 200, callback.Message, callback.Data)
-
-
-# @marketplace_router.route("/marketplace/crm/<crm_id>", methods=["GET", "DELETE"])
-# @jwt_required
-# def crm(crm_id):
-#     # Authenticate
-#     user = get_jwt_identity()['user']
-#
-#     # Get a crm and test the connection before return
-#     if request.method == "GET":
-#         callback: Callback = crm_services.getCRMByID(crm_id, user.get("companyID"))
-#
-#         crm = helpers.getDictFromSQLAlchemyObj(callback.Data)
-#         # Test connection
-#         crm['Status'] = crm_services.testConnection(crm['Type'], crm['Auth'], user.get("companyID")).Success
-#
-#         if not callback.Success:
-#             return helpers.jsonResponse(False, 400, callback.Message)
-#         return helpers.jsonResponse(True, 200, callback.Message, callback.Data)
-#
-#     # Delete a crm
-#     if request.method == "DELETE":
-#         callback: Callback = crm_services.disconnect(crm_id, user.get("companyID"))
-#
-#         if not callback.Success:
-#             return helpers.jsonResponse(False, 400, callback.Message)
-#         return helpers.jsonResponse(True, 200, callback.Message, callback.Data)
-#
-#
-# # Get and test connection & Disconnect a Calendar
-# @marketplace_router.route("/marketplace/calendar/<calendar_id>", methods=["GET", "DELETE"])
-# @jwt_required
-# def calendar(calendar_id):
-#     # Authenticate
-#     user = get_jwt_identity()['user']
-#
-#     # Get a calendar and test the connection before return
-#     if request.method == "GET":
-#         callback: Callback = calendar_services.getCalendarByID(calendar_id, user.get("companyID"))
-#
-#         calendar = helpers.getDictFromSQLAlchemyObj(callback.Data)
-#         # Test connection
-#         calendar['Status'] = calendar_services.testConnection(calendar['Type'], calendar['Auth'],
-#                                                               user.get("companyID")).Success
-#
-#         if not callback.Success:
-#             return helpers.jsonResponse(False, 400, callback.Message)
-#         return helpers.jsonResponse(True, 200, callback.Message, callback.Data)
-#
-#     # Delete a calendar
-#     if request.method == "DELETE":
-#         callback: Callback = calendar_services.disconnect(calendar_id, user.get("companyID"))
-#
-#         if not callback.Success:
-#             return helpers.jsonResponse(False, 400, callback.Message)
-#         return helpers.jsonResponse(True, 200, callback.Message, callback.Data)
 
 
 @marketplace_router.route("/crm/recruiter_value_report", methods=['POST'])

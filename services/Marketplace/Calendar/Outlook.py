@@ -102,7 +102,7 @@ def retrieveAccessToken(auth, companyID):
         if result_body.get("refresh_token"):
             auth["refresh_token"] = result_body.get("refresh_token")
 
-        saveAuth_callback: Callback = marketplace_helpers.saveNewCalendarAuth(auth, "Outlook", companyID)
+        saveAuth_callback: Callback = calendar_services.updateByType("Outlook", auth, None, companyID)
         if not saveAuth_callback.Success:
             raise Exception(saveAuth_callback.Message)
 

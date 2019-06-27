@@ -61,34 +61,6 @@ def connect(type, auth, companyID) -> Callback:
         return Callback(False, "Calendar connection failed")
 
 
-# Update Calendar Details
-def updateByType(type, auth, metaData, companyID):
-    try:
-        # test connection
-        test_callback: Callback = testConnection(type, auth, companyID)
-        if not test_callback.Success:
-            return test_callback
-
-        connection_callback: Callback = getCalendarByType(type, companyID)
-        if not connection_callback.Success:
-            raise Exception(connection_callback.Message)
-
-        Calendar: Calendar_Model = connection_callback.Data
-
-        Calendar.Auth = auth
-        if metaData: Calendar.MetaData = metaData
-
-        # Save
-        db.session.commit()
-
-        return Callback(True, 'Calendar has been updated successfully', Calendar)
-
-    except Exception as exc:
-        helpers.logError("calendar_services.updateByCompanyAndType(): " + str(exc))
-        db.session.rollback()
-        return Callback(False, "Update Calendar details failed.")
-
-
 # Test connection to a Calendar (details must include the auth)
 def testConnection(type, auth, companyID) -> Callback:
     try:
@@ -178,3 +150,31 @@ def getAll(companyID) -> Callback:
     except Exception as exc:
         helpers.logError("calendar_services.getAll(): " + str(exc))
         return Callback(False, 'Could not fetch all Calendars.')
+
+
+# Update Calendar Details
+def updateByType(type, auth, metaData, companyID):
+    try:
+        # test connection
+        test_callback: Callback = testConnection(type, auth, companyID)
+        if not test_callback.Success:
+            return test_callback
+
+        connection_callback: Callback = getCalendarByType(type, companyID)
+        if not connection_callback.Success:
+            raise Exception(connection_callback.Message)
+
+        Calendar: Calendar_Model = connection_callback.Data
+
+        Calendar.Auth = auth
+        if metaData: Calendar.MetaData = metaData
+
+        # Save
+        db.session.commit()
+
+        return Callback(True, 'Calendar has been updated successfully', Calendar)
+
+    except Exception as exc:
+        helpers.logError("calendar_services.updateByCompanyAndType(): " + str(exc))
+        db.session.rollback()
+        return Callback(False, "Update Calendar details failed.")

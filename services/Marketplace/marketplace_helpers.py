@@ -96,32 +96,3 @@ def sendRequest(url, method, headers, data=None):
     elif method is "get":
         request = requests.get(url, headers=headers, data=data)
     return request
-
-
-# save the CRM Auth by companyID and CRM Type
-def saveNewCRMAuth(auth, marketplaceItemName, companyID):
-    try:
-        crm = db.session.query(CRM).filter(and_(CRM.CompanyID == companyID, CRM.Type == marketplaceItemName)).first()
-        crm.Auth = dict(auth)
-        db.session.commit()
-        return Callback(True, "New auth has been saved")
-
-    except Exception as exc:
-        db.session.rollback()
-        helpers.logError("Marketplace.marketplace_helpers.saveNewCRMAuth() ERROR: " + str(exc))
-        return Callback(False, str(exc))
-
-
-# save the Calendar Auth by companyID and Calendar Type
-def saveNewCalendarAuth(auth, marketplaceItemName, companyID):
-    try:
-        calendar = db.session.query(Calendar).filter(and_(Calendar.CompanyID == companyID,
-                                                          Calendar.Type == marketplaceItemName)).first()
-        calendar.Auth = dict(auth)
-        db.session.commit()
-        return Callback(True, "New auth has been saved")
-
-    except Exception as exc:
-        db.session.rollback()
-        helpers.logError("Marketplace.marketplace_helpers.saveNewCalendarAuth() ERROR: " + str(exc))
-        return Callback(False, str(exc))

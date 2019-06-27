@@ -9,6 +9,8 @@ from enums import DataType as DT
 from models import Callback, Conversation, db, CRM, StoredFile
 from services import databases_services, stored_file_services
 from services.Marketplace import marketplace_helpers
+from services.Marketplace.CRM import crm_services
+
 # Bullhorn Notes:
 # access_token (used to generate rest_token) lasts 10 minutes, needs to be requested by using the auth from the client
 # refresh_token (can be used to generate access_token) - generated with access_token on auth, ...
@@ -101,7 +103,7 @@ def retrieveRestToken(auth, companyID):
         authCopy["rest_token"] = result_body.get("BhRestToken")
         authCopy["rest_url"] = result_body.get("restUrl")
 
-        saveAuth_callback: Callback = marketplace_helpers.saveNewCRMAuth(authCopy, "Bullhorn", companyID)
+        saveAuth_callback: Callback = crm_services.updateByType("Bullhorn", authCopy, companyID)
         if not saveAuth_callback.Success:
             raise Exception(saveAuth_callback.Message)
 

@@ -83,17 +83,13 @@ def getAllByCompanyIDWithEnabledNotifications(companyID) -> Callback:
     try:
         # Get result and check if None then raise exception
         result = db.session.query(User) \
-            .filter(and_(User.CompanyID == companyID, User.ChatbotNotifications)).all()
-        if not result: raise Exception
+            .filter(and_(User.CompanyID == companyID, User.ChatbotNotifications, User.Verified)).all()
 
-        return Callback(True,
-                        'Users with company ID ' + str(companyID) + ' were successfully retrieved.',
-                        result)
+        return Callback(True, 'Users were successfully retrieved.', result)
     except Exception as exc:
         helpers.logError("user_services.getAllByCompanyIDWithEnabledNotifications(): " + str(exc))
         db.session.rollback()
-        return Callback(False,
-                        'Users with company ID ' + str(companyID) + ' could not be retrieved.')
+        return Callback(False, 'Users could not be retrieved.')
 
 
 # takes in attribute name for Users ex. Users.

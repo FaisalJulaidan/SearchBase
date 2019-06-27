@@ -67,8 +67,6 @@ def logError(exception):
 # ID Hasher
 # IMPORTANT: don't you ever make changes to the hash values before consulting Faisal Julaidan
 hashids = Hashids(salt=BaseConfig.HASH_IDS_SALT, min_length=5)
-
-
 def encodeID(id):
     return hashids.encrypt(id)
 
@@ -88,6 +86,13 @@ def decrypt(token, isDict=False, isBtye=False):
     value = fernet.decrypt(token)
     if isDict: value = json.loads(value)
     return value
+
+
+def seed():
+    # Create universal Roles
+    db.session.add(Role(Name="Staff", EditChatbots=True, AddUsers=True, EditUsers=True, DeleteUsers=True, AccessBilling=True))
+    db.session.add(Role(Name="Owner", EditChatbots=True, AddUsers=True, EditUsers=True, DeleteUsers=True, AccessBilling=True))
+    db.session.commit()
 
 
 def getPlanNickname(SubID=None):
@@ -151,23 +156,39 @@ def gzipped(f):
     return view_func
 
 
-# Check if the logged in user owns the accessed assistant for security
-def validAssistant(func):
-    def wrapperValidAssistant(assistantID):
-        user = get_jwt_identity()['user']
-        callback: Callback = assistant_services.getByID(assistantID, user['companyID'])
-        if not callback.Success:
-            return jsonResponse(False, 404, "Assistant not found.", None)
-        assistant: Assistant = callback.Data
-        return func(assistant)
+# Note: Hourly is not supported because it varies and number of working hours is required
+def convertSalaryPeriod(salary, fromPeriod: Period, toPeriod: Period):
 
-    return wrapperValidAssistant
+    if fromPeriod == Period.Annually:
+        if toPeriod == Period.Monthly:
+            return salary / 12
+        elif toPeriod == Period.Weekly:
+            return salary / 52.1429
+        else:
+            return salary
+
+    elif fromPeriod == Period.Monthly:
+        if toPeriod == Period.Annually:
+            return salary * 12
+        elif toPeriod == Period.Weekly:
+            return salary / 4
+        else:
+            return salary
+
+    elif fromPeriod == Period.Weekly:
+        if toPeriod == Period.Annually:
+            return salary * 52.1429
+        elif toPeriod == Period.Monthly:
+            return salary * 4.33
+        else:
+            return salary
+
+    else:
+        raise Exception("helpers.convertSalaryPeriod(): Not supported Period")
 
 
 # -------- SQLAlchemy Converters -------- #
 """Convert a SQLAlchemy object to a single dict """
-
-
 def getDictFromSQLAlchemyObj(obj) -> dict:
     dict = {}  # Results
     if not obj: return dict
@@ -196,14 +217,17 @@ def getDictFromSQLAlchemyObj(obj) -> dict:
         dict["FilePath"] = obj.FilePath
     return dict
 
+"""Convert a SQLAlchemy list of objects to a list of dicts"""
+def getListFromSQLAlchemyList(SQLAlchemyList):
+    return list(map(getDictFromSQLAlchemyObj, SQLAlchemyList))
 
 """Used when you want to only gather specific data from a table (columns)"""
 """Provide a list of keys (e.g ['id', 'name']) and the list of tuples"""
 """provided by sqlalchemy when querying for specific columns"""
 """this func will work for enums as well."""
 
-
-def getDictFromLimitedQuery(columnsList, tupleList: List[tuple]):
+# For a list of SQLAlchemy objects
+def getListFromLimitedQuery(columnsList, tupleList: List[tuple]) -> list:
     if not isinstance(tupleList, list):
         raise Exception("Provided list of tuples is empty. (Check data being returned from db)")
 
@@ -216,24 +240,39 @@ def getDictFromLimitedQuery(columnsList, tupleList: List[tuple]):
         raise Exception("List of indexes provided must match in length to the items in each of the tuples")
 
     d = []
-    for item in tupleList:
-        dict = {}
-        for idx, i in enumerate(item):
-            if isinstance(i, Enum):
-                dict[columnsList[idx]] = i.value
-            else:
-                dict[columnsList[idx]] = i
-        d.append(dict)
+    for tuple in tupleList:
+        d.append(getDictFromLimitedQuery(columnsList, tuple))
     return d
 
 
-"""Convert a SQLAlchemy list of objects to a list of dicts"""
+# For a list of SQLAlchemy objects
+def getDictFromLimitedQuery(columnsList, tuple) -> dict:
 
+    # When tupleList is not empty, then the number of items in each tuple must match the number of items in columnsList
+    if len(columnsList) != len(tuple):
+        raise Exception("List of indexes provided must match in length to the items in each of the tuples")
 
-def getListFromSQLAlchemyList(SQLAlchemyList):
-    return list(map(getDictFromSQLAlchemyObj, SQLAlchemyList))
+    dict = {}
+    for idx, v in enumerate(tuple):
+        key = columnsList[idx]
+        if isinstance(v, Enum): # Convert Enum
+            dict[key] = v.value
 
-    return view_func
+        elif isinstance(v, time): # Convert Times
+            dict[key] = str(v)
+
+        elif isinstance(v, Currency): # Convert Currencies
+            dict[key] = v.code
+
+        elif key in [Job.JobStartDate.name, Job.JobEndDate.name] and v: # Convert Datetime only for Jobs
+            dict[key] = '/'.join(map(str, [v.year, v.month, v.day]))
+
+        elif key in ['Flow', 'AssistantFlow'] and v: # Parse Flow
+            dict[key] = flow_services.parseFlow(v)
+
+        else:
+            dict[key] = v
+    return dict
 
 
 # Check if the logged in user owns the accessed assistant for security

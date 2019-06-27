@@ -163,10 +163,7 @@ def generate():
     reader_s = Assistant(Name="Reader", Message="Hey there", TopBarText="Sabic Bot", SecondsUntilPopup=1, Active=True, Company=sabic)
     helper_s = Assistant(Name="Helper", Message="Hey there", TopBarText="Sabic Bot", SecondsUntilPopup=1, Active=True, Company=sabic)
 
-
-    # Create Roles
-    db.session.add(Role(Name="Staff", EditChatbots=True, AddUsers=True, EditUsers=True, DeleteUsers=True, AccessBilling=True))
-    db.session.add(Role(Name="Owner", EditChatbots=True, AddUsers=True, EditUsers=True, DeleteUsers=True, AccessBilling=True))
+    helpers.seed()
 
     db.session.add(Role(Name="Admin", Company= aramco, AddUsers=True, EditChatbots=True, EditUsers=True, DeleteUsers=True, AccessBilling=True))
     db.session.add(Role(Name="User", Company= aramco, AddUsers=False, EditChatbots=True, EditUsers=False, DeleteUsers=False, AccessBilling=False))
@@ -240,12 +237,12 @@ def generate():
     conversation1 = Conversation(Data=data, DateTime=datetime.now(),
                                  TimeSpent=55, SolutionsReturned=2, QuestionsAnswered=3,
                                  UserType=enums.UserType.Candidate, Score= 1,
-                                 ApplicationStatus=enums.ApplicationStatus.Accepted, Assistant=reader_a)
+                                 ApplicationStatus=enums.Status.Accepted, Assistant=reader_a)
     db.session.add(conversation1)
     db.session.add(Conversation(Data=data, DateTime=datetime.now(),
                                 TimeSpent=120, SolutionsReturned=20, QuestionsAnswered=7,
                                 UserType=enums.UserType.Client, Score= 0.05, Completed=False,
-                                ApplicationStatus=enums.ApplicationStatus.Rejected, Assistant=reader_a))
+                                ApplicationStatus=enums.Status.Rejected, Assistant=reader_a))
 
     # add chatbot session in bulk
     for i in range(50):

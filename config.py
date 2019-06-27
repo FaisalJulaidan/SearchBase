@@ -39,7 +39,7 @@ def set_encrypt_key():
 
 class BaseConfig(object):
 
-    ALLOWED_EXTENSIONS = {'png', 'jpg','json', 'xml', 'xls','txt', 'pdf', 'doc', 'docx'}
+    ALLOWED_EXTENSIONS = {'png', 'jpg','json', 'xml', 'xls', 'xlsx', 'txt', 'pdf', 'doc', 'docx'}
     MAX_CONTENT_LENGTH = 16 * 1024 * 1024
 
     APP_ROOT = os.path.dirname(os.path.abspath(__file__))
@@ -71,7 +71,7 @@ class BaseConfig(object):
     MAIL_PORT = 465
     MAIL_USE_SSL = True
     MAIL_USERNAME = 'thesearchbase@gmail.com'
-    MAIL_PASSWORD = 'pilbvnczzdgxkyzy'
+    MAIL_PASSWORD = 'orfqpgqiusxcoeif'
     MAIL_SUPPRESS_SEND = False
 
     # # Calendar Config

@@ -28,8 +28,8 @@ def get_crms():
             return helpers.jsonResponse(False, 400, callback.Message)
 
         crms = helpers.getListFromSQLAlchemyList(callback.Data)
-        for crm in crms:
-            crm['Status'] = crm_services.testConnection(user.get("companyID"), {'auth': crm['Auth'], 'type': crm['Type']}).Success
+        # for crm in crms:
+        #     crm['Status'] = crm_services.testConnection(user.get("companyID"), {'auth': crm['Auth'], 'type': crm['Type']}).Success
         data = {"crms": crms, "companyID": user.get("companyID")}
 
         return helpers.jsonResponse(True, 200, callback.Message, data)
@@ -103,17 +103,7 @@ def recruiter_value_report():
         return helpers.jsonResponse(True, 200, data_callback.Message, data_callback.Data)
 
 
-@marketplace_router.route("/bullhorn_callback", methods=['GET', 'POST', 'PUT'])
-def bullhorn_callback():
-    return str(request.url)
-
-
-@marketplace_router.route("/crm_callback", methods=['GET', 'POST', 'PUT'])
-def crm_callback():
-    return str(request.url)
-
-
-@marketplace_router.route("/calendar/<assistantID>/google/authorize", methods=['GET', 'POST'])
+@marketplace_router.route("/calendar/<assistantID>/Google/authorize", methods=['GET', 'POST'])
 @jwt_required
 @helpers.validAssistant
 def calendar_auth(assistantID):
@@ -136,18 +126,29 @@ def calendar_auth(assistantID):
 #         return helpers.jsonResponse(True, 200, callback.Message)
 
 
+@marketplace_router.route("/bullhorn_callback", methods=['GET', 'POST', 'PUT'])
+def bullhorn_callback():
+
+    callback: Callback = marketplace_helpers.processRedirect(request.args)
+
+    if not callback.Success:
+        return "Retrieving authorisation code failed. Please try again later."
+
+    return "Authorisation completed. You can now close this window."
+
+
 @marketplace_router.route("/marketplace_callback", methods=['GET', 'POST', 'PUT'])
 def marketplace_callback():
 
     callback: Callback = marketplace_helpers.processRedirect(request.args)
 
     if not callback.Success:
-        return "Authorisation failed. Please try again later."
+        return helpers.jsonResponse(False, 400, callback.Message)
 
-    return "Authorisation has been successful. You can now close this window."
+    return helpers.jsonResponse(True, 200, "Success")
 
 
-@marketplace_router.route("/marketplace_test", methods=['GET', 'POST', 'PUT'])
-def testtss():
-    assistant = assistant_services.getByID(1, 1).Data
-    return Outlook.addEvent(assistant.Calendar, request.json).Message
+# @marketplace_router.route("/marketplace_test", methods=['GET', 'POST', 'PUT'])
+# def testtss():
+#     assistant = assistant_services.getByID(1, 1).Data
+#     return Outlook.addEvent(assistant.Calendar.Auth, assistant, assistant.CompanyID).Message

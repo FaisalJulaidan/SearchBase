@@ -14,8 +14,8 @@ def admin_analytics_data(assistant):
         callback: Callback = analytics_services.getAnalytics(assistant)
         if not callback.Success:
             return helpers.jsonResponse(False, 400, 'Failed to gather analytics')
-        result = helpers.getDictFromLimitedQuery(['ID', 'DateTime', 'TimeSpent', 'ApplicationStatus', 'Score', 'UserType'],
-                                                     callback.Data)
+        result = helpers.getListFromLimitedQuery(['ID', 'DateTime', 'TimeSpent', 'ApplicationStatus', 'Score', 'UserType'],
+                                                 callback.Data)
         return helpers.jsonResponse(True, 200, callback.Message, result)
 
 

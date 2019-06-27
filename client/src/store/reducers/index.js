@@ -6,7 +6,7 @@ import {conversation} from "./conversation.reducer";
 import {usersManagement} from "./usersManagement.reducer";
 import {database} from "./database.reducer";
 import {options} from "./options.reducer";
-import {crm} from "./crm.reducer";
+import {marketplace} from "./marketplaces.reducer";
 import {analytics} from './analytics.reducer'
 import {autoPilot} from "./autoPilot.reducer";
 import {appointmentsPicker} from "./appointmentsPicker.reducer";
@@ -16,7 +16,7 @@ import storage from 'redux-persist/lib/storage'
 
 const appReducer = combineReducers({
     auth,
-    crm,
+    marketplace,
     assistant,
     autoPilot,
     account,

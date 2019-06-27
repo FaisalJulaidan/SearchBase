@@ -39,7 +39,7 @@ def users():
         callback: Callback = user_management_services.addUser(data["firstname"],
                                                               data["surname"],
                                                               data["email"],
-                                                              data["phoneNumber"],
+                                                              data.get("phoneNumber"),
                                                               data["roleID"],
                                                               user['id'],
                                                               user['companyID']

@@ -163,21 +163,21 @@ def buildUrl(rest_data, query, optionalParams=None):
 def insertCandidate(auth, conversation: Conversation) -> Callback:
     try:
         # New candidate details
-        emails = conversation.Data.get('keywordsByDataType').get(DT.CandidateEmail.value['name'], [""])
+        emails = conversation.Data.get('keywordsByDataType').get(DT.CandidateEmail.value['name'], [" "])
 
         # availability, yearsExperience
         body = {
-            "first_name": conversation.Data.get('keywordsByDataType').get(DT.CandidateName.value['name'], [""])[0],
-            "last_name": conversation.Data.get('keywordsByDataType').get(DT.CandidateName.value['name'], [""])[-1],
+            "first_name": conversation.Data.get('keywordsByDataType').get(DT.CandidateName.value['name'], [" "])[0],
+            "last_name": conversation.Data.get('keywordsByDataType').get(DT.CandidateName.value['name'], [" "])[-1],
             "mobile":
-                conversation.Data.get('keywordsByDataType').get(DT.CandidateMobile.value['name'], [""])[0],
+                conversation.Data.get('keywordsByDataType').get(DT.CandidateMobile.value['name'], [" "])[0],
             "address": {
                 "city": "".join(
-                    conversation.Data.get('keywordsByDataType').get(DT.CandidateLocation.value['name'], [""])),
+                    conversation.Data.get('keywordsByDataType').get(DT.CandidateLocation.value['name'], [" "])),
             },
             "email": emails[0],
             "skills": "".join(
-                conversation.Data.get('keywordsByDataType').get(DT.CandidateSkills.value['name'], [""])),
+                conversation.Data.get('keywordsByDataType').get(DT.CandidateSkills.value['name'], [" "])),
             "education_summary": "".join(
                 conversation.Data.get('keywordsByDataType').get(DT.CandidateEducation.value['name'], [])),
             "desired_salary":
@@ -268,13 +268,13 @@ def insertClient(auth, conversation: Conversation) -> Callback:
 def insertClientContact(auth, conversation: Conversation, vincCompanyID) -> Callback:
     try:
         # New candidate details
-        emails = conversation.Data.get('keywordsByDataType').get(DT.ClientEmail.value['name'], [""])
+        emails = conversation.Data.get('keywordsByDataType').get(DT.ClientEmail.value['name'], [" "])
 
         body = {
             "first_name": conversation.Data.get('keywordsByDataType').get(DT.ClientName.value['name'], [])[0],
             "last_name": conversation.Data.get('keywordsByDataType').get(DT.ClientName.value['name'], [])[-1],
             "mobile":
-                conversation.Data.get('keywordsByDataType').get(DT.ClientTelephone.value['name'], [""])[0],
+                conversation.Data.get('keywordsByDataType').get(DT.ClientTelephone.value['name'], [" "])[0],
             "address": {
                 "city": " ".join(
                     conversation.Data.get('keywordsByDataType').get(DT.ClientLocation.value['name'], [])),

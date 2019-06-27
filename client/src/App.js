@@ -13,6 +13,7 @@ const ForgetPassword = lazy(() => import('./application/ForgetPassword/ForgetPas
 const NewResetPassword = lazy(() => import('./application/ForgetPassword/NewResetPassword/NewResetPassword'));
 const AppointmentsPicker = lazy(() => import('./application/AppointmentsPicker/AppointmentsPicker'));
 const AccountVerification = lazy(() => import('./application/AccountVerification/AccountVerification'));
+const ChatbotDirectLink = lazy(() => import('./application/ChatbotDirectLink/ChatbotDirectLink'));
 
 
 class App extends Component {
@@ -34,6 +35,7 @@ class App extends Component {
                         <Route path="/reset_password/" component={NewResetPassword}/>
                         <Route path="/verify_account/" component={AccountVerification}/>
                         <Route path="/appointments_picker/" component={AppointmentsPicker}/>
+                        <Route path="/chatbot_direct_link/" component={ChatbotDirectLink}/>
                         <PrivateRoute path="/dashboard" component={Dashboard}/>
                         <Redirect to={{pathname: '/dashboard'}}/>
                     </Switch>

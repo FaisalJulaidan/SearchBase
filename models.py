@@ -19,8 +19,8 @@ db = SQLAlchemy()
 def _set_sqlite_pragma(dbapi_connection, connection_record):
     cursor = dbapi_connection.cursor()
 
-    if not isinstance(dbapi_connection, SQLite3Connection):
-        cursor.execute("SET wait_timeout=31536000;")
+    # if not isinstance(dbapi_connection, SQLite3Connection):
+    #     cursor.execute("SET wait_timeout=31536000;")
 
     if isinstance(dbapi_connection, SQLite3Connection):
         cursor.execute("PRAGMA foreign_keys=ON;")
@@ -177,6 +177,11 @@ class Assistant(db.Model):
 
 class Conversation(db.Model):
     ID = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
+
+    Name = db.Column(db.String(64), nullable=True)
+    Email = db.Column(db.String(64), nullable=True)
+    PhoneNumber = db.Column(db.String(30), nullable=True)
+
     Data = db.Column(MagicJSON, nullable=False)
     DateTime = db.Column(db.DateTime(), nullable=False, default=datetime.now)
     TimeSpent = db.Column(db.Integer, nullable=False, default=0)
@@ -185,8 +190,8 @@ class Conversation(db.Model):
     UserType = db.Column(Enum(enums.UserType), nullable=False)
 
     Completed = db.Column(db.Boolean, nullable=False, default=True)
-    ApplicationStatus = db.Column(Enum(enums.ApplicationStatus), nullable=False,
-                                  default=enums.ApplicationStatus.Pending)
+    ApplicationStatus = db.Column(Enum(enums.Status), nullable=False,
+                                  default=enums.Status.Pending)
     Score = db.Column(db.Float(), nullable=False)
 
     AcceptanceEmailSentAt = db.Column(db.DateTime(), default=None)
@@ -207,7 +212,7 @@ class Conversation(db.Model):
     Appointment = db.relationship('Appointment', uselist=False, back_populates='Conversation')
 
     def __repr__(self):
-        return '<Conversation {}>'.format(self.Data)
+        return '<Conversation {} with AssistantID {}>'.format(self.ID, self.AssistantID)
 
 
 class AutoPilot(db.Model):

@@ -7,14 +7,13 @@ const initialState = {assistantList: [], assistant: null, isLoading: false, erro
 
 export const assistant = (state = initialState, action) => {
 
-    let assistantsCopy;
-    let index;
 
     switch (action.type) {
-        // Fetch
+        // Fetch All
         case actionTypes.FETCH_ASSISTANTS_REQUEST:
             return updateObject(state, {
                 assistantList: [],
+                assistant: null,
                 errorMsg: null,
                 isLoading: true,
             });
@@ -30,7 +29,7 @@ export const assistant = (state = initialState, action) => {
                 errorMsg: action.error
             });
 
-
+        // Fetch One
         case actionTypes.FETCH_ASSISTANT_REQUEST:
             return updateObject(state, {
                 assistant: null,
@@ -79,13 +78,11 @@ export const assistant = (state = initialState, action) => {
                 isLoading: true
             });
         case actionTypes.UPDATE_ASSISTANT_SUCCESS:
-            assistantsCopy = state.assistantList
-                .map(a => a.ID === action.assistantID ? {...action.updatedAssistant}: a);
-
             return updateObject(state, {
                 successMsg: action.successMsg,
                 isLoading: false,
-                assistantList: assistantsCopy
+                assistantList: state.assistantList
+                    .map(a => a.ID === action.assistantID ? {...action.updatedAssistant}: a)
             });
         case actionTypes.UPDATE_ASSISTANT_FAILURE:
             return updateObject(state, {
@@ -119,12 +116,10 @@ export const assistant = (state = initialState, action) => {
                 isDeleting: true
             });
         case actionTypes.DELETE_ASSISTANT_SUCCESS:
-
-            let assistantList = [...state.assistantList].filter(assistant => assistant.ID !== action.assistantID);
             return updateObject(state, {
                 successMsg: action.successMsg,
                 isDeleting: false,
-                assistantList
+                assistantList: [...state.assistantList].filter(assistant => assistant.ID !== action.assistantID)
             });
         case actionTypes.DELETE_ASSISTANT_FAILURE:
             return updateObject(state, {
@@ -174,29 +169,29 @@ export const assistant = (state = initialState, action) => {
             });
 
         // CRM Connection
-        case actionTypes.CONNECT_ASSISTANT_CRM_REQUEST:
+        case actionTypes.CONNECT_ASSISTANT_MARKETPLACE_REQUEST:
             return updateObject(state, {
                 errorMsg: null,
             });
-        case actionTypes.CONNECT_ASSISTANT_CRM_SUCCESS:
+        case actionTypes.CONNECT_ASSISTANT_MARKETPLACE_SUCCESS:
             return updateObject(state, {
                 assistant: {...state.assistant, CRMID: action.CRMID}
             });
-        case actionTypes.CONNECT_ASSISTANT_CRM_FAILURE:
+        case actionTypes.CONNECT_ASSISTANT_MARKETPLACE_FAILURE:
             return updateObject(state, {
                 errorMsg: action.error
             });
 
-        case actionTypes.DISCONNECT_ASSISTANT_CRM_REQUEST:
+        case actionTypes.DISCONNECT_ASSISTANT_MARKETPLACE_REQUEST:
             return updateObject(state, {
                 errorMsg: null,
             });
-        case actionTypes.DISCONNECT_ASSISTANT_CRM_SUCCESS:
+        case actionTypes.DISCONNECT_ASSISTANT_MARKETPLACE_SUCCESS:
             return updateObject(state, {
                 assistant: {...state.assistant, CRMID: null}
             });
 
-        case actionTypes.DISCONNECT_ASSISTANT_CRM_FAILURE:
+        case actionTypes.DISCONNECT_ASSISTANT_MARKETPLACE_FAILURE:
             return updateObject(state, {
                 errorMsg: action.error
             });
@@ -207,7 +202,6 @@ export const assistant = (state = initialState, action) => {
                 errorMsg: null,
             });
         case actionTypes.CONNECT_ASSISTANT_AUTO_PILOT_SUCCESS:
-            console.log(action.autoPilotID);
             return updateObject(state, {
                 assistant: {...state.assistant, autoPilotID: action.autoPilotID}
             });
@@ -229,8 +223,6 @@ export const assistant = (state = initialState, action) => {
             return updateObject(state, {
                 errorMsg: action.error
             });
-
-
 
         default:
             return state

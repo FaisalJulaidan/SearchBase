@@ -87,16 +87,16 @@ class Solutions extends Component {
                 <Form layout='horizontal'>
 
                     <FormItem label="Show Top Results"
-                              extra="Number of results you want to return (Best matches e.g. Clients, Candidates, etc.) max: 10"
+                              extra="Number of results you want to return (Best matches e.g. Clients, Candidates, etc.) max: 20"
                               {...layout}>
                         {getFieldDecorator('showTop', {
-                            initialValue: block.Content.showTop,
+                            initialValue: block.Content.showTop || 5,
                             rules: [{
                                 required: true,
                                 message: "Please set how many solutions to return",
                             }],
                         })(
-                            <Input min="1" max="10" type="number" placeholder="Ex: 5"/>
+                            <Input min="1" max="20" type="number" placeholder="Ex: 5"/>
                         )}
                     </FormItem>
 

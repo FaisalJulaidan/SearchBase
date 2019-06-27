@@ -6,7 +6,7 @@ from jsonschema import validate
 from sqlalchemy.sql import and_
 from sqlalchemy.sql import desc
 
-from enums import UserType, ApplicationStatus
+from enums import UserType, Status
 from models import db, Callback, Conversation, Assistant
 from services import assistant_services, stored_file_services, auto_pilot_services, mail_services
 from services.Marketplace.CRM import crm_services
@@ -44,14 +44,16 @@ def processConversation(assistantHashID, data: dict) -> Callback:
         # Validate submitted conversation after adding the modified version of selected solutions
         validate(conversationData, json_schemas.conversation)
 
-
         # timeSpent is in seconds.
         conversation = Conversation(Data=conversationData,
+                                    Name=data['name'],
+                                    Email=data['email'],
+                                    PhoneNumber=data['phone'],
                                     TimeSpent=data['timeSpent'],
                                     Completed=data['isConversationCompleted'],
                                     SolutionsReturned=data['solutionsReturned'],
                                     QuestionsAnswered=len(collectedData),
-                                    UserType=UserType[data['userType'].replace(" ", "")],
+                                    UserType=UserType[data['userType']],
                                     Score=round(data['score'], 2),
                                     Assistant=assistant)
 
@@ -73,22 +75,17 @@ def processConversation(assistantHashID, data: dict) -> Callback:
                 conversation.CRMSynced = True
             conversation.CRMResponse = crm_callback.Message
 
-        # immediate notification
-        if assistant.NotifyEvery == 0:
-            assistant.LastNotificationDate = datetime.now()
-            # notify via email ?
 
+        # Save conversation data
         db.session.add(conversation)
-        # db.session.save(assistant)
         db.session.commit()
 
-        # Notify company about the new chatbot session
-        fileUpload = False
-        for key, value in conversation.Data['keywordsByDataType'].items():
-            if "&FILE_UPLOAD&" in value:
-                fileUpload = True
-        if not fileUpload:
-            mail_services.notifyNewConversation(assistant, conversation)
+        # Notify company about the new chatbot session only if set as immediate -> NotifyEvery=0
+        # Note: if there is a file upload the /file route in chatbot.py will handle the notification instead
+        if assistant.NotifyEvery == 0:
+            assistant.LastNotificationDate = datetime.now()
+            if not data['hasFiles']:
+                mail_services.notifyNewConversation(assistant, conversation)
 
         return Callback(True, 'Chatbot data has been processed successfully!', conversation)
 
@@ -111,7 +108,7 @@ def getAllByAssistantID(assistantID):
             if storedFile_callback.Success:
                 filePaths = storedFile_callback.Data.FilePath
             conversation.FilePath = filePaths
-        return Callback(True, "User inputs retrieved successfully.", conversations)
+        return Callback(True, "Conversations retrieved successfully.", conversations)
 
     except Exception as exc:
         helpers.logError("conversation_services.getAllByAssistantID(): " + str(exc))
@@ -143,7 +140,7 @@ def updateStatus(conversationID, assistantID, newStatus):
     try:
         db.session.query(Conversation) \
             .filter(and_(Conversation.AssistantID == assistantID, Conversation.ID == conversationID)) \
-            .update({'ApplicationStatus': ApplicationStatus[newStatus]})
+            .update({'ApplicationStatus': Status[newStatus]})
 
         db.session.commit()
         return Callback(True, 'Status updated Successfully')

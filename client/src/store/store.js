@@ -11,7 +11,7 @@ import {
     authSaga,
     autoPilotSaga,
     conversationSaga,
-    crmSaga,
+    marketplacesSaga,
     databaseSaga,
     optionsSaga,
     accountSaga,
@@ -43,7 +43,7 @@ sagaMiddleware.run(conversationSaga);
 sagaMiddleware.run(usersManagementSaga);
 sagaMiddleware.run(databaseSaga);
 sagaMiddleware.run(optionsSaga);
-sagaMiddleware.run(crmSaga);
+sagaMiddleware.run(marketplacesSaga);
 sagaMiddleware.run(autoPilotSaga);
 sagaMiddleware.run(analyticsSaga);
 sagaMiddleware.run(appointmentsPickerSaga);

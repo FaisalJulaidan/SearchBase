@@ -5,7 +5,6 @@ from utilities import helpers
 from config import BaseConfig
 from enums import UserType, DataType
 from flask_jwt_extended import jwt_required, get_jwt_identity
-import io
 
 conversation_router: Blueprint = Blueprint('conversation_router', __name__ , template_folder="../../templates")
 
@@ -31,11 +30,7 @@ def conversation(assistantID):
         if not s_callback.Success:
             return helpers.jsonResponse(False, 400, "Error in retrieving conversation.")
         return helpers.jsonResponse(True, 200, s_callback.Message,
-                                    {'conversationsList': helpers.getListFromSQLAlchemyList(s_callback.Data),
-                                     'userTypes': [ut.value for ut in UserType],
-                                     'dataTypes': [dt.value for dt in DataType],
-                                     'filesPath': BaseConfig.USER_FILES
-                                     })
+                                    {'conversationsList': helpers.getListFromSQLAlchemyList(s_callback.Data)})
 
 
     # Clear all user inputs/chatbot conversation
@@ -74,21 +69,19 @@ def conversation_file_uploads(assistantID, filename):
         return helpers.jsonResponse(False, 404, "File not found.")
     conversation: Conversation = cs_callback.Data
 
+
     # Check if this user has access to user input conversation
-    if assistant != conversation.Assistant:
+    if assistant != conversation.Assistant or (not conversation.StoredFile):
         return helpers.jsonResponse(False, 401, "File access is unauthorised!")
 
 
     if request.method == "GET":
-        callback: Callback = stored_file_services.downloadFile(filename, stored_file_services.USER_FILES_PATH)
+        callback: Callback = stored_file_services.genPresigendURL(filename, stored_file_services.USER_FILES_PATH)
         if not callback.Success:
             return helpers.jsonResponse(False, 404, "File not found.")
 
         file = callback.Data
-        return send_file(
-            io.BytesIO(file.get()['Body'].read()),
-            mimetype=file.get()['ContentType']
-        )
+        return helpers.jsonResponse(True, 200, callback.Message, {'url': callback.Data})
 
 
 @conversation_router.route("/assistant/<assistantID>/conversation/<conversationID>", methods=["DELETE"])

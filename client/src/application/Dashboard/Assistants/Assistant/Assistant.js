@@ -13,7 +13,7 @@ import Flow from "./Flow/Flow"
 import Connections from "./Connections/Connections"
 
 import {history} from "helpers";
-import {assistantActions, crmActions, optionsActions} from "store/actions";
+import {assistantActions, marketplacesActions, optionsActions, autoPilotActions} from "store/actions";
 import NoHeaderPanel from 'components/NoHeaderPanel/NoHeaderPanel'
 
 
@@ -39,8 +39,9 @@ class Assistant extends Component {
             }).catch(() => history.push(`/dashboard/assistants`));
 
         if (!this.props.options) this.props.dispatch(optionsActions.getOptions());
+        if (!this.props.autoPilotsList) this.props.dispatch(autoPilotActions.fetchAutoPilots());
 
-        this.props.dispatch(crmActions.getConnectedCRMs());
+        this.props.dispatch(marketplacesActions.getConnectedCRMs());
 
         window.onbeforeunload = () => {
             if (!this.state.isFlowSaved)
@@ -51,10 +52,7 @@ class Assistant extends Component {
     }
 
     componentDidMount() {
-        setTimeout(() => {
-            this.firstHead = [...document.head.children];
-            console.log(this.firstHead)
-        }, 1000)
+        setTimeout(() => this.firstHead = [...document.head.children], 1000)
     }
      componentWillUnmount() {
         this.removeChatbot()
@@ -122,6 +120,7 @@ class Assistant extends Component {
 
     render() {
         const {assistant} = this.props;
+
         return (
             <>
                 <NoHeaderPanel>
@@ -161,7 +160,7 @@ class Assistant extends Component {
                     <div className={[styles.Body, 'assistantTabs'].join(' ')}>
                         {!assistant ? <Spin/> :
 
-                            <Tabs defaultActiveKey={'Script'} size={"large"} animated={false}
+                            <Tabs defaultActiveKey={'Settings'} size={"large"} animated={false}
                                   onTabClick={this.onTabClick}>
                                 <TabPane tab="Analytics" key="Analytics">
                                     <Analytics assistant={assistant}/>
@@ -178,7 +177,7 @@ class Assistant extends Component {
 
                                 <TabPane tab="Connections" key="Connections">
                                     <Connections assistant={assistant}
-                                                 CRMsList={this.props.CRMsList}
+                                                 marketplacesList={this.props.marketplacesList}
                                                  autoPilotsList={this.props.autoPilotsList}/>
                                 </TabPane>
 
@@ -240,7 +239,7 @@ function mapStateToProps(state) {
         isLoading: state.assistant.isLoading,
         isStatusChanging: state.assistant.isStatusChanging,
 
-        CRMsList: state.crm.CRMsList,
+        marketplacesList: state.marketplace.marketplacesList,
         autoPilotsList: state.autoPilot.autoPilotsList,
     };
 }

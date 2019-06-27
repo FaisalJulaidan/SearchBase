@@ -4,7 +4,7 @@ import {connect} from 'react-redux';
 
 import styles from "./Assistants.module.less"
 
-import {assistantActions, crmActions} from "store/actions";
+import {assistantActions, marketplacesActions} from "store/actions";
 import {RobotIcon} from "components/SVGs";
 import {history} from "helpers";
 

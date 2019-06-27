@@ -11,9 +11,9 @@ from sqlalchemy_utils import create_database, database_exists
 from services.auth_services import jwt
 from utilities import helpers, tasks, dummy_data
 from flask_babel import Babel
-from services import appointment_services
+from services import scheduler_services, appointment_services, scheduler_services, flow_services
 from datetime import datetime
-
+import enums
 # Import all routers to register them as blueprints
 from routes.admin.routers import account_router, analytics_router, sub_router, \
     conversation_router, users_router, flow_router, assistant_router,\
@@ -69,7 +69,7 @@ manager = Manager(app)
 babel = Babel(app)
 # scheduler = APScheduler()
 manager.add_command('db', MigrateCommand)
-
+app.jinja_env.add_extension('jinja2.ext.do') # Add 'do' extension to Jinja engine
 
 # will be used for migration purposes
 @manager.command
@@ -79,6 +79,7 @@ def run_tasks(functionName):
 
 print("Run the server...")
 if os.environ['FLASK_ENV'] in ['production', 'staging']:
+
     # Server Setup
     app.config.from_object('config.ProductionConfig')
     url = os.environ['SQLALCHEMY_DATABASE_URI']
@@ -92,9 +93,10 @@ if os.environ['FLASK_ENV'] in ['production', 'staging']:
         print('Create db tables')
         create_database(url)
         db.create_all()
+        helpers.seed()
 
-    # Check if staging what to do
-    # scheduler.start()
+    # Start scheduled tasks
+    scheduler_services.scheduler.start()
 
     print('Production mode running...')
 
@@ -108,13 +110,16 @@ elif os.environ['FLASK_ENV'] == 'development':
     mail.init_app(app)
     app.app_context().push()
 
-
     url = os.environ['SQLALCHEMY_DATABASE_URI']  # get database URL
     if os.environ['REFRESH_DB_IN_DEV'] == 'yes':
         print('Reinitialize the database...')
         db.drop_all()
         db.create_all()
         dummy_data.generate()
+
+    # Start scheduled tasks
+    scheduler_services.scheduler.start()
+
 
     # appointment_services.getAllByCompanyID(1)
 

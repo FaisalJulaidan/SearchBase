@@ -90,8 +90,8 @@ def sendRequest(url, method, headers, data=None):
 #     try:
 #         # New candidate details
 #         body = {
-#             "first_name": conversation.Data.get('keywordsByDataType').get(DT.CandidateName.value['name'], [""])[0],
-#             "last_name": conversation.Data.get('keywordsByDataType').get(DT.CandidateName.value['name'], [""])[-1],
+#             "first_name": conversation.Data.get('keywordsByDataType').get(DT.CandidateName.value['name'], [" "])[0],
+#             "last_name": conversation.Data.get('keywordsByDataType').get(DT.CandidateName.value['name'], [" "])[-1],
 #             "phone_numbers": [],
 #             "email_addresses": [],
 #             "applications": [{}]  # TODO NEEDS SOMETHING IN HERE...
@@ -104,7 +104,7 @@ def sendRequest(url, method, headers, data=None):
 #         if conversation.Data.get('keywordsByDataType').get(DT.CandidateLocation.value['name'], None):
 #             body["addresses"] = [{
 #                 "value": "".join(
-#                     conversation.Data.get('keywordsByDataType').get(DT.CandidateLocation.value['name'], [""])),
+#                     conversation.Data.get('keywordsByDataType').get(DT.CandidateLocation.value['name'], [" "])),
 #                 "type": "home"
 #             }]
 #

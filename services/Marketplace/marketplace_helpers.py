@@ -30,7 +30,7 @@ def processRedirect(args):
         elif Calendar_Enum.has_value(args["type"]):
             callback: Callback = calendar_services.connect(int(state.get("companyID")), args)
         else:
-            callback = Callback(False, "The Marketplace object did not match one on the system")
+            callback = Callback(False, "The Marketplace object did not match any on the system")
 
         return callback
 

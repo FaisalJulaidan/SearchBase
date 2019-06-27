@@ -32,13 +32,14 @@ def marketplace():
 
 # ===== Connect ===== #
 @marketplace_router.route("/marketplace/connect", methods=['POST'])
+@jwt_required
 def connect():
     # Authenticate
     user = get_jwt_identity()['user']
     if request.method == "POST":
         data = request.json
         callback: Callback = marketplace_helpers.connect(data.get('type'),
-                                                         data.get('details'),
+                                                         data.get('auth'),
                                                          user.get("companyID"))
 
         if not callback.Success:
@@ -64,10 +65,10 @@ def crm(type):
 
     # Get and test the connection before return
     if request.method == "DELETE":
-        callback: Callback = marketplace_helpers.testConnection(type, user.get("companyID"))
+        callback: Callback = marketplace_helpers.disconnect(type, user.get("companyID"))
         if not callback.Success:
             return helpers.jsonResponse(False, 400, callback.Message)
-        return helpers.jsonResponse(True, 200, callback.Message, callback.Data)
+        return helpers.jsonResponse(True, 200, callback.Message)
 
 
 @marketplace_router.route("/crm/recruiter_value_report", methods=['POST'])

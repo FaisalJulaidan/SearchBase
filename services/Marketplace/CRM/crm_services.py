@@ -179,7 +179,6 @@ def testConnection(type, auth, companyID) -> Callback:
 
 def disconnectByType(type, companyID) -> Callback:
     try:
-
         crm_callback: Callback = getCRMByType(type, companyID)
         if not crm_callback:
             return Callback(False, "Could not find CRM.")

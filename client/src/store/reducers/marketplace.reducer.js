@@ -2,11 +2,14 @@ import * as actionTypes from '../actions/actionTypes';
 import {updateObject} from '../utility';
 
 const initialState = {
+    marketplaceItems: null,
+
     connectionStatus: 'NOT_CONNECTED',
+
     isPinging: false,
     isDisconnecting: false,
-
     isConnecting: false,
+
     errorMsg: null
 };
 
@@ -19,9 +22,13 @@ export const marketplace = (state = initialState, action) => {
         case actionTypes.FETCH_MARKETPLACE_REQUEST:
             return updateObject(state, {});
         case actionTypes.FETCH_MARKETPLACE_SUCCESS:
-            return updateObject(state, {});
+            return updateObject(state, {
+                marketplaceItems: action.marketplaceItems
+            });
         case actionTypes.FETCH_MARKETPLACE_FAILURE:
-            return updateObject(state, {});
+            return updateObject(state, {
+                marketplaceItems: null
+            });
 
         // PING MARKETPLACE
         case actionTypes.PING_MARKETPLACE_REQUEST:
@@ -61,12 +68,9 @@ export const marketplace = (state = initialState, action) => {
                 isConnecting: true,
             });
         case actionTypes.CONNECT_MARKETPLACE_SUCCESS:
-            tState = {...state};
-            tState.marketplacesList.push(action.connectedCRM);
             return updateObject(state, {
+                connectionStatus: "CONNECTED",
                 isConnecting: false,
-                connectedCRM_ID: action.connectedCRM,
-                marketplacesList: tState.marketplacesList
             });
         case actionTypes.CONNECT_MARKETPLACE_FAILURE:
             return updateObject(state, {

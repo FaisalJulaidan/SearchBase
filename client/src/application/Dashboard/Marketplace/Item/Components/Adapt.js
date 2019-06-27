@@ -11,7 +11,6 @@ export const AdaptFormItems = ({
                                    getFieldDecorator,
                                    marketplace,
                                    connectMarketplace,
-                                   testMarketplace,
                                    isConnecting,
                                    isTesting,
                                }) =>
@@ -23,6 +22,7 @@ export const AdaptFormItems = ({
                 <FormItem label="Domain"
                           {...layout}>
                     {getFieldDecorator('domain', {
+                        initialValue: 'PartnerDomain9',
                         rules: [{
                             required: true,
                             message: "Please add your domain name",
@@ -35,6 +35,7 @@ export const AdaptFormItems = ({
                 <FormItem label="Username"
                           {...layout}>
                     {getFieldDecorator('username', {
+                        initialValue: 'SD9USR8',
                         rules: [{
                             required: true,
                             max: 20,
@@ -51,6 +52,7 @@ export const AdaptFormItems = ({
                 <FormItem label="Password"
                           {...layout}>
                     {getFieldDecorator('password', {
+                        initialValue: 'P@55word',
                         rules: [{
                             required: true,
                             max: 32,
@@ -68,6 +70,7 @@ export const AdaptFormItems = ({
                 <FormItem label="Profile"
                           {...layout}>
                     {getFieldDecorator('profile', {
+                        initialValue: 'CoreProfile',
                         rules: [{
                             required: true,
                             message: "Profile is required field",
@@ -79,6 +82,7 @@ export const AdaptFormItems = ({
 
                 <FormItem label="Locale" {...layout}>
                     {getFieldDecorator('locale', {
+                        initialValue: 'en_GB',
                         rules: [{
                             required: true,
                             message: "Locale is required field",
@@ -91,6 +95,7 @@ export const AdaptFormItems = ({
                 <FormItem label="Timezone"
                           {...layout}>
                     {getFieldDecorator('timezone', {
+                        initialValue: 'GMT',
                         rules: [{
                             required: true,
                             message: "Timezone is required field",
@@ -103,6 +108,7 @@ export const AdaptFormItems = ({
                 <FormItem label="Date Format"
                           {...layout}>
                     {getFieldDecorator('dateFormat', {
+                        initialValue: 0,
                         rules: [{
                             required: true,
                             message: "Date Format is required field",
@@ -121,6 +127,7 @@ export const AdaptFormItems = ({
                 <FormItem label="Time Format"
                           {...layout}>
                     {getFieldDecorator('timeFormat', {
+                        initialValue: 0,
                         rules: [{
                             required: true,
                             message: "Time Format is required field",
@@ -137,11 +144,8 @@ export const AdaptFormItems = ({
 
                 {
                     marketplace.status === "NOT_CONNECTED" &&
-                    <>
-                        <Button type="primary" disabled={isConnecting || isTesting}
-                                onClick={connectMarketplace}>Connect</Button>
-                        <Button onClick={testMarketplace} disabled={isConnecting || isTesting}>Test</Button>
-                    </>
+                    <Button type="primary" disabled={isConnecting || isTesting}
+                            onClick={connectMarketplace}>Connect</Button>
                 }
             </div>
         }

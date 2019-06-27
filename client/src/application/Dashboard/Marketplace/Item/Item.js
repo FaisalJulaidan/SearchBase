@@ -40,26 +40,7 @@ class Item extends React.Component {
 
     connectMarketplace = () => this.props.form.validateFields((err, values) => {
         if (err) return;
-        this.props.dispatch(
-            marketplaceActions.connectMarketplace(
-                {
-                    type: this.marketplaceItem.type,
-                    auth: {...values}
-                }
-            )
-        );
-    });
-
-    testMarketplace = () => this.props.form.validateFields((err, values) => {
-        if (err) return;
-        this.props.dispatch(
-            marketplaceActions.testMarketplace(
-                {
-                    type: this.marketplaceItem.type,
-                    auth: {...values}
-                }
-            )
-        );
+        this.props.dispatch(marketplaceActions.connectMarketplace(this.marketplaceItem.type, {...values}))
     });
 
     disconnectMarketplace = () => this.props.dispatch(marketplaceActions.disconnectMarketplace(this.marketplaceItem.type));
@@ -85,12 +66,10 @@ class Item extends React.Component {
             marketplace: this.marketplaceItem,
             FormItem: FormItem,
             isConnecting: this.props.isConnecting,
-            isTesting: this.props.isTesting,
             isDisconnecting: this.props.isDisconnecting,
             openModal: this.showModal,
             disconnectMarketplace: this.disconnectMarketplace,
-            connectCRM: this.connectMarketplace,
-            testMarketplace: this.testMarketplace
+            connectMarketplace: this.connectMarketplace,
         };
         const buttonsOptions = {
             disconnectMarketplace: this.disconnectMarketplace,
@@ -256,10 +235,10 @@ function mapStateToProps(state) {
     return {
         connectionStatus: state.marketplace.connectionStatus,
         isPinging: state.marketplace.isPinging,
+        isDisconnecting: state.marketplace.isDisconnecting,
+
         companyID: state.marketplace.companyID,
         isConnecting: state.marketplace.isConnecting,
-        isTesting: state.marketplace.isTesting,
-        isDisconnecting: state.marketplace.isDisconnecting,
         isLoading: state.marketplace.isLoading,
         exportData: state.marketplace.exportData,
     };

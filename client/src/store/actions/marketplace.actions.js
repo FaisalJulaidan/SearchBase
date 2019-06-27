@@ -5,8 +5,9 @@ const fetchMarketplace = () => ({
     type: actionTypes.FETCH_MARKETPLACE_REQUEST,
 });
 
-const fetchMarketplaceSuccess = () => ({
+const fetchMarketplaceSuccess = (marketplaceItems) => ({
     type: actionTypes.FETCH_MARKETPLACE_SUCCESS,
+    marketplaceItems
 });
 
 const fetchMarketplaceFailure = (error) => ({
@@ -29,13 +30,14 @@ const pingMarketplaceFailure = (error) => ({
     error
 });
 
-const connectMarketplace = () => ({
+const connectMarketplace = (marketplaceType, auth) => ({
     type: actionTypes.CONNECT_MARKETPLACE_REQUEST,
+    marketplaceType,
+    auth
 });
 
-const connectMarketplaceSuccess = (msg) => ({
+const connectMarketplaceSuccess = () => ({
     type: actionTypes.CONNECT_MARKETPLACE_SUCCESS,
-    msg
 });
 
 const connectMarketplaceFailure = (error) => ({

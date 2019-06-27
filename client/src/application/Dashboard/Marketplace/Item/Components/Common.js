@@ -4,7 +4,7 @@ import {Button, Popconfirm} from "antd";
 export const DefaultButton = ({
                                   buttonText,
                                   icon,
-                                  windowObject,
+                                  windowObject = {},
                                   disconnectMarketplace,
                                   isDisconnecting,
                                   showModal,
@@ -24,7 +24,7 @@ export const DefaultButton = ({
                 <Button type="danger"
                         style={{width: 'auto'}}
                         size={'large'}
-                        disabled={isDisconnecting}>
+                        loading={isDisconnecting}>
                     {
                         status === "FAILED" ? '(Failed) click to disconnect' : 'Disconnect'
                     }

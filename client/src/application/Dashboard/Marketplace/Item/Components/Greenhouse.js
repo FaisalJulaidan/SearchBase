@@ -11,7 +11,6 @@ export const GreenhouseFormItem = ({
                                        marketplace,
                                        disconnectMarketplace,
                                        connectMarketplace,
-                                       testMarketplace,
                                        isConnecting,
                                        isTesting,
                                    }) =>
@@ -54,11 +53,8 @@ export const GreenhouseFormItem = ({
 
                 {
                     marketplace.status === "NOT_CONNECTED" &&
-                    <>
-                        <Button type="primary" disabled={isConnecting || isTesting}
-                                onClick={connectMarketplace}>Connect</Button>
-                        <Button onClick={testMarketplace} disabled={isConnecting || isTesting}>Test</Button>
-                    </>
+                    <Button type="primary" disabled={isConnecting || isTesting}
+                            onClick={connectMarketplace}>Connect</Button>
                 }
 
             </div>

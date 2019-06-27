@@ -8,7 +8,7 @@ function* fetchMarketplace() {
     try {
         const res = yield http.get('/marketplace');
         successMessage(res.data?.msg || "Marketplace fetched successfully");
-        yield put(marketplaceActions.fetchMarketplaceSuccess());
+        yield put(marketplaceActions.fetchMarketplaceSuccess(res.data.data));
     } catch (error) {
         const msg = error.response?.data?.msg || "Couldn't fetch marketplace";
         errorMessage(msg);
@@ -39,12 +39,12 @@ function* disconnectMarketplace({marketplaceType}) {
     }
 }
 
-function* connectMarketplace({connectedCRM}) {
+function* connectMarketplace({marketplaceType, auth}) {
     try {
-        loadingMessage('Connecting to ' + connectedCRM.type, 0);
-        const res = yield http.post(`/marketplace/connect`, {type: connectedCRM.type, auth: connectedCRM.auth});
-        successMessage(res.data?.msg || `${connectedCRM.type} connected successfully`);
-        yield put(marketplaceActions.connectMarketplaceSuccess(res.data.data));
+        loadingMessage('Connecting to ' + marketplaceType, 0);
+        const res = yield http.post(`/marketplace/connect`, {type: marketplaceType, auth});
+        successMessage(res.data?.msg || `${marketplaceType} connected successfully`);
+        yield put(marketplaceActions.connectMarketplaceSuccess());
     } catch (error) {
         const msg = error.response?.data?.msg || "Couldn't Connect CRM";
         errorMessage(msg);

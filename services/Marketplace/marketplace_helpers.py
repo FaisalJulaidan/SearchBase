@@ -1,5 +1,3 @@
-import json
-
 import requests
 from sqlalchemy import and_
 
@@ -11,14 +9,55 @@ from utilities import helpers
 
 
 # process the redirect from the auth callback
-def auth(type, details, companyID):
+def connect(type, auth, companyID):
     try:
 
         # find the type and redirect to its service
         if CRM_Enum.has_value(type):
-            callback: Callback = crm_services.connect(type, details, companyID)
+            return crm_services.connect(type, auth, companyID)
         elif Calendar_Enum.has_value(type):
-            callback: Callback = calendar_services.connect(type, details, companyID)
+            return calendar_services.connect(type, auth, companyID)
+        else:
+            return Callback(False, "The Marketplace object did not match any on the system")
+
+    except Exception as exc:
+        helpers.logError("Marketplace.marketplace_helpers.processRedirect() ERROR: " + str(exc))
+        return Callback(False, str(exc))
+
+
+# Test marketplace item connection (e.g. CRM, Calendar...)
+def testConnection(type, companyID):
+    try:
+
+        # find the type and redirect to its service
+        if CRM_Enum.has_value(type):
+
+            # Check if connection exist
+            exist_callback: Callback = crm_services.getCRMByType(type, companyID)
+            if not exist_callback:
+                return Callback(True, "", {"Status": "NOT_CONNECTED"})
+
+            # If yes test connection
+            return Callback(True, "",
+                            {"Status":
+                                "CONNECTED" if crm_services
+                                .testConnection(type, exist_callback.Data.Auth, companyID).Success else "FAILED"
+                            })
+
+        elif Calendar_Enum.has_value(type):
+
+            # Check if connection exist
+            exist_callback: Callback = calendar_services.getCalendarByType(type, companyID)
+            if not exist_callback:
+                return Callback(True, "", {"Status": "NOT_CONNECTED"})
+
+            # If yes test connection
+            return Callback(True, "",
+                            {"Status":
+                                 "CONNECTED" if calendar_services
+                                 .testConnection(type, exist_callback.Data.Auth, companyID).Success else "FAILED"
+                             })
+
         else:
             callback = Callback(False, "The Marketplace object did not match any on the system")
 
@@ -27,6 +66,24 @@ def auth(type, details, companyID):
     except Exception as exc:
         helpers.logError("Marketplace.marketplace_helpers.processRedirect() ERROR: " + str(exc))
         return Callback(False, str(exc))
+
+
+# d marketplace item connection (e.g. CRM, Calendar...)
+def disconnect(type, companyID):
+    try:
+
+        # find the type and redirect to its service
+        if CRM_Enum.has_value(type):
+            return crm_services.disconnectByType(type, companyID)
+        elif Calendar_Enum.has_value(type):
+            return calendar_services.disconnectByType(type, companyID)
+        else:
+            return Callback(False, "The Marketplace object did not match any on the system")
+
+    except Exception as exc:
+        helpers.logError("Marketplace.marketplace_helpers.processRedirect() ERROR: " + str(exc))
+        return Callback(False, str(exc))
+
 
 
 # send request with dynamic method

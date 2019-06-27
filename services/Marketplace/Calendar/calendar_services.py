@@ -39,11 +39,11 @@ def addEvent(eventDetails, assistant=None, assistantID=None):
 
 # Connect to a new Calendar
 # type e.g. Outlook, Google etc.
-def connect(type, details, companyID) -> Callback:
+def connect(type, auth, companyID) -> Callback:
     try:
         calendar_type: Calendar_Enum = Calendar_Enum[type]
         # test connection
-        test_callback: Callback = testConnection(type, details, companyID)
+        test_callback: Callback = testConnection(type, auth, companyID)
         if not test_callback.Success:
             return test_callback
 
@@ -62,50 +62,21 @@ def connect(type, details, companyID) -> Callback:
 
 
 # Update Calendar Details
-# details is a dict that has {auth, type}
-def update(calendarID, companyID, details) -> Callback:
+def updateByType(type, auth, metaData, companyID):
     try:
-        calendar_auth = details['auth']
-
         # test connection
-        test_callback: Callback = testConnection(details, companyID)
+        test_callback: Callback = testConnection(type, auth, companyID)
         if not test_callback.Success:
             return test_callback
 
-        connection_callback: Callback = getCalendarByID(calendarID, companyID)
-        if not connection_callback.Success:
-            raise Exception(connection_callback.Message)
-
-        Calendar = connection_callback.Data
-
-        Calendar.Auth = calendar_auth
-
-        # Save
-        db.session.commit()
-
-        return Callback(True, 'Calendar has been updated successfully')
-
-    except Exception as exc:
-        helpers.logError("calendar_services.update(): " + str(exc))
-        db.session.rollback()
-        return Callback(False, "Update Calendar details failed.")
-
-
-def updateByCompanyAndType(calendarType, companyID, auth, metaData):
-    try:
-        # test connection
-        test_callback: Callback = testConnection({"auth": auth, "type": calendarType}, companyID)
-        if not test_callback.Success:
-            return test_callback
-
-        connection_callback: Callback = getCalendarByType(calendarType, companyID)
+        connection_callback: Callback = getCalendarByType(type, companyID)
         if not connection_callback.Success:
             raise Exception(connection_callback.Message)
 
         Calendar: Calendar_Model = connection_callback.Data
 
         Calendar.Auth = auth
-        Calendar.MetaData = metaData
+        if metaData: Calendar.MetaData = metaData
 
         # Save
         db.session.commit()
@@ -119,12 +90,12 @@ def updateByCompanyAndType(calendarType, companyID, auth, metaData):
 
 
 # Test connection to a Calendar (details must include the auth)
-def testConnection(type, details, companyID) -> Callback:
+def testConnection(type, auth, companyID) -> Callback:
     try:
         calendar_type: Calendar_Enum = Calendar_Enum[type]
 
         if calendar_type == Calendar_Enum.Outlook:
-            return Outlook.testConnection(details["auth"], companyID)
+            return Outlook.testConnection(auth, companyID)
         # elif calendar_type == Calendar_Enum.Google:
         #     return Google.authorizeUser()
         else:
@@ -135,7 +106,7 @@ def testConnection(type, details, companyID) -> Callback:
         return Callback(False, "Calendar test failed.")
 
 
-def disconnect(calendarID, companyID) -> Callback:
+def disconnectByID(calendarID, companyID) -> Callback:
     try:
 
         calendar_callback: Callback = getCalendarByID(calendarID, companyID)
@@ -144,7 +115,24 @@ def disconnect(calendarID, companyID) -> Callback:
 
         db.session.delete(calendar_callback.Data)
         db.session.commit()
-        return Callback(True, 'Calendar has been disconnected successfully', calendarID)
+        return Callback(True, 'Calendar has been disconnected successfully')
+
+    except Exception as exc:
+        helpers.logError("calendar_services.disconnect(): " + str(exc))
+        db.session.rollback()
+        return Callback(False, "Calendar disconnection failed.")
+
+
+def disconnectByType(type, companyID) -> Callback:
+    try:
+
+        calendar_callback: Callback = getCalendarByType(type, companyID)
+        if not calendar_callback:
+            return Callback(False, "Could not find Calendar.")
+
+        db.session.delete(calendar_callback.Data)
+        db.session.commit()
+        return Callback(True, 'Calendar has been disconnected successfully')
 
     except Exception as exc:
         helpers.logError("calendar_services.disconnect(): " + str(exc))

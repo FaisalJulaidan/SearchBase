@@ -127,11 +127,11 @@ def produceRecruiterValueReport(companyID, crmName):
 
 # Connect to a new CRM
 # type e.g. Bullhorn, Adapt etc.
-def connect(type, details, companyID) -> Callback:
+def connect(type, auth, companyID) -> Callback:
     try:
         crm_type: CRM = CRM[type]
         # test connection
-        test_callback: Callback = testConnection(type, details, companyID)
+        test_callback: Callback = testConnection(type, auth, companyID)
         if not test_callback.Success:
             return test_callback
 
@@ -150,10 +150,10 @@ def connect(type, details, companyID) -> Callback:
 
 
 # Test connection to a CRM
-def testConnection(type, details, companyID) -> Callback:
+def testConnection(type, auth, companyID) -> Callback:
     try:
         crm_type: CRM = CRM[type]
-        crm_auth = details.get('auth') or details  # if it comes from the callback route
+        crm_auth = auth
 
         # test connection
         test_callback: Callback = Callback(False, 'Connection failure. Please check entered details')
@@ -177,7 +177,25 @@ def testConnection(type, details, companyID) -> Callback:
         return Callback(False, "CRM testing failed.")
 
 
-def disconnect(crmID, companyID) -> Callback:
+def disconnectByType(type, companyID) -> Callback:
+    try:
+
+        crm_callback: Callback = getCRMByType(type, companyID)
+        if not crm_callback:
+            return Callback(False, "Could not find CRM.")
+
+        db.session.delete(crm_callback.Data)
+        db.session.commit()
+        return Callback(True, 'CRM has been disconnected successfully')
+
+    except Exception as exc:
+        helpers.logError("CRM_services.disconnect(): " + str(exc))
+        db.session.rollback()
+        return Callback(False, "CRM disconnection failed.")
+
+
+
+def disconnectByID(crmID, companyID) -> Callback:
     try:
 
         crm_callback: Callback = getCRMByID(crmID, companyID)

@@ -197,8 +197,10 @@ def addCalendar(auth, companyID):
             result_body = json.loads(sendQuery_callback.Data.text)
             calendarID = result_body["Id"]
 
-        update_callback: Callback = calendar_services.updateByCompanyAndType("Outlook", companyID, auth,
-                                                                             {"calendarID": str(calendarID)})
+        update_callback: Callback = calendar_services.updateByType("Outlook",
+                                                                   auth,
+                                                                   {"calendarID": str(calendarID)},
+                                                                   companyID)
         if not update_callback.Success:
             raise Exception(update_callback.Message)
 

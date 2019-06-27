@@ -21,8 +21,9 @@ from itsdangerous import URLSafeTimedSerializer
 from sqlalchemy_utils import Currency
 
 from config import BaseConfig
-from models import Assistant, Job, Callback
+from models import db, Assistant, Job, Callback, Role
 from services import flow_services, assistant_services
+from enums import Period
 
 # ======== Global Variables ======== #
 

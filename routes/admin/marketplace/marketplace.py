@@ -24,7 +24,7 @@ marketplace_router: Blueprint = Blueprint('marketplace_router', __name__, templa
 # Get connected marketplace items with testing the connection (CRMs, Calendars etc.)
 @marketplace_router.route("/marketplace", methods=["GET"])
 @jwt_required
-def get_marketplace():
+def marketplace():
     user = get_jwt_identity()['user']
 
     if request.method == "GET":
@@ -65,7 +65,7 @@ def simple_auth():
 
 
 @marketplace_router.route("/marketplace/oauth2", methods=['POST'])
-def marketplace_callback():
+def oauth2():
 
     # Authenticate
     user = get_jwt_identity()['user']
@@ -85,7 +85,7 @@ def marketplace_callback():
 # Disconnect a CRM
 @marketplace_router.route("/marketplace/crm/<crm_id>", methods=["GET", "DELETE"])
 @jwt_required
-def crm_control(crm_id):
+def crm(crm_id):
 
     # Authenticate
     user = get_jwt_identity()['user']
@@ -114,7 +114,7 @@ def crm_control(crm_id):
 # Disconnect a Calendar
 @marketplace_router.route("/marketplace/calendar/<calendar_id>", methods=["GET", "DELETE"])
 @jwt_required
-def crm_control(calendar_id):
+def calendar(calendar_id):
 
     # Authenticate
     user = get_jwt_identity()['user']

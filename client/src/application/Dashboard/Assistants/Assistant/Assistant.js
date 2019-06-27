@@ -41,7 +41,7 @@ class Assistant extends Component {
         if (!this.props.options) this.props.dispatch(optionsActions.getOptions());
         if (!this.props.autoPilotsList) this.props.dispatch(autoPilotActions.fetchAutoPilots());
 
-        this.props.dispatch(marketplacesActions.getConnectedCRMs());
+        // this.props.dispatch(marketplacesActions.getConnectedCRMs());
 
         window.onbeforeunload = () => {
             if (!this.state.isFlowSaved)

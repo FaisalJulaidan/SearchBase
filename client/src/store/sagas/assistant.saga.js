@@ -7,7 +7,6 @@ function* fetchAssistants() {
     try {
         const res = yield http.get(`/assistants`);
         yield put(assistantActions.fetchAssistantsSuccess(res.data?.data.assistants));
-        yield put(marketplacesActions.getConnectedCRMs());
     } catch (error) {
         const msg = error.response?.data?.msg || "Couldn't load assistants";
         errorMessage(msg);
@@ -18,7 +17,6 @@ function* fetchAssistants() {
 function* fetchAssistant({assistantID, meta}) {
     try {
         const res = yield http.get(`/assistant/${assistantID}`);
-        // yield put(marketplacesActions.getConnectedCRMs());
         yield put({...assistantActions.fetchAssistantSuccess(res.data?.data), meta});
     } catch (error) {
         const msg = error.response?.data?.msg || "Couldn't load assistants";

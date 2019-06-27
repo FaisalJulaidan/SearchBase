@@ -11,24 +11,32 @@ from utilities import helpers
 
 
 # process the redirect from the auth callback
-def processRedirect(args):
+def oAuth2(type, details, companyID):
     try:
-        args = dict(args)
-
-        # get the state
-        state = json.loads(args.get("state")[0])
-
-        # check if error in response or if it does not contain the auth code and the state(containing companyID)
-        if args.get("error") or not (args.get("code") and args.get("state")):
-            return Callback(False, args.get("error_description") or "Required parameters were not provided")
-
-        args["type"] = state.get("type")
 
         # find the type and redirect to its service
-        if CRM_Enum.has_value(args["type"]):
-            callback: Callback = crm_services.connect(int(state.get("companyID")), args)
-        elif Calendar_Enum.has_value(args["type"]):
-            callback: Callback = calendar_services.connect(int(state.get("companyID")), args)
+        if CRM_Enum.has_value(type):
+            callback: Callback = crm_services.connect(type, details, companyID)
+        elif Calendar_Enum.has_value(type):
+            callback: Callback = calendar_services.connect(type, details, companyID)
+        else:
+            callback = Callback(False, "The Marketplace object did not match any on the system")
+
+        return callback
+
+    except Exception as exc:
+        helpers.logError("Marketplace.marketplace_helpers.processRedirect() ERROR: " + str(exc))
+        return Callback(False, str(exc))
+
+
+# for SimpleAuth
+def simpleAuth(type, details, companyID):
+    try:
+        # find the type and redirect to its service
+        if CRM_Enum.has_value(type):
+            callback: Callback = crm_services.connect(type, details, companyID)
+        elif Calendar_Enum.has_value(type):
+            callback: Callback = calendar_services.connect(type, details, companyID)
         else:
             callback = Callback(False, "The Marketplace object did not match any on the system")
 

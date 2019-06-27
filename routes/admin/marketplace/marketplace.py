@@ -1,27 +1,16 @@
-import json
-
 from flask import Blueprint, request
 from flask_jwt_extended import jwt_required, get_jwt_identity
 
 from models import Callback
-from services import assistant_services
 from services.Marketplace import marketplace_helpers
-from services.Marketplace.CRM import crm_services, Bullhorn
 from services.Marketplace.CRM import crm_services
-from services.Marketplace.Calendar import Outlook, Google, calendar_services
+from services.Marketplace.Calendar import Google, calendar_services
 from utilities import helpers
-
-from datetime import datetime
 
 marketplace_router: Blueprint = Blueprint('marketplace_router', __name__, template_folder="../../templates")
 
 
-# OAuth2
-# auth
-# /marketplace/oath2 test, connect and delete
-#/marketplace/simple_auth  test, connect, and delete
-
-# Get connected marketplace items with testing the connection (CRMs, Calendars etc.)
+# Get connected marketplace items without testing the connection (CRMs, Calendars etc.)
 @marketplace_router.route("/marketplace", methods=["GET"])
 @jwt_required
 def marketplace():
@@ -36,57 +25,32 @@ def marketplace():
 
         return helpers.jsonResponse(True, 200, crm_callback.Message,
                                     {
-                                      "crms": helpers.getListFromSQLAlchemyList(crm_callback.Data),
-                                      "calendar": helpers.getListFromSQLAlchemyList(calendar_callback.Data),
+                                        "crms": helpers.getListFromSQLAlchemyList(crm_callback.Data),
+                                        "calendar": helpers.getListFromSQLAlchemyList(calendar_callback.Data),
                                     })
 
 
 # ===== Connect ===== #
-# Connect CRM
-@marketplace_router.route("/marketplace/simple_auth", methods=["POST"])
-@jwt_required
-def simple_auth():
-
-    # Authenticate
-    user = get_jwt_identity()['user']
-
-    if request.method == "POST":
-        data = request.json
-        callback: Callback = marketplace_helpers.simpleAuth(data.get('type'),
-                                                            data.get('details'),
-                                                            user.get("companyID"))
-
-        callback.Data = helpers.getDictFromSQLAlchemyObj(callback.Data)
-        callback.Data['Status'] = True
-
-        if not callback.Success:
-            return helpers.jsonResponse(False, 400, callback.Message, callback.Data)
-        return helpers.jsonResponse(True, 200, callback.Message, callback.Data)
-
-
-@marketplace_router.route("/marketplace/oauth2", methods=['POST'])
-def oauth2():
-
+@marketplace_router.route("/marketplace/auth", methods=['POST'])
+def auth():
     # Authenticate
     user = get_jwt_identity()['user']
     if request.method == "POST":
         data = request.json
-        callback: Callback = marketplace_helpers.oAuth2(data.get('type'),
-                                                        data.get('details'),
-                                                        user.get("companyID"))
+        callback: Callback = marketplace_helpers.auth(data.get('type'),
+                                                      data.get('details'),
+                                                      user.get("companyID"))
 
         if not callback.Success:
             return helpers.jsonResponse(False, 400, callback.Message)
-
         return helpers.jsonResponse(True, 200, "Success")
 
 
-# ===== Disconnect ===== #
-# Disconnect a CRM
+# ===== Test Connection & Disconnect ===== #
+# Get and test connection & Disconnect a CRM
 @marketplace_router.route("/marketplace/crm/<crm_id>", methods=["GET", "DELETE"])
 @jwt_required
 def crm(crm_id):
-
     # Authenticate
     user = get_jwt_identity()['user']
 
@@ -111,11 +75,10 @@ def crm(crm_id):
         return helpers.jsonResponse(True, 200, callback.Message, callback.Data)
 
 
-# Disconnect a Calendar
+# Get and test connection & Disconnect a Calendar
 @marketplace_router.route("/marketplace/calendar/<calendar_id>", methods=["GET", "DELETE"])
 @jwt_required
 def calendar(calendar_id):
-
     # Authenticate
     user = get_jwt_identity()['user']
 
@@ -125,7 +88,8 @@ def calendar(calendar_id):
 
         calendar = helpers.getDictFromSQLAlchemyObj(callback.Data)
         # Test connection
-        calendar['Status'] = calendar_services.testConnection(calendar['Type'], calendar['Auth'], user.get("companyID")).Success
+        calendar['Status'] = calendar_services.testConnection(calendar['Type'], calendar['Auth'],
+                                                              user.get("companyID")).Success
 
         if not callback.Success:
             return helpers.jsonResponse(False, 400, callback.Message)
@@ -138,25 +102,6 @@ def calendar(calendar_id):
         if not callback.Success:
             return helpers.jsonResponse(False, 400, callback.Message)
         return helpers.jsonResponse(True, 200, callback.Message, callback.Data)
-
-
-
-# Test CRM
-@marketplace_router.route("/crm/test", methods=['POST'])
-@jwt_required
-def test_crm_connection():
-    # No need for assistant authentication because testing marketplace connection should be public however at least
-    # the user has to be logged in and has the token included in the request to minimise security risks
-    # Connect to marketplace
-    user = get_jwt_identity()['user']
-    callback: Callback = Callback(False, '')
-    if request.method == "POST":
-        callback: Callback = crm_services.testConnection(user.get("companyID"), request.json)  # marketplace details passed (auth, type)
-
-    # Return response
-    if not callback.Success:
-        return helpers.jsonResponse(False, 400, callback.Message)
-    return helpers.jsonResponse(True, 200, callback.Message)
 
 
 @marketplace_router.route("/crm/recruiter_value_report", methods=['POST'])
@@ -183,8 +128,6 @@ def calendar_auth(assistantID):
         return helpers.jsonResponse(False, 400, callback.Message)
     return helpers.jsonResponse(True, 200, callback.Message)
 
-
-
 # post method, only adds events
 # @marketplace_router.route("/calendar/<hashedAssistantID>/event", methods=['POST'])
 # def calendar_add_event(hashedAssistantID):
@@ -195,8 +138,3 @@ def calendar_auth(assistantID):
 #         if not callback.Success:
 #             return helpers.jsonResponse(False, 400, callback.Message)
 #         return helpers.jsonResponse(True, 200, callback.Message)
-
-# @marketplace_router.route("/marketplace_test", methods=['GET', 'POST', 'PUT'])
-# def testtss():
-#     assistant = assistant_services.getByID(1, 1).Data
-#     return Outlook.addEvent(assistant.Calendar.Auth, assistant, assistant.CompanyID).Message

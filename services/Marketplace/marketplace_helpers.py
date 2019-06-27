@@ -11,27 +11,9 @@ from utilities import helpers
 
 
 # process the redirect from the auth callback
-def oAuth2(type, details, companyID):
+def auth(type, details, companyID):
     try:
 
-        # find the type and redirect to its service
-        if CRM_Enum.has_value(type):
-            callback: Callback = crm_services.connect(type, details, companyID)
-        elif Calendar_Enum.has_value(type):
-            callback: Callback = calendar_services.connect(type, details, companyID)
-        else:
-            callback = Callback(False, "The Marketplace object did not match any on the system")
-
-        return callback
-
-    except Exception as exc:
-        helpers.logError("Marketplace.marketplace_helpers.processRedirect() ERROR: " + str(exc))
-        return Callback(False, str(exc))
-
-
-# for SimpleAuth
-def simpleAuth(type, details, companyID):
-    try:
         # find the type and redirect to its service
         if CRM_Enum.has_value(type):
             callback: Callback = crm_services.connect(type, details, companyID)

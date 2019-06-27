@@ -12,5 +12,5 @@
  @property {string} image
  @property {string} type - The name of the CRM
  @property {boolean} disabled
- @property {('CONNECTED'|'NOT_CONNECTED'|'FAILED'|'Comming Soon')} status
+ @property {('CONNECTED'|'NOT_CONNECTED'|'FAILED'|'Coming Soon')} status
  */

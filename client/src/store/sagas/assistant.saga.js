@@ -1,6 +1,6 @@
 import {all, put, takeEvery, takeLatest} from 'redux-saga/effects'
 import * as actionTypes from '../actions/actionTypes';
-import {assistantActions, marketplacesActions, flowActions} from "../actions";
+import {assistantActions, flowActions} from "../actions";
 import {errorMessage, flow, http, loadingMessage, successMessage} from "helpers";
 
 function* fetchAssistants() {

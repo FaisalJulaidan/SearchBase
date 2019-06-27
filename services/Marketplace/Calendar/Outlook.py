@@ -11,6 +11,20 @@ from utilities import helpers
 client_id = os.environ['OUTLOOK_CLIENT_ID']
 client_secret = os.environ['OUTLOOK_CLIENT_SECRET']
 
+# Event takes in:
+# {
+# 	"name": "Event name",
+# 	"description": "What appears in the email as main text",
+# 	"start": "2020-02-02T18:00:00", (start date and time)
+# 	"end": "2020-02-02T19:00:00", (end date and time)
+# 	"attendees": [{
+# 		"email": "evgeniybtonchev@gmail.com",
+# 		"name": "Evgeniy"
+# 	}] (list of objects)
+# }
+# attendees get emailed to accept the event
+# owner of the logged in account automatically gets the event in their calendar without having to accept
+
 
 def testConnection(auth, companyID):
     try:

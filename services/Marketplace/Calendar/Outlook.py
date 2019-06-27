@@ -1,17 +1,33 @@
 import json
-import logging
 import os
 
 import requests
 
 from models import Callback
 from services.Marketplace import marketplace_helpers
-# Client ID and secret
 from services.Marketplace.Calendar import calendar_services
 from utilities import helpers
 
 client_id = os.environ['OUTLOOK_CLIENT_ID']
 client_secret = os.environ['OUTLOOK_CLIENT_SECRET']
+
+
+def testConnection(auth, companyID):
+    try:
+        if auth.get("refresh_token"):
+            callback = retrieveAccessToken(auth, companyID)
+        elif auth.get("code"):
+            callback = login(auth)
+        else:
+            callback = Callback(False, "Parameters for connection were not provided")
+
+        if not callback.Success:
+            raise Exception(callback.Message)
+
+        return Callback(True, "Connection has been successful", callback)
+    except Exception as exc:
+        helpers.logError("Marketplace.Calendar.Outlook.testConnection() ERROR: " + str(exc))
+        return Callback(False, "Error in testing connection")
 
 
 def login(auth):
@@ -43,13 +59,13 @@ def login(auth):
                         })
 
     except Exception as exc:
-        helpers.logError("CRM.Outlook.login() ERROR: " + str(exc))
+        helpers.logError("Marketplace.Calendar.Outlook.login() ERROR: " + str(exc))
         return Callback(False, "Error in logging you in. Please try again")
 
 
 def retrieveAccessToken(auth, companyID):
     try:
-        print(auth.get("refresh_token"))
+        auth = dict(auth)
         headers = {'Content-Type': 'application/x-www-form-urlencoded'}
 
         body = {
@@ -68,8 +84,8 @@ def retrieveAccessToken(auth, companyID):
 
         result_body = json.loads(get_access_token.text)
 
+        auth["access_token"] = result_body.get("access_token")
         if result_body.get("refresh_token"):
-            auth = dict(auth)
             auth["refresh_token"] = result_body.get("refresh_token")
 
         saveAuth_callback: Callback = marketplace_helpers.saveNewCalendarAuth(auth, "Outlook", companyID)
@@ -79,8 +95,66 @@ def retrieveAccessToken(auth, companyID):
         return Callback(True, "Access Token retrieved", auth)
 
     except Exception as exc:
-        helpers.logError("CRM.Outlook.login() ERROR: " + str(exc))
-        return Callback(False, str(exc))
+        helpers.logError("Marketplace.Calendar.Outlook.retrieveAccessToken() ERROR: " + str(exc))
+        return Callback(False, "Could not retrieve access token")
+
+
+def sendQuery(auth, query, method, body, companyID, optionalParams=None):
+    try:
+        # get url
+        url = buildUrl(query, optionalParams)
+
+        # set headers
+        headers = {'Content-Type': 'application/json', "Authorization": "Bearer " + auth.get("access_token")}
+
+        r = marketplace_helpers.sendRequest(url, method, headers, json.dumps(body))
+
+        if r.status_code == 401:  # wrong access token
+            callback: Callback = retrieveAccessToken(auth, companyID)
+            if not callback.Success:
+                raise Exception(callback.Message)
+
+            headers["Authorization"] = "Bearer " + callback.Data.get("access_token")
+            r = marketplace_helpers.sendRequest(url, method, headers, json.dumps(body))
+            if not r.ok and not r.status_code == 409:
+                raise Exception(r.text + ". Query could not be sent")
+
+        elif not r.ok and not r.status_code == 409:
+            raise Exception(r.text + ". Unexpected error occurred when calling the API")
+
+        return Callback(True, "Query was successful", r)
+
+    except Exception as exc:
+        helpers.logError("Marketplace.Calendar.Bullhorn.sendQuery() ERROR: " + str(exc))
+        return Callback(False, "Query could not be sent")
+
+
+def buildUrl(query, optionalParams=None):
+    # set up initial url
+    url = "https://graph.microsoft.com/v1.0/me/" + query
+    # add additional params
+    if optionalParams:
+        for param in optionalParams:
+            url += "&" + param
+    # return the url
+    return url
+
+
+def getCalendars(auth, companyID):
+    try:
+
+        # send query
+        sendQuery_callback: Callback = sendQuery(auth, "calendars", "get", {}, companyID)
+
+        if not sendQuery_callback.Success:
+            raise Exception(sendQuery_callback.Message)
+
+        result_body = json.loads(sendQuery_callback.Data.text)
+
+        return Callback(True, sendQuery_callback.Data.text, result_body)
+    except Exception as exc:
+        helpers.logError("Marketplace.Calendar.Outlook.getCalendars() ERROR: " + str(exc))
+        return Callback(False, "Could not retrieve calendars")
 
 
 def addCalendar(auth, companyID):
@@ -91,29 +165,44 @@ def addCalendar(auth, companyID):
 
         # send query
         sendQuery_callback: Callback = sendQuery(auth, "calendars", "post", body, companyID)
-
         if not sendQuery_callback.Success:
             raise Exception(sendQuery_callback.Message)
 
-        result_body = json.loads(sendQuery_callback.Data.text)
+        if sendQuery_callback.Data.status_code == 409:  # calendar already exists - needs to be retrieved
+            calendars_callback: Callback = getCalendars(auth, companyID)
+            if not calendars_callback.Success:
+                raise Exception(calendars_callback.Message)
 
-        calendar_services.updateByCompanyAndType("Outlook", companyID, auth, {"calendarID": result_body["Id"]})
+            record = helpers.objectListContains(calendars_callback.Data["value"],
+                                                lambda x: x["name"] == "TheSearchBase")
 
-        return Callback(True, sendQuery_callback.Data.text)
+            if not record:
+                raise Exception("Could not get the existing TheSearchBase calendar")
+            calendarID = record["id"]
+        else:  # calendar was created
+            result_body = json.loads(sendQuery_callback.Data.text)
+            calendarID = result_body["Id"]
+
+        update_callback: Callback = calendar_services.updateByCompanyAndType("Outlook", companyID, auth,
+                                                                             {"calendarID": str(calendarID)})
+        if not update_callback.Success:
+            raise Exception(update_callback.Message)
+
+        return Callback(True, sendQuery_callback.Data.text, update_callback.Data)
 
     except Exception as exc:
-        helpers.logError("CRM.Outlook.login() ERROR: " + str(exc))
-        return Callback(False, str(exc))
+        helpers.logError("Marketplace.Calendar.Outlook.addCalendar() ERROR: " + str(exc))
+        return Callback(False, "Could not add calendar")
 
 
-# TODO remove auth, take it from assistant.Calendar - check for others too
-def addEvent(auth, assistant, eventDetails):
+def addEvent(calendar, eventDetails):
     try:
-        if not assistant.Calendar.MetaData:
-            createCalendar_callback: Callback = addCalendar(auth, assistant.CompanyID)
+        if not calendar.MetaData.get("companyID"):
+            createCalendar_callback: Callback = addCalendar(calendar.Auth, calendar.CompanyID)
             if not createCalendar_callback.Success:
-                raise Exception("Could not create TheSearchBase calendar to add the event to")
-        # TODO if it doesnt find TSB calendar add it to the main one
+                raise Exception(createCalendar_callback.Message)
+            calendar = createCalendar_callback.Data
+
         body = {
             "Subject": eventDetails.get("name"),
             "Body": {
@@ -141,57 +230,15 @@ def addEvent(auth, assistant, eventDetails):
             })
 
         # send query
-        sendQuery_callback: Callback = sendQuery(auth,
+        sendQuery_callback: Callback = sendQuery(calendar.Auth,
                                                  "calendars/" + str(
-                                                     assistant.Calendar.MetaData["calendarID"]) + "events",
-                                                 "post", body, assistant.CompanyID)
+                                                     calendar.MetaData["calendarID"]) + "/events",
+                                                 "post", body, calendar.CompanyID)
 
         if not sendQuery_callback.Success:
             raise Exception(sendQuery_callback.Message)
 
         return Callback(True, sendQuery_callback.Data.text)
     except Exception as exc:
-        helpers.logError("CRM.Outlook.login() ERROR: " + str(exc))
-        return Callback(False, str(exc))
-
-
-def sendQuery(auth, query, method, body, companyID, optionalParams=None):
-    try:
-        # get url
-        url = buildUrl(query, optionalParams)
-        print("auth: ", auth)
-        # set headers
-        headers = {'Content-Type': 'application/json', "Authorization": "Bearer " + auth.get("access_token")}
-
-        # test the BhRestToken (rest_token)
-        r = marketplace_helpers.sendRequest(url, method, headers, json.dumps(body))
-        if r.status_code == 401:  # wrong access token
-            callback: Callback = retrieveAccessToken(auth, companyID)
-            if callback.Success:
-                url = buildUrl(query, optionalParams)
-
-                r = marketplace_helpers.sendRequest(url, method, headers, json.dumps(body))
-                print(r.status_code)
-                if not r.ok:
-                    raise Exception(r.text + ". Query could not be sent")
-            else:
-                raise Exception("Access token could not be retrieved")
-        elif not r.ok:
-            raise Exception("Unexpected error occurred when calling the API")
-
-        return Callback(True, "Query was successful", r)
-
-    except Exception as exc:
-        helpers.logError("CRM.Bullhorn.sendQuery() ERROR: " + str(exc))
-        return Callback(False, str(exc))
-
-
-def buildUrl(query, optionalParams=None):
-    # set up initial url
-    url = "https://outlook.office.com/api/v2.0/me/" + query
-    # add additional params
-    if optionalParams:
-        for param in optionalParams:
-            url += "&" + param
-    # return the url
-    return url
+        helpers.logError("Marketplace.Calendar.Outlook.addEvent() ERROR: " + str(exc))
+        return Callback(False, "Adding the event failed")

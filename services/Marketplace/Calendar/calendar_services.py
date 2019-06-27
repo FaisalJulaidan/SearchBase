@@ -1,9 +1,7 @@
-import logging
-
 from sqlalchemy.sql import and_
 
-from enums import UserType, Calendar as Calendar_Enum
-from models import db, Callback, Conversation, Assistant, Calendar as Calendar_Model, StoredFile
+from enums import Calendar as Calendar_Enum
+from models import db, Callback, Calendar as Calendar_Model
 from services import assistant_services
 from services.Marketplace.Calendar import Google, Outlook
 from utilities import helpers
@@ -24,14 +22,14 @@ def addEvent(eventDetails, assistant=None, assistantID=None):
     if not (assistant or assistantID):
         return Callback(False, "Assistant was not provided")
 
-    if assistantID:
+    if not assistant:
         assistant_callback: Callback = assistant_services.getByHashID(assistantID)
         if not assistant_callback.Success:
             return Callback(False, "Assistant could not be retrieved")
         assistant = assistant_callback.Data
 
     if assistant.Calendar.Type is Calendar_Enum.Outlook:
-        return Outlook.addEvent(assistant.Calendar.Auth, assistant.CompanyID, eventDetails)
+        return Outlook.addEvent(assistant.Calendar, eventDetails)
     elif assistant.Calendar.Type is Calendar_Enum.Google:
         return Google.addEvent(assistant.CompanyID, eventDetails.get("name"), eventDetails.get("description"),
                                eventDetails.get("start"), eventDetails.get("end"))
@@ -95,11 +93,8 @@ def update(calendar_id, company_id, details) -> Callback:
 
 def updateByCompanyAndType(calendar_type, company_id, auth, metaData):
     try:
-        calendar_type: Calendar_Model = Calendar_Model[calendar_type]
-        calendar_auth = auth
-
         # test connection
-        test_callback: Callback = testConnection({"auth": auth}, company_id)
+        test_callback: Callback = testConnection({"auth": auth, "type": calendar_type}, company_id)
         if not test_callback.Success:
             return test_callback
 
@@ -109,32 +104,32 @@ def updateByCompanyAndType(calendar_type, company_id, auth, metaData):
 
         Calendar: Calendar_Model = connection_callback.Data
 
-        Calendar.Auth = calendar_auth
+        Calendar.Auth = auth
         Calendar.MetaData = metaData
 
         # Save
         db.session.commit()
 
-        return Callback(True, 'Calendar has been updated successfully')
+        return Callback(True, 'Calendar has been updated successfully', Calendar)
 
     except Exception as exc:
-        helpers.logError("calendar_services.update(): " + str(exc))
+        helpers.logError("calendar_services.updateByCompanyAndType(): " + str(exc))
         db.session.rollback()
         return Callback(False, "Update Calendar details failed.")
 
 
-# Test connection to a Calendar
+# Test connection to a Calendar (details must include the auth)
 def testConnection(details, companyID) -> Callback:
     try:
         calendar_type: Calendar_Enum = Calendar_Enum[details['type']]
 
         if calendar_type == Calendar_Enum.Outlook:
-            return Outlook.login(details)
+            return Outlook.testConnection(details["auth"], companyID)
         else:
             return Callback(False, "Could not match Calendar's type")
 
     except Exception as exc:
-        helpers.logError("calendar_services.connect(): " + str(exc))
+        helpers.logError("calendar_services.testConnection(): " + str(exc))
         return Callback(False, "Calendar test failed.")
 
 

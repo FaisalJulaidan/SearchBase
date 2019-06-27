@@ -1,6 +1,5 @@
 import base64
 import json
-import logging
 import os
 
 import requests
@@ -9,8 +8,6 @@ from enums import DataType as DT
 from models import Callback, Conversation, db, StoredFile
 from services import stored_file_services, databases_services
 from services.Marketplace import marketplace_helpers
-
-
 # Vincere Notes:
 # access_token (used to generate rest_token) lasts 10 minutes, needs to be requested by using the auth from the client
 # refresh_token (can be used to generate access_token) - generated with access_token on auth, ...
@@ -85,15 +82,16 @@ def retrieveRestToken(auth, companyID):
             body = {
                 "grant_type": "refresh_token",
                 "refresh_token": authCopy.get("refresh_token"),
-                "client_id": authCopy.get("client_id")
+                "client_id": client_id
             }
 
-            get_tokens = requests.put(url, headers=headers, data=json.dumps(body))
+            get_tokens = requests.post(url, headers=headers, data=body)
+
             if get_tokens.ok:
                 result_body = json.loads(get_tokens.text)
-                authCopy["access_token"] = result_body.get("access_token")
-                authCopy["refresh_token"] = result_body.get("refresh_token")
-                authCopy["id_token"] = result_body.get("id_token")
+                authCopy["access_token"] = result_body["access_token"]
+                authCopy["refresh_token"] = result_body["refresh_token"]
+                authCopy["id_token"] = result_body["id_token"]
             else:
                 raise Exception("CRM not set up properly")
         # else if not go through login again with the saved auth
@@ -131,14 +129,15 @@ def sendQuery(auth, query, method, body, companyID, optionalParams=None):
 
         if r.status_code == 401:  # wrong rest token
             callback: Callback = retrieveRestToken(auth, companyID)
-            if callback.Success:
-                url = buildUrl(callback.Data, query, optionalParams)
-
-                r = marketplace_helpers.sendRequest(url, method, headers, json.dumps(body))
-                if not r.ok:
-                    raise Exception(r.text + ". Query could not be sent")
-            else:
+            if not callback.Success:
                 raise Exception("Rest token could not be retrieved")
+
+            url = buildUrl(callback.Data, query, optionalParams)
+
+            r = marketplace_helpers.sendRequest(url, method, headers, json.dumps(body))
+            if not r.ok:
+                raise Exception(r.text + ". Query could not be sent")
+
         elif str(r.status_code)[:1] != "2":  # check if error code is in the 200s
             raise Exception("Rest url for query is incorrect")
 

@@ -128,9 +128,9 @@ def marketplace_callback():
     callback: Callback = marketplace_helpers.processRedirect(request.args)
 
     if not callback.Success:
-        return "Retrieving authorisation code failed. Please try again later."
+        return helpers.jsonResponse(False, 400, callback.Message)
 
-    return "Authorisation completed. You can now close this window."
+    return helpers.jsonResponse(True, 200, "Success")
 
 
 

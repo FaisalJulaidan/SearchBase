@@ -130,14 +130,15 @@ def sendQuery(auth, query, method, body, companyID, optionalParams=None):
         r = marketplace_helpers.sendRequest(url, method, headers, json.dumps(body))
         if r.status_code == 401:  # wrong rest token
             callback: Callback = retrieveRestToken(auth, companyID)
-            if callback.Success:
-                url = buildUrl(callback.Data, query, optionalParams)
-
-                r = marketplace_helpers.sendRequest(url, method, headers, json.dumps(body))
-                if not r.ok:
-                    raise Exception(r.text + ". Query could not be sent")
-            else:
+            if not callback.Success:
                 raise Exception("Rest token could not be retrieved")
+
+            url = buildUrl(callback.Data, query, optionalParams)
+
+            r = marketplace_helpers.sendRequest(url, method, headers, json.dumps(body))
+            if not r.ok:
+                raise Exception(r.text + ". Query could not be sent")
+
         elif not r.ok:
             raise Exception("Rest url for query is incorrect")
 

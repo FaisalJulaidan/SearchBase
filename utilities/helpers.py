@@ -1,21 +1,28 @@
-from flask import json, after_this_request, request
-from models import db, Assistant, Job, Callback, Role
-from services import flow_services, assistant_services
+import functools
+import gzip
+import inspect
+import logging
+import os
+import re
+import traceback
 from datetime import time
 from enum import Enum
-from hashids import Hashids
-from config import BaseConfig
 from io import BytesIO
-from itsdangerous import URLSafeTimedSerializer
-from cryptography.fernet import Fernet
-from sqlalchemy_utils import Currency
 from typing import List
+
+import geoip2.webservice
+import stripe
+from cryptography.fernet import Fernet
+from flask import json, after_this_request, request
 from flask_jwt_extended import get_jwt_identity
 from forex_python.converter import CurrencyRates
-from enums import Period
-import re, os, stripe, gzip, functools, logging, geoip2.webservice, traceback
+from hashids import Hashids
+from itsdangerous import URLSafeTimedSerializer
+from sqlalchemy_utils import Currency
 
-
+from config import BaseConfig
+from models import Assistant, Job, Callback
+from services import flow_services, assistant_services
 
 # ======== Global Variables ======== #
 
@@ -36,6 +43,7 @@ fernet = Fernet(os.environ['TEMP_SECRET_KEY'])
 # Currency converter by forex-python
 currencyConverter = CurrencyRates()
 
+
 # ======== Helper Functions ======== #
 
 # Get domain based on current environment
@@ -53,7 +61,7 @@ def logError(exception):
     if os.environ['FLASK_ENV'] == 'development':
         print(exception)
         # print(traceback.format_exc())
-    logging.error(traceback.format_exc() + exception + "\n \n" )
+    logging.error(traceback.format_exc() + exception + "\n \n")
 
 
 # ID Hasher
@@ -182,8 +190,7 @@ def convertSalaryPeriod(salary, fromPeriod: Period, toPeriod: Period):
 # -------- SQLAlchemy Converters -------- #
 """Convert a SQLAlchemy object to a single dict """
 def getDictFromSQLAlchemyObj(obj) -> dict:
-
-    dict = {} # Results
+    dict = {}  # Results
     if not obj: return dict
 
     # A nested for loop for joining two tables
@@ -191,20 +198,20 @@ def getDictFromSQLAlchemyObj(obj) -> dict:
         key = attr.name
         if key not in ['Password']:
             dict[key] = getattr(obj, key)
-            if isinstance(dict[key], Enum): # Convert Enums
+            if isinstance(dict[key], Enum):  # Convert Enums
                 dict[key] = dict[key].value
 
-            if isinstance(dict[key], time): # Convert Times
+            if isinstance(dict[key], time):  # Convert Times
                 dict[key] = str(dict[key])
 
-            if isinstance(dict[key], Currency): # Convert Currencies
+            if isinstance(dict[key], Currency):  # Convert Currencies
                 dict[key] = dict[key].code
 
-            if key in [Job.JobStartDate.name, Job.JobEndDate.name] and dict[key]: # Convert Datetime only for Jobs
+            if key in [Job.JobStartDate.name, Job.JobEndDate.name] and dict[key]:  # Convert Datetime only for Jobs
                 dict[key] = '/'.join(map(str, [dict[key].year, dict[key].month, dict[key].day]))
 
-            if key == Assistant.Flow.name and dict[key]: # Parse Flow !!
-                flow_services.parseFlow(dict[key]) # pass by reference
+            if key == Assistant.Flow.name and dict[key]:  # Parse Flow !!
+                flow_services.parseFlow(dict[key])  # pass by reference
 
     if hasattr(obj, "FilePath"):
         dict["FilePath"] = obj.FilePath
@@ -286,6 +293,14 @@ def findIndexOfKeyInArray(key, value, array):
     for item, idx in array:
         if item.key == value:
             return idx
+    return False
+
+
+# example: objectListContains(myList, lambda x: x.n == 3)  # True if any element has .n==3
+def objectListContains(list, filter):
+    for x in list:
+        if filter(x):
+            return x
     return False
 
 

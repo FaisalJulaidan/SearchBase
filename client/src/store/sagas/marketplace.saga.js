@@ -27,11 +27,11 @@ function* pingMarketplace({marketplaceType}) {
     }
 }
 
-function* disconnectMarketplace({type}) {
+function* disconnectMarketplace({marketplaceType}) {
     try {
-        const res = yield http.delete(`/marketplace/${type}`);
+        const res = yield http.delete(`/marketplace/${marketplaceType}`);
         successMessage(res.data.msg || 'Marketplace is disconnected');
-        yield put(marketplaceActions.disconnectMarketplaceSuccess(res.data.data));
+        yield put(marketplaceActions.disconnectMarketplaceSuccess());
     } catch (error) {
         const msg = error.response?.data?.msg || "Couldn't disconnect marketplace";
         yield put(marketplaceActions.disconnectMarketplaceFailure(msg));

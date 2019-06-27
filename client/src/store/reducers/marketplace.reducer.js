@@ -4,12 +4,10 @@ import {updateObject} from '../utility';
 const initialState = {
     connectionStatus: 'NOT_CONNECTED',
     isPinging: false,
-    errorMsg: null,
-    currentCRM: {},
-    isLoadingMarketplaces: false,
+    isDisconnecting: false,
+
     isConnecting: false,
-    isTesting: false,
-    isDisconnecting: false
+    errorMsg: null
 };
 
 export const marketplace = (state = initialState, action) => {
@@ -44,15 +42,12 @@ export const marketplace = (state = initialState, action) => {
         // DISCONNECT MARKETPLACE
         case actionTypes.DISCONNECT_MARKETPLACE_REQUEST:
             return updateObject(state, {
-                isDisconnecting: false,
-                errorMsg: null,
+                isDisconnecting: true,
             });
         case actionTypes.DISCONNECT_MARKETPLACE_SUCCESS:
-            tState = {...state};
             return updateObject(state, {
+                connectionStatus: "NOT_CONNECTED",
                 isDisconnecting: false,
-                connectedCRM_ID: action.connectedCRM_ID,
-                marketplacesList: tState.marketplacesList.filter(x => x.ID !== action.connectedCRM_ID)
             });
         case actionTypes.DISCONNECT_MARKETPLACE_FAILURE:
             return updateObject(state, {

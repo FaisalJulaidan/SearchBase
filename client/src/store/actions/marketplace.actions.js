@@ -1,108 +1,79 @@
 import * as actionTypes from './actionTypes';
 
 
-const fetchMarketplace = () => {
-    return {
-        type: actionTypes.FETCH_MARKETPLACE_REQUEST,
-    };
-};
+const fetchMarketplace = () => ({
+    type: actionTypes.FETCH_MARKETPLACE_REQUEST,
+});
 
-const fetchMarketplaceSuccess = () => {
-    return {
-        type: actionTypes.FETCH_MARKETPLACE_SUCCESS,
-    };
-};
+const fetchMarketplaceSuccess = () => ({
+    type: actionTypes.FETCH_MARKETPLACE_SUCCESS,
+});
 
-const fetchMarketplaceFailure = (error) => {
-    return {
-        type: actionTypes.FETCH_MARKETPLACE_FAILURE,
-        error
-    };
-};
+const fetchMarketplaceFailure = (error) => ({
+    type: actionTypes.FETCH_MARKETPLACE_FAILURE,
+    error
+});
 
-const pingMarketplace = (marketplaceType) => {
-    return {
-        type: actionTypes.PING_MARKETPLACE_REQUEST,
-        marketplaceType
-    };
-};
+const pingMarketplace = (marketplaceType) => ({
+    type: actionTypes.PING_MARKETPLACE_REQUEST,
+    marketplaceType
+});
 
-const pingMarketplaceSuccess = (connectionStatus) => {
-    return {
-        type: actionTypes.PING_MARKETPLACE_SUCCESS,
-        connectionStatus,
-    };
-};
+const pingMarketplaceSuccess = (connectionStatus) => ({
+    type: actionTypes.PING_MARKETPLACE_SUCCESS,
+    connectionStatus,
+});
 
-const pingMarketplaceFailure = (error) => {
-    return {
-        type: actionTypes.PING_MARKETPLACE_FAILURE,
-        error
-    };
-};
+const pingMarketplaceFailure = (error) => ({
+    type: actionTypes.PING_MARKETPLACE_FAILURE,
+    error
+});
 
-const connectMarketplace = () => {
-    return {
-        type: actionTypes.CONNECT_MARKETPLACE_REQUEST,
-    };
-};
+const connectMarketplace = () => ({
+    type: actionTypes.CONNECT_MARKETPLACE_REQUEST,
+});
 
-const connectMarketplaceSuccess = (msg) => {
-    return {
-        type: actionTypes.CONNECT_MARKETPLACE_SUCCESS,
-        msg
-    };
-};
+const connectMarketplaceSuccess = (msg) => ({
+    type: actionTypes.CONNECT_MARKETPLACE_SUCCESS,
+    msg
+});
 
-const connectMarketplaceFailure = (error) => {
-    return {
-        type: actionTypes.CONNECT_MARKETPLACE_FAILURE,
-        error
-    };
-};
+const connectMarketplaceFailure = (error) => ({
+    type: actionTypes.CONNECT_MARKETPLACE_FAILURE,
+    error
+});
 
 
-const disconnectMarketplace = () => {
-    return {
-        type: actionTypes.DISCONNECT_MARKETPLACE_REQUEST,
-    };
-};
+const disconnectMarketplace = (marketplaceType) => ({
+    type: actionTypes.DISCONNECT_MARKETPLACE_REQUEST,
+    marketplaceType
+});
 
-const disconnectMarketplaceSuccess = (msg) => {
-    return {
-        type: actionTypes.DISCONNECT_MARKETPLACE_SUCCESS,
-        msg
-    };
-};
+const disconnectMarketplaceSuccess = (msg) => ({
+    type: actionTypes.DISCONNECT_MARKETPLACE_SUCCESS,
+    msg
+});
 
-const disconnectMarketplaceFailure = (error) => {
-    return {
-        type: actionTypes.DISCONNECT_MARKETPLACE_FAILURE,
-        error
-    };
-};
+const disconnectMarketplaceFailure = (error) => ({
+    type: actionTypes.DISCONNECT_MARKETPLACE_FAILURE,
+    error
+});
 
 
-const exportRecruiterValueReport = (connectedCRM_Type) => {
-    return {
-        type: actionTypes.EXPORT_RECRUITER_VALUE_REPORT_REQUEST,
-        connectedCRM_Type
-    };
-};
+const exportRecruiterValueReport = (connectedCRM_Type) => ({
+    type: actionTypes.EXPORT_RECRUITER_VALUE_REPORT_REQUEST,
+    connectedCRM_Type
+});
 
-const exportRecruiterValueReportSuccess = (exportData) => {
-    return {
-        type: actionTypes.EXPORT_RECRUITER_VALUE_REPORT_SUCCESS,
-        exportData
-    };
-};
+const exportRecruiterValueReportSuccess = (exportData) => ({
+    type: actionTypes.EXPORT_RECRUITER_VALUE_REPORT_SUCCESS,
+    exportData
+});
 
-const exportRecruiterValueReportFailure = (error) => {
-    return {
-        type: actionTypes.EXPORT_RECRUITER_VALUE_REPORT_FAILURE,
-        error
-    };
-};
+const exportRecruiterValueReportFailure = (error) => ({
+    type: actionTypes.EXPORT_RECRUITER_VALUE_REPORT_FAILURE,
+    error
+});
 
 
 export const marketplaceActions = {
@@ -125,5 +96,4 @@ export const marketplaceActions = {
     exportRecruiterValueReport,
     exportRecruiterValueReportSuccess,
     exportRecruiterValueReportFailure
-
 };

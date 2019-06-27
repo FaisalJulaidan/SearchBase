@@ -46,8 +46,8 @@ def connect():
         return helpers.jsonResponse(True, 200, "Success")
 
 
-# ===== Test Connection & Disconnect ===== #
-# Get and test connection & Disconnect a CRM
+# ===== Ping Connection & Disconnect ===== #
+# Get and ping connection & Disconnect a marketplace
 
 @marketplace_router.route("/marketplace/<type>", methods=["GET", "DELETE"])
 @jwt_required

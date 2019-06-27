@@ -1,64 +1,49 @@
 import React from 'react'
 import {Breadcrumb, Form, Modal, Tabs, Typography} from 'antd';
-import 'types/Marketplaces_Types';
+import 'types/Marketplace_Types';
 import {getLink, history} from "helpers";
 import NoHeaderPanel from 'components/NoHeaderPanel/NoHeaderPanel'
-import {marketplacesActions} from "store/actions";
-import styles from './Marketplace.module.less'
-import {DefaultButton} from './CrmForms/Common'
-import {AdaptFeatures, AdaptFormItems, AdaptHeader} from "./CrmForms/Adapt";
-import {BullhornFeatures, BullhornButton, BullhornHeader} from "./CrmForms/Bullhorn";
-import {VincereButtons, VincereFeatures, VincereHeader} from "./CrmForms/Vincere";
-import {GreenhouseFeatures, GreenhouseFormItem, GreenhouseHeader} from "./CrmForms/Greenhouse";
-import {GoogleButton, GoogleFeatures, GoogleHeader} from './CrmForms/Google'
-import {OutlookButton, OutlookFeatures, OutlookHeader} from "./CrmForms/Outlook";
-import data from '../Marketplaces.json'
+import {marketplaceActions} from "store/actions";
+import styles from './Item.module.less'
+import {DefaultButton} from './Components/Common'
+import {AdaptFeatures, AdaptFormItems, AdaptHeader} from "./Components/Adapt";
+import {BullhornFeatures, BullhornHeader} from "./Components/Bullhorn";
+import {VincereFeatures, VincereHeader} from "./Components/Vincere";
+import {GreenhouseFeatures, GreenhouseFormItem, GreenhouseHeader} from "./Components/Greenhouse";
+import {GoogleFeatures, GoogleHeader} from './Components/Google'
+import {OutlookFeatures, OutlookHeader} from "./Components/Outlook";
+import data from '../Items.json'
 import {connect} from 'react-redux';
 
 const TabPane = Tabs.TabPane;
 const FormItem = Form.Item;
 const {Title, Paragraph, Text} = Typography;
 
-class Marketplace extends React.Component {
+class Item extends React.Component {
 
     state = {visible: false};
 
-    /**@return {Marketplace}*/
-    getMarketplaceObj = () => data.Marketplaces.find(marketplace => marketplace.type === this.props.match.params.type);
-
+    /**@type {MarketplaceItem}*/
+    marketplaceItem = data.Items.find(/**@type {MarketplaceItem}*/item => item.type === this.props.match.params.type);
 
     componentWillMount() {
-        // const marketplace = this.getMarketplaceObj();
-        // this.props.dispatch(marketplacesActions.exportRecruiterValueReport({Name: marketplace.type}))
-        this.props.dispatch(marketplacesActions.getConnectedCRMs())
+        // this.props.dispatch(marketplaceActions.exportRecruiterValueReport({Name: marketplace.type}))
+        this.props.dispatch(marketplaceActions.pingMarketplace(this.marketplaceItem.type))
     }
 
     componentWillReceiveProps(nextProps) {
-        const marketplace = this.getMarketplaceObj();
-        const index = nextProps.marketplacesList.findIndex(serverCRM => serverCRM.Type === marketplace.type);
-        if (index === -1) {
-            // if there is not marketplace from the server
-            marketplace.status = 'NOT_CONNECTED';
-            marketplace.companyID = nextProps.companyID;
-            delete marketplace.ID;
-        } else {
-            // if there is a marketplace, check if it is failed or connected
-            // and add the ID
-            marketplace.status = nextProps.marketplacesList[index].Status ? "CONNECTED" : "FAILED";
-            marketplace.ID = nextProps.marketplacesList[index].ID;
-        }
-        if (nextProps.exportData) {
-            marketplace.exportData = nextProps.exportData;
-        }
+        this.marketplaceItem.status = nextProps.connectionStatus;
+        // if (nextProps.exportData) {
+        //     marketplace.exportData = nextProps.exportData;
+        // }
     }
 
     connectMarketplace = () => this.props.form.validateFields((err, values) => {
         if (err) return;
-        const marketplace = this.getMarketplaceObj();
         this.props.dispatch(
-            marketplacesActions.connectMarketplace(
+            marketplaceActions.connectMarketplace(
                 {
-                    type: marketplace.type,
+                    type: this.marketplaceItem.type,
                     auth: {...values}
                 }
             )
@@ -67,31 +52,21 @@ class Marketplace extends React.Component {
 
     testMarketplace = () => this.props.form.validateFields((err, values) => {
         if (err) return;
-        const marketplace = this.getMarketplaceObj();
         this.props.dispatch(
-            marketplacesActions.testMarketplace(
+            marketplaceActions.testMarketplace(
                 {
-                    type: marketplace.type,
+                    type: this.marketplaceItem.type,
                     auth: {...values}
                 }
             )
         );
     });
 
-    disconnectMarketplace = () => this.props.dispatch(marketplacesActions.disconnectMarketplace({ID: this.getMarketplaceObj().ID}));
+    disconnectMarketplace = () => this.props.dispatch(marketplaceActions.disconnectMarketplace(this.marketplaceItem.type));
 
+    showModal = () => this.setState({visible: true});
 
-    showModal = () => {
-        this.setState({
-            visible: true,
-        });
-    };
-
-    handleCancel = e => {
-        this.setState({
-            visible: false,
-        });
-    };
+    handleCancel = () => this.setState({visible: false});
 
 
     /**
@@ -107,7 +82,7 @@ class Marketplace extends React.Component {
         const formOptions = {
             getFieldDecorator,
             layout,
-            marketplace: this.getMarketplaceObj(),
+            marketplace: this.marketplaceItem,
             FormItem: FormItem,
             isConnecting: this.props.isConnecting,
             isTesting: this.props.isTesting,
@@ -121,12 +96,19 @@ class Marketplace extends React.Component {
             disconnectMarketplace: this.disconnectMarketplace,
             isDisconnecting: this.props.isDisconnecting,
             showModal: this.showModal,
-            type: this.getMarketplaceObj().type,
-            status: this.getMarketplaceObj().status,
-            companyID: this.props.companyID
+            type: this.marketplaceItem.type,
+            status: this.marketplaceItem.status,
+            isConnecting: this.props.isPinging
+        };
+
+        const windowObject = {
+            url: '',
+            target: 'Ratting',
+            features: 'width=600,height=600,0,top=40%,right=30%,status=0',
         };
 
         switch (type) {
+
             case "Adapt":
                 if (place === 'header')
                     return <AdaptHeader/>;
@@ -135,7 +117,7 @@ class Marketplace extends React.Component {
                 if (place === 'form')
                     return <AdaptFormItems {...formOptions}/>;
                 if (place === 'button')
-                    return <DefaultButton {...buttonsOptions}/>;
+                    return <DefaultButton buttonText={'Connect to Adapt'} {...buttonsOptions}/>;
                 break;
 
             case "Bullhorn":
@@ -143,8 +125,12 @@ class Marketplace extends React.Component {
                     return <BullhornHeader/>;
                 if (place === 'features')
                     return <BullhornFeatures/>;
-                if (place === 'button')
-                    return <BullhornButton {...buttonsOptions}/>;
+                if (place === 'button') {
+                    windowObject.url = "https://auth.bullhornstaffing.com/oauth/authorize?response_type=code&redirect_uri=https://www.thesearchbase.com/api/bullhorn_callback&client_id=7719607b-7fe7-4715-b723-809cc57e2714";
+                    return <DefaultButton buttonText={'Connect to Bullhorn'}
+                                          windowObject={windowObject}
+                                          {...buttonsOptions}/>;
+                }
                 break;
 
             case "Vincere":
@@ -152,8 +138,12 @@ class Marketplace extends React.Component {
                     return <VincereHeader/>;
                 if (place === 'features')
                     return <VincereFeatures/>;
-                if (place === 'button')
-                    return <VincereButtons {...buttonsOptions}/>;
+                if (place === 'button') {
+                    windowObject.url = "https://id.vincere.io/oauth2/authorize?client_id=9829f4ad-3ff3-4d00-8ecf-e5d7fa2983d1&response_type=code&redirect_uri=https://www.thesearchbase.com/api/marketplace_callback";
+                    return <DefaultButton buttonText={'Connect to Vincere'}
+                                          windowObject={windowObject}
+                                          {...buttonsOptions}/>;
+                }
                 break;
 
             case "Greenhouse":
@@ -164,7 +154,7 @@ class Marketplace extends React.Component {
                 if (place === 'form')
                     return <GreenhouseFormItem {...formOptions}/>;
                 if (place === 'button')
-                    return <DefaultButton {...buttonsOptions}/>;
+                    return <DefaultButton buttonText={'Connect to Greenhouse'} {...buttonsOptions}/>;
                 break;
 
             case "Google":
@@ -172,8 +162,17 @@ class Marketplace extends React.Component {
                     return <GoogleHeader/>;
                 if (place === 'features')
                     return <GoogleFeatures/>;
-                if (place === 'button')
-                    return <GoogleButton {...buttonsOptions}/>;
+                if (place === 'button') {
+                    const clientID = "623652835897-tj9rf1v6hd1tak5bv5hr4bq9hrvjns95.apps.googleusercontent.com";
+                    const responseType = "code";
+                    const scope = "https://www.googleapis.com/auth/calendar";
+                    const redirectURI = getLink("/dashboard/marketplace?googleVerification=true");
+
+                    windowObject.url = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${clientID}&response_type=${responseType}&scope=${scope}&redirect_uri=${redirectURI}&access_type=offline`;
+                    return <DefaultButton buttonText={'Connect to Google'}
+                                          windowObject={windowObject}
+                                          {...buttonsOptions}/>;
+                }
                 break;
 
             case "Outlook":
@@ -181,14 +180,18 @@ class Marketplace extends React.Component {
                     return <OutlookHeader/>;
                 if (place === 'features')
                     return <OutlookFeatures/>;
-                if (place === 'button')
-                    return <OutlookButton {...buttonsOptions}/>;
+                if (place === 'button') {
+                    windowObject.url = "https://login.microsoftonline.com/common/oauth2/v2.0/authorize?response_type=code&client_id=0978960c-c837-479f-97ef-a75be4bbacd4&redirect_uri=https://www.thesearchbase.com/api/marketplace_callback&response_mode=query&scope=openid+https%3A%2F%2Fgraph.microsoft.com%2Fcalendars.readwrite%20+offline_access";
+                    return <DefaultButton buttonText={'Connect to Outlook'}
+                                          windowObject={windowObject}
+                                          {...buttonsOptions}/>;
+                }
                 break;
         }
     };
 
     render() {
-        const {title, image, type} = this.getMarketplaceObj();
+        const {title, image, type} = this.marketplaceItem;
         return (
             <>
                 <NoHeaderPanel>
@@ -197,7 +200,7 @@ class Marketplace extends React.Component {
                             <Breadcrumb>
                                 <Breadcrumb.Item>
                                     <a href={"javascript:void(0);"}
-                                       onClick={() => history.push('/dashboard/marketplaces')}>
+                                       onClick={() => history.push('/dashboard/marketplace')}>
                                         Marketplace
                                     </a>
                                 </Breadcrumb.Item>
@@ -251,7 +254,8 @@ class Marketplace extends React.Component {
 
 function mapStateToProps(state) {
     return {
-        marketplacesList: state.marketplace.marketplacesList,
+        connectionStatus: state.marketplace.connectionStatus,
+        isPinging: state.marketplace.isPinging,
         companyID: state.marketplace.companyID,
         isConnecting: state.marketplace.isConnecting,
         isTesting: state.marketplace.isTesting,
@@ -261,4 +265,4 @@ function mapStateToProps(state) {
     };
 }
 
-export default connect(mapStateToProps)(Form.create()(Marketplace));
+export default connect(mapStateToProps)(Form.create()(Item));

@@ -2,7 +2,8 @@ import * as actionTypes from '../actions/actionTypes';
 import {updateObject} from '../utility';
 
 const initialState = {
-    marketplacesList: [],
+    connectionStatus: 'NOT_CONNECTED',
+    isPinging: false,
     errorMsg: null,
     currentCRM: {},
     isLoadingMarketplaces: false,
@@ -15,58 +16,32 @@ export const marketplace = (state = initialState, action) => {
     let tState = {};
 
     switch (action.type) {
-        case actionTypes.GET_MARKETPLACES_REQUEST:
+
+        // FETCH MARKETPLACE
+        case actionTypes.FETCH_MARKETPLACE_REQUEST:
+            return updateObject(state, {});
+        case actionTypes.FETCH_MARKETPLACE_SUCCESS:
+            return updateObject(state, {});
+        case actionTypes.FETCH_MARKETPLACE_FAILURE:
+            return updateObject(state, {});
+
+        // PING MARKETPLACE
+        case actionTypes.PING_MARKETPLACE_REQUEST:
             return updateObject(state, {
-                isLoadingMarketplaces: true,
+                isPinging: true
             });
-        case actionTypes.GET_MARKETPLACES_SUCCESS:
+        case actionTypes.PING_MARKETPLACE_SUCCESS:
             return updateObject(state, {
-                isLoadingMarketplaces: false,
-                marketplacesList: action.marketplacesList["crms"],
-                companyID: action.marketplacesList["companyID"],
+                connectionStatus: action.connectionStatus,
+                isPinging: false
             });
-        case actionTypes.GET_MARKETPLACES_FAILURE:
+        case actionTypes.PING_MARKETPLACE_FAILURE:
             return updateObject(state, {
-                isLoadingMarketplaces: false,
-                errorMsg: action.error
+                errorMsg: action.error,
+                isPinging: false
             });
 
-
-        // CONNECT CRM
-        case actionTypes.CONNECT_MARKETPLACE_REQUEST:
-            return updateObject(state, {
-                isConnecting: true,
-            });
-        case actionTypes.CONNECT_MARKETPLACE_SUCCESS:
-            tState = {...state};
-            tState.marketplacesList.push(action.connectedCRM);
-            return updateObject(state, {
-                isConnecting: false,
-                connectedCRM_ID: action.connectedCRM,
-                marketplacesList: tState.marketplacesList
-            });
-        case actionTypes.CONNECT_MARKETPLACE_FAILURE:
-            return updateObject(state, {
-                isConnecting: false,
-                errorMsg: action.error
-            });
-
-        // TEST CRM
-        case actionTypes.TEST_MARKETPLACE_REQUEST:
-            return updateObject(state, {
-                isTesting: true,
-            });
-        case actionTypes.TEST_MARKETPLACE_SUCCESS:
-            return updateObject(state, {
-                isTesting: false,
-            });
-        case actionTypes.TEST_MARKETPLACE_FAILURE:
-            return updateObject(state, {
-                isTesting: false,
-                errorMsg: action.error
-            });
-
-        // DISCONNECT CRM
+        // DISCONNECT MARKETPLACE
         case actionTypes.DISCONNECT_MARKETPLACE_REQUEST:
             return updateObject(state, {
                 isDisconnecting: false,
@@ -82,6 +57,25 @@ export const marketplace = (state = initialState, action) => {
         case actionTypes.DISCONNECT_MARKETPLACE_FAILURE:
             return updateObject(state, {
                 isDisconnecting: false,
+                errorMsg: action.error
+            });
+
+        // CONNECT MARKETPLACE
+        case actionTypes.CONNECT_MARKETPLACE_REQUEST:
+            return updateObject(state, {
+                isConnecting: true,
+            });
+        case actionTypes.CONNECT_MARKETPLACE_SUCCESS:
+            tState = {...state};
+            tState.marketplacesList.push(action.connectedCRM);
+            return updateObject(state, {
+                isConnecting: false,
+                connectedCRM_ID: action.connectedCRM,
+                marketplacesList: tState.marketplacesList
+            });
+        case actionTypes.CONNECT_MARKETPLACE_FAILURE:
+            return updateObject(state, {
+                isConnecting: false,
                 errorMsg: action.error
             });
 

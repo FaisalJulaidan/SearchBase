@@ -14,7 +14,6 @@ import {CSSTransition, TransitionGroup} from "react-transition-group";
 
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
 import {faCloud} from '@fortawesome/free-solid-svg-icons'
-import Marketplace from "./Marketplaces/Marketplace/Marketplace";
 
 const Home = lazy(() => import('./Home/Home'));
 const Assistants = lazy(() => import('./Assistants/Assistants'));
@@ -28,7 +27,8 @@ const Documentation = lazy(() => import('./Documentation/Documentation'));
 const Calendar = lazy(() => import('./Calendar/Calendar'));
 const AutoPilots = lazy(() => import('./AutoPilots/AutoPilots'));
 const AutoPilot = lazy(() => import('./AutoPilots/AutoPilot/AutoPilot'));
-const Marketplaces = lazy(() => import('./Marketplaces/Marketplaces'));
+const Marketplace = lazy(() => import('./Marketplace/Marketplace'));
+const Item = lazy(() => import('./Marketplace/Item/Item'));
 
 
 const {SubMenu} = Menu;
@@ -111,7 +111,7 @@ class Dashboard extends Component {
 
         const newLayoutRoutes = [
             "/dashboard/assistants",
-            "/dashboard/marketplaces",
+            "/dashboard/marketplace",
             "/dashboard/calendar",
             "/dashboard/auto_pilot",
             "/dashboard/databases",
@@ -174,7 +174,7 @@ class Dashboard extends Component {
                             <span>Auto Pilot</span>
                         </Menu.Item>
 
-                        <Menu.Item key="marketplaces">
+                        <Menu.Item key="marketplace">
                             <Icon type="interation"/>
                             <span>Marketplaces</span>
                         </Menu.Item>
@@ -256,9 +256,8 @@ class Dashboard extends Component {
                                             <Route path={`${match.path}/assistants`} component={Assistants} exact/>
                                             <Route path={`${match.path}/assistants/:id`} component={Assistant} exact/>
 
-                                            <Route path={`${match.path}/marketplaces`} component={Marketplaces} exact/>
-                                            <Route path={`${match.path}/marketplaces/:type`} component={Marketplace}
-                                                   exact/>
+                                            <Route path={`${match.path}/marketplace`} component={Marketplace} exact/>
+                                            <Route path={`${match.path}/marketplace/:type`} component={Item} exact/>
 
                                             <Route path={`${match.path}/databases`} component={Databases} exact/>
                                             <Route path={`${match.path}/databases/:id`} component={Database} exact/>

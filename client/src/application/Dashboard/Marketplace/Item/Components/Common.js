@@ -2,17 +2,21 @@ import React from 'react';
 import {Button, Popconfirm} from "antd";
 
 export const DefaultButton = ({
+                                  buttonText,
+                                  icon,
+                                  windowObject,
                                   disconnectMarketplace,
                                   isDisconnecting,
                                   showModal,
                                   status,
+                                  isConnecting
                               }) =>
     <>
         {
             (status === "CONNECTED" || status === "FAILED")
             &&
             <Popconfirm placement={'bottomRight'}
-                        title="Chatbot conversations will no longer be synced with Adapt account"
+                        title="Chatbot conversations will no longer be synced with your account"
                         onConfirm={disconnectMarketplace}
                         okType={'danger'}
                         okText="Disconnect"
@@ -31,8 +35,21 @@ export const DefaultButton = ({
         {
             status === "NOT_CONNECTED" &&
             <Button type="primary"
-                    icon={'login'}
-                    onClick={showModal}
-                    size={'large'}>Connect</Button>
+                    icon={icon ? icon : 'login'}
+                    style={{width: 'auto'}}
+                    loading={isConnecting}
+                    onClick={() => {
+                        if (windowObject.url)
+                            return window.open(windowObject.url, windowObject.target, windowObject.features);
+                        else
+                            return showModal()
+                    }}
+                    size={'large'}>
+                {
+                    isConnecting ? 'Pinging...' : buttonText
+                }
+
+            </Button>
         }
     </>;
+

@@ -3,7 +3,7 @@ import {connect} from 'react-redux';
 import {store} from "store/store";
 
 import {Button, Select, Form, Input, InputNumber, Divider, Switch, Modal, Radio} from "antd";
-import {assistantActions, marketplacesActions} from "store/actions";
+import {assistantActions, marketplaceActions} from "store/actions";
 import {history} from "helpers";
 
 import countries from 'helpers/static_data/countries'

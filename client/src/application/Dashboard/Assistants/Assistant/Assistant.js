@@ -13,7 +13,7 @@ import Flow from "./Flow/Flow"
 import Connections from "./Connections/Connections"
 
 import {history} from "helpers";
-import {assistantActions, marketplacesActions, optionsActions, autoPilotActions} from "store/actions";
+import {assistantActions, marketplaceActions, optionsActions, autoPilotActions} from "store/actions";
 import NoHeaderPanel from 'components/NoHeaderPanel/NoHeaderPanel'
 
 
@@ -41,7 +41,7 @@ class Assistant extends Component {
         if (!this.props.options) this.props.dispatch(optionsActions.getOptions());
         if (!this.props.autoPilotsList) this.props.dispatch(autoPilotActions.fetchAutoPilots());
 
-        // this.props.dispatch(marketplacesActions.getConnectedCRMs());
+        // this.props.dispatch(marketplaceActions.getConnectedCRMs());
 
         window.onbeforeunload = () => {
             if (!this.state.isFlowSaved)

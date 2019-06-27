@@ -1,8 +1,7 @@
 import requests
-from sqlalchemy import and_
 
 from enums import Calendar as Calendar_Enum, CRM as CRM_Enum
-from models import db, Callback, CRM, Calendar
+from models import Callback
 from services.Marketplace.CRM import crm_services
 from services.Marketplace.Calendar import calendar_services
 from utilities import helpers
@@ -34,7 +33,7 @@ def testConnection(type, companyID):
 
             # Check if connection exist
             exist_callback: Callback = crm_services.getCRMByType(type, companyID)
-            if not exist_callback:
+            if not exist_callback.Success:
                 return Callback(True, "", {"Status": "NOT_CONNECTED"})
 
             # If yes test connection

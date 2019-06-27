@@ -1,38 +1,55 @@
 import * as actionTypes from './actionTypes';
 
-const getConnectedCRMs = () => {
+
+const fetchMarketplace = () => {
     return {
-        type: actionTypes.GET_MARKETPLACES_REQUEST,
+        type: actionTypes.FETCH_MARKETPLACE_REQUEST,
     };
 };
 
-const getConnectedCRMsSuccess = (marketplacesList, companyID, msg) => {
+const fetchMarketplaceSuccess = () => {
     return {
-        type: actionTypes.GET_MARKETPLACES_SUCCESS,
-        marketplacesList,
-        companyID,
-        msg
+        type: actionTypes.FETCH_MARKETPLACE_SUCCESS,
     };
 };
 
-const getConnectedCRMsFailure = (error) => {
+const fetchMarketplaceFailure = (error) => {
     return {
-        type: actionTypes.GET_MARKETPLACES_FAILURE,
+        type: actionTypes.FETCH_MARKETPLACE_FAILURE,
         error
     };
 };
 
-const connectMarketplace = (connectedCRM) => {
+const pingMarketplace = (marketplaceType) => {
     return {
-        type: actionTypes.CONNECT_MARKETPLACE_REQUEST,
-        connectedCRM
+        type: actionTypes.PING_MARKETPLACE_REQUEST,
+        marketplaceType
     };
 };
 
-const connectMarketplaceSuccess = (connectedCRM, msg) => {
+const pingMarketplaceSuccess = (connectionStatus) => {
+    return {
+        type: actionTypes.PING_MARKETPLACE_SUCCESS,
+        connectionStatus,
+    };
+};
+
+const pingMarketplaceFailure = (error) => {
+    return {
+        type: actionTypes.PING_MARKETPLACE_FAILURE,
+        error
+    };
+};
+
+const connectMarketplace = () => {
+    return {
+        type: actionTypes.CONNECT_MARKETPLACE_REQUEST,
+    };
+};
+
+const connectMarketplaceSuccess = (msg) => {
     return {
         type: actionTypes.CONNECT_MARKETPLACE_SUCCESS,
-        connectedCRM,
         msg
     };
 };
@@ -44,37 +61,16 @@ const connectMarketplaceFailure = (error) => {
     };
 };
 
-const testMarketplace = (testedCRM) => {
-    return {
-        type: actionTypes.TEST_MARKETPLACE_REQUEST,
-        testedCRM
-    };
-};
 
-const testMarketplaceSuccess = () => {
-    return {
-        type: actionTypes.TEST_MARKETPLACE_SUCCESS,
-    };
-};
-
-const testMarketplaceFailure = (error) => {
-    return {
-        type: actionTypes.TEST_MARKETPLACE_FAILURE,
-        error
-    };
-};
-
-const disconnectMarketplace = (disconnectedCRMID) => {
+const disconnectMarketplace = () => {
     return {
         type: actionTypes.DISCONNECT_MARKETPLACE_REQUEST,
-        disconnectedCRMID
     };
 };
 
-const disconnectMarketplaceSuccess = (connectedCRM_ID, msg) => {
+const disconnectMarketplaceSuccess = (msg) => {
     return {
         type: actionTypes.DISCONNECT_MARKETPLACE_SUCCESS,
-        connectedCRM_ID,
         msg
     };
 };
@@ -85,6 +81,7 @@ const disconnectMarketplaceFailure = (error) => {
         error
     };
 };
+
 
 const exportRecruiterValueReport = (connectedCRM_Type) => {
     return {
@@ -108,18 +105,18 @@ const exportRecruiterValueReportFailure = (error) => {
 };
 
 
-export const marketplacesActions = {
-    getConnectedCRMs,
-    getConnectedCRMsSuccess,
-    getConnectedCRMsFailure,
+export const marketplaceActions = {
+    fetchMarketplace,
+    fetchMarketplaceSuccess,
+    fetchMarketplaceFailure,
+
+    pingMarketplace,
+    pingMarketplaceSuccess,
+    pingMarketplaceFailure,
 
     connectMarketplace,
     connectMarketplaceSuccess,
     connectMarketplaceFailure,
-
-    testMarketplace,
-    testMarketplaceSuccess,
-    testMarketplaceFailure,
 
     disconnectMarketplace,
     disconnectMarketplaceSuccess,

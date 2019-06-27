@@ -1,7 +1,7 @@
 
 /**
  * Date type
- @typedef Marketplace
+ @typedef MarketplaceItem
  @type {Object}
  @property {string} companyID
  @property {string} exportData - Evginy should explain this

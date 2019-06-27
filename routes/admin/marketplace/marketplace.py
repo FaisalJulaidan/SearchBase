@@ -16,10 +16,10 @@ from datetime import datetime
 marketplace_router: Blueprint = Blueprint('marketplace_router', __name__, template_folder="../../templates")
 
 
-# Get all company CRMs and check their connections before returning them
-@marketplace_router.route("/crm", methods=["GET"])
+# Get and delete all connected marketplace items (CRMs, Calendars etc.)
+@marketplace_router.route("/marketplace", methods=["GET"])
 @jwt_required
-def get_crms():
+def get_marketplace():
     user = get_jwt_identity()['user']
 
     if request.method == "GET":
@@ -34,6 +34,28 @@ def get_crms():
 
         return helpers.jsonResponse(True, 200, callback.Message, data)
 
+
+# Edit/Disconnect Marketplace item (CRMs, Calendars etc.)
+@marketplace_router.route("/crm/<int:crm_id>", methods=["PUT", "DELETE"])
+@jwt_required
+def crm_control(crm_id):
+    user = get_jwt_identity()['user']
+
+    callback: Callback = Callback(False, '')
+    if request.method == "PUT":
+        callback: Callback = crm_services.update(crm_id, user.get("companyID"), request.json)
+
+    if request.method == "DELETE":
+        callback: Callback = crm_services.disconnect(crm_id, user.get("companyID"))
+
+    if not callback.Success:
+        return helpers.jsonResponse(False, 400, callback.Message)
+    return helpers.jsonResponse(True, 200, callback.Message, callback.Data)
+
+# OAuth2
+# auth
+# /marketplace/oath2
+#/marketplace/auth
 
 # Connect CRM
 @marketplace_router.route("/crm/connect", methods=["POST"])
@@ -53,22 +75,7 @@ def crm_connect():
     return helpers.jsonResponse(True, 200, callback.Message, callback.Data)
 
 
-# Edit/Disconnect CRM
-@marketplace_router.route("/crm/<int:crm_id>", methods=["PUT", "DELETE"])
-@jwt_required
-def crm_control(crm_id):
-    user = get_jwt_identity()['user']
 
-    callback: Callback = Callback(False, '')
-    if request.method == "PUT":
-        callback: Callback = crm_services.update(crm_id, user.get("companyID"), request.json)
-
-    if request.method == "DELETE":
-        callback: Callback = crm_services.disconnect(crm_id, user.get("companyID"))
-
-    if not callback.Success:
-        return helpers.jsonResponse(False, 400, callback.Message)
-    return helpers.jsonResponse(True, 200, callback.Message, callback.Data)
 
 
 # Test CRM
@@ -114,28 +121,6 @@ def calendar_auth(assistantID):
     return helpers.jsonResponse(True, 200, callback.Message)
 
 
-# post method, only adds events
-# @marketplace_router.route("/calendar/<hashedAssistantID>/event", methods=['POST'])
-# def calendar_add_event(hashedAssistantID):
-#     if request.method == "POST":
-#         body = request.json
-#
-#         callback: Callback = calendar_services.addEvent(body, assistantID=hashedAssistantID)
-#         if not callback.Success:
-#             return helpers.jsonResponse(False, 400, callback.Message)
-#         return helpers.jsonResponse(True, 200, callback.Message)
-
-
-@marketplace_router.route("/bullhorn_callback", methods=['GET', 'POST', 'PUT'])
-def bullhorn_callback():
-
-    callback: Callback = marketplace_helpers.processRedirect(request.args)
-
-    if not callback.Success:
-        return "Retrieving authorisation code failed. Please try again later."
-
-    return "Authorisation completed. You can now close this window."
-
 
 @marketplace_router.route("/marketplace_callback", methods=['GET', 'POST', 'PUT'])
 def marketplace_callback():
@@ -147,6 +132,18 @@ def marketplace_callback():
 
     return "Authorisation completed. You can now close this window."
 
+
+
+# post method, only adds events
+# @marketplace_router.route("/calendar/<hashedAssistantID>/event", methods=['POST'])
+# def calendar_add_event(hashedAssistantID):
+#     if request.method == "POST":
+#         body = request.json
+#
+#         callback: Callback = calendar_services.addEvent(body, assistantID=hashedAssistantID)
+#         if not callback.Success:
+#             return helpers.jsonResponse(False, 400, callback.Message)
+#         return helpers.jsonResponse(True, 200, callback.Message)
 
 # @marketplace_router.route("/marketplace_test", methods=['GET', 'POST', 'PUT'])
 # def testtss():

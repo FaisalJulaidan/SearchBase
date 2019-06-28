@@ -44,11 +44,12 @@ class Calendar extends React.Component {
 
     dateCellRender = (value) => {
         let d = this.props.appointments.filter(d => value.utc().isSame(moment(d.DateTime).utc(), 'day'))
+        let pending = this.props.appointments.filter(d => d.Status === "Pending")
         return (
             <ul className="events">
                 {d.length !== 0 ?
                     <li>
-                        <Badge status="warning" text={`${d.length} Appointments`}/>
+                        <Badge status="warning" text={`${d.length} Appointments ` + (pending.length !== 0 ? `(${pending.length} pending approval)`: ``) }/>
                     </li>
                 : null}
             </ul>
@@ -72,14 +73,21 @@ class Calendar extends React.Component {
     };
 
     setAppointmentStatus = (appointmentID, status) => {
-        this.props.dispatch(appointmentActions.setAppointmentStatusRequest(appointmentID, status))
-        let { appointments } = this.state
-        this.setState({appointments: appointments.map(a => ({...a, Status: a.ID === appointmentID ? status : a.Status}))})
+        confirm({
+            title: `Set appointment status to ${status}?`,
+            content: `If you click OK, you will not be able to update the status of this appointment`,
+            okType: 'danger',
+            onOk: () => {
+                this.props.dispatch(appointmentActions.setAppointmentStatusRequest(appointmentID, status))
+                let { appointments } = this.state
+                this.setState({appointments: appointments.map(a => ({...a, Status: a.ID === appointmentID ? status : a.Status}))})
+            },
+            maskClosable: true
+        });
     }
 
 
     render() {
-        console.log(this.props.appointments)
         const {value} = this.state;
         return (
             <NoHeaderPanel>
@@ -93,24 +101,6 @@ class Calendar extends React.Component {
                 </div>
 
                 <div>
-                    { this.props.appointments ?
-                    <List
-                        style={{width: "30%"}}
-                        dataSource={this.props.appointments}
-                        renderItem={appointment => {
-                            //temp
-                            let name = appointment.Conversation.keywordsByDataType.Email[0]
-                            return (
-                                <List.Item>
-                                    <List.Item.Meta
-                                        title={`Appointment for ${name}`}
-                                    />
-                                    <button onClick={() => {this.setAppointmentStatus()}}>Accept</button>
-                                    <button onClick={() => {this.props.dispatch(appointmentActions.setAppointmentStatusRequest(appointment.ID, 'Rejected'))}}>Reject</button>
-                                </List.Item>
-                            )
-                        }}/>
-                        : null }
                     {this.props.appointments ?
                     <React.Fragment>
                         <AntdCalendar value={value} onSelect={this.onSelect} onPanelChange={this.onPanelChange}

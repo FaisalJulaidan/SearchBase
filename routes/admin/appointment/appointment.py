@@ -39,7 +39,7 @@ def set_appointment_status():
     if callback.Success:
         return helpers.jsonResponse(True, 200, callback.Message)
     else:
-        return helpers.jsonResponse(False, 404, callback.Message)
+        return helpers.jsonResponse(False, 401, callback.Message)
 
 
 # Get all open times for a user to pick up from, it uses the payload to know for which company and other details...

@@ -1,7 +1,7 @@
 import {all, put, takeEvery} from 'redux-saga/effects'
 import * as actionTypes from '../actions/actionTypes';
 import {appointmentActions} from "../actions";
-import {errorMessage, http} from "helpers";
+import {errorMessage, http, loadingMessage, successMessage} from "helpers";
 
 // import * as Sentry from '@sentry/browser';
 
@@ -19,7 +19,8 @@ function* fetchAppointments({assistantID}) {
 function* setAppointmentStatus({appointmentID, status}) {
     try {
         const res = yield http.post('/appointments/set_status', {appointmentID, status});
-        yield put(appointmentActions.setAppointmentStatusRequest(res.data?.data))
+        yield put(appointmentActions.setAppointmentStatusSuccess(res.data?.data))
+        successMessage(`Appointment ${status}`);
     } catch (error) {
         const msg = error.response?.data?.msg || "Couldn't set appointment status";
         yield put(appointmentActions.setAppointmentStatusFailure(msg));

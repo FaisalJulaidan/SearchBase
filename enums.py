@@ -3,15 +3,12 @@ from typing import List
 
 
 # ===============================================================================================
-# IMPORTANT: don't forget to  migrate database tables where necessary e.g. ChatbotSession, Block
-# You know just ask Faisal Julaidan before making any changes.
+# IMPORTANT: when making changes to enums don't forget to  migrate database tables
+# where necessary e.g. Conversation, Block. You know just ask Faisal Julaidan before making any changes.
 # STEPS TO FOLLOW
 # 1. Change the Enum
 # 2. Migrate the Database accordingly
 # ===============================================================================================
-
-# TODO What should be stored in the json is the enum name not value this will need a new parsing system for flow and
-# TODO Chatbot session. but is important before the lunch as it will have significant benefits to the system
 
 @unique
 class CRM(Enum):
@@ -24,6 +21,7 @@ class CRM(Enum):
     def has_value(cls, value):
         return any(value == item.value for item in cls)
 
+
 @unique
 class Calendar(Enum):
     Google = 'Google'
@@ -32,6 +30,7 @@ class Calendar(Enum):
     @classmethod
     def has_value(cls, value):
         return any(value == item.value for item in cls)
+
 
 @unique
 class Status(Enum):
@@ -43,11 +42,13 @@ class Status(Enum):
     def has_value(cls, value):
         return any(value == item.value for item in cls)
 
+
 @unique
 class Period(Enum):
     Annually = 'Annually'
     Monthly = 'Monthly'
     Weekly = 'Weekly'
+
 
 @unique
 class BlockType(Enum):
@@ -61,6 +62,7 @@ class BlockType(Enum):
     def has_value(cls, value):
         return any(value == item.value for item in cls)
 
+
 @unique
 class BlockAction(Enum):
     GoToNextBlock = 'Go To Next Block'
@@ -71,6 +73,7 @@ class BlockAction(Enum):
     @classmethod
     def has_value(cls, value):
         return any(value == item.value for item in cls)
+
 
 @unique
 class UserType(Enum):
@@ -222,6 +225,7 @@ class DataType(Enum):
         DataTypeSection.Candidate,
         [UserType.Candidate])
 
+    # Example: Less Than 5000 GBP Annually
     CandidateDesiredSalary = dataTypeCreator(
         'Candidate Desired Salary',
         'CandidateDesiredSalary',
@@ -238,9 +242,9 @@ class DataType(Enum):
 
     # ======================================================================
     # Client
-    # The chances of asking a question with a client data type is very low. however when is it asked it means most of
-    # the time that this user type is a client. For that reason we multiplied Client UserType by 5 to increase
-    # the probability of the userType being a Client at the end :)
+    # The chances of asking a question with a client data type is very low; however when asked it means most of
+    # the time that this user type is a client. For that reason we multiplied Client UserType by 6 to increase
+    # the probability of the userType being a Client when the chatbot tries to detect the user type :)
 
     ClientName = dataTypeCreator(
         'Client Name',
@@ -294,6 +298,7 @@ class DataType(Enum):
         DataTypeSection.Job,
         [UserType.Candidate, UserType.Client])
 
+    # Example: Less Than 5000 GBP Annually
     JobSalary = dataTypeCreator(
         'Job Salary',
         'JobSalary',

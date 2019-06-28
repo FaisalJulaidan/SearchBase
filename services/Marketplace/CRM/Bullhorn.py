@@ -170,15 +170,13 @@ def insertCandidate(auth, conversation: Conversation) -> Callback:
 
         # availability, yearsExperience
         body = {
-            "name": "".join(
-                conversation.Data.get('keywordsByDataType').get(DT.CandidateName.value['name'], [" "])),
-            "mobile":
-                conversation.Data.get('keywordsByDataType').get(DT.CandidateMobile.value['name'], [" "])[0],
+            "name": conversation.Name or " ",
+            "mobile": conversation.PhoneNumber or " ",
             "address": {
                 "city": "".join(
                     conversation.Data.get('keywordsByDataType').get(DT.CandidateLocation.value['name'], [" "])),
             },
-            "email": emails[0],
+            "email": conversation.Email or " ",
             "primarySkills": "".join(
                 conversation.Data.get('keywordsByDataType').get(DT.CandidateSkills.value['name'], [" "])),
             "educations": {
@@ -188,7 +186,7 @@ def insertCandidate(auth, conversation: Conversation) -> Callback:
                 conversation.Data.get('keywordsByDataType').get(DT.CandidateDesiredSalary.value['name'], [0])[0]) * 365)
         }
 
-        # add additional emails to email2 and email3
+        # Add additional emails to email2 and email3
         for email in emails:
             index = emails.index(email)
             if index != 0:
@@ -218,7 +216,7 @@ def uploadFile(auth, storedFile: StoredFile):
         if not conversation.CRMResponse:
             raise Exception("Can't upload file for record with no CRM Response")
 
-        file_callback = stored_file_services.downloadFile(storedFile.FilePath)
+        file_callback = stored_file_services.downloadFile(storedFile.FilePath, stored_file_services.USER_FILES_PATH)
         if not file_callback.Success:
             raise Exception(file_callback.Message)
         file = file_callback.Data

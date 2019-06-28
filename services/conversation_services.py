@@ -58,18 +58,18 @@ def processConversation(assistantHashID, data: dict) -> Callback:
                                     Assistant=assistant)
 
         # AutoPilot Operations
-        if assistant.AutoPilot:
+        if assistant.AutoPilot and conversation.Completed:
             ap_callback: Callback = auto_pilot_services.processConversation(conversation, assistant.AutoPilot)
             if ap_callback.Success:
                 conversation.AutoPilotStatus = True
                 conversation.ApplicationStatus = ap_callback.Data['applicationStatus']
                 conversation.AcceptanceEmailSentAt = ap_callback.Data['acceptanceEmailSentAt']
                 conversation.RejectionEmailSentAt = ap_callback.Data['rejectionEmailSentAt']
-                # conversation.AppointmentEmailSentAt = ap_callback.Data['appointmentEmailSentAt']
+                conversation.AppointmentEmailSentAt = ap_callback.Data['appointmentEmailSentAt']
             conversation.AutoPilotResponse = ap_callback.Message
 
         # CRM integration
-        if assistant.CRM:
+        if assistant.CRM and conversation.Completed:
             crm_callback: Callback = crm_services.processConversation(assistant, conversation)
             if crm_callback.Success:
                 conversation.CRMSynced = True

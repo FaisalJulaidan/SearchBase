@@ -212,7 +212,7 @@ def uploadFile(auth, storedFile: StoredFile):
         if not conversation.CRMResponse:
             raise Exception("Can't upload file for record with no CRM Response")
 
-        file_callback = stored_file_services.downloadFile(storedFile.FilePath)
+        file_callback = stored_file_services.downloadFile(storedFile.FilePath, stored_file_services.USER_FILES_PATH)
         if not file_callback.Success:
             raise Exception(file_callback.Message)
         file = file_callback.Data

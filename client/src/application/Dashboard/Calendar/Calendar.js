@@ -32,19 +32,18 @@ class Calendar extends React.Component {
     };
 
     onSelect = value => {
-        let d = this.props.appointments.filter(d => value.utc().isSame(moment(d.DateTime).utc(), 'day'))
+        let d = this.state.appointments.filter(d => value.utc().isSame(moment(d.DateTime).utc(), 'day'))
+
         if (d.length)
-            this.setState({value, appointmentModalVisible: true, appointments: d});
-        else
-            this.setState({value});
+            this.setState({value, appointmentModalVisible: true});
     };
 
     onPanelChange = value => this.setState({value});
 
 
     dateCellRender = (value) => {
-        let d = this.props.appointments.filter(d => value.utc().isSame(moment(d.DateTime).utc(), 'day'))
-        let pending = this.props.appointments.filter(d => d.Status === "Pending")
+        let d = this.state.appointments.filter(d => value.utc().isSame(moment(d.DateTime).utc(), 'day'))
+        let pending = this.state.appointments.filter(d => d.Status === "Pending")
         return (
             <ul className="events">
                 {d.length !== 0 ?
@@ -79,16 +78,27 @@ class Calendar extends React.Component {
             okType: 'danger',
             onOk: () => {
                 this.props.dispatch(appointmentActions.setAppointmentStatusRequest(appointmentID, status))
-                let { appointments } = this.state
-                this.setState({appointments: appointments.map(a => ({...a, Status: a.ID === appointmentID ? status : a.Status}))})
+                let {appointments} = this.state
+                this.setState({
+                    appointments: appointments.map(a => ({
+                        ...a,
+                        Status: a.ID === appointmentID ? status : a.Status
+                    }))
+                })
             },
             maskClosable: true
         });
     }
 
+    componentWillReceiveProps(nextProps) {
+        if(nextProps.appointments && this.state.appointments.length === 0){
+            this.setState({appointments: nextProps.appointments})
+        }
+    }
 
     render() {
         const {value} = this.state;
+        const visibleAppointments = this.state.appointments.filter(d => value.utc().isSame(moment(d.DateTime).utc(), 'day'))
         return (
             <NoHeaderPanel>
                 <div className={styles.Header}>
@@ -114,7 +124,7 @@ class Calendar extends React.Component {
                                cancelText="Cancel"
                                visible={this.state.appointmentModalVisible}>
                             {
-                                this.state.appointments.map((a, index) =>{
+                                visibleAppointments.map((a, index) =>{
                                     let name = a.Conversation.keywordsByDataType.Email[0]
                                     return (
                                     <div key={index}>

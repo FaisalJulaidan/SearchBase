@@ -142,99 +142,107 @@ const updateFlowFailure = (error) => ({
 });
 
 
-const uploadLogo = (assistantID, file) => ({
-    type: actionTypes.UPLOAD_LOGO_REQUEST,
-    assistantID,
-    file
-});
-
-const uploadLogoSuccess = (msg) => ({
-    type: actionTypes.UPLOAD_LOGO_SUCCESS,
-    msg
-});
-
-const uploadLogoFailure = (error) => ({
-    type: actionTypes.UPLOAD_LOGO_FAILURE,
-    error
-});
-
-
-const deleteLogo = (assistantID) => ({
-    type: actionTypes.DELETE_LOGO_REQUEST,
-    assistantID
-});
-
-const deleteLogoSuccess = (msg) => ({
-    type: actionTypes.DELETE_LOGO_SUCCESS,
-    msg
-});
-
-const deleteLogoFailure = (error) => ({
-    type: actionTypes.DELETE_LOGO_FAILURE,
-    error
-});
-
-const connectAssistantCRM = (CRMID, assistantID) => ({
-    type: actionTypes.CONNECT_ASSISTANT_MARKETPLACE_REQUEST,
+// === Connections ===
+// CRM
+const connectToCRM = (CRMID, assistantID) => ({
+    type: actionTypes.CONNECT_ASSISTANT_TO_CRM_REQUEST,
     CRMID,
     assistantID
 });
 
-const connectAssistantCRMSuccess = (CRMID, msg) => ({
-    type: actionTypes.CONNECT_ASSISTANT_MARKETPLACE_SUCCESS,
+const connectToCRMSuccess = (CRMID, msg) => ({
+    type: actionTypes.CONNECT_ASSISTANT_TO_CRM_SUCCESS,
     CRMID,
     msg
 });
 
-const connectAssistantCRMFailure = (error) => ({
-    type: actionTypes.CONNECT_ASSISTANT_MARKETPLACE_FAILURE,
+const connectToCRMFailure = (error) => ({
+    type: actionTypes.CONNECT_ASSISTANT_TO_CRM_FAILURE,
     error
 });
 
-// Connections
-const disconnectAssistantCRM = (assistantID) => ({
-    type: actionTypes.DISCONNECT_ASSISTANT_MARKETPLACE_REQUEST,
+
+const disconnectFromCRM = (assistantID) => ({
+    type: actionTypes.DISCONNECT_ASSISTANT_FROM_CRM_REQUEST,
     assistantID
 });
 
-const disconnectAssistantCRMSuccess = (msg) => ({
-    type: actionTypes.DISCONNECT_ASSISTANT_MARKETPLACE_SUCCESS,
+const disconnectFromCRMSuccess = (msg) => ({
+    type: actionTypes.DISCONNECT_ASSISTANT_FROM_CRM_SUCCESS,
     msg
 });
 
-const disconnectAssistantCRMFailure = (error) => ({
-    type: actionTypes.DISCONNECT_ASSISTANT_MARKETPLACE_FAILURE,
+const disconnectFromCRMFailure = (error) => ({
+    type: actionTypes.DISCONNECT_ASSISTANT_FROM_CRM_FAILURE,
     error
 });
 
-const connectAutoPilot = (autoPilotID, assistantID) => ({
-    type: actionTypes.CONNECT_ASSISTANT_AUTO_PILOT_REQUEST,
+
+// Calendar
+const connectToCalendar = (calendarID, assistantID) => ({
+    type: actionTypes.CONNECT_ASSISTANT_TO_CALENDAR_REQUEST,
+    calendarID,
+    assistantID
+});
+
+const connectToCalendarSuccess = (calendarID, msg) => ({
+    type: actionTypes.CONNECT_ASSISTANT_TO_CALENDAR_SUCCESS,
+    calendarID,
+    msg
+});
+
+const connectToCalendarFailure = (error) => ({
+    type: actionTypes.CONNECT_ASSISTANT_TO_CALENDAR_FAILURE,
+    error
+});
+
+
+const disconnectFromCalendar = (assistantID) => ({
+    type: actionTypes.DISCONNECT_ASSISTANT_FROM_CALENDAR_REQUEST,
+    assistantID
+});
+
+const disconnectFromCalendarSuccess = (msg) => ({
+    type: actionTypes.DISCONNECT_ASSISTANT_FROM_CALENDAR_SUCCESS,
+    msg
+});
+
+const disconnectFromCalendarFailure = (error) => ({
+    type: actionTypes.DISCONNECT_ASSISTANT_FROM_CALENDAR_FAILURE,
+    error
+});
+
+
+
+// Auto Pilot
+const connectToAutoPilot = (autoPilotID, assistantID) => ({
+    type: actionTypes.CONNECT_ASSISTANT_TO_AUTO_PILOT_REQUEST,
     assistantID,
     autoPilotID
 });
 
-const connectAutoPilotSuccess = (autoPilotID) => ({
-    type: actionTypes.CONNECT_ASSISTANT_AUTO_PILOT_SUCCESS,
+const connectToAutoPilotSuccess = (autoPilotID) => ({
+    type: actionTypes.CONNECT_ASSISTANT_TO_AUTO_PILOT_SUCCESS,
     autoPilotID
 });
 
-const connectAutoPilotFailure = (error) => ({
-    type: actionTypes.CONNECT_ASSISTANT_AUTO_PILOT_FAILURE,
+const connectToAutoPilotFailure = (error) => ({
+    type: actionTypes.CONNECT_ASSISTANT_TO_AUTO_PILOT_FAILURE,
     error
 });
 
-const disconnectAutoPilot = (assistantID) => ({
-    type: actionTypes.DISCONNECT_ASSISTANT_AUTO_PILOT_REQUEST,
+const disconnectFromAutoPilot = (assistantID) => ({
+    type: actionTypes.DISCONNECT_ASSISTANT_FROM_AUTO_PILOT_REQUEST,
     assistantID,
 });
 
-const disconnectAutoPilotSuccess = (msg) => ({
-    type: actionTypes.DISCONNECT_ASSISTANT_AUTO_PILOT_SUCCESS,
+const disconnectFromAutoPilotSuccess = (msg) => ({
+    type: actionTypes.DISCONNECT_ASSISTANT_FROM_AUTO_PILOT_SUCCESS,
     msg
 });
 
-const disconnectAutoPilotFailure = (error) => ({
-    type: actionTypes.DISCONNECT_ASSISTANT_AUTO_PILOT_FAILURE,
+const disconnectFromAutoPilotFailure = (error) => ({
+    type: actionTypes.DISCONNECT_ASSISTANT_FROM_AUTO_PILOT_FAILURE,
     error
 });
 
@@ -272,27 +280,27 @@ export const assistantActions = {
     updateFlowSuccess,
     updateFlowFailure,
 
-    connectAssistantCRM,
-    connectAssistantCRMSuccess,
-    connectAssistantCRMFailure,
+    connectToCRM,
+    connectToCRMSuccess,
+    connectToCRMFailure,
 
-    disconnectAssistantCRM,
-    disconnectAssistantCRMSuccess,
-    disconnectAssistantCRMFailure,
+    disconnectFromCRM,
+    disconnectFromCRMSuccess,
+    disconnectFromCRMFailure,
 
-    uploadLogo,
-    uploadLogoSuccess,
-    uploadLogoFailure,
+    connectToCalendar,
+    connectToCalendarSuccess,
+    connectToCalendarFailure,
 
-    deleteLogo,
-    deleteLogoSuccess,
-    deleteLogoFailure,
+    disconnectFromCalendar,
+    disconnectFromCalendarSuccess,
+    disconnectFromCalendarFailure,
 
-    connectAutoPilot,
-    connectAutoPilotSuccess,
-    connectAutoPilotFailure,
+    connectToAutoPilot,
+    connectToAutoPilotSuccess,
+    connectToAutoPilotFailure,
 
-    disconnectAutoPilot,
-    disconnectAutoPilotSuccess,
-    disconnectAutoPilotFailure,
+    disconnectFromAutoPilot,
+    disconnectFromAutoPilotSuccess,
+    disconnectFromAutoPilotFailure,
 };

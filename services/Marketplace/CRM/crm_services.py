@@ -135,7 +135,7 @@ def connect(type, auth, companyID) -> Callback:
         if not test_callback.Success:
             return test_callback
 
-        connection = CRM_Model(Type=crm_type, Auth=test_callback.Data, CompanyID=companyID)
+        connection = CRM_Model(Type=crm_type, Auth=auth, CompanyID=companyID)
 
         # Save
         db.session.add(connection)
@@ -153,18 +153,17 @@ def connect(type, auth, companyID) -> Callback:
 def testConnection(type, auth, companyID) -> Callback:
     try:
         crm_type: CRM = CRM[type]
-        crm_auth = auth
 
         # test connection
         test_callback: Callback = Callback(False, 'Connection failure. Please check entered details')
         if crm_type == CRM.Adapt:
-            test_callback = Adapt.login(crm_auth)
+            test_callback = Adapt.login(auth)
         elif crm_type == CRM.Bullhorn:
-            test_callback = Bullhorn.testConnection(crm_auth, companyID) # oauth2
+            test_callback = Bullhorn.testConnection(auth, companyID) # oauth2
         elif crm_type == CRM.Greenhouse:
-            test_callback = Greenhouse.login(crm_auth)
+            test_callback = Greenhouse.login(auth)
         elif crm_type == CRM.Vincere:
-            test_callback = Vincere.testConnection(crm_auth, companyID) # oauth2
+            test_callback = Vincere.testConnection(auth, companyID) # oauth2
 
         # When connection failed
         if not test_callback.Success:
@@ -232,7 +231,7 @@ def getCRMByType(crmType, companyID):
         crm = db.session.query(CRM_Model) \
             .filter(and_(CRM_Model.CompanyID == companyID, CRM_Model.Type == crmType)).first()
         if not crm:
-            raise Exception("CRM not found")
+            return Callback(False, "CRM doesn't exist")
 
         return Callback(True, "CRM retrieved successfully.", crm)
 

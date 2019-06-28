@@ -39,9 +39,7 @@ class Assistant extends Component {
             }).catch(() => history.push(`/dashboard/assistants`));
 
         if (!this.props.options) this.props.dispatch(optionsActions.getOptions());
-        if (!this.props.autoPilotsList) this.props.dispatch(autoPilotActions.fetchAutoPilots());
 
-        // this.props.dispatch(marketplaceActions.getConnectedCRMs());
 
         window.onbeforeunload = () => {
             if (!this.state.isFlowSaved)
@@ -176,9 +174,7 @@ class Assistant extends Component {
                                 </TabPane>
 
                                 <TabPane tab="Connections" key="Connections">
-                                    <Connections assistant={assistant}
-                                                 marketplacesList={this.props.marketplacesList}
-                                                 autoPilotsList={this.props.autoPilotsList}/>
+                                    <Connections assistant={assistant}/>
                                 </TabPane>
 
                                 <TabPane tab="Integration" key="Integration">
@@ -238,9 +234,6 @@ function mapStateToProps(state) {
         options: state.options.options,
         isLoading: state.assistant.isLoading,
         isStatusChanging: state.assistant.isStatusChanging,
-
-        marketplacesList: state.marketplace.marketplacesList,
-        autoPilotsList: state.autoPilot.autoPilotsList,
     };
 }
 

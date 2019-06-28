@@ -197,7 +197,7 @@ def getDictFromSQLAlchemyObj(obj) -> dict:
     # A nested for loop for joining two tables
     for attr in obj.__table__.columns:
         key = attr.name
-        if key not in ['Password']:
+        if key not in ['Password', 'Auth']:
             dict[key] = getattr(obj, key)
             if isinstance(dict[key], Enum):  # Convert Enums
                 dict[key] = dict[key].value

@@ -17,6 +17,7 @@ def marketplace():
     user = get_jwt_identity()['user']
 
     if request.method == "GET":
+
         crm_callback: Callback = crm_services.getAll(user.get("companyID"))
         calendar_callback: Callback = calendar_services.getAll(user.get("companyID"))
 

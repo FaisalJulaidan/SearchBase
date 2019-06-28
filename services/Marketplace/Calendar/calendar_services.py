@@ -133,7 +133,7 @@ def getCalendarByType(calendarType, companyID):
         Calendar = db.session.query(Calendar_Model) \
             .filter(and_(Calendar_Model.CompanyID == companyID, Calendar_Model.Type == calendarType)).first()
         if not Calendar:
-            raise Exception("Calendar not found")
+            return Callback(False, "Calendar doesn't exist")
 
         return Callback(True, "Calendar retrieved successfully.", Calendar)
 

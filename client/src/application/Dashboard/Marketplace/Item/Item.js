@@ -195,7 +195,7 @@ class Item extends React.Component {
                                          float: 'left',
                                          marginRight: 20
                                      }}/>
-                                <Title style={{fontSize: '55pt', margin: 0}}>{title}</Title>
+                                <Title style={{fontSize: '38pt', margin: "15px 0 0 0"}}>{title}</Title>
                             </div>
                             <div className={styles.Buttons}>
                                 {this.getMarketplaceComponent(type, 'button')}
@@ -209,7 +209,7 @@ class Item extends React.Component {
                     </div>
 
                     <div className={styles.Body}>
-                        <Tabs defaultActiveKey="1">
+                        <Tabs defaultActiveKey="1" size={'large'}>
                             <TabPane tab="Feature" key="1">
                                 {this.getMarketplaceComponent(type, 'features')}
                             </TabPane>

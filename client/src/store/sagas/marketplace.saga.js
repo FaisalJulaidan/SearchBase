@@ -7,10 +7,9 @@ import {errorMessage, http, loadingMessage, successMessage} from "helpers";
 function* fetchMarketplace() {
     try {
         const res = yield http.get('/marketplace');
-        successMessage(res.data?.msg || "Marketplace fetched successfully");
         yield put(marketplaceActions.fetchMarketplaceSuccess(res.data.data));
     } catch (error) {
-        const msg = error.response?.data?.msg || "Couldn't fetch marketplace";
+        const msg = error.response?.data?.msg || "Couldn't fetch your connected marketplace items";
         errorMessage(msg);
         yield put(marketplaceActions.fetchMarketplaceFailure());
     }
@@ -30,7 +29,7 @@ function* pingMarketplace({marketplaceType}) {
 function* disconnectMarketplace({marketplaceType}) {
     try {
         const res = yield http.delete(`/marketplace/${marketplaceType}`);
-        successMessage(res.data.msg || 'Marketplace is disconnected');
+        successMessage('Marketplace is disconnected');
         yield put(marketplaceActions.disconnectMarketplaceSuccess());
     } catch (error) {
         const msg = error.response?.data?.msg || "Couldn't disconnect marketplace";
@@ -43,7 +42,7 @@ function* connectMarketplace({marketplaceType, auth}) {
     try {
         loadingMessage('Connecting to ' + marketplaceType, 0);
         const res = yield http.post(`/marketplace/connect`, {type: marketplaceType, auth});
-        successMessage(res.data?.msg || `${marketplaceType} connected successfully`);
+        successMessage(`${marketplaceType} connected successfully`);
         yield put(marketplaceActions.connectMarketplaceSuccess());
     } catch (error) {
         const msg = error.response?.data?.msg || "Couldn't Connect CRM";

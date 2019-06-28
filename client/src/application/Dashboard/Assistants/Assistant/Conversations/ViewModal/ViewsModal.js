@@ -154,7 +154,7 @@ class ViewsModal extends Component {
                                       isDownloadingFile={this.state.isDownloadingFile}/>
                     </TabPane>
 
-                    <TabPane tab={`Profile (${userType})`} key={"2"}>
+                    <TabPane tab={"Profile"} key={"2"}>
                         <Profile conversation={conversation} downloadFile={this.downloadFileHandler}
                                  dataTypes={flowOptions?.dataTypes}
                                  isDownloadingFile={this.state.isDownloadingFile}/>

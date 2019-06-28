@@ -14,7 +14,7 @@ from models import db, Callback, Database, Candidate, Assistant, Job
 from services import assistant_services
 from services.Marketplace.CRM import crm_services
 from utilities import helpers
-
+import time
 
 def fetchDatabase(id, companyID: int, pageNumber: int) -> Callback:
     try:
@@ -486,6 +486,7 @@ def scanJobs(session, dbIDs, extraJobs=None):
                 "output": helpers.encrypt(record, True)
             })
 
+        # time.sleep(5)
         return Callback(True, '', data)
 
     except Exception as exc:

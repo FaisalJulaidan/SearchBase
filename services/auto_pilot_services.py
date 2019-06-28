@@ -4,13 +4,13 @@ from datetime import datetime, time
 import logging
 from utilities import helpers
 from services import mail_services, stored_file_services as sfs
-from enums import UserType, DataType, ApplicationStatus
+from enums import UserType, DataType, Status
 
 
 def processConversation(conversation: Conversation, autoPilot: AutoPilot):
     try:
         result = {
-            "applicationStatus": ApplicationStatus.Pending,
+            "applicationStatus": Status.Pending,
             "appointmentEmailSentAt": None,
             "acceptanceEmailSentAt": None,
             "rejectionEmailSentAt": None,
@@ -19,25 +19,27 @@ def processConversation(conversation: Conversation, autoPilot: AutoPilot):
 
         # Do automation only if the autoPilot is active
         if autoPilot.Active:
-            keywords = conversation.Data.get('keywordsByDataType')
-            email = keywords.get(DataType.CandidateEmail.value['name'], [""])[0]
 
-            def __processSendingEmails (email, status: ApplicationStatus, autoPilot: AutoPilot):
+            email = conversation.Email
 
-                userName = " ".join(keywords.get(DataType.CandidateName.value['name'], [""])) # get candidate name
-                logoPath = sfs.PUBLIC_URL + sfs.UPLOAD_FOLDER + sfs.COMPANY_LOGOS_PATH + "/" + autoPilot.Company.LogoPath
+            def __processSendingEmails (email, status: Status, autoPilot: AutoPilot):
+
+                userName = conversation.Name # get candidate name
+                logoPath = autoPilot.Company.LogoPath
+                if logoPath:
+                    logoPath = sfs.PUBLIC_URL\
+                           + sfs.UPLOAD_FOLDER + sfs.COMPANY_LOGOS_PATH\
+                           + "/" + logoPath
+
                 companyName = autoPilot.Company.Name
 
+                # ======================
                 # Send Acceptance Letters
-                if status is ApplicationStatus.Accepted and AutoPilot.SendAcceptanceEmail:
+                if status is Status.Accepted and AutoPilot.SendAcceptanceEmail:
 
-                    acceptance_callback: Callback = \
-                        mail_services.sendAcceptanceEmail(userName, email, logoPath, companyName)
 
-                    if acceptance_callback.Success:
-                        result['acceptanceEmailSentAt'] = datetime.now()
-
-                    # Process candidates appointment email only if score is accepted
+                    # NOTE: Send appointment email before acceptance email if automatic appoitment manger set to active
+                    # Process candidates Appointment email only if score is accepted
                     if AutoPilot.SendCandidatesAppointments:
 
                         appointments_callback: Callback = \
@@ -54,8 +56,17 @@ def processConversation(conversation: Conversation, autoPilot: AutoPilot):
                             result['appointmentEmailSentAt'] = datetime.now()
 
 
+                    # Process candidates Acceptance email
+                    acceptance_callback: Callback = \
+                        mail_services.sendAcceptanceEmail(userName, email, logoPath, companyName)
+
+                    if acceptance_callback.Success:
+                        result['acceptanceEmailSentAt'] = datetime.now()
+
+
+                # ======================
                 # Send Rejection Letters
-                elif status is ApplicationStatus.Rejected and AutoPilot.SendRejectionEmail:
+                elif status is Status.Rejected and AutoPilot.SendRejectionEmail:
 
                     rejection_callback: Callback = \
                         mail_services.sendRejectionEmail(userName, email, logoPath, companyName)
@@ -238,12 +249,12 @@ def removeByID(id, companyID):
 
 # ----- Private Functions (shouldn't be accessed from the outside) ----- #
 
-def __getApplicationResult(score, autoPilot: AutoPilot) -> ApplicationStatus:
-    result = ApplicationStatus.Pending
+def __getApplicationResult(score, autoPilot: AutoPilot) -> Status:
+    result = Status.Pending
     if autoPilot.AcceptApplications and (score > autoPilot.AcceptanceScore):
-        result = ApplicationStatus.Accepted
+        result = Status.Accepted
     if autoPilot.RejectApplications and (score < autoPilot.RejectionScore):
-        result = ApplicationStatus.Rejected
+        result = Status.Rejected
     return result
 
 

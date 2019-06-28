@@ -1,327 +1,250 @@
 import * as actionTypes from './actionTypes';
 
 
-const fetchAssistants = () => {
-    return {
-        type: actionTypes.FETCH_ASSISTANTS_REQUEST
-    };
-};
+const fetchAssistants = () => ({
+    type: actionTypes.FETCH_ASSISTANTS_REQUEST
+});
 
-const fetchAssistantsSuccess = (assistantList) => {
-    return {
-        type: actionTypes.FETCH_ASSISTANTS_SUCCESS,
-        assistantList
-    };
-};
+const fetchAssistantsSuccess = (assistantList) => ({
+    type: actionTypes.FETCH_ASSISTANTS_SUCCESS,
+    assistantList
+});
 
-const fetchAssistantsFailure = (error) => {
-    return {
-        type: actionTypes.FETCH_ASSISTANTS_FAILURE,
-        error
-    };
-};
+const fetchAssistantsFailure = (error) => ({
+    type: actionTypes.FETCH_ASSISTANTS_FAILURE,
+    error
+});
 
 
-const fetchAssistant = (assistantID) => {
-    return {
-        type: actionTypes.FETCH_ASSISTANT_REQUEST,
-        meta: {thunk: true},
-        assistantID
-    };
-};
+const fetchAssistant = (assistantID) => ({
+    type: actionTypes.FETCH_ASSISTANT_REQUEST,
+    meta: {thunk: true},
+    assistantID
+});
 
-const fetchAssistantSuccess = (assistant) => {
-    return {
-        type: actionTypes.FETCH_ASSISTANT_SUCCESS,
-        assistant
-    };
-};
+const fetchAssistantSuccess = (assistant) => ({
+    type: actionTypes.FETCH_ASSISTANT_SUCCESS,
+    assistant
+});
 
-const fetchAssistantFailure = (error) => {
-    return {
-        type: actionTypes.FETCH_ASSISTANT_FAILURE,
-        error
-    };
-};
+const fetchAssistantFailure = (error) => ({
+    type: actionTypes.FETCH_ASSISTANT_FAILURE,
+    error
+});
 
 
-const addAssistant = (newAssistant) => {
-    return {
-        type: actionTypes.ADD_ASSISTANT_REQUEST,
-        newAssistant
-    };
-};
+const addAssistant = (newAssistant) => ({
+    type: actionTypes.ADD_ASSISTANT_REQUEST,
+    newAssistant
+});
 
-const addAssistantSuccess = (newAssistant, successMsg) => {
-    return {
-        type: actionTypes.ADD_ASSISTANT_SUCCESS,
-        newAssistant,
-        successMsg
-    };
-};
+const addAssistantSuccess = (newAssistant, successMsg) => ({
+    type: actionTypes.ADD_ASSISTANT_SUCCESS,
+    newAssistant,
+    successMsg
+});
 
-const addAssistantFailure = (error) => {
-    return {
-        type: actionTypes.ADD_ASSISTANT_FAILURE,
-        error
-    };
-};
+const addAssistantFailure = (error) => ({
+    type: actionTypes.ADD_ASSISTANT_FAILURE,
+    error
+});
 
-const updateAssistant = (assistantID, updatedSettings) => {
-    return {
-        type: actionTypes.UPDATE_ASSISTANT_REQUEST,
-        assistantID,
-        updatedSettings
-    };
-};
+const updateAssistant = (assistantID, updatedSettings) => ({
+    type: actionTypes.UPDATE_ASSISTANT_REQUEST,
+    assistantID,
+    updatedSettings
+});
 
-const updateAssistantSuccess = (assistantID, updatedAssistant, successMsg) => {
-    return {
-        type: actionTypes.UPDATE_ASSISTANT_SUCCESS,
-        assistantID,
-        updatedAssistant,
-        successMsg
-    };
-};
+const updateAssistantSuccess = (assistantID, updatedAssistant, successMsg) => ({
+    type: actionTypes.UPDATE_ASSISTANT_SUCCESS,
+    assistantID,
+    updatedAssistant,
+    successMsg
+});
 
-const updateAssistantFailure = (error) => {
-    return {
-        type: actionTypes.UPDATE_ASSISTANT_FAILURE,
-        error
-    };
-};
+const updateAssistantFailure = (error) => ({
+    type: actionTypes.UPDATE_ASSISTANT_FAILURE,
+    error
+});
 
 
-const updateAssistantConfigs = (assistantID, updatedSettings) => {
-    return {
-        type: actionTypes.UPDATE_ASSISTANT_CONFIGS_REQUEST,
-        assistantID,
-        updatedSettings
-    };
-};
+const updateAssistantConfigs = (assistantID, updatedSettings) => ({
+    type: actionTypes.UPDATE_ASSISTANT_CONFIGS_REQUEST,
+    assistantID,
+    updatedSettings
+});
 
-const updateAssistantConfigsSuccess = (assistantID, updatedAssistant, successMsg) => {
-    return {
-        type: actionTypes.UPDATE_ASSISTANT_CONFIGS_SUCCESS,
-        assistantID,
-        updatedAssistant,
-        successMsg
-    };
-};
+const updateAssistantConfigsSuccess = (assistantID, updatedAssistant, successMsg) => ({
+    type: actionTypes.UPDATE_ASSISTANT_CONFIGS_SUCCESS,
+    assistantID,
+    updatedAssistant,
+    successMsg
+});
 
-const updateAssistantConfigsFailure = (error) => {
-    return {
-        type: actionTypes.UPDATE_ASSISTANT_CONFIGS_FAILURE,
-        error
-    };
-};
+const updateAssistantConfigsFailure = (error) => ({
+    type: actionTypes.UPDATE_ASSISTANT_CONFIGS_FAILURE,
+    error
+});
 
 
-const deleteAssistant = (assistantID) => {
-    return {
-        type: actionTypes.DELETE_ASSISTANT_REQUEST,
-        meta: {thunk: true},
-        assistantID
-    };
-};
+const deleteAssistant = (assistantID) => ({
+    type: actionTypes.DELETE_ASSISTANT_REQUEST,
+    meta: {thunk: true},
+    assistantID
+});
 
-const deleteAssistantSuccess = (assistantID, successMsg) => {
-    return {
-        type: actionTypes.DELETE_ASSISTANT_SUCCESS,
-        assistantID,
-        successMsg
-    };
-};
+const deleteAssistantSuccess = (assistantID, successMsg) => ({
+    type: actionTypes.DELETE_ASSISTANT_SUCCESS,
+    assistantID,
+    successMsg
+});
 
-const deleteAssistantFailure = (error) => {
-    return {
-        type: actionTypes.DELETE_ASSISTANT_FAILURE,
-        error
-    };
-};
+const deleteAssistantFailure = (error) => ({
+    type: actionTypes.DELETE_ASSISTANT_FAILURE,
+    error
+});
 
 
-const changeAssistantStatus = (assistantID, status) => {
-    return {
-        type: actionTypes.CHANGE_ASSISTANT_STATUS_REQUEST,
-        assistantID,
-        status
-    };
-};
+const changeAssistantStatus = (assistantID, status) => ({
+    type: actionTypes.CHANGE_ASSISTANT_STATUS_REQUEST,
+    assistantID,
+    status
+});
 
-const changeAssistantStatusSuccess = (successMsg, status, assistantID) => {
-    return {
-        type: actionTypes.CHANGE_ASSISTANT_STATUS_SUCCESS,
-        successMsg,
-        status,
-        assistantID
-    };
-};
+const changeAssistantStatusSuccess = (successMsg, status, assistantID) => ({
+    type: actionTypes.CHANGE_ASSISTANT_STATUS_SUCCESS,
+    successMsg,
+    status,
+    assistantID
+});
 
-const changeAssistantStatusFailure = (error) => {
-    return {
-        type: actionTypes.CHANGE_ASSISTANT_STATUS_FAILURE,
-        error
-    };
-};
+const changeAssistantStatusFailure = (error) => ({
+    type: actionTypes.CHANGE_ASSISTANT_STATUS_FAILURE,
+    error
+});
 
 
-const updateFlow = (assistant) => {
-    return {
-        type: actionTypes.UPDATE_FLOW_REQUEST,
-        meta: {thunk: true},
-        assistant
-    };
-};
+const updateFlow = (assistant) => ({
+    type: actionTypes.UPDATE_FLOW_REQUEST,
+    meta: {thunk: true},
+    assistant
+});
 
-const updateFlowSuccess = (assistant, msg) => {
-    return {
-        type: actionTypes.UPDATE_FLOW_SUCCESS,
-        assistant,
-        msg
-    };
-};
+const updateFlowSuccess = (assistant, msg) => ({
+    type: actionTypes.UPDATE_FLOW_SUCCESS,
+    assistant,
+    msg
+});
 
-const updateFlowFailure = (error) => {
-    return {
-        type: actionTypes.UPDATE_FLOW_FAILURE,
-        error
-    };
-};
+const updateFlowFailure = (error) => ({
+    type: actionTypes.UPDATE_FLOW_FAILURE,
+    error
+});
 
 
-const uploadLogo = (assistantID, file) => {
-    return {
-        type: actionTypes.UPLOAD_LOGO_REQUEST,
-        assistantID,
-        file
-    };
-};
+// === Connections ===
+// CRM
+const connectToCRM = (CRMID, assistantID) => ({
+    type: actionTypes.CONNECT_ASSISTANT_TO_CRM_REQUEST,
+    CRMID,
+    assistantID
+});
 
-const uploadLogoSuccess = (msg) => {
-    return {
-        type: actionTypes.UPLOAD_LOGO_SUCCESS,
-        msg
-    };
-};
+const connectToCRMSuccess = (CRMID, msg) => ({
+    type: actionTypes.CONNECT_ASSISTANT_TO_CRM_SUCCESS,
+    CRMID,
+    msg
+});
 
-const uploadLogoFailure = (error) => {
-    return {
-        type: actionTypes.UPLOAD_LOGO_FAILURE,
-        error
-    };
-};
+const connectToCRMFailure = (error) => ({
+    type: actionTypes.CONNECT_ASSISTANT_TO_CRM_FAILURE,
+    error
+});
 
 
-const deleteLogo = (assistantID) => {
-    return {
-        type: actionTypes.DELETE_LOGO_REQUEST,
-        assistantID
-    };
-};
+const disconnectFromCRM = (assistantID) => ({
+    type: actionTypes.DISCONNECT_ASSISTANT_FROM_CRM_REQUEST,
+    assistantID
+});
 
-const deleteLogoSuccess = (msg) => {
-    return {
-        type: actionTypes.DELETE_LOGO_SUCCESS,
-        msg
-    };
-};
+const disconnectFromCRMSuccess = (msg) => ({
+    type: actionTypes.DISCONNECT_ASSISTANT_FROM_CRM_SUCCESS,
+    msg
+});
 
-const deleteLogoFailure = (error) => {
-    return {
-        type: actionTypes.DELETE_LOGO_FAILURE,
-        error
-    };
-};
+const disconnectFromCRMFailure = (error) => ({
+    type: actionTypes.DISCONNECT_ASSISTANT_FROM_CRM_FAILURE,
+    error
+});
 
-const connectAssistantCRM = (CRMID, assistantID) => {
-    return {
-        type: actionTypes.CONNECT_ASSISTANT_MARKETPLACE_REQUEST,
-        CRMID,
-        assistantID
-    };
-};
 
-const connectAssistantCRMSuccess = (CRMID, msg) => {
-    return {
-        type: actionTypes.CONNECT_ASSISTANT_MARKETPLACE_SUCCESS,
-        CRMID,
-        msg
-    };
-};
+// Calendar
+const connectToCalendar = (calendarID, assistantID) => ({
+    type: actionTypes.CONNECT_ASSISTANT_TO_CALENDAR_REQUEST,
+    calendarID,
+    assistantID
+});
 
-const connectAssistantCRMFailure = (error) => {
-    return {
-        type: actionTypes.CONNECT_ASSISTANT_MARKETPLACE_FAILURE,
-        error
-    };
-};
+const connectToCalendarSuccess = (calendarID, msg) => ({
+    type: actionTypes.CONNECT_ASSISTANT_TO_CALENDAR_SUCCESS,
+    calendarID,
+    msg
+});
 
-// Connections
-const disconnectAssistantCRM = (assistantID) => {
-    return {
-        type: actionTypes.DISCONNECT_ASSISTANT_MARKETPLACE_REQUEST,
-        assistantID
-    };
-};
+const connectToCalendarFailure = (error) => ({
+    type: actionTypes.CONNECT_ASSISTANT_TO_CALENDAR_FAILURE,
+    error
+});
 
-const disconnectAssistantCRMSuccess = (msg) => {
-    return {
-        type: actionTypes.DISCONNECT_ASSISTANT_MARKETPLACE_SUCCESS,
-        msg
-    };
-};
 
-const disconnectAssistantCRMFailure = (error) => {
-    return {
-        type: actionTypes.DISCONNECT_ASSISTANT_MARKETPLACE_FAILURE,
-        error
-    };
-};
+const disconnectFromCalendar = (assistantID) => ({
+    type: actionTypes.DISCONNECT_ASSISTANT_FROM_CALENDAR_REQUEST,
+    assistantID
+});
 
-const connectAutoPilot = (autoPilotID, assistantID) => {
-    return {
-        type: actionTypes.CONNECT_ASSISTANT_AUTO_PILOT_REQUEST,
-        assistantID,
-        autoPilotID
-    };
-};
+const disconnectFromCalendarSuccess = (msg) => ({
+    type: actionTypes.DISCONNECT_ASSISTANT_FROM_CALENDAR_SUCCESS,
+    msg
+});
 
-const connectAutoPilotSuccess = (autoPilotID) => {
-    return {
-        type: actionTypes.CONNECT_ASSISTANT_AUTO_PILOT_SUCCESS,
-        autoPilotID
-    };
-};
+const disconnectFromCalendarFailure = (error) => ({
+    type: actionTypes.DISCONNECT_ASSISTANT_FROM_CALENDAR_FAILURE,
+    error
+});
 
-const connectAutoPilotFailure = (error) => {
-    return {
-        type: actionTypes.CONNECT_ASSISTANT_AUTO_PILOT_FAILURE,
-        error
-    };
-};
 
-const disconnectAutoPilot = (assistantID) => {
-    return {
-        type: actionTypes.DISCONNECT_ASSISTANT_AUTO_PILOT_REQUEST,
-        assistantID,
-    };
-};
 
-const disconnectAutoPilotSuccess = (msg) => {
-    return {
-        type: actionTypes.DISCONNECT_ASSISTANT_AUTO_PILOT_SUCCESS,
-        msg
-    };
-};
+// Auto Pilot
+const connectToAutoPilot = (autoPilotID, assistantID) => ({
+    type: actionTypes.CONNECT_ASSISTANT_TO_AUTO_PILOT_REQUEST,
+    assistantID,
+    autoPilotID
+});
 
-const disconnectAutoPilotFailure = (error) => {
-    return {
-        type: actionTypes.DISCONNECT_ASSISTANT_AUTO_PILOT_FAILURE,
-        error
-    };
-};
+const connectToAutoPilotSuccess = (autoPilotID) => ({
+    type: actionTypes.CONNECT_ASSISTANT_TO_AUTO_PILOT_SUCCESS,
+    autoPilotID
+});
 
+const connectToAutoPilotFailure = (error) => ({
+    type: actionTypes.CONNECT_ASSISTANT_TO_AUTO_PILOT_FAILURE,
+    error
+});
+
+const disconnectFromAutoPilot = (assistantID) => ({
+    type: actionTypes.DISCONNECT_ASSISTANT_FROM_AUTO_PILOT_REQUEST,
+    assistantID,
+});
+
+const disconnectFromAutoPilotSuccess = (msg) => ({
+    type: actionTypes.DISCONNECT_ASSISTANT_FROM_AUTO_PILOT_SUCCESS,
+    msg
+});
+
+const disconnectFromAutoPilotFailure = (error) => ({
+    type: actionTypes.DISCONNECT_ASSISTANT_FROM_AUTO_PILOT_FAILURE,
+    error
+});
 
 
 export const assistantActions = {
@@ -357,27 +280,27 @@ export const assistantActions = {
     updateFlowSuccess,
     updateFlowFailure,
 
-    connectAssistantCRM,
-    connectAssistantCRMSuccess,
-    connectAssistantCRMFailure,
+    connectToCRM,
+    connectToCRMSuccess,
+    connectToCRMFailure,
 
-    disconnectAssistantCRM,
-    disconnectAssistantCRMSuccess,
-    disconnectAssistantCRMFailure,
+    disconnectFromCRM,
+    disconnectFromCRMSuccess,
+    disconnectFromCRMFailure,
 
-    uploadLogo,
-    uploadLogoSuccess,
-    uploadLogoFailure,
+    connectToCalendar,
+    connectToCalendarSuccess,
+    connectToCalendarFailure,
 
-    deleteLogo,
-    deleteLogoSuccess,
-    deleteLogoFailure,
+    disconnectFromCalendar,
+    disconnectFromCalendarSuccess,
+    disconnectFromCalendarFailure,
 
-    connectAutoPilot,
-    connectAutoPilotSuccess,
-    connectAutoPilotFailure,
+    connectToAutoPilot,
+    connectToAutoPilotSuccess,
+    connectToAutoPilotFailure,
 
-    disconnectAutoPilot,
-    disconnectAutoPilotSuccess,
-    disconnectAutoPilotFailure,
+    disconnectFromAutoPilot,
+    disconnectFromAutoPilotSuccess,
+    disconnectFromAutoPilotFailure,
 };

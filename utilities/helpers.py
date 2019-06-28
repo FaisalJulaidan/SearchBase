@@ -1,21 +1,29 @@
-from flask import json, after_this_request, request
-from models import db, Assistant, Job, Callback, Role
-from services import flow_services, assistant_services
+import functools
+import gzip
+import inspect
+import logging
+import os
+import re
+import traceback
 from datetime import time
 from enum import Enum
-from hashids import Hashids
-from config import BaseConfig
 from io import BytesIO
-from itsdangerous import URLSafeTimedSerializer
-from cryptography.fernet import Fernet
-from sqlalchemy_utils import Currency
 from typing import List
+
+import geoip2.webservice
+import stripe
+from cryptography.fernet import Fernet
+from flask import json, after_this_request, request
 from flask_jwt_extended import get_jwt_identity
 from forex_python.converter import CurrencyRates
+from hashids import Hashids
+from itsdangerous import URLSafeTimedSerializer
+from sqlalchemy_utils import Currency
+
+from config import BaseConfig
+from models import db, Assistant, Job, Callback, Role
+from services import flow_services, assistant_services
 from enums import Period
-import re, os, stripe, gzip, functools, logging, geoip2.webservice, traceback
-
-
 
 # ======== Global Variables ======== #
 
@@ -36,6 +44,7 @@ fernet = Fernet(os.environ['TEMP_SECRET_KEY'])
 # Currency converter by forex-python
 currencyConverter = CurrencyRates()
 
+
 # ======== Helper Functions ======== #
 
 # Get domain based on current environment
@@ -53,14 +62,12 @@ def logError(exception):
     if os.environ['FLASK_ENV'] == 'development':
         print(exception)
         # print(traceback.format_exc())
-    logging.error(traceback.format_exc() + exception + "\n \n" )
+    logging.error(traceback.format_exc() + exception + "\n \n")
 
 
 # ID Hasher
 # IMPORTANT: don't you ever make changes to the hash values before consulting Faisal Julaidan
 hashids = Hashids(salt=BaseConfig.HASH_IDS_SALT, min_length=5)
-
-
 def encodeID(id):
     return hashids.encrypt(id)
 
@@ -80,6 +87,7 @@ def decrypt(token, isDict=False, isBtye=False):
     value = fernet.decrypt(token)
     if isDict: value = json.loads(value)
     return value
+
 
 def seed():
     # Create universal Roles
@@ -149,20 +157,6 @@ def gzipped(f):
     return view_func
 
 
-# Check if the logged in user owns the accessed assistant for security
-# Wrapper function
-def validAssistant(func):
-    def wrapperValidAssistant(assistantID):
-        user = get_jwt_identity()['user']
-        callback: Callback = assistant_services.getByID(assistantID, user['companyID'])
-        if not callback.Success:
-            return jsonResponse(False, 404, "Assistant not found.", None)
-        assistant: Assistant = callback.Data
-        return func(assistant)
-
-    return wrapperValidAssistant
-
-
 # Note: Hourly is not supported because it varies and number of working hours is required
 def convertSalaryPeriod(salary, fromPeriod: Period, toPeriod: Period):
 
@@ -197,41 +191,44 @@ def convertSalaryPeriod(salary, fromPeriod: Period, toPeriod: Period):
 # -------- SQLAlchemy Converters -------- #
 """Convert a SQLAlchemy object to a single dict """
 def getDictFromSQLAlchemyObj(obj) -> dict:
-
-    dict = {} # Results
+    dict = {}  # Results
     if not obj: return dict
 
     # A nested for loop for joining two tables
     for attr in obj.__table__.columns:
         key = attr.name
-        if key not in ['Password']:
+        if key not in ['Password', 'Auth']:
             dict[key] = getattr(obj, key)
-            if isinstance(dict[key], Enum): # Convert Enums
+            if isinstance(dict[key], Enum):  # Convert Enums
                 dict[key] = dict[key].value
 
-            if isinstance(dict[key], time): # Convert Times
+            if isinstance(dict[key], time):  # Convert Times
                 dict[key] = str(dict[key])
 
-            if isinstance(dict[key], Currency): # Convert Currencies
+            if isinstance(dict[key], Currency):  # Convert Currencies
                 dict[key] = dict[key].code
 
-            if key in [Job.JobStartDate.name, Job.JobEndDate.name] and dict[key]: # Convert Datetime only for Jobs
+            if key in [Job.JobStartDate.name, Job.JobEndDate.name] and dict[key]:  # Convert Datetime only for Jobs
                 dict[key] = '/'.join(map(str, [dict[key].year, dict[key].month, dict[key].day]))
 
-            if key == Assistant.Flow.name and dict[key]: # Parse Flow !!
-                flow_services.parseFlow(dict[key]) # pass by reference
+            if key == Assistant.Flow.name and dict[key]:  # Parse Flow !!
+                flow_services.parseFlow(dict[key])  # pass by reference
 
     if hasattr(obj, "FilePath"):
         dict["FilePath"] = obj.FilePath
     return dict
 
+"""Convert a SQLAlchemy list of objects to a list of dicts"""
+def getListFromSQLAlchemyList(SQLAlchemyList):
+    return list(map(getDictFromSQLAlchemyObj, SQLAlchemyList))
 
 """Used when you want to only gather specific data from a table (columns)"""
 """Provide a list of keys (e.g ['id', 'name']) and the list of tuples"""
 """provided by sqlalchemy when querying for specific columns"""
 """this func will work for enums as well."""
 
-def getDictFromLimitedQuery(columnsList, tupleList: List[tuple]):
+# For a list of SQLAlchemy objects
+def getListFromLimitedQuery(columnsList, tupleList: List[tuple]) -> list:
     if not isinstance(tupleList, list):
         raise Exception("Provided list of tuples is empty. (Check data being returned from db)")
 
@@ -244,24 +241,39 @@ def getDictFromLimitedQuery(columnsList, tupleList: List[tuple]):
         raise Exception("List of indexes provided must match in length to the items in each of the tuples")
 
     d = []
-    for item in tupleList:
-        dict = {}
-        for idx, i in enumerate(item):
-            if isinstance(i, Enum):
-                dict[columnsList[idx]] = i.value
-            else:
-                dict[columnsList[idx]] = i
-        d.append(dict)
+    for tuple in tupleList:
+        d.append(getDictFromLimitedQuery(columnsList, tuple))
     return d
 
 
-"""Convert a SQLAlchemy list of objects to a list of dicts"""
+# For a list of SQLAlchemy objects
+def getDictFromLimitedQuery(columnsList, tuple) -> dict:
 
+    # When tupleList is not empty, then the number of items in each tuple must match the number of items in columnsList
+    if len(columnsList) != len(tuple):
+        raise Exception("List of indexes provided must match in length to the items in each of the tuples")
 
-def getListFromSQLAlchemyList(SQLAlchemyList):
-    return list(map(getDictFromSQLAlchemyObj, SQLAlchemyList))
+    dict = {}
+    for idx, v in enumerate(tuple):
+        key = columnsList[idx]
+        if isinstance(v, Enum): # Convert Enum
+            dict[key] = v.value
 
-    return view_func
+        elif isinstance(v, time): # Convert Times
+            dict[key] = str(v)
+
+        elif isinstance(v, Currency): # Convert Currencies
+            dict[key] = v.code
+
+        elif key in [Job.JobStartDate.name, Job.JobEndDate.name] and v: # Convert Datetime only for Jobs
+            dict[key] = '/'.join(map(str, [v.year, v.month, v.day]))
+
+        elif key in ['Flow', 'AssistantFlow'] and v: # Parse Flow
+            dict[key] = flow_services.parseFlow(v)
+
+        else:
+            dict[key] = v
+    return dict
 
 
 # Check if the logged in user owns the accessed assistant for security
@@ -282,6 +294,14 @@ def findIndexOfKeyInArray(key, value, array):
     for item, idx in array:
         if item.key == value:
             return idx
+    return False
+
+
+# example: objectListContains(myList, lambda x: x.n == 3)  # True if any element has .n==3
+def objectListContains(list, filter):
+    for x in list:
+        if filter(x):
+            return x
     return False
 
 

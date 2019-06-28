@@ -3,7 +3,7 @@ import {connect} from 'react-redux';
 import {store} from "store/store";
 
 import {Button, Select, Form, Input, InputNumber, Divider, Switch, Modal, Radio} from "antd";
-import {assistantActions, marketplacesActions} from "store/actions";
+import {assistantActions, marketplaceActions} from "store/actions";
 import {history} from "helpers";
 
 import countries from 'helpers/static_data/countries'
@@ -11,7 +11,7 @@ const FormItem = Form.Item;
 const Option = Select.Option;
 const confirm = Modal.confirm;
 
-const manualNotify = [null, 0, 6, 24, 168]
+const manualNotify = [null, 0, 6, 24, 168];
 
 
 class Settings extends Component {
@@ -20,13 +20,16 @@ class Settings extends Component {
         isAlertsEnabled: this.props.assistant.MailEnabled,
         // alertOptions: {0: "Immediately", 4: "4 hours", 8: "8 hours", 12: "12 hours", 24: "24 hours"}
         alertOptions: {0: "Immediately"},
-        isManualNotify: manualNotify.indexOf(this.props.assistant.NotifyEvery) === -1,
-        notifyEvery: ""
+        isManualNotify: false,
+        notifyEvery: "null"
     };
 
     componentDidMount() {
+        const {assistant} = this.props;
         this.setState({
-            inputValue: this.props.assistant.SecondsUntilPopup
+            inputValue: this.props.assistant.SecondsUntilPopup,
+            notifyEvery: assistant.NotifyEvery === null ? "null" : assistant.NotifyEvery,
+            isManualNotify: manualNotify.indexOf(assistant.NotifyEvery) === -1,
         });
     }
 
@@ -43,14 +46,10 @@ class Settings extends Component {
         this.setState({isPopupDisabled: !this.state.isPopupDisabled})
     };
 
-    toggleAlertsSwitch = () => {
-        this.setState({isAlertsEnabled: !this.state.isAlertsEnabled})
-    };
-
-
 
     handleSave = () => this.props.form.validateFields((err, values) => {
         if (!err) {
+
             if (this.state.isPopupDisabled)
                 values.secondsUntilPopup = 0;
             values.alertsEnabled = this.state.isAlertsEnabled;
@@ -59,7 +58,8 @@ class Settings extends Component {
             };
 
             delete values.restrictedCountries;
-            values.notifyEvery = this.state.notifyEvery || this.props.assistant.NotifyEvery
+            values.notifyEvery = this.state.notifyEvery;
+
             store.dispatch(assistantActions.updateAssistantConfigs(this.props.assistant.ID, values))
         }
     });
@@ -76,15 +76,13 @@ class Settings extends Component {
     };
 
     render() {
-        const alertsKeys = Object.keys(this.state.alertOptions);
-        const maxAlertsLength = parseInt(alertsKeys[alertsKeys.length - 1]);
         const {getFieldDecorator} = this.props.form;
         const {assistant} = this.props;
         const countriesOptions = [...countries.map(country => <Option key={country.code}>{country.name}</Option>)];
 
         return (
             <>
-                <Form layout='vertical' wrapperCol={{span: 15}}>
+                <Form layout='vertical' wrapperCol={{span: 10}}>
 
                     <h2>Basic Settings</h2>
                     <FormItem
@@ -171,10 +169,11 @@ class Settings extends Component {
                         <span className="ant-form-text"> seconds</span>
                     </FormItem>
 
-                    <Form.Item label="Alert Me Every:"
+                    <Form.Item label="Notify Me Every:"
+                               wrapperCol={{span: 20}}
                                extra="Select how often you would like to be notified via email of new chats">
                         <Radio.Group style={{width:'100%'}}
-                                     defaultValue={this.state.isManualNotify ? "custom" : (assistant.NotifyEvery === null ? "null" : assistant.NotifyEvery)
+                                     value={this.state.isManualNotify ? "custom" : this.state.notifyEvery
                                      }
                                      onChange={(e) => {if(e.target.value !== "custom"){this.setState({notifyEvery: e.target.value, isManualNotify: false})}}}>
                             <Radio.Button value={"null"}>Never</Radio.Button>
@@ -185,15 +184,18 @@ class Settings extends Component {
                             <Radio.Button value={730}>Monthly</Radio.Button>
                             <Radio.Button value={"custom"} onClick={() => {this.setState({isManualNotify: !this.state.isManualNotify})}}>Custom</Radio.Button>
                         </Radio.Group>
+
                         {this.state.isManualNotify ?
                             <InputNumber placeholder="Amount of time between notifications, in hours"
                                          min={1}
-                                         style={{marginTop: 10, width: "100%"}}
-                                         defaultValue={assistant.NotifyEvery}
+                                         style={{marginTop: 10, width: "30%"}}
+                                         value={this.state.notifyEvery === 'null' ? 1 : this.state.notifyEvery}
+                                         formatter={value => `${value} hours`}
+                                         parser={value => value.replace('hours', '')}
                                          onChange={(val) => {this.setState({notifyEvery:val})}}/>
                             : null}
                     </Form.Item>
-                        <FormItem
+                    <FormItem
                         label="Restricted Countries"
                         extra="Chatbot will be disabled for users who live in the selected countries"
                     >
@@ -212,25 +214,25 @@ class Settings extends Component {
 
 
                     {/*<FormItem*/}
-                        {/*label="Records Notifications"*/}
-                        {/*extra="If you turn this on, we will notify you through your email"*/}
+                    {/*label="Records Notifications"*/}
+                    {/*extra="If you turn this on, we will notify you through your email"*/}
                     {/*>*/}
-                        {/*<Switch checked={this.state.isAlertsEnabled} onChange={this.toggleAlertsSwitch}*/}
-                                {/*style={{marginRight: '5px'}}/>*/}
+                    {/*<Switch checked={this.state.isAlertsEnabled} onChange={this.toggleAlertsSwitch}*/}
+                    {/*style={{marginRight: '5px'}}/>*/}
                     {/*</FormItem>*/}
 
                     {/*<FormItem*/}
-                        {/*label="Alert Me Every:"*/}
-                        {/*extra="Select how often you would like to be notified"*/}
+                    {/*label="Alert Me Every:"*/}
+                    {/*extra="Select how often you would like to be notified"*/}
                     {/*>*/}
-                        {/*{getFieldDecorator('alertEveryy', {*/}
-                            {/*initialValue: this.props.assistant.MailPeriod*/}
-                        {/*})(*/}
-                            {/*<Slider*/}
-                                {/*max={maxAlertsLength}*/}
-                                {/*disabled={!this.state.isAlertsEnabled}*/}
-                                {/*marks={this.state.alertOptions} step={null}/>*/}
-                        {/*)}*/}
+                    {/*{getFieldDecorator('alertEveryy', {*/}
+                    {/*initialValue: this.props.assistant.MailPeriod*/}
+                    {/*})(*/}
+                    {/*<Slider*/}
+                    {/*max={maxAlertsLength}*/}
+                    {/*disabled={!this.state.isAlertsEnabled}*/}
+                    {/*marks={this.state.alertOptions} step={null}/>*/}
+                    {/*)}*/}
                     {/*</FormItem>*/}
 
 

@@ -1,40 +1,40 @@
-import logging
-
 from flask import request
 from jsonschema import validate
 
 import enums
-from models import db, Callback, Assistant
+from models import db, Callback, Assistant, Company
 from services import assistant_services, options_services
 from utilities import json_schemas, helpers
-
 
 # ----- Getters ----- #
 # Get the chatbot for the public to use
 def getChatbot(assistantHashID) -> Callback:
     try:
 
-        callback: Callback = assistant_services.getByHashID(assistantHashID)
-        if not callback.Success:
-            return Callback(False, "Assistant not found!")
-        assistant = helpers.getDictFromSQLAlchemyObj(callback.Data)
+        assistantID = helpers.decodeID(assistantHashID)
+        if not assistantID:
+            return Callback(False, "Assistant not found!", None)
 
-        if not assistant['Active']:
+        assistant: Assistant = db.session.query(Assistant.Name, Assistant.Flow, Assistant.Message, Assistant.TopBarText,
+                                          Assistant.SecondsUntilPopup, Assistant.Active, Assistant.Config,
+                                          Company.Name.label("CompanyName"), Company.LogoPath.label("LogoPath"))\
+            .join(Company)\
+            .filter(Assistant.ID == assistantID[0]).first()
+
+        if not assistant.Active:
             return Callback(True, '', {'isDisabled': True})
 
         # Check for restricted countries
         ip = request.remote_addr
-        if ip != '127.0.0.1' and assistant.get('Config'):
-            restrictedCountries = assistant['Config'].get('restrictedCountries', [])
+        if ip != '127.0.0.1' and assistant.Config:
+            restrictedCountries = assistant.Config.get('restrictedCountries', [])
             if len(restrictedCountries):
                 if helpers.geoIP.country(ip).country.iso_code in restrictedCountries:
                     return Callback(True, '', {'isDisabled': True})
 
-        assistant['ID'] = assistantHashID  # Use the assistant hashID instead of the integer one
-        del assistant['CompanyID']
-
         data = {
-            "assistant": assistant,
+            "assistant": helpers.getDictFromLimitedQuery(['Name', 'Flow', 'Message', 'TopBarText', 'SecondsUntilPopup',
+                                                          'Active', 'Config', 'CompanyName', 'LogoPath'], assistant),
             "isDisabled": False,
             "currencies": options_services.getOptions().Data['databases']['currencyCodes']
         }
@@ -122,5 +122,6 @@ def parseFlow(flow: dict):
         for group in flow['groups']:
             for block in group['blocks']:
                 block['DataType'] = enums.DataType[block['DataType']].value
+        return flow
     except Exception as exc:
         helpers.logError("flow_service.parseFlow(): " + str(exc))

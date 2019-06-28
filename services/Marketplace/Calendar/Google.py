@@ -11,8 +11,8 @@ from models import Callback, Calendar, db
 from utilities import helpers
 
 
-# todo - csrf - if necessary
-# todo - need to get company id automatically
+# TODO - csrf - if necessary
+# TODO - need to get company id automatically
 
 
 # Gets a new token, and refreshes it if the expiry has passed
@@ -70,7 +70,7 @@ def authorizeUser(code):
         cal = Calendar(Auth=tokenInfo, Type=enums.Calendar.Google, CompanyID=2)
         db.session.add(cal)
         db.session.commit()
-        return Callback(True, 'User authorized succesfully')
+        return Callback(True, 'User authorized successfully')
     except exc.IntegrityError as e:
         db.session.rollback()
         return Callback(False,
@@ -87,7 +87,6 @@ def authorizeUser(code):
     @start - start date of the event (RFC 3339 - SEND WITH TIMEZONE)
     @end - end date of the event (RFC 3339 - SEND WITH TIMEZONE)
 '''
-
 
 def addEvent(companyID, eventName, description, start, end):
     try:

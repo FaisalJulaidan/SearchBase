@@ -1,13 +1,12 @@
 import os
 
-from flask import Blueprint, render_template, request, send_from_directory, redirect
+from flask import Blueprint, render_template, request, send_from_directory
 from flask_cors import CORS
 from flask_mail import Message
 
 from models import Callback
-from services import user_services, mail_services
+from services import mail_services
 from services.mail_services import mail
-from utilities import helpers
 
 public_router = Blueprint('public_router', __name__, template_folder="../templates", static_folder='static')
 CORS(public_router)
@@ -43,6 +42,11 @@ def reset_password(payload):
 
 @public_router.route('/appointments_picker/<payload>')
 def appointments_picker(payload):
+    return serve()
+
+
+@public_router.route('/chatbot_direct_link/<payload>')
+def chatbot_direct_link(payload):
     return serve()
 
 @public_router.route('/verify_account/<payload>')

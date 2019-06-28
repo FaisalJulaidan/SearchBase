@@ -1,15 +1,15 @@
 import React from 'react'
 import {Icon, Typography} from 'antd';
-import styles from './Marketplaces.module.less'
-import 'types/Marketplaces_Types';
-import data from './Marketplaces.json'
+import styles from './Marketplace.module.less'
+import 'types/Marketplace_Types';
+import data from './Items.json'
 import AuroraCardAvatar from "components/AuroraCardAvatar/AuroraCardAvatar";
 import NoHeaderPanel from 'components/NoHeaderPanel/NoHeaderPanel'
-import {Link} from "react-router-dom";
+import {history} from "helpers";
 
 const {Title, Paragraph, Text} = Typography;
 
-class Marketplaces extends React.Component {
+class Marketplace extends React.Component {
 
     render() {
         return (
@@ -32,16 +32,14 @@ class Marketplaces extends React.Component {
 
                 <div className={styles.Body}>
                     {
-                        data.Marketplaces.map((marketplace, i) =>
+                        data.Items.map((item, i) =>
                             <div className={styles.CardFrame} key={i}>
-                                <Link to={{
-                                    pathname: `/dashboard/marketplaces/${marketplace.type}`,
-                                }}>
-                                    <AuroraCardAvatar title={marketplace.title}
-                                                      desc={marketplace.desc}
-                                                      image={marketplace.image}
-                                                      disabled={marketplace.disabled}/>
-                                </Link>
+                                <AuroraCardAvatar
+                                    onClick={() => history.push(`/dashboard/marketplace/${item.type}`)}
+                                    title={item.title}
+                                    desc={item.desc}
+                                    image={item.image}
+                                    disabled={item.disabled}/>
                             </div>
                         )
                     }
@@ -51,4 +49,4 @@ class Marketplaces extends React.Component {
     }
 }
 
-export default Marketplaces;
+export default Marketplace;

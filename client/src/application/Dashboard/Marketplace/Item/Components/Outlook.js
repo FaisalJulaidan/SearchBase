@@ -1,45 +1,7 @@
 import React from 'react';
-import {Button, Icon, Popconfirm, Typography} from "antd";
-import {OutlookIcon} from "components/SVGs";
+import {Typography} from "antd";
 
 const {Title, Paragraph, Text} = Typography;
-
-
-export const OutlookButton = ({
-                                  disconnectMarketplace, isDisconnecting, status, showModal
-                              }) => {
-    return (
-        <>
-            {
-                status === "NOT_CONNECTED" &&
-                <Button type="primary"
-                        onClick={showModal}
-                        style={{width: 'auto'}}
-                        size={'large'}><Icon component={() => <OutlookIcon/>}/> Connect with Outlook</Button>
-            }
-
-            {
-                (status === "CONNECTED" || status === "FAILED")
-                &&
-                <Popconfirm placement={'bottomRight'}
-                            title="Chatbot conversations will no longer be synced with Adapt account"
-                            onConfirm={disconnectMarketplace}
-                            okType={'danger'}
-                            okText="Disconnect"
-                            cancelText="No">
-                    <Button type="danger"
-                            style={{width: 'auto'}}
-                            size={'large'}
-                            disabled={isDisconnecting}>
-                        {
-                            status === "FAILED" ? '(Failed) click to disconnect' : 'Disconnect'
-                        }
-                    </Button>
-                </Popconfirm>
-            }
-        </>
-    )
-};
 
 export const OutlookFeatures = () =>
     <Typography style={{padding: '0 60px'}}>

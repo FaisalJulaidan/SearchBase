@@ -1,12 +1,8 @@
-import logging
-
 from sqlalchemy.sql import and_
 
 from enums import CRM, UserType
 from models import db, Callback, Conversation, Assistant, CRM as CRM_Model, StoredFile
 from services.Marketplace.CRM import Greenhouse, Adapt, Bullhorn, Vincere
-
-
 # Process chatbot session
 from utilities import helpers
 
@@ -130,16 +126,16 @@ def produceRecruiterValueReport(companyID, crmName):
 
 
 # Connect to a new CRM
-# details is a dict that has {auth, type}
-def connect(company_id, details) -> Callback:
+# type e.g. Bullhorn, Adapt etc.
+def connect(type, auth, companyID) -> Callback:
     try:
-        crm_type: CRM = CRM[details['type']]
+        crm_type: CRM = CRM[type]
         # test connection
-        test_callback: Callback = testConnection(company_id, details)
+        test_callback: Callback = testConnection(type, auth, companyID)
         if not test_callback.Success:
             return test_callback
 
-        connection = CRM_Model(Type=crm_type, Auth=test_callback.Data, CompanyID=company_id)
+        connection = CRM_Model(Type=crm_type, Auth=auth, CompanyID=companyID)
 
         # Save
         db.session.add(connection)
@@ -153,81 +149,21 @@ def connect(company_id, details) -> Callback:
         return Callback(False, "CRM connection failed")
 
 
-# Update CRM Details
-# details is a dict that has {auth, type}
-def update(crm_id, company_id, details) -> Callback:
-    try:
-        crm_auth = details['auth']
-
-        # test connection
-        test_callback: Callback = testConnection(company_id, details)
-        if not test_callback.Success:
-            return test_callback
-
-        connection_callback: Callback = getCRMByID(crm_id, company_id)
-        if not connection_callback.Success:
-            raise Exception(connection_callback.Message)
-
-        crm = connection_callback.Data
-
-        crm.Auth = crm_auth
-
-        # Save
-        db.session.commit()
-
-        return Callback(True, 'CRM has been updated successfully')
-
-    except Exception as exc:
-        helpers.logError("CRM_services.update(): " + str(exc))
-        db.session.rollback()
-        return Callback(False, "Update CRM details failed.")
-
-
-def updateByCompanyAndType(crm_type, company_id, auth):
-    try:
-        crm_type: CRM = CRM[crm_type]
-        crm_auth = auth
-
-        # test connection
-        test_callback: Callback = testConnection(company_id, {"auth": auth, "type": crm_type})
-        if not test_callback.Success:
-            return test_callback
-
-        connection_callback: Callback = getCRMByType(crm_type, company_id)
-        if not connection_callback.Success:
-            raise Exception(connection_callback.Message)
-
-        crm = connection_callback.Data
-
-        crm.Auth = crm_auth
-
-        # Save
-        db.session.commit()
-
-        return Callback(True, 'CRM has been updated successfully')
-
-    except Exception as exc:
-        helpers.logError("CRM_services.update(): " + str(exc))
-        db.session.rollback()
-        return Callback(False, "Update CRM details failed.")
-
-
 # Test connection to a CRM
-def testConnection(companyID, details) -> Callback:
+def testConnection(type, auth, companyID) -> Callback:
     try:
-        crm_type: CRM = CRM[details['type']]
-        crm_auth = details.get('auth') or details  # if it comes from the callback route
+        crm_type: CRM = CRM[type]
 
         # test connection
         test_callback: Callback = Callback(False, 'Connection failure. Please check entered details')
         if crm_type == CRM.Adapt:
-            test_callback = Adapt.login(crm_auth)
+            test_callback = Adapt.login(auth)
         elif crm_type == CRM.Bullhorn:
-            test_callback = Bullhorn.testConnection(crm_auth, companyID)
+            test_callback = Bullhorn.testConnection(auth, companyID) # oauth2
         elif crm_type == CRM.Greenhouse:
-            test_callback = Greenhouse.login(crm_auth)
+            test_callback = Greenhouse.login(auth)
         elif crm_type == CRM.Vincere:
-            test_callback = Vincere.testConnection(crm_auth, companyID)
+            test_callback = Vincere.testConnection(auth, companyID) # oauth2
 
         # When connection failed
         if not test_callback.Success:
@@ -240,16 +176,33 @@ def testConnection(companyID, details) -> Callback:
         return Callback(False, "CRM testing failed.")
 
 
-def disconnect(crm_id, company_id) -> Callback:
+def disconnectByType(type, companyID) -> Callback:
     try:
-
-        crm_callback: Callback = getCRMByID(crm_id, company_id)
+        crm_callback: Callback = getCRMByType(type, companyID)
         if not crm_callback:
             return Callback(False, "Could not find CRM.")
 
         db.session.delete(crm_callback.Data)
         db.session.commit()
-        return Callback(True, 'CRM has been disconnected successfully', crm_id)
+        return Callback(True, 'CRM has been disconnected successfully')
+
+    except Exception as exc:
+        helpers.logError("CRM_services.disconnect(): " + str(exc))
+        db.session.rollback()
+        return Callback(False, "CRM disconnection failed.")
+
+
+
+def disconnectByID(crmID, companyID) -> Callback:
+    try:
+
+        crm_callback: Callback = getCRMByID(crmID, companyID)
+        if not crm_callback:
+            return Callback(False, "Could not find CRM.")
+
+        db.session.delete(crm_callback.Data)
+        db.session.commit()
+        return Callback(True, 'CRM has been disconnected successfully', crmID)
 
     except Exception as exc:
         helpers.logError("CRM_services.disconnect(): " + str(exc))
@@ -259,10 +212,10 @@ def disconnect(crm_id, company_id) -> Callback:
 
 # get marketplace with id and company_id
 # also checking if the marketplace is under that company
-def getCRMByID(crm_id, company_id):
+def getCRMByID(crmID, companyID):
     try:
         crm = db.session.query(CRM_Model) \
-            .filter(and_(CRM_Model.CompanyID == company_id, CRM_Model.ID == crm_id)).first()
+            .filter(and_(CRM_Model.CompanyID == companyID, CRM_Model.ID == crmID)).first()
         if not crm:
             raise Exception("CRM not found")
 
@@ -273,12 +226,12 @@ def getCRMByID(crm_id, company_id):
         return Callback(False, 'Could not retrieve CRM.')
 
 
-def getCRMByType(crm_type, company_id):
+def getCRMByType(crmType, companyID):
     try:
         crm = db.session.query(CRM_Model) \
-            .filter(and_(CRM_Model.CompanyID == company_id, CRM_Model.Type == crm_type)).first()
+            .filter(and_(CRM_Model.CompanyID == companyID, CRM_Model.Type == crmType)).first()
         if not crm:
-            raise Exception("CRM not found")
+            return Callback(False, "CRM doesn't exist")
 
         return Callback(True, "CRM retrieved successfully.", crm)
 
@@ -295,3 +248,16 @@ def getAll(companyID) -> Callback:
     except Exception as exc:
         helpers.logError("crm_services.getAll(): " + str(exc))
         return Callback(False, 'Could not fetch all CRMs.')
+
+
+def updateByType(type, newAuth, companyID):
+    try:
+        crm = db.session.query(CRM).filter(and_(CRM.CompanyID == companyID, CRM.Type == type)).first()
+        crm.Auth = dict(newAuth)
+        db.session.commit()
+        return Callback(True, "New auth has been saved")
+
+    except Exception as exc:
+        db.session.rollback()
+        helpers.logError("Marketplace.marketplace_helpers.saveNewCRMAuth() ERROR: " + str(exc))
+        return Callback(False, str(exc))

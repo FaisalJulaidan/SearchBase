@@ -5,7 +5,7 @@ export * from './conversation.saga';
 export * from './usersManagement.saga';
 export * from './database.saga';
 export * from './options.saga';
-export * from './marketplaces.saga';
+export * from './marketplace.saga';
 export * from './autoPilot.saga';
 export * from './analytics.saga';
 export * from './appointmentsPicker.saga';

@@ -1,13 +1,12 @@
 import {all, put, takeEvery, takeLatest} from 'redux-saga/effects'
 import * as actionTypes from '../actions/actionTypes';
-import {assistantActions, marketplacesActions, flowActions} from "../actions";
+import {assistantActions, flowActions} from "../actions";
 import {errorMessage, flow, http, loadingMessage, successMessage} from "helpers";
 
 function* fetchAssistants() {
     try {
         const res = yield http.get(`/assistants`);
         yield put(assistantActions.fetchAssistantsSuccess(res.data?.data.assistants));
-        yield put(marketplacesActions.getConnectedCRMs());
     } catch (error) {
         const msg = error.response?.data?.msg || "Couldn't load assistants";
         errorMessage(msg);
@@ -18,7 +17,6 @@ function* fetchAssistants() {
 function* fetchAssistant({assistantID, meta}) {
     try {
         const res = yield http.get(`/assistant/${assistantID}`);
-        // yield put(marketplacesActions.getConnectedCRMs());
         yield put({...assistantActions.fetchAssistantSuccess(res.data?.data), meta});
     } catch (error) {
         const msg = error.response?.data?.msg || "Couldn't load assistants";
@@ -111,24 +109,49 @@ function* updateStatus({status, assistantID}) {
 function* connectAssistantCRM({assistantID, CRMID}) {
     try {
         const res = yield http.post(`/assistant/${assistantID}/crm`, {CRMID});
-        yield put(assistantActions.connectAssistantCRMSuccess(CRMID, res.data?.msg));
-        successMessage(res.data.msg);
+        yield put(assistantActions.connectToCRMSuccess(CRMID, res.data?.msg));
+        successMessage("CRM connected successfully");
     } catch (error) {
-        const msg = error.response?.data?.msg || "Can't select CRM";
+        const msg = error.response?.data?.msg || "Can't connect to CRM";
         errorMessage(msg);
-        yield put(assistantActions.selectAssistantCRMFailure(msg));
+        yield put(assistantActions.connectToCRMFailure(msg));
     }
 }
 
 function* disconnectAssistantCRM({assistantID}) {
     try {
         const res = yield http.delete(`/assistant/${assistantID}/crm`);
-        yield put(assistantActions.disconnectAssistantCRMSuccess(res.data?.msg));
-        successMessage(res.data.msg);
+        yield put(assistantActions.disconnectFromCRMSuccess(res.data?.msg));
+        successMessage("CRM disconnected successfully");
     } catch (error) {
-        const msg = error.response?.data?.msg || "Can't reset CRM";
+        const msg = error.response?.data?.msg || "Can't disconnect from CRM";
         errorMessage(msg);
-        yield put(assistantActions.resetAssistantCRMFailure(msg));
+        yield put(assistantActions.disconnectFromCRMFailure(msg));
+    }
+}
+
+
+function* connectAssistantCalendar({assistantID, calendarID}) {
+    try {
+        const res = yield http.post(`/assistant/${assistantID}/calendar`, {calendarID});
+        yield put(assistantActions.connectToCalendarSuccess(calendarID, res.data?.msg));
+        successMessage("Calendar connected successfully");
+    } catch (error) {
+        const msg = error.response?.data?.msg || "Can't connect to calendar";
+        errorMessage(msg);
+        yield put(assistantActions.connectToCalendarFailure(msg));
+    }
+}
+
+function* disconnectAssistantCalendar({assistantID}) {
+    try {
+        const res = yield http.delete(`/assistant/${assistantID}/calendar`);
+        yield put(assistantActions.disconnectFromCalendarSuccess(res.data?.msg));
+        successMessage("Calendar disconnected successfully");
+    } catch (error) {
+        const msg = error.response?.data?.msg || "Can't disconnect from calendar";
+        errorMessage(msg);
+        yield put(assistantActions.disconnectFromCalendarFailure(msg));
     }
 }
 
@@ -137,11 +160,11 @@ function* connectAutoPilot({assistantID, autoPilotID}) {
     try {
         const res = yield http.post(`/assistant/${assistantID}/auto_pilot`, {AutoPilotID: autoPilotID});
         successMessage(res.data?.msg || 'Auto pilot connected successfully');
-        yield put(assistantActions.connectAutoPilotSuccess(autoPilotID));
+        yield put(assistantActions.connectToAutoPilotSuccess(autoPilotID));
     } catch (error) {
         const msg = error.response?.data?.msg || "Couldn't connect to this auto pilot";
         errorMessage(msg);
-        yield put(assistantActions.selectAutoPilotFailure(msg));
+        yield put(assistantActions.connectToAutoPilotFailure(msg));
     }
 }
 
@@ -149,25 +172,39 @@ function* disconnectAutoPilot({assistantID, autoPilotID}) {
     try {
         const res = yield http.delete(`/assistant/${assistantID}/auto_pilot`, {AutoPilotID: autoPilotID});
         successMessage(res.data?.msg || "Disconnected from auto pilot successfully");
-        yield put(assistantActions.disconnectAutoPilotSuccess(res.data?.msg));
+        yield put(assistantActions.disconnectFromAutoPilotSuccess(res.data?.msg));
     } catch (error) {
         const msg = error.response?.data?.msg || "Couldn't disconnect from auto pilot";
         errorMessage(msg);
-        yield put(assistantActions.disconnectAutoPilotFailure(msg));
+        yield put(assistantActions.disconnectFromAutoPilotFailure(msg));
     }
 }
 
 function* watchDisconnectAutoPilot() {
-    yield takeEvery(actionTypes.DISCONNECT_ASSISTANT_AUTO_PILOT_REQUEST, disconnectAutoPilot)
+    yield takeEvery(actionTypes.DISCONNECT_ASSISTANT_FROM_AUTO_PILOT_REQUEST, disconnectAutoPilot)
 }
 
-function* watchSelectAutoPilot() {
-    yield takeEvery(actionTypes.CONNECT_ASSISTANT_AUTO_PILOT_REQUEST, connectAutoPilot)
+function* watchConnectAutoPilot() {
+    yield takeEvery(actionTypes.CONNECT_ASSISTANT_TO_AUTO_PILOT_REQUEST, connectAutoPilot)
 }
 
-function* watchResetAssistantCrm() {
-    yield takeEvery(actionTypes.DISCONNECT_ASSISTANT_MARKETPLACE_REQUEST, disconnectAssistantCRM)
+function* watchConnectAssistantCrm() {
+    yield takeEvery(actionTypes.CONNECT_ASSISTANT_TO_CRM_REQUEST, connectAssistantCRM)
 }
+
+function* watchDisconnectAssistantCrm() {
+    yield takeEvery(actionTypes.DISCONNECT_ASSISTANT_FROM_CRM_REQUEST, disconnectAssistantCRM)
+}
+
+function* watchConnectAssistantCalendar() {
+    yield takeEvery(actionTypes.CONNECT_ASSISTANT_TO_CALENDAR_REQUEST, connectAssistantCRM)
+}
+
+function* watchDisconnectAssistantCalendar() {
+    yield takeEvery(actionTypes.DISCONNECT_ASSISTANT_FROM_CALENDAR_REQUEST, disconnectAssistantCRM)
+}
+
+
 
 function* watchUpdateStatus() {
     yield takeLatest(actionTypes.CHANGE_ASSISTANT_STATUS_REQUEST, updateStatus)
@@ -201,13 +238,12 @@ function* watchDeleteAssistant() {
     yield takeEvery(actionTypes.DELETE_ASSISTANT_REQUEST, deleteAssistant)
 }
 
-function* watchSelectAssistantCrm() {
-    yield takeEvery(actionTypes.CONNECT_ASSISTANT_MARKETPLACE_REQUEST, connectAssistantCRM)
-}
+
 
 
 export function* assistantSaga() {
     yield all([
+
         watchFetchAssistants(),
         watchFetchAssistant(),
         watchAddAssistant(),
@@ -216,9 +252,15 @@ export function* assistantSaga() {
         watchDeleteAssistant(),
         watchUpdateFlow(),
         watchUpdateStatus(),
-        watchSelectAssistantCrm(),
-        watchResetAssistantCrm(),
-        watchSelectAutoPilot(),
+
+        watchConnectAssistantCrm(),
+        watchDisconnectAssistantCrm(),
+
+        watchConnectAssistantCalendar(),
+        watchDisconnectAssistantCalendar(),
+
+
+        watchConnectAutoPilot(),
         watchDisconnectAutoPilot()
 
 

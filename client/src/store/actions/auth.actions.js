@@ -1,121 +1,88 @@
 import * as actionTypes from './actionTypes';
 
 
-function login(email, password, prevPath) {
-    return {
-        type: actionTypes.LOGIN_REQUEST,
-        email,
-        password,
-        prevPath
-    };
-}
+const login = (email, password, prevPath) => ({
+    type: actionTypes.LOGIN_REQUEST,
+    email,
+    password,
+    prevPath
+});
 
-function loginSuccess (user, role) {
-    return {
-        type: actionTypes.LOGIN_SUCCESS,
-        user,
-        role
-    };
-}
+const loginSuccess = (user, role) => ({
+    type: actionTypes.LOGIN_SUCCESS,
+    user,
+    role
+});
 
-function loginFailure (error) {
-    return {
-        type: actionTypes.LOGIN_FAILURE,
-        error
-    };
-}
+const loginFailure = (error) => ({
+    type: actionTypes.LOGIN_FAILURE,
+    error
+});
 
-function signup (signupDetails) {
-    return {
-        type: actionTypes.SIGNUP_REQUEST,
-        signupDetails
-    };
-}
+const signup = (signupDetails) => ({
+    type: actionTypes.SIGNUP_REQUEST,
+    signupDetails
+});
 
-function signupSuccess () {
-    return {
-        type: actionTypes.SIGNUP_SUCCESS,
-    };
-}
+const signupSuccess = () => ({
+    type: actionTypes.SIGNUP_SUCCESS,
+});
 
-function signupFailure (error) {
-    return {
-        type: actionTypes.SIGNUP_FAILURE,
-        error
-    };
-}
+const signupFailure = (error) => ({
+    type: actionTypes.SIGNUP_FAILURE,
+    error
+});
 
 
-function resetPassword (data) {
-    return {
-        type: actionTypes.RESET_PASSWORD_REQUEST,
-        data
-    };
-}
+const resetPassword = (data) => ({
+    type: actionTypes.RESET_PASSWORD_REQUEST,
+    data
+});
 
-function resetPasswordSuccess () {
-    return {
-        type: actionTypes.RESET_PASSWORD_SUCCESS,
-    };
-}
+const resetPasswordSuccess = () => ({
+    type: actionTypes.RESET_PASSWORD_SUCCESS,
+});
 
-function resetPasswordFailure (error) {
-    return {
-        type: actionTypes.RESET_PASSWORD_FAILURE,
-        error
-    };
-}
+const resetPasswordFailure = (error) => ({
+    type: actionTypes.RESET_PASSWORD_FAILURE,
+    error
+});
 
 
-function newResetPassword (data) {
-    return {
-        type: actionTypes.NEW_RESET_PASSWORD_REQUEST,
-        data
-    };
-}
+const newResetPassword = (data) => ({
+    type: actionTypes.NEW_RESET_PASSWORD_REQUEST,
+    data
+});
 
-function newResetPasswordSuccess () {
-    return {
-        type: actionTypes.NEW_RESET_PASSWORD_SUCCESS,
-    };
-}
+const newResetPasswordSuccess = () => ({
+    type: actionTypes.NEW_RESET_PASSWORD_SUCCESS,
+});
 
-function newResetPasswordFailure (error) {
-    return {
-        type: actionTypes.NEW_RESET_PASSWORD_FAILURE,
-        error
-    };
-}
+const newResetPasswordFailure = (error) => ({
+    type: actionTypes.NEW_RESET_PASSWORD_FAILURE,
+    error
+});
 
 
-const logout = () => {
-    return {
-        type: actionTypes.LOGOUT
-    };
-}
+const logout = () => ({
+    type: actionTypes.LOGOUT
+});
 
-const verifyAccount = (token) => {
-    return {
-        type: actionTypes.VERIFY_ACCOUNT_REQUEST,
-        meta: {thunk: true},
-        token
-    };
-};
+const verifyAccount = (token) => ({
+    type: actionTypes.VERIFY_ACCOUNT_REQUEST,
+    meta: {thunk: true},
+    token
+});
 
-const verifyAccountSuccess = (msg) => {
-    return {
-        type: actionTypes.VERIFY_ACCOUNT_SUCCESS,
-        msg
-    };
-};
+const verifyAccountSuccess = (msg) => ({
+    type: actionTypes.VERIFY_ACCOUNT_SUCCESS,
+    msg
+});
 
-const verifyAccountFailure = (error) => {
-    return {
-        type: actionTypes.VERIFY_ACCOUNT_FAILURE,
-        error
-    };
-};
-
+const verifyAccountFailure = (error) => ({
+    type: actionTypes.VERIFY_ACCOUNT_FAILURE,
+    error
+});
 
 
 export const authActions = {
@@ -140,5 +107,4 @@ export const authActions = {
     verifyAccount,
     verifyAccountSuccess,
     verifyAccountFailure,
-
 };

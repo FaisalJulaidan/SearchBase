@@ -13,7 +13,7 @@ import Flow from "./Flow/Flow"
 import Connections from "./Connections/Connections"
 
 import {history} from "helpers";
-import {assistantActions, marketplacesActions, optionsActions} from "store/actions";
+import {assistantActions, marketplaceActions, optionsActions, autoPilotActions} from "store/actions";
 import NoHeaderPanel from 'components/NoHeaderPanel/NoHeaderPanel'
 
 
@@ -40,7 +40,6 @@ class Assistant extends Component {
 
         if (!this.props.options) this.props.dispatch(optionsActions.getOptions());
 
-        this.props.dispatch(marketplacesActions.getConnectedCRMs());
 
         window.onbeforeunload = () => {
             if (!this.state.isFlowSaved)
@@ -119,6 +118,7 @@ class Assistant extends Component {
 
     render() {
         const {assistant} = this.props;
+
         return (
             <>
                 <NoHeaderPanel>
@@ -158,7 +158,7 @@ class Assistant extends Component {
                     <div className={[styles.Body, 'assistantTabs'].join(' ')}>
                         {!assistant ? <Spin/> :
 
-                            <Tabs defaultActiveKey={'Conversations'} size={"large"} animated={false}
+                            <Tabs defaultActiveKey={'Settings'} size={"large"} animated={false}
                                   onTabClick={this.onTabClick}>
                                 <TabPane tab="Analytics" key="Analytics">
                                     <Analytics assistant={assistant}/>
@@ -174,9 +174,7 @@ class Assistant extends Component {
                                 </TabPane>
 
                                 <TabPane tab="Connections" key="Connections">
-                                    <Connections assistant={assistant}
-                                                 marketplacesList={this.props.marketplacesList}
-                                                 autoPilotsList={this.props.autoPilotsList}/>
+                                    <Connections assistant={assistant}/>
                                 </TabPane>
 
                                 <TabPane tab="Integration" key="Integration">
@@ -236,9 +234,6 @@ function mapStateToProps(state) {
         options: state.options.options,
         isLoading: state.assistant.isLoading,
         isStatusChanging: state.assistant.isStatusChanging,
-
-        marketplacesList: state.marketplace.marketplacesList,
-        autoPilotsList: state.autoPilot.autoPilotsList,
     };
 }
 

@@ -22,7 +22,7 @@ def assistants():
             return helpers.jsonResponse(False, 404, "Cannot fetch Assistants")
         return helpers.jsonResponse(True, 200,
                                     "Assistants Returned!",
-                                    {"assistants": helpers.getDictFromLimitedQuery(['ID',
+                                    {"assistants": helpers.getListFromLimitedQuery(['ID',
                                                                                     'Name',
                                                                                     'Description',
                                                                                     'Message',

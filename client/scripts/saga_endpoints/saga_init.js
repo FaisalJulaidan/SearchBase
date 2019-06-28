@@ -73,25 +73,17 @@ const createActions = (sagaName) => {
     const placeholder_Upper = sagaName.toUpperCase().split(' ').join('_');
     return `COPY AND PASTE THIS IN .actions.js file:
     
-    const ${placeholder_camel} = () => {
-        return {
-            type: actionTypes.${placeholder_Upper}_REQUEST,
-        };
-    };
+    const ${placeholder_camel} = () => ({
+        type: actionTypes.${placeholder_Upper}_REQUEST,
+    });
 
-    const ${placeholder_camel}Success = (msg) => {
-        return {
-            type: actionTypes.${placeholder_Upper}_SUCCESS,
-            msg
-        };
-    };
+    const ${placeholder_camel}Success = () => ({
+        type: actionTypes.${placeholder_Upper}_SUCCESS,
+    });
 
-    const ${placeholder_camel}Failure = (error) => {
-        return {
-            type: actionTypes.${placeholder_Upper}_FAILURE,
-            error
-        };
-    };
+    const ${placeholder_camel}Failure = () => ({
+        type: actionTypes.${placeholder_Upper}_FAILURE,
+    });
     
     COPY AND PASTE THIS IN EXPORT FUNCTION:
     ${placeholder_camel},

@@ -28,11 +28,11 @@ class Conversations extends React.Component {
         this.columns = [
             {
                 title: '#',
+                key: '#',
                 render: (text, record, index) => (<p>{index + 1}</p>),
 
             }, {
                 title: 'User Type',
-                dataIndex: 'UserType',
                 key: 'UserType',
                 filters: [
                     {text: 'Candidate', value: 'Candidate'},
@@ -43,14 +43,24 @@ class Conversations extends React.Component {
 
             }, {
                 title: 'Name',
-                dataIndex: 'Name',
                 key: 'Name',
                 render: (text, record) => (
-                    <p style={{textTransform: 'capitalize'}}>{this.findUserName(record.Data.keywordsByDataType, record.UserType)}</p>),
+                    <p style={{textTransform: 'capitalize'}}>{record.Name}</p>),
+
+            }, {
+                title: 'Email',
+                key: 'Email',
+                render: (text, record) => (
+                    <p>{record.Email}</p>),
+
+            }, {
+                title: 'Phone',
+                key: 'PhoneNumber',
+                render: (text, record) => (
+                    <p>{record.PhoneNumber}</p>),
 
             }, {
                 title: 'Time Spent',
-                dataIndex: 'TimeSpent',
                 key: 'TimeSpent',
                 sorter: (a, b) => a.TimeSpent - b.TimeSpent,
                 render: (_, record) => {
@@ -65,14 +75,13 @@ class Conversations extends React.Component {
                 }
             }, {
                 title: 'Date & Time',
-                dataIndex: 'DateTime',
                 key: 'DateTime',
                 sorter: (a, b) => new Date(a.DateTime).valueOf() - new Date(b.DateTime).valueOf(),
                 render: (text, record) => (<p>{record.DateTime}</p>),
 
             }, {
                 title: 'Score',
-                dataIndex: 'Score',
+                key: 'Score',
                 sorter: (a, b) => a.Score - b.Score,
                 render: (text, record) => {
                     return (
@@ -85,7 +94,6 @@ class Conversations extends React.Component {
 
             }, {
                 title: 'Application Status',
-                dataIndex: 'ApplicationStatus',
                 key: 'ApplicationStatus',
                 // filters: [
                 //     {text: 'Completed', value: 'Completed'},
@@ -128,7 +136,6 @@ class Conversations extends React.Component {
 
             },{
                 title: 'Conversation',
-                dataIndex: 'Completed',
                 key: 'Completed',
                 // filters: [
                 //     {text: 'Completed', value: 'Completed'},
@@ -167,7 +174,12 @@ class Conversations extends React.Component {
         this.props.dispatch(conversationActions.fetchConversations(this.props.assistant.ID))
     }
 
+
     componentWillReceiveProps(nextProps) {
+
+        if (nextProps.conversations !== this.props.conversations)
+            this.populateDownloadData(this.props.conversations);
+
         if (nextProps.conversations?.conversationsList && this.state.selectedConversation){
             const updatedConversation = nextProps.conversations.conversationsList
                 .find(c => this.state.selectedConversation.ID === c.ID);
@@ -175,7 +187,6 @@ class Conversations extends React.Component {
             if (updatedConversation)
                 this.setState({selectedConversation: updatedConversation })
         }
-
     }
 
     refreshConversations = () => {
@@ -186,7 +197,6 @@ class Conversations extends React.Component {
 
 
     handleFilter = (pagination, filters, sorter) => {
-        console.log('Various parameters', pagination, filters, sorter);
         this.setState({
             filteredInfo: filters,
             sortedInfo: sorter,
@@ -256,7 +266,7 @@ class Conversations extends React.Component {
     };
 
     // get the conversation to be rendered and save them in the state in format which can be downloaded by the CSV
-    populateDownloadData(Conversations){
+    populateDownloadData = Conversations => {
         const conversationsList = Conversations.conversationsList;
 
         let data = [["ID", "User Type", "Name", "Questions Answered", "Solutions Returned", "Time Spent", "Date & Time",
@@ -274,8 +284,7 @@ class Conversations extends React.Component {
             conversation = "";
 
             // Conversations Page Base Table
-            dataRecord = [record["ID"], record["UserType"], this.findUserName(record["Data"]["keywordsByDataType"],
-                record["UserType"] ), record["QuestionsAnswered"], record["SolutionsReturned"],
+            dataRecord = [record["ID"], record["UserType"], record['Name'], record["QuestionsAnswered"], record["SolutionsReturned"],
                 record["TimeSpent"], record["DateTime"], record["Score"] * 100 + "%", record["ApplicationStatus"]];
 
             // Conversation Questions and Answers   ex. "What is your name? : Bob House (Name)"
@@ -316,17 +325,8 @@ class Conversations extends React.Component {
             data.push(dataRecord);
         });}
 
-
         // put the data in the state and set refresh to false
         this.setState({downloadData:data, ConversationsRefreshed:false});
-    }
-
-    findUserName = (keywords, userType) => {
-        if ('Client Name' in keywords && userType === 'Client')
-            return keywords['Client Name'].join(' ');
-        else if ('Candidate Name' in keywords && userType === 'Candidate')
-            return keywords['Candidate Name'].join(' ');
-        return 'Unavailable';
     };
 
     updateStatus = (newStatus, conversation) => {
@@ -349,8 +349,6 @@ class Conversations extends React.Component {
 
     render() {
         const {assistant, conversations, options} = this.props;
-
-        if(this.state.ConversationsRefreshed){this.populateDownloadData(conversations)}
 
         return (
                     <>
@@ -407,9 +405,10 @@ class Conversations extends React.Component {
 }
 
 const mapStateToProps = state =>  {
-    const {conversation} = state;
+    const {conversation, options} = state;
     return {
         conversations: conversation.conversations,
+        options: options.options,
         isLoading: conversation.isLoading,
         errorMsg: conversation.errorMsg,
         isClearingAll: conversation.isClearingAll,

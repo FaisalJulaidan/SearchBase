@@ -1,11 +1,9 @@
 import base64
 import json
-import logging
 
 import requests
 
-from enums import DataType as DT
-from models import Callback, Conversation, StoredFile
+from models import Callback, StoredFile
 from services import databases_services, stored_file_services
 from utilities import helpers
 
@@ -27,7 +25,8 @@ def login(auth):
         body = {"per_page": 1}
 
         # get the authorization code
-        code_request = requests.get("https://harvest.greenhouse.io/v1/candidates/", headers=headers, data=json.dumps(body))
+        code_request = requests.get("https://harvest.greenhouse.io/v1/candidates/", headers=headers,
+                                    data=json.dumps(body))
         if not code_request.ok:
             raise Exception(code_request.text)
 
@@ -91,8 +90,8 @@ def sendRequest(url, method, headers, data=None):
 #     try:
 #         # New candidate details
 #         body = {
-#             "first_name": conversation.Data.get('keywordsByDataType').get(DT.CandidateName.value['name'], [""])[0],
-#             "last_name": conversation.Data.get('keywordsByDataType').get(DT.CandidateName.value['name'], [""])[-1],
+#             "first_name": conversation.Data.get('keywordsByDataType').get(DT.CandidateName.value['name'], [" "])[0],
+#             "last_name": conversation.Data.get('keywordsByDataType').get(DT.CandidateName.value['name'], [" "])[-1],
 #             "phone_numbers": [],
 #             "email_addresses": [],
 #             "applications": [{}]  # TODO NEEDS SOMETHING IN HERE...
@@ -105,7 +104,7 @@ def sendRequest(url, method, headers, data=None):
 #         if conversation.Data.get('keywordsByDataType').get(DT.CandidateLocation.value['name'], None):
 #             body["addresses"] = [{
 #                 "value": "".join(
-#                     conversation.Data.get('keywordsByDataType').get(DT.CandidateLocation.value['name'], [""])),
+#                     conversation.Data.get('keywordsByDataType').get(DT.CandidateLocation.value['name'], [" "])),
 #                 "type": "home"
 #             }]
 #
@@ -187,7 +186,7 @@ def searchCandidates(auth) -> Callback:
         for record in return_body:
             result.append(databases_services.createPandaCandidate(id=record.get("id"),
                                                                   name=record.get("first_name", "") +
-                                                                  record.get("last_name", ""),
+                                                                       record.get("last_name", ""),
                                                                   email=
                                                                   getValue(record.get("email_addresses"), "value"),
                                                                   mobile=
@@ -241,7 +240,7 @@ def searchJobs(auth, conversation) -> Callback:
 
             min_salary = record.get("custom_fields", {}).get("salary_range", {}).get("min_value", 0)
             max_salary = record.get("custom_fields", {}).get("salary_range", {}).get("max_value", 0)
-            mid_salary = min_salary + ((max_salary-min_salary) / 2)
+            mid_salary = min_salary + ((max_salary - min_salary) / 2)
 
             result.append(databases_services.createPandaJob(id=record.get("id"),
                                                             title=record.get("name"),
@@ -256,7 +255,8 @@ def searchJobs(auth, conversation) -> Callback:
                                                             endDate=None,
                                                             linkURL=None,
                                                             currency=
-                                                            record.get("custom_fields", {}).get("salary_range", {}).get("unit"),
+                                                            record.get("custom_fields", {}).get("salary_range", {}).get(
+                                                                "unit"),
                                                             source="Greenhouse"))
 
         return Callback(True, sendQuery_callback.Message, result)
@@ -283,7 +283,7 @@ def getAllCandidates(auth) -> Callback:
         for record in return_body:
             result.append(databases_services.createPandaCandidate(id=record.get("id"),
                                                                   name=record.get("first_name", "") +
-                                                                  record.get("last_name", ""),
+                                                                       record.get("last_name", ""),
                                                                   email=
                                                                   getValue(record.get("email_addresses"), "value"),
                                                                   mobile=
@@ -328,7 +328,7 @@ def getAllJobs(auth) -> Callback:
 
             min_salary = record.get("custom_fields", {}).get("salary_range", {}).get("min_value", 0)
             max_salary = record.get("custom_fields", {}).get("salary_range", {}).get("max_value", 0)
-            mid_salary = min_salary + ((max_salary-min_salary) / 2)
+            mid_salary = min_salary + ((max_salary - min_salary) / 2)
 
             result.append(databases_services.createPandaJob(id=record.get("id"),
                                                             title=record.get("name"),
@@ -343,7 +343,8 @@ def getAllJobs(auth) -> Callback:
                                                             endDate=None,
                                                             linkURL=None,
                                                             currency=
-                                                            record.get("custom_fields", {}).get("salary_range", {}).get("unit"),
+                                                            record.get("custom_fields", {}).get("salary_range", {}).get(
+                                                                "unit"),
                                                             source="Greenhouse"))
 
         return Callback(True, sendQuery_callback.Message, result)

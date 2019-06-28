@@ -101,8 +101,6 @@ def chatbot_upload_files(assistantIDAsHash, sessionID):
                                                                             stored_file_services.USER_FILES_PATH,
                                                                             True)
 
-
-
                 if not upload_callback.Success:
                     filename = 'fileCorrupted'
 

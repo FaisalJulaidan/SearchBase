@@ -4,51 +4,6 @@ import {getLink} from "helpers";
 
 const {Title, Paragraph, Text} = Typography;
 
-//api/calendar/google/authorize
-export const GoogleButton = ({
-                                 disconnectMarketplace, isDisconnecting, status
-                             }) => {
-    const clientID = "623652835897-tj9rf1v6hd1tak5bv5hr4bq9hrvjns95.apps.googleusercontent.com";
-    const responseType = "code";
-    const scope = "https://www.googleapis.com/auth/calendar";
-    const redirectURI = getLink("/dashboard/marketplace?googleVerification=true");
-    return (
-        <div>
-            {
-                status !== "CONNECTED" &&
-                status !== "FAILED" &&
-                <div>
-                    <a href={`https://accounts.google.com/o/oauth2/v2/auth?client_id=${clientID}&response_type=${responseType}&scope=${scope}&redirect_uri=${redirectURI}&access_type=offline`}
-                       target={'_blank'}>
-                        <img alt={'google login button'}
-                             src={"https://developers.google.com/identity/images/btn_google_signin_light_normal_web.png"}
-                        />
-                    </a>
-                </div>
-            }
-
-            {
-                (status === "CONNECTED" || status === "FAILED")
-                &&
-                <Popconfirm placement={'bottomRight'}
-                            title="Chatbot conversations will no longer be synced with Adapt account"
-                            onConfirm={disconnectMarketplace}
-                            okType={'danger'}
-                            okText="Disconnect"
-                            cancelText="No">
-                    <Button type="danger"
-                            style={{width: 'auto'}}
-                            size={'large'}
-                            disabled={isDisconnecting}>
-                        {
-                            status === "FAILED" ? '(Failed) click to disconnect' : 'Disconnect'
-                        }
-                    </Button>
-                </Popconfirm>
-            }
-        </div>
-    )
-};
 
 export const GoogleFeatures = () =>
     <Typography style={{padding: '0 60px'}}>

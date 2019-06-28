@@ -34,7 +34,7 @@ class Calendar(Enum):
         return any(value == item.value for item in cls)
 
 @unique
-class ApplicationStatus(Enum):
+class Status(Enum):
     Pending = 'Pending'
     Accepted = 'Accepted'
     Rejected = 'Rejected'

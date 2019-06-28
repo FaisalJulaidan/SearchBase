@@ -2,7 +2,7 @@ import React from 'react';
 import {connect} from 'react-redux';
 import styles from './Calendar.module.less'
 import NoHeaderPanel from 'components/NoHeaderPanel/NoHeaderPanel'
-import {Badge, Calendar as AntdCalendar, Col, Divider, Icon, Input, Modal, Row, Typography, List} from 'antd';
+import {Badge, Calendar as AntdCalendar, Col, Divider, Icon, Input, Modal, Row, Typography, Button} from 'antd';
 import moment from 'moment';
 import {appointmentActions} from "store/actions";
 import './Calendar.less'
@@ -144,8 +144,8 @@ class Calendar extends React.Component {
                                                     <b>Appointment Status: </b>
                                                     {a.Status === "Pending" ?
                                                         <span>
-                                                            <button onClick={() => {this.setAppointmentStatus(a.ID, 'Accepted')}}>Accept</button>
-                                                            <button onClick={() => {this.setAppointmentStatus(a.ID, 'Rejected')}}>Reject</button>
+                                                            <Button type="primary" icon="check" onClick={() => {this.setAppointmentStatus(a.ID, 'Accepted')}}>Accept</Button>
+                                                            <Button type="primary" icon="close" onClick={() => {this.setAppointmentStatus(a.ID, 'Rejected')}}>Reject</Button>
                                                         </span>
                                                         :
                                                         <span>{a.Status}</span>

@@ -5,7 +5,7 @@ import 'types/Marketplace_Types';
 import data from './Items.json'
 import AuroraCardAvatar from "components/AuroraCardAvatar/AuroraCardAvatar";
 import NoHeaderPanel from 'components/NoHeaderPanel/NoHeaderPanel'
-import {Link} from "react-router-dom";
+import {history} from "helpers";
 
 const {Title, Paragraph, Text} = Typography;
 
@@ -34,14 +34,12 @@ class Marketplace extends React.Component {
                     {
                         data.Items.map((item, i) =>
                             <div className={styles.CardFrame} key={i}>
-                                <Link to={{
-                                    pathname: `/dashboard/marketplace/${item.type}`,
-                                }}>
-                                    <AuroraCardAvatar title={item.title}
-                                                      desc={item.desc}
-                                                      image={item.image}
-                                                      disabled={item.disabled}/>
-                                </Link>
+                                <AuroraCardAvatar
+                                    onClick={() => history.push(`/dashboard/marketplace/${item.type}`)}
+                                    title={item.title}
+                                    desc={item.desc}
+                                    image={item.image}
+                                    disabled={item.disabled}/>
                             </div>
                         )
                     }

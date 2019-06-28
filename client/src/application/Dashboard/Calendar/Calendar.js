@@ -42,13 +42,16 @@ class Calendar extends React.Component {
 
 
     dateCellRender = (value) => {
-        let d = this.state.appointments.filter(d => value.utc().isSame(moment(d.DateTime).utc(), 'day'))
+        let d = this.state.appointments.filter(d => value.utc().isSame(moment(d.DateTime).utc(), 'day')).filter(d => d.Status !== "Pending")
         let pending = this.state.appointments.filter(d => d.Status === "Pending")
         return (
             <ul className="events">
                 {d.length !== 0 ?
                     <li>
-                        <Badge status="warning" text={`${d.length} Appointments ` + (pending.length !== 0 ? `(${pending.length} pending approval)`: ``) }/>
+                        <Badge status="warning" text={`${d.length} `+ (d.length === 1 ? 'Appointment' : 'Appointments' )}/>
+                        { pending.length !== 0 ?
+                            <Badge status="error" text={`${pending.length} ${(pending.length === 1 ? 'Appointment' : 'Appointments' )} pending approval `}/>
+                        : null}
                     </li>
                 : null}
             </ul>

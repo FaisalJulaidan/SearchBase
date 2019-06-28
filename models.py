@@ -275,8 +275,8 @@ class OpenTimes(db.Model):
 class Appointment(db.Model):
     ID = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
     DateTime = db.Column(db.DateTime(), nullable=False, default=datetime.now)
-    Status = db.Column(Enum(enums.ApplicationStatus), nullable=False,
-                       default=enums.ApplicationStatus.Pending)
+    Status = db.Column(Enum(enums.Status), nullable=False,
+                       default=enums.Status.Pending)
 
     ConversationID = db.Column(db.Integer, db.ForeignKey('conversation.ID', ondelete='cascade'),
                                nullable=False, unique=True)

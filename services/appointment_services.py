@@ -31,24 +31,10 @@ def add(conversationID, assistantID, dateTime, confirmed=False):
 
 
 # ----- Getters ----- #
-def getAllByCompanyID(companyID):
-    try:
-        # Get assistant and check if None then raise exception
-        appointments: Appointment = Company.query.get(companyID).Assistants.appointments
-
-        print(appointments)
-
-        return Callback(True,"Got open time slots successfully.", appointments)
-
-    except Exception as exc:
-        helpers.logError("appointment_services.getAllByCompanyID(): " + str(exc))
-        db.session.rollback()
-        return Callback(False, 'Could not get the appointments')
-
 def setAppointmentStatus(appointmentID, status):
     try:
         appointment = db.session.query(Appointment).filter(Appointment.ID == appointmentID).first()
-        if appointment.Status != enums.ApplicationStatus.Pending:
+        if appointment.Status != enums.Status.Pending:
           return Callback(False, "Appointment status is {} and cannot be modified.".format(appointment.Status.value))
         appointment.Status = status
         db.session.commit()
@@ -66,7 +52,7 @@ def getAppointments(companyID):
             for idx, appointment in enumerate(helpers.getListFromSQLAlchemyList(assistant.appointments)):
                 appointment['Conversation'] = assistant.appointments[idx].Conversation.Data
                 appointments.append(appointment)
-        return Callback(True, 'Succesfully gathered appointments.', appointments)
+        return Callback(True, 'Successfully gathered appointments.', appointments)
     except Exception as exc:
         print(exc)
         return Callback(False, 'Could not get appointments.')

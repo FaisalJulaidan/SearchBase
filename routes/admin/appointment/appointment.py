@@ -28,7 +28,6 @@ POST REQUEST EXAMPLE:
     "appointmentID": 1,
     "status": "Accepted"
 }
-
 '''
 
 @appointment_router.route("/appointments/set_status", methods=['POST'])

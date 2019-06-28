@@ -42,15 +42,16 @@ class Calendar extends React.Component {
 
 
     dateCellRender = (value) => {
-        let d = this.state.appointments.filter(d => value.utc().isSame(moment(d.DateTime).utc(), 'day')).filter(d => d.Status !== "Pending")
-        let pending = this.state.appointments.filter(d => d.Status === "Pending")
+        let today = this.state.appointments.filter(d => value.utc().isSame(moment(d.DateTime).utc(), 'day'))
+        let a = today.filter(a => a.Status === "Accepted")
+        let p = today.filter(a => a.Status === "Pending")
         return (
             <ul className="events">
-                {d.length !== 0 ?
+                {a.length !== 0 || p.length !== 0?
                     <li>
-                        <Badge status="warning" text={`${d.length} `+ (d.length === 1 ? 'Appointment' : 'Appointments' )}/>
-                        { pending.length !== 0 ?
-                            <Badge status="error" text={`${pending.length} ${(pending.length === 1 ? 'Appointment' : 'Appointments' )} pending approval `}/>
+                        {a.length !== 0 ? <Badge status="warning" text={`${a.length} `+ (a.length === 1 ? 'Appointment' : 'Appointments' )}/> : null }
+                        { p.length !== 0 ?
+                            <Badge status="error" text={`${p.length} ${(p.length === 1 ? 'Appointment' : 'Appointments' )} pending approval `}/>
                         : null}
                     </li>
                 : null}
@@ -101,7 +102,9 @@ class Calendar extends React.Component {
 
     render() {
         const {value} = this.state;
-        const visibleAppointments = this.state.appointments.filter(d => value.utc().isSame(moment(d.DateTime).utc(), 'day'))
+        const todayAppointments = this.state.appointments.filter(d => value.utc().isSame(moment(d.DateTime).utc(), 'day'))
+        const notRejectedAppointments = this.state.appointments.filter(d => d.Status !== "Rejected")
+        const visibleAppointments = notRejectedAppointments
         return (
             <NoHeaderPanel>
                 <div className={styles.Header}>

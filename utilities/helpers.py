@@ -305,6 +305,13 @@ def objectListContains(list, filter):
     return False
 
 
+def getListValue(list, idx, default=None):
+    try:
+        return list[idx]
+    except IndexError:
+        return default
+
+
 # Helpful printer, so you can find out where a print if you forget about it and want to remove it
 def HPrint(message):
     callerframerecord = inspect.stack()[1]

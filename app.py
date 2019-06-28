@@ -20,6 +20,7 @@ from routes.admin.routers import account_router, analytics_router, sub_router, \
     database_router, options_router, marketplace_router, auto_pilot_router, appointment_router
 from routes.public.routers import public_router, reset_password_router, chatbot_router, auth_router
 import re
+from sqlalchemy_utils import Currency
 app = Flask(__name__, static_folder='static')
 
 # Register Routes:
@@ -120,7 +121,7 @@ elif os.environ['FLASK_ENV'] == 'development':
     # Start scheduled tasks
     scheduler_services.scheduler.start()
 
-
+    print(Currency('GBP'))
     # appointment_services.getAllByCompanyID(1)
 
     # payload = {

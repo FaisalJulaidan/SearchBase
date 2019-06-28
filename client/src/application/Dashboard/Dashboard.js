@@ -38,7 +38,7 @@ const {Header, Content, Footer, Sider} = Layout;
 
 class Dashboard extends Component {
     state = {
-        collapsed: true,
+        collapsed: false,
     };
 
     componentWillMount() {

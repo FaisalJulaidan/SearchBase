@@ -1,6 +1,6 @@
 from sqlalchemy.sql import and_
 
-from enums import CRM, UserType
+from enums import CRM, UserType, DataType, Period
 from models import db, Callback, Conversation, Assistant, CRM as CRM_Model, StoredFile
 from services.Marketplace.CRM import Greenhouse, Adapt, Bullhorn, Vincere
 # Process chatbot session
@@ -262,3 +262,12 @@ def updateByType(type, newAuth, companyID):
         db.session.rollback()
         helpers.logError("Marketplace.marketplace_helpers.saveNewCRMAuth() ERROR: " + str(exc))
         return Callback(False, str(exc))
+
+
+def getSalary(conversation: Conversation, dataType: DataType, toPeriod: Period):
+    # Less Than 5000 GBP Monthly
+    salary = conversation.Data.get('keywordsByDataType').get(dataType.value['name'], 0)
+    if salary:
+        salarySplitted = salary[0].split(" ")
+        salary = helpers.convertSalaryPeriod(salarySplitted[2], Period[salarySplitted[4]], toPeriod)
+    return salary

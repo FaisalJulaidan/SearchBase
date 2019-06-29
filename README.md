@@ -6,7 +6,7 @@
 * Clone the project
 * Change directory `cd TheSearchBase`
 * Setup the .env file for server and client
-* Run `docker-compose up -d --no-deps --build web`
+* Run `docker-compose up -d --no-deps --build`
 * Run `./docker/init-letsencrypt`
 
 

@@ -1,7 +1,7 @@
 from flask import Blueprint, request
 from flask_jwt_extended import jwt_required, get_jwt_identity
 
-from models import Callback, AutoPilot
+from models import Callback
 from services import auto_pilot_services
 from utilities import helpers
 
@@ -12,7 +12,6 @@ auto_pilot_router: Blueprint = Blueprint('auto_pilot_router', __name__, template
 @auto_pilot_router.route("/auto_pilots", methods=['GET', 'POST'])
 @jwt_required
 def auto_pilots():
-
     # Authenticate
     user = get_jwt_identity()['user']
 
@@ -32,7 +31,7 @@ def auto_pilots():
 
 
 # Update & Delete auto pilots
-@auto_pilot_router.route("/auto_pilot/<int:autoPilotID>", methods=['GET','DELETE', 'PUT'])
+@auto_pilot_router.route("/auto_pilot/<int:autoPilotID>", methods=['GET', 'DELETE', 'PUT'])
 @jwt_required
 def auto_pilot(autoPilotID):
     # Authenticate
@@ -48,11 +47,11 @@ def auto_pilot(autoPilotID):
     # Update AutoPilot
     if request.method == "PUT":
         data = request.json
-        callback: Callback = auto_pilot_services\
+        callback: Callback = auto_pilot_services \
             .update(autoPilotID,
-                           data.get('name'),
-                           request.json.get('description'),
-                           user['companyID'])
+                    data.get('name'),
+                    data.get('description'),
+                    user['companyID'])
         if not callback.Success:
             return helpers.jsonResponse(False, 400, callback.Message, None)
         return helpers.jsonResponse(True, 200, callback.Message, helpers.getDictFromSQLAlchemyObj(callback.Data))
@@ -77,7 +76,7 @@ def auto_pilot_configs(autoPilotID):
         callback: Callback = auto_pilot_services \
             .updateConfigs(autoPilotID,
                            data.get('name'),
-                           request.json.get('description'),
+                           data.get('description'),
                            data.get('active'),
                            data.get('acceptApplications'),
                            data.get('acceptanceScore'),

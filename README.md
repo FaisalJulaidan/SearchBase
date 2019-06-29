@@ -8,7 +8,7 @@
 * Setup the .env file for server and client
 * Run `docker-compose up -d --no-deps --build`
 * Update global variables in `docker/init-letsencrypt` add the new domain for SSL
-* Run `./docker/init-letsencrypt`
+* Run `./docker/init-letsencrypt.sh`
 
 
 

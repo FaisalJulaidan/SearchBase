@@ -217,7 +217,7 @@ def updateConfigs(id, name, desc, active, acceptApplications, acceptanceScore, s
     except Exception as exc:
         helpers.logError("auto_pilot.update(): " + str(exc))
         db.session.rollback()
-        return Callback(False, 'Could update the AutoPilot.')
+        return Callback(False, 'Could not update the AutoPilot.')
 
 def updateStatus(autoPilotID, newStatus, companyID):
     try:

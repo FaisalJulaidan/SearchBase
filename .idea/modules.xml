@@ -2,7 +2,9 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/TheSearchBase.iml" filepath="$PROJECT_DIR$/.idea/TheSearchBase.iml" />
+      <module fileurl="file://$PROJECT_DIR$/Chatbot/chatbot.iml" filepath="$PROJECT_DIR$/Chatbot/chatbot.iml" />
+      <module fileurl="file://$PROJECT_DIR$/Client/client.iml" filepath="$PROJECT_DIR$/Client/client.iml" />
+      <module fileurl="file://$PROJECT_DIR$/Server/server.iml" filepath="$PROJECT_DIR$/Server/server.iml" />
     </modules>
   </component>
 </project>

@@ -34,14 +34,9 @@ geoIP = geoip2.webservice.Client(140914, os.environ['GEOIP_KEY'])
 verificationSigner = URLSafeTimedSerializer(os.environ['TEMP_SECRET_KEY'])
 
 # Configure logging system
-if os.environ['FLASK_ENV'] == 'development':
-    logging.basicConfig(filename='Server/logs/errors.log',
-                        level=logging.ERROR,
-                        format='%(asctime)s -- %(message)s')
-elif os.environ['FLASK_ENV'] in ['production', 'staging']:
-    logging.basicConfig(filename='logs/errors.log',
-                        level=logging.ERROR,
-                        format='%(asctime)s -- %(message)s')
+logging.basicConfig(filename='logs/errors.log',
+                    level=logging.ERROR,
+                    format='%(asctime)s -- %(message)s')
 
 # Fernet for encryption
 fernet = Fernet(os.environ['TEMP_SECRET_KEY'])

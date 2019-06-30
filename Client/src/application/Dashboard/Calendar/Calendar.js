@@ -23,8 +23,7 @@ class Calendar extends React.Component {
     }
 
     componentDidMount() {
-        const {assistant} = this.props;
-        this.props.dispatch(appointmentActions.fetchAppointments(assistant.ID))
+        this.props.dispatch(appointmentActions.fetchAppointments())
     }
 
     onCloseModal = () => {
@@ -179,7 +178,7 @@ class Calendar extends React.Component {
 }
 
 function mapStateToProps(state) {
-    console.log('what')
+    console.log(state)
     return {
         assistant: state.assistant.assistant,
         appointments: state.appointment.appointments,

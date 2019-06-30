@@ -5,7 +5,7 @@ import {errorMessage, http, loadingMessage, successMessage} from "helpers";
 
 // import * as Sentry from '@sentry/browser';
 
-function* fetchAppointments({assistantID}) {
+function* fetchAppointments() {
     try {
         const res = yield http.get(`/appointments`);
         yield put(appointmentActions.fetchAppointmentsSuccess(res.data?.data));

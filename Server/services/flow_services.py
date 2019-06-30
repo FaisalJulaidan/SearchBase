@@ -1,10 +1,9 @@
 from flask import request
 from jsonschema import validate
 
-import enums
 from models import db, Callback, Assistant, Company
-from services import assistant_services, options_services
-from utilities import json_schemas, helpers
+from services import options_services
+from utilities import json_schemas, helpers, enums
 
 # ----- Getters ----- #
 # Get the chatbot for the public to use

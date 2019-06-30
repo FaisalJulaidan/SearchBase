@@ -4,7 +4,7 @@ import os
 
 import requests
 
-from enums import DataType as DT, Period
+from utilities.enums import DataType as DT, Period
 from sqlalchemy_utils import Currency
 from models import Callback, Conversation, db, StoredFile
 from services import stored_file_services, databases_services

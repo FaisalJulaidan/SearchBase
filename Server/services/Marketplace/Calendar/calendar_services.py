@@ -1,6 +1,6 @@
 from sqlalchemy.sql import and_
 
-from enums import Calendar as Calendar_Enum
+from utilities.enums import Calendar as Calendar_Enum
 from models import db, Callback, Calendar as Calendar_Model
 from services import assistant_services
 from services.Marketplace.Calendar import Google, Outlook

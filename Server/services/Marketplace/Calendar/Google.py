@@ -4,11 +4,9 @@ from datetime import datetime, timedelta
 
 import dateutil
 import requests
-from sqlalchemy import exc
-
-import enums
 from models import Callback, Calendar, db
-from utilities import helpers
+from sqlalchemy import exc
+from utilities import helpers, enums
 
 
 # TODO - csrf - if necessary

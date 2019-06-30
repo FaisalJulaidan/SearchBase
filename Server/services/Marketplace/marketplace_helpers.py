@@ -1,6 +1,6 @@
 import requests
 
-from enums import Calendar as Calendar_Enum, CRM as CRM_Enum
+from utilities.enums import Calendar as Calendar_Enum, CRM as CRM_Enum
 from models import Callback
 from services.Marketplace.CRM import crm_services
 from services.Marketplace.Calendar import calendar_services

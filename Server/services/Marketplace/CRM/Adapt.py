@@ -2,7 +2,7 @@ import json
 
 import requests
 
-from enums import DataType as DT
+from utilities.enums import DataType as DT
 from models import Callback, Conversation
 from utilities import helpers
 

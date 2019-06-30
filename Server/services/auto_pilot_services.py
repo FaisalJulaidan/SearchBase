@@ -1,10 +1,10 @@
-from sqlalchemy import and_
-from models import db, Callback, AutoPilot, OpenTimes, Conversation
 from datetime import datetime, time
-import logging
-from utilities import helpers
+
+from models import db, Callback, AutoPilot, OpenTimes, Conversation
 from services import mail_services, stored_file_services as sfs
-from enums import UserType, DataType, Status
+from sqlalchemy import and_
+from utilities import helpers
+from utilities.enums import UserType, Status
 
 
 def processConversation(conversation: Conversation, autoPilot: AutoPilot):

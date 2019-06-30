@@ -1,15 +1,16 @@
+import json
+import os
+from datetime import datetime
+from sqlite3 import Connection as SQLite3Connection
+
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import Enum, event, types
-from sqlalchemy.ext import mutable
-from datetime import datetime
-import os
-import json
-import enums
-from sqlalchemy_utils import PasswordType, CurrencyType
 from sqlalchemy.engine import Engine
-from sqlite3 import Connection as SQLite3Connection
+from sqlalchemy.ext import mutable
 from sqlalchemy_utils import EncryptedType
+from sqlalchemy_utils import PasswordType, CurrencyType
 from sqlalchemy_utils.types.encrypted.encrypted_type import AesEngine
+from utilities import enums
 
 db = SQLAlchemy()
 

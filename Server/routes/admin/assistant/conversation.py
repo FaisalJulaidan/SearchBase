@@ -3,7 +3,7 @@ from services import conversation_services, assistant_services, stored_file_serv
 from models import Callback, Conversation, Assistant
 from utilities import helpers
 from config import BaseConfig
-from enums import UserType, DataType
+from utilities.enums import UserType, DataType
 from flask_jwt_extended import jwt_required, get_jwt_identity
 
 conversation_router: Blueprint = Blueprint('conversation_router', __name__ , template_folder="../../templates")

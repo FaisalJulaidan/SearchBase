@@ -1,12 +1,12 @@
-from models import db, Assistant
-from utilities import json_schemas
-from jsonschema import validate
-from os.path import join
-from config import BaseConfig
-import enums
 import copy
-import os
 import json
+import os
+from os.path import join
+
+from config import BaseConfig
+from jsonschema import validate
+from models import db, Assistant
+from utilities import json_schemas, enums
 
 
 # NOTE: Make sure to take a backup of the database before running this function

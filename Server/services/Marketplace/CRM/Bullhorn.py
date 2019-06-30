@@ -5,7 +5,7 @@ from datetime import datetime
 import requests
 from sqlalchemy_utils import Currency
 
-from enums import DataType as DT, Period
+from utilities.enums import DataType as DT, Period
 from models import Callback, Conversation, db, CRM, StoredFile
 from services import databases_services, stored_file_services
 from services.Marketplace import marketplace_helpers

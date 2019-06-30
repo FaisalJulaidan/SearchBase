@@ -1,20 +1,18 @@
-import enums
 import json
-import pandas
 import random
 import re
 from datetime import datetime
 from typing import List
 
-from sqlalchemy import and_
-from sqlalchemy_utils import Currency
-
-from enums import DatabaseType, DataType as DT, Period
+import pandas
+from utilities.enums import DatabaseType, DataType as DT, Period
 from models import db, Callback, Database, Candidate, Assistant, Job
 from services import assistant_services
 from services.Marketplace.CRM import crm_services
+from sqlalchemy import and_
+from sqlalchemy_utils import Currency
 from utilities import helpers
-import time
+
 
 def fetchDatabase(id, companyID: int, pageNumber: int) -> Callback:
     try:

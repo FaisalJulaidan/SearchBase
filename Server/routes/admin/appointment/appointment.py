@@ -41,7 +41,7 @@ def set_appointment_status():
         return helpers.jsonResponse(False, 401, callback.Message)
 
 @appointment_router.route("/appointments/set_status_public/", methods=['POST'])
-def set_appointment_status(token):
+def set_appointment_status_public(token):
     data = request.get_json()
     callback = appointment_services.setAppointmentStatusPublic(data['token'], data['appointmentID'], data['status'])
 

@@ -1,9 +1,7 @@
-from models import db, Callback, Appointment, Conversation, Assistant, Company
-from sqlalchemy import and_
-from utilities import helpers
-from services import conversation_services
 from datetime import datetime
-import enums
+
+from models import db, Callback, Appointment, Conversation, Assistant
+from utilities import helpers, enums
 
 
 def add(conversationID, assistantID, dateTime, confirmed=False):

@@ -1,9 +1,8 @@
 from models import db, Role, Company, Assistant, Conversation, Database, Candidate, CRM, Appointment, Job
 from services import user_services, flow_services, auto_pilot_services, assistant_services, scheduler_services
 from datetime import datetime, timedelta, time
-from utilities import helpers
+from utilities import helpers,enums
 from sqlalchemy_utils import Currency
-import enums
 
 # Generates dummy data for testing
 def generate():

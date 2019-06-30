@@ -1,5 +1,5 @@
-import enums
 from config import BaseConfig
+from utilities import enums
 
 assistant_config = {
     "type": "object",

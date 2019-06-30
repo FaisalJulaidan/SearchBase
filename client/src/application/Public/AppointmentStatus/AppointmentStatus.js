@@ -70,4 +70,4 @@ class AppointmentStatus extends React.Component {
 }
 
 
-export default publicPage(AppointmentStatus, 'lol', '/', '/appointments/verify');
+export default publicPage(AppointmentStatus, 'token', '/', '/appointments/verify');

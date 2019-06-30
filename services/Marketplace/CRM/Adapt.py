@@ -31,9 +31,9 @@ def login(auth):
         return Callback(False, str(exc))
 
 
-def insertCandidate(auth, session: Conversation) -> Callback:
+def insertCandidate(auth, conversation: Conversation) -> Callback:
     try:
-        callback: Callback = login(auth)
+        callback: Callback = login(auth) # callback.Data is the SID used in authorised requests
         if not callback.Success:
             return callback
 
@@ -46,36 +46,33 @@ def insertCandidate(auth, session: Conversation) -> Callback:
             "defaultRole": "TEMP_CAND",
             "PERSON_GEN": {
                 "TITLE": 1303812,
-                "FIRST_NAME": " ".join(session.Data.get('keywordsByDataType')
-                                       .get(DT.CandidateName.value['name'], "Unavailable - TSB")),
+                "FIRST_NAME": conversation.Name or "Name Unavailable - TSB",
                 "LAST_NAME": " ",
                 "SALUTATION": " "
             },
             "EMAIL": [
                 {
                     "OCC_ID": "Home",
-                    "EMAIL_ADD": session.Data.get('keywordsByDataType')
-                        .get(DT.CandidateEmail.value['name'], ["Unavailable@TSB.com"])[0]
+                    "EMAIL_ADD": conversation.Email or "Email_Unavailable@TSB.com"
                 }
             ],
             "TELEPHONE": [
                 {
                     "OCC_ID": "Mobile",
-                    "TEL_NUMBER": session.Data.get('keywordsByDataType')
-                        .get(DT.CandidateLocation.value['name'], ["Unavailable - TSB"])[0]
+                    "TEL_NUMBER": conversation.PhoneNumber or "Telephone Unavailable - TSB"
                 }
             ],
             "ADDRESS": [{
                 "OCC_ID": "Primary",
-                "STREET1": " ".join(session.Data.get('keywordsByDataType')
-                                    .get(DT.CandidateLocation.value['name'], "Unavailable - TSB")),
+                "STREET1": " ".join(conversation.Data.get('keywordsByDataType')
+                                    .get(DT.CandidateLocation.value['name'], "Location Unavailable - TSB")),
             }],
         }
 
-        # Send request
+        # Send request to insert new candidate
         r = requests.post(url, headers=headers, data=json.dumps(body))
 
-        # When not ok
+        # When not ok (Error)
         if not r.ok: raise Exception(r.json().get('ERROR_MSG', r.text))
 
         return Callback(True, r.text)
@@ -87,7 +84,7 @@ def insertCandidate(auth, session: Conversation) -> Callback:
         return Callback(False, str(exc))
 
 
-def insertClient(auth, session: Conversation) -> Callback:
+def insertClient(auth, conversation: Conversation) -> Callback:
     try:
         callback: Callback = login(auth)
         if not callback.Success:
@@ -100,26 +97,23 @@ def insertClient(auth, session: Conversation) -> Callback:
         body = {
             "CLIENT_GEN": {
                 "CLIENT_TYPE": 8252178,
-                "NAME": " ".join(session.Data.get('keywordsByDataType')
-                                 .get(DT.ClientName.value['name'], "Unavailable - TSB"))
+                "NAME": conversation.Name or "Name Unavailable - TSB",
             },
             "TELEPHONE": [
                 {
                     "OCC_ID": "Work",
-                    "TEL_NUMBER": session.Data.get('keywordsByDataType')
-                        .get(DT.ClientTelephone.value['name'], ["Unavailable - TSB"])[0]
+                    "TEL_NUMBER": conversation.PhoneNumber or "Telephone Unavailable - TSB"
                 }
             ],
             "ADDRESS": [{
                 "OCC_ID": "Primary",
-                "STREET1": " ".join(session.Data.get('keywordsByDataType')
-                                    .get(DT.ClientLocation.value['name'], "Unavailable - TSB")),
+                "STREET1": " ".join(conversation.Data.get('keywordsByDataType')
+                                    .get(DT.ClientLocation.value['name'], " Location Unavailable - TSB")),
             }],
-            "NOTES": " ".join(session.Data.get('keywordsByDataType')
-                              .get(DT.ClientEmail.value['name'], "Unavailable - TSB")),
+            "NOTES": conversation.Email or "Email_Unavailable@TSB.com",
         }
 
-        # Send request
+        # Send request to insert new client
         r = requests.post(url, headers=headers, data=json.dumps(body))
 
         # When not ok

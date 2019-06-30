@@ -1,6 +1,6 @@
 from sqlalchemy.sql import and_
 
-from enums import CRM, UserType
+from enums import CRM, UserType, DataType, Period
 from models import db, Callback, Conversation, Assistant, CRM as CRM_Model, StoredFile
 from services.Marketplace.CRM import Greenhouse, Adapt, Bullhorn, Vincere
 # Process chatbot session
@@ -115,14 +115,19 @@ def getAllJobs(assistant: Assistant):
 
 
 def produceRecruiterValueReport(companyID, crmName):
-    crm_callback: Callback = getCRMByType(crmName, companyID)
-    if not crm_callback.Success:
-        return Callback(False, "CRM not found")
-    # Check CRM type
-    if crmName == CRM.Bullhorn.name:
-        return Bullhorn.produceRecruiterValueReport(crm_callback.Data, companyID)
+    try:
+        crm_callback: Callback = getCRMByType(crmName, companyID)
+        if not crm_callback.Success:
+            return Callback(False, "CRM not found")
+        # Check CRM type
+        if crmName == CRM.Bullhorn.name:
+            return Bullhorn.produceRecruiterValueReport(crm_callback.Data, companyID)
 
-    return Callback(True, crmName + " doesn't support this functionality")
+        return Callback(True, crmName + " doesn't support this functionality")
+    except Exception as exc:
+        helpers.logError("CRM_services.produceRecruiterValueReport(): " + str(exc))
+        db.session.rollback()
+        return Callback(False, "Producing recruiter value report failed")
 
 
 # Connect to a new CRM
@@ -192,10 +197,8 @@ def disconnectByType(type, companyID) -> Callback:
         return Callback(False, "CRM disconnection failed.")
 
 
-
 def disconnectByID(crmID, companyID) -> Callback:
     try:
-
         crm_callback: Callback = getCRMByID(crmID, companyID)
         if not crm_callback:
             return Callback(False, "Could not find CRM.")
@@ -210,8 +213,6 @@ def disconnectByID(crmID, companyID) -> Callback:
         return Callback(False, "CRM disconnection failed.")
 
 
-# get marketplace with id and company_id
-# also checking if the marketplace is under that company
 def getCRMByID(crmID, companyID):
     try:
         crm = db.session.query(CRM_Model) \
@@ -261,3 +262,12 @@ def updateByType(type, newAuth, companyID):
         db.session.rollback()
         helpers.logError("Marketplace.marketplace_helpers.saveNewCRMAuth() ERROR: " + str(exc))
         return Callback(False, str(exc))
+
+
+def getSalary(conversation: Conversation, dataType: DataType, toPeriod: Period):
+    # Less Than 5000 GBP Monthly
+    salary = conversation.Data.get('keywordsByDataType').get(dataType.value['name'], 0)
+    if salary:
+        salarySplitted = salary[0].split(" ")
+        salary = helpers.convertSalaryPeriod(salarySplitted[2], Period[salarySplitted[4]], toPeriod)
+    return salary

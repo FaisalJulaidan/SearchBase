@@ -1,18 +1,17 @@
 from flask import Blueprint, request
-from services import assistant_services, conversation_services, appointment_services
-from models import Callback, Assistant, Conversation, Appointment
-from utilities import helpers
-
 from flask_jwt_extended import jwt_required, get_jwt_identity
 
+from models import Callback, Assistant, Conversation, Appointment
+from services import assistant_services, conversation_services, appointment_services
+from utilities import helpers
 
 appointment_router: Blueprint = Blueprint('appointment_router', __name__, template_folder="../../templates")
+
 
 # Get all appointments for a company
 @appointment_router.route("/appointments", methods=['GET'])
 @jwt_required
 def appointments():
-
     user = get_jwt_identity()['user']
     callback = appointment_services.getAppointments(user['companyID'])
 
@@ -60,11 +59,9 @@ def verify_get_appointment(token):
     else:
         return helpers.jsonResponse(False, 401, callback.Message)
 
-
 # Get all open times for a user to pick up from, it uses the payload to know for which company and other details...
 @appointment_router.route("/open_times/<payload>", methods=['GET', 'POST'])
 def open_times(payload):
-
     try:
         # Token expires in 5 days
         data = helpers.verificationSigner.loads(payload, salt='appointment-key', max_age=432000)
@@ -94,7 +91,6 @@ def open_times(payload):
         }
 
         return helpers.jsonResponse(True, 200, "", data)
-
 
     if request.method == "POST":
 

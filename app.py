@@ -3,7 +3,7 @@ import os
 import config
 from flask import Flask, render_template, request
 from flask_api import status
-from models import db, Callback, Assistant
+from models import db
 from services.mail_services import mail
 from flask_script import Manager, Command
 from flask_migrate import Migrate, MigrateCommand
@@ -11,15 +11,16 @@ from sqlalchemy_utils import create_database, database_exists
 from services.auth_services import jwt
 from utilities import helpers, tasks, dummy_data
 from flask_babel import Babel
-from services import scheduler_services, appointment_services, scheduler_services, flow_services
-from datetime import datetime
-import enums
+from services import scheduler_services
+
+
 # Import all routers to register them as blueprints
 from routes.admin.routers import account_router, analytics_router, sub_router, \
     conversation_router, users_router, flow_router, assistant_router,\
     database_router, options_router, marketplace_router, auto_pilot_router, appointment_router
 from routes.public.routers import public_router, reset_password_router, chatbot_router, auth_router
-import re
+
+
 app = Flask(__name__, static_folder='static')
 
 # Register Routes:
@@ -119,21 +120,6 @@ elif os.environ['FLASK_ENV'] == 'development':
 
     # Start scheduled tasks
     scheduler_services.scheduler.start()
-
-
-    # appointment_services.getAllByCompanyID(1)
-
-    # payload = {
-    #     'conversationID': 5,
-    #     'assistantID': 1,
-    #     'companyID': 1,
-    #     'email': 'julaidan.faisal@gmail.com',
-    #     'userName': 'Faisal',
-    # }
-    #
-    # token = helpers.verificationSigner.dumps(payload, salt='appointment-key')
-    # print(token)
-    # print(helpers.verificationSigner.loads(token, salt='appointment-key', max_age=432000))
 
     print('Development mode running...')
 

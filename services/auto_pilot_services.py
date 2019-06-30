@@ -217,7 +217,7 @@ def updateConfigs(id, name, desc, active, acceptApplications, acceptanceScore, s
     except Exception as exc:
         helpers.logError("auto_pilot.update(): " + str(exc))
         db.session.rollback()
-        return Callback(False, 'Could update the AutoPilot.')
+        return Callback(False, 'Could not update the AutoPilot.')
 
 def updateStatus(autoPilotID, newStatus, companyID):
     try:
@@ -250,13 +250,9 @@ def removeByID(id, companyID):
 # ----- Private Functions (shouldn't be accessed from the outside) ----- #
 
 def __getApplicationResult(score, autoPilot: AutoPilot) -> Status:
-    result = Status.Pending
-    if autoPilot.AcceptApplications and (score > autoPilot.AcceptanceScore):
-        result = Status.Accepted
+
+    if autoPilot.AcceptApplications and (score >= autoPilot.AcceptanceScore):
+        return Status.Accepted
     if autoPilot.RejectApplications and (score < autoPilot.RejectionScore):
-        result = Status.Rejected
-    return result
-
-
-def __sendAppointmentEmail(conversation: Conversation, autoPilot):
-    return None
+        return Status.Rejected
+    return Status.Pending

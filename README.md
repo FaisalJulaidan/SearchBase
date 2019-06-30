@@ -4,10 +4,12 @@
 
 * Install docker (or use DigitalOcean marketplace)
 * Clone the project
-* Xhange directory `cd TheSearchBase`
+* Change directory `cd TheSearchBase`
 * Setup the .env file for server and client
-* Run `docker-compose up -d --no-deps --build web`
-* Run `./docker/init-letsencrypt`
+* Run `docker-compose up -d --no-deps --build`
+* Update global variables in `docker/init-letsencrypt` add the new domain for SSL
+* Update conf file in `docker/nginx/conf.d` to the new domain
+* Run `./docker/init-letsencrypt.sh`
 
 
 

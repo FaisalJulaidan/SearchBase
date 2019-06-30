@@ -5,7 +5,7 @@ from datetime import datetime
 import requests
 from sqlalchemy_utils import Currency
 
-from enums import DataType as DT
+from enums import DataType as DT, Period
 from models import Callback, Conversation, db, CRM, StoredFile
 from services import databases_services, stored_file_services
 from services.Marketplace import marketplace_helpers
@@ -170,25 +170,22 @@ def insertCandidate(auth, conversation: Conversation) -> Callback:
 
         # availability, yearsExperience
         body = {
-            "name": "".join(
-                conversation.Data.get('keywordsByDataType').get(DT.CandidateName.value['name'], [" "])),
-            "mobile":
-                conversation.Data.get('keywordsByDataType').get(DT.CandidateMobile.value['name'], [" "])[0],
+            "name": conversation.Name or " ",
+            "mobile": conversation.PhoneNumber or " ",
             "address": {
                 "city": "".join(
                     conversation.Data.get('keywordsByDataType').get(DT.CandidateLocation.value['name'], [" "])),
             },
-            "email": emails[0],
+            "email": conversation.Email or " ",
             "primarySkills": "".join(
                 conversation.Data.get('keywordsByDataType').get(DT.CandidateSkills.value['name'], [" "])),
             "educations": {
                 "data": conversation.Data.get('keywordsByDataType').get(DT.CandidateEducation.value['name'], [])
             },
-            "dayRate": str(float(
-                conversation.Data.get('keywordsByDataType').get(DT.CandidateDesiredSalary.value['name'], [0])[0]) * 365)
+            "salary": str(crm_services.getSalary(conversation, DT.CandidateDesiredSalary, Period.Annually))
         }
 
-        # add additional emails to email2 and email3
+        # Add additional emails to email2 and email3
         for email in emails:
             index = emails.index(email)
             if index != 0:
@@ -218,7 +215,7 @@ def uploadFile(auth, storedFile: StoredFile):
         if not conversation.CRMResponse:
             raise Exception("Can't upload file for record with no CRM Response")
 
-        file_callback = stored_file_services.downloadFile(storedFile.FilePath)
+        file_callback = stored_file_services.downloadFile(storedFile.FilePath, stored_file_services.USER_FILES_PATH)
         if not file_callback.Success:
             raise Exception(file_callback.Message)
         file = file_callback.Data
@@ -280,10 +277,8 @@ def insertClientContact(auth, conversation: Conversation, bhCompanyID) -> Callba
         emails = conversation.Data.get('keywordsByDataType').get(DT.ClientEmail.value['name'], [" "])
 
         body = {
-            "name": " ".join(
-                conversation.Data.get('keywordsByDataType').get(DT.ClientName.value['name'], [])),
-            "mobile":
-                conversation.Data.get('keywordsByDataType').get(DT.ClientTelephone.value['name'], [" "])[0],
+            "name": conversation.Name or " ",
+            "mobile": conversation.PhoneNumber or " ",
             "address": {
                 "city": " ".join(
                     conversation.Data.get('keywordsByDataType').get(DT.ClientLocation.value['name'], [])),
@@ -344,13 +339,14 @@ def searchCandidates(auth, companyID, conversation, fields=None) -> Callback:
         keywords = conversation['keywordsByDataType']
 
         # populate filter
-        checkFilter(keywords, DT.CandidateLocation.value["name"], "address.city", query)
+        query += checkFilter(keywords, DT.CandidateLocation, "address.city")
 
         # if keywords[DT.CandidateSkills.value["name"]]:
         #     query += "primarySkills.data:" + keywords[DT.CandidateSkills.name] + " or"
 
-        if keywords.get(DT.CandidateDesiredSalary.value["name"]):
-            query += " dayRate:" + str((float(keywords[DT.CandidateDesiredSalary.value["name"]]) / 365)) + " or"
+        salary =  crm_services.getSalary(conversation, DT.CandidateDesiredSalary, Period.Annually)
+        if salary:
+            query += " salary:" + str(salary) + " or"
 
         query = query[:-3]
 
@@ -382,9 +378,9 @@ def searchCandidates(auth, companyID, conversation, fields=None) -> Callback:
                                                                       record.get("educations", {}).get("data")),
                                                                   yearsExperience=0,
                                                                   desiredSalary=record.get("salary") or
-                                                                                record.get("dayRate", 0) * 365,
-                                                                  # payPeriod=PayPeriod("Annually"),
+                                                                                record.get("dayRate", 0) * 261,
                                                                   currency=Currency("GBP"),
+                                                                  payPeriod=Period("Annually"),
                                                                   source="Bullhorn"))
 
         return Callback(True, sendQuery_callback.Message, result)
@@ -396,32 +392,34 @@ def searchCandidates(auth, companyID, conversation, fields=None) -> Callback:
 
 def searchJobs(auth, companyID, conversation, fields=None) -> Callback:
     try:
-        query = "query=*:*"
+        query = "query="
         if not fields:
             fields = "fields=id,title,publicDescription,address,employmentType,salary,skills,yearsRequired,startDate,dateEnd"
         keywords = conversation['keywordsByDataType']
 
         # populate filter TODO
-        checkFilter(keywords, DT.JobTitle.value["name"], "title", query)
+        query += checkFilter(keywords, DT.JobTitle, "title")
 
-        checkFilter(keywords, DT.JobLocation.value["name"], "address.city", query)
+        query += checkFilter(keywords, DT.JobLocation, "address.city")
 
-        checkFilter(keywords, DT.JobType.value["name"], "employmentType", query)
+        query += checkFilter(keywords, DT.JobType, "employmentType")
 
-        checkFilter(keywords, DT.JobSalary.value["name"], "salary", query)
+        salary = crm_services.getSalary(conversation, DT.JobSalary, Period.Annually)
+        if salary > 0:
+            query += "salary:" + str(salary) + " or"
 
-        checkFilter(keywords, DT.JobDesiredSkills.value["name"], "skills", query)
+        query += checkFilter(keywords, DT.JobDesiredSkills, "skills")
 
-        checkFilter(keywords, DT.JobStartDate.value["name"], "startDate", query)
+        query += checkFilter(keywords, DT.JobStartDate, "startDate")
 
-        checkFilter(keywords, DT.JobEndDate.value["name"], "dateEnd", query)
+        query += checkFilter(keywords, DT.JobEndDate, "dateEnd")
 
-        checkFilter(keywords, DT.JobYearsRequired.value["name"], "yearsRequired", query)
+        query += checkFilter(keywords, DT.JobYearsRequired, "yearsRequired")
 
         query = query[:-3]
 
         # check if no conditions submitted
-        if len(query) < 6:
+        if len(query) < 4:
             query = "query=*:*"
 
         # send query
@@ -447,6 +445,7 @@ def searchJobs(auth, companyID, conversation, fields=None) -> Callback:
                                                             endDate=record.get("dateEnd"),
                                                             linkURL=None,
                                                             currency=Currency("GBP"),
+                                                            payPeriod=Period("Annually"),
                                                             source="Bullhorn"))
 
         return Callback(True, sendQuery_callback.Message, result)
@@ -456,10 +455,10 @@ def searchJobs(auth, companyID, conversation, fields=None) -> Callback:
         return Callback(False, str(exc))
 
 
-def checkFilter(keywords, filter, string, query):
-    if keywords.get(filter):
-        query += string + ":" + "".join(keywords[filter]) + " or"
-    return query
+def checkFilter(keywords, dataType: DT, string):
+    if keywords.get(dataType.value["name"]):
+        return string + ":" + "".join(keywords[dataType.value["name"]]) + " or"
+    return ""
 
 
 def searchJobsCustomQuery(auth, companyID, query, fields=None) -> Callback:

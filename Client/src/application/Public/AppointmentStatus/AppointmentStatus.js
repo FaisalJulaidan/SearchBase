@@ -10,10 +10,6 @@ const {confirm} = Modal;
 
 class AppointmentStatus extends React.Component {
 
-    componentDidMount() {
-        console.log('hehe')
-    }
-
     constructor(props){
         super(props)
         this.state = {

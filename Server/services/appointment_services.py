@@ -30,8 +30,10 @@ def add(conversationID, assistantID, dateTime, confirmed=False):
 def generateEmailUrl(appointmentID):
     try:
         appointment = db.session.query(Appointment).filter(Appointment.ID == appointmentID).first()
+        print(appointment)
+        print(appointment.Status)
         if appointment:
-            if appointment.Status != "Pending":
+            if appointment.Status != enums.Status.Pending:
                 raise(Exception("Appointment status has already been set!"))
             else:
                 return helpers.verificationSigner.dumps({'id': appointmentID}, salt='verify-appointment')
@@ -85,6 +87,7 @@ def setAppointmentStatus(appointmentID, status):
 
 def getAppointments(companyID):
     try:
+        print(generateEmailUrl(1))
         assistants = db.session.query(Assistant).filter(Assistant.CompanyID == companyID).all()
         appointments = []
         for assistant in assistants:

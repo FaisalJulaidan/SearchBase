@@ -2,12 +2,17 @@ import React from 'react'
 import publicPage from '../../../hoc/PublicPage'
 import {appointmentsPickerActions} from "store/actions";
 import {Row, Col, Button, Typography, Modal} from 'antd'
-import {http, history} from '../../../helpers'
+import { history} from '../../../helpers'
+import axios from 'axios'
 
 const {Title} = Typography;
 const {confirm} = Modal;
 
 class AppointmentStatus extends React.Component {
+
+    componentDidMount() {
+        console.log('hehe')
+    }
 
     constructor(props){
         super(props)
@@ -22,7 +27,11 @@ class AppointmentStatus extends React.Component {
             content: `If you click OK, you will not be able to update the status of this appointment`,
             okType: 'danger',
             onOk: () => {
-                http.post("/appointments/set_status", {token: this.props.key, appointmentID: appointmentID, status: status})
+                console.log(this.props.token)
+                axios.post("/api/appointments/set_status_public", {token: this.props.token, appointmentID: appointmentID, status: status},
+                    {
+                        headers: {'Content-Type': 'application/json'},
+                    })
 
 
             },

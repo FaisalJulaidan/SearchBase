@@ -4,7 +4,9 @@ import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
 import {faCloud} from '@fortawesome/free-solid-svg-icons'
 import queryString from 'query-string'
 import {Spin} from 'antd'
-import {history, http} from '../helpers'
+
+import axios from 'axios'
+import {history} from '../helpers'
 
 
 
@@ -27,8 +29,8 @@ export const PublicPage = (Component, param, redirectIfFail, authUrl) => {
             if(!params[param]){
                 history.push(redirectIfFail)
             }
-            let url = `${authUrl}/${params[param]}`
-            http.get(url).then(data => {
+            let url = `api/${authUrl}/${params[param]}`
+            axios.get(url).then(data => {
                 this.setState({
                     isLoading: false,
                     success: true,
@@ -66,7 +68,7 @@ export const PublicPage = (Component, param, redirectIfFail, authUrl) => {
                     <div className={styles.Wrapper}>
                         <div>
                             {!isLoading ?
-                            <Component success={this.state.success} data={this.state.data} error={this.state.error} key={this.state.key}/>
+                            <Component success={this.state.success} data={this.state.data} error={this.state.error} token={this.state.key}/>
                             : <Spin style={{margin: "auto", display: "block"}} /> }
                         </div>
                     </div>

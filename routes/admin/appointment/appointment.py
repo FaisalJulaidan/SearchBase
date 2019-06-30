@@ -41,6 +41,25 @@ def set_appointment_status():
     else:
         return helpers.jsonResponse(False, 401, callback.Message)
 
+@appointment_router.route("/appointments/set_status_public/", methods=['POST'])
+def set_appointment_status(token):
+    data = request.get_json()
+    callback = appointment_services.setAppointmentStatusPublic(data['token'], data['appointmentID'], data['status'])
+
+    if callback.Success:
+        return helpers.jsonResponse(True, 200, callback.Message)
+    else:
+        return helpers.jsonResponse(False, 401, callback.Message)
+
+@appointment_router.route("/appointments/verify/<token>", methods=['GET'])
+def verify_get_appointment(token):
+    callback = appointment_services.verifyRequest(token)
+
+    if callback.Success:
+        return helpers.jsonResponse(True, 200, callback.Message, callback.Data)
+    else:
+        return helpers.jsonResponse(False, 401, callback.Message)
+
 
 # Get all open times for a user to pick up from, it uses the payload to know for which company and other details...
 @appointment_router.route("/open_times/<payload>", methods=['GET', 'POST'])

@@ -1,0 +1,108 @@
+@import "~antd/lib/style/themes/default.less";
+
+body {
+  background-color: rgb(244, 246, 252);
+}
+.Wrapper {
+  min-height: calc(100% - 80px);
+  background: #F4F6FC;
+  @media (max-width: @screen-sm) {
+    padding: 25px;
+  }
+  @media (min-width: @screen-sm) and (max-width: @screen-lg) {
+    padding: 25px 100px;
+  }
+
+  @media (min-width: @screen-lg) and (max-width: @screen-xl) {
+    padding: 25px 150px;
+  }
+
+  @media (min-width: @screen-xl) {
+    width: 70%;
+    margin: auto
+  }
+}
+
+.Wrapper > div {
+  background-color: #fff;
+  padding: 15px;
+}
+
+.Container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+
+.Navbar {
+  height: 80px;
+  background: #fff;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 0 0 20px 0;
+}
+
+.Navbar > div {
+  width: 70%;
+  height: 80px;
+  display: flex;
+  font-size: 18px;
+  align-items: center;
+
+}
+
+.Title {
+  margin-bottom: 40px;
+}
+
+.Table {
+  width: 100%;
+  padding: 10px;
+  background: #fff;
+  border-radius: 5px;
+  -webkit-box-shadow: 0 0 65px 20px #EBEFFD;
+  -moz-box-shadow: 0 0 65px 20px #EBEFFD;
+  box-shadow: 0 0 65px 20px #EBEFFD;
+}
+
+.TableContent {
+  width: 100%;
+  display: inline-flex;
+}
+
+
+.Columns {
+  display: inline-flex;
+  width: calc(100% - 68px);
+  text-align: center;
+}
+
+.Columns > div {
+  width: 14.2857142857%;
+  @media screen and (max-width: 800px) {
+    width: 33.33%;
+  }
+}
+
+.Columns button {
+  margin: 10px 0;
+  padding: 0;
+}
+
+.Header {
+  padding: 0 10px 10px;
+  @media screen and (max-width: 800px) {
+    padding: 0 0 10px
+  }
+  border-bottom: 1px #e0e0e0 solid;
+}
+
+.Body {
+  padding: 0 5px;
+}
+
+.NavigateButtons {
+  margin-top: 10px;
+}

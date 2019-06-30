@@ -103,7 +103,7 @@ class Calendar extends React.Component {
     render() {
         const {value} = this.state;
         const todayAppointments = this.state.appointments.filter(d => value.utc().isSame(moment(d.DateTime).utc(), 'day'))
-        const notRejectedAppointments = this.state.appointments.filter(d => d.Status !== "Rejected")
+        const notRejectedAppointments = todayAppointments.filter(d => d.Status !== "Rejected")
         const visibleAppointments = notRejectedAppointments
         return (
             <NoHeaderPanel>

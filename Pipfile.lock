@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "828614e283c4f3a5926b3af4d4ba1a58447ccf99ad878347a6e962725ec17123"
+            "sha256": "6e04fd7eda0df973277440a370eda51a94f747ce8d0c47d5960ee2c2aa0f99a8"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -113,18 +113,18 @@
         },
         "boto3": {
             "hashes": [
-                "sha256:73b65793f12141e14393a4f321861f3f33b68f9dfe4f14b7e65cdbfda5c7ccdb",
-                "sha256:e6472861a88d0bb47844c7d03764b730c7fb9ab393a5f0a29f6b4dc0b20bee3d"
+                "sha256:29cc84e5a12f6476f909710373ebc294f37217baf33b50b6acd7f67aee3bb384",
+                "sha256:43ac443a5f11153a372ff54e8ed9e3a5a06059f047df533a86324a4ce2c1beff"
             ],
             "index": "pypi",
-            "version": "==1.9.174"
+            "version": "==1.9.178"
         },
         "botocore": {
             "hashes": [
-                "sha256:3356e72901d5a4259b8858785e415a895641454971e3fa67b4076b4c9bed543d",
-                "sha256:f7220c6dd551724d4af796fb7ddfef6d423bade92e78c3cc2282953b38dfb259"
+                "sha256:6b5a42cd6267467bf6a7d6ca9452385dd984b7b402b4a1e2a9c42e2a3d311edd",
+                "sha256:a9515ee8511b73d7caeaa33e27c50ea1b85d722007aa870d8d7a424cc3f903da"
             ],
-            "version": "==1.12.174"
+            "version": "==1.12.178"
         },
         "certifi": {
             "hashes": [
@@ -634,6 +634,15 @@
             "index": "pypi",
             "version": "==2.2.0"
         },
+        "pysocks": {
+            "hashes": [
+                "sha256:15d38914b60dbcb231d276f64882a20435c049450160e953ca7d313d1405f16f",
+                "sha256:32238918ac0f19e9fd870a8692ac9bd14f5e8752b3c62624cda5851424642210",
+                "sha256:d9031ea45fdfacbe59a99273e9f0448ddb33c1580fe3831c1b09557c5718977c"
+            ],
+            "markers": "python_version >= '3.0'",
+            "version": "==1.7.0"
+        },
         "python-dateutil": {
             "hashes": [
                 "sha256:1adb80e7a782c12e52ef9a8182bebeb73f1d7e24e374397af06fb4956c8dc5c0",
@@ -766,6 +775,14 @@
             ],
             "index": "pypi",
             "version": "==2.6.0"
+        },
+        "twilio": {
+            "hashes": [
+                "sha256:bff68df2d6bd7db681d69b84d789c9d8de677e6438e35291c7200e6e58f20dbf",
+                "sha256:d4b7891d495edaf4dee48d588a4c4dd32d75bc2433c6593aede4a42002733ad5"
+            ],
+            "index": "pypi",
+            "version": "==6.29.0"
         },
         "tzlocal": {
             "hashes": [

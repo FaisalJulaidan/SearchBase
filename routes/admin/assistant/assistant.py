@@ -42,10 +42,9 @@ def assistants():
         return helpers.jsonResponse(True, 200, callback.Message, helpers.getDictFromSQLAlchemyObj(callback.Data))
 
 
-@assistant_router.route("/assistant/<int:assistantID>", methods=['GET', 'DELETE', 'PUT'])
+@assistant_router.route("/assistant/<int:assistantID>", methods=['GET', 'PUT', 'DELETE'])
 @jwt_required
 def assistant(assistantID):
-
     # Authenticate
     user = get_jwt_identity()['user']
 
@@ -81,7 +80,6 @@ def assistant(assistantID):
 @assistant_router.route("/assistant/<int:assistantID>/configs", methods=['PUT'])
 @jwt_required
 def assistant_configs(assistantID):
-
     # Authenticate
     user = get_jwt_identity()['user']
 
@@ -90,26 +88,24 @@ def assistant_configs(assistantID):
     if request.method == "PUT":
         updatedSettings = request.json
         callback: Callback = assistant_services.updateConfigs(assistantID,
-                                                       updatedSettings.get("assistantName"),
-                                                       updatedSettings.get('assistantDesc'),
-                                                       updatedSettings.get("welcomeMessage"),
-                                                       updatedSettings.get("topBarTitle"),
-                                                       updatedSettings.get("secondsUntilPopup"),
-                                                       updatedSettings.get("notifyEvery"),
-                                                       updatedSettings.get('config'),
-                                                       user['companyID']
-                                                       )
+                                                              updatedSettings.get("assistantName"),
+                                                              updatedSettings.get('assistantDesc'),
+                                                              updatedSettings.get("welcomeMessage"),
+                                                              updatedSettings.get("topBarTitle"),
+                                                              updatedSettings.get("secondsUntilPopup"),
+                                                              updatedSettings.get("notifyEvery"),
+                                                              updatedSettings.get('config'),
+                                                              user['companyID']
+                                                              )
     if not callback.Success:
         return helpers.jsonResponse(False, 400, callback.Message, None)
     return helpers.jsonResponse(True, 200, callback.Message, helpers.getDictFromSQLAlchemyObj(callback.Data))
-
 
 
 # Activate or deactivate assistant
 @assistant_router.route("/assistant/<int:assistantID>/status", methods=['PUT'])
 @jwt_required
 def assistant_status(assistantID):
-
     # Authenticate
     user = get_jwt_identity()['user']
 
@@ -127,7 +123,6 @@ def assistant_status(assistantID):
 @assistant_router.route("/assistant/<int:assistantID>/crm", methods=['POST', 'DELETE'])
 @jwt_required
 def assistant_crm_connect(assistantID):
-
     # Authenticate
     user = get_jwt_identity()['user']
 
@@ -147,13 +142,13 @@ def assistant_crm_connect(assistantID):
 @assistant_router.route("/assistant/<int:assistantID>/calendar", methods=['POST', 'DELETE'])
 @jwt_required
 def assistant_calendar_connect(assistantID):
-
     # Authenticate
     user = get_jwt_identity()['user']
 
     callback: Callback = Callback(False, 'Error!')
     if request.method == "POST":
-        callback: Callback = assistant_services.connectToCalendar(assistantID, request.json.get('CalendarID'), user['companyID'])
+        callback: Callback = assistant_services.connectToCalendar(assistantID, request.json.get('CalendarID'),
+                                                                  user['companyID'])
 
     if request.method == "DELETE":
         callback: Callback = assistant_services.disconnectFromCalendar(assistantID, user['companyID'])
@@ -167,7 +162,6 @@ def assistant_calendar_connect(assistantID):
 @assistant_router.route("/assistant/<int:assistantID>/auto_pilot", methods=['POST', 'DELETE'])
 @jwt_required
 def assistant_auto_pilot_connect(assistantID):
-
     # Authenticate
     user = get_jwt_identity()['user']
 

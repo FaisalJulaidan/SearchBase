@@ -1,5 +1,4 @@
 import React from 'react';
-import {Layout} from 'antd'
 import styles from "./PublicPage.module.less";
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
 import {faCloud} from '@fortawesome/free-solid-svg-icons'

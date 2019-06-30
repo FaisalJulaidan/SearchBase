@@ -137,6 +137,7 @@ class Assistant(db.Model):
         q = Appointment.query.join(Conversation).filter(Conversation.Assistant == self)
         return q.all()
 
+
     ID = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
     Name = db.Column(db.String(128), nullable=False)
     Description = db.Column(db.String(260), nullable=True)
@@ -274,7 +275,8 @@ class OpenTimes(db.Model):
 class Appointment(db.Model):
     ID = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
     DateTime = db.Column(db.DateTime(), nullable=False, default=datetime.now)
-    Confirmed = db.Column(db.Boolean, nullable=False, default=False)
+    Status = db.Column(Enum(enums.Status), nullable=False,
+                       default=enums.Status.Pending)
 
     ConversationID = db.Column(db.Integer, db.ForeignKey('conversation.ID', ondelete='cascade'),
                                nullable=False, unique=True)

@@ -2,77 +2,59 @@ import React from 'react';
 import {connect} from 'react-redux';
 import styles from './Calendar.module.less'
 import NoHeaderPanel from 'components/NoHeaderPanel/NoHeaderPanel'
-import {Badge, Calendar as AntdCalendar, Col, Divider, Icon, Input, Modal, Row, Typography} from 'antd';
+import {Badge, Calendar as AntdCalendar, Col, Divider, Icon, Input, Modal, Row, Typography, Button} from 'antd';
 import moment from 'moment';
+import {appointmentActions} from "store/actions";
 import './Calendar.less'
 
 const {Title, Paragraph} = Typography;
 const { TextArea } = Input;
+const { confirm } = Modal;
 
 class Calendar extends React.Component {
 
-    state = {
-        value: moment(),
-        appointmentModalVisible: false,
-        appointments: [
-            {
-                name: "Jamie Burns",
-                dateTime: 'Mon, 27 May 2019 23:13:45 GMT',
-                notes: "This is a good candidate and fits very well in big projects"
-            }, {
-                name: "Emilio Blake",
-                dateTime: 'Mon, 27 May 2019 23:13:45 GMT',
-                notes: null
-            }, {
-                name: "Marvin Williamson",
-                dateTime: 'Mon, 27 May 2019 23:13:45 GMT',
-                notes: null
-            },
-        ]
-    };
+    constructor(props){
+        super(props)
+        this.state = {
+            value: moment(),
+            appointmentModalVisible: false,
+            appointments: []
+        };
+    }
+
+    componentDidMount() {
+        const {assistant} = this.props;
+        this.props.dispatch(appointmentActions.fetchAppointments(assistant.ID))
+    }
 
     onCloseModal = () => {
         this.setState({appointmentModalVisible: false});
     };
 
     onSelect = value => {
-        const x = this.getListData(value);
+        let d = this.state.appointments.filter(d => value.utc().isSame(moment(d.DateTime).utc(), 'day'))
 
-        if (x.length)
+        if (d.length)
             this.setState({value, appointmentModalVisible: true});
-        else
-            this.setState({value});
     };
 
     onPanelChange = value => this.setState({value});
 
-    getListData = (value) => {
-        let listData;
-        switch (value.date()) {
-            case 8:
-                listData = [
-                    {type: 'warning', content: '2 Appointments'},
-                ];
-                break;
-            case 10:
-                listData = [
-                    {type: 'warning', content: '1 Appointment'},
-                ];
-                break;
-            default:
-        }
-        return listData || [];
-    };
 
     dateCellRender = (value) => {
-        const listData = this.getListData(value);
+        let today = this.state.appointments.filter(d => value.utc().isSame(moment(d.DateTime).utc(), 'day'))
+        let a = today.filter(a => a.Status === "Accepted")
+        let p = today.filter(a => a.Status === "Pending")
         return (
             <ul className="events">
-                {listData.map(item => (
-                    <li key={item.content}>
-                        <Badge status={item.type} text={item.content}/>
+                {a.length !== 0 || p.length !== 0?
+                    <li>
+                        {a.length !== 0 ? <Badge status="warning" text={`${a.length} `+ (a.length === 1 ? 'Appointment' : 'Appointments' )}/> : null }
+                        { p.length !== 0 ?
+                            <Badge status="error" text={`${p.length} ${(p.length === 1 ? 'Appointment' : 'Appointments' )} pending approval `}/>
+                        : null}
                     </li>
-                ))}
+                : null}
             </ul>
         );
     };
@@ -93,9 +75,36 @@ class Calendar extends React.Component {
         ) : null;
     };
 
+    setAppointmentStatus = (appointmentID, status) => {
+        confirm({
+            title: `Set appointment status to ${status}?`,
+            content: `If you click OK, you will not be able to update the status of this appointment`,
+            okType: 'danger',
+            onOk: () => {
+                this.props.dispatch(appointmentActions.setAppointmentStatusRequest(appointmentID, status))
+                let {appointments} = this.state
+                this.setState({
+                    appointments: appointments.map(a => ({
+                        ...a,
+                        Status: a.ID === appointmentID ? status : a.Status
+                    }))
+                })
+            },
+            maskClosable: true
+        });
+    }
+
+    componentWillReceiveProps(nextProps) {
+        if(nextProps.appointments && this.state.appointments.length === 0){
+            this.setState({appointments: nextProps.appointments})
+        }
+    }
 
     render() {
         const {value} = this.state;
+        const todayAppointments = this.state.appointments.filter(d => value.utc().isSame(moment(d.DateTime).utc(), 'day'))
+        const notRejectedAppointments = todayAppointments.filter(d => d.Status !== "Rejected")
+        const visibleAppointments = notRejectedAppointments
         return (
             <NoHeaderPanel>
                 <div className={styles.Header}>
@@ -108,43 +117,61 @@ class Calendar extends React.Component {
                 </div>
 
                 <div>
-                    <AntdCalendar value={value} onSelect={this.onSelect} onPanelChange={this.onPanelChange}
-                                  dateCellRender={this.dateCellRender} monthCellRender={this.monthCellRender}/>
+                    {this.props.appointments ?
+                    <React.Fragment>
+                        <AntdCalendar value={value} onSelect={this.onSelect} onPanelChange={this.onPanelChange}
+                                      dateCellRender={this.dateCellRender} monthCellRender={this.monthCellRender}/>
+                        <Modal title="Appointments Details"
+                               width={640}
+                               className={'custom_calendar'}
+                               onCancel={this.onCloseModal}
+                               onOk={this.onCloseModal}
+                               okText="Save"
+                               cancelText="Cancel"
+                               visible={this.state.appointmentModalVisible}>
+                            {
+                                visibleAppointments.map((a, index) =>{
+                                    let name = a.Conversation.keywordsByDataType.Email[0]
+                                    return (
+                                    <div key={index}>
+                                        <Title level={4}>Appointment for {name}</Title>
+                                        <Row>
+                                            <Col span={24}>
+                                                <p>
+                                                    <b>Date & Time: </b>
+                                                    <span style={{color: '#9254de'}}>{a.DateTime}</span>
+                                                </p>
+                                            </Col>
+                                            <Col span={24}>
+                                                <p>
+                                                    <b>Appointment Status: </b>
+                                                    {a.Status === "Pending" ?
+                                                        <span>
+                                                            <Button type="primary" icon="check" onClick={() => {this.setAppointmentStatus(a.ID, 'Accepted')}}>Accept</Button>
+                                                            <Button type="primary" icon="close" onClick={() => {this.setAppointmentStatus(a.ID, 'Rejected')}}>Reject</Button>
+                                                        </span>
+                                                        :
+                                                        <span>{a.Status}</span>
+                                                    }
+                                                </p>
+                                            </Col>
 
-                    <Modal title="Appointments Details"
-                           width={640}
-                           className={'custom_calendar'}
-                           onCancel={this.onCloseModal}
-                           onOk={this.onCloseModal}
-                           okText="Save"
-                           cancelText="Cancel"
-                           visible={this.state.appointmentModalVisible}>
-                        {
-                            this.state.appointments.map((a, index) =>
-                                <div key={index}>
-                                    {console.log(a.name)}
-                                    <Title level={4}>{a.name}</Title>
-                                    <Row>
-                                        <Col span={24}>
-                                            <p>
-                                                <b>Date & Time: </b>
-                                                <span style={{color:'#9254de'}}>{a.dateTime}</span>
-                                            </p>
-                                        </Col>
-                                        <Col span={24}>
-                                            <p><b>Notes:</b></p>
-                                            <TextArea
-                                                placeholder="Write your notes here..."
-                                                autosize={{ minRows: 2, maxRows: 6 }}
-                                                value={a.notes}
-                                            />
-                                        </Col>
-                                    </Row>
-                                    <Divider/>
-                                </div>
-                            )
-                        }
-                    </Modal>
+                                            <Col span={24}>
+                                                <p><b>Notes:</b></p>
+                                                <TextArea
+                                                    placeholder="Write your notes here..."
+                                                    autosize={{minRows: 2, maxRows: 6}}
+                                                    value={a.notes}
+                                                />
+                                            </Col>
+                                        </Row>
+                                        <Divider/>
+                                    </div>)}
+                                )
+                            }
+                        </Modal>
+                    </React.Fragment>
+                    : null}
                 </div>
             </NoHeaderPanel>
         );
@@ -152,7 +179,11 @@ class Calendar extends React.Component {
 }
 
 function mapStateToProps(state) {
-    return {};
+    console.log('what')
+    return {
+        assistant: state.assistant.assistant,
+        appointments: state.appointment.appointments,
+    };
 }
 
 export default connect(mapStateToProps)(Calendar);

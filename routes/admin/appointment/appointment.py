@@ -12,12 +12,52 @@ appointment_router: Blueprint = Blueprint('appointment_router', __name__, templa
 @appointment_router.route("/appointments", methods=['GET'])
 @jwt_required
 def appointments():
-    # Authenticate
     user = get_jwt_identity()['user']
+    callback = appointment_services.getAppointments(user['companyID'])
 
-    if request.method == "GET":
-        pass
+    if callback.Success:
+        return helpers.jsonResponse(True, 200, callback.Message, callback.Data)
+    else:
+        return helpers.jsonResponse(False, 404, callback.Message)
 
+
+'''
+POST REQUEST EXAMPLE:
+{
+    "appointmentID": 1,
+    "status": "Accepted"
+}
+'''
+
+@appointment_router.route("/appointments/set_status", methods=['POST'])
+@jwt_required
+def set_appointment_status():
+    data = request.get_json()
+    callback = appointment_services.setAppointmentStatus(data['appointmentID'], data['status'])
+
+    if callback.Success:
+        return helpers.jsonResponse(True, 200, callback.Message)
+    else:
+        return helpers.jsonResponse(False, 401, callback.Message)
+
+@appointment_router.route("/appointments/set_status_public/", methods=['POST'])
+def set_appointment_status(token):
+    data = request.get_json()
+    callback = appointment_services.setAppointmentStatusPublic(data['token'], data['appointmentID'], data['status'])
+
+    if callback.Success:
+        return helpers.jsonResponse(True, 200, callback.Message)
+    else:
+        return helpers.jsonResponse(False, 401, callback.Message)
+
+@appointment_router.route("/appointments/verify/<token>", methods=['GET'])
+def verify_get_appointment(token):
+    callback = appointment_services.verifyRequest(token)
+
+    if callback.Success:
+        return helpers.jsonResponse(True, 200, callback.Message, callback.Data)
+    else:
+        return helpers.jsonResponse(False, 401, callback.Message)
 
 # Get all open times for a user to pick up from, it uses the payload to know for which company and other details...
 @appointment_router.route("/open_times/<payload>", methods=['GET', 'POST'])

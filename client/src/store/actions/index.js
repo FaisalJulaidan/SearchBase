@@ -9,4 +9,5 @@ export * from "./marketplace.actions";
 export * from "./autoPilot.actions";
 export * from "./analytics.actions";
 export * from "./appointmentsPicker.actions";
+export * from "./appointment.actions"
 

@@ -288,7 +288,7 @@ def generate():
         "timeFormat": 0}))
 
     # Bullhorn
-    db.session.add(CRM(Type=enums.CRM.Adapt, CompanyID=1, Auth={
+    db.session.add(CRM(Type=enums.CRM.Bullhorn, CompanyID=1, Auth={
         "access_token": "91:55656d98-a869-4905-a853-07e16cebff3b",
         "refresh_token": "91:5706d882-3b3b-4f40-ae3a-c2794b770cb6"
     }))

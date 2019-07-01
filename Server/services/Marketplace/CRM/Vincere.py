@@ -4,7 +4,7 @@ import os
 
 import requests
 
-from utilities.enums import DataType as DT, Period
+from utilities.enums import DataType as DT, Period, CRM
 from sqlalchemy_utils import Currency
 from models import Callback, Conversation, db, StoredFile
 from services import stored_file_services, databases_services
@@ -104,7 +104,7 @@ def retrieveRestToken(auth, companyID):
                 raise Exception(login_callback.Message)
             authCopy = dict(login_callback.Data)
 
-        saveAuth_callback: Callback = crm_services.updateByType("Vincere", authCopy, companyID)
+        saveAuth_callback: Callback = crm_services.updateByType(CRM.Vincere, authCopy, companyID)
 
         if not saveAuth_callback.Success:
             raise Exception(saveAuth_callback.Message)

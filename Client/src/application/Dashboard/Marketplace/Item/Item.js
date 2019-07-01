@@ -87,6 +87,8 @@ class Item extends React.Component {
             features: 'width=600,height=600,0,top=40%,right=30%,status=0',
         };
 
+        console.log("IS PINGING!:", this.props.isPinging);
+
         switch (type) {
 
             case "Adapt":

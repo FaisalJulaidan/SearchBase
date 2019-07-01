@@ -251,9 +251,9 @@ def getAll(companyID) -> Callback:
         return Callback(False, 'Could not fetch all CRMs.')
 
 
-def updateByType(type, newAuth, companyID):
+def updateByType(type: CRM, newAuth, companyID):
     try:
-        crm = db.session.query(CRM).filter(and_(CRM.CompanyID == companyID, CRM.Type == type)).first()
+        crm = db.session.query(CRM_Model).filter(and_(CRM_Model.CompanyID == companyID, CRM_Model.Type == type)).first()
         crm.Auth = dict(newAuth)
         db.session.commit()
         return Callback(True, "New auth has been saved")

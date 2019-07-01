@@ -97,7 +97,7 @@
   },
   "scripts": {
     "start": "node scripts/start.js",
-    "build": "node scripts/build.js && bash scripts/after_build.sh",
+    "build": "node scripts/build.js",
     "test": "node scripts/test.js"
   },
   "homepage": "/static/react_app/",

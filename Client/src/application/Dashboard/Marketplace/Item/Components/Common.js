@@ -24,9 +24,22 @@ export const DefaultButton = ({
                 <Button type="danger"
                         style={{width: 'auto'}}
                         size={'large'}
-                        loading={isDisconnecting}>
+                        loading={isDisconnecting || isConnecting}>
                     {
-                        status === "FAILED" ? '(Failed) click to disconnect' : 'Disconnect'
+                        status === "FAILED" &&
+                        '(Failed) click to disconnect'
+                    }
+
+                    {
+                        status === "CONNECTED" &&
+                        isConnecting &&
+                        'Pinging...'
+                    }
+
+                    {
+                        status === "CONNECTED" &&
+                        !isConnecting &&
+                        'Disconnect'
                     }
                 </Button>
             </Popconfirm>

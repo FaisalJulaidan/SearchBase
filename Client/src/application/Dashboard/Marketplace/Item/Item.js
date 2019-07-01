@@ -1,5 +1,5 @@
 import React from 'react'
-import {Breadcrumb, Button, Dropdown, Form, Icon, Menu, Modal, Select, Tabs, Typography} from 'antd';
+import {Breadcrumb, Button, Dropdown, Form, Icon, Menu, Modal, Tabs, Typography} from 'antd';
 import 'types/Marketplace_Types';
 import {getLink, history} from "helpers";
 import NoHeaderPanel from 'components/NoHeaderPanel/NoHeaderPanel'
@@ -17,8 +17,7 @@ import {connect} from 'react-redux';
 
 const TabPane = Tabs.TabPane;
 const FormItem = Form.Item;
-const {Title, Paragraph, Text} = Typography;
-const Option = Select.Option;
+const {Title} = Typography;
 
 class Item extends React.Component {
 
@@ -33,10 +32,6 @@ class Item extends React.Component {
 
     componentWillReceiveProps(nextProps) {
         this.marketplaceItem.status = nextProps.connectionStatus;
-        console.log(nextProps.exportData)
-        // if (nextProps.exportData) {
-        //     marketplace.exportData = nextProps.exportData;
-        // }
     }
 
     connectMarketplace = () => this.props.form.validateFields((err, values) => {
@@ -115,7 +110,7 @@ class Item extends React.Component {
                 }
                 if (place === 'runExport') {
                     return (
-                        <Dropdown disabled={this.marketplaceItem.status !== "CONNECTED"}
+                        <Dropdown disabled={this.marketplaceItem.status !== "CONNECTED" || this.props.isPinging}
                                   overlay={
                                       <Menu>
                                           <Menu.Item onClick={

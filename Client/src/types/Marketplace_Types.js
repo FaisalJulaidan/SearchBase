@@ -4,7 +4,7 @@
  @typedef MarketplaceItem
  @type {Object}
  @property {string} companyID
- @property {string} exportData - Evginy should explain this
+ @property {string} exportData - Returned data from server ready to be in XML form
  @property {string} ID - The ID of the CRM from DB
  @property {string} title
  @property {string} desc

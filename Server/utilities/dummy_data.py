@@ -276,6 +276,7 @@ def generate():
                                     2, "Cardiff"))
 
     # Add CRM connection for aramco company
+    # Adapt
     db.session.add(CRM(Type=enums.CRM.Adapt, Company=aramco, Auth={
         "domain": "PartnerDomain9",
         "username": "SD9USR8",
@@ -286,7 +287,14 @@ def generate():
         "dateFormat": 0,
         "timeFormat": 0}))
 
-    # Create an AutoPilot for a Company
+    # Bullhorn
+    db.session.add(CRM(Type=enums.CRM.Adapt, CompanyID=1, Auth={
+        "access_token": "91:55656d98-a869-4905-a853-07e16cebff3b",
+        "refresh_token": "91:5706d882-3b3b-4f40-ae3a-c2794b770cb6"
+    }))
+
+
+# Create an AutoPilot for a Company
     auto_pilot_services.create('First Pilot',
                                "First pilot to automate the acceptance and rejection of candidates application",
                                aramco.ID)

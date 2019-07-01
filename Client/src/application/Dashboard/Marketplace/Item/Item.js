@@ -1,5 +1,5 @@
 import React from 'react'
-import {Breadcrumb, Form, Modal, Tabs, Typography} from 'antd';
+import {Breadcrumb, Button, Dropdown, Form, Icon, Menu, Modal, Select, Tabs, Typography} from 'antd';
 import 'types/Marketplace_Types';
 import {getLink, history} from "helpers";
 import NoHeaderPanel from 'components/NoHeaderPanel/NoHeaderPanel'
@@ -18,6 +18,7 @@ import {connect} from 'react-redux';
 const TabPane = Tabs.TabPane;
 const FormItem = Form.Item;
 const {Title, Paragraph, Text} = Typography;
+const Option = Select.Option;
 
 class Item extends React.Component {
 
@@ -27,12 +28,12 @@ class Item extends React.Component {
     marketplaceItem = data.Items.find(/**@type {MarketplaceItem}*/item => item.type === this.props.match.params.type);
 
     componentWillMount() {
-        // this.props.dispatch(marketplaceActions.exportRecruiterValueReport({Name: marketplace.type}))
-        this.props.dispatch(marketplaceActions.pingMarketplace(this.marketplaceItem.type))
+        this.props.dispatch(marketplaceActions.pingMarketplace(this.marketplaceItem.type));
     }
 
     componentWillReceiveProps(nextProps) {
         this.marketplaceItem.status = nextProps.connectionStatus;
+        console.log(nextProps.exportData)
         // if (nextProps.exportData) {
         //     marketplace.exportData = nextProps.exportData;
         // }
@@ -52,7 +53,7 @@ class Item extends React.Component {
 
     /**
      * @param {string} type
-     * @param {'header'|'features'|'form'|'button'} place
+     * @param {'header'|'features'|'form'|'button'|'runExport'} place
      * */
     getMarketplaceComponent = (type, place) => {
         const {getFieldDecorator} = this.props.form;
@@ -109,6 +110,24 @@ class Item extends React.Component {
                     return <DefaultButton buttonText={'Connect to Bullhorn'}
                                           windowObject={windowObject}
                                           {...buttonsOptions}/>;
+                }
+                if (place === 'runExport') {
+                    return (
+                        <Dropdown disabled={this.marketplaceItem.status !== "CONNECTED"}
+                                  overlay={
+                                      <Menu>
+                                          <Menu.Item onClick={
+                                              () => this.props.dispatch(marketplaceActions.exportRecruiterValueReport({Name: this.marketplaceItem.type}))
+                                          }>
+                                              Export Data
+                                          </Menu.Item>
+                                      </Menu>
+                                  }>
+                            <Button className="ant-dropdown-link" href="#">
+                                Extra Actions <Icon type="down"/>
+                            </Button>
+                        </Dropdown>
+                    )
                 }
                 break;
 
@@ -209,7 +228,8 @@ class Item extends React.Component {
                     </div>
 
                     <div className={styles.Body}>
-                        <Tabs defaultActiveKey="1" size={'large'}>
+                        <Tabs defaultActiveKey="1" size={'large'}
+                              tabBarExtraContent={this.getMarketplaceComponent(type, 'runExport')}>
                             <TabPane tab="Feature" key="1">
                                 {this.getMarketplaceComponent(type, 'features')}
                             </TabPane>
@@ -240,6 +260,7 @@ function mapStateToProps(state) {
         companyID: state.marketplace.companyID,
         isConnecting: state.marketplace.isConnecting,
         isLoading: state.marketplace.isLoading,
+
         exportData: state.marketplace.exportData,
     };
 }

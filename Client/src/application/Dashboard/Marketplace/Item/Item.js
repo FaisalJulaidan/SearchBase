@@ -12,6 +12,7 @@ import {VincereFeatures, VincereHeader} from "./Components/Vincere";
 import {GreenhouseFeatures, GreenhouseFormItem, GreenhouseHeader} from "./Components/Greenhouse";
 import {GoogleFeatures, GoogleHeader} from './Components/Google'
 import {OutlookFeatures, OutlookHeader} from "./Components/Outlook";
+import {CSVLink} from "react-csv";
 import data from '../Items.json'
 import {connect} from 'react-redux';
 
@@ -28,6 +29,8 @@ class Item extends React.Component {
 
     componentWillMount() {
         this.props.dispatch(marketplaceActions.pingMarketplace(this.marketplaceItem.type));
+        if (this.marketplaceItem.type === "Bullhorn")
+            this.props.dispatch(marketplaceActions.exportRecruiterValueReport({Name: this.marketplaceItem.type}))
     }
 
     componentWillReceiveProps(nextProps) {
@@ -82,8 +85,6 @@ class Item extends React.Component {
             features: 'width=600,height=600,0,top=40%,right=30%,status=0',
         };
 
-        console.log("IS PINGING!:", this.props.isPinging);
-
         switch (type) {
 
             case "Adapt":
@@ -113,13 +114,15 @@ class Item extends React.Component {
                         <Dropdown disabled={this.marketplaceItem.status !== "CONNECTED" || this.props.isPinging}
                                   overlay={
                                       <Menu>
-                                          <Menu.Item onClick={
-                                              () => this.props.dispatch(marketplaceActions.exportRecruiterValueReport({Name: this.marketplaceItem.type}))
-                                          }>
-                                              Export Data
+                                          <Menu.Item>
+                                              <CSVLink filename={'Recruiter Pipeline Report.csv'}
+                                                       data={this.props.exportData || []}>
+                                                  Export Recruiter Pipeline Report
+                                              </CSVLink>
                                           </Menu.Item>
                                       </Menu>
                                   }>
+
                             <Button className="ant-dropdown-link" href="#">
                                 Extra Actions <Icon type="down"/>
                             </Button>

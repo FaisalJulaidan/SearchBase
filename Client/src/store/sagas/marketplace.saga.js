@@ -15,14 +15,14 @@ function* fetchMarketplace() {
     }
 }
 
-function* pingMarketplace({marketplaceType}) {
+function* pingMarketplace({marketplaceType, meta}) {
     try {
         const res = yield http.get(`/marketplace/${marketplaceType}`);
-        yield put(marketplaceActions.pingMarketplaceSuccess(res.data?.data.Status));
+        yield put({...marketplaceActions.pingMarketplaceSuccess(res.data?.data.Status), meta});
     } catch (error) {
         const msg = error.response?.data?.msg || "Couldn't ping marketplace";
         errorMessage(msg);
-        yield put(marketplaceActions.pingMarketplaceFailure(msg));
+        yield put({...marketplaceActions.pingMarketplaceFailure(msg), meta});
     }
 }
 

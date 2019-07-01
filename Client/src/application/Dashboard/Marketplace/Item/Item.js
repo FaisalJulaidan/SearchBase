@@ -28,9 +28,11 @@ class Item extends React.Component {
     marketplaceItem = data.Items.find(/**@type {MarketplaceItem}*/item => item.type === this.props.match.params.type);
 
     componentWillMount() {
-        this.props.dispatch(marketplaceActions.pingMarketplace(this.marketplaceItem.type));
-        if (this.marketplaceItem.type === "Bullhorn")
-            this.props.dispatch(marketplaceActions.exportRecruiterValueReport({Name: this.marketplaceItem.type}))
+        this.props.dispatch(marketplaceActions.pingMarketplace(this.marketplaceItem.type))
+            .then(() => {
+                if (this.marketplaceItem.type === "Bullhorn" && this.props.connectionStatus === "CONNECTED")
+                    this.props.dispatch(marketplaceActions.exportRecruiterValueReport({Name: this.marketplaceItem.type}))
+            });
     }
 
     componentWillReceiveProps(nextProps) {
@@ -115,7 +117,8 @@ class Item extends React.Component {
                                   overlay={
                                       <Menu>
                                           <Menu.Item>
-                                              <CSVLink filename={'Recruiter Pipeline Report.csv'}
+                                              <CSVLink
+                                                  filename={'Recruiter Pipeline Report.csv'}
                                                        data={this.props.exportData || []}>
                                                   Export Recruiter Pipeline Report
                                               </CSVLink>

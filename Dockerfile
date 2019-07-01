@@ -61,9 +61,6 @@ COPY --from=chatbot_builder Chatbot/dist static/widgets
 # Copy static/react_app directory from client_builder, which includes the new build version of react_app
 COPY --from=client_builder Client/build static/react_app
 
-RUN mkdir logs
-RUN touch logs/errors.log
-
 # Wait for mysql to run
 COPY docker/wait-for-it.sh /wait-for-it.sh
 RUN chmod +x /wait-for-it.sh

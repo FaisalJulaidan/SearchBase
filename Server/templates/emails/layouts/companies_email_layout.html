@@ -1,5 +1,5 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office">
+<html xmlns="http://www.w3.org/1999/xhtml">
 	<head>
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
@@ -174,12 +174,14 @@
 								<table class="container header" border="0" cellpadding="0" cellspacing="0" width="620" style="width: 620px;">
 									<tr>
 										<td style="padding: 20px 0 20px 0; margin-bottom: 100px; border-bottom: solid 1px #eeeeee;" align="left">
-											<a href="#" style="font-size: 30px; text-decoration: none; color: #000000;">{{ companyName }}</a>
+											<a href="{{ companyURL }}"
+											   style="font-size: 30px; text-decoration: none; color: #000000;">{{
+												companyName }}</a>
                                         </td>
                                         
                                         <td style="padding: 30px 0 25px 0; margin-bottom: 100px; border-bottom: solid 1px #eeeeee;" align="right">
                                             {% if logoPath %}
-                                                <a href="#">
+											<a href="{{ companyURL }}">
                                                     <img src="{{ logoPath }}" alt="company logo" width="42" height="42" />
                                                 </a>
                                             {% endif %}
@@ -205,6 +207,7 @@
 									<tr>
                                         <td class="hero-subheader__title" style="font-size: 26px; font-weight: bold; padding: 15px 0 15px 0;" align="left">
                                             {% block content_title %}{% endblock %}
+											<img alt="company logo" height="42" src="{{ logoPath }}" width="42"/>
                                         </td>
 									</tr>
 
@@ -241,7 +244,9 @@
 											<table class="container" border="0" cellpadding="0" cellspacing="0" width="620" align="center" style="border-top: 1px solid #eeeeee; width: 620px;">
 												<tr>
 													<td style="text-align: center; padding: 10px 0 10px 0;">
-														<a href="#" style="font-size: 28px; text-decoration: none; color: #d5d5d5;">{{ companyName }}</a>
+														<a href="{{ companyURL }}"
+														   style="font-size: 28px; text-decoration: none; color: #d5d5d5;">{{
+															companyName }}</a>
 													</td>
 												</tr>
 
@@ -268,10 +273,53 @@
                                                 <tr>
                                                     <td align="center" style="padding: 0 0 10px;">
                                                             <a href="https://www.linkedin.com/company/thesearchbase/about/" target="_blank">
-                                                                <svg style="margin-right: 5px" height="25pt" width="25pt" version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 112.196 112.196" style="enable-background:new 0 0 112.196 112.196;" xml:space="preserve"><g><circle style="fill:#bbc0c5;" cx="56.098" cy="56.097" r="56.098"/><g><path style="fill:#F1F2F2;" d="M89.616,60.611v23.128H76.207V62.161c0-5.418-1.936-9.118-6.791-9.118c-3.705,0-5.906,2.491-6.878,4.903c-0.353,0.862-0.444,2.059-0.444,3.268v22.524H48.684c0,0,0.18-36.546,0-40.329h13.411v5.715c-0.027,0.045-0.065,0.089-0.089,0.132h0.089v-0.132c1.782-2.742,4.96-6.662,12.085-6.662C83.002,42.462,89.616,48.226,89.616,60.611L89.616,60.611z M34.656,23.969c-4.587,0-7.588,3.011-7.588,6.967c0,3.872,2.914,6.97,7.412,6.97h0.087c4.677,0,7.585-3.098,7.585-6.97C42.063,26.98,39.244,23.969,34.656,23.969L34.656,23.969z M27.865,83.739H41.27V43.409H27.865V83.739z"/></g></g><g></g><g></g><g></g><g></g><g></g><g></g><g></g><g></g><g></g><g></g><g></g><g></g><g></g><g></g><g></g></svg>
+																<svg height="25pt" id="Capa_1" style="margin-right: 5px"
+																	 style="enable-background:new 0 0 112.196 112.196;"
+																	 version="1.1" viewBox="0 0 112.196 112.196"
+																	 width="25pt" x="0px" xml:space="preserve"
+																	 xmlns="http://www.w3.org/2000/svg" y="0px"><g><circle cx="56.098" cy="56.097" r="56.098" style="fill:#bbc0c5;"/><g><path d="M89.616,60.611v23.128H76.207V62.161c0-5.418-1.936-9.118-6.791-9.118c-3.705,0-5.906,2.491-6.878,4.903c-0.353,0.862-0.444,2.059-0.444,3.268v22.524H48.684c0,0,0.18-36.546,0-40.329h13.411v5.715c-0.027,0.045-0.065,0.089-0.089,0.132h0.089v-0.132c1.782-2.742,4.96-6.662,12.085-6.662C83.002,42.462,89.616,48.226,89.616,60.611L89.616,60.611z M34.656,23.969c-4.587,0-7.588,3.011-7.588,6.967c0,3.872,2.914,6.97,7.412,6.97h0.087c4.677,0,7.585-3.098,7.585-6.97C42.063,26.98,39.244,23.969,34.656,23.969L34.656,23.969z M27.865,83.739H41.27V43.409H27.865V83.739z" style="fill:#F1F2F2;"/></g></g>
+																	<g></g>
+																	<g></g>
+																	<g></g>
+																	<g></g>
+																	<g></g>
+																	<g></g>
+																	<g></g>
+																	<g></g>
+																	<g></g>
+																	<g></g>
+																	<g></g>
+																	<g></g>
+																	<g></g>
+																	<g></g>
+																	<g></g></svg>
                                                             </a>
                                                             <a href="https://www.facebook.com/pages/category/Computers---Internet-Website/TheSearchbase-824670787721617/" target="_blank">
-                                                                <svg style="margin-right: 5px" height="25pt" width="25pt" version="1.1" id="Capa_2" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 112.196 112.196" style="enable-background:new 0 0 112.196 112.196;" xml:space="preserve"><g><circle style="fill:#bbc0c5;" cx="56.098" cy="56.098" r="56.098"/><path style="fill:#FFFFFF;" d="M70.201,58.294h-10.01v36.672H45.025V58.294h-7.213V45.406h7.213v-8.34c0-5.964,2.833-15.303,15.301-15.303L71.56,21.81v12.51h-8.151c-1.337,0-3.217,0.668-3.217,3.513v7.585h11.334L70.201,58.294z"/></g><g></g><g></g><g></g><g></g><g></g><g></g><g></g><g></g><g></g><g></g><g></g><g></g><g></g><g></g><g></g></svg>                                               
+																<svg height="25pt" id="Capa_2"
+																	 style="margin-right: 5px"
+																	 style="enable-background:new 0 0 112.196 112.196;"
+																	 version="1.1"
+																	 viewBox="0 0 112.196 112.196"
+																	 width="25pt" x="0px" xml:space="preserve"
+																	 xmlns="http://www.w3.org/2000/svg"
+																	 y="0px"><g><circle cx="56.098" cy="56.098" r="56.098" style="fill:#bbc0c5;"/><path
+																		d="M70.201,58.294h-10.01v36.672H45.025V58.294h-7.213V45.406h7.213v-8.34c0-5.964,2.833-15.303,15.301-15.303L71.56,21.81v12.51h-8.151c-1.337,0-3.217,0.668-3.217,3.513v7.585h11.334L70.201,58.294z"
+																		style="fill:#FFFFFF;"/></g>
+																	<g></g>
+																	<g></g>
+																	<g></g>
+																	<g></g>
+																	<g></g>
+																	<g></g>
+																	<g></g>
+																	<g></g>
+																	<g></g>
+																	<g></g>
+																	<g></g>
+																	<g></g>
+																	<g></g>
+																	<g></g>
+																	<g></g></svg>
                                                             </a>
                                                     </td>
                                                 </tr>

@@ -1,7 +1,5 @@
 import React, {Component} from 'react';
-import {Button, Table, Tag} from "antd";
-
-import {Typography} from 'antd';
+import {Empty, Tag, Typography} from "antd";
 
 const {Text} = Typography;
 
@@ -24,11 +22,11 @@ class CRMResponse extends Component {
 
                     <br/>
 
-                    <h3>CRM Response:
-                        <Text code>
+                    <h3>CRM Response:</h3>
+                    <Text>
                             {conversation.CRMResponse}
-                        </Text></h3>
-                </div> : null
+                    </Text>
+                </div> : <Empty description={'CRM was not connected'}/>
         );
     }
 }

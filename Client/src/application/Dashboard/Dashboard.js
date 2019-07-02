@@ -224,7 +224,6 @@ class Dashboard extends Component {
                                     {
                                         position: 'fixed',
                                         width: `calc(100% - ${this.state.collapsed ? 80 : 200}px)`,
-                                        zIndex: 1
                                     }
                                     :
                                     {}

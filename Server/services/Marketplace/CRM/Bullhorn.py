@@ -5,12 +5,10 @@ from datetime import datetime
 import requests
 from sqlalchemy_utils import Currency
 
-from utilities.enums import DataType as DT, Period, CRM
 from models import Callback, Conversation, db, CRM as CRM_Model, StoredFile
 from services import databases_services, stored_file_services
 from services.Marketplace import marketplace_helpers
 from services.Marketplace.CRM import crm_services
-
 # Bullhorn Notes:
 # access_token (used to generate rest_token) lasts 10 minutes, needs to be requested by using the auth from the client
 # refresh_token (can be used to generate access_token) - generated with access_token on auth, ...
@@ -19,8 +17,7 @@ from services.Marketplace.CRM import crm_services
 # submitting a new candidate has no required* fields
 # auth needs to contain auth data + rest_token, rest_url, access_token, refresh_token (retrieved upon connecting)
 from utilities import helpers
-
-
+from utilities.enums import DataType as DT, Period, CRM
 
 """
 Auth = 
@@ -173,10 +170,14 @@ def insertCandidate(auth, conversation: Conversation) -> Callback:
     try:
         # New candidate details
         emails = conversation.Data.get('keywordsByDataType').get(DT.CandidateEmail.value['name'], [" "])
+        name = (conversation.Name or " ").split(" ")
 
         # availability, yearsExperience
         body = {
+
             "name": conversation.Name or " ",
+            "firstName": helpers.getListValue(name, 0, " "),
+            "lastName": helpers.getListValue(name, 1, " "),
             "mobile": conversation.PhoneNumber or " ",
             "address": {
                 "city": "".join(

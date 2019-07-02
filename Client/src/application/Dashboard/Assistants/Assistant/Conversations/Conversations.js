@@ -54,12 +54,6 @@ class Conversations extends React.Component {
                     <p>{record.Email}</p>),
 
             }, {
-                title: 'Phone',
-                key: 'PhoneNumber',
-                render: (text, record) => (
-                    <p>{record.PhoneNumber}</p>),
-
-            }, {
                 title: 'Time Spent',
                 key: 'TimeSpent',
                 sorter: (a, b) => a.TimeSpent - b.TimeSpent,
@@ -112,7 +106,7 @@ class Conversations extends React.Component {
                             </Button>
 
                             <Button className={styles.StatusChangeBtn} type="link"
-                                    style={{fontSize: "18px"}}
+                                    style={{color: "#faad14", fontSize: "18px"}}
                                     disabled={isUpdatingStatus}
                                     onClick={() => this.updateStatus("Pending", record)} >
                                 <Icon type="clock-circle"/>
@@ -382,7 +376,7 @@ class Conversations extends React.Component {
                                bordered={true}
                                pagination={{position:'both', pageSize: 20}}
                                size='default'
-                               scroll={{ x: 1200 }}
+                               scroll={{x: 500}}
                         />
 
                         {

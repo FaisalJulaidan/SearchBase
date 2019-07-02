@@ -1,5 +1,13 @@
 from models import db
+
 class Company(db.Model):
+
+    @property
+    def logo(self):
+        from services import stored_file_services as sfs
+        logo = sfs.PUBLIC_URL + sfs.UPLOAD_FOLDER + sfs.COMPANY_LOGOS_PATH + "/" + (
+                self.LogoPath or "")
+        return logo if self.LogoPath else None
 
     ID = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
     Name = db.Column(db.String(80), nullable=False)

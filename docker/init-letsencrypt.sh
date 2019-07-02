@@ -1,6 +1,6 @@
 #!/bin/bash
 
-domains=(staging.thesearchbase.com)
+domains=(thesearchbase.com)
 rsa_key_size=4096
 data_path="./docker/certbot"
 email="" # Adding a valid address is strongly recommended

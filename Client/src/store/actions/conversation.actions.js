@@ -3,6 +3,7 @@ import * as actionTypes from './actionTypes';
 
 const fetchConversations = (assistantID) => ({
     type: actionTypes.FETCH_CONVERSATIONS_REQUEST,
+    meta: {thunk: true},
     assistantID
 });
 

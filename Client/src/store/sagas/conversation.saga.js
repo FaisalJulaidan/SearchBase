@@ -4,13 +4,13 @@ import {conversationActions} from "../actions";
 import {errorMessage, http, loadingMessage, successMessage} from "helpers";
 
 
-function* fetchConversations({assistantID}) {
+function* fetchConversations({assistantID, meta}) {
     try {
         const res = yield http.get(`/assistant/${assistantID}/conversations`);
-        return yield put(conversationActions.fetchConversationsSuccess(res.data.data))
+        return yield put({...conversationActions.fetchConversationsSuccess(res.data.data), meta})
     } catch (error) {
         const msg = error.response?.data?.msg || "Couldn't load conversation";
-        yield put(conversationActions.fetchConversationsFailure(msg));
+        yield put({...conversationActions.fetchConversationsFailure(msg), meta});
         errorMessage(msg);
     }
 }

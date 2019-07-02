@@ -3,8 +3,9 @@ import json
 import os
 from os.path import join
 
-from config import BaseConfig
 from jsonschema import validate
+
+from config import BaseConfig
 from models import db, Assistant
 from utilities import json_schemas, enums
 
@@ -72,10 +73,11 @@ def __migrateFlow(flow):
 
                 if block['Type'] == enums.BlockType.Question.value:
                     for answer in block['Content']['answers']:
-                        answer['score']= 0
+                      pass
 
                 if block['Type'] == enums.BlockType.UserInput.value:
-                    block['Content']['keywords']= []
+                    pass
+                    # block['Content']['keywords']= []
 
                 if block['Type'] == enums.BlockType.Solutions.value:
                     pass

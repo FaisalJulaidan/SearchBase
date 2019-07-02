@@ -230,8 +230,6 @@ def notifyNewConversation(assistant: Assistant, conversation: Conversation):
         # Get Company
         company: Company = assistant.Company
 
-        print(company.logo)
-
         # Get pre singed url to download the file if there are files
         fileURLsSinged = []
         if conversation.StoredFile:
@@ -246,8 +244,13 @@ def notifyNewConversation(assistant: Assistant, conversation: Conversation):
             'status': conversation.ApplicationStatus.name,
             'fileURLsSinged': fileURLsSinged,
             'completed': "Yes" if conversation.Completed else "No",
-            'dateTime': conversation.DateTime
+            'dateTime': conversation.DateTime.strftime("%Y-%m-%d %H:%M"),
+            'link': helpers.getDomain() + "/dashboard/assistants/" +
+                               str(assistant.ID) + "?tab=Conversations&conversation_id=" + str(conversation.ID)
+
         }]
+
+        print(conversations[0]['link'])
 
         # send emails, jobs applied for
         for user in users_callback.Data:
@@ -300,7 +303,9 @@ def notifyNewConversations(assistant: dict, conversations, lastNotificationDate)
                 'status': conversation.ApplicationStatus.name,
                 'fileURLsSinged': fileURLsSinged,
                 'completed': "Yes" if conversation.Completed else "No",
-                'dateTime': conversation.DateTime
+                'dateTime': conversation.DateTime.strftime("%Y-%m-%d %H:%M"),
+                'link': helpers.getDomain() + "/dashboard/assistants/" +
+                        str(assistant["ID"]) + "?tab=Conversations&conversation_id=" + str(conversation.ID)
             })
 
         if not len(conversationsList) > 0:

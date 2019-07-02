@@ -32,7 +32,9 @@ class Login extends React.Component {
         this.props.form.validateFields((err, values) => {
             if (!err) {
 
-                let prevPath = this.props.history.location.state?.from.pathname || null;
+                let from = this.props.history.location.state?.from || "";
+                let prevPath = from?.pathname || "";
+                if (prevPath) prevPath += from.search;
 
                 // prevPath has to have /dashboard keyword if not make it null
                 if (prevPath?.indexOf('/dashboard') < -1)

@@ -15,6 +15,7 @@ import Connections from "./Connections/Connections"
 import {history} from "helpers";
 import {assistantActions, autoPilotActions, marketplaceActions, optionsActions} from "store/actions";
 import NoHeaderPanel from 'components/NoHeaderPanel/NoHeaderPanel'
+import queryString from 'query-string'
 
 
 const {Title, Paragraph} = Typography;
@@ -28,7 +29,7 @@ class Assistant extends Component {
         CRMVisible: false,
         selectAutoPilotModalVisible: false,
         isFlowSaved: true,
-        activeTab: 'Script'
+        defaultTab: 'Script'
     };
 
     firstHead = null;
@@ -40,6 +41,10 @@ class Assistant extends Component {
 
         if (!this.props.options) this.props.dispatch(optionsActions.getOptions());
 
+        // Set tab from url search params
+        let params = queryString.parse(this.props.location.search);
+        if (["Analytics", "Conversations", "Script", "Connections", "Settings"].includes(params["tab"]))
+            this.setState({defaultTab: params["tab"]});
 
         window.onbeforeunload = () => {
             if (!this.state.isFlowSaved)
@@ -83,11 +88,11 @@ class Assistant extends Component {
 
     onTabClick = (key, e) => {
         // this.firstHead = [...document.head.children];
-        if (this.state.activeTab !== key)
+        if ("Script" !== key){
             this.removeChatbot();
-
-        if (this.state.activeTab !== key)
             this.onScriptTabChanges();
+        }
+
     };
 
     setIsFlowSaved = (bool) => {
@@ -118,7 +123,7 @@ class Assistant extends Component {
     };
 
     render() {
-        const {assistant} = this.props;
+        const {assistant, location} = this.props;
 
         return (
             <>
@@ -159,33 +164,39 @@ class Assistant extends Component {
                     <div className={[styles.Body, 'assistantTabs'].join(' ')}>
                         {!assistant ? <Spin/> :
 
-                            <Tabs defaultActiveKey={'Settings'} size={"large"} animated={false}
+                            <Tabs defaultActiveKey={this.state.defaultTab} size={"large"} animated={false}
                                   onTabClick={this.onTabClick}>
                                 <TabPane tab="Analytics" key="Analytics">
-                                    <Analytics assistant={assistant}/>
+                                    <Analytics assistant={assistant}
+                                               location={location}/>
                                 </TabPane>
                                 <TabPane tab="Conversations" key="Conversations">
-                                    <Conversations assistant={assistant}/>
+                                    <Conversations assistant={assistant}
+                                                   location={location}/>
                                 </TabPane>
 
                                 <TabPane tab="Script" key="Script">
                                     <Flow setIsFlowSaved={this.setIsFlowSaved}
                                           isFlowSaved={this.state.isFlowSaved}
-                                          assistant={assistant}/>
+                                          assistant={assistant}
+                                          location={location}/>
                                 </TabPane>
 
                                 <TabPane tab="Connections" key="Connections">
-                                    <Connections assistant={assistant}/>
+                                    <Connections assistant={assistant}
+                                                 location={location}/>
                                 </TabPane>
 
                                 <TabPane tab="Integration" key="Integration">
                                     <Integration assistant={assistant}
-                                                 removeChatbot={this.removeChatbot}/>
+                                                 removeChatbot={this.removeChatbot}
+                                                 location={location}/>
                                 </TabPane>
 
                                 <TabPane tab="Settings" key="Settings">
                                     <Settings assistant={assistant}
-                                              isAssistantNameValid={this.isAssistantNameValid}/>
+                                              isAssistantNameValid={this.isAssistantNameValid}
+                                              location={location}/>
                                 </TabPane>
                             </Tabs>
                         }

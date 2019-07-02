@@ -242,8 +242,10 @@ def notifyNewConversation(assistant: Assistant, conversation: Conversation):
         conversations = [{
             'userType': conversation.UserType.name,
             'data': conversation.Data,
+            'status': conversation.ApplicationStatus.name,
             'fileURLsSinged': fileURLsSinged,
-            'completed': "Yes" if conversation.Completed else "No"
+            'completed': "Yes" if conversation.Completed else "No",
+            'dateTime': conversation.DateTime
         }]
 
         # send emails, jobs applied for

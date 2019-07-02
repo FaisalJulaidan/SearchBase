@@ -258,7 +258,7 @@ def notifyNewConversation(assistant: Assistant, conversation: Conversation):
                                                    assistantName = assistant.Name,
                                                    assistantID = assistant.ID,
                                                    conversations = conversations,
-                                                   logPath = logoPath,
+                                                   logoPath = logoPath,
                                                    companyName = assistant.Company.Name,
                                                    )
             if not email_callback.Success:

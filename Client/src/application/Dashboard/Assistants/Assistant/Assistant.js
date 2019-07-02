@@ -13,7 +13,7 @@ import Flow from "./Flow/Flow"
 import Connections from "./Connections/Connections"
 
 import {history} from "helpers";
-import {assistantActions, marketplaceActions, optionsActions, autoPilotActions} from "store/actions";
+import {assistantActions, autoPilotActions, marketplaceActions, optionsActions} from "store/actions";
 import NoHeaderPanel from 'components/NoHeaderPanel/NoHeaderPanel'
 
 
@@ -52,9 +52,10 @@ class Assistant extends Component {
     componentDidMount() {
         setTimeout(() => this.firstHead = [...document.head.children], 1000)
     }
-     componentWillUnmount() {
+
+    componentWillUnmount() {
         this.removeChatbot()
-     }
+    }
 
     onScriptTabChanges = () => {
         if (!this.state.isFlowSaved)

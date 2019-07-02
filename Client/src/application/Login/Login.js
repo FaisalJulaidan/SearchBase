@@ -8,6 +8,7 @@ import {Button, Col, Form, Icon, Input, Row, Spin} from 'antd';
 import {Link} from "react-router-dom";
 
 const FormItem = Form.Item;
+
 class Login extends React.Component {
 
     constructor(props) {
@@ -98,9 +99,9 @@ class Login extends React.Component {
                         </Row>
 
                         {/*<Row type="flex" justify="center">*/}
-                            {/*<Col>*/}
-                                {/*<Link style={{color: "#9254de"}} to="/signup">Don't have an account?</Link>*/}
-                            {/*</Col>*/}
+                        {/*<Col>*/}
+                        {/*<Link style={{color: "#9254de"}} to="/signup">Don't have an account?</Link>*/}
+                        {/*</Col>*/}
                         {/*</Row>*/}
                         <br/>
                     </Spin>

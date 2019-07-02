@@ -30,7 +30,7 @@ class Conversation(db.Model):
     AutoPilotResponse = db.Column(db.String(250), nullable=True)
 
     CRMSynced = db.Column(db.Boolean, nullable=False, default=False)
-    CRMResponse = db.Column(db.String(250), nullable=True)
+    CRMResponse = db.Column(db.String(2500), nullable=True)
 
     # Relationships:
     AssistantID = db.Column(db.Integer, db.ForeignKey('assistant.ID', ondelete='cascade'), nullable=False)

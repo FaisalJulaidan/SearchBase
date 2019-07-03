@@ -24,12 +24,15 @@ def getChatbot(assistantHashID) -> Callback:
             return Callback(True, '', {'isDisabled': True})
 
         # Check for restricted countries
-        ip = request.remote_addr
-        if ip != '127.0.0.1' and assistant.Config:
-            restrictedCountries = assistant.Config.get('restrictedCountries', [])
-            if len(restrictedCountries):
-                if helpers.geoIP.country(ip).country.iso_code in restrictedCountries:
-                    return Callback(True, '', {'isDisabled': True})
+        try:
+            ip = request.remote_addr
+            if ip != '127.0.0.1' and assistant.Config:
+                restrictedCountries = assistant.Config.get('restrictedCountries', [])
+                if len(restrictedCountries):
+                    if helpers.geoIP.country(ip).country.iso_code in restrictedCountries:
+                        return Callback(True, '', {'isDisabled': True})
+        except Exception as e:
+            pass
 
         data = {
             "assistant": helpers.getDictFromLimitedQuery(['Name', 'Flow', 'Message', 'TopBarText', 'SecondsUntilPopup',

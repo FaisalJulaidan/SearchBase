@@ -65,7 +65,7 @@ class BaseConfig(object):
 
 
     # Hashids Salt
-    HASH_IDS_SALT = 'b9iLXiAa' # Never change it
+    HASH_IDS_SALT = 'b9iLXiAa'  # Never change it
 
     # Calendar Config
     MAIL_SERVER = 'smtp.gmail.com'

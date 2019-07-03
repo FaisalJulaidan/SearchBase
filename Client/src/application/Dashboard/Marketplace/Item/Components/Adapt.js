@@ -22,7 +22,6 @@ export const AdaptFormItems = ({
                 <FormItem label="Domain"
                           {...layout}>
                     {getFieldDecorator('domain', {
-                        initialValue: 'PartnerDomain9',
                         rules: [{
                             required: true,
                             message: "Please add your domain name",
@@ -35,7 +34,6 @@ export const AdaptFormItems = ({
                 <FormItem label="Username"
                           {...layout}>
                     {getFieldDecorator('username', {
-                        initialValue: 'SD9USR8',
                         rules: [{
                             required: true,
                             max: 20,
@@ -52,7 +50,7 @@ export const AdaptFormItems = ({
                 <FormItem label="Password"
                           {...layout}>
                     {getFieldDecorator('password', {
-                        initialValue: 'P@55word',
+
                         rules: [{
                             required: true,
                             max: 32,
@@ -70,7 +68,6 @@ export const AdaptFormItems = ({
                 <FormItem label="Profile"
                           {...layout}>
                     {getFieldDecorator('profile', {
-                        initialValue: 'CoreProfile',
                         rules: [{
                             required: true,
                             message: "Profile is required field",
@@ -82,7 +79,6 @@ export const AdaptFormItems = ({
 
                 <FormItem label="Locale" {...layout}>
                     {getFieldDecorator('locale', {
-                        initialValue: 'en_GB',
                         rules: [{
                             required: true,
                             message: "Locale is required field",
@@ -95,7 +91,6 @@ export const AdaptFormItems = ({
                 <FormItem label="Timezone"
                           {...layout}>
                     {getFieldDecorator('timezone', {
-                        initialValue: 'GMT',
                         rules: [{
                             required: true,
                             message: "Timezone is required field",

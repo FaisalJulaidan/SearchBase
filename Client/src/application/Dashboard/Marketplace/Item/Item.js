@@ -106,7 +106,8 @@ class Item extends React.Component {
                 if (place === 'features')
                     return <BullhornFeatures/>;
                 if (place === 'button') {
-                    windowObject.url = "https://auth.bullhornstaffing.com/oauth/authorize?response_type=code&redirect_uri=https://www.thesearchbase.com/api/bullhorn_callback&client_id=7719607b-7fe7-4715-b723-809cc57e2714";
+                    windowObject.url = "https://auth.bullhornstaffing.com/oauth/authorize?response_type=code&redirect_uri=https://www.thesearchbase.com/dashboard/marketplace/Bullhorn&client_id=7719607b-7fe7-4715-b723-809cc57e2714";
+                    return <a href={windowObject.url}>Click me</a>
                     return <DefaultButton buttonText={'Connect to Bullhorn'}
                                           windowObject={windowObject}
                                           {...buttonsOptions}/>;

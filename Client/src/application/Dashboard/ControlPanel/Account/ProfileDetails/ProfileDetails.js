@@ -57,7 +57,7 @@ class ProfileDetails extends React.Component {
                     </FormItem>
 
                     <FormItem
-                        label={"Email:"}
+                        label={"Email"}
                         extra={"For your security, we have temporarily disabled this box"}>
                         {getFieldDecorator("email", {
                             initialValue: account?.user?.Email,
@@ -72,7 +72,7 @@ class ProfileDetails extends React.Component {
                     </FormItem>
 
                     <FormItem
-                        label={"Phone Number:"}>
+                        label={"Phone Number"}>
                         {getFieldDecorator("phoneNumber", {
                             initialValue: account?.user?.PhoneNumber,
                             rules: [{required: false, message: "Please enter a valid email"},
@@ -87,7 +87,7 @@ class ProfileDetails extends React.Component {
 
                     <FormItem
                         label={"Chatbot Email Notifications"}
-                        extra={"If switched on, we will send you notification via email with users that have interacted with the chatbot.  " +
+                        extra={"If switched on, we will send you notifications via email with users that have interacted with the chatbot.  " +
                         "You can change the frequency of the notifications from the assistant settings page. "}>
                         {getFieldDecorator("chatbotNotifications", {
                             initialValue: account?.user?.ChatbotNotifications,
@@ -99,7 +99,7 @@ class ProfileDetails extends React.Component {
                     </FormItem>
 
                     <FormItem
-                        label={"Newsletters:"}
+                        label={"Newsletters"}
                         extra={"We would like to keep you updated with the latest software updates and features available to\n" +
                         "you, If you decide to not subscribe you may miss on important features and announcements."}>
                         {getFieldDecorator("newsletters", {

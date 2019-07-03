@@ -8,6 +8,7 @@ import {Button, Col, Form, Icon, Input, Row, Spin} from 'antd';
 import {Link} from "react-router-dom";
 
 const FormItem = Form.Item;
+
 class Login extends React.Component {
 
     constructor(props) {
@@ -31,7 +32,9 @@ class Login extends React.Component {
         this.props.form.validateFields((err, values) => {
             if (!err) {
 
-                let prevPath = this.props.history.location.state?.from.pathname || null;
+                let from = this.props.history.location.state?.from || "";
+                let prevPath = from?.pathname || "";
+                if (prevPath) prevPath += from.search;
 
                 // prevPath has to have /dashboard keyword if not make it null
                 if (prevPath?.indexOf('/dashboard') < -1)
@@ -98,9 +101,9 @@ class Login extends React.Component {
                         </Row>
 
                         {/*<Row type="flex" justify="center">*/}
-                            {/*<Col>*/}
-                                {/*<Link style={{color: "#9254de"}} to="/signup">Don't have an account?</Link>*/}
-                            {/*</Col>*/}
+                        {/*<Col>*/}
+                        {/*<Link style={{color: "#9254de"}} to="/signup">Don't have an account?</Link>*/}
+                        {/*</Col>*/}
                         {/*</Row>*/}
                         <br/>
                     </Spin>

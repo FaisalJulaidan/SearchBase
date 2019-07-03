@@ -5,12 +5,10 @@ from datetime import datetime
 import requests
 from sqlalchemy_utils import Currency
 
-from utilities.enums import DataType as DT, Period
-from models import Callback, Conversation, db, CRM, StoredFile
+from models import Callback, Conversation, db, CRM as CRM_Model, StoredFile
 from services import databases_services, stored_file_services
 from services.Marketplace import marketplace_helpers
 from services.Marketplace.CRM import crm_services
-
 # Bullhorn Notes:
 # access_token (used to generate rest_token) lasts 10 minutes, needs to be requested by using the auth from the client
 # refresh_token (can be used to generate access_token) - generated with access_token on auth, ...
@@ -19,10 +17,15 @@ from services.Marketplace.CRM import crm_services
 # submitting a new candidate has no required* fields
 # auth needs to contain auth data + rest_token, rest_url, access_token, refresh_token (retrieved upon connecting)
 from utilities import helpers
+from utilities.enums import DataType as DT, Period, CRM
 
-
-# login requires: username, password
-
+"""
+Auth = 
+ {
+    "access_token": "91:184cd487-b4b0-4114-be56-67f70f50d358",
+    "refresh_token": "91:260a1587-41fd-4c2b-9769-0356049554f3"
+ }
+"""
 
 def testConnection(auth, companyID):
     try:
@@ -103,7 +106,7 @@ def retrieveRestToken(auth, companyID):
         authCopy["rest_token"] = result_body.get("BhRestToken")
         authCopy["rest_url"] = result_body.get("restUrl")
 
-        saveAuth_callback: Callback = crm_services.updateByType("Bullhorn", authCopy, companyID)
+        saveAuth_callback: Callback = crm_services.updateByType(CRM.Bullhorn, authCopy, companyID)
         if not saveAuth_callback.Success:
             raise Exception(saveAuth_callback.Message)
 
@@ -167,10 +170,14 @@ def insertCandidate(auth, conversation: Conversation) -> Callback:
     try:
         # New candidate details
         emails = conversation.Data.get('keywordsByDataType').get(DT.CandidateEmail.value['name'], [" "])
+        name = (conversation.Name or " ").split(" ")
 
         # availability, yearsExperience
         body = {
+
             "name": conversation.Name or " ",
+            "firstName": helpers.getListValue(name, 0, " "),
+            "lastName": helpers.getListValue(name, 1, " "),
             "mobile": conversation.PhoneNumber or " ",
             "address": {
                 "city": "".join(
@@ -523,7 +530,7 @@ def getAllJobs(auth, companyID, fields=None) -> Callback:
         return Callback(False, str(exc))
 
 
-def produceRecruiterValueReport(crm: CRM, companyID) -> Callback:
+def produceRecruiterValueReport(crm: CRM_Model, companyID) -> Callback:
     try:
 
         getJobs_callback: Callback = searchJobsCustomQuery(

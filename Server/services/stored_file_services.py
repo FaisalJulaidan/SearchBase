@@ -1,10 +1,10 @@
-import boto3
-import botocore
 import os
-from utilities import helpers
-from models import db, Callback, StoredFile, Conversation
+
+import boto3
 from botocore.exceptions import ClientError
 
+from models import db, Callback, StoredFile, Conversation
+from utilities import helpers
 
 PUBLIC_URL = "https://tsb.ams3.digitaloceanspaces.com/"
 UPLOAD_FOLDER = os.environ['FLASK_ENV']

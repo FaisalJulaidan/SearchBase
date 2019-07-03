@@ -78,6 +78,7 @@ forex-python = "*"
 msal = "*"
 authlib = "*"
 twilio = "*"
+sqlalchemy-stubs = "*"
 
 [requires]
 python_version = "3.7"

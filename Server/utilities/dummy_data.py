@@ -1,8 +1,11 @@
-from models import db, Role, Company, Assistant, Conversation, Database, Candidate, CRM, Appointment, Job
-from services import user_services, flow_services, auto_pilot_services, assistant_services, scheduler_services
-from datetime import datetime, timedelta, time
-from utilities import helpers,enums
+from datetime import datetime, timedelta
+
 from sqlalchemy_utils import Currency
+
+from models import db, Role, Company, Assistant, Conversation, Database, Candidate, CRM, Appointment, Job
+from services import user_services, flow_services, auto_pilot_services
+from utilities import helpers, enums
+
 
 # Generates dummy data for testing
 def generate():
@@ -276,6 +279,7 @@ def generate():
                                     2, "Cardiff"))
 
     # Add CRM connection for aramco company
+    # Adapt
     db.session.add(CRM(Type=enums.CRM.Adapt, Company=aramco, Auth={
         "domain": "PartnerDomain9",
         "username": "SD9USR8",
@@ -286,7 +290,14 @@ def generate():
         "dateFormat": 0,
         "timeFormat": 0}))
 
-    # Create an AutoPilot for a Company
+    # Bullhorn
+    db.session.add(CRM(Type=enums.CRM.Bullhorn, CompanyID=1, Auth={
+        "access_token": "91:184cd487-b4b0-4114-be56-67f70f50d358",
+        "refresh_token": "91:91aa0af7-67f8-4cac-a4bf-016413b51b4a"
+    }))
+
+
+# Create an AutoPilot for a Company
     auto_pilot_services.create('First Pilot',
                                "First pilot to automate the acceptance and rejection of candidates application",
                                aramco.ID)

@@ -6,15 +6,13 @@ FROM node:9.6.1 as chatbot_builder
 WORKDIR /Chatbot
 
 # Copy package.json file - To be cache -
-COPY Chatbot/package.json .
+#COPY Chatbot/package.json .
 
 # Install npm dependecies
-RUN npm install --silent
+#RUN npm install --silent
 
 # Copy chatbot project from (host) to (container)
 ADD Chatbot .
-# Copy python static/widgets directory
-ADD Server/static/widgets static/widgets
 
 # Run the build script it will move it self from
 RUN npm run build
@@ -35,8 +33,6 @@ RUN npm install react-scripts@1.1.1 -g --silent
 
 # Copy react project
 ADD Client .
-# Copy python static directory
-ADD Server/static/react_app static/react_app
 
 # Run the build script it will move it self from
 RUN npm run build
@@ -60,13 +56,10 @@ RUN pipenv install --system --deploy --ignore-pipfile
 ADD Server .
 
 # Copy static/widgets directory from chatbot_builder, which includes the new build version of chatbot
-COPY --from=chatbot_builder Chatbot/static/widgets static/widgets
+COPY --from=chatbot_builder Chatbot/dist static/widgets
 
 # Copy static/react_app directory from client_builder, which includes the new build version of react_app
-COPY --from=client_builder Client/static/react_app static/react_app
-
-RUN mkdir logs
-RUN touch logs/errors.log
+COPY --from=client_builder Client/build static/react_app
 
 # Wait for mysql to run
 COPY docker/wait-for-it.sh /wait-for-it.sh

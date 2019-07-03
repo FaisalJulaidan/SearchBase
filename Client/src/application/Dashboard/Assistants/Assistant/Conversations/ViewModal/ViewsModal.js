@@ -1,7 +1,6 @@
 import React, {Component} from 'react';
 import {Button, Col, Icon, Modal, Progress, Row, Tabs, Typography} from "antd";
-import {errorMessage, http, loadingMessage, successMessage ,destroyMessage} from "helpers";
-import saveAs from 'file-saver';
+import {destroyMessage, errorMessage, http, loadingMessage, successMessage} from "helpers";
 import Profile from '../Profile/Profile'
 import Conversation from '../Conversation/Conversation'
 import SelectedSolutions from "../SelectedSolutions/SelectedSolutions";
@@ -112,7 +111,7 @@ class ViewsModal extends Component {
 
                     <Button className={styles.StatusChangeBtn}
                             type={conversation?.Status === "Pending" ? "link" : "default"}
-                            style={{fontSize: "18px"}}
+                            style={{color: "#faad14", fontSize: "18px"}}
                             disabled={isUpdatingStatus}
                             onClick={() => updateStatus("Pending", conversation)} >
                         <Icon type="clock-circle"/>
@@ -164,7 +163,7 @@ class ViewsModal extends Component {
                         <SelectedSolutions solutions={conversation?.Data?.selectedSolutions}/>
                     </TabPane>
 
-                    <TabPane tab={"CRM Status"} key={"4"} disabled={!(conversation?.CRMResponse)}>
+                    <TabPane tab={"CRM Status"} key={"4"}>
                         <CRMResponse conversation={conversation}/>
                     </TabPane>
 

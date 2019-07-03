@@ -81,18 +81,15 @@ export const marketplace = (state = initialState, action) => {
         // EXPORT RECRUITER VALUE CRM
         case actionTypes.EXPORT_RECRUITER_VALUE_REPORT_REQUEST:
             return updateObject(state, {
-                isLoading: true,
                 errorMsg: null,
             });
         case actionTypes.EXPORT_RECRUITER_VALUE_REPORT_SUCCESS:
             tState = {...state};
             return updateObject(state, {
-                isLoading: false,
                 exportData: action.exportData
             });
         case actionTypes.EXPORT_RECRUITER_VALUE_REPORT_FAILURE:
             return updateObject(state, {
-                isLoading: false,
                 errorMsg: action.error
             });
 

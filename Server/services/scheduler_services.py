@@ -1,13 +1,15 @@
+import os
+from datetime import datetime
+
+from apscheduler.executors.pool import ThreadPoolExecutor, ProcessPoolExecutor
+from apscheduler.jobstores.sqlalchemy import SQLAlchemyJobStore
+from apscheduler.schedulers.background import BackgroundScheduler
 from pytz import utc
 from sqlalchemy import and_
-from apscheduler.schedulers.background import BackgroundScheduler
-from apscheduler.jobstores.sqlalchemy import SQLAlchemyJobStore
-from apscheduler.executors.pool import ThreadPoolExecutor, ProcessPoolExecutor
+
 from models import db, Callback, Assistant, Conversation, Company
 from services import mail_services
 from utilities import helpers
-from datetime import datetime
-import os
 
 jobstores = {
     'default': SQLAlchemyJobStore(url=os.environ['SQLALCHEMY_DATABASE_URI'])
@@ -39,15 +41,17 @@ def sendConversationsNotifications(assistantID=None):
         with app.app_context():
 
             now = datetime.now()
-            assistantsQuery = db.session.query(Assistant.ID, Assistant.CompanyID, Company.Name ,Company.LogoPath, Assistant.NotifyEvery, Assistant.Name, Assistant.LastNotificationDate) \
+            assistantsQuery = db.session.query(Assistant.ID, Assistant.CompanyID, Company.Name, Company.LogoPath,
+                                               Company.URL, Assistant.NotifyEvery, Assistant.Name,
+                                               Assistant.LastNotificationDate) \
                 .join(Company)\
                 .filter(and_(Assistant.NotifyEvery))
 
             if assistantID != None:
                 assistantsQuery.filter(Assistant.ID == assistantID)
 
-            assistants = helpers.getListFromLimitedQuery(["ID", "CompanyID", "CompanyName", "LogoPath", "NotifyEvery",
-                                                           "Name", "LastNotificationDate"],
+            assistants = helpers.getListFromLimitedQuery(["ID", "CompanyID", "CompanyName", "LogoPath", "CompanyURL",
+                                                          "NotifyEvery", "Name", "LastNotificationDate"],
                                                          assistantsQuery.all())
 
             for assistant in assistants:

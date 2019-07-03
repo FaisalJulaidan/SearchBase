@@ -76,7 +76,7 @@ class CompanyDetails extends React.Component {
                     <br />
 
                     <FormItem
-                        label={"Tracking Data:"}
+                        label={"Tracking Data"}
                         extra={"We do not in any way track your company information for marketing purposes. However we would recommend " +
                         "allowing us to contact you if we see that there are ways we could enhance your bot or use of our software."}>
                         {getFieldDecorator("trackData", {
@@ -89,7 +89,7 @@ class CompanyDetails extends React.Component {
 
 
                     <FormItem
-                        label={"Technical Support:"}
+                        label={"Technical Support"}
                         extra={"Let our team view your errors and problems in order for us to solve your issues."}>
                         {getFieldDecorator("techSupport", {
                             initialValue: account?.company?.TechnicalSupport,
@@ -100,7 +100,7 @@ class CompanyDetails extends React.Component {
                     </FormItem>
 
                     <FormItem
-                        label={"Account Specialist:"}
+                        label={"Account Specialist"}
                         extra={"Let our team contact you to help make recommendations as to how you can make your bots more " +
                         "successful and ways to collect more valuable data. If you don't have a sales specialist, we recommend " +
                         "you enable this so we can help you make the most of our software."}>

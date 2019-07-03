@@ -2,10 +2,10 @@ from threading import Thread
 
 from flask import render_template, current_app
 from flask_mail import Mail, Message
-from models import Callback, Assistant, Conversation
+
+from models import Callback, Assistant, Conversation, Company
 from services import user_services, stored_file_services as sfs
 from utilities import helpers
-
 
 mail = Mail()
 tsbEmail = "info@thesearchbase.com"
@@ -227,9 +227,8 @@ def notifyNewConversation(assistant: Assistant, conversation: Conversation):
         if len(users_callback.Data) == 0:
             return Callback(True, "No user has notifications enabled")
 
-        # Company logo
-        logoPath = sfs.PUBLIC_URL + sfs.UPLOAD_FOLDER + sfs.COMPANY_LOGOS_PATH + "/" + (
-                    assistant.Company.LogoPath or "")
+        # Get Company
+        company: Company = assistant.Company
 
         # Get pre singed url to download the file if there are files
         fileURLsSinged = []
@@ -242,9 +241,16 @@ def notifyNewConversation(assistant: Assistant, conversation: Conversation):
         conversations = [{
             'userType': conversation.UserType.name,
             'data': conversation.Data,
+            'status': conversation.ApplicationStatus.name,
             'fileURLsSinged': fileURLsSinged,
-            'completed': "Yes" if conversation.Completed else "No"
+            'completed': "Yes" if conversation.Completed else "No",
+            'dateTime': conversation.DateTime.strftime("%Y-%m-%d %H:%M"),
+            'link': helpers.getDomain() + "/dashboard/assistants/" +
+                               str(assistant.ID) + "?tab=Conversations&conversation_id=" + str(conversation.ID)
+
         }]
+
+        print(conversations[0]['link'])
 
         # send emails, jobs applied for
         for user in users_callback.Data:
@@ -256,8 +262,9 @@ def notifyNewConversation(assistant: Assistant, conversation: Conversation):
                                                    assistantName = assistant.Name,
                                                    assistantID = assistant.ID,
                                                    conversations = conversations,
-                                                   logPath = logoPath,
-                                                   companyName = assistant.Company.Name,
+                                                   logoPath=company.logo,
+                                                   companyName=company.Name,
+                                                   companyURL=company.URL,
                                                    )
             if not email_callback.Success:
                 raise Exception(email_callback.Message)
@@ -296,11 +303,15 @@ def notifyNewConversations(assistant: dict, conversations, lastNotificationDate)
                 'status': conversation.ApplicationStatus.name,
                 'fileURLsSinged': fileURLsSinged,
                 'completed': "Yes" if conversation.Completed else "No",
-                'dateTime': conversation.DateTime
+                'dateTime': conversation.DateTime.strftime("%Y-%m-%d %H:%M"),
+                'link': helpers.getDomain() + "/dashboard/assistants/" +
+                        str(assistant["ID"]) + "?tab=Conversations&conversation_id=" + str(conversation.ID)
             })
 
         if not len(conversationsList) > 0:
             return Callback(True, "No new conversation to send")
+
+        logo = assistant["LogoPath"]
 
         # send emails, jobs applied for
         for user in users_callback.Data:
@@ -312,8 +323,9 @@ def notifyNewConversations(assistant: dict, conversations, lastNotificationDate)
                                                    assistantID = assistant["ID"],
                                                    conversations = conversationsList,
                                                    logoPath = sfs.PUBLIC_URL + sfs.UPLOAD_FOLDER + sfs.COMPANY_LOGOS_PATH + "/" + (
-                                                          assistant["LogoPath"] or ""),
+                                                           logo or "") if logo else None,
                                                    companyName = assistant["CompanyName"],
+                                                   companyURL=assistant["CompanyURL"],
                                                    )
             if not email_callback.Success:
                 raise Exception(email_callback.Message)

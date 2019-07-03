@@ -17,6 +17,7 @@ const fetchMarketplaceFailure = (error) => ({
 
 const pingMarketplace = (marketplaceType) => ({
     type: actionTypes.PING_MARKETPLACE_REQUEST,
+    meta: {thunk: true},
     marketplaceType
 });
 

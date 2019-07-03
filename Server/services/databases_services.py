@@ -516,29 +516,33 @@ def __numCounter(dbColumn, compareSign, dataType: DT, keywords, df, plus=1, addI
                    int(numberInput), 'Score'] += plus
 
 
+# min-max currency period / ex. "10000-45000 GBP Annually"         old: "Greater Than 5000 GBP Annually"
 def __salary(row, dbSalaryColumn, dbCurrencyColumn, dbPayPeriodColumn, salaryInput: str, plus=4, forceLessThan=False):
 
-    userSalary = salaryInput.split(' ') # e.g. Less Than 5000 GBP Annually
+    userSalary = salaryInput.split(' ')
 
-    # Convert salary currency if did not match with user's entered currency
+    # Get user's min and max salary
+    userMin = userSalary[0].split("-")[0]
+    userMax = userSalary[0].split("-")[1]
+
+    # Convert db salary currency if did not match with user's entered currency
     dbSalary = row[dbSalaryColumn.name] or 0
-    if (not row[dbCurrencyColumn.name] == userSalary[3]) and dbSalary > 0:
-        dbSalary = helpers.currencyConverter.convert(row[dbCurrencyColumn.name], userSalary[3], dbSalary)
+    if (not row[dbCurrencyColumn.name] == userSalary[1]) and dbSalary > 0:
+        dbSalary = helpers.currencyConverter.convert(row[dbCurrencyColumn.name], userSalary[1], dbSalary)
         row[dbSalaryColumn.name] = dbSalary
 
-    # Convert salary rate if did not match with user's entered pay period e.g. Annually to Monthly...
-    if (not row[dbPayPeriodColumn.name] == userSalary[4]) and dbSalary > 0:
-        dbSalary = helpers.convertSalaryPeriod(dbSalary, row[dbPayPeriodColumn.name], Period[userSalary[4]])
+    # Convert salary rate if did not match with user's entered pay period e.g. Annually to Daily...
+    if (not row[dbPayPeriodColumn.name] == userSalary[2]) and dbSalary > 0:
+        dbSalary = helpers.convertSalaryPeriod(dbSalary, row[dbPayPeriodColumn.name], Period[userSalary[2]])
 
     # Add old score to new score if success
     plus += row['Score']
 
     # Compare salaries, if true then return 'plus' to be added to the score otherwise old score
-    if userSalary[0] == 'Greater' and not (forceLessThan):
-        return (plus if dbSalary >= float(userSalary[2]) else row['Score']), dbSalary, userSalary[3], userSalary[4]
-    else: # Less
-        return (plus if dbSalary <= float(userSalary[2]) else row['Score']), dbSalary, userSalary[3], userSalary[4]
-
+    if not forceLessThan:
+        return (plus if (float(userMin) >= dbSalary <= float(userMax)) else row['Score']), dbSalary, userSalary[1], userSalary[2]
+    else:  # Less
+        return (plus if dbSalary <= float(userMax) else row['Score']), dbSalary, userSalary[1], userSalary[2]
 
 
 def createPandaCandidate(id, name, email, mobile, location, skills,

@@ -27,8 +27,8 @@ Auth =
     "refresh_token": "91:260a1587-41fd-4c2b-9769-0356049554f3"
  }
 """
-client_id = os.environ['VINCERE_CLIENT_ID']
-client_secret = os.environ['VINCERE_CLIENT_SECRET']
+client_id = os.environ['BULLHORN_CLIENT_ID']
+client_secret = os.environ['BULLHORN_CLIENT_SECRET']
 
 
 def testConnection(auth, companyID):

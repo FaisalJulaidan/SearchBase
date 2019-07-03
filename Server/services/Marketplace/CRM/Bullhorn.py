@@ -1,5 +1,6 @@
 import base64
 import json
+import os
 from datetime import datetime
 
 import requests
@@ -26,6 +27,9 @@ Auth =
     "refresh_token": "91:260a1587-41fd-4c2b-9769-0356049554f3"
  }
 """
+client_id = os.environ['VINCERE_CLIENT_ID']
+client_secret = os.environ['VINCERE_CLIENT_SECRET']
+
 
 def testConnection(auth, companyID):
     try:
@@ -53,8 +57,8 @@ def login(auth):
         access_token_url = "https://auth9.bullhornstaffing.com/oauth/token?" + \
                            "&grant_type=authorization_code" + \
                            "&redirect_uri=https://www.thesearchbase.com/api/bullhorn_callback" + \
-                           "&client_id=7719607b-7fe7-4715-b723-809cc57e2714" + \
-                           "&client_secret=0ZiVSILQ7CY0bf054LPiX4kN" + \
+                           "&client_id=" + client_id + \
+                           "&client_secret=" + client_secret + \
                            "&code=" + authCopy.get("code")[0]
 
         # get the access token and refresh token
@@ -84,8 +88,8 @@ def retrieveRestToken(auth, companyID):
         # use refresh_token to generate access_token and refresh_token
         url = "https://auth.bullhornstaffing.com/oauth/token?grant_type=refresh_token&refresh_token=" + \
               authCopy.get("refresh_token") + \
-              "&client_id=7719607b-7fe7-4715-b723-809cc57e2714" + \
-              "&client_secret=0ZiVSILQ7CY0bf054LPiX4kN"
+              "&client_id=" + client_id + \
+              "&client_secret=" + client_secret
         get_access_token = requests.post(url, headers=headers)
 
         if get_access_token.ok:

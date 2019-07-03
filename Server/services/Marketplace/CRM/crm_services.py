@@ -140,7 +140,7 @@ def connect(type, auth, companyID) -> Callback:
         if not test_callback.Success:
             return test_callback
 
-        connection = CRM_Model(Type=crm_type, Auth=auth, CompanyID=companyID)
+        connection = CRM_Model(Type=crm_type, Auth=test_callback.Data, CompanyID=companyID)
 
         # Save
         db.session.add(connection)
@@ -160,21 +160,16 @@ def testConnection(type, auth, companyID) -> Callback:
         crm_type: CRM = CRM[type]
 
         # test connection
-        test_callback: Callback = Callback(False, 'Connection failure. Please check entered details')
         if crm_type == CRM.Adapt:
-            test_callback = Adapt.login(auth)
+            return Adapt.testConnection(auth)
         elif crm_type == CRM.Bullhorn:
-            test_callback = Bullhorn.testConnection(auth, companyID) # oauth2
+            return Bullhorn.testConnection(auth, companyID)  # oauth2
         elif crm_type == CRM.Greenhouse:
-            test_callback = Greenhouse.login(auth)
+            return Greenhouse.login(auth)
         elif crm_type == CRM.Vincere:
-            test_callback = Vincere.testConnection(auth, companyID) # oauth2
+            return Vincere.testConnection(auth, companyID)  # oauth2
 
-        # When connection failed
-        if not test_callback.Success:
-            return test_callback
-
-        return Callback(True, 'Successful connection', test_callback.Data)
+        return Callback(False, 'Connection failure. Please check entered details')
 
     except Exception as exc:
         helpers.logError("CRM_services.connect(): " + str(exc))

@@ -7,6 +7,14 @@ from models import Callback, Conversation
 from utilities import helpers
 
 
+def testConnection(auth):
+    try:
+        return Callback(login(auth).Success, "Message", auth)
+
+    except Exception as exc:
+        return Callback(False, "Testing failed")
+
+
 def login(auth):
     try:
         authCopy = dict(auth)  # we took copy to delete domain later only from the copy

@@ -27,9 +27,9 @@ Auth =
     "refresh_token": "91:260a1587-41fd-4c2b-9769-0356049554f3"
  }
 """
-client_id = os.environ['BULLHORN_CLIENT_ID']
-client_secret = os.environ['BULLHORN_CLIENT_SECRET']
-
+CLIENT_ID = os.environ['BULLHORN_CLIENT_ID']
+CLIENT_SECRET = os.environ['BULLHORN_CLIENT_SECRET']
+REDIRECT_URI = helpers.getDomain() + "/dashboard/marketplace/Bullhorn"
 
 def testConnection(auth, companyID):
     try:
@@ -56,10 +56,10 @@ def login(auth):
 
         access_token_url = "https://auth9.bullhornstaffing.com/oauth/token?" + \
                            "&grant_type=authorization_code" + \
-                           "&redirect_uri=https://www.thesearchbase.com/api/bullhorn_callback" + \
-                           "&client_id=" + client_id + \
-                           "&client_secret=" + client_secret + \
-                           "&code=" + authCopy.get("code")[0]
+                           "&redirect_uri=" + REDIRECT_URI + \
+                           "&client_id=" + CLIENT_ID + \
+                           "&client_secret=" + CLIENT_SECRET + \
+                           "&code=" + authCopy.get("code")
 
         # get the access token and refresh token
         access_token_request = requests.post(access_token_url, headers=headers)
@@ -88,8 +88,8 @@ def retrieveRestToken(auth, companyID):
         # use refresh_token to generate access_token and refresh_token
         url = "https://auth.bullhornstaffing.com/oauth/token?grant_type=refresh_token&refresh_token=" + \
               authCopy.get("refresh_token") + \
-              "&client_id=" + client_id + \
-              "&client_secret=" + client_secret
+              "&client_id=" + CLIENT_ID + \
+              "&client_secret=" + CLIENT_SECRET
         get_access_token = requests.post(url, headers=headers)
 
         if get_access_token.ok:

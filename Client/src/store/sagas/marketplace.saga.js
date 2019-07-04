@@ -29,10 +29,10 @@ function* pingMarketplace({marketplaceType, meta}) {
 function* disconnectMarketplace({marketplaceType}) {
     try {
         const res = yield http.delete(`/marketplace/${marketplaceType}`);
-        successMessage('Marketplace is disconnected');
+        successMessage(`${marketplaceType} is disconnected successfully`);
         yield put(marketplaceActions.disconnectMarketplaceSuccess());
     } catch (error) {
-        const msg = error.response?.data?.msg || "Couldn't disconnect marketplace";
+        const msg = error.response?.data?.msg || `Couldn't disconnect ${marketplaceType}`;
         yield put(marketplaceActions.disconnectMarketplaceFailure(msg));
         errorMessage(msg);
     }
@@ -45,7 +45,7 @@ function* connectMarketplace({marketplaceType, auth}) {
         successMessage(`${marketplaceType} connected successfully`);
         yield put(marketplaceActions.connectMarketplaceSuccess());
     } catch (error) {
-        const msg = error.response?.data?.msg || "Couldn't Connect CRM";
+        const msg = error.response?.data?.msg || `Couldn't Connect ${marketplaceType}`;
         errorMessage(msg);
         yield put(marketplaceActions.connectMarketplaceFailure(msg));
     }

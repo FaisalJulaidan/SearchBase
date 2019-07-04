@@ -43,7 +43,7 @@ class Item extends React.Component {
         let type = location.pathname.split('/').slice(-1)[0]; // ex. Bullhorn, Adapt...
         let params = queryString.parse(location.search);
 
-        if( (type === "Bullhorn" || type === "Vincere") && params['code']){
+        if( (type === "Bullhorn" || type === "Vincere" || type === "Outlook") && params['code']){
             dispatch(marketplaceActions.connectMarketplace(type, {...params})); // connect
             this.props.history.replace("/dashboard/marketplace/" + type) // clean the url from args
 
@@ -157,7 +157,7 @@ class Item extends React.Component {
                 if (place === 'features')
                     return <VincereFeatures/>;
                 if (place === 'button') {
-                    windowObject.url = "https://id.vincere.io/oauth2/authorize?client_id=9829f4ad-3ff3-4d00-8ecf-e5d7fa2983d1&response_type=code&redirect_uri=" + getLink("/dashboard/marketplace/Vincere");
+                    windowObject.url = "https://id.vincere.io/oauth2/authorize?client_id=9829f4ad-3ff3-4d00-8ecf-e5d7fa2983d1&response_type=code&redirect_uri=" + ""+getLink("/dashboard/marketplace/Vincere");
                     return <DefaultButton buttonText={'Connect to Vincere'}
                                           windowObject={windowObject}
                                           {...buttonsOptions}/>;

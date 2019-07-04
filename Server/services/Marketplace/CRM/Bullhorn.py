@@ -10,26 +10,29 @@ from models import Callback, Conversation, db, CRM as CRM_Model, StoredFile
 from services import databases_services, stored_file_services
 from services.Marketplace import marketplace_helpers
 from services.Marketplace.CRM import crm_services
-# Bullhorn Notes:
-# access_token (used to generate rest_token) lasts 10 minutes, needs to be requested by using the auth from the client
-# refresh_token (can be used to generate access_token) - generated with access_token on auth, ...
-#       ... expires after 1 use (new one comes in), no time limit
-# BhRestToken (rest_token) (used to verify users when making queries), expires in 10 minutes
-# submitting a new candidate has no required* fields
-# auth needs to contain auth data + rest_token, rest_url, access_token, refresh_token (retrieved upon connecting)
+
 from utilities import helpers
 from utilities.enums import DataType as DT, Period, CRM
 
 """
+Bullhorn Notes:
+ access_token (used to generate rest_token) lasts 10 minutes, needs to be requested by using the auth from the client
+ refresh_token (can be used to generate access_token) - generated with access_token on auth, ...
+ ... expires after 1 use (new one comes in), no time limit
+ BhRestToken (rest_token) (used to verify users when making queries), expires in 10 minutes
+ submitting a new candidate has no required* fields
+ auth needs to contain auth data + rest_token, rest_url, access_token, refresh_token (retrieved upon connecting)
+ 
 Auth = 
  {
     "access_token": "91:184cd487-b4b0-4114-be56-67f70f50d358",
     "refresh_token": "91:260a1587-41fd-4c2b-9769-0356049554f3"
  }
+ 
+ 
 """
 CLIENT_ID = os.environ['BULLHORN_CLIENT_ID']
 CLIENT_SECRET = os.environ['BULLHORN_CLIENT_SECRET']
-REDIRECT_URI = helpers.getDomain() + "/dashboard/marketplace/Bullhorn"
 
 def testConnection(auth, companyID):
     try:
@@ -56,7 +59,7 @@ def login(auth):
 
         access_token_url = "https://auth9.bullhornstaffing.com/oauth/token?" + \
                            "&grant_type=authorization_code" + \
-                           "&redirect_uri=" + REDIRECT_URI + \
+                           "&redirect_uri=" + helpers.getDomain() + "/dashboard/marketplace/Bullhorn" + \
                            "&client_id=" + CLIENT_ID + \
                            "&client_secret=" + CLIENT_SECRET + \
                            "&code=" + authCopy.get("code")
@@ -69,10 +72,8 @@ def login(auth):
 
         result_body = json.loads(access_token_request.text)
 
-        authCopy = {"refresh_token": result_body.get("refresh_token")}
-
         # Logged in successfully
-        return Callback(True, 'Logged in successfully', authCopy)
+        return Callback(True, 'Logged in successfully', {"refresh_token": result_body.get("refresh_token")})
 
     except Exception as exc:
         helpers.logError("Marketplace.CRM.Bullhorn.login() ERROR: " + str(exc))

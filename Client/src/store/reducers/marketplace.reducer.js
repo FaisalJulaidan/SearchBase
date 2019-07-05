@@ -33,7 +33,8 @@ export const marketplace = (state = initialState, action) => {
         // PING MARKETPLACE
         case actionTypes.PING_MARKETPLACE_REQUEST:
             return updateObject(state, {
-                isPinging: true
+                isPinging: true,
+                isDisconnecting: false,
             });
         case actionTypes.PING_MARKETPLACE_SUCCESS:
             return updateObject(state, {
@@ -66,6 +67,7 @@ export const marketplace = (state = initialState, action) => {
         case actionTypes.CONNECT_MARKETPLACE_REQUEST:
             return updateObject(state, {
                 isConnecting: true,
+                isDisconnecting: false,
             });
         case actionTypes.CONNECT_MARKETPLACE_SUCCESS:
             return updateObject(state, {

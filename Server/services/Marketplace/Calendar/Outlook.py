@@ -8,52 +8,50 @@ from services.Marketplace import marketplace_helpers
 from services.Marketplace.Calendar import calendar_services
 from utilities import helpers
 
-client_id = os.environ['OUTLOOK_CLIENT_ID']
-client_secret = os.environ['OUTLOOK_CLIENT_SECRET']
+CLIENT_ID = os.environ['OUTLOOK_CLIENT_ID']
+CLIENT_SECRET = os.environ['OUTLOOK_CLIENT_SECRET']
 
-# Event takes in:
-# {
-# 	"name": "Event name",
-# 	"description": "What appears in the email as main text",
-# 	"start": "2020-02-02T18:00:00", (start date and time)
-# 	"end": "2020-02-02T19:00:00", (end date and time)
-# 	"attendees": [{
-# 		"email": "evgeniybtonchev@gmail.com",
-# 		"name": "Evgeniy"
-# 	}] (list of objects)
-# }
-# attendees get emailed to accept the event
-# owner of the logged in account automatically gets the event in their calendar without having to accept
-
+"""
+Event takes in:
+ {
+     "name": "Event name",
+     "description": "What appears in the email as main text",
+     "start": "2020-02-02T18:00:00", (start date and time)
+     "end": "2020-02-02T19:00:00", (end date and time)
+     "attendees": [{
+            "email": "evgeniybtonchev@gmail.com",
+            "name": "Evgeniy"
+     }] (list of objects)
+ }
+ attendees get emailed to accept the event
+ owner of the logged in account automatically gets the event in their calendar without having to accept
+"""
 
 def testConnection(auth, companyID):
     try:
         if auth.get("refresh_token"):
-            callback = retrieveAccessToken(auth, companyID)
+            return retrieveAccessToken(auth, companyID)
         elif auth.get("code"):
-            callback = login(auth)
+            return login(auth)
         else:
-            callback = Callback(False, "Parameters for connection were not provided")
+            return Callback(False, "Parameters for connection were not provided")
 
-        if not callback.Success:
-            raise Exception(callback.Message)
-
-        return Callback(True, "Connection has been successful", callback)
     except Exception as exc:
         helpers.logError("Marketplace.Calendar.Outlook.testConnection() ERROR: " + str(exc))
         return Callback(False, "Error in testing connection")
 
 
 def login(auth):
+    from utilities import helpers
     try:
 
         headers = {'Content-Type': 'application/x-www-form-urlencoded'}
 
         body = {
             "grant_type": "authorization_code",
-            "client_id": client_id,
-            "client_secret": client_secret,
-            "redirect_uri": "https://www.thesearchbase.com/api/marketplace_callback",
+            "client_id": CLIENT_ID,
+            "client_secret": CLIENT_SECRET,
+            "redirect_uri": helpers.getDomain() + "/dashboard/marketplace/Outlook",
             "code": auth.get("code")
         }
 
@@ -78,15 +76,16 @@ def login(auth):
 
 
 def retrieveAccessToken(auth, companyID):
+    from utilities import helpers
     try:
         auth = dict(auth)
         headers = {'Content-Type': 'application/x-www-form-urlencoded'}
 
         body = {
             "grant_type": "refresh_token",
-            "client_id": client_id,
-            "client_secret": client_secret,
-            "redirect_uri": "https://www.thesearchbase.com/api/marketplace_callback",
+            "client_id": CLIENT_ID,
+            "client_secret": CLIENT_SECRET,
+            "redirect_uri": helpers.getDomain() + "/dashboard/marketplace/Outlook",
             "refresh_token": auth.get("refresh_token")
         }
 

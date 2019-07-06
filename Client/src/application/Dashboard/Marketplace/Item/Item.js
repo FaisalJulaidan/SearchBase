@@ -12,6 +12,7 @@ import {VincereFeatures, VincereHeader} from "./Components/Vincere";
 import {GreenhouseFeatures, GreenhouseFormItem, GreenhouseHeader} from "./Components/Greenhouse";
 import {GoogleFeatures, GoogleHeader} from './Components/Google'
 import {OutlookFeatures, OutlookHeader} from "./Components/Outlook";
+import {MercuryFeatures, MercuryHeader} from "./Components/Mercury";
 import {CSVLink} from "react-csv";
 import data from '../Items.json'
 import {connect} from 'react-redux';
@@ -200,6 +201,19 @@ class Item extends React.Component {
                     return <OutlookFeatures/>;
                 if (place === 'button') {
                     windowObject.url = "https://login.microsoftonline.com/common/oauth2/v2.0/authorize?response_type=code&client_id=0978960c-c837-479f-97ef-a75be4bbacd4&response_mode=query&scope=openid+https%3A%2F%2Fgraph.microsoft.com%2Fcalendars.readwrite%20+offline_access&redirect_uri="+ getLink("/dashboard/marketplace/Outlook");
+                    return <DefaultButton buttonText={'Connect to Outlook'}
+                                          windowObject={windowObject}
+                                          {...buttonsOptions}/>;
+                }
+                break;
+
+            case "Mercury":
+                if (place === 'header')
+                    return <MercuryHeader/>;
+                if (place === 'features')
+                    return <MercuryFeatures/>;
+                if (place === 'button') {
+                    windowObject.url = "https://login.microsoftonline.com/common/oauth2/v2.0/authorize?response_type=code&client_id=ba1f45c8-500c-4c16-b23e-911c3278d6ab&response_mode=query&scope=openid+https%3A%2F%2Fgraph.microsoft.com%2Fcalendars.readwrite%20+offline_access&redirect_uri="+ getLink("/dashboard/marketplace/Outlook");
                     return <DefaultButton buttonText={'Connect to Outlook'}
                                           windowObject={windowObject}
                                           {...buttonsOptions}/>;

@@ -41,6 +41,14 @@
       "status": "NOT_CONNECTED"
     },
     {
+      "title": "Mercury",
+      "desc": "Calendar is the calendar and scheduling component of Outlook that is fully integrated with email, contacts, and other features.",
+      "image": "/static/images/CRM/mercury.png",
+      "type": "Mercury",
+      "disabled": false,
+      "status": "NOT_CONNECTED"
+    },
+    {
       "title": "Google",
       "desc": "Google Calendar is a time-management and scheduling calendar service lets you keep track of important events, share your schedule.",
       "image": "/static/images/CRM/gmail.svg",

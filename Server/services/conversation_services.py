@@ -15,7 +15,6 @@ from utilities import json_schemas, helpers
 # Process chatbot conversation data
 def processConversation(assistantHashID, data: dict) -> Callback:
     try:
-
         if data['score'] > 1:
             raise Exception("Score is corrupted")
 

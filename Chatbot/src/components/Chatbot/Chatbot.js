@@ -130,8 +130,6 @@ class Chatbot extends React.Component {
             this.setState({ isFetching: false, isFetched: false });
             if (this.isDev) this.setState({isFetched: true});
         });
-
-
     }
 
     openWindow = () => {

@@ -12,6 +12,7 @@ from services.Marketplace.CRM import crm_services
 from sqlalchemy import and_
 from sqlalchemy_utils import Currency
 from utilities import helpers
+import time
 
 
 def fetchDatabase(id, companyID: int, pageNumber: int) -> Callback:
@@ -69,7 +70,7 @@ def uploadDatabase(data: dict, companyID: int) -> Callback:
                     if key in [Candidate.Currency.name, Job.Currency.name]:
                         parsed[key] = Currency(data)
                     elif key in [Candidate.PayPeriod.name, Job.PayPeriod.name]:
-                        parsed[key] = enums.Period[data]
+                        parsed[key] = Period[data]
                     elif key in [Job.JobStartDate.name, Job.JobEndDate.name]:
                         parsed[key] = datetime(year=data['year'],
                                                month=data['month'],
@@ -102,12 +103,12 @@ def uploadDatabase(data: dict, companyID: int) -> Callback:
         databaseName = databaseData["databaseName"]
 
         # Upload Candidates database
-        if databaseData['databaseType'] == enums.DatabaseType.Candidates.name:
+        if databaseData['databaseType'] == DatabaseType.Candidates.name:
             newDatabase = createDatabase(databaseName, DatabaseType.Candidates)
             uploadCandidates(databaseData, newDatabase)
 
         # Upload Jobs database
-        elif databaseData['databaseType'] == enums.DatabaseType.Jobs.name:
+        elif databaseData['databaseType'] == DatabaseType.Jobs.name:
             newDatabase = createDatabase(databaseName, DatabaseType.Jobs)
             uploadJobs(databaseData, newDatabase)
         else:
@@ -245,9 +246,9 @@ def scan(session, assistantHashID):
         extraRecords = getCRMData(assistant, databaseType.name, session)
 
         # Scan database for solutions based on database type
-        if databaseType == enums.DatabaseType.Candidates:
+        if databaseType == DatabaseType.Candidates:
             return scanCandidates(session, [d[0] for d in databases], extraRecords)
-        elif databaseType == enums.DatabaseType.Jobs:
+        elif databaseType == DatabaseType.Jobs:
             return scanJobs(session, [d[0] for d in databases], extraRecords)
         else:
             return Callback(False, "Database type is not recognised", None)
@@ -350,7 +351,7 @@ def scanCandidates(session, dbIDs, extraCandidates=None):
             random.shuffle(desc)
             data.append({
                 "id": record["ID"],
-                "databaseType": enums.DatabaseType.Candidates.value,
+                "databaseType": DatabaseType.Candidates.value,
                 "title": "Candidate " + indexes[i],
                 "subTitles": [],
                 "description": " ".join(desc),
@@ -476,7 +477,7 @@ def scanJobs(session, dbIDs, extraJobs=None):
 
             data.append({
                 "id": record["ID"],
-                "databaseType": enums.DatabaseType.Jobs.value,
+                "databaseType": DatabaseType.Jobs.value,
                 "title": record[Job.JobTitle.name],
                 "subTitles": subTitles,
                 "description": " ".join(desc),
@@ -484,7 +485,6 @@ def scanJobs(session, dbIDs, extraJobs=None):
                 "output": helpers.encrypt(record, True)
             })
 
-        # time.sleep(5)
         return Callback(True, '', data)
 
     except Exception as exc:

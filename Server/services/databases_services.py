@@ -494,10 +494,10 @@ def scanJobs(session, dbIDs, extraJobs=None):
 
 
 def __wordsCounter(dataType: DT, dbColumn, keywords, df, x=1):
-    if keywords.get(dataType.value['name']):
-        df['Score'] += x * df[dbColumn.name].str.count('|'.join(keywords[dataType.value['name']]),
+    keywords = keywords.get(dataType.value['name'])
+    if keywords:
+        df['Score'] += x * df[dbColumn.name].str.count('|'.join([re.escape(k) for k in keywords ]),
                                                        flags=re.IGNORECASE) | 0
-
 
 def __numCounter(dbColumn, compareSign, dataType: DT, keywords, df, plus=1, addInputToScore=False):
     if keywords.get(dataType.value['name']):

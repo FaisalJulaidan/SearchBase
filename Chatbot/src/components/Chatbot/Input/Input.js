@@ -94,7 +94,7 @@ class Input extends React.Component {
                     inputSubmitted(inputText, [inputText]);
                     break;
                 default:
-                    inputSubmitted(inputText, inputText.trim().split(' '));
+                    inputSubmitted(inputText, inputTextstring.trim().split(' '));
             }
             this.setState({inputText: ''});
             // if we set botIsTyping to true it means user cannot submit multiple input unless bot responded

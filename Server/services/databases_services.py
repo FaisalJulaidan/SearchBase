@@ -535,7 +535,7 @@ def __salary(row, dbSalaryColumn, dbCurrencyColumn, dbPayPeriodColumn, salaryInp
     if (not row[dbPayPeriodColumn.name] == userSalary[2]) and dbSalary > 0:
         dbSalary = helpers.convertSalaryPeriod(dbSalary, row[dbPayPeriodColumn.name], Period[userSalary[2]])
 
-    # Add old score to new score if success
+    # Add old score to new score
     plus += row['Score']
 
     # Compare salaries, if true then return 'plus' to be added to the score otherwise old score

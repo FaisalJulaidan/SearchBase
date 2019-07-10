@@ -15,6 +15,7 @@ import {OutlookFeatures, OutlookHeader} from "./Components/Outlook";
 import {CSVLink} from "react-csv";
 import data from '../Items.json'
 import {connect} from 'react-redux';
+import queryString from 'query-string'
 
 const TabPane = Tabs.TabPane;
 const FormItem = Form.Item;
@@ -33,6 +34,21 @@ class Item extends React.Component {
                 if (this.marketplaceItem.type === "Bullhorn" && this.props.connectionStatus === "CONNECTED")
                     this.props.dispatch(marketplaceActions.exportRecruiterValueReport({Name: this.marketplaceItem.type}))
             });
+    }
+
+    componentDidMount() {
+
+        // Authenticate users through Callback/Redirect URI
+        const {location, dispatch} = this.props;
+        let type = location.pathname.split('/').slice(-1)[0]; // ex. Bullhorn, Adapt...
+        let params = queryString.parse(location.search);
+
+        if( (type === "Bullhorn" || type === "Vincere" || type === "Outlook") && params['code']){
+            dispatch(marketplaceActions.connectMarketplace(type, {...params})); // connect
+            this.props.history.replace("/dashboard/marketplace/" + type) // clean the url from args
+
+        }
+
     }
 
     componentWillReceiveProps(nextProps) {
@@ -106,7 +122,8 @@ class Item extends React.Component {
                 if (place === 'features')
                     return <BullhornFeatures/>;
                 if (place === 'button') {
-                    windowObject.url = "https://auth.bullhornstaffing.com/oauth/authorize?response_type=code&redirect_uri=https://www.thesearchbase.com/api/bullhorn_callback&client_id=7719607b-7fe7-4715-b723-809cc57e2714";
+                    windowObject.url = "https://auth.bullhornstaffing.com/oauth/authorize?response_type=code&client_id=7719607b-7fe7-4715-b723-809cc57e2714&redirect_uri=" + getLink("/dashboard/marketplace/Bullhorn");
+                    // return <a href={windowObject.url}>Click me</a>
                     return <DefaultButton buttonText={'Connect to Bullhorn'}
                                           windowObject={windowObject}
                                           {...buttonsOptions}/>;
@@ -140,7 +157,7 @@ class Item extends React.Component {
                 if (place === 'features')
                     return <VincereFeatures/>;
                 if (place === 'button') {
-                    windowObject.url = "https://id.vincere.io/oauth2/authorize?client_id=9829f4ad-3ff3-4d00-8ecf-e5d7fa2983d1&response_type=code&redirect_uri=https://www.thesearchbase.com/api/marketplace_callback";
+                    windowObject.url = "https://id.vincere.io/oauth2/authorize?client_id=9829f4ad-3ff3-4d00-8ecf-e5d7fa2983d1&response_type=code&redirect_uri=" + ""+getLink("/dashboard/marketplace/Vincere");
                     return <DefaultButton buttonText={'Connect to Vincere'}
                                           windowObject={windowObject}
                                           {...buttonsOptions}/>;
@@ -182,7 +199,7 @@ class Item extends React.Component {
                 if (place === 'features')
                     return <OutlookFeatures/>;
                 if (place === 'button') {
-                    windowObject.url = "https://login.microsoftonline.com/common/oauth2/v2.0/authorize?response_type=code&client_id=0978960c-c837-479f-97ef-a75be4bbacd4&redirect_uri=https://www.thesearchbase.com/api/marketplace_callback&response_mode=query&scope=openid+https%3A%2F%2Fgraph.microsoft.com%2Fcalendars.readwrite%20+offline_access";
+                    windowObject.url = "https://login.microsoftonline.com/common/oauth2/v2.0/authorize?response_type=code&client_id=0978960c-c837-479f-97ef-a75be4bbacd4&response_mode=query&scope=openid+https%3A%2F%2Fgraph.microsoft.com%2Fcalendars.readwrite%20+offline_access&redirect_uri="+ getLink("/dashboard/marketplace/Outlook");
                     return <DefaultButton buttonText={'Connect to Outlook'}
                                           windowObject={windowObject}
                                           {...buttonsOptions}/>;

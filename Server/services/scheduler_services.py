@@ -93,6 +93,7 @@ def pingDatabaseConnection():
         from app import app
         with app.app_context():
             db.engine.execute("SELECT NOW();")
+            db.session.commit()
     except Exception as e:
         helpers.logError("Ping! Database Connection ERROR: " + str(e))
 

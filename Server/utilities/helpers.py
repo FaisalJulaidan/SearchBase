@@ -50,7 +50,7 @@ currencyConverter = CurrencyRates()
 # Get domain based on current environment
 def getDomain():
     if os.environ['FLASK_ENV'] == 'development':
-        return 'localhost:3000'
+        return 'http://localhost:3000'
     elif os.environ['FLASK_ENV'] == 'staging':
         return 'http://staging.thesearchbase.com'
     elif os.environ['FLASK_ENV'] == 'production':

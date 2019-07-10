@@ -67,7 +67,7 @@ def getSolutions_forChatbot(assistantHashID):
         return helpers.jsonResponse(True, 200, "show top is 0", [])
 
 
-@chatbot_router.route("/assistant/<string:assistantIDAsHash>/session/<int:sessionID>/file", methods=['POST'])
+@chatbot_router.route("/assistant/<string:assistantIDAsHash>/chatbot/<int:sessionID>/file", methods=['POST'])
 def chatbot_upload_files(assistantIDAsHash, sessionID):
     callback: Callback = conversation_services.getByID(sessionID, helpers.decodeID(assistantIDAsHash)[0])
     if not callback.Success:
@@ -89,7 +89,6 @@ def chatbot_upload_files(assistantIDAsHash, sessionID):
 
                 if file.filename == '':
                     return helpers.jsonResponse(False, 404, "No selected file")
-
                 # Generate unique name: hash_sessionIDEncrypted.extension
                 filename = str(uuid.uuid4()) + '_' + helpers.encodeID(sessionID) + '.' + \
                            secure_filename(file.filename).rsplit('.', 1)[1].lower()

@@ -2,7 +2,6 @@ import React from 'react'
 import styles from './ChatbotDirectLink.module.less'
 import PublicNavbar from "components/PublicNavbar/PublicNavbar";
 import axios from "axios";
-import {getLink} from "helpers";
 
 class ChatbotDirectLink extends React.Component {
 
@@ -14,8 +13,17 @@ class ChatbotDirectLink extends React.Component {
     componentDidMount() {
         const assistantID = this.props.location.pathname.split('/')[2];
         if (assistantID) {
+
+            const root = document.createElement('div');
+            root.id = "TheSearchBase_Chatbot";
+            document.body.appendChild(root);
+
+
             const script = document.createElement("script");
-            script.src = getLink("/static/widgets/chatbot.js");
+            // Development
+            script.src = "http://localhost:3001/vendor/js/bundle.js";
+            // script.src = getLink("/static/widgets/build/vendor/js/main.5a3a2054.js");
+
             script.async = true;
             script.defer = true;
             script.setAttribute('data-directLink', '');
@@ -23,6 +31,16 @@ class ChatbotDirectLink extends React.Component {
             script.setAttribute('data-id', assistantID);
             script.setAttribute('data-circle', '#9254de');
             document.body.appendChild(script);
+
+
+            // var link = document.createElement("link");
+            // link.href = getLink('/static/widgets/build/vendor/css/main.9fcdf850.css');
+            // link.type = "text/css";
+            // link.rel = "stylesheet";
+            // document.getElementsByTagName("head")[0].appendChild(link);
+
+
+
 
             axios.get(`/api/assistant/${assistantID}/chatbot`)
                 .then(res => {

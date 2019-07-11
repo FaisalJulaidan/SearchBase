@@ -291,7 +291,7 @@ def scanCandidates(session, dbIDs, extraCandidates=None):
         # Salary comparision for JobSalary (LessThan is forced)
         salaryInputs: list = keywords.get(DT.JobSalary.value['name'])
         if salaryInputs and len(salaryInputs):
-            df[['Score', Candidate.CandidateDesiredSalary.name, Candidate.Currency.name, Job.PayPeriod.name]] = \
+            df[['Score', Candidate.CandidateDesiredSalary.name, Candidate.Currency.name]] = \
                 df.apply(lambda row: __salary(row, Candidate.CandidateDesiredSalary,
                                               Candidate.Currency, Candidate.PayPeriod,
                                               salaryInputs[-1], plus=8, forceLessThan=True), axis=1, result_type='expand')
@@ -299,7 +299,7 @@ def scanCandidates(session, dbIDs, extraCandidates=None):
         # Salary comparision for CandidateDesiredSalary
         salaryInputs: list = keywords.get(DT.CandidateDesiredSalary.value['name'])
         if salaryInputs and len(salaryInputs):
-            df[['Score', Candidate.CandidateDesiredSalary.name, Candidate.Currency.name, Job.PayPeriod.name]] = \
+            df[['Score', Candidate.CandidateDesiredSalary.name, Candidate.Currency.name]] = \
                 df.apply(lambda row: __salary(row, Candidate.CandidateDesiredSalary,
                                               Candidate.Currency, Candidate.PayPeriod,
                                               salaryInputs[-1], plus=8, forceLessThan=False), axis=1, result_type='expand')
@@ -390,7 +390,7 @@ def scanJobs(session, dbIDs, extraJobs=None):
         # Salary comparision
         salaryInputs: list = keywords.get(DT.JobSalary.value['name'], keywords.get(DT.CandidateDesiredSalary.value['name']))
         if salaryInputs and len(salaryInputs):
-            df[['Score', Job.JobSalary.name, Job.Currency.name, Job.PayPeriod.name]] = \
+            df[['Score', Job.JobSalary.name, Job.Currency.name]] = \
                 df.apply(lambda row: __salary(row, Job.JobSalary, Job.Currency, Job.PayPeriod, salaryInputs[-1], 8),
                                                                             axis=1, result_type='expand')
 
@@ -532,17 +532,17 @@ def __salary(row, dbSalaryColumn, dbCurrencyColumn, dbPayPeriodColumn, salaryInp
         row[dbSalaryColumn.name] = dbSalary
 
     # Convert salary rate if did not match with user's entered pay period e.g. Annually to Daily...
-    if (not row[dbPayPeriodColumn.name] == userSalary[2]) and dbSalary > 0:
-        dbSalary = helpers.convertSalaryPeriod(dbSalary, row[dbPayPeriodColumn.name], Period[userSalary[2]])
+    # if (not row[dbPayPeriodColumn.name] == userSalary[2]) and dbSalary > 0:
+    #     dbSalary = helpers.convertSalaryPeriod(dbSalary, row[dbPayPeriodColumn.name], Period[userSalary[2]])
 
     # Add old score to new score
     plus += row['Score']
 
     # Compare salaries, if true then return 'plus' to be added to the score otherwise old score
     if not forceLessThan:
-        return (plus if (float(userMin) >= dbSalary <= float(userMax)) else row['Score']), dbSalary, userSalary[1], userSalary[2]
+        return (plus if (float(userMin) >= dbSalary <= float(userMax)) else row['Score']), dbSalary, userSalary[1]
     else:  # Less
-        return (plus if dbSalary <= float(userMax) else row['Score']), dbSalary, userSalary[1], userSalary[2]
+        return (plus if dbSalary <= float(userMax) else row['Score']), dbSalary, userSalary[1]
 
 
 def createPandaCandidate(id, name, email, mobile, location, skills,

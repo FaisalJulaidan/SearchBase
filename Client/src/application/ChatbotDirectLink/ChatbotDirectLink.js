@@ -21,7 +21,7 @@ class ChatbotDirectLink extends React.Component {
 
             const script = document.createElement("script");
             // Development
-            script.src = "http://localhost:3001/vendor/js/bundle.js";
+            script.src = "http://localhost:3000/vendor/js/bundle.js";
             // script.src = getLink("/static/widgets/build/vendor/js/main.5a3a2054.js");
 
             script.async = true;

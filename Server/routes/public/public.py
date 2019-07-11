@@ -1,6 +1,6 @@
 import os
 
-from flask import Blueprint, render_template, request, send_from_directory
+from flask import Blueprint, render_template, request, send_from_directory, make_response
 from flask_cors import CORS
 from flask_mail import Message
 
@@ -15,10 +15,12 @@ CORS(public_router)
 # ======== Server React =========== #
 def serve(path=''):
     if path != "" and os.path.exists("static/react_app/" + path):
-        return send_from_directory('static/react_app', path)
+        response = make_response(send_from_directory('static/react_app', path))
     else:
-        return send_from_directory('static/react_app', 'index.html')
+        response = make_response(send_from_directory('static/react_app', 'index.html'))
 
+    response.headers["Cache-Control"] = "no-store, no-cache"
+    return response
 
 # Serve React App
 @public_router.route('/login')

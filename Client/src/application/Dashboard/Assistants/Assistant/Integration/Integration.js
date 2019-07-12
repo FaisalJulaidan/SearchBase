@@ -52,7 +52,8 @@ class Integration extends React.Component {
 
         const script = document.createElement("script");
 
-        script.src = this.state.source;
+        // script.src = this.state.source;
+        script.src = "http://localhost:3000/vendor/js/bundle.js";
         script.async = this.state.async;
         script.defer = this.state.defer;
         script.setAttribute("data-name", this.state.dataName);

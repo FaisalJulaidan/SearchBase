@@ -13,33 +13,24 @@ class ChatbotDirectLink extends React.Component {
     componentDidMount() {
         const assistantID = this.props.location.pathname.split('/')[2];
         if (assistantID) {
-
-            const root = document.createElement('div');
-            root.id = "TheSearchBase_Chatbot";
-            document.body.appendChild(root);
-
-
             const script = document.createElement("script");
             // Development
-            script.src = "http://localhost:3000/vendor/js/bundle.js";
+            script.src = "http://localhost:3001/vendor/js/bundle.js";
             // script.src = getLink("/static/widgets/build/vendor/js/main.5a3a2054.js");
 
             script.async = true;
             script.defer = true;
-            script.setAttribute('data-directLink', '');
+            script.setAttribute('directLink', '');
             script.setAttribute('data-name', 'tsb-widget');
             script.setAttribute('data-id', assistantID);
-            script.setAttribute('data-circle', '#9254de');
+            script.setAttribute('data-circle', '#68de41');
             document.body.appendChild(script);
-
 
             // var link = document.createElement("link");
             // link.href = getLink('/static/widgets/build/vendor/css/main.9fcdf850.css');
             // link.type = "text/css";
             // link.rel = "stylesheet";
             // document.getElementsByTagName("head")[0].appendChild(link);
-
-
 
 
             axios.get(`/api/assistant/${assistantID}/chatbot`)
@@ -55,9 +46,10 @@ class ChatbotDirectLink extends React.Component {
 
     render() {
         return (
-            <div style={{height: '100%'}}>
+            <div style={{height: '100%', background: '#F4F6FC'}}>
                 <PublicNavbar companyLogo={this.state.LogoPath} CompanyName={this.state.CompanyName}/>
-                <div id="directlink" className={styles.Wrapper}></div>
+                <div id={'direct_link_container'} className={styles.Wrapper}>
+                </div>
             </div>
         )
     }

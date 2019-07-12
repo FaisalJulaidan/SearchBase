@@ -1,0 +1,179 @@
+
+.Flow {
+    height: calc(100% - 150px);
+    width: 100%;
+    display: flex;
+    flex-flow: column;
+    padding: 10px 20px 15px;
+    overflow-x: hidden;
+    transition: height 0.5s;
+    overflow-y: auto;
+    will-change: transform;
+}
+
+.FlowBottom {
+}
+
+.Extended {
+    height: calc(100% - 110px)
+}
+
+.Flow > p {
+    font-size: 15px;
+}
+
+.Flow::-webkit-scrollbar {
+    display: none;
+}
+
+.BOT {
+    align-self: flex-start;
+    flex-flow: column;
+    position: relative;
+    flex-wrap: nowrap;
+    width: 100%;
+    height: auto;
+}
+
+.BOT_IE11 {
+    position: relative;
+    /*padding: 10px 15px;*/
+    background: #f2f2f2;
+    color: black;
+    margin: 5px;
+    max-width: 100%;
+}
+
+.USER {
+    align-self: flex-end;
+    border-radius: 20px;
+    position: relative;
+}
+
+.solution_margin{
+
+}
+
+/* ----------- iPhone 5, 5S, 5C and 5SE ----------- */
+/* Portrait */
+@media only screen
+and (min-device-width: 320px)
+and (max-device-width: 320px)
+and (-webkit-min-device-pixel-ratio: 2)
+and (orientation: portrait) {
+    .BOT {
+        padding: 10px 15px;
+    }
+}
+
+
+.BOT > p {
+    margin: 0;
+    word-break: break-word;
+}
+
+.BOT_IE11 > p {
+    margin: 0;
+    word-break: break-word;
+}
+
+/*
+.BOT::before {
+    content: "";
+    position: absolute;
+    z-index: 2;
+    bottom: -2px;
+    left: -7px;
+    height: 20px;
+    border-left: 20px solid #f2f2f2;
+    border-bottom-right-radius: 16px 14px;
+    -webkit-transform: translate(0, -2px);
+}
+
+.BOT::after {
+    content: "";
+    position: absolute;
+    z-index: 3;
+    bottom: -2px;
+    left: 15px;
+    width: 15px;
+    height: 20px;
+    background: #fafafa;
+    border-bottom-right-radius: 10px;
+    -webkit-transform: translate(-30px, -2px);
+} */
+
+
+/* ----------- Animation ----------- */
+@keyframes BounceIn {
+    from,
+    20%,
+    40%,
+    60%,
+    80%,
+    to {
+        animation-timing-function: cubic-bezier(0.215, 0.61, 0.355, 1);
+    }
+
+    0% {
+        opacity: 0;
+        transform: scale3d(0.3, 0.3, 0.3);
+    }
+
+    20% {
+        transform: scale3d(1.1, 1.1, 1.1);
+    }
+
+    40% {
+        transform: scale3d(0.9, 0.9, 0.9);
+    }
+
+    60% {
+        opacity: 1;
+        transform: scale3d(1.03, 1.03, 1.03);
+    }
+
+    80% {
+        transform: scale3d(0.97, 0.97, 0.97);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale3d(1, 1, 1);
+    }
+}
+
+.BounceIn {
+    animation-duration: 1s;
+    animation-name: BounceIn;
+}
+
+@keyframes fadeOut {
+    from {
+        opacity: 1;
+    }
+
+    to {
+        opacity: 0;
+    }
+}
+
+.fadeOut {
+    animation-name: fadeOut;
+    animation-duration: 1000ms
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+.fadeIn {
+    animation-name: fadeIn;
+    animation-duration: 1000ms;
+}

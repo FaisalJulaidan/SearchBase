@@ -1,0 +1,40 @@
+import React from 'react';
+import ReactDOM from 'react-dom';
+import './index.css';
+import * as serviceWorker from './serviceWorker';
+
+import { compose, createStore } from 'redux';
+import { Provider } from 'react-redux';
+import reducers from './store/reducers';
+import WebFont from 'webfontloader';
+import 'react-app-polyfill/ie11';
+import Chatbot from './components/Chatbot/Chatbot';
+
+const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
+const store = createStore(reducers, composeEnhancers());
+WebFont.load({ google: { families: ['Source Sans Pro', 'sans-serif'] } });
+
+const scriptTag = document.querySelector('script[data-name="tsb-widget"][data-id]');
+const isDirectLink = scriptTag.getAttribute('directLink') === '';
+const assistantID = scriptTag.getAttribute('data-id');
+const btnColor = scriptTag.getAttribute('data-circle') || '#1890ff';
+
+let root = document.createElement('div');
+root.id = 'TheSearchBase_Chatbot';
+
+if (isDirectLink)
+    document.getElementById('direct_link_container').appendChild(root);
+else
+    document.body.appendChild(root);
+
+ReactDOM.render(
+    <Provider store={store}>
+        <Chatbot isDirectLink={isDirectLink} btnColor={btnColor}
+                 assistantID={assistantID}/>
+    </Provider>, root
+);
+
+// If you want your app to work offline and load faster, you can change
+// unregister() to register() below. Note this comes with some pitfalls.
+// Learn more about service workers: https://bit.ly/CRA-PWA
+serviceWorker.unregister();

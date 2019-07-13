@@ -21,7 +21,7 @@ class ChatbotDirectLink extends React.Component {
                 script.src = "http://localhost:3001/vendor/js/bundle.js";
             else {
 
-                script.src = getLink("/static/widgets/build/vendor/js/main.5a3a2054.js");
+                script.src = getLink("/static/widgets/vendor/js/main.5a3a2054.js");
                 script.async = true;
                 script.defer = true;
                 script.setAttribute('directLink', '');
@@ -31,7 +31,7 @@ class ChatbotDirectLink extends React.Component {
                 document.body.appendChild(script);
 
                 const link = document.createElement("link");
-                link.href = getLink('/static/widgets/build/vendor/css/main.9fcdf850.css');
+                link.href = getLink('/static/widgets/vendor/css/main.9fcdf850.css');
                 link.type = "text/css";
                 link.rel = "stylesheet";
                 document.getElementsByTagName("head")[0].appendChild(link);

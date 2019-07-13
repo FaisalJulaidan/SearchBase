@@ -49,20 +49,20 @@ services:
             - frontend
         restart: always
 
-    chatbot_container:
-        container_name: chatbot_container
-        build: ./Chatbot
-        ports:
-            - 9000
-        networks:
-            - frontend
-        restart: always
-
     client_container:
         container_name: client_container
         build: ./Client
         ports:
             - 3000
+        networks:
+            - frontend
+        restart: always
+
+    chatbot_container:
+        container_name: chatbot_container
+        build: ./Chatbot
+        ports:
+            - 9000
         networks:
             - frontend
         restart: always

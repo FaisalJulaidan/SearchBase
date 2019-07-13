@@ -6,10 +6,10 @@ FROM node:9.6.1 as chatbot_builder
 WORKDIR /Chatbot
 
 # Copy package.json file - To be cache -
-#COPY Chatbot/package.json .
+COPY Chatbot/package.json .
 
 # Install npm dependecies
-#RUN npm install --silent
+RUN npm install --silent
 
 # Copy chatbot project from (host) to (container)
 ADD Chatbot .

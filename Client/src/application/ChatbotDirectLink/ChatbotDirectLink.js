@@ -14,24 +14,27 @@ class ChatbotDirectLink extends React.Component {
         const assistantID = this.props.location.pathname.split('/')[2];
         if (assistantID) {
             const script = document.createElement("script");
+
             // Development
-            script.src = "http://localhost:3001/vendor/js/bundle.js";
-            // script.src = getLink("/static/widgets/build/vendor/js/main.5a3a2054.js");
+            if (process.env.NODE_ENV === 'development')
+                script.src = "http://localhost:3001/vendor/js/bundle.js";
+            else {
 
-            script.async = true;
-            script.defer = true;
-            script.setAttribute('directLink', '');
-            script.setAttribute('data-name', 'tsb-widget');
-            script.setAttribute('data-id', assistantID);
-            script.setAttribute('data-circle', '#68de41');
-            document.body.appendChild(script);
+                script.src = getLink("/static/widgets/build/vendor/js/main.5a3a2054.js");
+                script.async = true;
+                script.defer = true;
+                script.setAttribute('directLink', '');
+                script.setAttribute('data-name', 'tsb-widget');
+                script.setAttribute('data-id', assistantID);
+                script.setAttribute('data-circle', '#68de41');
+                document.body.appendChild(script);
 
-            // var link = document.createElement("link");
-            // link.href = getLink('/static/widgets/build/vendor/css/main.9fcdf850.css');
-            // link.type = "text/css";
-            // link.rel = "stylesheet";
-            // document.getElementsByTagName("head")[0].appendChild(link);
-
+                const link = document.createElement("link");
+                link.href = getLink('/static/widgets/build/vendor/css/main.9fcdf850.css');
+                link.type = "text/css";
+                link.rel = "stylesheet";
+                document.getElementsByTagName("head")[0].appendChild(link);
+            }
 
             axios.get(`/api/assistant/${assistantID}/chatbot`)
                 .then(res => {

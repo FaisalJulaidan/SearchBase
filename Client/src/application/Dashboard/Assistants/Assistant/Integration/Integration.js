@@ -1,10 +1,10 @@
 import React from 'react';
 
-import {Button, Col, Input, Row, Divider} from "antd";
+import {Button, Divider, Input} from "antd";
 
 import styles from "./Integration.module.less"
 import ReactDOMServer from 'react-dom/server'
-import {hasher, getLink} from "helpers";
+import {getLink, hasher} from "helpers";
 import {SwatchesPicker} from 'react-color';
 import {connect} from 'react-redux';
 
@@ -52,14 +52,28 @@ class Integration extends React.Component {
 
         const script = document.createElement("script");
 
-        // script.src = this.state.source;
-        script.src = "http://localhost:3000/vendor/js/bundle.js";
-        script.async = this.state.async;
-        script.defer = this.state.defer;
-        script.setAttribute("data-name", this.state.dataName);
-        script.setAttribute("data-id", this.state.assistantID);
-        script.setAttribute("data-circle", this.state.dataCircle);
-        script.setAttribute("id", "oldBotScript");
+        // Development
+        if (process.env.NODE_ENV === 'development')
+            script.src = "http://localhost:3001/vendor/js/bundle.js";
+        else {
+
+            script.src = getLink("/static/widgets/build/vendor/js/main.5a3a2054.js");
+            script.async = true;
+            script.defer = true;
+            script.setAttribute('directLink', '');
+            script.setAttribute('data-name', this.state.dataName);
+            script.setAttribute('data-id', this.state.assistantID);
+            script.setAttribute('data-circle', this.state.dataCircle);
+            script.setAttribute("id", "oldBotScript");
+            document.body.appendChild(script);
+
+            const link = document.createElement("link");
+            link.href = getLink('/static/widgets/build/vendor/css/main.9fcdf850.css');
+            link.type = "text/css";
+            link.rel = "stylesheet";
+            document.getElementsByTagName("head")[0].appendChild(link);
+        }
+
 
         document.body.appendChild(script);
     };

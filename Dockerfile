@@ -10,6 +10,7 @@ COPY Chatbot/package.json .
 
 # Install npm dependecies
 RUN npm install --silent
+RUN npm install react-scripts@1.1.1 -g --silent
 
 # Copy chatbot project from (host) to (container)
 ADD Chatbot .

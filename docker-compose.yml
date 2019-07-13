@@ -31,6 +31,7 @@ services:
     networks:
       - frontend
 
+
   certbot:
     image: certbot/certbot
     entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;'"
@@ -40,33 +41,14 @@ services:
     networks:
       - frontend
 
-  server_container:
-    container_name: server_container
-    build: ./Server
+  web:
+    container_name: python_app
+    build: .
     ports:
       - 5000
     networks:
       - frontend
     restart: always
-
-  chatbot_container:
-    container_name: chatbot_container
-    build: ./Chatbot
-    ports:
-      - 9000
-    networks:
-      - frontend
-    restart: always
-
-  client_container:
-    container_name: client_container
-    build: ./Client
-    ports:
-      - 3000
-    networks:
-      - frontend
-    restart: always
-
 
 networks:
   frontend:

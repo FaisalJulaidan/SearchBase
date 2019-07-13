@@ -2,6 +2,7 @@ import React from 'react'
 import styles from './ChatbotDirectLink.module.less'
 import PublicNavbar from "components/PublicNavbar/PublicNavbar";
 import axios from "axios";
+import {getLink} from 'helpers'
 
 class ChatbotDirectLink extends React.Component {
 

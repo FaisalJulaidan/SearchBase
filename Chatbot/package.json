@@ -78,6 +78,7 @@
     "build": "node scripts/build.js",
     "test": "node scripts/test.js"
   },
+  "homepage": "/chatbot",
   "eslintConfig": {
     "extends": "react-app"
   },

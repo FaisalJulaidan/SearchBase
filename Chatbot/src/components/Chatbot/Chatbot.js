@@ -1,5 +1,5 @@
-import React, {useEffect, useRef} from 'react';
-import {connect} from 'react-redux';
+import React, { useEffect, useRef } from 'react';
+import { connect } from 'react-redux';
 import axios from 'axios';
 // Actions
 import {
@@ -14,8 +14,15 @@ import {
 import './styles/Chatbot.css';
 import 'antd/dist/antd.css';
 // Utils
-import {dataHandler, getLink, isReady, optionalDelayExecution, promiseWrapper, useInterval} from '../../utils';
-import {fetchData, getCurBlock} from '../../utils/flowHandler';
+import {
+    dataHandler,
+    isReady,
+    optionalDelayExecution,
+    promiseWrapper,
+    useInterval,
+    getServerDomain
+} from '../../utils';
+import { fetchData, getCurBlock } from '../../utils/flowHandler';
 // Constants
 import * as flowAttributes from '../../constants/FlowAttributes';
 // Components
@@ -176,7 +183,7 @@ const Chatbot = ({
     // initialize chatbot
     useEffect(() => {
         const fetchChatbot = async () => {
-            const {data, error} = await promiseWrapper(axios.get(getLink(`/api/assistant/${assistantID}/chatbot`)));
+            const { data, error } = await promiseWrapper(axios.get(`${getServerDomain()}/api/assistant/${assistantID}/chatbot`));
             if (error) {
                 // ERROR SENTRY
                 console.log(error);

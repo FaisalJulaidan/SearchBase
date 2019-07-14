@@ -13,6 +13,7 @@ import Solutions from './Solutions';
 
 const BotMessage = ({ type, message, addUserMessage, addBotMessage, setChatbotStatus, index, active }) => {
     let [responded, setResponded] = useState(false);
+    console.log(responded)
     let [skip, setSkip] = useState({skipText: false, skippable: false});
 
     const _checkAfterMessage = (afterMessage, newState, type) => {
@@ -67,9 +68,7 @@ const BotMessage = ({ type, message, addUserMessage, addBotMessage, setChatbotSt
     }, [message]);
 
     useEffect(() => {
-        if (active) {
-            setResponded(!active);
-        }
+        setResponded(!active);
     }, [active]);
 
 

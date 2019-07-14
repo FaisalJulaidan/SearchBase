@@ -15,8 +15,8 @@ import Thinking from './BotMessage/Thinking';
 const Flow = ({ messages, setChatbotStatus, addUserMessage, addBotMessage, thinking, inputOpen, rewindToMessage, resetAsync }) => {
     const flowRef = useRef(null);
     const scrollRef = useRef(null);
-    let [msgList, setMsgList] = useState([]);
     let [active, setActive] = useState(null);
+
     const addStatus = (component, message) => {
         return React.cloneElement(component, {
             setChatbotStatus,
@@ -54,8 +54,8 @@ const Flow = ({ messages, setChatbotStatus, addUserMessage, addBotMessage, think
 
     useEffect(() => {
         dataHandler.updateMessages(messages);
-        setActive(null);
-        setMsgList(messages);
+        const lastBotMessage = messages.slice().reverse().filter(msg => msg.sender === 'BOT')[0];
+        setActive(lastBotMessage ? lastBotMessage.index : null)
     }, [messages]);
 
 
@@ -71,14 +71,13 @@ const Flow = ({ messages, setChatbotStatus, addUserMessage, addBotMessage, think
     };
 
     const rewind = (idx) => {
-        const active = msgList.filter(msg => msg.index <= idx).reverse().filter(msg => msg.sender === 'BOT')[0];
-        setActive(active.index);
-        rewindToMessage(active.index);
+        const lastBotMessage = messages.slice().filter(msg => msg.index <= idx).reverse().filter(msg => msg.sender === 'BOT')[0];
+        rewindToMessage(lastBotMessage.index);
         resetAsync();
         setChatbotStatus({ thinking: false, finished: false });
     };
+    let groupedMessages = groupMessages(messages);
 
-    let groupedMessages = groupMessages(msgList);
     return (
         <div className={['Flow', (inputOpen ? '' : 'Extended')].join(' ')} ref={flowRef}>
             {

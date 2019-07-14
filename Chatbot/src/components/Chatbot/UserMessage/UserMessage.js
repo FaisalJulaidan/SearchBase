@@ -9,7 +9,6 @@ import TextMessage from './TextMessage';
 import { Icon, Tooltip } from 'antd';
 
 const UserMessage = ({ type, message, addUserMessage, setChatbotStatus, rewind, finished }) => {
-    console.log(finished);
     const addStatus = (component) => {
         return React.cloneElement(component, { setChatbotStatus, addUserMessage });
     };
@@ -35,7 +34,7 @@ const UserMessage = ({ type, message, addUserMessage, setChatbotStatus, rewind, 
             {finished ? null : <Tooltip placement={'left'}
                                         getPopupContainer={() => document.getElementById('TheSearchBase_Chatbot')}
                                         title="Rewind to change your answer to this question">
-              <Icon type="sync" onClick={() => rewind(message.index)}/>
+                <Icon type="sync" onClick={() => rewind(message.index)}/>
             </Tooltip>}
             <div className={'User_Message'}>
                 {addStatus(findMessageType(type))}
@@ -46,7 +45,7 @@ const UserMessage = ({ type, message, addUserMessage, setChatbotStatus, rewind, 
 };
 
 const mapStateToProps = (state) => ({
-  finished: state.chatbot.status.finished
+    finished: state.chatbot.status.finished
 })
 
 export default connect(mapStateToProps)(UserMessage);

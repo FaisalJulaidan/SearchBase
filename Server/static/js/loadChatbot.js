@@ -5,7 +5,7 @@ function main() {
         // if (window.location.port !== "")
             // colon = ":";
         const {protocol, port, hostname} = window.location;
-        return 'https://www.thesearchbase.com/' + src;
+        return 'https://www.thesearchbase.com' + src;
     };
 
     fetch(getLink("/static/widgets/chatbot/asset-manifest.json?NoCache=" + new Date().getTime()))

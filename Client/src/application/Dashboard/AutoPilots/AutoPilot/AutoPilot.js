@@ -110,7 +110,7 @@ class AutoPilot extends React.Component {
         const /**@type AutoPilot*/ autoPilot = this.props.autoPilot;
         const layout = {
             labelCol: {span: 4},
-            wrapperCol: {span: 16},
+            wrapperCol: {span: 18},
         };
         const {getFieldDecorator} = this.props.form;
         return (
@@ -177,7 +177,7 @@ class AutoPilot extends React.Component {
 
                                 <br />
                                 <Divider/>
-                                <h2> Applications Acceptance Automation:</h2>
+                                <h2> Applications Acceptance Automation</h2>
                                 <FormItem label="Auto accept applicants "
                                           help="Select the percentage to auto accept the applicants">
                                     {getFieldDecorator('acceptApplications', {
@@ -254,7 +254,7 @@ class AutoPilot extends React.Component {
 
                                 <br />
                                 <Divider/>
-                                <h2> Manage Appointments Automation:</h2>
+                                <h2> Manage Appointments Automation (coming soon)</h2>
                                 <FormItem label="Auto manage candidates appointments"
                                           help="Accepted candidates will receive an email (if provided) to pick
                                            a time slot for an appointment. You can then confirm these
@@ -267,7 +267,8 @@ class AutoPilot extends React.Component {
                                     })(
                                         <div style={{marginLeft: 3}}>
                                             <Switch onChange={this.onAppointmentChange}
-                                                    checked={this.state.sendCandidatesAppointments}/>
+                                                    checked={this.state.sendCandidatesAppointments}
+                                                    disabled={true}/>
                                         </div>
                                     )}
                                 </FormItem>

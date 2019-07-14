@@ -184,9 +184,9 @@ class Dashboard extends Component {
                             <span>Database</span>
                         </Menu.Item>
 
-                        <Menu.Item key="calendar">
+                        <Menu.Item disabled={true} key="calendar">
                             <Icon type="calendar"/>
-                            <span>Calendar</span>
+                            <span>Calendar (soon)</span>
                         </Menu.Item>
 
                         <Divider/>
@@ -261,7 +261,6 @@ class Dashboard extends Component {
                                             <Route path={`${match.path}/databases`} component={Databases} exact/>
                                             <Route path={`${match.path}/databases/:id`} component={Database} exact/>
 
-                                            <Route path={`${match.path}/calendar`} component={Calendar} exact/>
                                             <Route path={`${match.path}/account`} component={Account} exact/>
                                             <Route path={`${match.path}/billing`} component={Billing} exact/>
 
@@ -272,6 +271,8 @@ class Dashboard extends Component {
                                                    exact/>
                                             <Route path={`${match.path}/documentation`} component={Documentation}
                                                    exact/>
+                                            {/*<Route path={`${match.path}/calendar`} component={Calendar} exact/>*/}
+
                                             <Route path="/dashboard" component={Home}/>
                                         </Switch>
                                     </Suspense>

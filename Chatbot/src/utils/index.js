@@ -4,6 +4,17 @@ const isReady = (chatbot) => {
     return !chatbot.status.loading && !chatbot.status.finished;
 };
 
+const getLink = (src) => {
+    // include the colon if there is port number, which means localhost and not real server
+    let colon = "";
+    if (window.location.port !== "")
+        colon = ":";
+
+
+    const {protocol, hostname} = window.location;
+    return protocol + '//' + hostname + colon + 5000 + src;
+};
+
 const getServerDomain = () => {
     const env = process.env.REACT_APP_ENV;
     if (env === 'development')
@@ -51,7 +62,7 @@ const delayMessageLength = (message) => {
 };
 
 
-export { isReady, getServerDomain, optionalDelayExecution, createBlock, delayMessageLength };
+export {isReady, getServerDomain, optionalDelayExecution, createBlock, delayMessageLength, getLink};
 
 export * from './flowHandler';
 export * from './dataHandler';

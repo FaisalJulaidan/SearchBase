@@ -1,6 +1,6 @@
 import React from 'react';
 
-import {Button, Divider, Input, Spin} from "antd";
+import {Button, Divider, Input} from "antd";
 
 import styles from "./Integration.module.less"
 import {getLink, hasher} from "helpers";
@@ -18,7 +18,6 @@ class Integration extends React.Component {
         async: true,
         defer: true,
         isTestButtonDisabled: false,
-        assetsManifest: null
     };
 
     componentDidMount() {
@@ -111,21 +110,13 @@ class Integration extends React.Component {
                         To integrate your assistant, you must paste the pre-made code into any
                         part of your HTML source code.
                     </p>
-                    {
-                        this.state.assetsManifest ?
-                            <TextArea value={this.getChatbotScript()}
-                                      onClick={() => {
-                                          console.log(this.getChatbotScript())
-                                      }}
-                                      id={"pasteArea"}
-                                      style={{height: "70px", fontWeight: "600", margin: "1.5% 0"}}
-                                      readOnly/>
-                            :
-                            <Spin>
-                                <TextArea style={{height: "70px", fontWeight: "600", margin: "1.5% 0"}}
-                                          readOnly/>
-                            </Spin>
-                    }
+                    <TextArea value={this.getChatbotScript()}
+                              onClick={() => {
+                                  console.log(this.getChatbotScript())
+                              }}
+                              id={"pasteArea"}
+                              style={{height: "70px", fontWeight: "600", margin: "1.5% 0"}}
+                              readOnly/>
 
                     <Button onClick={this.copyScriptPaste} className={"ant-btn-primary"}>Copy</Button>
                     <Button style={{marginLeft: "5px"}} onClick={this.generateDirectLink}

@@ -41,7 +41,8 @@ def add_header(r):
 @helpers.gzipped
 def get_widget_legacy():
     if request.method == "GET":
-        return send_from_directory('static/js/loadChatbot.js?NoCache=' + str(int(datetime.timestamp(datetime.now()))))
+        return send_from_directory('static/js',
+                                   'loadChatbot.js')
 
 
 @chatbot_router.route("/assistant/<string:assistantIDAsHash>/chatbot_direct_link", methods=['GET'])

@@ -5,10 +5,12 @@ function main() {
         // if (window.location.port !== "")
             // colon = ":";
         const {protocol, port, hostname} = window.location;
+        return 'http://localhost:5000' + src;
         return 'https://www.thesearchbase.com' + src;
     };
 
-    fetch(getLink("/static/widgets/chatbot/asset-manifest.json?NoCache=" + new Date().getTime()))
+    fetch(getLink("/static/widgets/chatbot/asset-manifest.json?NoCache=" + new Date().getTime()),
+        {mode: 'no-cors'})
         .then(response => response.json())
         .then(manifest => {
             // request and get assistant data
@@ -34,7 +36,10 @@ function main() {
             l.type = "text/css";
             l.rel = "stylesheet";
             document.getElementsByTagName("head")[0].appendChild(l);
-        });
+            // resolve(manifest ? JSON.parse(manifest) : {})
+        }).catch((error) => {
+        // reject(error)
+    });
 }
 
 main();

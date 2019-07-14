@@ -55,10 +55,10 @@ class Integration extends React.Component {
 
         // Development
         if (process.env.NODE_ENV === 'development') {
-            s.src = "http://localhost:3001/vendor/js/bundle.js";
+            s.src = getLink("/vendor/js/bundle.js");
             s.setAttribute("id", "oldBotScript");
-        } else
-            s.src = getLink("/api/widgets/chatbot");
+        }
+        s.src = getLink("/api/widgets/chatbot");
 
         document.body.appendChild(s);
     };

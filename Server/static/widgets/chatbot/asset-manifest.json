@@ -1,0 +1,9 @@
+{
+  "files": {
+    "main.css": "/vendor/css/main.11747642.css",
+    "main.js": "/vendor/js/main.ba18bf65.js",
+    "precache-manifest.b37c513b01348aa863c7386a0eefdd95.js": "/precache-manifest.b37c513b01348aa863c7386a0eefdd95.js",
+    "service-worker.js": "/service-worker.js",
+    "vendor/css/main.11747642.css.map": "/vendor/css/main.11747642.css.map"
+  }
+}

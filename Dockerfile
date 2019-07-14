@@ -57,7 +57,7 @@ RUN pipenv install --system --deploy --ignore-pipfile
 ADD Server .
 
 # Copy static/widgets directory from chatbot_builder, which includes the new build version of chatbot
-COPY --from=chatbot_builder Chatbot/build static/widgets
+COPY --from=chatbot_builder Chatbot/build static/widgets/chatbot
 
 # Copy static/react_app directory from client_builder, which includes the new build version of react_app
 COPY --from=client_builder Client/build static/react_app

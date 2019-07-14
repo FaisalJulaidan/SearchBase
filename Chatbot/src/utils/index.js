@@ -5,7 +5,7 @@ const isReady = (chatbot) => {
 };
 
 const getServerDomain = () => {
-    const env = process.env.NODE_ENV;
+    const env = process.env.REACT_APP_ENV;
     if (env === 'development')
         return 'http://localhost:5000';
     else if (env === 'staging')

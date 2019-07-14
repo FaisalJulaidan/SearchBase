@@ -1,5 +1,4 @@
 import uuid
-from datetime import datetime
 
 from flask import Blueprint, request, send_from_directory
 from flask import render_template
@@ -17,7 +16,8 @@ CORS(chatbot_router)
 
 
 @chatbot_router.route("/widgets/chatbot", methods=['GET'])
-@helpers.gzipped
+# @helpers.gzipped
+@crossdomain(origin='*', headers=['access-control-allow-origin', 'Content-Type'])
 def get_widget():
     if request.method == "GET":
         return send_from_directory('static/js',
@@ -40,7 +40,8 @@ def get_widget():
 # LEGACY CODE
 # TO BE REMOVED
 @chatbot_router.route("/widgets/chatbot.js", methods=['GET'])
-@helpers.gzipped
+# @helpers.gzipped
+@crossdomain(origin='*', headers=['access-control-allow-origin', 'Content-Type'])
 def get_widget_legacy():
     if request.method == "GET":
         return send_from_directory('static/js',

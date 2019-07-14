@@ -70,7 +70,7 @@ class Integration extends React.Component {
             window.open(getLink(`/api/assistant/${this.state.assistantID}/chatbot_direct_link`));
     };
 
-    getChatbotScript = () => `<script>const s=document.createElement("script");s.src=getLink("/api/widgets/chatbot");s.setAttribute('data-name',${this.state.dataName});s.setAttribute('data-id',${this.state.assistantID});s.setAttribute('data-circle',${this.state.dataCircle});document.body.appendChild(s);</script>`;
+    getChatbotScript = () => `<script>const s=document.createElement("script");s.src=getLink("/api/widgets/chatbot");s.setAttribute('data-name','${this.state.dataName}');s.setAttribute('data-id','${this.state.assistantID}');s.setAttribute('data-circle','${this.state.dataCircle}');document.body.appendChild(s);</script>`;
 
     render() {
         return (

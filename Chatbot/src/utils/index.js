@@ -10,9 +10,8 @@ const getLink = (src) => {
     if (window.location.port !== "")
         colon = ":";
 
-
-    const {protocol, hostname} = window.location;
-    return protocol + '//' + hostname + colon + 5000 + src;
+    const {protocol, port, hostname} = window.location;
+    return protocol + '//' + hostname + colon + port + src;
 };
 
 const getServerDomain = () => {

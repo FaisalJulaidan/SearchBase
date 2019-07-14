@@ -1,10 +1,11 @@
 function main() {
     const getLink = (src) => {
-        let colon = "";
-        if (window.location.port !== "")
-            colon = ":";
+
+        // let colon = "";
+        // if (window.location.port !== "")
+            // colon = ":";
         const {protocol, port, hostname} = window.location;
-        return protocol + '//' + hostname + colon + port + src;
+        return 'https://www.thesearchbase.com/' + src;
     };
 
     fetch(getLink("/static/widgets/chatbot/asset-manifest.json?NoCache=" + new Date().getTime()))

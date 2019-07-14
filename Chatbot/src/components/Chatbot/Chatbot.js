@@ -1,7 +1,6 @@
-import React, { useEffect, useRef } from 'react';
-import { connect } from 'react-redux';
+import React, {useEffect, useRef} from 'react';
+import {connect} from 'react-redux';
 import axios from 'axios';
-
 // Actions
 import {
     addBotMessage,
@@ -11,31 +10,19 @@ import {
     setChatbotAnimation,
     setChatbotStatus
 } from '../../store/actions';
-
 // Styles
 import './styles/Chatbot.css';
 import 'antd/dist/antd.css';
 // Utils
-import {
-    dataHandler,
-    getServerDomain,
-    isReady,
-    optionalDelayExecution,
-    promiseWrapper,
-    useInterval
-} from '../../utils';
-import { fetchData, getCurBlock } from '../../utils/flowHandler';
-
+import {dataHandler, getLink, isReady, optionalDelayExecution, promiseWrapper, useInterval} from '../../utils';
+import {fetchData, getCurBlock} from '../../utils/flowHandler';
 // Constants
 import * as flowAttributes from '../../constants/FlowAttributes';
-
 // Components
 import ChatButton from './ChatButton';
 import Header from './Header';
 import Flow from './Flow';
 import Input from './Input';
-
-import MockChatbotData from './mockData.json';
 import Signature from './Signature';
 
 const Chatbot = ({
@@ -189,7 +176,7 @@ const Chatbot = ({
     // initialize chatbot
     useEffect(() => {
         const fetchChatbot = async () => {
-            const { data, error } = await promiseWrapper(axios.get(`${getServerDomain()}/api/assistant/${assistantID}/chatbot`));
+            const {data, error} = await promiseWrapper(axios.get(getLink(`/api/assistant/${assistantID}/chatbot`)));
             if (error) {
                 // ERROR SENTRY
                 console.log(error);

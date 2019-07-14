@@ -17,7 +17,7 @@ const Header = ({ title, logoPath, isDirectLink, resetChatbot, closeWindow }) =>
                             {
                                 logoPath ?
                                     <img alt="header" width={30}
-                                         src={`${process.env.REACT_APP_ASSETS_PUBLIC_URL}${process.env.NODE_ENV}/company_logos/${logoPath}`}/> :
+                                         src={`${process.env.REACT_APP_ASSETS_PUBLIC_URL}${process.env.REACT_APP_ENV}/company_logos/${logoPath}`}/> :
                                     <FontAwesomeIcon size="2x" icon={faCloud} style={{ color: '#673AB7' }}/>
                             }
                         </Col>

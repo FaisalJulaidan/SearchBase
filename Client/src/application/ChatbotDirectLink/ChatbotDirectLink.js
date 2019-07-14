@@ -14,28 +14,19 @@ class ChatbotDirectLink extends React.Component {
     componentDidMount() {
         const assistantID = this.props.location.pathname.split('/')[2];
         if (assistantID) {
-            const script = document.createElement("script");
+            const s = document.createElement("script");
+            s.setAttribute('directLink', '');
+            s.setAttribute('data-name', 'tsb-widget');
+            s.setAttribute('data-id', assistantID);
+            s.setAttribute('data-circle', '#9254de');
 
             // Development
             if (process.env.NODE_ENV === 'development')
-                script.src = "http://localhost:3001/vendor/js/bundle.js";
-            else {
+                s.src = "http://localhost:3001/vendor/js/bundle.js";
+            else
+                s.src = getLink("/api/widgets/chatbot");
 
-                script.src = getLink("/static/widgets/vendor/js/main.5a3a2054.js");
-                script.async = true;
-                script.defer = true;
-                script.setAttribute('directLink', '');
-                script.setAttribute('data-name', 'tsb-widget');
-                script.setAttribute('data-id', assistantID);
-                script.setAttribute('data-circle', '#68de41');
-                document.body.appendChild(script);
-
-                const link = document.createElement("link");
-                link.href = getLink('/static/widgets/vendor/css/main.9fcdf850.css');
-                link.type = "text/css";
-                link.rel = "stylesheet";
-                document.getElementsByTagName("head")[0].appendChild(link);
-            }
+            document.body.appendChild(s);
 
             axios.get(`/api/assistant/${assistantID}/chatbot`)
                 .then(res => {
@@ -52,8 +43,7 @@ class ChatbotDirectLink extends React.Component {
         return (
             <div style={{height: '100%', background: '#F4F6FC'}}>
                 <PublicNavbar companyLogo={this.state.LogoPath} CompanyName={this.state.CompanyName}/>
-                <div id={'direct_link_container'} className={styles.Wrapper}>
-                </div>
+                <div id={'direct_link_container'} className={styles.Wrapper}/>
             </div>
         )
     }

@@ -1,14 +1,12 @@
 import axios from 'axios';
-
 // Constants
 import * as messageTypes from '../constants/MessageType';
 import * as flowAttributes from '../constants/FlowAttributes';
 import * as solutionAttributes from '../constants/SolutionAttributes';
 import * as constants from '../constants/Constants';
-
 // Utils
-import { promiseWrapper } from './wrappers';
-import { getServerDomain } from './index';
+import {promiseWrapper} from './wrappers';
+import {getLink, getServerDomain} from './index';
 
 
 export const dataHandler = (() => {
@@ -50,7 +48,7 @@ export const dataHandler = (() => {
               cancelToken: source.token
             }
             // fetch solutions
-            const { data, error } = await promiseWrapper(axios.post(`${getServerDomain()}/api/assistant/${assistantID}/chatbot/solutions`, payload, cancel));
+            const {data, error} = await promiseWrapper(axios.post(getLink(`/api/assistant/${assistantID}/chatbot/solutions`), payload, cancel));
             const solutions = data ? data.data.data : []; // :) // lol faisal 🔫
             if (axios.isCancel(error)) {
                 console.log('cancelled');
@@ -74,7 +72,7 @@ export const dataHandler = (() => {
             const result = processMessages(completed); // loop messages
             if (!completed && result.collectedData.length < 3) return;
             let cancelled
-              
+
             const cancel = {
               cancelToken: source.token
             }
@@ -82,7 +80,7 @@ export const dataHandler = (() => {
             console.log(result)
             console.log('sending data...');
             // send data to server
-            const { data, error } = await promiseWrapper(axios.post(`${getServerDomain()}/api/assistant/${assistantID}/chatbot`, result, cancel));
+            const {data, error} = await promiseWrapper(axios.post(getLink(`/api/assistant/${assistantID}/chatbot`), result, cancel));
             sessionID = data ? data.data.data.sessionID : null; // :) // lol faisal 🔫
             if (axios.isCancel(error)) {
               console.log('cancelled')

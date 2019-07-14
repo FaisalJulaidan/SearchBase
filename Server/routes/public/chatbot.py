@@ -1,5 +1,5 @@
-import logging
 import uuid
+from datetime import datetime
 
 from flask import Blueprint, request, send_from_directory
 from flask import render_template
@@ -16,11 +16,32 @@ chatbot_router = Blueprint('chatbot_router', __name__, template_folder="../templ
 CORS(chatbot_router)
 
 
-@chatbot_router.route("/widgets/<path:path>", methods=['GET'])
+@chatbot_router.route("/widgets/chatbot", methods=['GET'])
 @helpers.gzipped
-def get_widget(path):
+def get_widget():
     if request.method == "GET":
-        return send_from_directory('static/widgets/', path)
+        return send_from_directory('static/js',
+                                   'loadChatbot.js')
+@chatbot_router.after_request
+def add_header(r):
+    """
+    Add headers to both force latest IE rendering engine or Chrome Frame,
+    and also to cache the rendered page for 10 minutes.
+    """
+    r.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
+    r.headers["Pragma"] = "no-cache"
+    r.headers["Expires"] = "0"
+    r.headers['Cache-Control'] = 'public, max-age=0'
+    return r
+
+
+# LEGACY CODE
+# TO BE REMOVED
+@chatbot_router.route("/widgets/chatbot.js", methods=['GET'])
+@helpers.gzipped
+def get_widget_legacy():
+    if request.method == "GET":
+        return send_from_directory('static/js/loadChatbot.js?NoCache=' + str(int(datetime.timestamp(datetime.now()))))
 
 
 @chatbot_router.route("/assistant/<string:assistantIDAsHash>/chatbot_direct_link", methods=['GET'])

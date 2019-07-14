@@ -23,7 +23,7 @@ const getClientEnvironment = require('./env');
 const ModuleNotFoundPlugin = require('react-dev-utils/ModuleNotFoundPlugin');
 const ForkTsCheckerWebpackPlugin = require('react-dev-utils/ForkTsCheckerWebpackPlugin');
 const typescriptFormatter = require('react-dev-utils/typescriptFormatter');
-
+const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
 
 const postcssNormalize = require('postcss-normalize');
 
@@ -183,6 +183,29 @@ module.exports = function(webpackEnv) {
             minimize: isEnvProduction,
             minimizer: [
                 // This is only used in production mode
+                new UglifyJsPlugin({
+                    cache: true,
+                    parallel: true,
+                    uglifyOptions: {
+                        output: {
+                            comments: true, // remove comments
+                        },
+                        compress: {
+                            loops: true,
+                            unused: true,
+                            dead_code: true, // big one--strip code that will never execute
+                            //warnings: false, // good for prod apps so users can't peek behind curtain
+                            drop_debugger: true,
+                            conditionals: true,
+                            evaluate: true,
+                            drop_console: true, // strips console statements
+                            sequences: true,
+                            booleans: true,
+                            if_return: true,
+                            join_vars: true,
+                        }
+                    },
+                }),
                 new TerserPlugin({
                     terserOptions: {
                         parse: {

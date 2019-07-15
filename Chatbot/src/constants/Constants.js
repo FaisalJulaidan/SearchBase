@@ -11,7 +11,7 @@ export const IGNORE = 'Ignore';
 
 
 
-const DEV = false;
+const DEV = true;
 export const BOT_DELAY = 800;
 export const BOT_DELAY_CHAR_MULTIPLIER = DEV ? 0 : 25;
 export const BOT_DELAY_MAX = 3000;

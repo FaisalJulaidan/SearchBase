@@ -1,18 +1,16 @@
 function main() {
     const getLink = (src) => {
-
-        // let colon = "";
-        // if (window.location.port !== "")
-            // colon = ":";
         const {protocol, port, hostname} = window.location;
-        return 'http://localhost:5000' + src;
+        // return 'http://localhost:5000' + src;
         return 'https://www.thesearchbase.com' + src;
     };
 
     fetch(getLink("/static/widgets/chatbot/asset-manifest.json?NoCache=" + new Date().getTime()),
         {mode: 'no-cors'})
-        .then(response => response.json())
+        .then(response => response.text())
         .then(manifest => {
+            manifest = manifest.files ? JSON.parse(manifest) : {};
+
             // request and get assistant data
             const scriptTag = document.querySelector('script[data-name="tsb-widget"][data-id]');
             const isDirectLink = scriptTag.getAttribute('directLink') || '';

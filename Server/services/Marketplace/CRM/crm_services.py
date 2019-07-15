@@ -160,10 +160,10 @@ def testConnection(type, auth, companyID) -> Callback:
         crm_type: CRM = CRM[type]
 
         # test connection
-        if crm_type == CRM.Adapt:
-            return Adapt.testConnection(auth)
-        elif crm_type == CRM.Bullhorn:
+        if crm_type == CRM.Bullhorn:
             return Bullhorn.testConnection(auth, companyID)  # oauth2
+        elif crm_type == CRM.Adapt:
+            return Adapt.testConnection(auth)
         elif crm_type == CRM.Greenhouse:
             return Greenhouse.login(auth)
         elif crm_type == CRM.Vincere:

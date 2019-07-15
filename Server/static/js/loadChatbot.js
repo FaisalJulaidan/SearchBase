@@ -5,12 +5,15 @@ function main() {
         return 'https://www.thesearchbase.com' + src;
     };
 
-    fetch(getLink("/api/static/widgets/chatbot/asset-manifest.json?NoCache=" + new Date().getTime()),
-        {mode: 'no-cors'})
-        .then(response => response.text())
+    const headers = {
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+        }
+    };
+    fetch(getLink("/api/static/widgets/chatbot/asset-manifest.json?NoCache=" + new Date().getTime()), headers)
+        .then(response => response.json())
         .then(manifest => {
-            manifest = manifest.files ? JSON.parse(manifest) : {};
-
             // request and get assistant data
             const scriptTag = document.querySelector('script[data-name="tsb-widget"][data-id]');
             const isDirectLink = scriptTag.getAttribute('directLink') || '';
@@ -32,11 +35,11 @@ function main() {
             const l = document.createElement("link");
             l.href = getLink(`/api/static/widgets/chatbot${manifest.files['main.css']}`);
             l.type = "text/css";
+
             l.rel = "stylesheet";
             document.getElementsByTagName("head")[0].appendChild(l);
-            // resolve(manifest ? JSON.parse(manifest) : {})
         }).catch((error) => {
-        // reject(error)
+        console.log(error)
     });
 }
 

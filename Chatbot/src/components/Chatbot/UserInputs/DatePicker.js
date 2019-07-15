@@ -1,5 +1,4 @@
 import React, {useEffect, useState} from 'react';
-import moment from 'moment';
 // Constants
 import * as messageTypes from '../../../constants/MessageType';
 import * as flowAttributes from '../../../constants/FlowAttributes';
@@ -125,20 +124,49 @@ const SalaryPicker = ({ message, submitMessage }) => {
         setSalary(roundTo25(val[0]), roundTo25(val[1]));
     };
 
+
+    const inputOnChangeHandler = (e) => {
+        let text;
+        if (e)
+            if (e._isAMomentObject)
+                text = e.format('L');
+            else
+                text = e.target.value;
+
+        let afterMessage = message.block[flowAttributes.CONTENT][flowAttributes.CONTENT_AFTER_MESSAGE];
+        let type = messageTypes.TEXT;
+        let block = message.block;
+
+        let newState = {
+            curBlockID: message.block[flowAttributes.CONTENT][flowAttributes.USER_INPUT_BLOCKTOGOID],
+            waitingForUser: false
+        };
+
+        submitMessage(text, type, newState, afterMessage, block, {
+            skipped: false,
+            input: text
+        });
+
+    };
+
     return (
         <React.Fragment>
-            <div className={'InputContainer'}>
-                <RangePicker
-                    // disabledDate={disabledDate}
-                    // disabledTime={disabledRangeTime}
-                    className={'RangePicker'}
-                    showTime={{
-                        hideDisabledOptions: true,
-                        defaultValue: [moment('00:00:00', 'HH:mm:ss'), moment('11:59:59', 'HH:mm:ss')]
-                    }}
-                    format="YYYY-MM-DD HH:mm:ss"
-                />
-            </div>
+
+            {/*<div className={'InputContainer'}>*/}
+            <DatePicker getCalendarContainer={() => document.getElementById('TheSearchBase_Chatbot')}
+                        className={'Datepicker'} suffixIcon={<div/>}
+                        dropdownClassName={'DatepickerCalendar'}
+                        onChange={inputOnChangeHandler}/>
+            {/*<RangePicker disabledTime={true}*/}
+            {/*             getCalendarContainer={() => document.getElementById('TheSearchBase_Chatbot')}*/}
+            {/*             className={'RangePicker'}*/}
+            {/*             showTime={{*/}
+            {/*                 hideDisabledOptions: true,*/}
+            {/*                 defaultValue: [moment('00:00:00', 'HH:mm:ss'), moment('11:59:59', 'HH:mm:ss')]*/}
+            {/*             }}*/}
+            {/*             format="YYYY-MM-DD HH:mm:ss"*/}
+            {/*/>*/}
+            {/*</div>*/}
             <div className={'Submit'}>
                 <i className={'SendIconActive'} onClick={submitSalary}>
                     <FontAwesomeIcon size="2x" icon={faTelegramPlane}/>
@@ -154,7 +182,7 @@ const SalaryPicker = ({ message, submitMessage }) => {
                         <Icon
                             type="setting"
                             theme="outlined"
-                            style={{ fontSize: '22px' }}
+                            style={{fontSize: '22px'}}
                             onClick={() => {
                                 setSettings(settings => !settings);
                             }}/>

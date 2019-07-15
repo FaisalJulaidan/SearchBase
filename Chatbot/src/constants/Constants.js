@@ -13,6 +13,6 @@ export const IGNORE = 'Ignore';
 
 const DEV = false;
 export const BOT_DELAY = 800;
-export const BOT_DELAY_CHAR_MULTIPLIER = DEV ? 0 : 35;
-export const BOT_DELAY_MAX = 3000;
+export const BOT_DELAY_CHAR_MULTIPLIER = DEV ? 0 : 50;
+export const BOT_DELAY_MAX = 5000;
 export const BOT_DELAY_MIN = 1000;

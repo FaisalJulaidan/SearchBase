@@ -33,7 +33,8 @@ const optionalDelayExecution = (cb, delay, time) => {
     } else {
         cb();
     }
-    return timeout;
+    const reset = () => clearTimeout(timeout)
+    return { reset }
 };
 
 const createBlock = (Content, Type, delay, ID = null, DataType = null, selfContinue = null, extra = {}) => ({

@@ -17,7 +17,7 @@ const ViewBox = (props) => {
                         </Menu>);
         optionsMenu = (
             <div className={styles.Options}>
-                <Dropdown getPopupContainer={() => document.getElementById('TheSearchBase_Chatbot')} overlay={overlay}>
+                <Dropdown overlay={overlay}>
                     <p>...</p>
                 </Dropdown>
             </div>

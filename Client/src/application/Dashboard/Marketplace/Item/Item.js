@@ -130,8 +130,7 @@ class Item extends React.Component {
                 }
                 if (place === 'runExport') {
                     return (
-                        <Dropdown getPopupContainer={() => document.getElementById('TheSearchBase_Chatbot')}
-                                  disabled={this.marketplaceItem.status !== "CONNECTED" || this.props.isPinging}
+                        <Dropdown disabled={this.marketplaceItem.status !== "CONNECTED" || this.props.isPinging}
                                   overlay={
                                       <Menu>
                                           <Menu.Item>

@@ -80,7 +80,7 @@ export const dataHandler = (() => {
             console.log(result)
             console.log('sending data...');
             // send data to server
-            const {data, error} = await promiseWrapper(axios.post(`${getServerDomain()}/api/assistant/${assistantID}/chatbot`), result, cancel);
+            const {data, error} = await promiseWrapper(axios.post(`${getServerDomain()}/api/assistant/${assistantID}/chatbot`, result, cancel));
             sessionID = data ? data.data.data.sessionID : null; // :) // lol faisal 🔫
             if (axios.isCancel(error)) {
                 console.log('cancelled')

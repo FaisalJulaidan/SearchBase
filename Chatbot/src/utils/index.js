@@ -16,6 +16,7 @@ const getLink = (src) => {
 
 const getServerDomain = () => {
     const env = process.env.REACT_APP_ENV;
+    console.log(env)
     if (env === 'development')
         return 'http://localhost:5000';
     else if (env === 'staging')

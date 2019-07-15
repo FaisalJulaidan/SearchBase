@@ -5,7 +5,7 @@ function main() {
         return 'https://www.thesearchbase.com' + src;
     };
 
-    fetch(getLink("/static/widgets/chatbot/asset-manifest.json?NoCache=" + new Date().getTime()),
+    fetch(getLink("/api/static/widgets/chatbot/asset-manifest.json?NoCache=" + new Date().getTime()),
         {mode: 'no-cors'})
         .then(response => response.text())
         .then(manifest => {
@@ -18,7 +18,7 @@ function main() {
             const btnColor = scriptTag.getAttribute('data-circle') || '#1890ff';
 
             const s = document.createElement("script");
-            s.src = getLink(`/static/widgets/chatbot${manifest.files['main.js']}`);
+            s.src = getLink(`/api/static/widgets/chatbot${manifest.files['main.js']}`);
             s.async = true;
             s.defer = true;
             s.setAttribute('data-directLink', isDirectLink || '');
@@ -30,7 +30,7 @@ function main() {
             document.body.appendChild(s);
 
             const l = document.createElement("link");
-            l.href = getLink(`/static/widgets/chatbot${manifest.files['main.css']}`);
+            l.href = getLink(`/api/static/widgets/chatbot${manifest.files['main.css']}`);
             l.type = "text/css";
             l.rel = "stylesheet";
             document.getElementsByTagName("head")[0].appendChild(l);

@@ -16,7 +16,7 @@ const notFoundBlock = (toGoID) => {
 };
 
 const endBlock = () => {
-    const text = 'Chat is over bye';
+    const text = 'This conversation has ended, if you would like to have a new one please click the reset button!';
     // Content, Type, delay, ID = null, DataType = null, selfContinue = null, extra = {})
     return createBlock({ text }, messageTypes.TEXT, delayMessageLength(text), null, null, null, { end: true });
 };

@@ -141,8 +141,7 @@ const SalaryPicker = ({ message, submitMessage }) => {
                     content={settingsDialog}
                     placement="top"
                     getPopupContainer={() => document.getElementById('TheSearchBase_Chatbot')}
-                    trigger={'click'}
-                    defaultVisible={true}>
+                    trigger={'click'}>
                     <i>
                         <Icon
                             type="setting"

@@ -17,10 +17,6 @@ const BotMessage = ({ type, message, addUserMessage, addBotMessage, setChatbotSt
     const _checkAfterMessage = (afterMessage, newState, type) => {
         if (afterMessage) {
             setChatbotStatus({ ...newState, thinking: true, afterMessage: afterMessage, curAction: 'Load After Message' });
-            // setTimeout(() => {
-            //     addBotMessage(afterMessage, type);
-            //     setChatbotStatus(newState);
-            // }, delayMessageLength(afterMessage));
         } else {
             setChatbotStatus(newState);
         }

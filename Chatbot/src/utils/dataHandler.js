@@ -48,7 +48,7 @@ export const dataHandler = (() => {
                 cancelToken: source.token
             }
             // fetch solutions
-            const {data, error} = await promiseWrapper(axios.post(`${getServerDomain()}/api/assistant/${assistantID}/chatbot/solutions`), payload, cancel);
+            const {data, error} = await promiseWrapper(axios.post(`${getServerDomain()}/api/assistant/${assistantID}/chatbot/solutions`, payload, cancel)   );
             const solutions = data ? data.data.data : []; // :) // lol faisal 🔫
             if (axios.isCancel(error)) {
                 console.log('cancelled');

@@ -28,18 +28,16 @@
 }
 
 
-.Solution {
-    height: 100%;
-    max-width: 100% !important;
-    margin: 0 !important;
+.BOT .Message.Solution {
+    max-width: 100%;
 }
 
 
 /*.BOT, .Bot_IE11 {*/
-    /*align-self: flex-start;*/
-    /*flex-flow: column;*/
-    /*flex-wrap: nowrap;*/
-    /*width: 100%;*/
+/*    align-self: flex-start;*/
+/*    flex-flow: column;*/
+/*    flex-wrap: nowrap;*/
+/*    width: 100%;*/
 /*}*/
 
 .BOT .Message, .Bot_IE11 .Message {

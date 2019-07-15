@@ -14,22 +14,32 @@ from utilities.helpers import logError
 chatbot_router = Blueprint('chatbot_router', __name__, template_folder="../templates")
 CORS(chatbot_router)
 
-# @chatbot_router.after_request
-# def add_header(r):
-#     """
-#     Add headers to both force latest IE rendering engine or Chrome Frame,
-#     and also to cache the rendered page for 10 minutes.
-#     """
-#     r.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
-#     r.headers["Pragma"] = "no-cache"
-#     r.headers["Expires"] = "0"
-#     r.headers['Cache-Control'] = 'public, max-age=0'
-#     r.headers['Access-Control-Allow-Origin'] = '*'
-#     r.headers['Access-Control-Allow-Headers'] = '*'
-#     r.headers['Access-Control-Allow-Methods'] = '*'
-#     return r
+
+@chatbot_router.after_request
+def add_header(r):
+    """
+    Add headers to both force latest IE rendering engine or Chrome Frame,
+    and also to cache the rendered page for 10 minutes.
+    """
+    r.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
+    r.headers["Pragma"] = "no-cache"
+    r.headers["Expires"] = "0"
+    r.headers['Cache-Control'] = 'public, max-age=0'
+    r.headers['Access-Control-Allow-Origin'] = '*'
+    r.headers['Access-Control-Allow-Headers'] = '*'
+    r.headers['Access-Control-Allow-Methods'] = '*'
+    return r
 
 
+# To give an access to the static/widgets/chatbot folder
+@chatbot_router.route("/static/widgets/chatbot/<path:path>", methods=['GET'])
+@helpers.gzipped
+def get_chatbot_static(path):
+    if request.method == "GET":
+        return send_from_directory('static/widgets/chatbot/', path)
+
+
+# To load the loadChatbo
 @chatbot_router.route("/widgets/chatbot", methods=['GET'])
 @helpers.gzipped
 def get_widget():
@@ -40,6 +50,7 @@ def get_widget():
 
 # LEGACY CODE
 # TO BE REMOVED
+# To load the loadChatbo
 @chatbot_router.route("/widgets/chatbot.js", methods=['GET'])
 @helpers.gzipped
 def get_widget_legacy():
@@ -118,8 +129,6 @@ def chatbot_upload_files(assistantIDAsHash, sessionID):
                 filename = str(uuid.uuid4()) + '_' + helpers.encodeID(sessionID) + '.' + \
                            secure_filename(file.filename).rsplit('.', 1)[1].lower()
 
-
-
                 # Upload file to DigitalOcean Space
                 upload_callback: Callback = stored_file_services.uploadFile(file, filename,
                                                                             stored_file_services.USER_FILES_PATH,
@@ -139,7 +148,6 @@ def chatbot_upload_files(assistantIDAsHash, sessionID):
             if not dbRef_callback.Success:
                 logError("Couldn't Save Stored Files Reference For: " + str(filenames))
                 raise Exception(dbRef_callback.Message)
-
 
             # Save changes
             db.session.commit()

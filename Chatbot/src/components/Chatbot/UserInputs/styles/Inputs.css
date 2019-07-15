@@ -123,3 +123,23 @@
     font-weight: 400;
 }
 
+
+.DatepickerCalendar {
+    z-index: 99999999 !important;
+}
+
+.Datepicker {
+    width: calc(100% - 80px);
+    height: 100%;
+    float: left;
+    padding-left: 15px;
+}
+
+.Datepicker input {
+    background: transparent;
+    border: none;
+}
+
+.Datepicker i {
+    top: 10px;
+}

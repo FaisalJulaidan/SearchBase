@@ -1,16 +1,13 @@
-import React, { useState, useEffect } from 'react';
-
+import React, {useEffect, useState} from 'react';
 // Constants
 import * as messageTypes from '../../../constants/MessageType';
 import * as flowAttributes from '../../../constants/FlowAttributes';
-
 // Styles
 import './styles/Inputs.css';
-
 // Components
-import { Icon, Slider, Popover, Dropdown, Menu } from 'antd';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faTelegramPlane } from '@fortawesome/free-brands-svg-icons';
+import {Dropdown, Icon, Menu, Popover, Slider} from 'antd';
+import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
+import {faTelegramPlane} from '@fortawesome/free-brands-svg-icons';
 
 const currencySymbols = { 'GBP': '£', 'USD': '$', 'EUR': '€' };
 
@@ -33,7 +30,7 @@ const SalaryPicker = ({ message, submitMessage }) => {
         let salaries = salary.map(salary => getDotNotation(salary, currency));
         let text = `Between ${salaries[0]} and ${salaries[1]}`;
         let newState = {
-            curAction: message.block[flowAttributes.CONTENT][flowAttributes.USER_INPUT_ACTION],
+            // curAction: message.block[flowAttributes.CONTENT][flowAttributes.USER_INPUT_ACTION],
             curBlockID: message.block[flowAttributes.CONTENT][flowAttributes.USER_INPUT_BLOCKTOGOID],
             waitingForUser: false
         };
@@ -106,13 +103,16 @@ const SalaryPicker = ({ message, submitMessage }) => {
             <h1 className={'SettingsTitle'}>Settings</h1>
             <div>
                 <h2 className={'SettingsOption'}>Currency</h2>
-                <Dropdown overlay={currencyMenu}>
+                <Dropdown overlay={currencyMenu}
+                          getPopupContainer={() => document.getElementById('TheSearchBase_Chatbot')}>
+
                     <a className="ant-dropdown-link" href="#a">
                         {currency} <Icon type="down"/>
                     </  a>
                 </Dropdown>
                 <h2 className={'SettingsOption'}>Pay rate</h2>
-                <Dropdown overlay={payRateMenu}>
+                <Dropdown getPopupContainer={() => document.getElementById('TheSearchBase_Chatbot')}
+                          overlay={payRateMenu}>
                     <a className="ant-dropdown-link" href="#a">
                         {payRate} <Icon type="down"/>
                     </a>
@@ -126,6 +126,7 @@ const SalaryPicker = ({ message, submitMessage }) => {
         <React.Fragment>
             <div className={'InputContainer'}>
                 <Slider
+                    getTooltipPopupContainer={() => document.getElementById('TheSearchBase_Chatbot')}
                     range={true}
                     tipFormatter={tipFormatter}
                     value={salary}
@@ -140,8 +141,7 @@ const SalaryPicker = ({ message, submitMessage }) => {
                     content={settingsDialog}
                     placement="top"
                     getPopupContainer={() => document.getElementById('TheSearchBase_Chatbot')}
-                    trigger={'click'}
-                    defaultVisible={true}>
+                    trigger={'click'}>
                     <i>
                         <Icon
                             type="setting"
@@ -155,7 +155,6 @@ const SalaryPicker = ({ message, submitMessage }) => {
                     <FontAwesomeIcon size="2x" icon={faTelegramPlane}/>
                 </i>
             </div>
-
         </React.Fragment>
     );
 };

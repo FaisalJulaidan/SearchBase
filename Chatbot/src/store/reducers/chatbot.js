@@ -9,6 +9,7 @@ const initialState = {
         started: false,
         curBlockID: null,
         curBlock: null,
+        afterMessage: null,
         curAction: 'Init',
         waitingForUser: false,
         ref: null

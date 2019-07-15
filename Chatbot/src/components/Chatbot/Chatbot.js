@@ -60,8 +60,10 @@ const Chatbot = ({
     };
 
     const resetAsync = () => {
+        console.log(stopTimer.current)
         dataHandler.cancelRequest();
-        clearTimeout(stopTimer.current);
+        console.log(stopTimer.current)
+        stopTimer.current.reset()
     };
 
     const closeWindow = () => {

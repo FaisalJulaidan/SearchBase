@@ -34,7 +34,7 @@ export const dataHandler = (() => {
         };
 
         const fetchSolutions = async (showTop, databaseType) => {
-            let resolve = {cancelled: false, solutions: []}
+            let resolve = {cancelled: false, solutions: []};
             source = CancelToken.source();
             const result = processMessages(false);
             const payload = {
@@ -46,9 +46,9 @@ export const dataHandler = (() => {
             };
             const cancel = {
                 cancelToken: source.token
-            }
+            };
             // fetch solutions
-            const {data, error} = await promiseWrapper(axios.post(`${getServerDomain()}/api/assistant/${assistantID}/chatbot/solutions`), payload, cancel);
+            const {data, error} = await promiseWrapper(axios.post(`${getServerDomain()}/api/assistant/${assistantID}/chatbot/solutions`, payload, cancel));
             const solutions = data ? data.data.data : []; // :) // lol faisal 🔫
             if (axios.isCancel(error)) {
                 console.log('cancelled');

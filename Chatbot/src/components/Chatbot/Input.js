@@ -19,16 +19,21 @@ const Input = ({ setChatbotStatus, isDirectLink, addUserMessage, lastMessage, ad
 
     const submitMessage = (text, type, newState, afterMessage, block, content) => {
         addUserMessage(text, type, block, content);
+        _checkAfterMessage(afterMessage, newState, messageTypes.TEXT);
+
+    };
+
+
+    const _checkAfterMessage = (afterMessage, newState, type) => {
         if (afterMessage) {
-            setChatbotStatus({ thinking: true });
-            setTimeout(() => {
-                addBotMessage(afterMessage, messageTypes.TEXT);
-                setChatbotStatus({ ...newState, thinking: false });
-            }, delayMessageLength(afterMessage));
+            console.log(newState)
+            setChatbotStatus({ ...newState, thinking: true, afterMessage: afterMessage, curAction: 'Load After Message' });
         } else {
+            console.log(newState)
             setChatbotStatus(newState);
         }
     };
+
 
     const addStatus = (component, message) => {
         return React.cloneElement(component, { setChatbotStatus, submitMessage, message });

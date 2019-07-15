@@ -102,7 +102,8 @@ class Dashboard extends Component {
                 </Menu>
             );
             userInfo = (
-                <Dropdown overlay={userInfoMenu} overlayStyle={{width: '255px'}}>
+                <Dropdown getPopupContainer={() => document.getElementById('TheSearchBase_Chatbot')}
+                          overlay={userInfoMenu} overlayStyle={{width: '255px'}}>
                     {avatar}
                 </Dropdown>
             );

@@ -1,6 +1,6 @@
 import React from 'react';
 
-import {Typography, Dropdown, Menu} from 'antd';
+import {Dropdown, Menu, Typography} from 'antd';
 import styles from "components/ViewBox/ViewBox.module.less";
 import PropTypes from 'prop-types';
 
@@ -17,7 +17,7 @@ const ViewBox = (props) => {
                         </Menu>);
         optionsMenu = (
             <div className={styles.Options}>
-                <Dropdown overlay={overlay}>
+                <Dropdown getPopupContainer={() => document.getElementById('TheSearchBase_Chatbot')} overlay={overlay}>
                     <p>...</p>
                 </Dropdown>
             </div>

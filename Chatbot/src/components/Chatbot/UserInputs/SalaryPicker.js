@@ -126,6 +126,7 @@ const SalaryPicker = ({ message, submitMessage }) => {
         <React.Fragment>
             <div className={'InputContainer'}>
                 <Slider
+                    getTooltipPopupContainer={() => document.getElementById('TheSearchBase_Chatbot')}
                     range={true}
                     tipFormatter={tipFormatter}
                     value={salary}

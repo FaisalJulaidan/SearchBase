@@ -1,0 +1,1 @@
+export const UPDATE_IS_BOT_TYPING = 'UPDATE_IS_BOT_TYPING';

@@ -1,0 +1,104 @@
+{
+    "assistant": {
+        "active": false,
+        "id": 3,
+        "message": "Welcome",
+        "name": "test",
+        "secondsUntilPopup": 0,
+        "topBarText": "Job Finder Bot"
+    },
+    "blocks": [{
+            "id": 168,
+            "storeInDB": true,
+            "isSkippable": true,
+            "type": "Question",
+            "order": 1,
+            "labels": "5",
+            "content": {
+                "text": "What best describes *&&TEXT:you*&&LINK:https://i1.sndcdn.com/artworks-000179876122-6vay96-t500x500.jpg*&&END*?",
+                "answers": [{
+                        "action": "Go To Next Block",
+                        "text": "Client",
+                        "keywords": [
+                            "client"
+                        ],
+                        "afterMessage": "I am gonna try to help you here as much as I can.",
+                        "blockToGoID": 0
+                    },
+                    {
+                        "action": "Go To Next Block",
+                        "text": "Candidate",
+                        "keywords": [
+                            "candidate"
+                        ],
+                        "afterMessage": "I am gonna try to help you here as much as I can.",
+                        "blockToGoID": 0
+                    }
+                ]
+            }
+        },
+        {
+            "id": 285,
+            "storeInDB": true,
+            "isSkippable": true,
+            "type": "User Input",
+            "order": 2,
+            "labels": "1",
+            "content": {
+                "action": "Go To Next Block",
+                "text": "Could you please first share your email?",
+                "validation": "Email",
+                "afterMessage": "Thank you!",
+                "blockToGoID": 0
+            }
+        },
+        {
+            "id": 289,
+            "storeInDB": true,
+            "isSkippable": false,
+            "type": "User Input",
+            "order": 3,
+            "labels": "1",
+            "content": {
+                "action": "Go To Next Block",
+                "text": "Give me any input",
+                "validation": "Ignore",
+                "afterMessage": "",
+                "blockToGoID": 0
+            }
+        },
+        {
+            "id": 285,
+            "storeInDB": true,
+            "isSkippable": false,
+            "type": "File Upload",
+            "order": 4,
+            "labels": "",
+            "content": {
+                "action": "Go To Next Block",
+                "text": "Upload your CV, please!",
+                "fileTypes": [
+                    "pdf",
+                    "jpg"
+                ],
+                "afterMessage": "Thank you!",
+                "blockToGoID": 0
+            }
+        },
+        {
+            "id": 286,
+            "storeInDB": true,
+            "isSkippable": false,
+            "type": "Solutions",
+            "order": 5,
+            "labels": "",
+            "content": {
+                "action": "End Chat",
+                "text": "Here is what we found!",
+                "showTop": 3,
+                "afterMessage": "",
+                "blockToGoID": 0
+            }
+        }
+    ]
+}

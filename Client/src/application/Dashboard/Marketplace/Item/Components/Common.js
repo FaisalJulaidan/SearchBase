@@ -53,7 +53,7 @@ export const DefaultButton = ({
                     loading={isConnecting}
                     onClick={() => {
                         if (windowObject.url)
-                            return window.open(windowObject.url, windowObject.target, windowObject.features);
+                            return window.open(windowObject.url);
                         else
                             return showModal()
                     }}

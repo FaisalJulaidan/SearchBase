@@ -11,18 +11,16 @@ import Question from './Question';
 import TextMessage from './TextMessage';
 import Solutions from './Solutions';
 
-const BotMessage = ({ type, message, addUserMessage, addBotMessage, setChatbotStatus, index, active }) => {
-    let [responded, setResponded] = useState(false);
-    console.log(responded)
+const BotMessage = ({ type, message, addUserMessage, addBotMessage, setChatbotStatus, index, active, thinking }) => {
     let [skip, setSkip] = useState({skipText: false, skippable: false});
 
     const _checkAfterMessage = (afterMessage, newState, type) => {
         if (afterMessage) {
-            setChatbotStatus({ thinking: true });
-            setTimeout(() => {
-                addBotMessage(afterMessage, type);
-                setChatbotStatus(newState);
-            }, delayMessageLength(afterMessage));
+            setChatbotStatus({ ...newState, thinking: true, afterMessage: afterMessage, curAction: 'Load After Message' });
+            // setTimeout(() => {
+            //     addBotMessage(afterMessage, type);
+            //     setChatbotStatus(newState);
+            // }, delayMessageLength(afterMessage));
         } else {
             setChatbotStatus(newState);
         }
@@ -36,7 +34,6 @@ const BotMessage = ({ type, message, addUserMessage, addBotMessage, setChatbotSt
             curBlockID: block[flowAttributes.SKIP_BLOCKTOGOID],
             waitingForUser: false
         };
-        setResponded(true);
         addUserMessage(text, messageTypes.TEXT, message.block, {input: text, skipped:true});
         setChatbotStatus(newState);
     };
@@ -44,7 +41,6 @@ const BotMessage = ({ type, message, addUserMessage, addBotMessage, setChatbotSt
     const submitAnswer = (text, type, newState, content, afterMessage) => {
         addUserMessage(text, type, message.block, content);
         _checkAfterMessage(afterMessage, newState, messageTypes.TEXT);
-        setResponded(true);
     };
 
 
@@ -53,12 +49,11 @@ const BotMessage = ({ type, message, addUserMessage, addBotMessage, setChatbotSt
         addUserMessage(text, type, block, content);
         const afterMessage = block[flowAttributes.CONTENT][flowAttributes.CONTENT_AFTER_MESSAGE];
         let newState = {
-            curAction: block[flowAttributes.CONTENT][flowAttributes.SOLUTION_ACTION],
+            // curAction: block[flowAttributes.CONTENT][flowAttributes.SOLUTION_ACTION],
             curBlockID: block[flowAttributes.CONTENT][flowAttributes.SOLUTION_BLOCKTOGOID],
             waitingForUser: false
         };
         _checkAfterMessage(afterMessage, newState, messageTypes.TEXT);
-        setResponded(true);
     };
 
     useEffect(() => {
@@ -67,13 +62,9 @@ const BotMessage = ({ type, message, addUserMessage, addBotMessage, setChatbotSt
         if (block) setSkip({skipText: block[flowAttributes.SKIP_TEXT], skippable: block[flowAttributes.SKIPPABLE]});
     }, [message]);
 
-    useEffect(() => {
-        setResponded(!active);
-    }, [active]);
-
 
     const addStatus = (component) => {
-        return React.cloneElement(component, { responded, skipResponse, skipText: skip.skipText, skippable: skip.skippable });
+        return React.cloneElement(component, { responded: !(active && !thinking), skipResponse, skipText: skip.skipText, skippable: skip.skippable });
     };
 
     const findMessageType = (type, message) => {

@@ -12,9 +12,10 @@ import BotMessage from './BotMessage/BotMessage';
 import UserMessage from './UserMessage/UserMessage';
 import Thinking from './BotMessage/Thinking';
 
-const Flow = ({ messages, setChatbotStatus, addUserMessage, addBotMessage, thinking, inputOpen, rewindToMessage, resetAsync }) => {
+const Flow = ({ messages, setChatbotStatus, addUserMessage, addBotMessage, thinking, inputOpen, rewindToMessage, resetAsync, status }) => {
     const flowRef = useRef(null);
     const scrollRef = useRef(null);
+    let [lastBotMessage, setLastBotMessage] = useState(null)
     let [active, setActive] = useState(null);
 
     const addStatus = (component, message) => {
@@ -22,6 +23,7 @@ const Flow = ({ messages, setChatbotStatus, addUserMessage, addBotMessage, think
             setChatbotStatus,
             addUserMessage,
             addBotMessage,
+            thinking: status.thinking,
             message
         });
     };
@@ -55,11 +57,14 @@ const Flow = ({ messages, setChatbotStatus, addUserMessage, addBotMessage, think
     useEffect(() => {
         dataHandler.updateMessages(messages);
         const lastBotMessage = messages.slice().reverse().filter(msg => msg.sender === 'BOT')[0];
-        setActive(lastBotMessage ? lastBotMessage.index : null)
+        setLastBotMessage(lastBotMessage ? lastBotMessage.index : null)
     }, [messages]);
 
+    useEffect(() => {
+        setActive(lastBotMessage ? lastBotMessage : null)
+    }, [status, lastBotMessage])
 
-    const getBySender = (message) => {
+    const getBySender = (message) =>  {
         if (message.sender === 'BOT') {
             return <BotMessage
                 key={message.index}
@@ -72,10 +77,12 @@ const Flow = ({ messages, setChatbotStatus, addUserMessage, addBotMessage, think
 
     const rewind = (idx) => {
         const lastBotMessage = messages.slice().filter(msg => msg.index <= idx).reverse().filter(msg => msg.sender === 'BOT')[0];
+        setLastBotMessage(lastBotMessage.index)
         rewindToMessage(lastBotMessage.index);
         resetAsync();
         setChatbotStatus({ thinking: false, finished: false });
     };
+
     let groupedMessages = groupMessages(messages);
 
     return (
@@ -94,6 +101,7 @@ const Flow = ({ messages, setChatbotStatus, addUserMessage, addBotMessage, think
 };
 
 const mapStateToProps = state => ({
+    status: state.chatbot.status,
     messages: state.messages.messageList
 });
 

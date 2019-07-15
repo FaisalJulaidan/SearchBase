@@ -44,7 +44,7 @@ const Text = ({ message, submitMessage }) => {
               let block = message.block;
               let afterMessage = message.block[flowAttributes.CONTENT][flowAttributes.CONTENT_AFTER_MESSAGE];
               let newState = {
-                  curAction: message.block[flowAttributes.CONTENT][flowAttributes.USER_INPUT_ACTION],
+                  // curAction: message.block[flowAttributes.CONTENT][flowAttributes.USER_INPUT_ACTION],
                   curBlockID: message.block[flowAttributes.CONTENT][flowAttributes.USER_INPUT_BLOCKTOGOID],
                   waitingForUser: false
               };

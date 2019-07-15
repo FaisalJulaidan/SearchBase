@@ -15,4 +15,4 @@ const DEV = true;
 export const BOT_DELAY = 800;
 export const BOT_DELAY_CHAR_MULTIPLIER = DEV ? 0 : 25;
 export const BOT_DELAY_MAX = 3000;
-export const BOT_DELAY_MIN = 600;
+export const BOT_DELAY_MIN = 1000;

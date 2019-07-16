@@ -144,7 +144,7 @@ class Item extends React.Component {
                                       </Menu>
                                   }>
 
-                            <Button className="ant-dropdown-link" href="#">
+                            <Button className="ant-dropdown-link">
                                 Extra Actions <Icon type="down"/>
                             </Button>
                         </Dropdown>

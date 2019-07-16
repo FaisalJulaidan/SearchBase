@@ -67,7 +67,7 @@ const Input = ({ setChatbotStatus, isDirectLink, addUserMessage, lastMessage, ad
             <>
                 {
                     component ?
-                        (<div className={[
+                        (<div id={'TheSearchBase_Chatbot_Input'} className={[
                             'Input',
                             visible ? 'Visible' : ''
                         ].join(' ')}>

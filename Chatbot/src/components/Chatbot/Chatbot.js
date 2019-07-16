@@ -172,6 +172,7 @@ const Chatbot = ({
                                 return;
                             }
                         }
+
                         if (nextBlock.extra.end) {
                             setChatbotStatus({ finished: true });
                             let { cancelled } = await endChat(true);

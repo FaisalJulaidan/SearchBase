@@ -66,6 +66,17 @@ class Item extends React.Component {
 
     handleCancel = () => this.setState({visible: false});
 
+    getWWWLink = (src) => {
+        let link = getLink(src);
+        let splitLink = link.split("://");
+
+        if (!link.includes("www") && !link.includes("localhost")){
+            return splitLink[0] + "://www." + splitLink[1]
+        }
+
+        return link
+    };
+
 
     /**
      * @param {string} type
@@ -122,7 +133,9 @@ class Item extends React.Component {
                 if (place === 'features')
                     return <BullhornFeatures/>;
                 if (place === 'button') {
-                    windowObject.url = "https://auth.bullhornstaffing.com/oauth/authorize?response_type=code&client_id=7719607b-7fe7-4715-b723-809cc57e2714&redirect_uri=" + getLink("/dashboard/marketplace/Bullhorn");
+                    windowObject.url = "https://auth.bullhornstaffing.com/oauth/authorize?response_type=code" +
+                        "&client_id=7719607b-7fe7-4715-b723-809cc57e2714&redirect_uri=" +
+                        this.getWWWLink("/dashboard/marketplace/Bullhorn");
                     // return <a href={windowObject.url}>Click me</a>
                     return <DefaultButton buttonText={'Connect to Bullhorn'}
                                           windowObject={windowObject}

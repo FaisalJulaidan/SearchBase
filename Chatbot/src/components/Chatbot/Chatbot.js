@@ -122,11 +122,13 @@ const Chatbot = ({
     // Every time the chatbot changes, call to flowHandler
     useEffect(() => {
         const setChatbotWaiting = (block, overrideAction = null) => {
+            console.log('lol')
             setChatbotStatus({
                 curAction: overrideAction,
                 waitingForUser: false,
                 curBlockID: block.ID,
                 curBlock: block,
+                afterMessage: null,
                 thinking: true
             });
         };
@@ -156,7 +158,7 @@ const Chatbot = ({
                 } else {
                     let nextBlock = getCurBlock(curAction, assistant, chatbot);
                     if (nextBlock) {
-                        setChatbotWaiting(nextBlock);
+                        setChatbotWaiting(nextBlock, chatbot.status.afterMessage ? chatbot.status.curAction: null);
                         let fetchedData = {};
                         if (nextBlock.extra.needsToFetch) {
                             let [key, data, cancelled] = await fetchData(nextBlock);

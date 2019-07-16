@@ -91,7 +91,8 @@ const getCurBlock = (action, assistant, chatbot) => {
     const { blocks, status } = chatbot;
     const { curBlockID, afterMessage } = status;
     const { Message } = assistant;
-    if(afterMessage){loadAfterMessage(chatbot)}
+    console.log(JSON.stringify(status))
+    if(afterMessage){return  loadAfterMessage(chatbot)}
     switch (action) {
         case 'Init':
             return createBlock({ text: Message }, messageTypes.TEXT, delayMessageLength(Message), null, null, loadFirstBlock(blocks).ID);

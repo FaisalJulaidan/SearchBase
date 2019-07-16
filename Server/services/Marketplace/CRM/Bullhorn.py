@@ -34,6 +34,7 @@ Auth =
 CLIENT_ID = os.environ['BULLHORN_CLIENT_ID']
 CLIENT_SECRET = os.environ['BULLHORN_CLIENT_SECRET']
 
+
 def testConnection(auth, companyID):
     try:
         if auth.get("refresh_token"):
@@ -77,6 +78,20 @@ def login(auth):
 
     except Exception as exc:
         helpers.logError("Marketplace.CRM.Bullhorn.login() ERROR: " + str(exc))
+        return Callback(False, str(exc))
+
+
+def logout(auth, companyID):
+    try:
+        # send query
+        sendQuery_callback: Callback = sendQuery(auth, "logout", "get", {}, companyID)
+
+        if not sendQuery_callback.Success:
+            raise Exception(sendQuery_callback.Message)
+
+        return Callback(True, sendQuery_callback.Data.text)
+    except Exception as exc:
+        helpers.logError("Marketplace.CRM.Bullhorn.logout() ERROR: " + str(exc))
         return Callback(False, str(exc))
 
 

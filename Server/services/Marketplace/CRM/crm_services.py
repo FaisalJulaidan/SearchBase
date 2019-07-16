@@ -125,7 +125,7 @@ def produceRecruiterValueReport(companyID, crmName):
 
         return Callback(True, crmName + " doesn't support this functionality")
     except Exception as exc:
-        helpers.logError("CRM_services.produceRecruiterValueReport(): " + str(exc))
+        helpers.logError("crm_services.produceRecruiterValueReport(): " + str(exc))
         db.session.rollback()
         return Callback(False, "Producing recruiter value report failed")
 
@@ -149,7 +149,7 @@ def connect(type, auth, companyID) -> Callback:
         return Callback(True, 'CRM has been connected successfully', connection)
 
     except Exception as exc:
-        helpers.logError("CRM_services.connect(): " + str(exc))
+        helpers.logError("crm_services.connect(): " + str(exc))
         db.session.rollback()
         return Callback(False, "CRM connection failed")
 
@@ -160,10 +160,10 @@ def testConnection(type, auth, companyID) -> Callback:
         crm_type: CRM = CRM[type]
 
         # test connection
-        if crm_type == CRM.Adapt:
-            return Adapt.testConnection(auth)
-        elif crm_type == CRM.Bullhorn:
+        if crm_type == CRM.Bullhorn:
             return Bullhorn.testConnection(auth, companyID)  # oauth2
+        elif crm_type == CRM.Adapt:
+            return Adapt.testConnection(auth)
         elif crm_type == CRM.Greenhouse:
             return Greenhouse.login(auth)
         elif crm_type == CRM.Vincere:
@@ -172,7 +172,7 @@ def testConnection(type, auth, companyID) -> Callback:
         return Callback(False, 'Connection failure. Please check entered details')
 
     except Exception as exc:
-        helpers.logError("CRM_services.connect(): " + str(exc))
+        helpers.logError("crm_services.connect(): " + str(exc))
         return Callback(False, "CRM testing failed.")
 
 
@@ -182,12 +182,15 @@ def disconnectByType(type, companyID) -> Callback:
         if not crm_callback:
             return Callback(False, "Could not find CRM.")
 
+        # no matter if it fails or not remove it from the system
+        logoutOfCRM(crm_callback.Data.Auth, type, companyID)
+
         db.session.delete(crm_callback.Data)
         db.session.commit()
         return Callback(True, 'CRM has been disconnected successfully')
 
     except Exception as exc:
-        helpers.logError("CRM_services.disconnect(): " + str(exc))
+        helpers.logError("crm_services.disconnect(): " + str(exc))
         db.session.rollback()
         return Callback(False, "CRM disconnection failed.")
 
@@ -198,14 +201,36 @@ def disconnectByID(crmID, companyID) -> Callback:
         if not crm_callback:
             return Callback(False, "Could not find CRM.")
 
+        # no matter if it fails or not remove it from the system
+        logoutOfCRM(crm_callback.Data.Auth, crm_callback.Data.Type, companyID)
+
         db.session.delete(crm_callback.Data)
         db.session.commit()
         return Callback(True, 'CRM has been disconnected successfully', crmID)
 
     except Exception as exc:
-        helpers.logError("CRM_services.disconnect(): " + str(exc))
+        helpers.logError("crm_services.disconnect(): " + str(exc))
         db.session.rollback()
         return Callback(False, "CRM disconnection failed.")
+
+
+def logoutOfCRM(auth, crm_type, companyID) -> Callback:
+    try:
+
+        if crm_type == CRM.Bullhorn:
+            return Bullhorn.logout(auth, companyID)
+        # elif crm_type == CRM.Adapt:
+        #     return Adapt.testConnection(auth)
+        # elif crm_type == CRM.Greenhouse:
+        #     return Greenhouse.login(auth)
+        # elif crm_type == CRM.Vincere:
+        #     return Vincere.testConnection(auth, companyID)
+
+        return Callback(False, 'Logout failed')
+        
+    except Exception as exc:
+        helpers.logError("crm_services.logoutOfCRM(): " + str(exc))
+        return Callback(False, "CRM logout failed.")
 
 
 def getCRMByID(crmID, companyID):
@@ -218,7 +243,7 @@ def getCRMByID(crmID, companyID):
         return Callback(True, "CRM retrieved successfully.", crm)
 
     except Exception as exc:
-        helpers.logError("CRM_services.getCRMByCompanyID(): " + str(exc))
+        helpers.logError("crm_services.getCRMByCompanyID(): " + str(exc))
         return Callback(False, 'Could not retrieve CRM.')
 
 
@@ -232,7 +257,7 @@ def getCRMByType(crmType, companyID):
         return Callback(True, "CRM retrieved successfully.", crm)
 
     except Exception as exc:
-        helpers.logError("CRM_services.getCRMByCompanyID(): " + str(exc))
+        helpers.logError("crm_services.getCRMByCompanyID(): " + str(exc))
         return Callback(False, 'Could not retrieve CRM.')
 
 

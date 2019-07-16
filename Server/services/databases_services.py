@@ -12,6 +12,7 @@ from services.Marketplace.CRM import crm_services
 from sqlalchemy import and_
 from sqlalchemy_utils import Currency
 from utilities import helpers
+import time
 
 
 def fetchDatabase(id, companyID: int, pageNumber: int) -> Callback:
@@ -69,7 +70,7 @@ def uploadDatabase(data: dict, companyID: int) -> Callback:
                     if key in [Candidate.Currency.name, Job.Currency.name]:
                         parsed[key] = Currency(data)
                     elif key in [Candidate.PayPeriod.name, Job.PayPeriod.name]:
-                        parsed[key] = enums.Period[data]
+                        parsed[key] = Period[data]
                     elif key in [Job.JobStartDate.name, Job.JobEndDate.name]:
                         parsed[key] = datetime(year=data['year'],
                                                month=data['month'],
@@ -102,12 +103,12 @@ def uploadDatabase(data: dict, companyID: int) -> Callback:
         databaseName = databaseData["databaseName"]
 
         # Upload Candidates database
-        if databaseData['databaseType'] == enums.DatabaseType.Candidates.name:
+        if databaseData['databaseType'] == DatabaseType.Candidates.name:
             newDatabase = createDatabase(databaseName, DatabaseType.Candidates)
             uploadCandidates(databaseData, newDatabase)
 
         # Upload Jobs database
-        elif databaseData['databaseType'] == enums.DatabaseType.Jobs.name:
+        elif databaseData['databaseType'] == DatabaseType.Jobs.name:
             newDatabase = createDatabase(databaseName, DatabaseType.Jobs)
             uploadJobs(databaseData, newDatabase)
         else:
@@ -245,9 +246,9 @@ def scan(session, assistantHashID):
         extraRecords = getCRMData(assistant, databaseType.name, session)
 
         # Scan database for solutions based on database type
-        if databaseType == enums.DatabaseType.Candidates:
+        if databaseType == DatabaseType.Candidates:
             return scanCandidates(session, [d[0] for d in databases], extraRecords)
-        elif databaseType == enums.DatabaseType.Jobs:
+        elif databaseType == DatabaseType.Jobs:
             return scanJobs(session, [d[0] for d in databases], extraRecords)
         else:
             return Callback(False, "Database type is not recognised", None)
@@ -290,7 +291,7 @@ def scanCandidates(session, dbIDs, extraCandidates=None):
         # Salary comparision for JobSalary (LessThan is forced)
         salaryInputs: list = keywords.get(DT.JobSalary.value['name'])
         if salaryInputs and len(salaryInputs):
-            df[['Score', Candidate.CandidateDesiredSalary.name, Candidate.Currency.name, Job.PayPeriod.name]] = \
+            df[['Score', Candidate.CandidateDesiredSalary.name, Candidate.Currency.name]] = \
                 df.apply(lambda row: __salary(row, Candidate.CandidateDesiredSalary,
                                               Candidate.Currency, Candidate.PayPeriod,
                                               salaryInputs[-1], plus=8, forceLessThan=True), axis=1, result_type='expand')
@@ -298,7 +299,7 @@ def scanCandidates(session, dbIDs, extraCandidates=None):
         # Salary comparision for CandidateDesiredSalary
         salaryInputs: list = keywords.get(DT.CandidateDesiredSalary.value['name'])
         if salaryInputs and len(salaryInputs):
-            df[['Score', Candidate.CandidateDesiredSalary.name, Candidate.Currency.name, Job.PayPeriod.name]] = \
+            df[['Score', Candidate.CandidateDesiredSalary.name, Candidate.Currency.name]] = \
                 df.apply(lambda row: __salary(row, Candidate.CandidateDesiredSalary,
                                               Candidate.Currency, Candidate.PayPeriod,
                                               salaryInputs[-1], plus=8, forceLessThan=False), axis=1, result_type='expand')
@@ -350,7 +351,7 @@ def scanCandidates(session, dbIDs, extraCandidates=None):
             random.shuffle(desc)
             data.append({
                 "id": record["ID"],
-                "databaseType": enums.DatabaseType.Candidates.value,
+                "databaseType": DatabaseType.Candidates.value,
                 "title": "Candidate " + indexes[i],
                 "subTitles": [],
                 "description": " ".join(desc),
@@ -389,7 +390,7 @@ def scanJobs(session, dbIDs, extraJobs=None):
         # Salary comparision
         salaryInputs: list = keywords.get(DT.JobSalary.value['name'], keywords.get(DT.CandidateDesiredSalary.value['name']))
         if salaryInputs and len(salaryInputs):
-            df[['Score', Job.JobSalary.name, Job.Currency.name, Job.PayPeriod.name]] = \
+            df[['Score', Job.JobSalary.name, Job.Currency.name]] = \
                 df.apply(lambda row: __salary(row, Job.JobSalary, Job.Currency, Job.PayPeriod, salaryInputs[-1], 8),
                                                                             axis=1, result_type='expand')
 
@@ -476,7 +477,7 @@ def scanJobs(session, dbIDs, extraJobs=None):
 
             data.append({
                 "id": record["ID"],
-                "databaseType": enums.DatabaseType.Jobs.value,
+                "databaseType": DatabaseType.Jobs.value,
                 "title": record[Job.JobTitle.name],
                 "subTitles": subTitles,
                 "description": " ".join(desc),
@@ -484,7 +485,6 @@ def scanJobs(session, dbIDs, extraJobs=None):
                 "output": helpers.encrypt(record, True)
             })
 
-        # time.sleep(5)
         return Callback(True, '', data)
 
     except Exception as exc:
@@ -494,10 +494,10 @@ def scanJobs(session, dbIDs, extraJobs=None):
 
 
 def __wordsCounter(dataType: DT, dbColumn, keywords, df, x=1):
-    if keywords.get(dataType.value['name']):
-        df['Score'] += x * df[dbColumn.name].str.count('|'.join(keywords[dataType.value['name']]),
+    keywords = keywords.get(dataType.value['name'])
+    if keywords:
+        df['Score'] += x * df[dbColumn.name].str.count('|'.join([re.escape(k) for k in keywords ]),
                                                        flags=re.IGNORECASE) | 0
-
 
 def __numCounter(dbColumn, compareSign, dataType: DT, keywords, df, plus=1, addInputToScore=False):
     if keywords.get(dataType.value['name']):
@@ -516,29 +516,33 @@ def __numCounter(dbColumn, compareSign, dataType: DT, keywords, df, plus=1, addI
                    int(numberInput), 'Score'] += plus
 
 
+# min-max currency period / ex. "10000-45000 GBP Annually"         old: "Greater Than 5000 GBP Annually"
 def __salary(row, dbSalaryColumn, dbCurrencyColumn, dbPayPeriodColumn, salaryInput: str, plus=4, forceLessThan=False):
 
-    userSalary = salaryInput.split(' ') # e.g. Less Than 5000 GBP Annually
+    userSalary = salaryInput.split(' ')
 
-    # Convert salary currency if did not match with user's entered currency
+    # Get user's min and max salary
+    userMin = userSalary[0].split("-")[0]
+    userMax = userSalary[0].split("-")[1]
+
+    # Convert db salary currency if did not match with user's entered currency
     dbSalary = row[dbSalaryColumn.name] or 0
-    if (not row[dbCurrencyColumn.name] == userSalary[3]) and dbSalary > 0:
-        dbSalary = helpers.currencyConverter.convert(row[dbCurrencyColumn.name], userSalary[3], dbSalary)
+    if (not row[dbCurrencyColumn.name] == userSalary[1]) and dbSalary > 0:
+        dbSalary = helpers.currencyConverter.convert(row[dbCurrencyColumn.name], userSalary[1], dbSalary)
         row[dbSalaryColumn.name] = dbSalary
 
-    # Convert salary rate if did not match with user's entered pay period e.g. Annually to Monthly...
-    if (not row[dbPayPeriodColumn.name] == userSalary[4]) and dbSalary > 0:
-        dbSalary = helpers.convertSalaryPeriod(dbSalary, row[dbPayPeriodColumn.name], Period[userSalary[4]])
+    # Convert salary rate if did not match with user's entered pay period e.g. Annually to Daily...
+    # if (not row[dbPayPeriodColumn.name] == userSalary[2]) and dbSalary > 0:
+    #     dbSalary = helpers.convertSalaryPeriod(dbSalary, row[dbPayPeriodColumn.name], Period[userSalary[2]])
 
-    # Add old score to new score if success
+    # Add old score to new score
     plus += row['Score']
 
     # Compare salaries, if true then return 'plus' to be added to the score otherwise old score
-    if userSalary[0] == 'Greater' and not (forceLessThan):
-        return (plus if dbSalary >= float(userSalary[2]) else row['Score']), dbSalary, userSalary[3], userSalary[4]
-    else: # Less
-        return (plus if dbSalary <= float(userSalary[2]) else row['Score']), dbSalary, userSalary[3], userSalary[4]
-
+    if not forceLessThan:
+        return (plus if (float(userMin) >= dbSalary <= float(userMax)) else row['Score']), dbSalary, userSalary[1]
+    else:  # Less
+        return (plus if dbSalary <= float(userMax) else row['Score']), dbSalary, userSalary[1]
 
 
 def createPandaCandidate(id, name, email, mobile, location, skills,

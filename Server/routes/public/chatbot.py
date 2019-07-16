@@ -1,4 +1,3 @@
-import logging
 import uuid
 
 from flask import Blueprint, request, send_from_directory
@@ -16,11 +15,48 @@ chatbot_router = Blueprint('chatbot_router', __name__, template_folder="../templ
 CORS(chatbot_router)
 
 
-@chatbot_router.route("/widgets/<path:path>", methods=['GET'])
+@chatbot_router.after_request
+def add_header(r):
+    """
+    Add headers to both force latest IE rendering engine or Chrome Frame,
+    and also to cache the rendered page for 10 minutes.
+    """
+    r.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
+    r.headers["Pragma"] = "no-cache"
+    r.headers["Expires"] = "0"
+    r.headers['Cache-Control'] = 'public, max-age=0'
+    r.headers['Access-Control-Allow-Origin'] = '*'
+    r.headers['Access-Control-Allow-Headers'] = '*'
+    r.headers['Access-Control-Allow-Methods'] = '*'
+    return r
+
+
+# To give an access to the static/widgets/chatbot folder
+@chatbot_router.route("/static/widgets/chatbot/<path:path>", methods=['GET'])
 @helpers.gzipped
-def get_widget(path):
+def get_chatbot_static(path):
     if request.method == "GET":
-        return send_from_directory('static/widgets/', path)
+        return send_from_directory('static/widgets/chatbot/', path)
+
+
+# To load the loadChatbo
+@chatbot_router.route("/widgets/chatbot", methods=['GET'])
+@helpers.gzipped
+def get_widget():
+    if request.method == "GET":
+        return send_from_directory('static/js',
+                                   'loadChatbot.js')
+
+
+# LEGACY CODE
+# TO BE REMOVED
+# To load the loadChatbo
+@chatbot_router.route("/widgets/chatbot.js", methods=['GET'])
+@helpers.gzipped
+def get_widget_legacy():
+    if request.method == "GET":
+        return send_from_directory('static/js',
+                                   'loadChatbot.js')
 
 
 @chatbot_router.route("/assistant/<string:assistantIDAsHash>/chatbot_direct_link", methods=['GET'])
@@ -67,7 +103,7 @@ def getSolutions_forChatbot(assistantHashID):
         return helpers.jsonResponse(True, 200, "show top is 0", [])
 
 
-@chatbot_router.route("/assistant/<string:assistantIDAsHash>/session/<int:sessionID>/file", methods=['POST'])
+@chatbot_router.route("/assistant/<string:assistantIDAsHash>/chatbot/<int:sessionID>/file", methods=['POST'])
 def chatbot_upload_files(assistantIDAsHash, sessionID):
     callback: Callback = conversation_services.getByID(sessionID, helpers.decodeID(assistantIDAsHash)[0])
     if not callback.Success:
@@ -89,12 +125,9 @@ def chatbot_upload_files(assistantIDAsHash, sessionID):
 
                 if file.filename == '':
                     return helpers.jsonResponse(False, 404, "No selected file")
-
                 # Generate unique name: hash_sessionIDEncrypted.extension
                 filename = str(uuid.uuid4()) + '_' + helpers.encodeID(sessionID) + '.' + \
                            secure_filename(file.filename).rsplit('.', 1)[1].lower()
-
-
 
                 # Upload file to DigitalOcean Space
                 upload_callback: Callback = stored_file_services.uploadFile(file, filename,
@@ -115,7 +148,6 @@ def chatbot_upload_files(assistantIDAsHash, sessionID):
             if not dbRef_callback.Success:
                 logError("Couldn't Save Stored Files Reference For: " + str(filenames))
                 raise Exception(dbRef_callback.Message)
-
 
             # Save changes
             db.session.commit()

@@ -1,0 +1,33 @@
+.Header {
+    height: 60px;
+    width: 100%;
+    background-color: #fafafa;
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+    padding: 15px;
+    /*-webkit-box-shadow: 0 14px 18px 1px #fafafa;*/
+    /*box-shadow: 0 14px 18px 1px #fafafa;*/
+    position: relative;
+    z-index: 8;
+}
+
+.H3 {
+    color: #1890ff;
+    line-height: 30px;
+    text-align: center;
+    font-size: 17px;
+}
+
+.Button {
+    margin: 3px;
+}
+
+.Danger:hover {
+    color: #fff !important;
+    background-color: #ff4d4f !important;
+    border-color: #ff4d4f !important;
+}
+
+.Danger {
+    color: red !important;
+}

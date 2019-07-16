@@ -1,0 +1,37 @@
+.Signature {
+    display: flex;
+    position: absolute;
+    bottom: 0;
+    margin: auto;
+    justify-content: center;
+    width: 100%;
+    background-color: #fafafa;
+    align-items: center;
+    z-index: 4;
+    height: 40px;
+}
+
+.Signature a {
+    color: #673AB7;
+    margin-left: 5px;
+}
+
+.Signature p {
+  margin: 0
+}
+
+.Signature a:link {
+    text-decoration: none;
+}
+
+.Signature a:visited {
+    text-decoration: none;
+}
+
+.Signature a:hover {
+    text-decoration: underline;
+}
+
+.Signature a:active {
+    text-decoration: underline;
+}

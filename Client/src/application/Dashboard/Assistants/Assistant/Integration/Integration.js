@@ -1,10 +1,9 @@
 import React from 'react';
 
-import {Button, Col, Input, Row, Divider} from "antd";
+import {Button, Divider, Input} from "antd";
 
 import styles from "./Integration.module.less"
-import ReactDOMServer from 'react-dom/server'
-import {hasher, getLink} from "helpers";
+import {getLink, hasher} from "helpers";
 import {SwatchesPicker} from 'react-color';
 import {connect} from 'react-redux';
 
@@ -13,21 +12,20 @@ const {TextArea} = Input;
 class Integration extends React.Component {
 
     state = {
-        source: "",
         dataName: "tsb-widget",
         assistantID: null,
         dataCircle: "#9254de",
         async: true,
         defer: true,
-        isTestButtonDisabled: false
+        isTestButtonDisabled: false,
     };
 
     componentDidMount() {
         this.setState({
             assistantID: hasher.encode(this.props.assistant?.ID),
-            source: this.getWidgetSrc()
         });
     }
+
 
     handleChange = (color) => this.setState({dataCircle: color.hex || color.target.value});
 
@@ -45,44 +43,34 @@ class Integration extends React.Component {
                 1500
             )
         );
-        let oldBot = document.getElementById("TheSearchBase_Chatbot");
 
+        let oldBot = document.getElementById("TheSearchBase_Chatbot");
         if (oldBot)
             this.props.removeChatbot();
 
-        const script = document.createElement("script");
+        const s = document.createElement("script");
+        s.setAttribute('data-name', this.state.dataName);
+        s.setAttribute('data-id', this.state.assistantID);
+        s.setAttribute('data-circle', this.state.dataCircle);
 
-        script.src = this.state.source;
-        script.async = this.state.async;
-        script.defer = this.state.defer;
-        script.setAttribute("data-name", this.state.dataName);
-        script.setAttribute("data-id", this.state.assistantID);
-        script.setAttribute("data-circle", this.state.dataCircle);
-        script.setAttribute("id", "oldBotScript");
+        // Development
+        if (process.env.NODE_ENV === 'development') {
+            s.src = getLink("/vendor/js/bundle.js");
+            s.setAttribute("id", "oldBotScript");
+        }
+        s.src = getLink("/api/widgets/chatbot");
 
-        document.body.appendChild(script);
-    };
-
-    getWidgetSrc = () => {
-        return getLink("/api/widgets/chatbot.js");
+        document.body.appendChild(s);
     };
 
     generateDirectLink = () => {
-
         if (window.location.port !== "")
             window.open(`http://localhost:5000/api/assistant/${this.state.assistantID}/chatbot_direct_link`);
         else
             window.open(getLink(`/api/assistant/${this.state.assistantID}/chatbot_direct_link`));
     };
 
-    getChatbotScript = () => {
-        return <script src={this.getWidgetSrc()}
-                       data-name={this.state.dataName}
-                       data-id={this.state.assistantID}
-                       data-circle={this.state.dataCircle}
-                       async={this.state.async}
-                       defer={this.state.defer}/>
-    };
+    getChatbotScript = () => `<script>const s=document.createElement("script");s.src=getLink("/api/widgets/chatbot");s.setAttribute('data-name','${this.state.dataName}');s.setAttribute('data-id','${this.state.assistantID}');s.setAttribute('data-circle','${this.state.dataCircle}');document.body.appendChild(s);</script>`;
 
     render() {
         return (
@@ -122,10 +110,14 @@ class Integration extends React.Component {
                         To integrate your assistant, you must paste the pre-made code into any
                         part of your HTML source code.
                     </p>
-                    <TextArea value={ReactDOMServer.renderToString(this.getChatbotScript())}
+                    <TextArea value={this.getChatbotScript()}
+                              onClick={() => {
+                                  console.log(this.getChatbotScript())
+                              }}
                               id={"pasteArea"}
                               style={{height: "70px", fontWeight: "600", margin: "1.5% 0"}}
                               readOnly/>
+
                     <Button onClick={this.copyScriptPaste} className={"ant-btn-primary"}>Copy</Button>
                     <Button style={{marginLeft: "5px"}} onClick={this.generateDirectLink}
                             className={"ant-btn-primary"}>Generate Direct Link</Button>

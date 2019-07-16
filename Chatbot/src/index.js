@@ -1,62 +1,40 @@
-import React from 'react'
-import ReactDOM from 'react-dom'
-import Chatbot from './components/Chatbot/Chatbot'
+import React from 'react';
+import ReactDOM from 'react-dom';
+import './index.css';
+import * as serviceWorker from './serviceWorker';
+
+import { compose, createStore } from 'redux';
+import { Provider } from 'react-redux';
+import reducers from './store/reducers';
 import WebFont from 'webfontloader';
-import 'antd/lib/button/style';
-import {Provider} from 'react-redux';
-import {createStore} from 'redux';
-import reducer from './store/reducer';
 import 'react-app-polyfill/ie11';
+import Chatbot from './components/Chatbot/Chatbot';
 
-if (!String.prototype.startsWith) {
-    String.prototype.startsWith = function(searchString, position) {
-        position = position || 0;
-        return this.indexOf(searchString, position) === position;
-    };
-}
-
-Object.defineProperty(Array.prototype, 'flat', {
-    value: function(depth = 1) {
-        return this.reduce(function (flat, toFlatten) {
-            return flat.concat((Array.isArray(toFlatten) && (depth>1)) ? toFlatten.flat(depth-1) : toFlatten);
-        }, []);
-    }
-});
-
-const store = createStore(reducer);
-WebFont.load({
-    google: {
-        families: ['Source Sans Pro', 'sans-serif']
-    }
-});
-
-const app = (
-    <Provider store={store}>
-        <Chatbot height={'600px'} width={'400px'}/>
-    </Provider>
-);
-
-const root = document.createElement('div');
-root.id = "TheSearchBase_Chatbot";
-
-const waitFor = object => {
-    Boolean(object) ? object.appendChild(root) : setTimeout(() => waitFor(document.body), 500);
-};
+const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
+const store = createStore(reducers, composeEnhancers());
+WebFont.load({ google: { families: ['Source Sans Pro', 'sans-serif'] } });
 
 const scriptTag = document.querySelector('script[data-name="tsb-widget"][data-id]');
-const isDirectLink = scriptTag.getAttribute('data-directLink') === '';
+const isDirectLink = scriptTag.getAttribute('directLink') === '';
+const assistantID = scriptTag.getAttribute('data-id');
+const btnColor = scriptTag.getAttribute('data-circle') || '#1890ff';
 
-if (!document.body)
-    waitFor(document.body);
-else {
+let root = document.createElement('div');
+root.id = 'TheSearchBase_Chatbot';
 
-    if (isDirectLink) {
-        document.getElementById('directlink').appendChild(root);
-    } else {
-        document.body.appendChild(root);
-    }
-}
+if (isDirectLink)
+    document.getElementById('direct_link_container').appendChild(root);
+else
+    document.body.appendChild(root);
 
+ReactDOM.render(
+    <Provider store={store}>
+        <Chatbot isDirectLink={isDirectLink} btnColor={btnColor}
+                 assistantID={assistantID}/>
+    </Provider>, root
+);
 
-
-ReactDOM.render(app, root);
+// If you want your app to work offline and load faster, you can change
+// unregister() to register() below. Note this comes with some pitfalls.
+// Learn more about service workers: https://bit.ly/CRA-PWA
+serviceWorker.unregister();

@@ -1,6 +1,6 @@
 import React from 'react';
 
-import {Typography, Dropdown, Menu} from 'antd';
+import {Dropdown, Menu, Typography} from 'antd';
 import styles from "components/ViewBox/ViewBox.module.less";
 import PropTypes from 'prop-types';
 

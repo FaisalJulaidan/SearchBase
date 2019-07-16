@@ -1,15 +1,14 @@
 import React from 'react';
+
 import styles from "./PublicPage.module.less";
+
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
 import {faCloud} from '@fortawesome/free-solid-svg-icons'
-import queryString from 'query-string'
 import {Spin} from 'antd'
+import queryString from 'query-string'
 
-import axios from 'axios'
 import {history} from '../helpers'
-
-
-
+import axios from 'axios'
 
 export const PublicPage = (Component, param, redirectIfFail, authUrl) => {
     return class extends React.Component {

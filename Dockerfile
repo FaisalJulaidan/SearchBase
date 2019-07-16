@@ -6,10 +6,11 @@ FROM node:9.6.1 as chatbot_builder
 WORKDIR /Chatbot
 
 # Copy package.json file - To be cache -
-#COPY Chatbot/package.json .
+COPY Chatbot/package.json .
 
 # Install npm dependecies
-#RUN npm install --silent
+RUN npm install --silent
+RUN npm install react-scripts@1.1.1 -g --silent
 
 # Copy chatbot project from (host) to (container)
 ADD Chatbot .
@@ -56,7 +57,7 @@ RUN pipenv install --system --deploy --ignore-pipfile
 ADD Server .
 
 # Copy static/widgets directory from chatbot_builder, which includes the new build version of chatbot
-COPY --from=chatbot_builder Chatbot/dist static/widgets
+COPY --from=chatbot_builder Chatbot/build static/widgets/chatbot
 
 # Copy static/react_app directory from client_builder, which includes the new build version of react_app
 COPY --from=client_builder Client/build static/react_app

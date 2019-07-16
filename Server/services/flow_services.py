@@ -21,7 +21,7 @@ def getChatbot(assistantHashID) -> Callback:
             .filter(Assistant.ID == assistantID[0]).first()
 
         if not assistant.Active:
-            return Callback(True, '', {'isDisabled': True})
+            return Callback(True, '', {'assistant': None, 'isDisabled': True})
 
         # Check for restricted countries
         try:

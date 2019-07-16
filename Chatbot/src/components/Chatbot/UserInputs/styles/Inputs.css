@@ -1,0 +1,145 @@
+.Input {
+    position: absolute;
+    z-index: 3;
+    padding: 0 10px;
+    -webkit-box-shadow: none;
+    box-shadow: none;
+    width: 100%;
+    transition: bottom 0.5s;
+    display: flex;
+    height: 50px;
+    bottom: 0;
+}
+
+.Input.Visible {
+    bottom: 40px;
+    box-shadow: 5px 5px 30px 0 rgba(0, 0, 0, 0.1);
+}
+
+.RangePicker {
+    width: 80% !important;
+    margin: auto;
+}
+
+#TheSearchBase_Chatbot input {
+    -webkit-box-shadow: none !important;
+    -moz-box-shadow: none !important;
+    box-shadow: none !important;
+    border: none !important;
+}
+
+#TheSearchBase_Chatbot input[type="text"]::placeholder {
+    color: #666565 !important;
+}
+
+#TheSearchBase_Chatbot input:focus {
+    -webkit-box-shadow: none !important;
+    box-shadow: none !important;
+    border: none !important;
+}
+
+
+.Text {
+    font-size: 16px;
+    font-weight: 400;
+    color: #647384;
+    background: transparent;
+    width: 100%;
+    height: 100%;
+    border: none;
+    float: left;
+}
+
+.Text:focus {
+    outline: none;
+}
+
+.Input > .InputContainer {
+    width: calc(100% - 80px);
+    justify-content: center;
+    align-items: center;
+    display: inherit;
+}
+
+.Input > .InputContainer > .Slider {
+    width: calc(100% - 80px)
+}
+
+.Input > .Text:focus {
+    outline: none
+}
+
+.Input > .Text:disabled {
+    cursor: not-allowed;
+}
+
+.Input > .Submit {
+    height: 100%;
+    width: 40px;
+    justify-content: center;
+    align-items: center;
+    display: inherit;
+    align-self: flex-end;
+}
+
+.Input > .Actions {
+    height: 100%;
+    width: 40px;
+    justify-content: center;
+    align-items: center;
+    display: inherit;
+    align-self: flex-end;
+}
+
+.SendIconActive {
+    color: #1890ff;
+    cursor: pointer;
+}
+
+.Input > .Actions > i.ClipIconActive {
+    color: #1890ff;
+    cursor: pointer;
+}
+
+.Input > .Actions > i > input[type=file] {
+    display: none;
+}
+
+.Progress {
+    width: 100%;
+    padding: 0 40px;
+}
+
+.Settings {
+    min-width: 70px
+}
+
+.Settings > .SettingsTitle {
+    font-size: 16px;
+}
+
+.Settings .SettingsOption {
+    font-size: 14px;
+    font-weight: 400;
+}
+
+
+.DatepickerCalendar {
+    z-index: 99999999 !important;
+}
+
+.Datepicker {
+    width: calc(100% - 80px);
+    height: 100%;
+    float: left;
+    padding-left: 15px;
+}
+
+.Datepicker input {
+    background: transparent;
+    border: none;
+}
+
+.Datepicker i {
+    top: 10px;
+}

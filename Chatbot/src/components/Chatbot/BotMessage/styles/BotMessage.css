@@ -1,0 +1,85 @@
+
+.Message {
+    width: auto;
+    position: relative;
+    background: #f2f2f2;
+    color: black;
+    margin: 2px 5px;
+    max-width: 70%;
+}
+.Message > p {
+    padding: 10px 15px;
+    margin: 0;
+    word-break: break-word;
+}
+.Message:first-child {
+    margin: 5px 5px 0 5px;
+    border-top-right-radius: 25px;
+    border-top-left-radius: 25px;
+}
+.Message:last-child {
+    margin: 2px 5px 5px 5px;
+    border-bottom-right-radius: 25px;
+    border-bottom-left-radius: 25px;
+}
+.Message:only-child {
+    border-radius: 25px;
+    margin: 5px;
+}
+
+
+.BOT .Message.Solution {
+    max-width: 100%;
+}
+
+
+/*.BOT, .Bot_IE11 {*/
+/*    align-self: flex-start;*/
+/*    flex-flow: column;*/
+/*    flex-wrap: nowrap;*/
+/*    width: 100%;*/
+/*}*/
+
+.BOT .Message, .Bot_IE11 .Message {
+    width: auto;
+    position: relative;
+    background: #f2f2f2;
+    color: black;
+    margin: 2px 5px;
+    max-width: 70%;
+}
+
+.BOT .Message > p, .Bot_IE11 .Message > p {
+    margin: 0;
+    word-break: break-word;
+}
+
+.BOT .Message:first-child {
+    margin: 5px 5px 0 5px;
+    border-top-right-radius: 25px;
+    border-top-left-radius: 25px;
+}
+
+.BOT .Message:last-child {
+    margin: 2px 5px 5px 5px;
+    border-bottom-right-radius: 25px;
+    border-bottom-left-radius: 25px;
+}
+
+.BOT .Message:only-child {
+    border-radius: 25px;
+    margin: 5px;
+}
+
+/* ----------- iPhone 5, 5S, 5C and 5SE ----------- */
+/* Portrait */
+@media only screen and (min-device-width: 320px) and (max-device-width: 320px) and (-webkit-min-device-pixel-ratio: 2) and (orientation: portrait) {
+    .BOT {
+        padding: 10px 15px;
+    }
+}
+
+.Bot_IE11 > p {
+    margin: 0;
+    word-break: break-word;
+}

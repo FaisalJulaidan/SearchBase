@@ -1,0 +1,12 @@
+// Messages
+
+export const ADD_MESSAGE = 'ADD_MESSAGE';
+export const RESET_MESSAGE = 'RESET_MESSAGE';
+export const REWIND_TO_INDEX = 'REWIND_TO_INDEX'
+
+// Chatbot
+
+export const SET_CHATBOT_STATUS = 'SET_CHATBOT_STATUS';
+export const SET_CHATBOT_ANIMATION = 'SET_CHATBOT_ANIMATION';
+export const INIT_CHATBOT = 'INIT_CHATBOT';
+export const RESET_CHATBOT = 'RESET_CHATBOT';

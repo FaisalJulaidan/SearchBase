@@ -1,0 +1,46 @@
+
+
+.SkipButton {
+    border-radius: 0 0 25px 25px !important;
+}
+
+/* for the skip button */
+.TextMessage > button[data-danger="true"] {
+    color: #f5222d !important;
+}
+
+.TextMessage > button[data-danger="true"]:hover {
+    color: white;
+}
+
+.TextMessage > button[data-danger="true"]:disabled {
+    color: rgba(0, 0, 0, 0.25) !important;
+}
+
+/* for the not interested button */
+.TextMessage > button[data-warning="true"] {
+    color: #eca415 !important;
+}
+
+.TextMessage > button[data-warning="true"]:hover {
+    color: white !important;
+    background-color: #eca415 !important;
+    border-color: transparent !important;
+}
+
+.TextMessage > button[data-warning="true"]:disabled {
+    color: rgba(0, 0, 0, 0.25) !important;
+}
+
+.TextMessage > button[data-warning="true"]:disabled:hover {
+    color: rgba(0, 0, 0, 0.25) !important;
+    background-color: #f5f5f5 !important;
+    border-color: #d9d9d9 !important;
+    text-shadow: none !important;
+    box-shadow: none !important;
+}
+
+.TextMessage > button:last-child {
+    border-bottom-left-radius: 10px;
+    border-bottom-right-radius: 10px;
+}

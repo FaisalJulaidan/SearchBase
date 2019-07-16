@@ -2,7 +2,7 @@ import React from 'react'
 import styles from './ChatbotDirectLink.module.less'
 import PublicNavbar from "components/PublicNavbar/PublicNavbar";
 import axios from "axios";
-import {getLink} from "helpers";
+import {getLink} from 'helpers'
 
 class ChatbotDirectLink extends React.Component {
 
@@ -14,15 +14,19 @@ class ChatbotDirectLink extends React.Component {
     componentDidMount() {
         const assistantID = this.props.location.pathname.split('/')[2];
         if (assistantID) {
-            const script = document.createElement("script");
-            script.src = getLink("/static/widgets/chatbot.js");
-            script.async = true;
-            script.defer = true;
-            script.setAttribute('data-directLink', '');
-            script.setAttribute('data-name', 'tsb-widget');
-            script.setAttribute('data-id', assistantID);
-            script.setAttribute('data-circle', '#9254de');
-            document.body.appendChild(script);
+            const s = document.createElement("script");
+            s.setAttribute('directLink', '');
+            s.setAttribute('data-name', 'tsb-widget');
+            s.setAttribute('data-id', assistantID);
+            s.setAttribute('data-circle', '#9254de');
+
+            // Development
+            if (process.env.NODE_ENV === 'development')
+                s.src = "http://localhost:3001/vendor/js/bundle.js";
+            else
+                s.src = getLink("/api/widgets/chatbot");
+
+            document.body.appendChild(s);
 
             axios.get(`/api/assistant/${assistantID}/chatbot`)
                 .then(res => {
@@ -37,9 +41,9 @@ class ChatbotDirectLink extends React.Component {
 
     render() {
         return (
-            <div style={{height: '100%'}}>
+            <div style={{height: '100%', background: '#F4F6FC'}}>
                 <PublicNavbar companyLogo={this.state.LogoPath} CompanyName={this.state.CompanyName}/>
-                <div id="directlink" className={styles.Wrapper}></div>
+                <div id={'direct_link_container'} className={styles.Wrapper}/>
             </div>
         )
     }

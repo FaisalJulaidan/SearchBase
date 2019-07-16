@@ -1,0 +1,16 @@
+.Flow {
+    height: calc(100% - 131px);
+    width: 100%;
+    padding: 10px 20px 15px;
+    overflow-x: hidden;
+    overflow-y: auto;
+    will-change: transform;
+}
+
+.Flow::-webkit-scrollbar {
+    display: none;
+}
+
+.Flow > p {
+    font-size: 15px;
+}

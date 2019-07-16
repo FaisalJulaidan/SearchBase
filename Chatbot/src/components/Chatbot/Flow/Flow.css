@@ -1,0 +1,8 @@
+#TheSearchBase_Chatbot .ant-card-body {
+    height: 0 !important;
+}
+
+#TheSearchBase_Chatbot label {
+    margin-bottom: 0 !important;
+    font-weight: normal !important;
+}

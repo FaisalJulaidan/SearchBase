@@ -1,0 +1,29 @@
+.Signature > p {
+    margin: 0 0 10px 21px;
+}
+
+.Signature {
+    text-align: center;
+    margin-right: 10px;
+}
+
+.Signature a {
+    color: #673AB7;
+    margin-left: 5px;
+}
+
+.Signature a:link {
+    text-decoration: none;
+}
+
+.Signature a:visited {
+    text-decoration: none;
+}
+
+.Signature a:hover {
+    text-decoration: underline;
+}
+
+.Signature a:active {
+    text-decoration: underline;
+}

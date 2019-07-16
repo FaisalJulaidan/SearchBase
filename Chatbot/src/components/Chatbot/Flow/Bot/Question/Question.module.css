@@ -1,0 +1,36 @@
+.Question > button {
+    height: 40px;
+    width: calc(100% + 30px);
+    left: -15px;
+    top: 10px;
+    border: none;
+    border-bottom: 1px #ddd solid;
+    border-radius: 0;
+    z-index: 10;
+    color: #298bef !important;
+}
+
+/* for the skip button */
+.Question > button[data-danger="true"] {
+    color: #f5222d;
+}
+
+.Question > button[data-danger="true"]:matches(:hover) {
+    color: white;
+}
+
+.Question > button[data-danger="true"]:matches(:disabled) {
+    color: rgba(0, 0, 0, 0.25);
+}
+
+/* =================== */
+
+.Question > button:last-child {
+    border-bottom-left-radius: 10px;
+    border-bottom-right-radius: 10px;
+}
+
+.Selected {
+    background-color: #1790ff;
+    color: white;
+}

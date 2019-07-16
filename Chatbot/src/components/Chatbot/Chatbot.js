@@ -135,7 +135,8 @@ const Chatbot = ({
             return await dataHandler.sendData(completed);
         };
 
-        const botRespond = (block) => {
+        const botRespond = (block, chatbot) => {
+            console.log(block)
             stopTimer.current = optionalDelayExecution(() => {
                 setChatbotStatus({ thinking: false, waitingForUser: true });
                 addBotMessage(block.Content.text, block.Type, block);
@@ -174,7 +175,7 @@ const Chatbot = ({
                             let { cancelled } = await endChat(true);
                             if (cancelled) return;
                         }
-                        botRespond({ ...nextBlock, fetchedData });
+                        botRespond({ ...nextBlock, fetchedData }, chatbot);
                     }
                 }
             }

@@ -16,10 +16,8 @@ const BotMessage = ({ type, message, addUserMessage, addBotMessage, setChatbotSt
 
     const _checkAfterMessage = (afterMessage, newState, type) => {
         if (afterMessage) {
-            console.log(newState)
-            setChatbotStatus({ ...newState, thinking: true, afterMessage: afterMessage, curAction: 'Load After Message' });
-        } else {
-            console.log(newState)
+            setChatbotStatus({...newState, afterMessage})
+             } else {
             setChatbotStatus(newState);
         }
     };
@@ -47,7 +45,7 @@ const BotMessage = ({ type, message, addUserMessage, addBotMessage, setChatbotSt
         addUserMessage(text, type, block, content);
         const afterMessage = block[flowAttributes.CONTENT][flowAttributes.CONTENT_AFTER_MESSAGE];
         let newState = {
-            // curAction: block[flowAttributes.CONTENT][flowAttributes.SOLUTION_ACTION],
+            curAction: block[flowAttributes.CONTENT][flowAttributes.SOLUTION_ACTION],
             curBlockID: block[flowAttributes.CONTENT][flowAttributes.SOLUTION_BLOCKTOGOID],
             waitingForUser: false
         };

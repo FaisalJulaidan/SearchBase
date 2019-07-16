@@ -56,7 +56,7 @@ const loadNextBlock = (chatbot) => {
 
 const loadAfterMessage = (chatbot) => {
     const { curBlock, curBlockID, afterMessage } = chatbot.status
-    console.log(afterMessage)
+    console.log(chatbot.status)
 
     return createBlock(
         { text: afterMessage},
@@ -77,10 +77,7 @@ const loadFirstBlock = (blocks) => {
             block[flowAttributes.CONTENT],
             block[flowAttributes.TYPE],
             delayMessageLength(block[flowAttributes.CONTENT][flowAttributes.TEXT]),
-            block[flowAttributes.ID],
-            null,
-            null,
-            extra);
+            block[flowAttributes.ID]);
     } catch (e) {
     }
 };
@@ -92,18 +89,15 @@ const fetchData = async (block) => {
 
 const getCurBlock = (action, assistant, chatbot) => {
     const { blocks, status } = chatbot;
-    const { curBlockID } = status;
+    const { curBlockID, afterMessage } = status;
     const { Message } = assistant;
-    console.log(action)
+    if(afterMessage){loadAfterMessage(chatbot)}
     switch (action) {
         case 'Init':
             return createBlock({ text: Message }, messageTypes.TEXT, delayMessageLength(Message), null, null, loadFirstBlock(blocks).ID);
         case 'Go To Next Block':
         case 'Go To Specific Block':
-            console.log(loadNextBlock(chatbot))
             return loadNextBlock(chatbot);
-        case 'Load After Message':
-            return loadAfterMessage(chatbot)
         case 'End Chat':
             return endBlock();
         case 'Not Found':

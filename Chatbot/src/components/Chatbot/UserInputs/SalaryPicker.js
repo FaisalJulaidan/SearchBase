@@ -104,14 +104,14 @@ const SalaryPicker = ({ message, submitMessage }) => {
             <div>
                 <h2 className={'SettingsOption'}>Currency</h2>
                 <Dropdown overlay={currencyMenu}
-                          getPopupContainer={() => document.getElementById('TheSearchBase_Chatbot')}>
+                          getPopupContainer={() => document.getElementById('TheSearchBase_Chatbot_Input')}>
 
                     <a className="ant-dropdown-link" href="#a">
                         {currency} <Icon type="down"/>
                     </  a>
                 </Dropdown>
                 <h2 className={'SettingsOption'}>Pay rate</h2>
-                <Dropdown getPopupContainer={() => document.getElementById('TheSearchBase_Chatbot')}
+                <Dropdown getPopupContainer={() => document.getElementById('TheSearchBase_Chatbot_Input')}
                           overlay={payRateMenu}>
                     <a className="ant-dropdown-link" href="#a">
                         {payRate} <Icon type="down"/>
@@ -126,7 +126,7 @@ const SalaryPicker = ({ message, submitMessage }) => {
         <React.Fragment>
             <div className={'InputContainer'}>
                 <Slider
-                    getTooltipPopupContainer={() => document.getElementById('TheSearchBase_Chatbot')}
+                    getTooltipPopupContainer={() => document.getElementById('TheSearchBase_Chatbot_Input')}
                     range={true}
                     tipFormatter={tipFormatter}
                     value={salary}
@@ -140,7 +140,7 @@ const SalaryPicker = ({ message, submitMessage }) => {
                 <Popover
                     content={settingsDialog}
                     placement="top"
-                    getPopupContainer={() => document.getElementById('TheSearchBase_Chatbot')}
+                    getPopupContainer={() => document.getElementById('TheSearchBase_Chatbot_Input')}
                     trigger={'click'}>
                     <i>
                         <Icon

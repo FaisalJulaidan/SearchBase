@@ -72,9 +72,7 @@ const Text = ({ message, submitMessage }) => {
                 <Tooltip
                     placement="top"
                     title={error}
-                    getPopupContainer={() =>
-                        document.getElementById('TheSearchBase_Chatbot')
-                    }
+                    getPopupContainer={() => document.getElementById('TheSearchBase_Chatbot_Input')}
                     visible={!valid}>
                     <input
                         className={'Text'}

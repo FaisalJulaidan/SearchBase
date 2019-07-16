@@ -16,7 +16,6 @@ const getLink = (src) => {
 
 const getServerDomain = () => {
     const env = process.env.REACT_APP_ENV;
-    console.log(env)
     if (env === 'development')
         return 'http://localhost:5000';
     else if (env === 'staging')
@@ -37,7 +36,7 @@ const optionalDelayExecution = (cb, delay, time) => {
     return { reset }
 };
 
-const createBlock = (Content, Type, delay, ID = null, DataType = null, selfContinue = null, extra = {}) => ({
+const createBlock = (Content, Type, delay, ID = null, DataType = null, selfContinue = null, extra = {}, deferredAction=null) => ({
     Content,
     Type,
     DataType,

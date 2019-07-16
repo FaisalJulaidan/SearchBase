@@ -70,7 +70,7 @@ class Item extends React.Component {
         let link = getLink(src);
         let splitLink = link.split("://");
 
-        if (!link.includes("www") && !link.includes("localhost")){
+        if (!link.includes("www.") && !link.includes("localhost")){
             return splitLink[0] + "://www." + splitLink[1]
         }
 

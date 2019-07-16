@@ -30,7 +30,7 @@ const SalaryPicker = ({ message, submitMessage }) => {
         let salaries = salary.map(salary => getDotNotation(salary, currency));
         let text = `Between ${salaries[0]} and ${salaries[1]}`;
         let newState = {
-            // curAction: message.block[flowAttributes.CONTENT][flowAttributes.USER_INPUT_ACTION],
+            curAction: message.block[flowAttributes.CONTENT][flowAttributes.USER_INPUT_ACTION],
             curBlockID: message.block[flowAttributes.CONTENT][flowAttributes.USER_INPUT_BLOCKTOGOID],
             waitingForUser: false
         };

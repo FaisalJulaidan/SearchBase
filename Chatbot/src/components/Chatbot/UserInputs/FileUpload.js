@@ -59,7 +59,7 @@ const FileUpload = ({ message, submitMessage }) => {
             let text = file.name;
             let block = message.block;
             let newState = {
-                // curAction: message.block[flowAttributes.CONTENT][flowAttributes.USER_INPUT_ACTION],
+                curAction: message.block[flowAttributes.CONTENT][flowAttributes.USER_INPUT_ACTION],
                 curBlockID: message.block[flowAttributes.CONTENT][flowAttributes.USER_INPUT_BLOCKTOGOID],
                 waitingForUser: false
             };

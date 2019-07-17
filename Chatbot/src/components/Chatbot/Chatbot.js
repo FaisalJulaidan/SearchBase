@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { connect } from 'react-redux';
 import axios from 'axios';
 // Actions
@@ -40,6 +40,7 @@ const Chatbot = ({
     const { assistant, status, animation } = chatbot;
     const { loading, thinking, open, disabled, started, curAction, finished } = status;
     const { open: animationOpen } = animation;
+    let [chatbotData, setChatbotData] = useState(null)
     let timer = useRef(null);
     let stopTimer = useRef(null);
 
@@ -60,9 +61,7 @@ const Chatbot = ({
     };
 
     const resetAsync = () => {
-        console.log(stopTimer.current)
         dataHandler.cancelRequest();
-        console.log(stopTimer.current)
         stopTimer.current.reset()
     };
 
@@ -100,19 +99,25 @@ const Chatbot = ({
     // When the chatbot animation has been set to true
     useEffect(() => {
         let startupTimeout;
-        if (assistant && started && animationOpen) {
+        if (chatbotData && animationOpen) {
             startupTimeout = setTimeout(() => {
                 setChatbotStatus({ open: true });
             }, 500);
         }
         return () => clearInterval(startupTimeout);
-    }, [started, setChatbotAnimation, setChatbotStatus, assistant, animationOpen]);
+    }, [chatbotData, setChatbotAnimation, setChatbotStatus, animationOpen]);
 
     // On start, set open true
     useEffect(() => {
-        if (started)
-            setChatbotAnimation({ open: true });
+        setChatbotAnimation({ open: true });
     }, [started, setChatbotAnimation]);
+
+
+    useEffect(() => {
+        if(open && chatbotData){
+            initChatbot(chatbotData.assistant, chatbotData.flow, chatbotData.disabled)
+        }
+    }, [open])
 
     // set timer for timeSpent
     useInterval(() => {
@@ -122,7 +127,6 @@ const Chatbot = ({
     // Every time the chatbot changes, call to flowHandler
     useEffect(() => {
         const setChatbotWaiting = (block, overrideAction = null) => {
-            console.log('lol')
             setChatbotStatus({
                 curAction: overrideAction,
                 waitingForUser: false,
@@ -138,7 +142,6 @@ const Chatbot = ({
         };
 
         const botRespond = (block, chatbot) => {
-            console.log(block)
             stopTimer.current = optionalDelayExecution(() => {
                 setChatbotStatus({ thinking: false, waitingForUser: true });
                 addBotMessage(block.Content.text, block.Type, block);
@@ -197,14 +200,19 @@ const Chatbot = ({
 
             const { assistant, isDisabled } = data.data.data;
             dataHandler.setAssistantID(assistantID);
-            initChatbot(
-                assistant,
-                [].concat(assistant.Flow.groups.map(group => group.blocks)).flat(1),
-                { disabled: isDisabled }
-            );
+            console.log({assistant,
+                flow: [].concat(assistant.Flow.groups.map(group => group.blocks)).flat(1),
+                disabled: { disabled: isDisabled }})
+            setChatbotData({assistant,
+                flow: [].concat(assistant.Flow.groups.map(group => group.blocks)).flat(1),
+                disabled: { disabled: isDisabled }})
         };
-        fetchChatbot();
+        if(!chatbotData){
+            fetchChatbot();
+        }
     }, [initChatbot]);
+
+
 
     return (
         <>

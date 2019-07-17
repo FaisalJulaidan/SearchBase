@@ -91,7 +91,6 @@ const getCurBlock = (action, assistant, chatbot) => {
     const { blocks, status } = chatbot;
     const { curBlockID, afterMessage } = status;
     const { Message } = assistant;
-    console.log(JSON.stringify(status))
     if(afterMessage){return  loadAfterMessage(chatbot)}
     switch (action) {
         case 'Init':

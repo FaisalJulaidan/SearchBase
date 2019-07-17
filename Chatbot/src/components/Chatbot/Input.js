@@ -5,8 +5,6 @@ import { connect } from 'react-redux';
 import * as messageTypes from '../../constants/MessageType';
 import * as flowAttributes from '../../constants/FlowAttributes';
 import * as constants from '../../constants/Constants';
-// Utils
-import { delayMessageLength } from '../../utils';
 // Actions
 import { addBotMessage, addUserMessage, setChatbotAnimation, setChatbotStatus } from '../../store/actions';
 // Styles

@@ -41,7 +41,13 @@ const SalaryPicker = ({message, submitMessage}) => {
     return (
         <React.Fragment>
 
-            <DatePicker getCalendarContainer={() => document.getElementById('TheSearchBase_Chatbot_Input')}
+            <DatePicker getCalendarContainer={
+                () => {
+                    if (document.getElementById('TheSearchBase_Chatbot_Input'))
+                        return document.getElementById('TheSearchBase_Chatbot_Input');
+                    else
+                        return document.getElementById('TheSearchBase_Chatbot')
+                }}
                         className={'Datepicker'} suffixIcon={<div/>}
                         dropdownClassName={'DatepickerCalendar'}
                         onChange={(e) => {

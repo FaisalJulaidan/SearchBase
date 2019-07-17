@@ -32,7 +32,12 @@ const UserMessage = ({ type, message, addUserMessage, setChatbotStatus, rewind, 
     return (
         <div className={'User'}>
             {finished ? null : <Tooltip placement={'left'}
-                                        getPopupContainer={() => document.getElementById('TheSearchBase_Chatbot_Input')}
+                                        getPopupContainer={() => {
+                                            if (document.getElementById('TheSearchBase_Chatbot_Input'))
+                                                return document.getElementById('TheSearchBase_Chatbot_Input');
+                                            else
+                                                return document.getElementById('TheSearchBase_Chatbot')
+                                        }}
                                         title="Rewind to change your answer to this question">
                 <Icon type="sync" onClick={() => rewind(message.index)}/>
             </Tooltip>}

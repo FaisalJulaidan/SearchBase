@@ -153,38 +153,48 @@ const Chatbot = ({
                 }
             }, !block.extra.needsToFetch, block.delay);
         };
+        const fetch = async (block) => {
+            let [key, data, cancelled] = await fetchData(block);
+            let fetchedData = {};
+
+            fetchedData[key] = data;
+
+            if (cancelled) return {};
+            if (!data.length) {
+                setChatbotStatus({
+                    curAction: 'Not Found',
+                    curBlockID: block[flowAttributes.CONTENT][flowAttributes.BLOCKTOGOID]
+                });
+                return {};
+            }
+            return fetchedData
+        }
+
 
         const setNextBlock = async (chatbot, started, curAction, assistant) => {
-            if (isReady(chatbot)) {
-                if (!started) {
-                    setChatbotStatus({ started: true });
-                } else {
-                    let nextBlock = getCurBlock(curAction, assistant, chatbot);
-                    if (nextBlock) {
-                        setChatbotWaiting(nextBlock, chatbot.status.afterMessage ? chatbot.status.curAction: null);
-                        let fetchedData = {};
-                        if (nextBlock.extra.needsToFetch) {
-                            let [key, data, cancelled] = await fetchData(nextBlock);
-                            fetchedData[key] = data;
-                            if (cancelled) return;
-                            if (!data.length) {
-                                setChatbotStatus({
-                                    curAction: 'Not Found',
-                                    curBlockID: nextBlock[flowAttributes.CONTENT][flowAttributes.BLOCKTOGOID]
-                                });
-                                return;
-                            }
-                        }
-                        if (nextBlock.extra.end) {
-                            setChatbotStatus({ finished: true });
-                            let { cancelled } = await endChat(true);
-                            if (cancelled) return;
-                        }
-                        botRespond({ ...nextBlock, fetchedData }, chatbot);
-                    }
-                }
+
+            if (!isReady(chatbot)) return
+            if(!started){
+                setChatbotStatus({ started: true });
+                return;
             }
-        };
+
+            let nextBlock = getCurBlock(curAction, assistant, chatbot);
+            if (!nextBlock) return
+
+            setChatbotWaiting(nextBlock, chatbot.status.afterMessage ? chatbot.status.curAction: null);
+            let fetchedData = {}
+            if (nextBlock.extra.needsToFetch) {
+               fetchedData = await fetch(nextBlock)
+            }
+            if (nextBlock.extra.end) {
+                setChatbotStatus({ finished: true });
+                let { cancelled } = await endChat(true);
+                if (cancelled) return;
+            }
+            botRespond({ ...nextBlock, fetchedData }, chatbot);
+        }
+
         setNextBlock(chatbot, started, curAction, assistant);
     }, [chatbot, setChatbotStatus, addBotMessage, assistant, curAction, started]);
 

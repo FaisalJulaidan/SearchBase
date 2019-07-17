@@ -63,12 +63,7 @@ class Integration extends React.Component {
         document.body.appendChild(s);
     };
 
-    generateDirectLink = () => {
-        if (window.location.port !== "")
-            window.open(`http://localhost:5000/api/assistant/${this.state.assistantID}/chatbot_direct_link`);
-        else
-            window.open(getLink(`/api/assistant/${this.state.assistantID}/chatbot_direct_link`));
-    };
+    generateDirectLink = () => window.open(getLink(`/chatbot_direct_link/${this.state.assistantID}`));
 
     getChatbotScript = () => `<script>const s=document.createElement("script");s.src=getLink("/api/widgets/chatbot");s.setAttribute('data-name','${this.state.dataName}');s.setAttribute('data-id','${this.state.assistantID}');s.setAttribute('data-circle','${this.state.dataCircle}');document.body.appendChild(s);</script>`;
 

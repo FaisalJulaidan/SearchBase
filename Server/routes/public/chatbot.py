@@ -59,15 +59,6 @@ def get_widget_legacy():
                                    'loadChatbot.js')
 
 
-# LEGACY CODE
-# TO BE REMOVED
-# To redirect old chatbot direct link to the newer one
-@chatbot_router.route("/assistant/<string:assistantIDAsHash>/chatbot_direct_link", methods=['GET'])
-def chatbot_direct_link(assistantIDAsHash):
-    if request.method == "GET":
-        return send_from_directory('static/react_app', '/chatbot_direct_link/' + assistantIDAsHash)
-
-
 @chatbot_router.route("/assistant/<string:assistantIDAsHash>/chatbot", methods=['GET', 'POST'])
 def chatbot(assistantIDAsHash):
     if request.method == "GET":

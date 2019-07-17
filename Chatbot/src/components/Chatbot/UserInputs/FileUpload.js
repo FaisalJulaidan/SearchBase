@@ -78,7 +78,7 @@ const FileUpload = ({ message, submitMessage }) => {
                 <div className={'InputContainer'}>
                     <div className={'Progress'}>
                         <Tooltip placement="top" title={file.name} visible
-                                 getPopupContainer={() => document.getElementById('TheSearchBase_Chatbot')}>
+                                 getPopupContainer={() => document.getElementById('TheSearchBase_Chatbot_Input')}>
                             <Progress percent={upload.progress} showInfo={false}/>
                         </Tooltip>
                     </div>
@@ -94,7 +94,7 @@ const FileUpload = ({ message, submitMessage }) => {
             <>
                 <div className={'Actions'}>
                     <Tooltip placement="topRight"
-                             getPopupContainer={() => document.getElementById('TheSearchBase_Chatbot')}
+                             getPopupContainer={() => document.getElementById('TheSearchBase_Chatbot_Input')}
                              title={error}
                              visible={!valid.fileExt}>
                         <i className={!upload.uploading ? 'ClipIconActive' : ''}

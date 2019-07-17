@@ -1,6 +1,6 @@
 import os
 
-from flask import Blueprint, render_template, request, send_from_directory, make_response
+from flask import Blueprint, render_template, request, send_from_directory, make_response, redirect
 from flask_cors import CORS
 from flask_mail import Message
 
@@ -50,6 +50,15 @@ def appointments_picker(payload):
 @public_router.route('/chatbot_direct_link/<payload>')
 def chatbot_direct_link(payload):
     return serve()
+
+
+# LEGACY CODE
+# TO BE REMOVED
+# To redirect old chatbot direct link to the newer one
+@public_router.route("/api/assistant/<string:assistantIDAsHash>/chatbot_direct_link", methods=['GET'])
+def chatbot_direct_link123(assistantIDAsHash):
+    return redirect("/chatbot_direct_link/" + assistantIDAsHash, code=302)
+
 
 @public_router.route('/verify_account/<payload>')
 def verify_account_serve(payload):

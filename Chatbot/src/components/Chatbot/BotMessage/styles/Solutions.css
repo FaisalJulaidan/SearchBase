@@ -23,7 +23,6 @@
 }
 
 .ant-carousel .slick-initialized .slick-slide {
-    /* no important */
     opacity: 0.4;
     transition: opacity 0.5s !important;
     padding: 5px;

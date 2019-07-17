@@ -92,10 +92,10 @@ const getCurBlock = (action, assistant, chatbot) => {
     const { curBlockID, afterMessage } = status;
     const { Message } = assistant;
     if(afterMessage){return  loadAfterMessage(chatbot)}
-    console.log(action, Message,afterMessage)
     /**
      * Batu please validate this:
      * Previously, if the action === null we end the chatbot
+     * how we can do it now?
      * */
 
     switch (action) {

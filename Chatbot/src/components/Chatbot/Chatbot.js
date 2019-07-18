@@ -100,9 +100,11 @@ const Chatbot = ({
     useEffect(() => {
         let startupTimeout;
         if (chatbotData && animationOpen) {
+            console.log(chatbotData)
+            const { SecondsUntilPopup } = chatbotData.assistant
             startupTimeout = setTimeout(() => {
                 setChatbotStatus({ open: true });
-            }, 500);
+            }, SecondsUntilPopup * 1000);
         }
         return () => clearInterval(startupTimeout);
     }, [chatbotData, setChatbotAnimation, setChatbotStatus, animationOpen]);

@@ -1,7 +1,7 @@
 import * as flowAttributes from '../constants/FlowAttributes';
 import * as messageTypes from '../constants/MessageType';
-import { dataHandler } from './dataHandler';
-import { createBlock, delayMessageLength } from './';
+import {dataHandler} from './dataHandler';
+import {createBlock, delayMessageLength} from './';
 
 const errorBlock = () => {
     // SEND SENTRY ERROR
@@ -92,6 +92,12 @@ const getCurBlock = (action, assistant, chatbot) => {
     const { curBlockID, afterMessage } = status;
     const { Message } = assistant;
     if(afterMessage){return  loadAfterMessage(chatbot)}
+    /**
+     * Batu please validate this:
+     * Previously, if the action === null we end the chatbot
+     * how we can do it now?
+     * */
+
     switch (action) {
         case 'Init':
             return createBlock({ text: Message }, messageTypes.TEXT, delayMessageLength(Message), null, null, loadFirstBlock(blocks).ID);

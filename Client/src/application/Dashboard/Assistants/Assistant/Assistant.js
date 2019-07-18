@@ -29,7 +29,7 @@ class Assistant extends Component {
         CRMVisible: false,
         selectAutoPilotModalVisible: false,
         isFlowSaved: true,
-        defaultTab: 'Script'
+        defaultTab: 'Conversations'
     };
 
     firstHead = null;

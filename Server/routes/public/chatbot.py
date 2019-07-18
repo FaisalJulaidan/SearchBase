@@ -1,7 +1,7 @@
 import uuid
 
 from flask import Blueprint, request, send_from_directory
-from flask import render_template
+from flask_cors import CORS
 from flask_cors import CORS
 from werkzeug.utils import secure_filename
 
@@ -50,19 +50,13 @@ def get_widget():
 
 # LEGACY CODE
 # TO BE REMOVED
-# To load the loadChatbo
+# To load the loadChatbot
 @chatbot_router.route("/widgets/chatbot.js", methods=['GET'])
 @helpers.gzipped
 def get_widget_legacy():
     if request.method == "GET":
         return send_from_directory('static/js',
                                    'loadChatbot.js')
-
-
-@chatbot_router.route("/assistant/<string:assistantIDAsHash>/chatbot_direct_link", methods=['GET'])
-def chatbot_direct_link(assistantIDAsHash):
-    if request.method == "GET":
-        return render_template("chatbot_direct_link.html", assistantID=assistantIDAsHash)
 
 
 @chatbot_router.route("/assistant/<string:assistantIDAsHash>/chatbot", methods=['GET', 'POST'])

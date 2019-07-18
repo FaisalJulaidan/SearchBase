@@ -14,15 +14,8 @@ import {
 import './styles/Chatbot.css';
 import 'antd/dist/antd.css';
 // Utils
-import {
-    dataHandler,
-    isReady,
-    optionalDelayExecution,
-    promiseWrapper,
-    useInterval,
-    getServerDomain
-} from '../../utils';
-import { fetchData, getCurBlock } from '../../utils/flowHandler';
+import {dataHandler, getServerDomain, isReady, optionalDelayExecution, promiseWrapper, useInterval} from '../../utils';
+import {fetchData, getCurBlock} from '../../utils/flowHandler';
 // Constants
 import * as flowAttributes from '../../constants/FlowAttributes';
 // Components
@@ -174,13 +167,11 @@ const Chatbot = ({
 
 
         const setNextBlock = async (chatbot, started, curAction, assistant) => {
-
             if (!isReady(chatbot)) return
             if(!started){
                 setChatbotStatus({ started: true });
                 return;
             }
-
             let nextBlock = getCurBlock(curAction, assistant, chatbot);
             if (!nextBlock) return
 

@@ -5,14 +5,12 @@ import * as flowAttributes from '../../../constants/FlowAttributes';
 // Styles
 import './styles/Inputs.css';
 // Components
-import {DatePicker} from 'antd';
+import {DatePicker as AntdDatePicker, Icon, Tooltip} from 'antd';
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
 import {faTelegramPlane} from '@fortawesome/free-brands-svg-icons';
-// import Tooltip from '../../generic/Tooltip'
 
-const {RangePicker} = DatePicker;
 
-const SalaryPicker = ({message, submitMessage}) => {
+const DatePicker = ({message, submitMessage}) => {
 
     let [settings, setSettings] = useState(false);
     let [selectedDate, setSelectedDate] = useState(null);
@@ -41,24 +39,25 @@ const SalaryPicker = ({message, submitMessage}) => {
 
     return (
         <React.Fragment>
-
-            <DatePicker getCalendarContainer={
-                () => {
-                    if (document.getElementById('TheSearchBase_Chatbot_Input'))
-                        return document.getElementById('TheSearchBase_Chatbot_Input');
-                    else
-                        return document.getElementById('TheSearchBase_Chatbot')
-                }}
-                        className={'Datepicker'} suffixIcon={<div/>}
-                        dropdownClassName={'DatepickerCalendar'}
-                        onChange={(e) => {
-                            if (e)
-                                if (e._isAMomentObject)
-                                    setSelectedDate(e.format('L'));
-                                else
-                                    setSelectedDate(e.target.value);
-                        }}
-            />
+            <div className={'InputContainer'}>
+                <AntdDatePicker getCalendarContainer={
+                    () => {
+                        if (document.getElementById('TheSearchBase_Chatbot_Input'))
+                            return document.getElementById('TheSearchBase_Chatbot_Input');
+                        else
+                            return document.getElementById('TheSearchBase_Chatbot')
+                    }}
+                            className={'Datepicker'} suffixIcon={<div/>}
+                            dropdownClassName={'DatepickerCalendar'}
+                            onChange={(e) => {
+                                if (e)
+                                    if (e._isAMomentObject)
+                                        setSelectedDate(e.format('L'));
+                                    else
+                                        setSelectedDate(e.target.value);
+                            }}
+                />
+            </div>
             <div className={'Submit'}>
                 <i className={'SendIconActive'} onClick={inputOnChangeHandler}>
                     <FontAwesomeIcon size="2x" icon={faTelegramPlane}/>
@@ -68,4 +67,4 @@ const SalaryPicker = ({message, submitMessage}) => {
     );
 };
 
-export default SalaryPicker;
+export default DatePicker;

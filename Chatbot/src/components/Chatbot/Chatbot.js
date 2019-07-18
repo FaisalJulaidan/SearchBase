@@ -1,5 +1,5 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { connect } from 'react-redux';
+import React, {useEffect, useRef, useState} from 'react';
+import {connect} from 'react-redux';
 import axios from 'axios';
 // Actions
 import {
@@ -200,6 +200,10 @@ const Chatbot = ({
             }
 
             const { assistant, isDisabled } = data.data.data;
+
+            if (!assistant.Active)
+                return;
+
             dataHandler.setAssistantID(assistantID);
             console.log({assistant,
                 flow: [].concat(assistant.Flow.groups.map(group => group.blocks)).flat(1),

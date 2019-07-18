@@ -18,7 +18,8 @@ const notFoundBlock = (toGoID) => {
 const endBlock = () => {
     const text = 'This conversation has ended, if you would like to have a new one please click the reset button!';
     // Content, Type, delay, ID = null, DataType = null, selfContinue = null, extra = {})
-    return createBlock({ text }, messageTypes.TEXT, delayMessageLength(text), null, null, null, { end: true });
+    return createBlock(null, messageTypes.TEXT, delayMessageLength(text), null, null, null, { end: true });
+    return null
 };
 
 const checkFetchData = (type) => {

@@ -33,7 +33,6 @@ const Chatbot = ({
     const { assistant, status, animation } = chatbot;
     const { loading, thinking, open, disabled, started, curAction, finished } = status;
     const { open: animationOpen } = animation;
-    let [chatbotData, setChatbotData] = useState(null)
     let timer = useRef(null);
     let stopTimer = useRef(null);
 
@@ -92,26 +91,14 @@ const Chatbot = ({
     // When the chatbot animation has been set to true
     useEffect(() => {
         let startupTimeout;
-        if (chatbotData && animationOpen) {
-            const { SecondsUntilPopup } = chatbotData.assistant
+        if (animationOpen) {
             startupTimeout = setTimeout(() => {
                 setChatbotStatus({ open: true });
-            }, SecondsUntilPopup * 1000);
+            }, 500);
         }
         return () => clearInterval(startupTimeout);
-    }, [chatbotData, setChatbotAnimation, setChatbotStatus, animationOpen]);
+    }, [setChatbotAnimation, setChatbotStatus, animationOpen]);
 
-    // On start, set open true
-    useEffect(() => {
-        setChatbotAnimation({ open: true });
-    }, [started, setChatbotAnimation]);
-
-
-    useEffect(() => {
-        if(open && chatbotData){
-            initChatbot(chatbotData.assistant, chatbotData.flow, chatbotData.disabled)
-        }
-    }, [open])
 
     // set timer for timeSpent
     useInterval(() => {
@@ -165,8 +152,8 @@ const Chatbot = ({
         }
 
 
-        const setNextBlock = async (chatbot, started, curAction, assistant) => {
-            if (!isReady(chatbot)) return
+            const setNextBlock = async (chatbot, started, curAction, assistant) => {
+            if (!isReady(chatbot) || !assistant) return
             if(!started){
                 setChatbotStatus({ started: true });
                 return;
@@ -182,11 +169,10 @@ const Chatbot = ({
             if (nextBlock.extra.end) {
                 setChatbotStatus({ finished: true });
                 let { cancelled } = await endChat(true);
-                if (cancelled) return;
+                if (!cancelled) return;
             }
             botRespond({ ...nextBlock, fetchedData }, chatbot);
         }
-
         setNextBlock(chatbot, started, curAction, assistant);
     }, [chatbot, setChatbotStatus, addBotMessage, assistant, curAction, started]);
 
@@ -206,17 +192,13 @@ const Chatbot = ({
                 return;
 
             dataHandler.setAssistantID(assistantID);
-            console.log({assistant,
-                flow: [].concat(assistant.Flow.groups.map(group => group.blocks)).flat(1),
-                disabled: { disabled: isDisabled }})
-            setChatbotData({assistant,
-                flow: [].concat(assistant.Flow.groups.map(group => group.blocks)).flat(1),
-                disabled: { disabled: isDisabled }})
+
+            initChatbot(assistant, [].concat(assistant.Flow.groups.map(group => group.blocks)).flat(1), { disabled: isDisabled })
         };
-        if(!chatbotData){
+        if(!assistant){
             fetchChatbot();
         }
-    }, [initChatbot]);
+    }, [initChatbot, setChatbotStatus]);
 
 
 

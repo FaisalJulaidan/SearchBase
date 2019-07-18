@@ -28,6 +28,7 @@ const SalaryPicker = ({message, submitMessage}) => {
 
         let newState = {
             curBlockID: message.block[flowAttributes.CONTENT][flowAttributes.USER_INPUT_BLOCKTOGOID],
+            curAction: message.block[flowAttributes.CONTENT][flowAttributes.USER_INPUT_ACTION],
             waitingForUser: false
         };
 

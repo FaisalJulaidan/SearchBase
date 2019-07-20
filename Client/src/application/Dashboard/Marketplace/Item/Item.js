@@ -226,7 +226,7 @@ class Item extends React.Component {
                 if (place === 'features')
                     return <MercuryFeatures/>;
                 if (place === 'button') {
-                    windowObject.url = "https://login.microsoftonline.com/common/oauth2/v2.0/authorize?response_type=code&client_id=b49f9e03-5586-4248-8585-8640c4b2539c&response_mode=query&scope=https%3A%2F%2Fadmin.services.crm.dynamics.com%2Fuser_impersonation+User.Read+offline_access&redirect_uri="+ getLink("/dashboard/marketplace/Outlook");
+                    windowObject.url = "https://login.microsoftonline.com/common/oauth2/v2.0/authorize?response_type=code&client_id=b49f9e03-5586-4248-8585-8640c4b2539c&response_mode=query&scope=https%3A%2F%2Fadmin.services.crm.dynamics.com%2Fuser_impersonation%2BUser.Read%2Boffline_access&redirect_uri="+ getLink("/dashboard/marketplace/Mercury");
                     return <DefaultButton buttonText={'Connect to Mercury'}
                                           windowObject={windowObject}
                                           {...buttonsOptions}/>;

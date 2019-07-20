@@ -3,8 +3,8 @@ import ReactDOM from 'react-dom';
 import './index.css';
 import * as serviceWorker from './serviceWorker';
 
-import { compose, createStore } from 'redux';
-import { Provider } from 'react-redux';
+import {compose, createStore} from 'redux';
+import {Provider} from 'react-redux';
 import reducers from './store/reducers';
 import WebFont from 'webfontloader';
 import 'react-app-polyfill/ie11';
@@ -21,7 +21,7 @@ const btnColor = scriptTag.getAttribute('data-circle') || '#1890ff';
 
 let root = document.createElement('div');
 root.id = 'TheSearchBase_Chatbot';
-
+root.style = 'background:none';
 if (isDirectLink)
     document.getElementById('direct_link_container').appendChild(root);
 else

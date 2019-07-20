@@ -56,6 +56,7 @@
 
 .Input > .InputContainer {
     width: calc(100% - 80px);
+    flex-shrink: 0;
     justify-content: center;
     align-items: center;
     display: inherit;
@@ -75,7 +76,8 @@
 
 .Input > .Submit {
     height: 100%;
-    width: 40px;
+    width: 100%;
+    flex-shrink: 1;
     justify-content: center;
     align-items: center;
     display: inherit;
@@ -84,7 +86,7 @@
 
 .Input > .Actions {
     height: 100%;
-    width: 40px;
+    flex-shrink: 1;
     justify-content: center;
     align-items: center;
     display: inherit;
@@ -129,10 +131,9 @@
 }
 
 .Datepicker {
-    width: calc(100% - 80px);
-    height: 100%;
-    float: left;
-    padding-left: 15px;
+    width: 100%;
+    display: inherit;
+    align-items: center;
 }
 
 .Datepicker input {

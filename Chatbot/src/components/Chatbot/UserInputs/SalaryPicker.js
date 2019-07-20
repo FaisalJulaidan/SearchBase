@@ -104,14 +104,24 @@ const SalaryPicker = ({ message, submitMessage }) => {
             <div>
                 <h2 className={'SettingsOption'}>Currency</h2>
                 <Dropdown overlay={currencyMenu}
-                          getPopupContainer={() => document.getElementById('TheSearchBase_Chatbot')}>
+                          getPopupContainer={() => {
+                                            if (document.getElementById('TheSearchBase_Chatbot_Input'))
+                                                return document.getElementById('TheSearchBase_Chatbot_Input');
+                                            else
+                                                return document.getElementById('TheSearchBase_Chatbot')
+                                        }}>
 
                     <a className="ant-dropdown-link" href="#a">
                         {currency} <Icon type="down"/>
                     </  a>
                 </Dropdown>
                 <h2 className={'SettingsOption'}>Pay rate</h2>
-                <Dropdown getPopupContainer={() => document.getElementById('TheSearchBase_Chatbot')}
+                <Dropdown getPopupContainer={() => {
+                                            if (document.getElementById('TheSearchBase_Chatbot_Input'))
+                                                return document.getElementById('TheSearchBase_Chatbot_Input');
+                                            else
+                                                return document.getElementById('TheSearchBase_Chatbot')
+                                        }}
                           overlay={payRateMenu}>
                     <a className="ant-dropdown-link" href="#a">
                         {payRate} <Icon type="down"/>
@@ -126,7 +136,12 @@ const SalaryPicker = ({ message, submitMessage }) => {
         <React.Fragment>
             <div className={'InputContainer'}>
                 <Slider
-                    getTooltipPopupContainer={() => document.getElementById('TheSearchBase_Chatbot')}
+                    getTooltipPopupContainer={() => {
+                                            if (document.getElementById('TheSearchBase_Chatbot_Input'))
+                                                return document.getElementById('TheSearchBase_Chatbot_Input');
+                                            else
+                                                return document.getElementById('TheSearchBase_Chatbot')
+                                        }}
                     range={true}
                     tipFormatter={tipFormatter}
                     value={salary}
@@ -140,7 +155,12 @@ const SalaryPicker = ({ message, submitMessage }) => {
                 <Popover
                     content={settingsDialog}
                     placement="top"
-                    getPopupContainer={() => document.getElementById('TheSearchBase_Chatbot')}
+                    getPopupContainer={() => {
+                                            if (document.getElementById('TheSearchBase_Chatbot_Input'))
+                                                return document.getElementById('TheSearchBase_Chatbot_Input');
+                                            else
+                                                return document.getElementById('TheSearchBase_Chatbot')
+                                        }}
                     trigger={'click'}>
                     <i>
                         <Icon

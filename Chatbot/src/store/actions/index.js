@@ -44,6 +44,7 @@ export const initChatbot = (assistant, blocks, status = {}) => ({
     }
 });
 
+
 export const setChatbotStatus = (status = {}) => ({
     type: actionTypes.SET_CHATBOT_STATUS,
     status: {

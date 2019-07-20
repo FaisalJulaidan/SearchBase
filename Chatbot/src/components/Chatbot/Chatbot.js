@@ -1,5 +1,5 @@
-import React, { useEffect, useRef } from 'react';
-import { connect } from 'react-redux';
+import React, {useEffect, useRef, useState} from 'react';
+import {connect} from 'react-redux';
 import axios from 'axios';
 // Actions
 import {
@@ -14,15 +14,8 @@ import {
 import './styles/Chatbot.css';
 import 'antd/dist/antd.css';
 // Utils
-import {
-    dataHandler,
-    isReady,
-    optionalDelayExecution,
-    promiseWrapper,
-    useInterval,
-    getServerDomain
-} from '../../utils';
-import { fetchData, getCurBlock } from '../../utils/flowHandler';
+import {dataHandler, getServerDomain, isReady, optionalDelayExecution, promiseWrapper, useInterval} from '../../utils';
+import {fetchData, getCurBlock} from '../../utils/flowHandler';
 // Constants
 import * as flowAttributes from '../../constants/FlowAttributes';
 // Components
@@ -60,9 +53,7 @@ const Chatbot = ({
     };
 
     const resetAsync = () => {
-        console.log(stopTimer.current)
         dataHandler.cancelRequest();
-        console.log(stopTimer.current)
         stopTimer.current.reset()
     };
 
@@ -100,19 +91,14 @@ const Chatbot = ({
     // When the chatbot animation has been set to true
     useEffect(() => {
         let startupTimeout;
-        if (assistant && started && animationOpen) {
+        if (animationOpen) {
             startupTimeout = setTimeout(() => {
                 setChatbotStatus({ open: true });
             }, 500);
         }
         return () => clearInterval(startupTimeout);
-    }, [started, setChatbotAnimation, setChatbotStatus, assistant, animationOpen]);
+    }, [setChatbotAnimation, setChatbotStatus, animationOpen]);
 
-    // On start, set open true
-    useEffect(() => {
-        if (started)
-            setChatbotAnimation({ open: true });
-    }, [started, setChatbotAnimation]);
 
     // set timer for timeSpent
     useInterval(() => {
@@ -122,7 +108,6 @@ const Chatbot = ({
     // Every time the chatbot changes, call to flowHandler
     useEffect(() => {
         const setChatbotWaiting = (block, overrideAction = null) => {
-            console.log('lol')
             setChatbotStatus({
                 curAction: overrideAction,
                 waitingForUser: false,
@@ -138,7 +123,6 @@ const Chatbot = ({
         };
 
         const botRespond = (block, chatbot) => {
-            console.log(block)
             stopTimer.current = optionalDelayExecution(() => {
                 setChatbotStatus({ thinking: false, waitingForUser: true });
                 addBotMessage(block.Content.text, block.Type, block);
@@ -150,38 +134,45 @@ const Chatbot = ({
                 }
             }, !block.extra.needsToFetch, block.delay);
         };
+        const fetch = async (block) => {
+            let [key, data, cancelled] = await fetchData(block);
+            let fetchedData = {};
 
-        const setNextBlock = async (chatbot, started, curAction, assistant) => {
-            if (isReady(chatbot)) {
-                if (!started) {
-                    setChatbotStatus({ started: true });
-                } else {
-                    let nextBlock = getCurBlock(curAction, assistant, chatbot);
-                    if (nextBlock) {
-                        setChatbotWaiting(nextBlock, chatbot.status.afterMessage ? chatbot.status.curAction: null);
-                        let fetchedData = {};
-                        if (nextBlock.extra.needsToFetch) {
-                            let [key, data, cancelled] = await fetchData(nextBlock);
-                            fetchedData[key] = data;
-                            if (cancelled) return;
-                            if (!data.length) {
-                                setChatbotStatus({
-                                    curAction: 'Not Found',
-                                    curBlockID: nextBlock[flowAttributes.CONTENT][flowAttributes.BLOCKTOGOID]
-                                });
-                                return;
-                            }
-                        }
-                        if (nextBlock.extra.end) {
-                            setChatbotStatus({ finished: true });
-                            let { cancelled } = await endChat(true);
-                            if (cancelled) return;
-                        }
-                        botRespond({ ...nextBlock, fetchedData }, chatbot);
-                    }
-                }
+            fetchedData[key] = data;
+
+            if (cancelled) return {};
+            if (!data.length) {
+                setChatbotStatus({
+                    curAction: 'Not Found',
+                    curBlockID: block[flowAttributes.CONTENT][flowAttributes.BLOCKTOGOID]
+                });
+                return {};
             }
-        };
+            return fetchedData
+        }
+
+
+            const setNextBlock = async (chatbot, started, curAction, assistant) => {
+            if (!isReady(chatbot) || !assistant) return
+            if(!started){
+                setChatbotStatus({ started: true });
+                return;
+            }
+            let nextBlock = getCurBlock(curAction, assistant, chatbot);
+            if (!nextBlock) return
+
+            setChatbotWaiting(nextBlock, chatbot.status.afterMessage ? chatbot.status.curAction: null);
+            let fetchedData = {}
+            if (nextBlock.extra.needsToFetch) {
+               fetchedData = await fetch(nextBlock)
+            }
+            if (nextBlock.extra.end) {
+                setChatbotStatus({ finished: true });
+                let { cancelled } = await endChat(true);
+                if (!cancelled) return;
+            }
+            botRespond({ ...nextBlock, fetchedData }, chatbot);
+        }
         setNextBlock(chatbot, started, curAction, assistant);
     }, [chatbot, setChatbotStatus, addBotMessage, assistant, curAction, started]);
 
@@ -196,15 +187,20 @@ const Chatbot = ({
             }
 
             const { assistant, isDisabled } = data.data.data;
+
+            if (!assistant.Active)
+                return;
+
             dataHandler.setAssistantID(assistantID);
-            initChatbot(
-                assistant,
-                [].concat(assistant.Flow.groups.map(group => group.blocks)).flat(1),
-                { disabled: isDisabled }
-            );
+
+            initChatbot(assistant, [].concat(assistant.Flow.groups.map(group => group.blocks)).flat(1), { disabled: isDisabled })
         };
-        fetchChatbot();
-    }, [initChatbot]);
+        if(!assistant){
+            fetchChatbot();
+        }
+    }, [initChatbot, setChatbotStatus]);
+
+
 
     return (
         <>

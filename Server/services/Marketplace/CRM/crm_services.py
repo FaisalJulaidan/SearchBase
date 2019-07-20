@@ -2,7 +2,7 @@ from sqlalchemy.sql import and_
 
 from utilities.enums import CRM, UserType, DataType, Period
 from models import db, Callback, Conversation, Assistant, CRM as CRM_Model, StoredFile
-from services.Marketplace.CRM import Greenhouse, Adapt, Bullhorn, Vincere
+from services.Marketplace.CRM import Greenhouse, Adapt, Bullhorn, Vincere, Mercury
 # Process chatbot session
 from utilities import helpers
 
@@ -24,6 +24,8 @@ def insertCandidate(assistant: Assistant, conversation: Conversation):
         return Bullhorn.insertCandidate(assistant.CRM.Auth, conversation)
     elif assistant.CRM.Type is CRM.Vincere:
         return Vincere.insertCandidate(assistant.CRM.Auth, conversation)
+    # elif assistant.CRM.Type is CRM.Mercury:
+    #     return Mercury.insertCandidate(assistant.CRM.Auth, conversation)
     elif assistant.CRM.Type is CRM.Adapt:
         return Adapt.insertCandidate(assistant.CRM.Auth, conversation)
     elif assistant.CRM.Type is CRM.Greenhouse:
@@ -271,7 +273,7 @@ def getAll(companyID) -> Callback:
         return Callback(False, 'Could not fetch all CRMs.')
 
 
-def updateByType(type: CRM, newAuth, companyID):
+def updateByType(type, newAuth, companyID):
     try:
         crm = db.session.query(CRM_Model).filter(and_(CRM_Model.CompanyID == companyID, CRM_Model.Type == type)).first()
         crm.Auth = dict(newAuth)

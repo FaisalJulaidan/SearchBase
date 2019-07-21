@@ -374,7 +374,6 @@ def scanJobs(session, dbIDs, extraJobs=None):
             .fillna({Job.JobSalary.name: 0, Job.JobYearsRequired.name: 0})\
             .fillna('')
 
-
         df = df.drop('DatabaseID', axis=1)  # Drop column
 
         keywords = session['keywordsByDataType']

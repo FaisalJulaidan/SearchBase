@@ -208,8 +208,7 @@ def insertCandidate(auth, conversation: Conversation) -> Callback:
                 conversation.Data.get('keywordsByDataType').get(DT.CandidateSkills.value['name'], [" "])),
             "educations": {
                 "data": conversation.Data.get('keywordsByDataType').get(DT.CandidateEducation.value['name'], [])
-            },
-            "salary": str(crm_services.getSalary(conversation, DT.CandidateDesiredSalary, Period.Annually))
+            }
         }
 
         # Add additional emails to email2 and email3
@@ -371,10 +370,6 @@ def searchCandidates(auth, companyID, conversation, fields=None) -> Callback:
         # if keywords[DT.CandidateSkills.value["name"]]:
         #     query += "primarySkills.data:" + keywords[DT.CandidateSkills.name] + " or"
 
-        salary =  crm_services.getSalary(conversation, DT.CandidateDesiredSalary, Period.Annually)
-        if salary:
-            query += " salary:" + str(salary) + " or"
-
         query = query[:-3]
 
         # check if no conditions submitted
@@ -430,10 +425,6 @@ def searchJobs(auth, companyID, conversation, fields=None) -> Callback:
         query += checkFilter(keywords, DT.JobLocation, "address.city")
 
         query += checkFilter(keywords, DT.JobType, "employmentType")
-
-        salary = crm_services.getSalary(conversation, DT.JobSalary, Period.Annually)
-        if salary > 0:
-            query += "salary:" + str(salary) + " or"
 
         query += checkFilter(keywords, DT.JobDesiredSkills, "skills")
 

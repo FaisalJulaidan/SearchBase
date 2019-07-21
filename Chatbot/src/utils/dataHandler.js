@@ -5,15 +5,15 @@ import * as flowAttributes from '../constants/FlowAttributes';
 import * as solutionAttributes from '../constants/SolutionAttributes';
 import * as constants from '../constants/Constants';
 // Utils
-import {promiseWrapper} from './wrappers';
-import {getServerDomain} from './index';
+import { promiseWrapper } from './wrappers';
+import { getServerDomain } from './index';
 
 
 export const dataHandler = (() => {
     let instance;
     const init = () => {
         const CancelToken = axios.CancelToken;
-        let source
+        let source;
 
         let assistantID = undefined;
         let sessionID = undefined;
@@ -34,7 +34,7 @@ export const dataHandler = (() => {
         };
 
         const fetchSolutions = async (showTop, databaseType) => {
-            let resolve = {cancelled: false, solutions: []};
+            let resolve = { cancelled: false, solutions: [] };
             source = CancelToken.source();
             const result = processMessages(false);
             const payload = {
@@ -48,14 +48,14 @@ export const dataHandler = (() => {
                 cancelToken: source.token
             };
             // fetch solutions
-            const {data, error} = await promiseWrapper(axios.post(`${getServerDomain()}/api/assistant/${assistantID}/chatbot/solutions`, payload, cancel));
+            const { data, error } = await promiseWrapper(axios.post(`${getServerDomain()}/api/assistant/${assistantID}/chatbot/solutions`, payload, cancel));
             const solutions = data ? data.data.data : []; // :) // lol faisal 🔫
             if (axios.isCancel(error)) {
                 console.log('cancelled');
-                resolve.cancelled = true
+                resolve.cancelled = true;
             }
             if (error) {
-                console.log("fetchSolutions: ", error)
+                console.log('fetchSolutions: ', error);
             }
             // Check the userTypes associated with the solutions and record them
             fetchedSolutions = fetchedSolutions.concat(solutions);
@@ -64,30 +64,30 @@ export const dataHandler = (() => {
         };
 
         const cancelRequest = (message) => {
-            if (source) source.cancel(message)
-        }
+            if (source) source.cancel(message);
+        };
 
         const sendData = async (completed) => {
             source = CancelToken.source();
             const result = processMessages(completed); // loop messages
             if (!completed && result.collectedData.length < 3) return;
-            let cancelled
+            let cancelled;
 
             const cancel = {
                 cancelToken: source.token
-            }
-            console.log("============>>>>>")
-            console.log(result)
+            };
+            console.log('============>>>>>');
+            console.log(result);
             console.log('sending data...');
             // send data to server
-            const {data, error} = await promiseWrapper(axios.post(`${getServerDomain()}/api/assistant/${assistantID}/chatbot`, result, cancel));
+            const { data, error } = await promiseWrapper(axios.post(`${getServerDomain()}/api/assistant/${assistantID}/chatbot`, result, cancel));
             sessionID = data ? data.data.data.sessionID : null; // :) // lol faisal 🔫
             if (axios.isCancel(error)) {
-                console.log('cancelled')
-                cancelled = true
+                console.log('cancelled');
+                cancelled = true;
             }
             if (error) {
-                console.log("SendData: ", error)
+                console.log('SendData: ', error);
             }
 
             console.log('sending files...');
@@ -96,17 +96,17 @@ export const dataHandler = (() => {
             let filesSentFailed = false;
             if (sessionID && files.length && !cancelled) {
                 const formData = new FormData();
-                const config = {headers: {'content-type': 'multipart/form-data'}};
+                const config = { headers: { 'content-type': 'multipart/form-data' } };
                 files.forEach(file => formData.append('file', file, file.name));
-                const {data, error} = await promiseWrapper(axios.post(`${getServerDomain()}/api/assistant/${assistantID}/chatbot/${sessionID}/file`, formData, config));
+                const { data, error } = await promiseWrapper(axios.post(`${getServerDomain()}/api/assistant/${assistantID}/chatbot/${sessionID}/file`, formData, config));
 
                 if (error) {
-                    console.error('file sending failed')
-                    filesSentFailed = true
+                    console.error('file sending failed');
+                    filesSentFailed = true;
                 }
             }
 
-            return {dataSent: !!sessionID, filesSent: !filesSentFailed, cancelled};
+            return { dataSent: !!sessionID, filesSent: !filesSentFailed, cancelled };
         };
 
         const processMessages = (completed) => {
@@ -128,9 +128,9 @@ export const dataHandler = (() => {
             };
 
             const __collectData = (blockID, questionText, input, dataType, keywords, skipped) => {
-                const {name, enumName} = dataType;
+                const { name, enumName } = dataType;
                 if (!skipped) {
-                    const kdt = {...keywordsByDataType};
+                    const kdt = { ...keywordsByDataType };
                     if (name in kdt) {
                         kdt[name] = kdt[name].concat(keywords || input);
                     } else {
@@ -185,9 +185,9 @@ export const dataHandler = (() => {
             const __accumulateScore = (earnedScore, total) => {
                 _curScore += earnedScore;
                 _totalScore += total;
-                console.log("ACUMELATED")
-                console.log(_curScore)
-                console.log(_totalScore)
+                console.log('ACUMELATED');
+                console.log(_curScore);
+                console.log(_totalScore);
             };
 
             const __recordUserTypes = (types) => {
@@ -195,7 +195,7 @@ export const dataHandler = (() => {
             };
 
             const __processQuestion = (message) => {
-                const {blockRef, content, text} = message;
+                const { blockRef, content, text } = message;
                 const answers = blockRef[flowAttributes.CONTENT][flowAttributes.CONTENT_ANSWERS];
 
                 // there will be no selectedAnswer when question skipped
@@ -215,13 +215,13 @@ export const dataHandler = (() => {
                     modifiedKeywords,
                     content.skipped);
                 __accumulateScore(score, Math.max(...answers.map(answer => answer.score)));
-                console.log(score)
-                console.log(Math.max(...answers.map(answer => answer.score)))
+                console.log(score);
+                console.log(Math.max(...answers.map(answer => answer.score)));
             };
 
             const __processUserInput = (message) => {
-                const {blockRef, content, text} = message;
-                const {input} = content;
+                const { blockRef, content, text } = message;
+                const { input } = content;
                 let keywords = text.trim().split(' ').filter(n => n);
 
                 switch (blockRef[flowAttributes.DATA_TYPE][flowAttributes.DATA_TYPE_VALIDATION]) {
@@ -249,7 +249,7 @@ export const dataHandler = (() => {
             };
 
             const __processFileUpload = (message) => {
-                const {blockRef, content, text} = message;
+                const { blockRef, content, text } = message;
                 const input = !content.skipped ? '&FILE_UPLOAD&' : text;
 
                 __collectData(
@@ -265,7 +265,7 @@ export const dataHandler = (() => {
             };
 
             const __processSolutions = (message) => {
-                const {blockRef, content, text} = message;
+                const { blockRef, content, text } = message;
                 const solutions = !content.skipped ? content.selectedSolutions : [];
                 __collectData(
                     blockRef[flowAttributes.ID],
@@ -317,16 +317,16 @@ export const dataHandler = (() => {
             let message;
             for (message of messages) {
                 if (message.sender === 'USER') {
-                    const {blockRef} = message;
+                    const { blockRef } = message;
                     console.log(message);
                     __recordUserTypes(blockRef[flowAttributes.DATA_TYPE][flowAttributes.DATA_TYPE_USER_TYPES]);
                     // don't process if data should not be stored in db
 
                     if (!blockRef[flowAttributes.STORE_IN_DB]) continue;
-                    console.log("HERE")
+                    console.log('HERE');
                     switch (blockRef[flowAttributes.TYPE]) {
                         case messageTypes.QUESTION:
-                            console.log("QUESTION");
+                            console.log('QUESTION');
                             __processQuestion(message);
                             break;
                         case messageTypes.USER_INPUT:
@@ -362,6 +362,6 @@ export const dataHandler = (() => {
     if (!instance) {
         instance = init();
     }
-    return {...instance};
+    return { ...instance };
 })();
 

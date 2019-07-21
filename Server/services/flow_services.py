@@ -24,7 +24,7 @@ def getChatbot(assistantHashID) -> Callback:
 
         # Check for restricted countries
         try:
-            ip = request.remote_addr
+            ip = request.headers['X-Real-IP']
             helpers.logError("The IP " + str(ip))
             if ip != '127.0.0.1' and assistant.Config:
                 helpers.logError("I am inside the if")

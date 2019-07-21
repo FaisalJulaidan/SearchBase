@@ -56,9 +56,14 @@ const Solutions = ({ responded, submitSolution, skipResponse, solutions, skippab
         toggleSelect: toggleSelect
     };
 
-    if (!solutions.length) {
-        return null;
+    if (solutions) {
+        if(!solutions.length) {
+            return null;
+        }
+    } else {
+        return null
     }
+
 
     return (
         <div className={'Solutions'}>

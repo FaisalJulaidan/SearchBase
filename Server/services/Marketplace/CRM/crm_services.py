@@ -286,7 +286,7 @@ def updateByType(type: CRM, newAuth, companyID):
 
 def getSalary(conversation: Conversation, dataType: DataType, toPeriod: Period):
     # Less Than 5000 GBP Monthly
-    salary = conversation.Data.get('keywordsByDataType').get(dataType.value['name'], 0)
+    salary = conversation.get('keywordsByDataType').get(dataType.value['name'], 0)
     if salary:
         salarySplitted = salary[0].split(" ")
         salary = helpers.convertSalaryPeriod(salarySplitted[2], Period[salarySplitted[4]], toPeriod)

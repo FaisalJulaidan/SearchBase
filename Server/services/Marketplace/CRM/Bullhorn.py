@@ -208,8 +208,7 @@ def insertCandidate(auth, conversation: Conversation) -> Callback:
                 conversation.Data.get('keywordsByDataType').get(DT.CandidateSkills.value['name'], [" "])),
             "educations": {
                 "data": conversation.Data.get('keywordsByDataType').get(DT.CandidateEducation.value['name'], [])
-            },
-            "salary": str(crm_services.getSalary(conversation, DT.CandidateDesiredSalary, Period.Annually))
+            }
         }
 
         # Add additional emails to email2 and email3
@@ -371,10 +370,6 @@ def searchCandidates(auth, companyID, conversation, fields=None) -> Callback:
         # if keywords[DT.CandidateSkills.value["name"]]:
         #     query += "primarySkills.data:" + keywords[DT.CandidateSkills.name] + " or"
 
-        salary =  crm_services.getSalary(conversation, DT.CandidateDesiredSalary, Period.Annually)
-        if salary:
-            query += " salary:" + str(salary) + " or"
-
         query = query[:-3]
 
         # check if no conditions submitted
@@ -419,6 +414,7 @@ def searchCandidates(auth, companyID, conversation, fields=None) -> Callback:
 
 def searchJobs(auth, companyID, conversation, fields=None) -> Callback:
     try:
+        print("starting job search")
         query = "query="
         if not fields:
             fields = "fields=id,title,publicDescription,address,employmentType,salary,skills,yearsRequired,startDate,dateEnd"
@@ -430,10 +426,6 @@ def searchJobs(auth, companyID, conversation, fields=None) -> Callback:
         query += checkFilter(keywords, DT.JobLocation, "address.city")
 
         query += checkFilter(keywords, DT.JobType, "employmentType")
-
-        salary = crm_services.getSalary(conversation, DT.JobSalary, Period.Annually)
-        if salary > 0:
-            query += "salary:" + str(salary) + " or"
 
         query += checkFilter(keywords, DT.JobDesiredSkills, "skills")
 
@@ -448,7 +440,7 @@ def searchJobs(auth, companyID, conversation, fields=None) -> Callback:
         # check if no conditions submitted
         if len(query) < 4:
             query = "query=*:*"
-
+        print("query: ", query)
         # send query
         sendQuery_callback: Callback = sendQuery(auth, "search/JobOrder", "get", {}, companyID,
                                                  [fields, query, "count=500"])
@@ -456,6 +448,7 @@ def searchJobs(auth, companyID, conversation, fields=None) -> Callback:
             raise Exception(sendQuery_callback.Message)
 
         return_body = json.loads(sendQuery_callback.Data.text)
+        print("return_body: ", return_body)
         result = []
         # not found match for JobLinkURL
         for record in return_body["data"]:

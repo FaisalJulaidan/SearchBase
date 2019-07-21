@@ -111,7 +111,7 @@ const SalaryPicker = ({ message, submitMessage }) => {
                                                 return document.getElementById('TheSearchBase_Chatbot')
                                         }}>
 
-                    <a className="ant-dropdown-link" href="#a">
+                    <a className="ant-dropdown-link">
                         {currency} <Icon type="down"/>
                     </  a>
                 </Dropdown>
@@ -123,7 +123,7 @@ const SalaryPicker = ({ message, submitMessage }) => {
                                                 return document.getElementById('TheSearchBase_Chatbot')
                                         }}
                           overlay={payRateMenu}>
-                    <a className="ant-dropdown-link" href="#a">
+                    <a className="ant-dropdown-link">
                         {payRate} <Icon type="down"/>
                     </a>
                 </Dropdown>

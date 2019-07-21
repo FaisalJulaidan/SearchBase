@@ -470,11 +470,16 @@ def scanJobs(session, dbIDs, extraJobs=None):
                                  + ' ' + currency
                                  + ' ' + payPeriod)
 
+            helpers.logError("record[Job.JobEssentialSkills.name]: ")
+            helpers.logError(record[Job.JobEssentialSkills.name])
             if record[Job.JobEssentialSkills.name]:
                 if type(record[Job.JobEssentialSkills.name]) is str:
                     subTitles.append("Essential Skills: " + record[Job.JobEssentialSkills.name])
-                else:
+                elif type(record[Job.JobEssentialSkills.name]) is list:
                     subTitles.append("Essential Skills: " + ", ".join(record[Job.JobEssentialSkills.name]))
+                elif type(record[Job.JobEssentialSkills.name]) is dict:
+                    helpers.logError("Dict unavailable")
+                    pass
 
 
             data.append({

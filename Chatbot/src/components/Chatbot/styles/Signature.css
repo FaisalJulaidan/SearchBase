@@ -8,6 +8,7 @@
     background-color: #fafafa;
     align-items: center;
     height: 40px;
+    z-index: 4;
 }
 
 .Signature a {

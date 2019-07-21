@@ -24,12 +24,14 @@ const Header = ({ title, logoPath, isDirectLink, resetChatbot, closeWindow }) =>
                         : <Col span={3}/>
                 }
 
-                <Col span={16}>
+                <Col span={15}>
                     <div className={'H3'}>{title}</div>
                 </Col>
-                <Col span={5} style={{ textAlign: 'right', position: 'relative' }}>
+                <Col span={6} style={{ textAlign: 'right', position: 'relative' }}>
                     <Tooltip title="Reset"
                              getPopupContainer={() => document.getElementById('TheSearchBase_Chatbot')}>
+                        <Button className={'Button'} onClick={resetChatbot}
+                                type="default" shape="circle" icon="lock" size={'small'}/>
                         <Button className={'Button'} onClick={resetChatbot}
                                 type="default" shape="circle" icon="redo" size={'small'}/>
                     </Tooltip>

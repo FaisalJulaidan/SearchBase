@@ -30,8 +30,10 @@ const BotMessage = ({ type, message, addUserMessage, addBotMessage, setChatbotSt
             curBlockID: block[flowAttributes.SKIP_BLOCKTOGOID],
             waitingForUser: false
         };
+        // const afterMessage = block[flowAttributes.SKIP_ACTION]
         addUserMessage(text, messageTypes.TEXT, message.block, {input: text, skipped:true});
         setChatbotStatus(newState);
+        _checkAfterMessage()
     };
 
     const submitAnswer = (text, type, newState, content, afterMessage) => {

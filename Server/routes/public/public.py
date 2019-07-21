@@ -22,6 +22,11 @@ def serve(path=''):
     response.headers["Cache-Control"] = "no-store, no-cache"
     return response
 
+@public_router.route('/ip')
+def ip():
+    return request.remote_addr
+
+
 # Serve React App
 @public_router.route('/login')
 def login():

@@ -59,7 +59,7 @@ export const dataHandler = (() => {
             }
             // Check the userTypes associated with the solutions and record them
             fetchedSolutions = fetchedSolutions.concat(solutions);
-            resolve.solutions = fetchedSolutions;
+            resolve.solutions = solutions;
             return resolve;
         };
 

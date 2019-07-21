@@ -64,7 +64,6 @@ const Solutions = ({ responded, submitSolution, skipResponse, solutions, skippab
         return null
     }
 
-
     return (
         <div className={'Solutions'}>
             {

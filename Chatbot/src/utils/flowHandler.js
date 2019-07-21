@@ -15,10 +15,10 @@ const notFoundBlock = (toGoID) => {
     return createBlock({ text }, messageTypes.TEXT, delayMessageLength(text), null, null, toGoID);
 };
 
-const endBlock = () => {
+const endBlock = (finished=true) => {
     const text = 'This conversation has ended, if you would like to have a new one please click the reset button!';
     // Content, Type, delay, ID = null, DataType = null, selfContinue = null, extra = {})
-    return createBlock(null, messageTypes.TEXT, delayMessageLength(text), null, null, null, { end: true });
+    return createBlock(null, messageTypes.TEXT, delayMessageLength(text), null, null, null, { end: true, finished });
     return null
 };
 
@@ -43,7 +43,9 @@ const checkSelfContinue = (type, blockToGoID) => {
 const loadNextBlock = (chatbot) => {
     try {
         const { curBlockID, finished } = chatbot.status;
+        console.log(curBlockID)
         let potential = finished ? null : chatbot.blocks.find(block => block.ID === curBlockID);
+        console.log(potential)
         let block = potential ? potential : null;
         if(!block) return endBlock();
         let extra = block.extra ? { ...block.extra, ...checkFetchData(block[flowAttributes.TYPE]) } : checkFetchData(block[flowAttributes.TYPE]);
@@ -57,7 +59,6 @@ const loadNextBlock = (chatbot) => {
 
 const loadAfterMessage = (chatbot) => {
     const { curBlock, curBlockID, afterMessage } = chatbot.status
-    console.log(chatbot.status)
 
     return createBlock(
         { text: afterMessage},
@@ -105,6 +106,8 @@ const getCurBlock = (action, assistant, chatbot) => {
         case 'Go To Next Block':
         case 'Go To Specific Block':
             return loadNextBlock(chatbot);
+        case 'Early End Chat':
+            return endBlock(false);
         case 'End Chat':
             return endBlock();
         case 'Not Found':

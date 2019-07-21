@@ -48,6 +48,9 @@ const Text = ({ message, submitMessage }) => {
                   curBlockID: message.block[flowAttributes.CONTENT][flowAttributes.USER_INPUT_BLOCKTOGOID],
                   waitingForUser: false
               };
+              console.log('------------------------------')
+
+              console.log(newState)
               submitMessage(text, type, newState, afterMessage, block, { input: text, skipped: false });
           }
         } catch (e) {

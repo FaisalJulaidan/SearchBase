@@ -213,7 +213,6 @@ const Chatbot = ({
         }
     }, [initChatbot, setChatbotStatus]);
 
-
     return (
         <>
             {active ?

@@ -380,8 +380,8 @@ export const DatabaseTypeFormItem = ({FormItem, block, getFieldDecorator, layout
 );
 
 export const ScoreFormItem = ({FormItem, layout, block, getFieldDecorator}) => (
-    <FormItem label="Score Weight" {...layout}
-              extra="Score to be used for ranking candidates">
+    <FormItem label="Qualification Points" {...layout}
+              extra="The answer with the highest points will weight the most in the candidate's ranking">
         {
             getFieldDecorator('scoreWeight', {
                 initialValue: block.Content.score,
@@ -391,16 +391,16 @@ export const ScoreFormItem = ({FormItem, layout, block, getFieldDecorator}) => (
                 }],
             })(
                 <Select placeholder="Select score weight">
-                    <Option value={1}>1</Option>
-                    <Option value={2}>2</Option>
-                    <Option value={3}>3</Option>
-                    <Option value={4}>4</Option>
-                    <Option value={5}>5</Option>
-                    <Option value={6}>6</Option>
-                    <Option value={7}>7</Option>
-                    <Option value={8}>8</Option>
-                    <Option value={9}>9</Option>
                     <Option value={10}>10</Option>
+                    <Option value={9}>9</Option>
+                    <Option value={8}>8</Option>
+                    <Option value={7}>7</Option>
+                    <Option value={6}>6</Option>
+                    <Option value={5}>5</Option>
+                    <Option value={4}>4</Option>
+                    <Option value={3}>3</Option>
+                    <Option value={2}>2</Option>
+                    <Option value={1}>1</Option>
                 </Select>
             )
         }

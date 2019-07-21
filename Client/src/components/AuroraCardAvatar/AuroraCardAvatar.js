@@ -15,7 +15,7 @@ class AuroraCardAvatar extends React.Component {
                 <div className={styles.Main}>
                     {
                         this.props.disabled &&
-                        <div className={styles.CommingSoonTag}>Comming Soon</div>
+                        <div className={styles.ComingSoonTag}>Coming Soon</div>
                     }
 
                     <img src={getLink(this.props.image)}

@@ -89,6 +89,7 @@ const Chatbot = ({
                 setChatbotStatus({ open: true });
             } else {
                 const { SecondsUntilPopup } = assistant;
+                if (SecondsUntilPopup === 0) return;
                 setTimeout(() => {
                     setChatbotAnimation({ open: true });
                 }, SecondsUntilPopup * 1000);
@@ -170,16 +171,16 @@ const Chatbot = ({
 
             // setTimeout(async () => {
             setChatbotWaiting(nextBlock);
-            let fetchedData = {}
+            let fetchedData = {};
             if (nextBlock.extra.needsToFetch) {
-                fetchedData = await fetch(nextBlock)
+                fetchedData = await fetch(nextBlock);
             }
             if (nextBlock.extra.end) {
-                setChatbotStatus({finished: true});
-                let {cancelled} = await endChat(nextBlock.extra.finished);
+                setChatbotStatus({ finished: true });
+                let { cancelled } = await endChat(nextBlock.extra.finished);
                 if (!cancelled) return;
             }
-            botRespond({...nextBlock, fetchedData}, chatbot);
+            botRespond({ ...nextBlock, fetchedData }, chatbot);
             // }, 600)
         };
         setNextBlock(chatbot, started, curAction, assistant);

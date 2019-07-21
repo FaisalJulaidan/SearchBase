@@ -24,7 +24,8 @@ def serve(path=''):
 
 @public_router.route('/ip')
 def ip():
-    return request.remote_addr
+    print(request.headers)
+    return request.headers['X-Real-IP']
 
 
 # Serve React App

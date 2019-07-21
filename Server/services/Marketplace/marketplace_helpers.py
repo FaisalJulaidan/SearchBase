@@ -84,7 +84,6 @@ def disconnect(type, companyID):
         return Callback(False, str(exc))
 
 
-
 # send request with dynamic method
 def sendRequest(url, method, headers, data=None):
     request = None

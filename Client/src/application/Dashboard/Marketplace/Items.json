@@ -17,6 +17,14 @@
       "status": "NOT_CONNECTED"
     },
     {
+      "title": "PRS Recruitment",
+      "desc": "PRS Jobs provides customer relationship management, applicant tracking system and operations software for the staffing industry.",
+      "image": "/static/images/CRM/prsjobs.png",
+      "type": "PRSJobs",
+      "disabled": false,
+      "status": "NOT_CONNECTED"
+    },
+    {
       "title": "Vincere",
       "desc": "Vincere provides customer relationship management, applicant tracking system and operations software for the staffing industry.",
       "image": "/static/images/CRM/vincere.svg",

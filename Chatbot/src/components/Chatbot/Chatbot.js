@@ -192,7 +192,6 @@ const Chatbot = ({
                 return;
 
             dataHandler.setAssistantID(assistantID);
-
             initChatbot(assistant, [].concat(assistant.Flow.groups.map(group => group.blocks)).flat(1), { disabled: isDisabled })
         };
         if(!assistant){

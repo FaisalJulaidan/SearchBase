@@ -54,7 +54,7 @@ class Integration extends React.Component {
         s.setAttribute('data-circle', this.state.dataCircle);
 
         // Development
-        if (process.env.NODE_ENV === 'development') {
+        if (process.env.REACT_APP_ENV === 'development') {
             s.src = "http://localhost:3001/vendor/js/bundle.js";
             s.setAttribute("id", "oldBotScript");
         }

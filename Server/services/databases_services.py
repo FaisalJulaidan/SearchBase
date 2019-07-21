@@ -471,7 +471,7 @@ def scanJobs(session, dbIDs, extraJobs=None):
                                  + ' ' + payPeriod)
 
             helpers.logError("record[Job.JobEssentialSkills.name]: ")
-            helpers.logError(record[Job.JobEssentialSkills.name])
+            helpers.logError(str(record[Job.JobEssentialSkills.name]))
             if record[Job.JobEssentialSkills.name]:
                 if type(record[Job.JobEssentialSkills.name]) is str:
                     subTitles.append("Essential Skills: " + record[Job.JobEssentialSkills.name])

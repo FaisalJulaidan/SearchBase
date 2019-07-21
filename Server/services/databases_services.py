@@ -471,7 +471,10 @@ def scanJobs(session, dbIDs, extraJobs=None):
                                  + ' ' + payPeriod)
 
             if record[Job.JobEssentialSkills.name]:
-                subTitles.append("Essential Skills: " + record[Job.JobEssentialSkills.name])
+                if type(record[Job.JobEssentialSkills.name]) is str:
+                    subTitles.append("Essential Skills: " + record[Job.JobEssentialSkills.name])
+                else:
+                    subTitles.append("Essential Skills: " + ", ".join(record[Job.JobEssentialSkills.name]))
 
 
             data.append({

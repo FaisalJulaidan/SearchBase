@@ -9,7 +9,6 @@ from utilities import json_schemas, helpers, enums
 # Get the chatbot for the public to use
 def getChatbot(assistantHashID) -> Callback:
     try:
-
         assistantID = helpers.decodeID(assistantHashID)
         if not assistantID:
             return Callback(False, "Assistant not found!", None)

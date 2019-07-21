@@ -66,6 +66,7 @@ export const resetChatbot = () => ({
     type: actionTypes.RESET_CHATBOT,
     status: {
         open: true,
+        active: true,
         loading: false
     },
     animation: {open: true}

@@ -39,7 +39,7 @@ const Chatbot = ({
     window.addEventListener('beforeunload', () => {
         if (!finished) {
             // localStorage.setItem('tsb_chatbot_draft', JSON.stringify({ver: '123', messages: messageList}))
-            setChatbotStatus({ curAction: 'End Chat' });
+            setChatbotStatus({ curAction: 'Early End Chat' });
         }
     });
 
@@ -107,9 +107,9 @@ const Chatbot = ({
 
     // Every time the chatbot changes, call to flowHandler
     useEffect(() => {
-        const setChatbotWaiting = (block, overrideAction = null) => {
+        const setChatbotWaiting = (block) => {
             setChatbotStatus({
-                curAction: overrideAction,
+                curAction: null,
                 waitingForUser: false,
                 curBlockID: block.ID,
                 curBlock: block,
@@ -126,6 +126,7 @@ const Chatbot = ({
             stopTimer.current = optionalDelayExecution(() => {
                 setChatbotStatus({ thinking: false, waitingForUser: true });
                 addBotMessage(block.Content.text, block.Type, block);
+                console.log(block)
                 if (block.selfContinue) {
                     setChatbotStatus({
                         curBlockID: block.selfContinue,
@@ -161,17 +162,19 @@ const Chatbot = ({
             let nextBlock = getCurBlock(curAction, assistant, chatbot);
             if (!nextBlock) return
 
-            setChatbotWaiting(nextBlock, chatbot.status.afterMessage ? chatbot.status.curAction: null);
+            // setTimeout(async () => {
+            setChatbotWaiting(nextBlock);
             let fetchedData = {}
             if (nextBlock.extra.needsToFetch) {
-               fetchedData = await fetch(nextBlock)
+                fetchedData = await fetch(nextBlock)
             }
             if (nextBlock.extra.end) {
-                setChatbotStatus({ finished: true });
-                let { cancelled } = await endChat(true);
+                setChatbotStatus({finished: true});
+                let {cancelled} = await endChat(nextBlock.extra.finished);
                 if (!cancelled) return;
             }
-            botRespond({ ...nextBlock, fetchedData }, chatbot);
+            botRespond({...nextBlock, fetchedData}, chatbot);
+            // }, 600)
         }
         setNextBlock(chatbot, started, curAction, assistant);
     }, [chatbot, setChatbotStatus, addBotMessage, assistant, curAction, started]);

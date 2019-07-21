@@ -38,7 +38,9 @@ const Input = ({ setChatbotStatus, isDirectLink, addUserMessage, lastMessage, ad
     };
 
     const getInput = (message) => {
+        return (<SalaryPicker/>);
         switch (message.type) {
+
             case messageTypes.FILE_UPLOAD:
                 return (<FileUpload/>);
             case messageTypes.USER_INPUT:

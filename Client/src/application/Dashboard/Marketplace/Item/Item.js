@@ -8,6 +8,7 @@ import styles from './Item.module.less'
 import {DefaultButton} from './Components/Common'
 import {AdaptFeatures, AdaptFormItems, AdaptHeader} from "./Components/Adapt";
 import {BullhornFeatures, BullhornHeader} from "./Components/Bullhorn";
+import {PRSJobsFeatures, PRSJobsHeader} from "./Components/PRSJobs";
 import {VincereFeatures, VincereHeader} from "./Components/Vincere";
 import {GreenhouseFeatures, GreenhouseFormItem, GreenhouseHeader} from "./Components/Greenhouse";
 import {GoogleFeatures, GoogleHeader} from './Components/Google'
@@ -161,6 +162,19 @@ class Item extends React.Component {
                             </Button>
                         </Dropdown>
                     )
+                }
+                break;
+
+            case "PRSJobs":
+                if (place === 'header')
+                    return <PRSJobsHeader/>;
+                if (place === 'features')
+                    return <PRSJobsFeatures/>;
+                if (place === 'button') {
+                    windowObject.url = "";
+                    return <DefaultButton buttonText={'Connect to PRS Recruitment'}
+                                          windowObject={windowObject}
+                                          {...buttonsOptions}/>;
                 }
                 break;
 

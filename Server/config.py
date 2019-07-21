@@ -83,21 +83,6 @@ class BaseConfig(object):
     # MAIL_PASSWORD = 'yyfcnddsbwhnqknj'
     # MAIL_SUPPRESS_SEND = False
 
-    # run code only with main app (second one)
-    # check if WERKZEUG_RUN_MAIN is in the environment variables and its True
-    # if os.environ.get("WERKZEUG_RUN_MAIN", None):
-    #     JOBS = [
-    #         {
-    #             'id': 'notify',
-    #             'func': 'services.mail_services:timer_tick',
-    #             'args': (),
-    #             'trigger': 'interval',
-    #             'seconds': 14400  # 4 hours
-    #         }
-    #     ]
-    #
-    # SCHEDULER_API_ENABLED = True
-
 
 class ProductionConfig(BaseConfig):
     ENV = 'production'

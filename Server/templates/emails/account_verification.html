@@ -5,7 +5,7 @@
 {% endblock %}
 
 {% block content_title %}
-    Hello {{ userName }},
+    Hello {{ userName if userName}},
 {% endblock %}
 
 {% block content_body %}

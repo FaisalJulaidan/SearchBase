@@ -8,6 +8,13 @@ import { faCloud } from '@fortawesome/free-solid-svg-icons';
 import { Button, Col, Row, Tooltip } from 'antd';
 
 const Header = ({ title, logoPath, isDirectLink, resetChatbot, closeWindow }) => {
+
+    const privacyPolicy = () => {
+        let win = window.open("https://www.thesearchbase.com/privacy", '_blank');
+        win.focus();
+    }
+
+
     return (
         <div className={'Header'}>
             <Row>
@@ -28,10 +35,14 @@ const Header = ({ title, logoPath, isDirectLink, resetChatbot, closeWindow }) =>
                     <div className={'H3'}>{title}</div>
                 </Col>
                 <Col span={6} style={{ textAlign: 'right', position: 'relative' }}>
+                    <Tooltip title="View our privacy policy"
+                             getPopupContainer={() => document.getElementById('TheSearchBase_Chatbot')}>
+                        <Button className={'Button'} onClick={privacyPolicy}
+                                type="default" shape="circle" icon="lock" size={'small'} />
+                    </Tooltip>
+
                     <Tooltip title="Reset"
                              getPopupContainer={() => document.getElementById('TheSearchBase_Chatbot')}>
-                        <Button className={'Button'} onClick={resetChatbot}
-                                type="default" shape="circle" icon="lock" size={'small'}/>
                         <Button className={'Button'} onClick={resetChatbot}
                                 type="default" shape="circle" icon="redo" size={'small'}/>
                     </Tooltip>

@@ -20,7 +20,7 @@ def getChatbot(assistantHashID) -> Callback:
             .filter(Assistant.ID == assistantID[0]).first()
 
         if not assistant:
-            return Callback(True, '', {'assistant': None, 'isDisabled': True})
+            return Callback(False, '')
 
         # Check for restricted countries
         try:
@@ -33,7 +33,7 @@ def getChatbot(assistantHashID) -> Callback:
                 if len(restrictedCountries):
                     if helpers.geoIP.country(ip).country.iso_code in restrictedCountries:
                         helpers.logError("Hi There")
-                        return Callback(True, '', {'isDisabled': True})
+                        return Callback(True, '', {'assistant': assistant, 'isDisabled': True})
         except Exception as exc:
             helpers.logError("flow_service.getChatbot() geoIP restrict countries: " + str(exc))
             pass

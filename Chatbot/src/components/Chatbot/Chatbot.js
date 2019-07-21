@@ -115,6 +115,7 @@ const Chatbot = ({
 
     // Every time the chatbot changes, call to flowHandler
     useEffect(() => {
+        // if(disabled) return;
         const setChatbotWaiting = (block) => {
             setChatbotStatus({
                 curAction: null,
@@ -142,6 +143,7 @@ const Chatbot = ({
                 }
             }, !block.extra.needsToFetch, block.delay);
         };
+
         const fetch = async (block) => {
             let [key, data, cancelled] = await fetchData(block);
             let fetchedData = {};
@@ -198,7 +200,7 @@ const Chatbot = ({
 
             const { assistant, isDisabled } = data.data.data;
             if (isDisabled)
-                return initChatbot(assistant, [], { disabled: isDisabled });
+                return setChatbotStatus({ disabled: isDisabled, active: assistant.Active, loading: false });
 
             dataHandler.setAssistantID(assistantID);
             initChatbot(

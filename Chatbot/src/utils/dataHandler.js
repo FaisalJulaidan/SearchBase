@@ -70,7 +70,7 @@ export const dataHandler = (() => {
         const sendData = async (completed) => {
             source = CancelToken.source();
             const result = processMessages(completed); // loop messages
-            if (!completed && result.collectedData.length < 3) return;
+            if ((!completed && result.collectedData.length < 3) || sessionID) return;
             let cancelled;
 
             const cancel = {
@@ -82,6 +82,7 @@ export const dataHandler = (() => {
             // send data to server
             const { data, error } = await promiseWrapper(axios.post(`${getServerDomain()}/api/assistant/${assistantID}/chatbot`, result, cancel));
             sessionID = data ? data.data.data.sessionID : null; // :) // lol faisal 🔫
+            setSessionID(sessionID);
             if (axios.isCancel(error)) {
                 console.log('cancelled');
                 cancelled = true;
@@ -157,7 +158,7 @@ export const dataHandler = (() => {
             const __detectUserType = () => {
                 let userType = 'Unknown'; // default
                 if (recordedUserTypes.length === 0)
-                    return [];
+                    return userType;
 
                 let types = {};
                 // let maxEl = recordedUserTypes[0]
@@ -215,8 +216,6 @@ export const dataHandler = (() => {
                     modifiedKeywords,
                     content.skipped);
                 __accumulateScore(score, Math.max(...answers.map(answer => answer.score)));
-                console.log(score);
-                console.log(Math.max(...answers.map(answer => answer.score)));
             };
 
             const __processUserInput = (message) => {

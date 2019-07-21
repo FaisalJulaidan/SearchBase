@@ -1,5 +1,5 @@
-import React, {useEffect, useRef, useState} from 'react';
-import {connect} from 'react-redux';
+import React, { useEffect, useRef, useState } from 'react';
+import { connect } from 'react-redux';
 import axios from 'axios';
 // Actions
 import {
@@ -14,8 +14,15 @@ import {
 import './styles/Chatbot.css';
 import 'antd/dist/antd.css';
 // Utils
-import {dataHandler, getServerDomain, isReady, optionalDelayExecution, promiseWrapper, useInterval} from '../../utils';
-import {fetchData, getCurBlock} from '../../utils/flowHandler';
+import {
+    dataHandler,
+    getServerDomain,
+    isReady,
+    optionalDelayExecution,
+    promiseWrapper,
+    useInterval
+} from '../../utils';
+import { fetchData, getCurBlock } from '../../utils/flowHandler';
 // Constants
 import * as flowAttributes from '../../constants/FlowAttributes';
 // Components
@@ -31,7 +38,7 @@ const Chatbot = ({
                      resetChatbot, resetMessage, setChatbotAnimation, messageList
                  }) => {
     const { assistant, status, animation } = chatbot;
-    const { loading, thinking, open, disabled, started, curAction, finished } = status;
+    const { loading, thinking, open, disabled, active, started, curAction, finished } = status;
     const { open: animationOpen } = animation;
     let timer = useRef(null);
     let stopTimer = useRef(null);
@@ -54,7 +61,7 @@ const Chatbot = ({
 
     const resetAsync = () => {
         dataHandler.cancelRequest();
-        stopTimer.current.reset()
+        stopTimer.current.reset();
     };
 
     const closeWindow = () => {
@@ -148,23 +155,23 @@ const Chatbot = ({
                 });
                 return {};
             }
-            return fetchedData
-        }
+            return fetchedData;
+        };
 
 
-            const setNextBlock = async (chatbot, started, curAction, assistant) => {
-            if (!isReady(chatbot) || !assistant) return
-            if(!started){
+        const setNextBlock = async (chatbot, started, curAction, assistant) => {
+            if (!isReady(chatbot) || !assistant) return;
+            if (!started) {
                 setChatbotStatus({ started: true });
                 return;
             }
             let nextBlock = getCurBlock(curAction, assistant, chatbot);
-            if (!nextBlock) return
+            if (!nextBlock) return;
 
-            setChatbotWaiting(nextBlock, chatbot.status.afterMessage ? chatbot.status.curAction: null);
-            let fetchedData = {}
+            setChatbotWaiting(nextBlock, chatbot.status.afterMessage ? chatbot.status.curAction : null);
+            let fetchedData = {};
             if (nextBlock.extra.needsToFetch) {
-               fetchedData = await fetch(nextBlock)
+                fetchedData = await fetch(nextBlock);
             }
             if (nextBlock.extra.end) {
                 setChatbotStatus({ finished: true });
@@ -172,7 +179,7 @@ const Chatbot = ({
                 if (!cancelled) return;
             }
             botRespond({ ...nextBlock, fetchedData }, chatbot);
-        }
+        };
         setNextBlock(chatbot, started, curAction, assistant);
     }, [chatbot, setChatbotStatus, addBotMessage, assistant, curAction, started]);
 
@@ -187,45 +194,51 @@ const Chatbot = ({
             }
 
             const { assistant, isDisabled } = data.data.data;
-
-            if (!assistant.Active)
-                return;
+            if (isDisabled)
+                return initChatbot(assistant, [], { disabled: isDisabled });
 
             dataHandler.setAssistantID(assistantID);
-            initChatbot(assistant, [].concat(assistant.Flow.groups.map(group => group.blocks)).flat(1), { disabled: isDisabled })
+            initChatbot(
+                assistant,
+                [].concat(assistant.Flow.groups.map(group => group.blocks)).flat(1),
+                { disabled: isDisabled, active: assistant.Active });
         };
-        if(!assistant){
+        if (!assistant) {
             fetchChatbot();
         }
     }, [initChatbot, setChatbotStatus]);
 
 
-
     return (
         <>
-            {open && !loading ?
-                <div style={{ position: isDirectLink ? 'relative' : '' }}
-                     className={[
-                         animation.open ? 'ZoomIn' : 'ZoomOut',
-                         isDirectLink ? 'Chatbot_DirectLink' : 'Chatbot'
-                     ].join(' ')}>
-                    <Header isDirectLink={isDirectLink}
-                            title={assistant.TopBarText}
-                            logoPath={assistant.LogoPath}
-                            resetChatbot={reset}
-                            closeWindow={closeWindow}/>
-                    <Flow inputOpen={animation.inputOpen} thinking={thinking}
-                          resetAsync={resetAsync}/>
-                    <Input isDirectLink={isDirectLink}
-                           visible={animation.inputOpen}/>
-                    <Signature isDirectLink={isDirectLink}/>
-                </div>
-                :
-                <ChatButton btnColor={btnColor}
-                            disabled={disabled}
-                            loading={loading}
-                            openWindow={openWindow}/>
-            }
+            {active ?
+                <>
+                    {open && !loading ?
+                        <div style={{ position: isDirectLink ? 'relative' : '' }}
+                             className={[
+                                 animation.open ? 'ZoomIn' : 'ZoomOut',
+                                 isDirectLink ? 'Chatbot_DirectLink' : 'Chatbot'
+                             ].join(' ')}>
+                            <Header isDirectLink={isDirectLink}
+                                    title={assistant.TopBarText}
+                                    logoPath={assistant.LogoPath}
+                                    resetChatbot={reset}
+                                    closeWindow={closeWindow}/>
+                            <Flow inputOpen={animation.inputOpen} thinking={thinking}
+                                  resetAsync={resetAsync}/>
+                            <Input isDirectLink={isDirectLink}
+                                   visible={animation.inputOpen}/>
+                            <Signature isDirectLink={isDirectLink}/>
+                        </div>
+                        :
+                        <ChatButton btnColor={btnColor}
+                                    disabled={disabled}
+                                    active={active}
+                                    loading={loading}
+                                    openWindow={openWindow}/>
+                    }
+                </>
+                : null}
         </>
     );
 };

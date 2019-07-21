@@ -2,6 +2,7 @@ const initialState = {
     status: {
         open: false,
         disabled: false,
+        active: false,
         finished: false, 
         loading: true,
         thinking: false,

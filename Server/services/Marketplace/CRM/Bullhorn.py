@@ -414,7 +414,6 @@ def searchCandidates(auth, companyID, conversation, fields=None) -> Callback:
 
 def searchJobs(auth, companyID, conversation, fields=None) -> Callback:
     try:
-        print("starting job search")
         query = "query="
         if not fields:
             fields = "fields=id,title,publicDescription,address,employmentType,salary,skills,yearsRequired,startDate,dateEnd"
@@ -440,7 +439,7 @@ def searchJobs(auth, companyID, conversation, fields=None) -> Callback:
         # check if no conditions submitted
         if len(query) < 4:
             query = "query=*:*"
-        print("query: ", query)
+
         # send query
         sendQuery_callback: Callback = sendQuery(auth, "search/JobOrder", "get", {}, companyID,
                                                  [fields, query, "count=500"])
@@ -448,7 +447,6 @@ def searchJobs(auth, companyID, conversation, fields=None) -> Callback:
             raise Exception(sendQuery_callback.Message)
 
         return_body = json.loads(sendQuery_callback.Data.text)
-        print("return_body: ", return_body)
         result = []
         # not found match for JobLinkURL
         for record in return_body["data"]:

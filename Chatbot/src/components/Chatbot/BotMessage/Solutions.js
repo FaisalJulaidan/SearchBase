@@ -96,6 +96,9 @@ const Solutions = ({ responded, submitSolution, skipResponse, solutions, skippab
 
 
 const Solution = ({ solution, index, selected, responded, toggleSelect }) => {
+
+    let subtitles = solution[solutionAttributes.SUB_TITLES].constructor === Array ? solution[solutionAttributes.SUB_TITLES] : [solution[solutionAttributes.SUB_TITLES]]
+
     return (
         <Card hoverable className={'Card'}
               cover={<img alt="example" height="100px" style={{ objectFit: 'cover' }}
@@ -103,7 +106,7 @@ const Solution = ({ solution, index, selected, responded, toggleSelect }) => {
         >
             <div className={'Card_Text'}>
                 <h3 className={'Title'}>{solution.title} </h3>
-                {solution[solutionAttributes.SUB_TITLES].map((subtitle, i) => <p key={i}
+                {subtitles.map((subtitle, i) => <p key={i}
                                                                                  className={'SubTitle'}>{subtitle}</p>)}
                 <div className={'Paragraph'}>{solution[solutionAttributes.DESCRIPTION]}</div>
             </div>

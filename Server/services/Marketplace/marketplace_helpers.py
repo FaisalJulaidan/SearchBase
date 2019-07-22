@@ -98,14 +98,15 @@ def sendRequest(url, method, headers, data=None):
 
 
 def convertSkillsToString(skills):
-    if type(skills) is list:  # list
-        if type(skills[0]) is str:  # list of strings
-            skills = ", ".join(skills)
+    if skills:
+        if type(skills) is list:  # list
+            if type(skills[0]) is str:  # list of strings
+                skills = ", ".join(skills)
 
-        elif type(skills[0]) is dict:  # list of dicts
-            temp = ""
-            for skill in skills:
-                temp += skill["name"] + ", "
-                skills = temp[:-2]
+            elif type(skills[0]) is dict:  # list of dicts
+                temp = ""
+                for skill in skills:
+                    temp += skill["name"] + ", "
+                    skills = temp[:-2]
 
     return skills

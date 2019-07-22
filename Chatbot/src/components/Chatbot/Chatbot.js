@@ -12,7 +12,6 @@ import {
 } from '../../store/actions';
 // Styles
 import './styles/Chatbot.css';
-import 'antd/dist/antd.css';
 // Utils
 import {
     dataHandler,
@@ -31,6 +30,7 @@ import Header from './Header';
 import Flow from './Flow';
 import Input from './Input';
 import Signature from './Signature';
+import 'antd/dist/antd.css';
 
 const Chatbot = ({
                      isDirectLink, btnColor, assistantID,

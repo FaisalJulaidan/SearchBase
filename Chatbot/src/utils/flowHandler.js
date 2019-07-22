@@ -58,7 +58,7 @@ const loadNextBlock = (chatbot) => {
 };
 
 const loadAfterMessage = (chatbot) => {
-    const { curBlock, curBlockID, afterMessage } = chatbot.status
+    const { curBlockID, afterMessage, curAction } = chatbot.status
 
     return createBlock(
         { text: afterMessage},
@@ -66,7 +66,7 @@ const loadAfterMessage = (chatbot) => {
         delayMessageLength(afterMessage),
         null,
         null,
-        curBlockID
+        curAction === "End Chat" ? "End Chat" : curBlockID
         )
 }
 
@@ -94,11 +94,7 @@ const getCurBlock = (action, assistant, chatbot) => {
     const { curBlockID, afterMessage } = status;
     const { Message } = assistant;
     if(afterMessage){return  loadAfterMessage(chatbot)}
-    /**
-     * Batu please validate this:
-     * Previously, if the action === null we end the chatbot
-     * how we can do it now?
-     * */
+
     switch (action) {
         case 'Init':
             return createBlock({ text: Message }, messageTypes.TEXT, delayMessageLength(Message), null, null, loadFirstBlock(blocks).ID);

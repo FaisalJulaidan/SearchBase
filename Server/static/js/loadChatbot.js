@@ -5,12 +5,16 @@ function main() {
         return 'https://www.thesearchbase.com' + src;
     };
 
+    let myHeaders = new Headers();
+    myHeaders.append('Content-Type', 'text/plain');
+    myHeaders.append('Accept', 'application/json');
+
     const headers = {
-        headers: {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json'
-        }
+        method: 'GET',
+        mode: 'cors',
+        headers: myHeaders
     };
+
     fetch(getLink("/api/static/widgets/chatbot/asset-manifest.json?NoCache=" + new Date().getTime()), headers)
         .then(response => response.json())
         .then(manifest => {

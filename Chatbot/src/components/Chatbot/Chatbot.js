@@ -24,6 +24,7 @@ import {
 import { fetchData, getCurBlock } from '../../utils/flowHandler';
 // Constants
 import * as flowAttributes from '../../constants/FlowAttributes';
+import * as messageTypes from '../../constants/MessageType';
 // Components
 import ChatButton from './ChatButton';
 import Header from './Header';
@@ -134,11 +135,18 @@ const Chatbot = ({
             stopTimer.current = optionalDelayExecution(() => {
                 setChatbotStatus({ thinking: false, waitingForUser: true });
                 addBotMessage(block.Content.text, block.Type, block);
+                console.log(block)
                 if (block.selfContinue) {
                     setChatbotStatus({
                         curBlockID: block.selfContinue,
-                        curAction: 'Go To Next Block'
+                        curAction: block.selfContinue === 'End Chat' ? 'End Chat' : 'Go To Next Block'
                     });
+                }
+                if (block[flowAttributes.TYPE] === messageTypes.RAW_TEXT) {
+                    setChatbotStatus({
+                        curBlockID: block[flowAttributes.CONTENT][flowAttributes.BLOCKTOGOID],
+                        curAction: block[flowAttributes.CONTENT][flowAttributes.SUPER_ACTION]
+                    })
                 }
             }, !block.extra.needsToFetch, block.delay);
         };

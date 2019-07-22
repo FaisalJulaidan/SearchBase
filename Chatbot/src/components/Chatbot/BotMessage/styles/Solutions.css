@@ -145,6 +145,12 @@
 /*!* =================== *!*/
 /*Next & Prev Buttons */
 /*Overried slick library*/
+
+.ant-carousel .slick-prev:before,
+.ant-carousel .slick-next:before {
+    content: none !important;
+}
+
 .ant-carousel .slick-arrow.slick-prev {
     left: 0;
 }
@@ -157,7 +163,6 @@
 .slick-next {
     height: 277px !important;
     width: 30px !important;
-    top: 0 !important;
     z-index: 100 !important;
 }
 

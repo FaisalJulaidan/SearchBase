@@ -50,7 +50,7 @@ const Header = ({ title, logoPath, isDirectLink, resetChatbot, closeWindow }) =>
                         isDirectLink ? '' :
                             <Tooltip title="Close"
                                      getPopupContainer={() => document.getElementById('TheSearchBase_Chatbot')}>
-                                <Button className={['Button'].join(' ')}
+                                <Button className={['Button', 'Danger'].join(' ')}
                                         onClick={closeWindow}
                                         type="danger" shape="circle" icon="close"
                                         style={{ display: isDirectLink ? 'none' : '' }}

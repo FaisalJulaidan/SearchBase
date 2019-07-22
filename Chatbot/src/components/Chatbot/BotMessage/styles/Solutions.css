@@ -224,6 +224,9 @@
 /* for the not interested button */
 .Solutions > button[data-warning="true"] {
     color: #eca415 !important;
+    background: #fff;
+    border: 1px solid #d9d9d9;
+    box-shadow: 0 2px 0 rgba(0, 0, 0, .015);
 }
 
 .Solutions > button[data-warning="true"]:hover {

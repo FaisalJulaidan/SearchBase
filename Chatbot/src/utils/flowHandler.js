@@ -58,7 +58,7 @@ const loadNextBlock = (chatbot) => {
 };
 
 const loadAfterMessage = (chatbot) => {
-    const { curBlock, curBlockID, afterMessage } = chatbot.status
+    const { curBlockID, afterMessage, curAction } = chatbot.status
 
     return createBlock(
         { text: afterMessage},
@@ -66,7 +66,7 @@ const loadAfterMessage = (chatbot) => {
         delayMessageLength(afterMessage),
         null,
         null,
-        curBlockID
+        curAction === "End Chat" ? "End Chat" : curBlockID
         )
 }
 

@@ -2,8 +2,9 @@
 /*!* =================== *!*/
 .Single_Solution {
     width: 275px;
-    margin: 0 auto 31px;
-    padding-top: 35px;
+    margin: 0 auto;
+    height: calc(100% - 32px);
+    padding: 20px 0;
 }
 
 .Solutions {

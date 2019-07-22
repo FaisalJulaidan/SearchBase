@@ -1,9 +1,8 @@
-import React, { useEffect, useState } from 'react';
+import React, {useEffect, useState} from 'react';
 // Constants
 import * as flowAttributes from '../../../constants/FlowAttributes';
 import * as messageTypes from '../../../constants/MessageType';
 // Utils
-import { delayMessageLength } from '../../../utils';
 // Style
 import './styles/BotMessage.css';
 // Components
@@ -95,7 +94,8 @@ const BotMessage = ({ type, message, addUserMessage, addBotMessage, setChatbotSt
     };
 
     return (
-        <div className={['Message', type === messageTypes.SOLUTIONS ? 'Solution' : null].join(' ')}>
+        <div
+            className={['Message', type === messageTypes.SOLUTIONS && message?.block?.fetchedData?.solutions?.length ? 'Solution' : null].join(' ')}>
             {addStatus(findMessageType(type, message, index))}
         </div>
     );

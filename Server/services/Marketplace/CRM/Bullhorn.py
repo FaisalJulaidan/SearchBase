@@ -10,6 +10,7 @@ from models import Callback, Conversation, db, CRM as CRM_Model, StoredFile
 from services import databases_services, stored_file_services
 from services.Marketplace import marketplace_helpers
 from services.Marketplace.CRM import crm_services
+from services.Marketplace.marketplace_helpers import convertSkillsToString
 
 from utilities import helpers
 from utilities.enums import DataType as DT, Period, CRM
@@ -392,7 +393,7 @@ def searchCandidates(auth, companyID, conversation, fields=None) -> Callback:
                                                                   email=record.get("email"),
                                                                   mobile=record.get("mobile"),
                                                                   location=record.get("address", {}).get("city") or "",
-                                                                  skills="".join(
+                                                                  skills=convertSkillsToString(
                                                                       record.get("primarySkills", {}).get("data")),
                                                                   linkdinURL=None,
                                                                   availability=record.get("status"),

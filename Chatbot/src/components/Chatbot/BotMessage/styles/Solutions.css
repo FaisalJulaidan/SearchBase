@@ -79,6 +79,7 @@
     height: calc(100% - 32px);
     padding: 10px;
     overflow-y: auto;
+    color: black;
 }
 
 .Card_Buttons > button {

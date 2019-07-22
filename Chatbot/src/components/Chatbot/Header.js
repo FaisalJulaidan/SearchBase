@@ -16,7 +16,7 @@ const Header = ({ title, logoPath, isDirectLink, resetChatbot, closeWindow }) =>
 
 
     return (
-        <div className={'Header'}>
+        <div className={'Header'} id={'Chatbot_Header'}>
             <Row>
                 {
                     !isDirectLink ?

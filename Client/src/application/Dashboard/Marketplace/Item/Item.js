@@ -171,7 +171,9 @@ class Item extends React.Component {
                 if (place === 'features')
                     return <PRSJobsFeatures/>;
                 if (place === 'button') {
-                    windowObject.url = "";
+                    windowObject.url = "https://prsjobs--jsfull.cs83.my.salesforce.com/services/oauth2/authorize?" +
+                        "response_type=code&client_id=3MVG9w8uXui2aB_pIyoEOL_U6UgvUQqi5KNnTkD95XSD2NQjWfWakra7aHmltLO8e.xdwY.1WgkJAp7KUWsCN&" +
+                        "redirect_uri=" + getLink("/dashboard/marketplace/PRSJobs");
                     return <DefaultButton buttonText={'Connect to PRS Recruitment'}
                                           windowObject={windowObject}
                                           {...buttonsOptions}/>;

@@ -14,7 +14,6 @@ const Header = ({ title, logoPath, isDirectLink, resetChatbot, closeWindow }) =>
         win.focus();
     }
 
-    console.log(resetChatbot)
 
     return (
         <div className={'Header'}>

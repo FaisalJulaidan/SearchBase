@@ -387,6 +387,7 @@ def searchCandidates(auth, companyID, conversation, fields=None) -> Callback:
         helpers.logError("CANDIDATES RESULTS:---------------------------------------")
         helpers.logError(str(return_body))
         result = []
+        # TODO educations uses ids - need to retrieve them
         for record in return_body["data"]:
             result.append(databases_services.createPandaCandidate(id=record.get("id", ""),
                                                                   name=record.get("name"),
@@ -398,8 +399,7 @@ def searchCandidates(auth, companyID, conversation, fields=None) -> Callback:
                                                                   linkdinURL=None,
                                                                   availability=record.get("status"),
                                                                   jobTitle=None,
-                                                                  education="".join(
-                                                                      record.get("educations", {}).get("data")),
+                                                                  education=None,
                                                                   yearsExperience=0,
                                                                   desiredSalary=record.get("salary") or
                                                                                 record.get("dayRate", 0) * 261,

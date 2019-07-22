@@ -413,10 +413,10 @@ def scanJobs(session, dbIDs, extraJobs=None):
         __wordsCounter(DT.CandidateLocation, Job.JobLocation, keywords, df, 3)
 
         # Skills
-        __wordsCounter(DT.JobEssentialSkills, Job.JobEssentialSkills, keywords, df, 3)
-        __wordsCounter(DT.JobDesiredSkills, Job.JobDesiredSkills, keywords, df, 3)
-        __wordsCounter(DT.CandidateSkills, Job.JobEssentialSkills, keywords, df, 3)
-        __wordsCounter(DT.CandidateSkills, Job.JobDesiredSkills, keywords, df, 3)
+        # __wordsCounter(DT.JobEssentialSkills, Job.JobEssentialSkills, keywords, df, 3)
+        # __wordsCounter(DT.JobDesiredSkills, Job.JobDesiredSkills, keywords, df, 3)
+        # __wordsCounter(DT.CandidateSkills, Job.JobEssentialSkills, keywords, df, 3)
+        # __wordsCounter(DT.CandidateSkills, Job.JobDesiredSkills, keywords, df, 3)
 
 
         # Results
@@ -503,12 +503,13 @@ def scanJobs(session, dbIDs, extraJobs=None):
         return Callback(False, 'Error while search the database for matches!')
 
 
-
+# ----------------------------------------------------------------
 def __wordsCounter(dataType: DT, dbColumn, keywords, df, x=1):
     keywords = keywords.get(dataType.value['name'])
     if keywords:
-        df['Score'] += x * df[dbColumn.name].str.count('|'.join([re.escape(k) for k in keywords ]),
+        df['Score'] += x * df[dbColumn.name].str.count('|'.join([re.escape(k) for k in keywords]),
                                                        flags=re.IGNORECASE) | 0
+
 
 def __numCounter(dbColumn, compareSign, dataType: DT, keywords, df, plus=1, addInputToScore=False):
     if keywords.get(dataType.value['name']):

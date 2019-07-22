@@ -49,6 +49,14 @@
       "status": "NOT_CONNECTED"
     },
     {
+      "title": "Twilio",
+      "desc": "Twilio is a messaging service allowing SearchBase to send SMS-s to users on behalf of Recruiters.",
+      "image": "/static/images/CRM/twilio.png",
+      "type": "Twilio",
+      "disabled": true,
+      "status": "NOT_CONNECTED"
+    },
+    {
       "title": "Google",
       "desc": "Google Calendar is a time-management and scheduling calendar service lets you keep track of important events, share your schedule.",
       "image": "/static/images/CRM/gmail.svg",

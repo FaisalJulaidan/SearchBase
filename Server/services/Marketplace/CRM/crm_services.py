@@ -2,7 +2,7 @@ from sqlalchemy.sql import and_
 
 from utilities.enums import CRM, UserType, DataType, Period
 from models import db, Callback, Conversation, Assistant, CRM as CRM_Model, StoredFile
-from services.Marketplace.CRM import Greenhouse, Adapt, Bullhorn, Vincere
+from services.Marketplace.CRM import Greenhouse, Adapt, Bullhorn, Vincere, prsjobs
 # Process chatbot session
 from utilities import helpers
 
@@ -158,7 +158,7 @@ def connect(type, auth, companyID) -> Callback:
 def testConnection(type, auth, companyID) -> Callback:
     try:
         crm_type: CRM = CRM[type]
-
+        print("TESTING CONNECTION FOR: " + type)
         # test connection
         if crm_type == CRM.Bullhorn:
             return Bullhorn.testConnection(auth, companyID)  # oauth2
@@ -168,6 +168,8 @@ def testConnection(type, auth, companyID) -> Callback:
             return Greenhouse.login(auth)
         elif crm_type == CRM.Vincere:
             return Vincere.testConnection(auth, companyID)  # oauth2
+        elif crm_type == CRM.PRSJobs:
+            return prsjobs.testConnection(auth, companyID) # oauth2
 
         return Callback(False, 'Connection failure. Please check entered details')
 

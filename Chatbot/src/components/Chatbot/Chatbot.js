@@ -117,6 +117,8 @@ const Chatbot = ({
     useEffect(() => {
         // if(disabled) return;
         const setChatbotWaiting = (block) => {
+
+            if(!block.Content   ) return
             setChatbotStatus({
                 curAction: null,
                 waitingForUser: false,
@@ -127,11 +129,8 @@ const Chatbot = ({
             });
         };
 
-        const endChat = async (completed) => {
-            return await dataHandler.sendData(completed);
-        };
-
         const botRespond = (block, chatbot) => {
+            if(!block.Content) return
             stopTimer.current = optionalDelayExecution(() => {
                 setChatbotStatus({ thinking: false, waitingForUser: true });
                 addBotMessage(block.Content.text, block.Type, block);
@@ -171,16 +170,16 @@ const Chatbot = ({
             let nextBlock = getCurBlock(curAction, assistant, chatbot);
             if (!nextBlock) return;
 
-            // setTimeout(async () => {
             setChatbotWaiting(nextBlock);
             let fetchedData = {};
+            console.log(nextBlock)
             if (nextBlock.extra.needsToFetch) {
                 fetchedData = await fetch(nextBlock);
             }
             if (nextBlock.extra.end) {
                 setChatbotStatus({ finished: true });
-                let { cancelled } = await endChat(nextBlock.extra.finished);
-                if (!cancelled) return;
+                let { cancelled } = await dataHandler.sendData(nextBlock.extra.finished);
+                if (cancelled) return;
             }
             botRespond({ ...nextBlock, fetchedData }, chatbot);
             // }, 600)

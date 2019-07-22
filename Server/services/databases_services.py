@@ -472,15 +472,12 @@ def scanJobs(session, dbIDs, extraJobs=None):
 
             if record[Job.JobSalary.name]:
                 currency = record[Job.Currency.name] or '' # it could be a Currency object e.g. {code: 'USD'...}
-                payPeriod = record[Job.PayPeriod.name] or '' # it could be a Period object e.g. {name: 'Annual'...}
 
                 if isinstance(currency, dict): currency = currency['code']
-                if isinstance(payPeriod, dict): payPeriod = payPeriod['name']
 
                 subTitles.append("Salary: "
                                  + str(int(record[Job.JobSalary.name]))
-                                 + ' ' + currency
-                                 + ' ' + payPeriod)
+                                 + ' ' + currency)
 
             if essentialSkills:
                 subTitles.append("Essential Skills: " + essentialSkills)

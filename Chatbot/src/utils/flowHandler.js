@@ -18,8 +18,8 @@ const notFoundBlock = (toGoID) => {
 const endBlock = (finished=true) => {
     const text = 'This conversation has ended, if you would like to have a new one please click the reset button!';
     // Content, Type, delay, ID = null, DataType = null, selfContinue = null, extra = {})
-    return createBlock(null, messageTypes.TEXT, delayMessageLength(text), null, null, null, { end: true, finished });
-    return null
+    return createBlock(null, messageTypes.TEXT, 0, null, null, null, { end: true, finished });
+
 };
 
 const checkFetchData = (type) => {
@@ -99,7 +99,6 @@ const getCurBlock = (action, assistant, chatbot) => {
      * Previously, if the action === null we end the chatbot
      * how we can do it now?
      * */
-
     switch (action) {
         case 'Init':
             return createBlock({ text: Message }, messageTypes.TEXT, delayMessageLength(Message), null, null, loadFirstBlock(blocks).ID);

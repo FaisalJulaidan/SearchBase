@@ -444,10 +444,22 @@ def scanJobs(session, dbIDs, extraJobs=None):
                 else:
                     desc[0] += ". "
 
-            if record[Job.JobYearsRequired.name] and record[Job.JobEssentialSkills.name]:
+            essentialSkills = record[Job.JobEssentialSkills.name]
+            if essentialSkills:
+                if type(essentialSkills) is list:  # list
+                    if type(essentialSkills[0]) is str:  # list of strings
+                        essentialSkills = ", ".join(essentialSkills)
+
+                    elif type(essentialSkills[0]) is dict:  # list of dicts
+                        temp = ""
+                        for skill in essentialSkills:
+                            temp += skill["name"] + ", "
+                        essentialSkills = temp[:-2]
+
+            if record[Job.JobYearsRequired.name] and essentialSkills:
                 desc.append(random.choice(requiredYearsSkills)
                             .replace("[yearsRequired]", str(int(record[Job.JobYearsRequired.name])))
-                            .replace("[essentialSkills]", record[Job.JobEssentialSkills.name]))
+                            .replace("[essentialSkills]", essentialSkills))
 
             if record[Job.JobDesiredSkills.name]:
                 desc.append(random.choice(desiredSkills).replace("[desirableSkills]",
@@ -470,22 +482,8 @@ def scanJobs(session, dbIDs, extraJobs=None):
                                  + ' ' + currency
                                  + ' ' + payPeriod)
 
-            helpers.logError("record[Job.JobEssentialSkills.name]: ")
-            helpers.logError(str(record[Job.JobEssentialSkills.name]))
-            essentialSkills = record[Job.JobEssentialSkills.name]
             if essentialSkills:
-                if type(essentialSkills) is str:  # string
-                    subTitles.append("Essential Skills: " + essentialSkills)
-
-                elif type(essentialSkills) is list:  # list
-                    if type(essentialSkills[0]) is str:  # list of strings
-                        subTitles.append("Essential Skills: " + ", ".join(essentialSkills))
-
-                    elif type(essentialSkills[0]) is dict:  # list of dicts
-                        subTitles = "Essential Skills: "
-                        for skill in essentialSkills:
-                            subTitles += skill["name"] + ", "
-                        subTitles = subTitles[:-2]
+                subTitles.append("Essential Skills: " + essentialSkills)
 
 
             data.append({

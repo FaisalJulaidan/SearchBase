@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Badge, Button, Card, Carousel, Tag } from 'antd';
+import React, {useState} from 'react';
+import {Badge, Button, Card, Carousel, Tag} from 'antd';
 // Constants
 import * as solutionAttributes from '../../../constants/SolutionAttributes';
 // Styles
@@ -75,7 +75,8 @@ const Solutions = ({ responded, submitSolution, skipResponse, solutions, skippab
                     :
                     <>
                         <div className={'Solutions_Text'}>*Multiple selection</div>
-                        <Carousel draggable centerMode={!(isIE11 || isEdge)} arrows infinite={false}>
+                        <Carousel variableWidth={false} draggable centerMode={!(isIE11 || isEdge)} arrows
+                                  infinite={false}>
                             {solutions.map((solution, i) => {
                                 return (
                                     <Solution {...props}
@@ -88,7 +89,6 @@ const Solutions = ({ responded, submitSolution, skipResponse, solutions, skippab
                     </>
 
             }
-            <br/>
             {button}
         </div>
     );

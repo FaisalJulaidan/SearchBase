@@ -22,12 +22,12 @@
     margin: 3px;
 }
 
-.Danger:hover {
+.Button.Danger:hover {
     color: #fff !important;
     background-color: #ff4d4f !important;
     border-color: #ff4d4f !important;
 }
 
-.Danger {
-    color: red ;
+.Button.Danger {
+    color: red;
 }

@@ -383,7 +383,8 @@ def searchCandidates(auth, companyID, conversation, fields=None) -> Callback:
             raise Exception(sendQuery_callback.Message)
 
         return_body = json.loads(sendQuery_callback.Data.text)
-
+        helpers.logError("CANDIDATES RESULTS:---------------------------------------")
+        helpers.logError(return_body)
         result = []
         for record in return_body["data"]:
             result.append(databases_services.createPandaCandidate(id=record.get("id", ""),

@@ -108,5 +108,6 @@ def convertSkillsToString(skills):
                 for skill in skills:
                     temp += skill["name"] + ", "
                     skills = temp[:-2]
-
+    helpers.logError("SKILLS: -----------------------------")
+    helpers.logError(skills)
     return skills

@@ -384,8 +384,6 @@ def searchCandidates(auth, companyID, conversation, fields=None) -> Callback:
             raise Exception(sendQuery_callback.Message)
 
         return_body = json.loads(sendQuery_callback.Data.text)
-        helpers.logError("CANDIDATES RESULTS:---------------------------------------")
-        helpers.logError(str(return_body))
         result = []
         # TODO educations uses ids - need to retrieve them
         for record in return_body["data"]:

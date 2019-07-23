@@ -135,7 +135,6 @@ const Chatbot = ({
             stopTimer.current = optionalDelayExecution(() => {
                 setChatbotStatus({ thinking: false, waitingForUser: true });
                 addBotMessage(block.Content.text, block.Type, block);
-                console.log(block)
                 if (block.selfContinue) {
                     setChatbotStatus({
                         curBlockID: block.selfContinue,
@@ -180,7 +179,6 @@ const Chatbot = ({
 
             setChatbotWaiting(nextBlock);
             let fetchedData = {};
-            console.log(nextBlock)
             if (nextBlock.extra.needsToFetch) {
                 fetchedData = await fetch(nextBlock);
             }

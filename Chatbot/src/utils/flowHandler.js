@@ -43,9 +43,7 @@ const checkSelfContinue = (type, blockToGoID) => {
 const loadNextBlock = (chatbot) => {
     try {
         const { curBlockID, finished } = chatbot.status;
-        console.log(curBlockID)
         let potential = finished ? null : chatbot.blocks.find(block => block.ID === curBlockID);
-        console.log(potential)
         let block = potential ? potential : null;
         if(!block) return endBlock();
         let extra = block.extra ? { ...block.extra, ...checkFetchData(block[flowAttributes.TYPE]) } : checkFetchData(block[flowAttributes.TYPE]);

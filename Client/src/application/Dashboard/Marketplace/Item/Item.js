@@ -44,7 +44,7 @@ class Item extends React.Component {
         let type = location.pathname.split('/').slice(-1)[0]; // ex. Bullhorn, Adapt...
         let params = queryString.parse(location.search);
 
-        if( (type === "Bullhorn" || type === "Vincere" || type === "Outlook") && params['code']){
+        if( (type === "Bullhorn" || type === "Vincere" || type === "Outlook" || type === "Mercury") && params['code']){
             dispatch(marketplaceActions.connectMarketplace(type, {...params})); // connect
             this.props.history.replace("/dashboard/marketplace/" + type) // clean the url from args
 
@@ -226,7 +226,7 @@ class Item extends React.Component {
                 if (place === 'features')
                     return <MercuryFeatures/>;
                 if (place === 'button') {
-                    windowObject.url = "https://login.microsoftonline.com/common/oauth2/v2.0/authorize?response_type=code&client_id=b49f9e03-5586-4248-8585-8640c4b2539c&response_mode=query&scope=https://admin.services.crm.dynamics.com/user_impersonation+User.Read+offline_access&redirect_uri="+ getLink("/dashboard/marketplace/Mercury");
+                    windowObject.url = "https://login.microsoftonline.com/common/oauth2/v2.0/authorize?response_type=code&client_id=b49f9e03-5586-4248-8585-8640c4b2539c&response_mode=query&scope=https://admin.services.crm.dynamics.com/user_impersonation+offline_access&redirect_uri="+ getLink("/dashboard/marketplace/Mercury");
                     return <DefaultButton buttonText={'Connect to Mercury'}
                                           windowObject={windowObject}
                                           {...buttonsOptions}/>;

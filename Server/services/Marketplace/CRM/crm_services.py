@@ -164,6 +164,8 @@ def testConnection(type, auth, companyID) -> Callback:
         # test connection
         if crm_type == CRM.Bullhorn:
             return Bullhorn.testConnection(auth, companyID)  # oauth2
+        elif crm_type == CRM.Mercury:
+            return Mercury.testConnection(auth, companyID)  # oauth2
         elif crm_type == CRM.Adapt:
             return Adapt.testConnection(auth)
         elif crm_type == CRM.Greenhouse:

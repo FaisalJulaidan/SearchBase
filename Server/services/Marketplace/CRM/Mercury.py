@@ -56,7 +56,7 @@ def login(auth):
             raise Exception(get_access_token.text)
 
         result_body = json.loads(get_access_token.text)
-
+        print(result_body)
         return Callback(True, "Success",
                         {
                             "access_token": result_body.get("access_token"),

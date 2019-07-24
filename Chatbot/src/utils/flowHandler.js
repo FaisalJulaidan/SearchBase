@@ -9,11 +9,6 @@ const errorBlock = () => {
     return createBlock({ text }, messageTypes.TEXT, delayMessageLength(text));
 };
 
-const notFoundBlock = (toGoID) => {
-    // SEND SENTRY ERROR
-    const text = 'Sorry, I could not find what you want!';
-    return createBlock({ text }, messageTypes.TEXT, delayMessageLength(text), null, null, toGoID);
-};
 
 const endBlock = (finished=true) => {
     const text = 'This conversation has ended, if you would like to have a new one please click the reset button!';
@@ -99,6 +94,7 @@ const getCurBlock = (action, assistant, chatbot) => {
      * Previously, if the action === null we end the chatbot
      * how we can do it now?
      * */
+    console.log(action)
     switch (action) {
         case 'Init':
             return createBlock({ text: Message }, messageTypes.TEXT, delayMessageLength(Message), null, null, loadFirstBlock(blocks).ID);
@@ -109,8 +105,6 @@ const getCurBlock = (action, assistant, chatbot) => {
             return endBlock(false);
         case 'End Chat':
             return endBlock();
-        case 'Not Found':
-            return notFoundBlock(curBlockID);
         default:
             return null;
     }

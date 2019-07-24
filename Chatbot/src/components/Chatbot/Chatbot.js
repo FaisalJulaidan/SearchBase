@@ -33,7 +33,7 @@ import Flow from './Flow';
 import Input from './Input';
 import Signature from './Signature';
 
-const Chatbot = ({
+export const Chatbot = ({
                      isDirectLink, btnColor, assistantID,
                      addBotMessage, setChatbotStatus, chatbot, initChatbot,
                      resetChatbot, resetMessage, setChatbotAnimation, messageList
@@ -118,7 +118,6 @@ const Chatbot = ({
     useEffect(() => {
         // if(disabled) return;
         const setChatbotWaiting = (block) => {
-
             if(!block.Content   ) return
             setChatbotStatus({
                 curAction: null,
@@ -135,7 +134,6 @@ const Chatbot = ({
             stopTimer.current = optionalDelayExecution(() => {
                 setChatbotStatus({ thinking: false, waitingForUser: true });
                 addBotMessage(block.Content.text, block.Type, block);
-                console.log(block)
                 if (block.selfContinue) {
                     setChatbotStatus({
                         curBlockID: block.selfContinue,
@@ -158,9 +156,11 @@ const Chatbot = ({
             fetchedData[key] = data;
 
             if (cancelled) return {};
+            console.log(block)
             if (!data.length) {
                 setChatbotStatus({
-                    curAction: 'Not Found',
+                    curAction: 'End Chat',
+                    afterMessage: 'Sorry, I could not find what you want!',
                     curBlockID: block[flowAttributes.CONTENT][flowAttributes.BLOCKTOGOID]
                 });
                 return {};

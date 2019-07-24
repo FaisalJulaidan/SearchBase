@@ -24,7 +24,6 @@ const Text = ({ message, submitMessage }) => {
     const validateInput = () => {
         const validation = message.block[flowAttributes.DATA_TYPE][flowAttributes.DATA_TYPE_VALIDATION];
         let validator = validate({ input: text }, validation);
-        console.log(validator)
         if (validator.error) {
             setValid(false);
             setError(validator.error);

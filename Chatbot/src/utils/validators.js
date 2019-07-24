@@ -26,8 +26,6 @@ const isValidNumber = number => {
 
 const isValidFile = (file, types) => {
     const type = file.name.split('.').splice(-1)[0];
-    console.log(types)
-    console.log(type)
     return types.includes(type);
     //JPEG - JPG FIX?
 };

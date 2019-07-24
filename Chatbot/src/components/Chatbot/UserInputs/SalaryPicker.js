@@ -104,6 +104,7 @@ const SalaryPicker = ({ message, submitMessage }) => {
             <div>
                 <h2 className={'SettingsOption'}>Currency</h2>
                 <Dropdown overlay={currencyMenu}
+                          placement="topCenter"
                           getPopupContainer={() => {
                                             if (document.getElementById('TheSearchBase_Chatbot_Input'))
                                                 return document.getElementById('TheSearchBase_Chatbot_Input');
@@ -111,7 +112,7 @@ const SalaryPicker = ({ message, submitMessage }) => {
                                                 return document.getElementById('TheSearchBase_Chatbot')
                                         }}>
 
-                    <a className="ant-dropdown-link" href="#a">
+                    <a className="ant-dropdown-link">
                         {currency} <Icon type="down"/>
                     </  a>
                 </Dropdown>
@@ -122,8 +123,9 @@ const SalaryPicker = ({ message, submitMessage }) => {
                                             else
                                                 return document.getElementById('TheSearchBase_Chatbot')
                                         }}
+                          placement="topCenter"
                           overlay={payRateMenu}>
-                    <a className="ant-dropdown-link" href="#a">
+                    <a className="ant-dropdown-link">
                         {payRate} <Icon type="down"/>
                     </a>
                 </Dropdown>

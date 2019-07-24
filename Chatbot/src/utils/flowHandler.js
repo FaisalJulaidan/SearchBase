@@ -15,11 +15,11 @@ const notFoundBlock = (toGoID) => {
     return createBlock({ text }, messageTypes.TEXT, delayMessageLength(text), null, null, toGoID);
 };
 
-const endBlock = () => {
+const endBlock = (finished=true) => {
     const text = 'This conversation has ended, if you would like to have a new one please click the reset button!';
     // Content, Type, delay, ID = null, DataType = null, selfContinue = null, extra = {})
-    return createBlock(null, messageTypes.TEXT, delayMessageLength(text), null, null, null, { end: true });
-    return null
+    return createBlock(null, messageTypes.TEXT, 0, null, null, null, { end: true, finished });
+
 };
 
 const checkFetchData = (type) => {
@@ -45,7 +45,7 @@ const loadNextBlock = (chatbot) => {
         const { curBlockID, finished } = chatbot.status;
         let potential = finished ? null : chatbot.blocks.find(block => block.ID === curBlockID);
         let block = potential ? potential : null;
-        if(!block) return;
+        if(!block) return endBlock();
         let extra = block.extra ? { ...block.extra, ...checkFetchData(block[flowAttributes.TYPE]) } : checkFetchData(block[flowAttributes.TYPE]);
         let selfContinue = checkSelfContinue(block[flowAttributes.TYPE], block[flowAttributes.CONTENT][flowAttributes.BLOCKTOGOID]);
         return { ...block, delay: delayMessageLength(block[flowAttributes.CONTENT][flowAttributes.TEXT]), selfContinue,  extra };
@@ -56,8 +56,7 @@ const loadNextBlock = (chatbot) => {
 };
 
 const loadAfterMessage = (chatbot) => {
-    const { curBlock, curBlockID, afterMessage } = chatbot.status
-    console.log(chatbot.status)
+    const { curBlockID, afterMessage, curAction } = chatbot.status
 
     return createBlock(
         { text: afterMessage},
@@ -65,7 +64,7 @@ const loadAfterMessage = (chatbot) => {
         delayMessageLength(afterMessage),
         null,
         null,
-        curBlockID
+        curAction === "End Chat" ? "End Chat" : curBlockID
         )
 }
 
@@ -93,11 +92,6 @@ const getCurBlock = (action, assistant, chatbot) => {
     const { curBlockID, afterMessage } = status;
     const { Message } = assistant;
     if(afterMessage){return  loadAfterMessage(chatbot)}
-    /**
-     * Batu please validate this:
-     * Previously, if the action === null we end the chatbot
-     * how we can do it now?
-     * */
 
     switch (action) {
         case 'Init':
@@ -105,6 +99,8 @@ const getCurBlock = (action, assistant, chatbot) => {
         case 'Go To Next Block':
         case 'Go To Specific Block':
             return loadNextBlock(chatbot);
+        case 'Early End Chat':
+            return endBlock(false);
         case 'End Chat':
             return endBlock();
         case 'Not Found':

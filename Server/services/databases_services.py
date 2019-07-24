@@ -5,6 +5,8 @@ from datetime import datetime
 from typing import List
 
 import pandas
+
+from services.Marketplace.marketplace_helpers import convertSkillsToString
 from utilities.enums import DatabaseType, DataType as DT, Period
 from models import db, Callback, Database, Candidate, Assistant, Job
 from services import assistant_services
@@ -374,7 +376,6 @@ def scanJobs(session, dbIDs, extraJobs=None):
             .fillna({Job.JobSalary.name: 0, Job.JobYearsRequired.name: 0})\
             .fillna('')
 
-
         df = df.drop('DatabaseID', axis=1)  # Drop column
 
         keywords = session['keywordsByDataType']
@@ -414,10 +415,10 @@ def scanJobs(session, dbIDs, extraJobs=None):
         __wordsCounter(DT.CandidateLocation, Job.JobLocation, keywords, df, 3)
 
         # Skills
-        __wordsCounter(DT.JobEssentialSkills, Job.JobEssentialSkills, keywords, df, 3)
-        __wordsCounter(DT.JobDesiredSkills, Job.JobDesiredSkills, keywords, df, 3)
-        __wordsCounter(DT.CandidateSkills, Job.JobEssentialSkills, keywords, df, 3)
-        __wordsCounter(DT.CandidateSkills, Job.JobDesiredSkills, keywords, df, 3)
+        # __wordsCounter(DT.JobEssentialSkills, Job.JobEssentialSkills, keywords, df, 3)
+        # __wordsCounter(DT.JobDesiredSkills, Job.JobDesiredSkills, keywords, df, 3)
+        # __wordsCounter(DT.CandidateSkills, Job.JobEssentialSkills, keywords, df, 3)
+        # __wordsCounter(DT.CandidateSkills, Job.JobDesiredSkills, keywords, df, 3)
 
 
         # Results
@@ -445,10 +446,12 @@ def scanJobs(session, dbIDs, extraJobs=None):
                 else:
                     desc[0] += ". "
 
-            if record[Job.JobYearsRequired.name] and record[Job.JobEssentialSkills.name]:
+            essentialSkills = convertSkillsToString(record[Job.JobEssentialSkills.name])
+
+            if record[Job.JobYearsRequired.name] and essentialSkills:
                 desc.append(random.choice(requiredYearsSkills)
                             .replace("[yearsRequired]", str(int(record[Job.JobYearsRequired.name])))
-                            .replace("[essentialSkills]", record[Job.JobEssentialSkills.name]))
+                            .replace("[essentialSkills]", essentialSkills))
 
             if record[Job.JobDesiredSkills.name]:
                 desc.append(random.choice(desiredSkills).replace("[desirableSkills]",
@@ -461,18 +464,15 @@ def scanJobs(session, dbIDs, extraJobs=None):
 
             if record[Job.JobSalary.name]:
                 currency = record[Job.Currency.name] or '' # it could be a Currency object e.g. {code: 'USD'...}
-                payPeriod = record[Job.PayPeriod.name] or '' # it could be a Period object e.g. {name: 'Annual'...}
 
                 if isinstance(currency, dict): currency = currency['code']
-                if isinstance(payPeriod, dict): payPeriod = payPeriod['name']
 
                 subTitles.append("Salary: "
                                  + str(int(record[Job.JobSalary.name]))
-                                 + ' ' + currency
-                                 + ' ' + payPeriod)
+                                 + ' ' + currency)
 
-            if record[Job.JobEssentialSkills.name]:
-                subTitles.append("Essential Skills: " + record[Job.JobEssentialSkills.name])
+            if essentialSkills:
+                subTitles.append("Essential Skills: " + essentialSkills)
 
 
             data.append({
@@ -492,12 +492,13 @@ def scanJobs(session, dbIDs, extraJobs=None):
         return Callback(False, 'Error while search the database for matches!')
 
 
-
+# ----------------------------------------------------------------
 def __wordsCounter(dataType: DT, dbColumn, keywords, df, x=1):
     keywords = keywords.get(dataType.value['name'])
     if keywords:
-        df['Score'] += x * df[dbColumn.name].str.count('|'.join([re.escape(k) for k in keywords ]),
+        df['Score'] += x * df[dbColumn.name].str.count('|'.join([re.escape(k) for k in keywords]),
                                                        flags=re.IGNORECASE) | 0
+
 
 def __numCounter(dbColumn, compareSign, dataType: DT, keywords, df, plus=1, addInputToScore=False):
     if keywords.get(dataType.value['name']):

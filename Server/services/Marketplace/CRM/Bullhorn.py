@@ -10,6 +10,7 @@ from models import Callback, Conversation, db, CRM as CRM_Model, StoredFile
 from services import databases_services, stored_file_services
 from services.Marketplace import marketplace_helpers
 from services.Marketplace.CRM import crm_services
+from services.Marketplace.marketplace_helpers import convertSkillsToString
 
 from utilities import helpers
 from utilities.enums import DataType as DT, Period, CRM
@@ -208,8 +209,7 @@ def insertCandidate(auth, conversation: Conversation) -> Callback:
                 conversation.Data.get('keywordsByDataType').get(DT.CandidateSkills.value['name'], [" "])),
             "educations": {
                 "data": conversation.Data.get('keywordsByDataType').get(DT.CandidateEducation.value['name'], [])
-            },
-            "salary": str(crm_services.getSalary(conversation, DT.CandidateDesiredSalary, Period.Annually))
+            }
         }
 
         # Add additional emails to email2 and email3
@@ -371,10 +371,6 @@ def searchCandidates(auth, companyID, conversation, fields=None) -> Callback:
         # if keywords[DT.CandidateSkills.value["name"]]:
         #     query += "primarySkills.data:" + keywords[DT.CandidateSkills.name] + " or"
 
-        salary =  crm_services.getSalary(conversation, DT.CandidateDesiredSalary, Period.Annually)
-        if salary:
-            query += " salary:" + str(salary) + " or"
-
         query = query[:-3]
 
         # check if no conditions submitted
@@ -388,21 +384,20 @@ def searchCandidates(auth, companyID, conversation, fields=None) -> Callback:
             raise Exception(sendQuery_callback.Message)
 
         return_body = json.loads(sendQuery_callback.Data.text)
-
         result = []
+        # TODO educations uses ids - need to retrieve them
         for record in return_body["data"]:
             result.append(databases_services.createPandaCandidate(id=record.get("id", ""),
                                                                   name=record.get("name"),
                                                                   email=record.get("email"),
                                                                   mobile=record.get("mobile"),
                                                                   location=record.get("address", {}).get("city") or "",
-                                                                  skills="".join(
+                                                                  skills=convertSkillsToString(
                                                                       record.get("primarySkills", {}).get("data")),
                                                                   linkdinURL=None,
                                                                   availability=record.get("status"),
                                                                   jobTitle=None,
-                                                                  education="".join(
-                                                                      record.get("educations", {}).get("data")),
+                                                                  education=None,
                                                                   yearsExperience=0,
                                                                   desiredSalary=record.get("salary") or
                                                                                 record.get("dayRate", 0) * 261,
@@ -430,10 +425,6 @@ def searchJobs(auth, companyID, conversation, fields=None) -> Callback:
         query += checkFilter(keywords, DT.JobLocation, "address.city")
 
         query += checkFilter(keywords, DT.JobType, "employmentType")
-
-        salary = crm_services.getSalary(conversation, DT.JobSalary, Period.Annually)
-        if salary > 0:
-            query += "salary:" + str(salary) + " or"
 
         query += checkFilter(keywords, DT.JobDesiredSkills, "skills")
 

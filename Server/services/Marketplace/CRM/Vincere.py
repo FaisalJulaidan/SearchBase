@@ -183,8 +183,7 @@ def insertCandidate(auth, conversation: Conversation) -> Callback:
             "skills": "".join(
                 conversation.Data.get('keywordsByDataType').get(DT.CandidateSkills.value['name'], [" "])),
             "education_summary": "".join(
-                conversation.Data.get('keywordsByDataType').get(DT.CandidateEducation.value['name'], [])),
-            "desired_salary": crm_services.getSalary(conversation, DT.CandidateDesiredSalary, Period.Annually) or None
+                conversation.Data.get('keywordsByDataType').get(DT.CandidateEducation.value['name'], []))
         }
 
         # send query
@@ -333,10 +332,6 @@ def searchCandidates(auth, companyID, conversation) -> Callback:
         # if keywords[DT.CandidateSkills.value["name"]]:
         #     query += "primarySkills.data:" + keywords[DT.CandidateSkills.name] + "&"
 
-        salary =  crm_services.getSalary(conversation, DT.CandidateDesiredSalary, Period.Annually)
-        if salary:
-            query += " desired_salary:" + str(salary) + " or"
-
         query = query[:-3]
 
         # check if no conditions submitted
@@ -389,10 +384,6 @@ def searchJobs(auth, companyID, conversation) -> Callback:
         query += checkFilter(keywords, DT.JobLocation, "address.city")
 
         query += checkFilter(keywords, DT.JobType, "employmentType")
-
-        salary = crm_services.getSalary(conversation, DT.JobSalary, Period.Annually)
-        if salary > 0:
-            query += "desired_salary:" + str(salary) + " or"
 
         query += checkFilter(keywords, DT.JobDesiredSkills, "skills")
 

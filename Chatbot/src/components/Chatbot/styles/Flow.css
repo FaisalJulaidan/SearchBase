@@ -4,7 +4,7 @@
     width: 100%;
     display: flex;
     flex-flow: column;
-    padding: 10px 20px 15px;
+    padding: 10px 15px 15px;
     overflow-x: hidden;
     transition: height 0.5s;
     overflow-y: auto;
@@ -32,8 +32,6 @@
     position: relative;
     flex-wrap: nowrap;
     width: 100%;
-    display: flex;
-    height: auto;
 }
 
 .BOT_IE11 {

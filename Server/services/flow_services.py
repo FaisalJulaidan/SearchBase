@@ -1,3 +1,5 @@
+import os
+
 from flask import request
 from jsonschema import validate
 
@@ -5,11 +7,11 @@ from models import db, Callback, Assistant, Company
 from services import options_services
 from utilities import json_schemas, helpers, enums
 
+
 # ----- Getters ----- #
 # Get the chatbot for the public to use
 def getChatbot(assistantHashID) -> Callback:
     try:
-
         assistantID = helpers.decodeID(assistantHashID)
         if not assistantID:
             return Callback(False, "Assistant not found!", None)
@@ -21,17 +23,22 @@ def getChatbot(assistantHashID) -> Callback:
             .filter(Assistant.ID == assistantID[0]).first()
 
         if not assistant:
-            return Callback(True, '', {'assistant': None, 'isDisabled': True})
+            return Callback(False, '')
 
         # Check for restricted countries
         try:
-            ip = request.remote_addr
+            if os.environ['FLASK_ENV'] == 'development':
+                ip = request.remote_addr
+            else:
+                ip = request.headers['X-Real-IP']
+
             if ip != '127.0.0.1' and assistant.Config:
                 restrictedCountries = assistant.Config.get('restrictedCountries', [])
                 if len(restrictedCountries):
                     if helpers.geoIP.country(ip).country.iso_code in restrictedCountries:
-                        return Callback(True, '', {'isDisabled': True})
-        except Exception as e:
+                        return Callback(True, '', {'assistant': assistant, 'isDisabled': True})
+        except Exception as exc:
+            helpers.logError("flow_service.getChatbot() geoIP restrict countries: " + str(exc))
             pass
 
         data = {

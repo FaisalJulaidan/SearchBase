@@ -12,7 +12,6 @@ import {
 } from '../../store/actions';
 // Styles
 import './styles/Chatbot.css';
-import 'antd/dist/antd.css';
 // Utils
 import {
     dataHandler,
@@ -32,6 +31,7 @@ import Header from './Header';
 import Flow from './Flow';
 import Input from './Input';
 import Signature from './Signature';
+import 'antd/dist/antd.css';
 
 export const Chatbot = ({
                      isDirectLink, btnColor, assistantID,
@@ -180,7 +180,6 @@ export const Chatbot = ({
 
             setChatbotWaiting(nextBlock);
             let fetchedData = {};
-            console.log(nextBlock)
             if (nextBlock.extra.needsToFetch) {
                 fetchedData = await fetch(nextBlock);
             }

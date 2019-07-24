@@ -38,9 +38,7 @@ const checkSelfContinue = (type, blockToGoID) => {
 const loadNextBlock = (chatbot) => {
     try {
         const { curBlockID, finished } = chatbot.status;
-        console.log(curBlockID)
         let potential = finished ? null : chatbot.blocks.find(block => block.ID === curBlockID);
-        console.log(potential)
         let block = potential ? potential : null;
         if(!block) return endBlock();
         let extra = block.extra ? { ...block.extra, ...checkFetchData(block[flowAttributes.TYPE]) } : checkFetchData(block[flowAttributes.TYPE]);
@@ -89,12 +87,6 @@ const getCurBlock = (action, assistant, chatbot) => {
     const { curBlockID, afterMessage } = status;
     const { Message } = assistant;
     if(afterMessage){return  loadAfterMessage(chatbot)}
-    /**
-     * Batu please validate this:
-     * Previously, if the action === null we end the chatbot
-     * how we can do it now?
-     * */
-    console.log(action)
     switch (action) {
         case 'Init':
             return createBlock({ text: Message }, messageTypes.TEXT, delayMessageLength(Message), null, null, loadFirstBlock(blocks).ID);

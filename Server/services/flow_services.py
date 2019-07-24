@@ -1,9 +1,12 @@
+import os
+
 from flask import request
 from jsonschema import validate
 
 from models import db, Callback, Assistant, Company
 from services import options_services
 from utilities import json_schemas, helpers, enums
+
 
 # ----- Getters ----- #
 # Get the chatbot for the public to use
@@ -24,7 +27,11 @@ def getChatbot(assistantHashID) -> Callback:
 
         # Check for restricted countries
         try:
-            ip = request.headers['X-Real-IP']
+            if os.environ['FLASK_ENV'] == 'development':
+                ip = request.remote_addr
+            else:
+                ip = request.headers['X-Real-IP']
+
             if ip != '127.0.0.1' and assistant.Config:
                 restrictedCountries = assistant.Config.get('restrictedCountries', [])
                 if len(restrictedCountries):

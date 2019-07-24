@@ -24,10 +24,8 @@ const Input = ({ setChatbotStatus, isDirectLink, addUserMessage, lastMessage, ad
 
     const _checkAfterMessage = (afterMessage, newState, type) => {
         if (afterMessage) {
-            console.log(newState)
             setChatbotStatus({...newState, afterMessage})
         } else {
-            console.log(newState)
             setChatbotStatus(newState);
         }
     };

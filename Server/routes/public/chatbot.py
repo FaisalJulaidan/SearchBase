@@ -2,7 +2,6 @@ import uuid
 
 from flask import Blueprint, request, send_from_directory
 from flask_cors import CORS
-from flask_cors import CORS
 from werkzeug.utils import secure_filename
 
 from models import Callback, db, Conversation, Assistant
@@ -17,17 +16,17 @@ CORS(chatbot_router)
 
 @chatbot_router.after_request
 def add_header(r):
-    """
-    Add headers to both force latest IE rendering engine or Chrome Frame,
-    and also to cache the rendered page for 10 minutes.
-    """
+#     """
+#     Add headers to both force latest IE rendering engine or Chrome Frame,
+#     and also to cache the rendered page for 10 minutes.
+#     """
     r.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
-    r.headers["Pragma"] = "no-cache"
-    r.headers["Expires"] = "0"
+#     r.headers["Pragma"] = "no-cache"
+#     r.headers["Expires"] = "0"
     r.headers['Cache-Control'] = 'public, max-age=0'
-    r.headers['Access-Control-Allow-Origin'] = '*'
-    r.headers['Access-Control-Allow-Headers'] = '*'
-    r.headers['Access-Control-Allow-Methods'] = '*'
+#     r.headers['Access-Control-Allow-Origin'] = '*'
+#     r.headers['Access-Control-Allow-Headers'] = '*'
+#     r.headers['Access-Control-Allow-Methods'] = '*'
     return r
 
 
@@ -92,9 +91,9 @@ def getSolutions_forChatbot(assistantHashID):
         if data['showTop'] > 0:
             callback: Callback = databases_services.scan(data, assistantHashID)
             if not callback.Success:
-                return helpers.jsonResponse(False, 400, callback.Message)
-            return helpers.jsonResponse(True, 200, "Solutions list is here!", callback.Data)
-        return helpers.jsonResponse(True, 200, "show top is 0", [])
+                return helpers.jsonResponseFlask(False, 400, callback.Message)
+            return helpers.jsonResponseFlask(True, 200, "Solutions list is here!", callback.Data)
+        return helpers.jsonResponseFlask(True, 200, "show top is 0", [])
 
 
 @chatbot_router.route("/assistant/<string:assistantIDAsHash>/chatbot/<int:sessionID>/file", methods=['POST'])

@@ -13,7 +13,7 @@ from typing import List
 import geoip2.webservice
 import stripe
 from cryptography.fernet import Fernet
-from flask import json, after_this_request, request
+from flask import json, after_this_request, request, Response
 from flask_jwt_extended import get_jwt_identity
 from forex_python.converter import CurrencyRates
 from hashids import Hashids
@@ -122,6 +122,13 @@ def jsonResponse(success: bool, http_code: int, msg: str, data=None):
     return json.dumps({'success': success, 'code': http_code, 'msg': msg, 'data': data}), \
            http_code, {'ContentType': 'application/json'}
 
+
+def jsonResponseFlask(success: bool, http_code: int, msg: str, data=None):
+    return Response(
+        response=json.dumps({'success': success, 'code': http_code, 'msg': msg, 'data': data}),
+        status=http_code,
+        mimetype='application/json'
+    )
 
 def gzipped(f):
     @functools.wraps(f)

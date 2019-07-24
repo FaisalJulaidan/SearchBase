@@ -24,7 +24,6 @@ const Text = ({ message, submitMessage }) => {
     const validateInput = () => {
         const validation = message.block[flowAttributes.DATA_TYPE][flowAttributes.DATA_TYPE_VALIDATION];
         let validator = validate({ input: text }, validation);
-        console.log(validator)
         if (validator.error) {
             setValid(false);
             setError(validator.error);
@@ -48,9 +47,6 @@ const Text = ({ message, submitMessage }) => {
                   curBlockID: message.block[flowAttributes.CONTENT][flowAttributes.USER_INPUT_BLOCKTOGOID],
                   waitingForUser: false
               };
-              console.log('------------------------------')
-
-              console.log(newState)
               submitMessage(text, type, newState, afterMessage, block, { input: text, skipped: false });
           }
         } catch (e) {

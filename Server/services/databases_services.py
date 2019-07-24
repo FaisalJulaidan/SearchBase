@@ -5,6 +5,8 @@ from datetime import datetime
 from typing import List
 
 import pandas
+
+from services.Marketplace.marketplace_helpers import convertSkillsToString
 from utilities.enums import DatabaseType, DataType as DT, Period
 from models import db, Callback, Database, Candidate, Assistant, Job
 from services import assistant_services
@@ -444,17 +446,7 @@ def scanJobs(session, dbIDs, extraJobs=None):
                 else:
                     desc[0] += ". "
 
-            essentialSkills = record[Job.JobEssentialSkills.name]
-            if essentialSkills:
-                if type(essentialSkills) is list:  # list
-                    if type(essentialSkills[0]) is str:  # list of strings
-                        essentialSkills = ", ".join(essentialSkills)
-
-                    elif type(essentialSkills[0]) is dict:  # list of dicts
-                        temp = ""
-                        for skill in essentialSkills:
-                            temp += skill["name"] + ", "
-                        essentialSkills = temp[:-2]
+            essentialSkills = convertSkillsToString(record[Job.JobEssentialSkills.name])
 
             if record[Job.JobYearsRequired.name] and essentialSkills:
                 desc.append(random.choice(requiredYearsSkills)

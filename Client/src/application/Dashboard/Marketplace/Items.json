@@ -19,7 +19,7 @@
     {
       "title": "PRS Recruitment",
       "desc": "PRS Jobs provides customer relationship management, applicant tracking system and operations software for the staffing industry.",
-      "image": "/static/images/CRM/prsjobs.svg",
+      "image": "/static/images/CRM/jobscience.svg",
       "type": "PRSJobs",
       "disabled": false,
       "status": "NOT_CONNECTED"

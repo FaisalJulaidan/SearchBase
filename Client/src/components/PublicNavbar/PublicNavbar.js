@@ -5,8 +5,8 @@ import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
 import {faCloud} from '@fortawesome/free-solid-svg-icons'
 import styles from './PublicNavbar.module.less'
 
-const PublicNavbar = ({companyLogo, CompanyName}) =>
-    <div>
+const PublicNavbar = ({companyLogo, CompanyName, HideOnMobile}) =>
+    <div className={HideOnMobile ? styles.HideOnMobile : ''}>
         <Row>
             <Col span={8} xs={24} className={styles.Navbar}>
                 <div>

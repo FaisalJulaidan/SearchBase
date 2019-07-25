@@ -15,6 +15,9 @@ from utilities.enums import DataType as DT, Period
 
 CLIENT_ID = os.environ['MERCURY_CLIENT_ID']
 CLIENT_SECRET = os.environ['MERCURY_CLIENT_SECRET']
+DYNAMICS_VERSION = "v9.1"
+
+DOMAIN = "greenrecruitmentcompanysandbox.crm11"  # NEEDS TO BE TAKEN FROM THE LOGIN
 
 """
 requires domain name ex. greenrecruitmentcompanysandbox.crm11.dynamics.com
@@ -138,7 +141,7 @@ def sendQuery(auth, query, method, body, companyID, optionalParams=None):
 
 def buildUrl(query, optionalParams=None):
     # set up initial url
-    url = "https://graph.microsoft.com/v1.0/me/" + query
+    url = "https://" + DOMAIN + ".dynamics.com/api/data/" + DYNAMICS_VERSION + "/" + query
     # add additional params
     if optionalParams:
         for param in optionalParams:
@@ -323,7 +326,10 @@ def searchCandidates(auth, companyID, conversation, fields=None) -> Callback:
     try:
         query = "query="
         if not fields:
-            fields = "fields=id,name,email,mobile,address,primarySkills,status,educations,dayRate,salary"
+            fields = "$select=crimson_availability,crimson_currentjobtitle,crimson_email,crimson_expratec,crimson_" + \
+                     "expsalaryp,crimson_jobtitle,crimson_mobile,crimson_name,crimson_town," + \
+                     "crimson_workpref_permanent,crimson_workpref_temp,mercury_cvurl,_transactioncurrencyid_value"
+
         keywords = conversation['keywordsByDataType']
 
         # populate filter
@@ -332,9 +338,9 @@ def searchCandidates(auth, companyID, conversation, fields=None) -> Callback:
         # if keywords[DT.CandidateSkills.value["name"]]:
         #     query += "primarySkills.data:" + keywords[DT.CandidateSkills.name] + " or"
 
-        salary = crm_services.getSalary(conversation, DT.CandidateDesiredSalary, Period.Annually)
-        if salary:
-            query += " salary:" + str(salary) + " or"
+        # salary = crm_services.getSalary(conversation, DT.CandidateDesiredSalary, Period.Annually)
+        # if salary:
+        #     query += " salary:" + str(salary) + " or"
 
         query = query[:-3]
 
@@ -343,33 +349,39 @@ def searchCandidates(auth, companyID, conversation, fields=None) -> Callback:
             query = "query=*:*"
 
         # send query
-        sendQuery_callback: Callback = sendQuery(auth, "search/Candidate", "get", {}, companyID,
-                                                 [fields, query, "count=500"])
+        sendQuery_callback: Callback = sendQuery(auth, "crimson_candidates", "get", {}, companyID,
+                                                 [fields, query])
         if not sendQuery_callback.Success:
             raise Exception(sendQuery_callback.Message)
 
         return_body = json.loads(sendQuery_callback.Data.text)
 
         result = []
-        for record in return_body["data"]:
-            result.append(databases_services.createPandaCandidate(id=record.get("id", ""),
-                                                                  name=record.get("name"),
-                                                                  email=record.get("email"),
-                                                                  mobile=record.get("mobile"),
-                                                                  location=record.get("address", {}).get("city") or "",
-                                                                  skills="".join(
-                                                                      record.get("primarySkills", {}).get("data")),
+        for record in return_body["value"]:
+            if record.get("crimson_workpref_permanent"):
+                payPeriod = Period("Annually")
+            elif record.get("crimson_workpref_temp"):
+                payPeriod = Period("Daily")
+            else:
+                payPeriod = None
+            # mercury_cvurl    - CV
+            # _transactioncurrencyid_value   - currency id
+            result.append(databases_services.createPandaCandidate(id=record.get("crimson_candidateid", ""),
+                                                                  name=record.get("crimson_name"),
+                                                                  email=record.get("crimson_email"),
+                                                                  mobile=record.get("crimson_mobile"),
+                                                                  location=record.get("crimson_town"),
+                                                                  skills=None,
                                                                   linkdinURL=None,
-                                                                  availability=record.get("status"),
-                                                                  jobTitle=None,
-                                                                  education="".join(
-                                                                      record.get("educations", {}).get("data")),
+                                                                  availability=record.get("crimson_availability"),
+                                                                  jobTitle=record.get("crimson_jobtitle"),
+                                                                  education=None,
                                                                   yearsExperience=0,
-                                                                  desiredSalary=record.get("salary") or
-                                                                                record.get("dayRate", 0) * 261,
+                                                                  desiredSalary=record.get("crimson_expsalaryp") or
+                                                                                record.get("crimson_expratec", 0),
                                                                   currency=Currency("GBP"),
-                                                                  payPeriod=Period("Annually"),
-                                                                  source="Bullhorn"))
+                                                                  payPeriod=payPeriod,
+                                                                  source="Mercury"))
 
         return Callback(True, sendQuery_callback.Message, result)
 
@@ -420,9 +432,9 @@ def searchJobs(auth, companyID, conversation, fields=None) -> Callback:
         result = []
         # not found match for JobLinkURL
         for record in return_body["data"]:
-            result.append(databases_services.createPandaJob(id=record.get("id"),
-                                                            title=record.get("title"),
-                                                            desc=record.get("publicDescription", ""),
+            result.append(databases_services.createPandaJob(id=record.get("id"),#
+                                                            title=record.get("title"),#
+                                                            desc=record.get("publicDescription", ""),#
                                                             location=record.get("address", {}).get("city"),
                                                             type=record.get("employmentType"),
                                                             salary=record.get("salary"),

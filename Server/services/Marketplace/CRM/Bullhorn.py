@@ -387,6 +387,10 @@ def searchCandidates(auth, companyID, conversation, fields=None) -> Callback:
         result = []
         # TODO educations uses ids - need to retrieve them
         for record in return_body["data"]:
+            if record.get("dayRate"):
+                payPeriod = Period("Daily")
+            else:
+                payPeriod = Period("Annually")
             result.append(databases_services.createPandaCandidate(id=record.get("id", ""),
                                                                   name=record.get("name"),
                                                                   email=record.get("email"),
@@ -396,13 +400,13 @@ def searchCandidates(auth, companyID, conversation, fields=None) -> Callback:
                                                                       record.get("primarySkills", {}).get("data")),
                                                                   linkdinURL=None,
                                                                   availability=record.get("status"),
-                                                                  jobTitle=None,
+                                                                  jobTitle=None,#
                                                                   education=None,
                                                                   yearsExperience=0,
                                                                   desiredSalary=record.get("salary") or
-                                                                                record.get("dayRate", 0) * 261,
+                                                                                record.get("dayRate", 0),
                                                                   currency=Currency("GBP"),
-                                                                  payPeriod=Period("Annually"),
+                                                                  payPeriod=payPeriod,
                                                                   source="Bullhorn"))
 
         return Callback(True, sendQuery_callback.Message, result)

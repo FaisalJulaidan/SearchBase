@@ -43,7 +43,7 @@
     {
       "title": "Mercury",
       "desc": "Calendar is the calendar and scheduling component of Outlook that is fully integrated with email, contacts, and other features.",
-      "image": "/static/images/CRM/mercury.png",
+      "image": "/static/images/CRM/mercury.svg",
       "type": "Mercury",
       "disabled": false,
       "status": "NOT_CONNECTED"
@@ -51,7 +51,7 @@
     {
       "title": "Twilio",
       "desc": "Twilio is a messaging service allowing SearchBase to send SMS-s to users on behalf of Recruiters.",
-      "image": "/static/images/CRM/twilio.png",
+      "image": "/static/images/CRM/twilio.svg",
       "type": "Twilio",
       "disabled": true,
       "status": "NOT_CONNECTED"

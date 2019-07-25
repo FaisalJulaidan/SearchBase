@@ -12,7 +12,7 @@ import {VincereFeatures, VincereHeader} from "./Components/Vincere";
 import {GreenhouseFeatures, GreenhouseFormItem, GreenhouseHeader} from "./Components/Greenhouse";
 import {GoogleFeatures, GoogleHeader} from './Components/Google'
 import {OutlookFeatures, OutlookHeader} from "./Components/Outlook";
-import {MercuryFeatures, MercuryHeader} from "./Components/Mercury";
+import {MercuryFeatures, MercuryFormItems, MercuryHeader} from "./Components/Mercury";
 import {CSVLink} from "react-csv";
 import data from '../Items.json'
 import {connect} from 'react-redux';
@@ -84,13 +84,14 @@ class Item extends React.Component {
      * @param {'header'|'features'|'form'|'button'|'runExport'} place
      * */
     getMarketplaceComponent = (type, place) => {
-        const {getFieldDecorator} = this.props.form;
+        const {getFieldDecorator,validateFields} = this.props.form;
         const layout = {
             labelCol: {span: 6},
             wrapperCol: {span: 14},
         };
         const formOptions = {
             getFieldDecorator,
+            validateFields,
             layout,
             marketplace: this.marketplaceItem,
             FormItem: FormItem,
@@ -225,10 +226,11 @@ class Item extends React.Component {
                     return <MercuryHeader/>;
                 if (place === 'features')
                     return <MercuryFeatures/>;
+                if (place === 'form')
+                    return <MercuryFormItems {...formOptions}/>;
                 if (place === 'button') {
-                    windowObject.url = "https://login.microsoftonline.com/common/oauth2/v2.0/authorize?response_type=code&client_id=b49f9e03-5586-4248-8585-8640c4b2539c&response_mode=query&scope=https://admin.services.crm.dynamics.com/user_impersonation+offline_access&redirect_uri="+ getLink("/dashboard/marketplace/Mercury");
                     return <DefaultButton buttonText={'Connect to Mercury'}
-                                          windowObject={windowObject}
+                                          // windowObject={windowObject}
                                           {...buttonsOptions}/>;
                 }
                 break;

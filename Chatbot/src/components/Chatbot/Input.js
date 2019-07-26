@@ -42,7 +42,7 @@ const Input = ({ setChatbotStatus, isDirectLink, addUserMessage, lastMessage, ad
             case messageTypes.USER_INPUT:
                 switch (message.block[flowAttributes.DATA_TYPE][flowAttributes.DATA_TYPE_VALIDATION]) {
                     case constants.SALARY:
-                        return (<SalaryPicker/>);
+                        return (<SalaryPicker period={message.block[flowAttributes.DATA_TYPE][flowAttributes.DATA_TYPE_ENUM]}/>);
                     case constants.DATEPICKER:
                         return (<DatePicker/>);
                     default:

@@ -15,9 +15,10 @@ const getDotNotation = (val, currency) => {
     return new Intl.NumberFormat('en-GB', { style: 'currency', currency, minimumFractionDigits: 0 }).format(val);
 };
 
-const SalaryPicker = ({ message, submitMessage }) => {
+const SalaryPicker = ({ message, submitMessage, period }) => {
 
-    let [payRate, setPayRate] = useState('Daily');
+
+    let [payRate, setPayRate] = useState(period === "CandidateAnnualDesiredSalary" ? "Annual" : "Daily");
     let [min, setMin] = useState(0);
     let [max, setMax] = useState(2000);
     let [salary, setSalary] = useState([0.3 * max, 0.7 * max]);

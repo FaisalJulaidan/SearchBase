@@ -14,6 +14,11 @@ from services.Marketplace.CRM import crm_services
 from utilities import helpers
 from utilities.enums import DataType as DT, Period, CRM
 
+# TODO: 26/07/2019
+# --> Match logout&login to Bullhorn
+# --> Add remaining inserts
+# --> Comment issues & unique features to prsjobs API
+
 CLIENT_ID = os.environ['PRSJOBS_CLIENT_ID']
 CLIENT_SECRET = os.environ['PRSJOBS_CLIENT_SECRET']
 
@@ -74,66 +79,115 @@ def login(auth):
         return Callback(False, str(exc))
 
 
-def logout(access_token, companyID):
+def logout(access_token, companyID): # Not called on disconnect
+    print("<-- ATTEMTING TO LOGOUT -->")
+    # try:
+    #     print("LOGOUT") # TODO
+    #     # Attempt logout
+    #     logout_url = "https://test.salesforce.com/services/oauth2/revoke?token=" + access_token
+    #     headers = {
+    #         'Content-Type': 'application/json',
+    #         'Authorization': "Bearer " + access_token,
+    #         'cache-control': "no-cache"
+    #     }
+    #
+    #     r = marketplace_helpers.sendRequest(logout_url, "get", headers, {})
+    #
+    # except Exception as exc:
+    #     helpers.logError("Marketplace.CRM.prsjobs.logout() ERROR: " + str(exc))
+    #     return Callback(False, str(exc))
 
-    try:
-        print("LOGOUT") # TODO
-        # Attempt logout
-        logout_url = "https://test.salesforce.com/services/oauth2/revoke?token=" + access_token
-        headers = {
-            'Content-Type': 'application/json',
-            'Authorization': "Bearer " + access_token,
-            'cache-control': "no-cache"
-        }
+# try:
+#     # send query
+#     sendQuery_callback: Callback = sendQuery(auth, "logout", "get", {}, companyID)
+#
+#     if not sendQuery_callback.Success:
+#         raise Exception(sendQuery_callback.Message)
+#
+#     return Callback(True, sendQuery_callback.Data.text)
+# except Exception as exc:
+#     helpers.logError("Marketplace.CRM.Bullhorn.logout() ERROR: " + str(exc))
+#     return Callback(False, str(exc))
 
-        r = marketplace_helpers.sendRequest(logout_url, "get", headers, {})
-
-    except Exception as exc:
-        helpers.logError("Marketplace.CRM.prsjobs.logout() ERROR: " + str(exc))
-        return Callback(False, str(exc))
-
+# TODO convert to look like Bullhorn
 
 
 def insertCandidate(access_token, conversation: Conversation) -> Callback:
-    # Attempt Dummy Insert:
-    print("<-- INSERT CANDIDATE -->")
+    print("Should be attempting candidate insert...")
+    try:
+        name = (conversation.Name or " ").split(" ")
+        body = {
+            "name": conversation.Name or " ",
+            "FirstName": helpers.getListValue(name, 0, " "),
+            "LastName": helpers.getListValue(name, 1, " "),
+            "phone": conversation.PhoneNumber or " ",
+            "MailingAddress": {
+                "city": "".join(conversation.Data.get('keywordsByDataType').get(DT.CandidateLocation.value['name'], [" "])),
+                "country": None,
+                "geocodeAccuracy": None,
+                "latitude": None,
+                "longitude": None,
+                "postalCode": None,
+                "state": None,
+                "street": None
+            },
+            "email": conversation.Email or " ",
+            # primarySkills": "".join(
+            # conversation.Data.get('keywordsByDataType').get(DT.CandidateSkills.value['name'], [" "])),
+            "ts2__Education__c": conversation.Data.get('keywordsByDataType').get(DT.CandidateEducation.value['name'], []),
+            "ts2__Desired_Salary__c": str(crm_services.getSalary(
+                conversation, DT.CandidateDesiredSalary, Period.Annually)),
+            "RecordTypeId": "0120O000000tJIAQA2"  # ID for a candidate person
+        }
+
+        # Attempt Dummy Insert:
+        print("<-- INSERT CANDIDATE -->")
+        sendQuery_callback: Callback = sendQuery(access_token, "post", body, "sobjects/Contact/")
+        if not sendQuery_callback.Success:
+            raise Exception(sendQuery_callback.Message)
+
+        return Callback(True, sendQuery_callback.Data.text)
+
+    except Exception as exc:
+        helpers.logError("Marketplace.CRM.Bullhorn.insertCandidate() ERROR: " + str(exc))
+        return Callback(False, str(exc))
 
     # Populate JSON fields:
     # 1 convert fields
     # 2 Add record type as candidate
-    headers = {
-        'Content-Type': 'application/json',
-        'Authorization': "Bearer " + access_token,
-        'accept-encoding': "gzip, deflate",
-        'content-length': "35",
-        'Connection': "keep-alive",
-        'cache-control': "no-cache"
-    }
-    payload = "{\n\t\"LastName\": \"ANOTHER_TEST\"\n\t\n}"
-    url = "https://prsjobs--jsfull.cs83.my.salesforce.com/services/data/v36.0/sobjects/Contact/"
-    response = requests.request("POST", url, data=payload, headers=headers)
-    print(response.status_code)
-    # TODO:
-    # (1) print in JSON format
-    # (2) Link to sendquery
-    # (3) Add fields
-    # Insert record
-    #sendQuery(access_token, "post", body, "sobjects/Contact/")
+    # headers = {
+    #     'Content-Type': 'application/json',
+    #     'Authorization': "Bearer " + access_token,
+    #     'accept-encoding': "gzip, deflate",
+    #     'content-length': "35",
+    #     'Connection': "keep-alive",
+    #     'cache-control': "no-cache"
+    # }
+    # payload = "{\n\t\"LastName\": \"ANOTHER_TEST\"\n\t\n}"
+    # url = "https://prsjobs--jsfull.cs83.my.salesforce.com/services/data/v36.0/sobjects/Contact/"
+    # response = requests.request("POST", url, data=payload, headers=headers)
+    # print(response.status_code)
+    # # TODO:
+    # # (1) print in JSON format
+    # # (2) Link to sendquery
+    # # (3) Add fields
+    # # Insert record
+    # #sendQuery(access_token, "post", body, "sobjects/Contact/")
 
 
-def uploadFile(auth, storedFile: StoredFile):
+def uploadFile(auth, storedFile: StoredFile): # NO CURRENT SOLUTION
     print("UPLOAD FILE")
 
 
-def insertClient(auth, conversation: Conversation) -> Callback:
+def insertClient(auth, conversation: Conversation) -> Callback: # TODO -> MAY NOT EXIST
     print("INSERT CLIENT")
 
 
-def insertClientContact(auth, conversation: Conversation, bhCompanyID) -> Callback:
+def insertClientContact(auth, conversation: Conversation, bhCompanyID) -> Callback: # TODO
     print("INSERT CONTACT FOR CLIENT")
 
 
-def insertCompany(auth, conversation: Conversation) -> Callback:
+def insertCompany(auth, conversation: Conversation) -> Callback: #TODO
     print("INSERT COMPANY")
 
 
@@ -240,7 +294,7 @@ def searchJobs(access_token, companyID, conversation, fields=None) -> Callback:
         return Callback(False, str(exc))
 
 
-def searchJobsCustomQuery(auth, companyID, query, fields=None) -> Callback:
+def searchJobsCustomQuery(auth, companyID, query, fields=None) -> Callback: # TODO
     print("SEARCH JOBS CUSTOM QUERY")
 
 
@@ -270,7 +324,7 @@ def getAllJobs(access_token, companyID, fields=None) -> Callback:
         return Callback(False, str(exc))
 
 
-def produceRecruiterValueReport(crm: CRM_Model, companyID) -> Callback:
+def produceRecruiterValueReport(crm: CRM_Model, companyID) -> Callback: # TODO
     print("PRODUCE RECRUITER VALUE REPORT")
 
 

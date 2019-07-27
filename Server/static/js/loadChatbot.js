@@ -1,13 +1,14 @@
 "use strict";
 
+require("whatwg-fetch");
+
 function main() {
     var getLink = function getLink(src) {
         var _window$location = window.location,
             protocol = _window$location.protocol,
             port = _window$location.port,
-            hostname = _window$location.hostname;
+            hostname = _window$location.hostname; // return 'http://localhost:5000' + src;
 
-        // return 'http://localhost:5000' + src;
         return 'https://www.thesearchbase.com' + src;
     };
 
@@ -16,10 +17,10 @@ function main() {
         mode: 'cors',
         headers: {
             'Content-Type': 'text/json',
-            'Accept': 'application/json',
+            'Accept': 'application/json'
         }
     };
-    fetch(getLink("/api/static/widgets/chatbot/asset-manifest.json?NoCache=" + new Date().getTime()), options).then(function (response) {
+    window.fetch(getLink("/api/static/widgets/chatbot/asset-manifest.json?NoCache=" + new Date().getTime()), options).then(function (response) {
         return response.json();
     }).then(function (manifest) {
         // request and get assistant data

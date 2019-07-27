@@ -65,6 +65,7 @@ def login(auth):
                             "access_token": result_body.get("access_token"),
                             "refresh_token": result_body.get("refresh_token"),
                             "id_token": result_body.get("id_token"),
+                            "domain": auth.get("domain")
                         })
 
     except Exception as exc:

@@ -51,7 +51,7 @@
     {
       "title": "Twilio",
       "desc": "Twilio is a messaging service allowing SearchBase to send SMS-s to users on behalf of Recruiters.",
-      "image": "/static/images/CRM/twilio.png",
+      "image": "/static/images/CRM/twilio.svg",
       "type": "Twilio",
       "disabled": true,
       "status": "NOT_CONNECTED"

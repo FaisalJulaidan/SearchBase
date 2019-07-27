@@ -1,5 +1,6 @@
 import React from 'react';
-import {Typography} from "antd";
+import {Button, Input, Typography} from "antd";
+import {getLink} from "helpers/links";
 
 const {Title, Paragraph, Text} = Typography;
 
@@ -49,5 +50,40 @@ export const MercuryHeader = () =>
     <Paragraph type="secondary">
         Mercury description
     </Paragraph>;
+
+export const MercuryFormItems = ({
+                                     FormItem,
+                                     layout,
+                                     getFieldDecorator,
+                                     validateFields
+                                 }) =>
+    <>
+        <FormItem label="Domain"
+                  {...layout}>
+            {getFieldDecorator('domain', {
+                rules: [{
+                    required: true,
+                    message: "Please add your domain name",
+                }],
+            })(
+                <Input placeholder={'E.g: thesearchbase.crm3'}/>
+            )}
+        </FormItem>
+
+
+        <Button type="primary"
+                icon={'login'}
+                style={{width: 'auto'}}
+                onClick={
+                    () => validateFields((err, values) =>
+                        window.location =
+                            `https://login.microsoftonline.com/common/oauth2/v2.0/authorize?response_type=code&client_id=b49f9e03-5586-4248-8585-8640c4b2539c&response_mode=query&scope=https://admin.services.crm.dynamics.com/user_impersonation+offline_access&redirect_uri=${getLink("/dashboard/marketplace/Mercury")}&state=${values.domain}`
+                    )
+                }
+                size={'large'}>
+            Connect
+        </Button>
+
+    </>;
 
 

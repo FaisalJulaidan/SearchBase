@@ -16,7 +16,7 @@ CLIENT_ID = os.environ['MERCURY_CLIENT_ID']
 CLIENT_SECRET = os.environ['MERCURY_CLIENT_SECRET']
 DYNAMICS_VERSION = "v9.1"
 
-DOMAIN = "greenrecruitmentcompanysandbox.crm11"  # NEEDS TO BE TAKEN FROM THE LOGIN
+TEST_DOMAIN = "greenrecruitmentcompanysandbox.crm11"  # NEEDS TO BE TAKEN FROM THE LOGIN
 
 """
 requires domain name ex. greenrecruitmentcompanysandbox.crm11.dynamics.com
@@ -112,7 +112,7 @@ def retrieveAccessToken(auth, companyID):
 def sendQuery(auth, query, method, body, companyID, optionalParams=None):
     try:
         # get url
-        url = buildUrl(query, optionalParams)
+        url = buildUrl(query, auth.get("domain"), optionalParams)
 
         # set headers
         headers = {'Content-Type': 'application/json', "Authorization": "Bearer " + auth.get("access_token")}
@@ -144,9 +144,9 @@ def sendQuery(auth, query, method, body, companyID, optionalParams=None):
         return Callback(False, "Query could not be sent")
 
 
-def buildUrl(query, optionalParams=None):
+def buildUrl(query, domain, optionalParams=None):
     # set up initial url
-    url = "https://" + DOMAIN + ".dynamics.com/api/data/" + DYNAMICS_VERSION + "/" + query
+    url = "https://" + domain + ".dynamics.com/api/data/" + DYNAMICS_VERSION + "/" + query
     # add additional params
     if optionalParams:
         url += "?"

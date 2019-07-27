@@ -226,9 +226,16 @@ class DataType(Enum):
         [UserType.Candidate])
 
     # Example: Less Than 5000 GBP Annually
-    CandidateDesiredSalary = dataTypeCreator(
-        'Candidate Desired Salary',
-        'CandidateDesiredSalary',
+    CandidateDailyDesiredSalary = dataTypeCreator(
+        'Candidate Daily Desired Salary',
+        'CandidateDailyDesiredSalary',
+        ValidationType.Salary,
+        DataTypeSection.Candidate,
+        [UserType.Candidate])
+
+    CandidateAnnualDesiredSalary = dataTypeCreator(
+        'Candidate Annual Desired Salary',
+        'CandidateAnnualDesiredSalary',
         ValidationType.Salary,
         DataTypeSection.Candidate,
         [UserType.Candidate])

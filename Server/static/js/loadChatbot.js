@@ -11,15 +11,15 @@ function main() {
         return 'https://www.thesearchbase.com' + src;
     };
 
-    var myHeaders = new Headers();
-    myHeaders.append('Content-Type', 'text/plain');
-    myHeaders.append('Accept', 'application/json');
-    var headers = {
+    var options = {
         method: 'GET',
         mode: 'cors',
-        headers: myHeaders
+        headers: {
+            'Content-Type': 'text/json',
+            'Accept': 'application/json',
+        }
     };
-    fetch(getLink("/api/static/widgets/chatbot/asset-manifest.json?NoCache=" + new Date().getTime()), headers).then(function (response) {
+    fetch(getLink("/api/static/widgets/chatbot/asset-manifest.json?NoCache=" + new Date().getTime()), options).then(function (response) {
         return response.json();
     }).then(function (manifest) {
         // request and get assistant data

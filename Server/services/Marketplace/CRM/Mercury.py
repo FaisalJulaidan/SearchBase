@@ -1,12 +1,11 @@
 import base64
 import json
 import os
-from datetime import datetime
 
 import requests
 from sqlalchemy_utils import Currency
 
-from models import Callback, Conversation, StoredFile, CRM as CRM_Model
+from models import Callback, Conversation, StoredFile
 from services import stored_file_services, databases_services
 from services.Marketplace import marketplace_helpers
 from services.Marketplace.CRM import crm_services
@@ -39,6 +38,7 @@ def testConnection(auth, companyID):
 
 
 def login(auth):
+    print("AUTH: ", auth)
     from utilities import helpers
     try:
 
@@ -59,7 +59,7 @@ def login(auth):
             raise Exception(get_access_token.text)
 
         result_body = json.loads(get_access_token.text)
-        print(result_body)
+
         return Callback(True, "Success",
                         {
                             "access_token": result_body.get("access_token"),
@@ -118,24 +118,29 @@ def sendQuery(auth, query, method, body, companyID, optionalParams=None):
         headers = {'Content-Type': 'application/json', "Authorization": "Bearer " + auth.get("access_token")}
 
         r = marketplace_helpers.sendRequest(url, method, headers, json.dumps(body))
-
-        if r.status_code == 401:  # wrong access token
+        print("refresh toekn", auth.get("refresh_token"))
+        print("CODE: ", r.status_code)
+        print("TEXT", r.text)
+        if r.status_code == 401:  # wrong rest token
             callback: Callback = retrieveAccessToken(auth, companyID)
             if not callback.Success:
                 raise Exception(callback.Message)
 
             headers["Authorization"] = "Bearer " + callback.Data.get("access_token")
+            print(headers)
             r = marketplace_helpers.sendRequest(url, method, headers, json.dumps(body))
-            if not r.ok and not r.status_code == 409:
+            print("CODE 2", r.status_code)
+            print("TEXT 2", r.text)
+            if not r.ok:
                 raise Exception(r.text + ". Query could not be sent")
 
-        elif not r.ok and not r.status_code == 409:
+        elif not r.ok:
             raise Exception(r.text + ". Unexpected error occurred when calling the API")
 
         return Callback(True, "Query was successful", r)
 
     except Exception as exc:
-        helpers.logError("Marketplace.Crm.Bullhorn.sendQuery() ERROR: " + str(exc))
+        helpers.logError("Marketplace.Crm.Mercury.sendQuery() ERROR: " + str(exc))
         return Callback(False, "Query could not be sent")
 
 
@@ -144,6 +149,7 @@ def buildUrl(query, optionalParams=None):
     url = "https://" + DOMAIN + ".dynamics.com/api/data/" + DYNAMICS_VERSION + "/" + query
     # add additional params
     if optionalParams:
+        url += "?"
         for param in optionalParams:
             url += "&" + param
     # return the url
@@ -158,35 +164,26 @@ def insertCandidate(auth, conversation: Conversation) -> Callback:
 
         # availability, yearsExperience
         body = {
-
-            "name": conversation.Name or " ",
-            "firstName": helpers.getListValue(name, 0, " "),
-            "lastName": helpers.getListValue(name, 1, " "),
-            "mobile": conversation.PhoneNumber or " ",
-            "address": {
-                "city": "".join(
-                    conversation.Data.get('keywordsByDataType').get(DT.CandidateLocation.value['name'], [" "])),
-            },
-            "email": conversation.Email or " ",
-            "primarySkills": "".join(
-                conversation.Data.get('keywordsByDataType').get(DT.CandidateSkills.value['name'], [" "])),
-            "educations": {
-                "data": conversation.Data.get('keywordsByDataType').get(DT.CandidateEducation.value['name'], [])
-            },
-            "salary": str(crm_services.getSalary(conversation, DT.CandidateDesiredSalary, Period.Annually))
+            "crimson_firstname": helpers.getListValue(name, 0, " "),
+            "crimson_surname": helpers.getListValue(name, 1, " "),
+            "crimson_mobile": conversation.PhoneNumber or " ",
+            "crimson_town": " ".join(
+                conversation.Data.get('keywordsByDataType').get(DT.CandidateLocation.value['name'], [" "])),
+            "crimson_email": conversation.Email or " ",
+            "crimson_availability": DT.CandidateAvailability,
+            "crimson_jobtitle": DT.JobTitle,
+            "crimson_expsalaryp": str(crm_services.getSalary(conversation, DT.CandidateDesiredSalary, Period.Annually)),
+            "crimson_expratec": str(crm_services.getSalary(conversation, DT.CandidateDesiredSalary, Period.Daily))
         }
 
         # Add additional emails to email2 and email3
-        for email in emails:
-            index = emails.index(email)
-            if index != 0:
-                body["email" + str(index + 1)] = email
+        # for email in emails:
+        #     index = emails.index(email)
+        #     if index != 0:
+        #         body["email" + str(index + 1)] = email
 
-        if body.get("dayRate") == 0:
-            body["dayRate"] = None
-
-        # send query
-        sendQuery_callback: Callback = sendQuery(auth, "entity/Candidate", "put", body,
+        # send filter
+        sendQuery_callback: Callback = sendQuery(auth, "entity/Candidate", "post", body,
                                                  conversation.Assistant.CompanyID)
 
         if not sendQuery_callback.Success:
@@ -195,7 +192,7 @@ def insertCandidate(auth, conversation: Conversation) -> Callback:
         return Callback(True, sendQuery_callback.Data.text)
 
     except Exception as exc:
-        helpers.logError("Marketplace.CRM.Bullhorn.insertCandidate() ERROR: " + str(exc))
+        helpers.logError("Marketplace.CRM.Mercury.insertCandidate() ERROR: " + str(exc))
         return Callback(False, str(exc))
 
 
@@ -230,7 +227,7 @@ def uploadFile(auth, storedFile: StoredFile):
         else:
             raise Exception("Entity type to submit could not be retrieved")
 
-        # send query
+        # send filter
         sendQuery_callback: Callback = sendQuery(auth, "file/" + entity + "/" + entityID,
                                                  "put", body, conversation.Assistant.CompanyID)
         if not sendQuery_callback.Success:
@@ -239,54 +236,28 @@ def uploadFile(auth, storedFile: StoredFile):
         return Callback(True, sendQuery_callback.Data.text)
 
     except Exception as exc:
-        helpers.logError("Marketplace.CRM.Bullhorn.insertCandidate() ERROR: " + str(exc))
+        helpers.logError("Marketplace.CRM.Mercury.insertCandidate() ERROR: " + str(exc))
         return Callback(False, str(exc))
 
 
 def insertClient(auth, conversation: Conversation) -> Callback:
     try:
-        # get query url
-        insertCompany_callback: Callback = insertCompany(auth, conversation)
-        if not insertCompany_callback.Success:
-            raise Exception(insertCompany_callback.Message)
-
-        insertClient_callback: Callback = insertClientContact(auth, conversation,
-                                                              insertCompany_callback.Data.get("changedEntityId"))
-        if not insertClient_callback.Success:
-            raise Exception(insertClient_callback.Message)
-
-        return Callback(True, insertClient_callback.Message)
-
-    except Exception as exc:
-        helpers.logError("Marketplace.CRM.Bullhorn.insertClient() ERROR: " + str(exc))
-        return Callback(False, str(exc))
-
-
-def insertClientContact(auth, conversation: Conversation, bhCompanyID) -> Callback:
-    try:
         # New candidate details
         emails = conversation.Data.get('keywordsByDataType').get(DT.ClientEmail.value['name'], [" "])
 
         body = {
-            "name": conversation.Name or " ",
-            "mobile": conversation.PhoneNumber or " ",
+            "firstname": conversation.Name or " ",
+            "lastname": conversation.PhoneNumber or " ",
             "address": {
                 "city": " ".join(
                     conversation.Data.get('keywordsByDataType').get(DT.ClientLocation.value['name'], [])),
             },
             # check number of emails and submit them
             "email": emails[0],
-            "clientCorporation": {"id": bhCompanyID}
         }
 
-        # add additional emails to email2 and email3
-        for email in emails:
-            index = emails.index(email)
-            if index != 0:
-                body["email" + str(index + 1)] = email
-
-        # send query
-        sendQuery_callback: Callback = sendQuery(auth, "entity/ClientContact", "put", body,
+        # send filter
+        sendQuery_callback: Callback = sendQuery(auth, "contacts", "post", body,
                                                  conversation.Assistant.CompanyID)
         if not sendQuery_callback.Success:
             raise Exception(sendQuery_callback.Message)
@@ -294,37 +265,13 @@ def insertClientContact(auth, conversation: Conversation, bhCompanyID) -> Callba
         return Callback(True, sendQuery_callback.Data.text)
 
     except Exception as exc:
-        helpers.logError("Marketplace.CRM.Bullhorn.insertClientContact() ERROR: " + str(exc))
-        return Callback(False, str(exc))
-
-
-def insertCompany(auth, conversation: Conversation) -> Callback:
-    try:
-        # New candidate details
-        body = {
-            "name": " ".join(
-                conversation.Data.get('keywordsByDataType').get(DT.CompanyName.value['name'],
-                                                                ["Undefined Company - TSB"])),
-        }
-
-        # send query
-        sendQuery_callback: Callback = sendQuery(auth, "entity/ClientCorporation", "put", body,
-                                                 conversation.Assistant.CompanyID)
-        if not sendQuery_callback.Success:
-            raise Exception(sendQuery_callback.Message)
-
-        return_body = json.loads(sendQuery_callback.Data.text)
-
-        return Callback(True, sendQuery_callback.Message, return_body)
-
-    except Exception as exc:
-        helpers.logError("Marketplace.CRM.Bullhorn.insertCompany() ERROR: " + str(exc))
+        helpers.logError("Marketplace.CRM.Mercury.insertClient() ERROR: " + str(exc))
         return Callback(False, str(exc))
 
 
 def searchCandidates(auth, companyID, conversation, fields=None) -> Callback:
     try:
-        query = "query="
+        filter = "$filter="
         if not fields:
             fields = "$select=crimson_availability,crimson_currentjobtitle,crimson_email,crimson_expratec,crimson_" + \
                      "expsalaryp,crimson_jobtitle,crimson_mobile,crimson_name,crimson_town," + \
@@ -333,24 +280,17 @@ def searchCandidates(auth, companyID, conversation, fields=None) -> Callback:
         keywords = conversation['keywordsByDataType']
 
         # populate filter
-        query += checkFilter(keywords, DT.CandidateLocation, "address.city")
+        filter += checkFilter(keywords, DT.CandidateLocation, "crimson_town")
 
-        # if keywords[DT.CandidateSkills.value["name"]]:
-        #     query += "primarySkills.data:" + keywords[DT.CandidateSkills.name] + " or"
-
-        # salary = crm_services.getSalary(conversation, DT.CandidateDesiredSalary, Period.Annually)
-        # if salary:
-        #     query += " salary:" + str(salary) + " or"
-
-        query = query[:-3]
+        filter = filter[:-3]
 
         # check if no conditions submitted
-        if len(query) < 6:
-            query = "query=*:*"
+        if len(filter) < 6:
+            filter = "$filter=*:*"
 
-        # send query
+        # send filter
         sendQuery_callback: Callback = sendQuery(auth, "crimson_candidates", "get", {}, companyID,
-                                                 [fields, query])
+                                                 [fields, filter])
         if not sendQuery_callback.Success:
             raise Exception(sendQuery_callback.Message)
 
@@ -386,45 +326,41 @@ def searchCandidates(auth, companyID, conversation, fields=None) -> Callback:
         return Callback(True, sendQuery_callback.Message, result)
 
     except Exception as exc:
-        helpers.logError("Marketplace.CRM.Bullhorn.searchCandidates() ERROR: " + str(exc))
+        helpers.logError("Marketplace.CRM.Mercury.searchCandidates() ERROR: " + str(exc))
         return Callback(False, str(exc))
 
 
 def searchJobs(auth, companyID, conversation, fields=None) -> Callback:
     try:
-        query = "query="
+        filter = "$filter="
         if not fields:
-            fields = "fields=id,title,publicDescription,address,employmentType,salary,skills,yearsRequired,startDate,dateEnd"
+            fields = "$select=crimson_addresscity,crimson_jobsummary,crimson_jobtitle,crimson_startdate," + \
+                     "crimson_typeofposition,crimson_vacancyid,mercury_permanentsalary_mc," + \
+                     "mercury_tempcandidatepay_mc,_mercury_vacancytype_value,_transactioncurrencyid_value"
         keywords = conversation['keywordsByDataType']
 
         # populate filter TODO
-        query += checkFilter(keywords, DT.JobTitle, "title")
+        filter += checkFilter(keywords, DT.JobTitle, "crimson_jobtitle")
 
-        query += checkFilter(keywords, DT.JobLocation, "address.city")
+        filter += checkFilter(keywords, DT.JobLocation, "crimson_addresscity")
 
-        query += checkFilter(keywords, DT.JobType, "employmentType")
+        # filter += checkFilter(keywords, DT.JobType, "employmentType")
 
-        salary = crm_services.getSalary(conversation, DT.JobSalary, Period.Annually)
-        if salary > 0:
-            query += "salary:" + str(salary) + " or"
+        # salary = crm_services.getSalary(conversation, DT.JobSalary, Period.Annually)
+        # if salary > 0:
+        #     filter += "salary:" + str(salary) + " or"
 
-        query += checkFilter(keywords, DT.JobDesiredSkills, "skills")
+        filter += checkFilter(keywords, DT.JobStartDate, "crimson_startdate")
 
-        query += checkFilter(keywords, DT.JobStartDate, "startDate")
-
-        query += checkFilter(keywords, DT.JobEndDate, "dateEnd")
-
-        query += checkFilter(keywords, DT.JobYearsRequired, "yearsRequired")
-
-        query = query[:-3]
+        filter = filter[:-3]
 
         # check if no conditions submitted
-        if len(query) < 4:
-            query = "query=*:*"
+        if len(filter) < 4:
+            filter = "$filter=*:*"
 
-        # send query
-        sendQuery_callback: Callback = sendQuery(auth, "search/JobOrder", "get", {}, companyID,
-                                                 [fields, query, "count=500"])
+        # send filter
+        sendQuery_callback: Callback = sendQuery(auth, "crimson_vacancies", "get", {}, companyID,
+                                                 [fields, filter])
         if not sendQuery_callback.Success:
             raise Exception(sendQuery_callback.Message)
 
@@ -432,44 +368,57 @@ def searchJobs(auth, companyID, conversation, fields=None) -> Callback:
         result = []
         # not found match for JobLinkURL
         for record in return_body["data"]:
-            result.append(databases_services.createPandaJob(id=record.get("id"),#
-                                                            title=record.get("title"),#
-                                                            desc=record.get("publicDescription", ""),#
-                                                            location=record.get("address", {}).get("city"),
-                                                            type=record.get("employmentType"),
-                                                            salary=record.get("salary"),
-                                                            essentialSkills=record.get("skills", {}).get("data"),
+            # crimson_typeofposition    - code for job type (143570000 is permanent, 143570001 is contract)
+            # TODO make it retrieve the job type from code from their api
+            if record.get("crimson_typeofposition") == 143570000:
+                payPeriod = Period("Annually")
+                employmentType = "Permanent"
+            elif record.get("crimson_typeofposition") == 143570001:
+                payPeriod = Period("Daily")
+                employmentType = "Contract"
+            else:
+                payPeriod = None
+                employmentType = None
+            # _transactioncurrencyid_value    - currency code
+            result.append(databases_services.createPandaJob(id=record.get("crimson_vacancyid"),
+                                                            title=record.get("crimson_jobtitle"),
+                                                            desc=record.get("crimson_jobsummary", ""),
+                                                            location=record.get("crimson_addresscity"),
+                                                            type=employmentType,
+                                                            salary=record.get("mercury_permanentsalary_mc") or
+                                                                   record.get("mercury_tempcandidatepay_mc"),
+                                                            essentialSkills=None,
                                                             desiredSkills=None,
-                                                            yearsRequired=record.get("yearsRequired", 0),
-                                                            startDate=record.get("startDate"),
-                                                            endDate=record.get("dateEnd"),
+                                                            yearsRequired=0,
+                                                            startDate=record.get("crimson_startdate"),
+                                                            endDate=None,
                                                             linkURL=None,
                                                             currency=Currency("GBP"),
-                                                            payPeriod=Period("Annually"),
-                                                            source="Bullhorn"))
+                                                            payPeriod=payPeriod,
+                                                            source="Mercury"))
 
         return Callback(True, sendQuery_callback.Message, result)
 
     except Exception as exc:
-        helpers.logError("Marketplace.CRM.Bullhorn.searchJobs() ERROR: " + str(exc))
+        helpers.logError("Marketplace.CRM.Mercury.searchJobs() ERROR: " + str(exc))
         return Callback(False, str(exc))
 
 
 def checkFilter(keywords, dataType: DT, string):
     if keywords.get(dataType.value["name"]):
-        return string + ":" + "".join(keywords[dataType.value["name"]]) + " or"
+        return string + " eq '" + "".join(keywords[dataType.value["name"]]) + "' or"
     return ""
 
 
-def searchJobsCustomQuery(auth, companyID, query, fields=None) -> Callback:
+def searchJobsCustomQuery(auth, companyID, filter, fields=None) -> Callback:
     try:
 
         if not fields:
             fields = "fields=id,title,publicDescription,address,employmentType,salary,skills,yearsRequired,startDate,dateEnd"
 
-        # send query
+        # send filter
         sendQuery_callback: Callback = sendQuery(auth, "search/JobOrder", "get", {}, companyID,
-                                                 [fields, query, "count=500"])
+                                                 [fields, filter, "count=500"])
         if not sendQuery_callback.Success:
             raise Exception(sendQuery_callback.Message)
 
@@ -478,113 +427,112 @@ def searchJobsCustomQuery(auth, companyID, query, fields=None) -> Callback:
         return Callback(True, sendQuery_callback.Message, return_body)
 
     except Exception as exc:
-        helpers.logError("Marketplace.CRM.Bullhorn.searchJobs() ERROR: " + str(exc))
+        helpers.logError("Marketplace.CRM.Mercury.searchJobs() ERROR: " + str(exc))
         return Callback(False, str(exc))
 
+# def getAllCandidates(auth, companyID, fields=None) -> Callback:
+#     try:
+#         # custom fields?
+#         if not fields:
+#             fields = "fields=id,name,email,mobile,address,primarySkills,status,educations,dayRate"
+#
+#         # send filter
+#         sendQuery_callback: Callback = sendQuery(auth, "departmentCandidates", "get", {}, companyID, [fields])
+#         if not sendQuery_callback.Success:
+#             raise Exception(sendQuery_callback.Message)
+#
+#         return_body = json.loads(sendQuery_callback.Data.text)
+#
+#         return Callback(True, sendQuery_callback.Message, return_body)
+#
+#     except Exception as exc:
+#         helpers.logError("Marketplace.CRM.Mercury.getAllCandidates() ERROR: " + str(exc))
+#         return Callback(False, str(exc))
+#
+#
+# def getAllJobs(auth, companyID, fields=None) -> Callback:
+#     try:
+#         # custom fields?
+#         if not fields:
+#             fields = "fields=*"
+#
+#         # send filter
+#         sendQuery_callback: Callback = sendQuery(auth, "search/JobOrder", "get", {}, companyID,
+#                                                  [fields, "$filter=*:*", "count=500"])
+#         if not sendQuery_callback.Success:
+#             raise Exception(sendQuery_callback.Message)
+#
+#         return_body = json.loads(sendQuery_callback.Data.text)
+#
+#         return Callback(True, sendQuery_callback.Message, return_body)
+#
+#     except Exception as exc:
+#         helpers.logError("Marketplace.CRM.Mercury.getAllJobs() ERROR: " + str(exc))
+#         return Callback(False, str(exc))
 
-def getAllCandidates(auth, companyID, fields=None) -> Callback:
-    try:
-        # custom fields?
-        if not fields:
-            fields = "fields=id,name,email,mobile,address,primarySkills,status,educations,dayRate"
 
-        # send query
-        sendQuery_callback: Callback = sendQuery(auth, "departmentCandidates", "get", {}, companyID, [fields])
-        if not sendQuery_callback.Success:
-            raise Exception(sendQuery_callback.Message)
-
-        return_body = json.loads(sendQuery_callback.Data.text)
-
-        return Callback(True, sendQuery_callback.Message, return_body)
-
-    except Exception as exc:
-        helpers.logError("Marketplace.CRM.Bullhorn.getAllCandidates() ERROR: " + str(exc))
-        return Callback(False, str(exc))
-
-
-def getAllJobs(auth, companyID, fields=None) -> Callback:
-    try:
-        # custom fields?
-        if not fields:
-            fields = "fields=*"
-
-        # send query
-        sendQuery_callback: Callback = sendQuery(auth, "search/JobOrder", "get", {}, companyID,
-                                                 [fields, "query=*:*", "count=500"])
-        if not sendQuery_callback.Success:
-            raise Exception(sendQuery_callback.Message)
-
-        return_body = json.loads(sendQuery_callback.Data.text)
-
-        return Callback(True, sendQuery_callback.Message, return_body)
-
-    except Exception as exc:
-        helpers.logError("Marketplace.CRM.Bullhorn.getAllJobs() ERROR: " + str(exc))
-        return Callback(False, str(exc))
-
-
-def produceRecruiterValueReport(crm: CRM_Model, companyID) -> Callback:
-    try:
-
-        getJobs_callback: Callback = searchJobsCustomQuery(
-            crm.Auth, companyID,
-            "query=employmentType:\"permanent\" AND status:\"accepting candidates\"",
-            "fields=dateAdded,title,clientCorporation,salary,feeArrangement,owner")
-        if not getJobs_callback.Success:
-            raise Exception("Jobs could not be retrieved")
-
-        def extractName(json):
-            return int(json["owner"]["id"])
-
-        return_body = getJobs_callback.Data["data"]
-        return_body.sort(key=extractName, reverse=True)
-
-        def getTotalPipeline(result, previousUser):
-            if len(result.keys()) > 0:
-                totalPipeline = 0
-                for pRecord in result[previousUser]:
-                    totalPipeline += float(pRecord[-1])
-                result[previousUser].append(["", "", "", "", "", previousUser + " Total Pipeline Value",
-                                             totalPipeline])
-            return result
-
-        titles = ["User Assigned", "Date Added", "Title", "Client Corporation", "Salary", "Fee Arrangement",
-                  "Pipeline Value"]
-
-        data = {}
-        previousUser = None
-        for record in return_body:
-            tempRecord = data.get(record["owner"]["firstName"] + " " + record["owner"]["lastName"])
-            if not tempRecord:
-                tempRecord = []
-                data = getTotalPipeline(data, previousUser)
-
-            tempRecord.append([
-                record["owner"]["firstName"] + " " + record["owner"]["lastName"],
-                datetime.fromtimestamp(int(str(record["dateAdded"])[:-3])),
-                record["title"],
-                record["clientCorporation"].get("name"),
-                record["salary"],
-                str(float(record["feeArrangement"]) * 100) + "%",
-                float(record["salary"]) * float(record["feeArrangement"])
-            ])
-            previousUser = record["owner"]["firstName"] + " " + record["owner"]["lastName"]
-
-            data[previousUser] = tempRecord
-        data = getTotalPipeline(data, previousUser)
-
-        nestedList = [titles]
-
-        totalPipelineValue = 0
-        for key, value in data.items():
-            for csvLine in value:
-                nestedList.append(csvLine)
-            totalPipelineValue += float(value[-1][-1])
-
-        nestedList = [["", "", "", "", "", "Overall Total Pipeline Value", totalPipelineValue]] + nestedList
-
-        return Callback(True, "Report information has been retrieved", nestedList)
-
-    except Exception as exc:
-        helpers.logError("Marketplace.CRM.Bullhorn.produceRecruiterValueReport() ERROR: " + str(exc))
-        return Callback(False, "Error in creating report")
+# def produceRecruiterValueReport(crm: CRM_Model, companyID) -> Callback:
+#     try:
+#
+#         getJobs_callback: Callback = searchJobsCustomQuery(
+#             crm.Auth, companyID,
+#             "$filter=employmentType:\"permanent\" AND status:\"accepting candidates\"",
+#             "fields=dateAdded,title,clientCorporation,salary,feeArrangement,owner")
+#         if not getJobs_callback.Success:
+#             raise Exception("Jobs could not be retrieved")
+#
+#         def extractName(json):
+#             return int(json["owner"]["id"])
+#
+#         return_body = getJobs_callback.Data["data"]
+#         return_body.sort(key=extractName, reverse=True)
+#
+#         def getTotalPipeline(result, previousUser):
+#             if len(result.keys()) > 0:
+#                 totalPipeline = 0
+#                 for pRecord in result[previousUser]:
+#                     totalPipeline += float(pRecord[-1])
+#                 result[previousUser].append(["", "", "", "", "", previousUser + " Total Pipeline Value",
+#                                              totalPipeline])
+#             return result
+#
+#         titles = ["User Assigned", "Date Added", "Title", "Client Corporation", "Salary", "Fee Arrangement",
+#                   "Pipeline Value"]
+#
+#         data = {}
+#         previousUser = None
+#         for record in return_body:
+#             tempRecord = data.get(record["owner"]["firstName"] + " " + record["owner"]["lastName"])
+#             if not tempRecord:
+#                 tempRecord = []
+#                 data = getTotalPipeline(data, previousUser)
+#
+#             tempRecord.append([
+#                 record["owner"]["firstName"] + " " + record["owner"]["lastName"],
+#                 datetime.fromtimestamp(int(str(record["dateAdded"])[:-3])),
+#                 record["title"],
+#                 record["clientCorporation"].get("name"),
+#                 record["salary"],
+#                 str(float(record["feeArrangement"]) * 100) + "%",
+#                 float(record["salary"]) * float(record["feeArrangement"])
+#             ])
+#             previousUser = record["owner"]["firstName"] + " " + record["owner"]["lastName"]
+#
+#             data[previousUser] = tempRecord
+#         data = getTotalPipeline(data, previousUser)
+#
+#         nestedList = [titles]
+#
+#         totalPipelineValue = 0
+#         for key, value in data.items():
+#             for csvLine in value:
+#                 nestedList.append(csvLine)
+#             totalPipelineValue += float(value[-1][-1])
+#
+#         nestedList = [["", "", "", "", "", "Overall Total Pipeline Value", totalPipelineValue]] + nestedList
+#
+#         return Callback(True, "Report information has been retrieved", nestedList)
+#
+#     except Exception as exc:
+#         helpers.logError("Marketplace.CRM.Mercury.produceRecruiterValueReport() ERROR: " + str(exc))
+#         return Callback(False, "Error in creating report")

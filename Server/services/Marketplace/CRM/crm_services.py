@@ -22,6 +22,8 @@ def insertCandidate(assistant: Assistant, conversation: Conversation):
     # Check CRM type
     if assistant.CRM.Type is CRM.Bullhorn:
         return Bullhorn.insertCandidate(assistant.CRM.Auth, conversation)
+    elif assistant.CRM.Type is CRM.Mercury:
+        return Mercury.insertCandidate(assistant.CRM.Auth, conversation)
     elif assistant.CRM.Type is CRM.Vincere:
         return Vincere.insertCandidate(assistant.CRM.Auth, conversation)
     # elif assistant.CRM.Type is CRM.Mercury:
@@ -38,6 +40,8 @@ def insertClient(assistant: Assistant, conversation: Conversation):
     # Check CRM type
     if assistant.CRM.Type is CRM.Bullhorn:
         return Bullhorn.insertClient(assistant.CRM.Auth, conversation)
+    elif assistant.CRM.Type is CRM.Mercury:
+        return Mercury.insertClient(assistant.CRM.Auth, conversation)
     elif assistant.CRM.Type is CRM.Vincere:
         return Vincere.insertClient(assistant.CRM.Auth, conversation)
     elif assistant.CRM.Type is CRM.Adapt:
@@ -52,6 +56,8 @@ def uploadFile(assistant: Assistant, storedFile: StoredFile):
     # Check CRM type
     if assistant.CRM.Type is CRM.Bullhorn:
         return Bullhorn.uploadFile(assistant.CRM.Auth, storedFile)
+    # elif assistant.CRM.Type is CRM.Mercury: TODO
+    #     return Mercury.uploadFile(assistant.CRM.Auth, storedFile)
     elif assistant.CRM.Type is CRM.Vincere:
         return Vincere.uploadFile(assistant.CRM.Auth, storedFile)
     elif assistant.CRM.Type is CRM.Greenhouse:
@@ -66,6 +72,8 @@ def searchCandidates(assistant: Assistant, session):
     #     return Adapt.searchCandidates(assistant.CRM.Auth)
     if assistant.CRM.Type is CRM.Bullhorn:
         return Bullhorn.searchCandidates(assistant.CRM.Auth, assistant.CompanyID, session)
+    elif assistant.CRM.Type is CRM.Mercury:
+        return Mercury.searchCandidates(assistant.CRM.Auth, assistant.CompanyID, session)
     elif assistant.CRM.Type is CRM.Vincere:
         return Vincere.searchCandidates(assistant.CRM.Auth, assistant.CompanyID, session)
     elif assistant.CRM.Type is CRM.Greenhouse:
@@ -80,38 +88,12 @@ def searchJobs(assistant: Assistant, session):
     #     return Adapt.pullAllCadidates(assistant.CRM.Auth)
     if assistant.CRM.Type is CRM.Bullhorn:
         return Bullhorn.searchJobs(assistant.CRM.Auth, assistant.CompanyID, session)
+    elif assistant.CRM.Type is CRM.Mercury:
+        return Mercury.searchJobs(assistant.CRM.Auth, assistant.CompanyID, session)
     elif assistant.CRM.Type is CRM.Vincere:
         return Vincere.searchJobs(assistant.CRM.Auth, assistant.CompanyID, session)
     elif assistant.CRM.Type is CRM.Greenhouse:
         return Greenhouse.searchJobs(assistant.CRM.Auth, session)
-    else:
-        return Callback(False, "CRM type did not match with those on the system")
-
-
-def getAllCandidates(assistant: Assistant):
-    # Check CRM type
-    # if assistant.CRM.Type is CRM.Adapt:
-    #     return Adapt.pullAllCadidates(assistant.CRM.Auth)
-    if assistant.CRM.Type is CRM.Bullhorn:
-        return Bullhorn.getAllCandidates(assistant.CRM.Auth, assistant.CompanyID)
-    elif assistant.CRM.Type is CRM.Vincere:
-        return Vincere.getAllCandidates(assistant.CRM.Auth, assistant.CompanyID)
-    elif assistant.CRM.Type is CRM.Greenhouse:
-        return Greenhouse.getAllCandidates(assistant.CRM.Auth)
-    else:
-        return Callback(False, "CRM type did not match with those on the system")
-
-
-def getAllJobs(assistant: Assistant):
-    # Check CRM type
-    # if assistant.CRM.Type is CRM.Adapt:
-    #     return Adapt.pullAllCadidates(assistant.CRM.Auth)
-    if assistant.CRM.Type is CRM.Bullhorn:
-        return Bullhorn.getAllJobs(assistant.CRM.Auth, assistant.CompanyID)
-    elif assistant.CRM.Type is CRM.Vincere:
-        return Vincere.getAllJobs(assistant.CRM.Auth, assistant.CompanyID)
-    elif assistant.CRM.Type is CRM.Greenhouse:
-        return Greenhouse.getAllJobs(assistant.CRM.Auth)
     else:
         return Callback(False, "CRM type did not match with those on the system")
 

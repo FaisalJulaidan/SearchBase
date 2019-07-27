@@ -42,7 +42,8 @@ class ChatbotDirectLink extends React.Component {
     render() {
         return (
             <div style={{height: '100%', background: '#F4F6FC'}}>
-                <PublicNavbar companyLogo={this.state.LogoPath} CompanyName={this.state.CompanyName}/>
+                <PublicNavbar companyLogo={this.state.LogoPath} CompanyName={this.state.CompanyName}
+                              HideOnMobile={true}/>
                 <div id={'direct_link_container'} className={styles.Wrapper}/>
             </div>
         )

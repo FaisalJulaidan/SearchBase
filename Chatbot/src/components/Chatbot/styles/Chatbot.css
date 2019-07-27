@@ -1,7 +1,3 @@
-html, body {
-    height: auto !important;
-    width: auto !important;
-}
 .Chatbot {
     position: fixed;
     bottom: 30px;

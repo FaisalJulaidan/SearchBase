@@ -33,7 +33,7 @@ import Input from './Input';
 import Signature from './Signature';
 import 'antd/dist/antd.css';
 
-const Chatbot = ({
+export const Chatbot = ({
                      isDirectLink, btnColor, assistantID,
                      addBotMessage, setChatbotStatus, chatbot, initChatbot,
                      resetChatbot, resetMessage, setChatbotAnimation, messageList
@@ -118,7 +118,6 @@ const Chatbot = ({
     useEffect(() => {
         // if(disabled) return;
         const setChatbotWaiting = (block) => {
-
             if(!block.Content   ) return
             setChatbotStatus({
                 curAction: null,
@@ -157,9 +156,11 @@ const Chatbot = ({
             fetchedData[key] = data;
 
             if (cancelled) return {};
+            console.log(block)
             if (!data.length) {
                 setChatbotStatus({
-                    curAction: 'Not Found',
+                    curAction: block[flowAttributes.SKIP_ACTION] | 'Go To Next Block',
+                    afterMessage: 'Sorry, I could not find what you want!',
                     curBlockID: block[flowAttributes.CONTENT][flowAttributes.BLOCKTOGOID]
                 });
                 return {};

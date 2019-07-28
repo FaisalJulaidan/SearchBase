@@ -98,7 +98,7 @@ Question = {
                     "blockToGoID": {"type": ["string", "null"]},
                     "action": {"enum": [e.value for e in enums.BlockAction]},
                     "afterMessage": {"type": "string"},
-                    "score": {"type": "integer"},
+                    "score": {"type": "integer", "minimum": 0},
                 },
                 "required": ["id", "text", "keywords", "action", "afterMessage", "blockToGoID", "score"],
                 "additionalProperties": False

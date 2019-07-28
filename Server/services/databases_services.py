@@ -280,7 +280,6 @@ def scanCandidates(session, dbIDs, extraCandidates=None):
         df = df.drop('DatabaseID', axis=1)  # Drop column
 
         keywords = session['keywordsByDataType']
-        keywords = session['employmentSalaryType']
         df['Score'] = 0  # Add column for tracking score
         df['Source'] = "Internal Database"  # Source of solution e.g. Bullhorn, Adapt...
         if extraCandidates:

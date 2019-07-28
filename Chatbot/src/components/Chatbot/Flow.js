@@ -1,9 +1,9 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { connect } from 'react-redux';
+import React, {useEffect, useRef, useState} from 'react';
+import {connect} from 'react-redux';
 // Actions
-import { addBotMessage, addUserMessage, rewindToMessage, setChatbotStatus } from '../../store/actions';
+import {addBotMessage, addUserMessage, rewindToMessage, setChatbotStatus} from '../../store/actions';
 // Utils
-import { dataHandler } from '../../utils';
+import {dataHandler} from '../../utils';
 // Styles
 import './styles/Flow.css';
 import './styles/Animations.css';
@@ -85,8 +85,9 @@ const Flow = ({ messages, setChatbotStatus, addUserMessage, addBotMessage, think
 
     let groupedMessages = groupMessages(messages);
 
+    const isIE11 = !!window.MSInputMethodContext && !!document.documentMode;
     return (
-        <div className={['Flow', (inputOpen ? '' : 'Extended')].join(' ')} ref={flowRef}>
+        <div className={[isIE11 ? 'Flow_IE11' : 'Flow', (inputOpen ? '' : 'Extended')].join(' ')} ref={flowRef}>
             {
                 groupedMessages.map((group, i) =>
                     <div className={[group[0].sender, 'BounceIn'].join(' ')} key={i}>
@@ -95,7 +96,7 @@ const Flow = ({ messages, setChatbotStatus, addUserMessage, addBotMessage, think
                 )
             }
             {thinking ? <Thinking/> : null}
-            <div className={'FlowBottom'} ref={scrollRef}/>
+            <div className={isIE11 ? 'FlowBottom_IE11' : 'FlowBottom'} ref={scrollRef}/>
         </div>
     );
 };

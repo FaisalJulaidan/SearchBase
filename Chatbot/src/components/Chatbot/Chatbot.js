@@ -134,7 +134,7 @@ export const Chatbot = ({
             stopTimer.current = optionalDelayExecution(() => {
                 setChatbotStatus({ thinking: false, waitingForUser: true });
                 addBotMessage(block.Content.text, block.Type, block);
-                if (block.selfContinue) {
+                    if (block.selfContinue) {
                     setChatbotStatus({
                         curBlockID: block.selfContinue,
                         curAction: block.selfContinue === 'End Chat' ? 'End Chat' : 'Go To Next Block'
@@ -156,10 +156,9 @@ export const Chatbot = ({
             fetchedData[key] = data;
 
             if (cancelled) return {};
-            console.log(block)
             if (!data.length) {
                 setChatbotStatus({
-                    curAction: block[flowAttributes.SKIP_ACTION] | 'Go To Next Block',
+                    curAction: block[flowAttributes.SKIP_ACTION] || 'Go To Next Block',
                     afterMessage: 'Sorry, I could not find what you want!',
                     curBlockID: block[flowAttributes.CONTENT][flowAttributes.BLOCKTOGOID]
                 });
@@ -176,6 +175,7 @@ export const Chatbot = ({
                 return;
             }
             let nextBlock = getCurBlock(curAction, assistant, chatbot);
+            console.log(nextBlock)
             if (!nextBlock) return;
 
             setChatbotWaiting(nextBlock);

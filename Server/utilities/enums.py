@@ -298,6 +298,13 @@ class DataType(Enum):
         DataTypeSection.Client,
         [UserType.Client] * 6)
 
+    ClientAvailability = dataTypeCreator(
+        'Client Availability',
+        'ClientAvailability',
+        ValidationType.DateTime,
+        DataTypeSection.Client,
+        [UserType.Client] * 6)
+
     # ======================================================================
     # Job
 

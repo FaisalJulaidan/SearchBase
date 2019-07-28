@@ -19,7 +19,7 @@
     {
       "title": "Mercury",
       "desc": "Calendar is the calendar and scheduling component of Outlook that is fully integrated with email, contacts, and other features.",
-      "image": "/static/images/CRM/mercury.png",
+      "image": "/static/images/CRM/mercury.svg",
       "type": "Mercury",
       "disabled": true,
       "status": "NOT_CONNECTED"

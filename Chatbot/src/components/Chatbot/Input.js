@@ -21,7 +21,6 @@ const Input = ({ setChatbotStatus, isDirectLink, addUserMessage, lastMessage, ad
 
     };
 
-
     const _checkAfterMessage = (afterMessage, newState, type) => {
         if (afterMessage) {
             setChatbotStatus({...newState, afterMessage})
@@ -29,7 +28,6 @@ const Input = ({ setChatbotStatus, isDirectLink, addUserMessage, lastMessage, ad
             setChatbotStatus(newState);
         }
     };
-
 
     const addStatus = (component, message) => {
         return React.cloneElement(component, { setChatbotStatus, submitMessage, message });

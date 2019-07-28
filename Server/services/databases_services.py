@@ -280,6 +280,7 @@ def scanCandidates(session, dbIDs, extraCandidates=None):
         df = df.drop('DatabaseID', axis=1)  # Drop column
 
         keywords = session['keywordsByDataType']
+        keywords = session['employmentSalaryType']
         df['Score'] = 0  # Add column for tracking score
         df['Source'] = "Internal Database"  # Source of solution e.g. Bullhorn, Adapt...
         if extraCandidates:
@@ -290,7 +291,7 @@ def scanCandidates(session, dbIDs, extraCandidates=None):
         df = df.fillna({Candidate.CandidateDesiredSalary.name: 0, Candidate.CandidateYearsExperience: 0}).fillna('')
 
         # Salary comparision for JobSalary (LessThan is forced)
-        salaryInputs: list = keywords.get(DT.JobSalary.value['name'])
+        salaryInputs: list = keywords.get(DT.JobAnnualSalary.value['name'], keywords.get(DT.JobDayRate.value['name']))
         if salaryInputs and len(salaryInputs):
             df[['Score', Candidate.CandidateDesiredSalary.name, Candidate.Currency.name]] = \
                 df.apply(lambda row: __salary(row, Candidate.CandidateDesiredSalary,
@@ -298,7 +299,7 @@ def scanCandidates(session, dbIDs, extraCandidates=None):
                                               salaryInputs[-1], plus=8, forceLessThan=True), axis=1, result_type='expand')
 
         # Salary comparision for CandidateDesiredSalary
-        salaryInputs: list = keywords.get(DT.CandidateDesiredSalary.value['name'])
+        salaryInputs: list = keywords.get(DT.CandidateAnnualDesiredSalary.value['name'], keywords.get(DT.CandidateDailyDesiredSalary.value['name']))
         if salaryInputs and len(salaryInputs):
             df[['Score', Candidate.CandidateDesiredSalary.name, Candidate.Currency.name]] = \
                 df.apply(lambda row: __salary(row, Candidate.CandidateDesiredSalary,
@@ -388,7 +389,7 @@ def scanJobs(session, dbIDs, extraJobs=None):
         df = df.fillna({Job.JobSalary.name: 0, Job.JobYearsRequired.name: 0}).fillna('')
 
         # Salary comparision
-        salaryInputs: list = keywords.get(DT.JobSalary.value['name'], keywords.get(DT.CandidateDesiredSalary.value['name']))
+        salaryInputs: list = keywords.get(DT.JobAnnualSalary.value['name'], keywords.get(DT.JobDayRate.value['name'], keywords.get(DT.CandidateAnnualDesiredSalary.value['name'], keywords.get(DT.CandidateDailyDesiredSalary.value['name']))))
         if salaryInputs and len(salaryInputs):
             df[['Score', Job.JobSalary.name, Job.Currency.name]] = \
                 df.apply(lambda row: __salary(row, Job.JobSalary, Job.Currency, Job.PayPeriod, salaryInputs[-1], 8),
@@ -516,7 +517,7 @@ def __numCounter(dbColumn, compareSign, dataType: DT, keywords, df, plus=1, addI
                    int(numberInput), 'Score'] += plus
 
 
-# min-max currency period / ex. "10000-45000 GBP Annually"         old: "Greater Than 5000 GBP Annually"
+# min-max currency period / ex. "10000-45000 GBP Annually" old: "Greater Than 5000 GBP Annually"
 def __salary(row, dbSalaryColumn, dbCurrencyColumn, dbPayPeriodColumn, salaryInput: str, plus=4, forceLessThan=False):
 
     userSalary = salaryInput.split(' ')
@@ -540,7 +541,7 @@ def __salary(row, dbSalaryColumn, dbCurrencyColumn, dbPayPeriodColumn, salaryInp
 
     # Compare salaries, if true then return 'plus' to be added to the score otherwise old score
     if not forceLessThan:
-        return (plus if (float(userMin) >= dbSalary <= float(userMax)) else row['Score']), dbSalary, userSalary[1]
+        return (plus if (float(userMin) <= dbSalary <= float(userMax)) else row['Score']), dbSalary, userSalary[1]
     else:  # Less
         return (plus if dbSalary <= float(userMax) else row['Score']), dbSalary, userSalary[1]
 

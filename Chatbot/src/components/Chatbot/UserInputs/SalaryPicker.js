@@ -18,7 +18,7 @@ const getDotNotation = (val, currency) => {
 const SalaryPicker = ({ message, submitMessage, period }) => {
 
 
-    let [payRate, setPayRate] = useState(period === "CandidateAnnualDesiredSalary" ? "Annual" : "Daily");
+    let [payRate, setPayRate] = useState(period === "CandidateAnnualDesiredSalary" || period === "JobAnnualSalary" ? "Annual" : "Daily");
     let [min, setMin] = useState(0);
     let [max, setMax] = useState(2000);
     let [salary, setSalary] = useState([0.3 * max, 0.7 * max]);

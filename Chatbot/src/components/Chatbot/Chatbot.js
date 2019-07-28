@@ -159,7 +159,7 @@ export const Chatbot = ({
             console.log(block)
             if (!data.length) {
                 setChatbotStatus({
-                    curAction: 'End Chat',
+                    curAction: block[flowAttributes.SKIP_ACTION] | 'Go To Next Block',
                     afterMessage: 'Sorry, I could not find what you want!',
                     curBlockID: block[flowAttributes.CONTENT][flowAttributes.BLOCKTOGOID]
                 });

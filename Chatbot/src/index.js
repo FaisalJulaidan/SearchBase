@@ -1,3 +1,6 @@
+import 'react-app-polyfill/ie11';
+import 'react-app-polyfill/stable';
+
 import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
@@ -7,7 +10,6 @@ import {compose, createStore} from 'redux';
 import {Provider} from 'react-redux';
 import reducers from './store/reducers';
 import WebFont from 'webfontloader';
-import 'react-app-polyfill/ie11';
 import Chatbot from './components/Chatbot/Chatbot';
 
 const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;

@@ -22,8 +22,9 @@ const assistantID = scriptTag.getAttribute('data-id');
 const btnColor = scriptTag.getAttribute('data-circle') || '#1890ff';
 
 let root = document.createElement('div');
-root.id = 'TheSearchBase_Chatbot';
-root.style = 'background:none';
+root.setAttribute('id', 'TheSearchBase_Chatbot');
+root.setAttribute('style', 'background:none');
+
 if (isDirectLink)
     document.getElementById('direct_link_container').appendChild(root);
 else

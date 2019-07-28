@@ -10,7 +10,7 @@ from models import db, Assistant
 from utilities import json_schemas, enums
 
 
-# NOTE: Make sure to take a backup of the database before running this function
+# NOTE: Make sure to take a backup of the database before running these functions
 # =============================================================================
 
 
@@ -70,6 +70,13 @@ def __migrateFlow(flow):
         newFlow = copy.deepcopy(flow) # deep clone is IMPORTANT
         for group in newFlow['groups']: # loop groups
             for block in group['blocks']: # loop blocks
+
+
+                if block['DataType'] == "JobSalary":
+                    block['DataType'] = enums.DataType.JobAnnualSalary.name
+
+                if block['DataType'] == "CandidateDesiredSalary":
+                    block['DataType'] = enums.DataType.CandidateAnnualDesiredSalary.name
 
                 if block['Type'] == enums.BlockType.Question.value:
                     for answer in block['Content']['answers']:

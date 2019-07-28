@@ -1,12 +1,12 @@
 import React from 'react';
-import {connect} from 'react-redux';
+import { connect } from 'react-redux';
 // Constants
 import * as messageTypes from '../../../constants/MessageType';
 // Styles
 import './styles/UserMessage.css';
 // Components
 import TextMessage from './TextMessage';
-import {Icon, Tooltip} from 'antd';
+import { Icon, Tooltip } from 'antd';
 
 const UserMessage = ({ type, message, addUserMessage, setChatbotStatus, rewind, finished }) => {
     const addStatus = (component) => {
@@ -28,9 +28,9 @@ const UserMessage = ({ type, message, addUserMessage, setChatbotStatus, rewind, 
                 return null
         }
     };
-    const isIE11 = !!window.MSInputMethodContext && !!document.documentMode;
+
     return (
-        <div className={isIE11 ? 'User_IE11' : 'User'}>
+        <div className={'User'}>
             {finished ? null : <Tooltip placement={'left'}
                                         getPopupContainer={() => {
                                             if (document.getElementById('TheSearchBase_Chatbot_Input'))

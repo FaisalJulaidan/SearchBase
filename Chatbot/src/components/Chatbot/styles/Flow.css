@@ -11,7 +11,22 @@
     will-change: transform;
 }
 
+.Flow_IE11 {
+    height: calc(100% - 150px);
+    width: 100%;
+    flex-flow: column;
+    padding: 10px 15px 15px;
+    overflow-x: hidden;
+    transition: height 0.5s;
+    overflow-y: auto;
+    will-change: transform;
+}
+
 .FlowBottom {
+}
+
+.FlowBottom_IE11 {
+    float: left;
 }
 
 .Extended {
@@ -35,18 +50,19 @@
 }
 
 .BOT_IE11 {
-    position: relative;
-    /*padding: 10px 15px;*/
-    background: #f2f2f2;
-    color: black;
-    margin: 5px;
-    max-width: 100%;
+    width: 100%;
+    float: left;
 }
 
 .USER {
     align-self: flex-end;
     border-radius: 20px;
     position: relative;
+}
+
+.USER_IE11 {
+    width: 100%;
+    float: right;
 }
 
 .solution_margin{

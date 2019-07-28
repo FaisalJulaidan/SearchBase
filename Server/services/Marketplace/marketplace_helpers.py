@@ -10,7 +10,6 @@ from utilities import helpers
 # process the redirect from the auth callback
 def connect(type, auth, companyID):
     try:
-
         # find the type and redirect to its service
         if CRM_Enum.has_value(type):
             return crm_services.connect(type, auth, companyID)

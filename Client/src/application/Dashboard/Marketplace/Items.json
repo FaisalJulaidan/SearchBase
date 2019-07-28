@@ -17,6 +17,14 @@
       "status": "NOT_CONNECTED"
     },
     {
+      "title": "Mercury",
+      "desc": "Calendar is the calendar and scheduling component of Outlook that is fully integrated with email, contacts, and other features.",
+      "image": "/static/images/CRM/mercury.svg",
+      "type": "Mercury",
+      "disabled": true,
+      "status": "NOT_CONNECTED"
+    },
+    {
       "title": "Vincere",
       "desc": "Vincere provides customer relationship management, applicant tracking system and operations software for the staffing industry.",
       "image": "/static/images/CRM/vincere.svg",
@@ -37,6 +45,14 @@
       "desc": "Calendar is the calendar and scheduling component of Outlook that is fully integrated with email, contacts, and other features.",
       "image": "/static/images/CRM/outlook.svg",
       "type": "Outlook",
+      "disabled": true,
+      "status": "NOT_CONNECTED"
+    },
+    {
+      "title": "Twilio",
+      "desc": "Twilio is a messaging service allowing SearchBase to send SMS-s to users on behalf of Recruiters.",
+      "image": "/static/images/CRM/twilio.svg",
+      "type": "Twilio",
       "disabled": true,
       "status": "NOT_CONNECTED"
     },

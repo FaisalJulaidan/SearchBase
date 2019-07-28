@@ -12,6 +12,7 @@ import {VincereFeatures, VincereHeader} from "./Components/Vincere";
 import {GreenhouseFeatures, GreenhouseFormItem, GreenhouseHeader} from "./Components/Greenhouse";
 import {GoogleFeatures, GoogleHeader} from './Components/Google'
 import {OutlookFeatures, OutlookHeader} from "./Components/Outlook";
+import {MercuryFeatures, MercuryFormItems, MercuryHeader} from "./Components/Mercury";
 import {CSVLink} from "react-csv";
 import data from '../Items.json'
 import {connect} from 'react-redux';
@@ -43,7 +44,7 @@ class Item extends React.Component {
         let type = location.pathname.split('/').slice(-1)[0]; // ex. Bullhorn, Adapt...
         let params = queryString.parse(location.search);
 
-        if( (type === "Bullhorn" || type === "Vincere" || type === "Outlook") && params['code']){
+        if( (type === "Bullhorn" || type === "Vincere" || type === "Outlook" || type === "Mercury") && params['code']){
             dispatch(marketplaceActions.connectMarketplace(type, {...params})); // connect
             this.props.history.replace("/dashboard/marketplace/" + type) // clean the url from args
 
@@ -83,13 +84,14 @@ class Item extends React.Component {
      * @param {'header'|'features'|'form'|'button'|'runExport'} place
      * */
     getMarketplaceComponent = (type, place) => {
-        const {getFieldDecorator} = this.props.form;
+        const {getFieldDecorator,validateFields} = this.props.form;
         const layout = {
             labelCol: {span: 6},
             wrapperCol: {span: 14},
         };
         const formOptions = {
             getFieldDecorator,
+            validateFields,
             layout,
             marketplace: this.marketplaceItem,
             FormItem: FormItem,
@@ -215,6 +217,20 @@ class Item extends React.Component {
                     windowObject.url = "https://login.microsoftonline.com/common/oauth2/v2.0/authorize?response_type=code&client_id=0978960c-c837-479f-97ef-a75be4bbacd4&response_mode=query&scope=openid+https%3A%2F%2Fgraph.microsoft.com%2Fcalendars.readwrite%20+offline_access&redirect_uri="+ getLink("/dashboard/marketplace/Outlook");
                     return <DefaultButton buttonText={'Connect to Outlook'}
                                           windowObject={windowObject}
+                                          {...buttonsOptions}/>;
+                }
+                break;
+
+            case "Mercury":
+                if (place === 'header')
+                    return <MercuryHeader/>;
+                if (place === 'features')
+                    return <MercuryFeatures/>;
+                if (place === 'form')
+                    return <MercuryFormItems {...formOptions}/>;
+                if (place === 'button') {
+                    return <DefaultButton buttonText={'Connect to Mercury'}
+                                          // windowObject={windowObject}
                                           {...buttonsOptions}/>;
                 }
                 break;

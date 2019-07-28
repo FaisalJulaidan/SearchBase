@@ -67,7 +67,7 @@ def generate():
                             ],
                             "text": "what?"
                         },
-                        "DataType": "CandidateSkills",
+                        "DataType": enums.DataType.CandidateSkills.value['enumName'],
                         "ID": "8EDEBiDHa",
                         "SkipAction": "End Chat",
                         "SkipBlockToGoID": None,
@@ -83,7 +83,7 @@ def generate():
                         "SkipText": "Not found what you're looking for?",
                         "SkipAction": "Go To Next Block",
                         "SkipBlockToGoID": None,
-                        "DataType": "NoType",
+                        "DataType": enums.DataType.NoType.value['enumName'],
                         "Content": {
                             "showTop": 5,
                             "action": "Go To Next Block",

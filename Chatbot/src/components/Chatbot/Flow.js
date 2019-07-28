@@ -86,11 +86,19 @@ const Flow = ({ messages, setChatbotStatus, addUserMessage, addBotMessage, think
     let groupedMessages = groupMessages(messages);
 
     const isIE11 = !!window.MSInputMethodContext && !!document.documentMode;
+    const getSender = (sender) => {
+        switch (sender) {
+            case 'BOT':
+                return isIE11 ? 'BOT_IE11' : 'BOT';
+            case 'USER':
+                return isIE11 ? 'USER_IE11' : 'USER'
+        }
+    };
     return (
         <div className={[isIE11 ? 'Flow_IE11' : 'Flow', (inputOpen ? '' : 'Extended')].join(' ')} ref={flowRef}>
             {
                 groupedMessages.map((group, i) =>
-                    <div className={[group[0].sender, 'BounceIn'].join(' ')} key={i}>
+                    <div className={[getSender(group[0].sender), 'BounceIn'].join(' ')} key={i}>
                         {group.map(message => addStatus(getBySender(message), message))}
                     </div>
                 )

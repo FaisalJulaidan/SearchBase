@@ -80,7 +80,8 @@ def __migrateFlow(flow):
 
                 if block['Type'] == enums.BlockType.Question.value:
                     for answer in block['Content']['answers']:
-                      pass
+                        if not answer.get('score', None):
+                            answer['score'] = 0
 
                 if block['Type'] == enums.BlockType.UserInput.value:
                     pass
@@ -101,6 +102,6 @@ def __migrateFlow(flow):
         return newFlow
 
     except Exception as exc:
-        print(exc.args)
+        # print(exc.args)
         print("Flow migration failed :(")
         return None

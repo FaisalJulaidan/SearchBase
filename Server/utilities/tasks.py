@@ -10,7 +10,7 @@ from models import db, Assistant
 from utilities import json_schemas, enums
 
 
-# NOTE: Make sure to take a backup of the database before running this function
+# NOTE: Make sure to take a backup of the database before running these functions
 # =============================================================================
 
 

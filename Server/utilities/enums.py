@@ -120,7 +120,7 @@ class ValidationType(Enum):
     Time = 'Time'
     Date = 'Date'
     DateTime = 'DateTime'
-    Salary = 'Salary'
+    Salary = 'Salary' # Ex: 1000-5000 GBP Annually
 
     @classmethod
     def has_value(cls, value):
@@ -240,6 +240,14 @@ class DataType(Enum):
         DataTypeSection.Candidate,
         [UserType.Candidate])
 
+    # /////////// DELETE BELOW
+    CandidateDesiredSalary = dataTypeCreator(
+        'Candidate Desired Salary',
+        'CandidateDesiredSalary',
+        ValidationType.Salary,
+        DataTypeSection.Candidate,
+        [UserType.Candidate])
+
     CompanyName = dataTypeCreator(
         'Company Name',
         'CompanyName',
@@ -305,10 +313,16 @@ class DataType(Enum):
         DataTypeSection.Job,
         [UserType.Candidate, UserType.Client])
 
-    # Example: Less Than 5000 GBP Annually
     JobSalary = dataTypeCreator(
         'Job Salary',
         'JobSalary',
+        ValidationType.Salary,
+        DataTypeSection.Job,
+        [UserType.Candidate, UserType.Client])
+
+    JobDayRate = dataTypeCreator(
+        'Job Day Rate',
+        'JobDayRate',
         ValidationType.Salary,
         DataTypeSection.Job,
         [UserType.Candidate, UserType.Client])

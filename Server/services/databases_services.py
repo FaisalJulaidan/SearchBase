@@ -260,14 +260,13 @@ def scan(session, assistantHashID):
         return Callback(False, 'Error while scanning the database')
 
 
-def getCRMData(assistant, scanEntity, session):
+def getCRMData(assistant, databaseType, session):
     # check CRM
     if assistant.CRM:
-        if scanEntity is "Jobs":
+        if databaseType is "Jobs":
             return crm_services.searchJobs(assistant, session).Data
-        elif scanEntity is "Candidates":
+        elif databaseType is "Candidates":
             return crm_services.searchCandidates(assistant, session).Data
-
     return None
 
 

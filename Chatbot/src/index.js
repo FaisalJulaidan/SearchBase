@@ -2,9 +2,6 @@ import 'react-app-polyfill/ie11';
 import 'react-app-polyfill/stable';
 import smoothscroll from 'smoothscroll-polyfill';
 
-// kick off the polyfill!
-smoothscroll.polyfill();
-
 import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
@@ -18,6 +15,10 @@ import Chatbot from './components/Chatbot/Chatbot';
 
 const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
 const store = createStore(reducers, composeEnhancers());
+
+// kick off the polyfill!
+smoothscroll.polyfill();
+
 WebFont.load({ google: { families: ['Source Sans Pro', 'sans-serif'] } });
 
 const scriptTag = document.querySelector('script[data-name="tsb-widget"][data-id]');

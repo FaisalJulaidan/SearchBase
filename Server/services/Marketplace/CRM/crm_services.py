@@ -60,6 +60,8 @@ def uploadFile(assistant: Assistant, storedFile: StoredFile):
         return Vincere.uploadFile(assistant.CRM.Auth, storedFile)
     elif assistant.CRM.Type is CRM.Greenhouse:
         return Greenhouse.uploadFile(assistant.CRM.Auth, storedFile)
+    elif assistant.CRM.Type is CRM.Jobscience:
+        return Callback(True, "Jobscience does not support file upload at this time")
     else:
         return Callback(False, "CRM type did not match with those on the system")
 
@@ -109,6 +111,8 @@ def getAllCandidates(assistant: Assistant):
         return Vincere.getAllCandidates(assistant.CRM.Auth, assistant.CompanyID)
     elif assistant.CRM.Type is CRM.Greenhouse:
         return Greenhouse.getAllCandidates(assistant.CRM.Auth)
+    elif assistant.CRM.Type is CRM.Jobscience:
+        return Jobscience.getAllCandidates(assistant.CRM.Auth, assistant.CompanyID)
     else:
         return Callback(False, "CRM type did not match with those on the system")
 
@@ -124,6 +128,8 @@ def getAllJobs(assistant: Assistant):
         return Vincere.getAllJobs(assistant.CRM.Auth, assistant.CompanyID)
     elif assistant.CRM.Type is CRM.Greenhouse:
         return Greenhouse.getAllJobs(assistant.CRM.Auth)
+    elif assistant.CRM.Type is CRM.Jobscience:
+        return Jobscience.getAllJobs(assistant.CRM.Auth, assistant.CompanyID)
     else:
         return Callback(False, "CRM type did not match with those on the system")
 

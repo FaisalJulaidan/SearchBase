@@ -1,4 +1,3 @@
-import base64
 import json
 import os
 from datetime import datetime
@@ -6,20 +5,11 @@ from datetime import datetime
 import requests
 from sqlalchemy_utils import Currency
 
-from models import Callback, Conversation, db, CRM as CRM_Model, StoredFile
-from services import databases_services, stored_file_services
+from models import Callback, Conversation, StoredFile
+from services import databases_services
 from services.Marketplace import marketplace_helpers
-from services.Marketplace.CRM import crm_services
-
 from utilities import helpers
-from utilities.enums import DataType as DT, Period, CRM
-
-# TODO: 29/07/2019
-# --> Draft filter Jobs [CHECK]
-# ---> Draft filter Candidates[CHECK]
-# ---> Code clean up [CHECK]
-# --> Comment issues & unique features to prsjobs API [CHECK]
-# --> Replace PRSJobs with JobScience [CHECK]
+from utilities.enums import DataType as DT, Period
 
 CLIENT_ID = os.environ['JOBSCIENCE_CLIENT_ID']
 CLIENT_SECRET = os.environ['JOBSCIENCE_CLIENT_SECRET']
@@ -27,9 +17,6 @@ CLIENT_SECRET = os.environ['JOBSCIENCE_CLIENT_SECRET']
 
 def testConnection(auth, companyID):
     try:
-        print("ATTEMPTING LOGIN")
-        print("auth: ")
-        print(auth)
         callback: Callback = login(auth)
 
         if not callback.Success:
@@ -44,8 +31,11 @@ def testConnection(auth, companyID):
 
 def login(auth):
     try:
+
+        print("LOG IN")
+
         authCopy = dict(auth)
-        print("LOGGING IN HERE")
+
         headers = {'Content-Type': 'application/json'}
 
         access_token_url = "https://test.salesforce.com/services/oauth2/token?" + \
@@ -62,12 +52,8 @@ def login(auth):
             raise Exception(access_token_request.text)
 
         result_body = json.loads(access_token_request.text)
-        print("WHERE IS THE CODE?")
-        print(result_body)
 
-        # Logged in successfully
-
-        # <-- TESTING QUERIES -->
+        # //////////////////////////// TESTING QUERIES ///////////////////////////////////////////////
         # GENERIC QUERY: sendQuery(result_body.get("access_token"), "get", "SELECT+name+from+Account")
         # FETCH ALL JOBS:
         # getAllJobs(result_body.get("access_token"), None, None)
@@ -84,7 +70,7 @@ def login(auth):
         # insertCandidate(result_body.get("access_token"), None)
         # INSERT A  CLIENT COMPANY:
         # insertCompany(result_body.get("access_token"), None);
-
+        # ///////////////////////////////////////////////////////////////////////////////////////////////
         return Callback(True, 'Logged in successfully', result_body.get('access_token'))  # No refresh token currently
 
     except Exception as exc:
@@ -93,7 +79,7 @@ def login(auth):
 
 
 def logout(access_token, companyID):  # QUESTION: Purpose of companyID param?
-    print("<-- ATTEMTING TO LOGOUT -->")
+    print("LOGOUT")
     try:
         # Attempt logout
         logout_url = "https://test.salesforce.com/services/oauth2/revoke?token=" + access_token

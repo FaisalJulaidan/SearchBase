@@ -97,7 +97,6 @@ if os.environ['FLASK_ENV'] in ['production', 'staging']:
 
     # Start scheduled tasks
     if not os.environ.get("scheduler_lock"):
-        print("Scheduler starting...")
         scheduler_services.scheduler.start()
         os.environ["scheduler_lock"] = "True"
 
@@ -122,7 +121,6 @@ elif os.environ['FLASK_ENV'] == 'development':
 
     # Start scheduled tasks
     if not os.environ.get("scheduler_lock"):
-        print("Scheduler starting...")
         scheduler_services.scheduler.start()
         os.environ["scheduler_lock"] = "True"
 

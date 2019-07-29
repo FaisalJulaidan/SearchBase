@@ -28,6 +28,7 @@ class Company(db.Model):
     CRMs = db.relationship('CRM', back_populates='Company')
     Calendars = db.relationship('Calendar', back_populates='Company')
     AutoPilots = db.relationship('AutoPilot', back_populates='Company')
+    AppointmentAllocationTimes = db.relationship('AppointmentAllocationTime', back_populates='Company')
 
     def __repr__(self):
         return '<Company {}>'.format(self.Name)

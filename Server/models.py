@@ -86,8 +86,11 @@ Job: Job = Job
 from schemas.Newsletter import Newsletter
 Newsletter: Newsletter = Newsletter
 
-from schemas.OpenTimes import OpenTimes
-OpenTimes: OpenTimes = OpenTimes
+from schemas.AppointmentAllocationTime import AppointmentAllocationTime
+AppointmentAllocationTime: AppointmentAllocationTime = AppointmentAllocationTime
+
+from schemas.AppointmentAllocationTimeInfo import AppointmentAllocationTimeInfo
+AppointmentAllocationTimeInfo: AppointmentAllocationTimeInfo = AppointmentAllocationTimeInfo
 
 from schemas.Role import Role
 Role: Role = Role

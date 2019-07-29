@@ -19,8 +19,10 @@ class AutoPilot(db.Model):
     CompanyID = db.Column(db.Integer, db.ForeignKey('company.ID', ondelete='cascade'), nullable=False)
     Company = db.relationship('Company', back_populates='AutoPilots')
 
+    AppointmentAllocationTimeID = db.Column(db.Integer, db.ForeignKey('appointment_allocation_time.ID', ondelete='SET NULL'), nullable=True)
+    AppointmentAllocationTime = db.relationship('AppointmentAllocationTime', back_populates='AutoPilots')
+
     Assistants = db.relationship('Assistant', back_populates='AutoPilot')
-    OpenTimes = db.relationship('OpenTimes', back_populates='AutoPilot')
 
     # Constraints:
     # cannot have two auto pilot with the same name under one company

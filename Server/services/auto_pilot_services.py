@@ -1,6 +1,6 @@
 from datetime import datetime, time
 
-from models import db, Callback, AutoPilot, OpenTimes, Conversation
+from models import db, Callback, Conversation, AutoPilot
 from services import mail_services, stored_file_services as sfs
 from sqlalchemy import and_
 from utilities import helpers
@@ -93,20 +93,8 @@ def processConversation(conversation: Conversation, autoPilot: AutoPilot):
 # The new AutoPilot will be returned parsed
 def create(name, desc, companyID: int) -> Callback:
     try:
-
         autoPilot= AutoPilot(Name=name, Description=desc, CompanyID=companyID) # Create new AutoPilot
-
-        # Create the AutoPilot with default open time slots
-        default = {"From": time(8,30), "To": time(12,0), "Duration": 30, "AutoPilot": autoPilot, "Active": False}
-        openTimes = [OpenTimes(Day=0, **default),  # Sunday
-                     OpenTimes(Day=1, **default),
-                     OpenTimes(Day=2, **default),
-                     OpenTimes(Day=3, **default),
-                     OpenTimes(Day=4, **default),
-                     OpenTimes(Day=5, **default),
-                     OpenTimes(Day=6, **default),  # Saturday
-                     ]
-        db.session.add_all(openTimes)
+        db.session.add(autoPilot)
         db.session.commit()
         return Callback(True, "Got AutoPilot successfully.", autoPilot)
 

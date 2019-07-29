@@ -78,14 +78,14 @@ def open_times(payload):
         assistant: Assistant = assistant_callback.Data
 
         # Get open times slots associated with this assistant if exist
-        openTimes_callback: Callback = assistant_services.getOpenTimes(data['assistantID'])
-        if not openTimes_callback.Success:
+        times_callback: Callback = assistant_services.getAppointmentAllocationTime(data['assistantID'])
+        if not times_callback.Success:
             return helpers.jsonResponse(False, 404, "Couldn't load available time slots")
 
         data = {
             "companyName": assistant.Company.Name,
             "companyLogoURL": assistant.Company.LogoPath,
-            "openTimes": helpers.getListFromSQLAlchemyList(openTimes_callback.Data or []),
+            "openTimes": helpers.getListFromSQLAlchemyList(times_callback.Data.Info or []),
             "takenTimeSlots": helpers.getListFromSQLAlchemyList(assistant.Appointments),
             "userName": data['userName']
         }
@@ -108,7 +108,7 @@ def open_times(payload):
                                         '{0:%Y-%m-%d %H:%M:%S}'.format(appointment.DateTime))
 
         # Add new appointment
-        appointment_callback: Callback = appointment_services.add(data['conversationID'],
+        appointment_callback: Callback = appointment_services.addNewAppointment(data['conversationID'],
                                                                   request.json.get('pickedTimeSlot'))
 
         if not appointment_callback.Success:

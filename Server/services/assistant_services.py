@@ -133,7 +133,7 @@ def getAllWithEnabledNotifications(companyID) -> Callback:
 
 
 # Return the openTimes from the autoPilot connected to this assistant
-def getOpenTimes(assistantID) -> Callback:
+def getAppointmentAllocationTime(assistantID) -> Callback:
     try:
         # Get assistant and check if None then raise exception
         assistant: Assistant = db.session.query(Assistant).filter(Assistant.ID == assistantID).first()
@@ -146,7 +146,7 @@ def getOpenTimes(assistantID) -> Callback:
             return Callback(True,"There are no open time slots")
 
         # OpenTimes is an array of all open slots per day
-        return Callback(True, "Got open time slots successfully.", connectedAutoPilot.OpenTimes)
+        return Callback(True, "Got open time slots successfully.", connectedAutoPilot.AppointmentAllocationTime)
 
     except Exception as exc:
         helpers.logError("assistant_services.getOpenTimes(): " + str(exc))

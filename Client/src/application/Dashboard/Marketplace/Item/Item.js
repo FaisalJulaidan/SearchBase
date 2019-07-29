@@ -44,7 +44,7 @@ class Item extends React.Component {
         let type = location.pathname.split('/').slice(-1)[0]; // ex. Bullhorn, Adapt...
         let params = queryString.parse(location.search);
 
-        if( (type === "Bullhorn" || type === "Vincere" || type === "Outlook" || type === "Mercury") && params['code']){
+        if( (type === "Bullhorn" || type === "Vincere" || type === "Outlook") && params['code']){
             dispatch(marketplaceActions.connectMarketplace(type, {...params})); // connect
             this.props.history.replace("/dashboard/marketplace/" + type) // clean the url from args
 

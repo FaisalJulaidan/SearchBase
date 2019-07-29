@@ -52,7 +52,7 @@ def login(auth):
             "code": auth.get("code")
         }
 
-        url = "https://login.microsoftonline.com/common/oauth2/v2.0/token"
+        url = "https://login.microsoftonline.com/ded6800a-6adb-4fc5-b14e-76747a56d913/oauth2/v2.0/token"
 
         get_access_token = requests.post(url, headers=headers, data=body)
         if not get_access_token.ok:

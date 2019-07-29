@@ -16,7 +16,7 @@ from utilities.enums import DataType as DT, Period, CRM
 
 # TODO: 29/07/2019
 # --> Draft filter Jobs [CHECK]
-#---> Draft filter Candiates[]
+# ---> Draft filter Candidates[CHECK]
 # ---> Code clean up []
 # --> Comment issues & unique features to prsjobs API []
 # --> Replace PRSJobs with JobScience
@@ -79,7 +79,7 @@ def login(auth):
         # SEARCH ALL CANDIDATES:
         # searchCandidates(result_body.get("access_token"), None, None, None)
         # SEARCH CANDIDATES WITH FILTER
-        searchCandidates(result_body.get("access_token"), None, None, None)
+        # searchCandidates(result_body.get("access_token"), None, None, None)
         # INSERT A CANDIDATE:
         # insertCandidate(result_body.get("access_token"), None)
         # INSERT A  CLIENT COMPANY:
@@ -140,30 +140,8 @@ def insertCandidate(access_token, conversation: Conversation) -> Callback:
         helpers.logError("Marketplace.CRM.Bullhorn.insertCandidate() ERROR: " + str(exc))
         return Callback(False, str(exc))
 
-    # Populate JSON fields:
-    # 1 convert fields
-    # 2 Add record type as candidate
-    # headers = {
-    #     'Content-Type': 'application/json',
-    #     'Authorization': "Bearer " + access_token,
-    #     'accept-encoding': "gzip, deflate",
-    #     'content-length': "35",
-    #     'Connection': "keep-alive",
-    #     'cache-control': "no-cache"
-    # }
-    # payload = "{\n\t\"LastName\": \"ANOTHER_TEST\"\n\t\n}"
-    # url = "https://prsjobs--jsfull.cs83.my.salesforce.com/services/data/v36.0/sobjects/Contact/"
-    # response = requests.request("POST", url, data=payload, headers=headers)
-    # print(response.status_code)
-    # # TODO:
-    # # (1) print in JSON format
-    # # (2) Link to sendquery
-    # # (3) Add fields
-    # # Insert record
-    # #sendQuery(access_token, "post", body, "sobjects/Contact/")
 
-
-def uploadFile(auth, storedFile: StoredFile): # TODO: NO CURRENT SOLUTION
+def uploadFile(auth, storedFile: StoredFile):  # ISSUE: NO CURRENT API OPTION FOR RESUME UPLOAD
     print("UPLOAD FILE")
 
 
@@ -249,22 +227,17 @@ def insertCompany(auth, conversation: Conversation) -> Callback:
 # TODO: Add filters
 def searchCandidates(access_token, companyID, conversation, fields=None) -> Callback:
 
+    print(conversation)
     # Dummy conversation keywords:
-    # keywords = conversation['keywordsByDataType']
-    keywords = {'Candidate Location': ['London']}
-    print(keywords)
+    keywords = conversation['keywordsByDataType']
+    # keywords = {'Candidate Location': ['London'], 'Candidate Desired Salary': '20000'}
+    # print(keywords)
 
     try:
         # TODO: Add more filters
         query = "WHERE+"
         query += checkFilter(keywords, DT.CandidateLocation, "MailingCity")
-        # =================================================================================
-        # BUG: Salary
-        # salary = crm_services.getSalary(conversation, DT.CandidateDesiredSalary, Period.Annually)
-        #
-        # if salary:
-        #     query += " salary:" + str(salary) + " or"
-        # ======================================================================================
+
         query = query[:-4]
         query += "+AND+RecordType.Name+IN+('Candidate')" # Fetch contacts who are candidates
         print("QUERY IS: ")
@@ -274,7 +247,7 @@ def searchCandidates(access_token, companyID, conversation, fields=None) -> Call
         sendQuery_callback: Callback = sendQuery(access_token, "get", "{}", "SELECT+Name,email,phone,MailingCity," +
                                                  "ts2__Desired_Salary__c,ts2__Desired_Hourly__c," +
                                                  "ts2__EduDegreeName1__c,ts2__Education__c+from+Contact+" + query +
-                                                 "+LIMIT+500")  # Limit set to 10 TODO: Customize
+                                                 "+LIMIT+5")  # Limit set to 10 TODO: Customize
 
         if not sendQuery_callback.Success:
             raise Exception(sendQuery_callback.Message)
@@ -314,7 +287,8 @@ def searchCandidates(access_token, companyID, conversation, fields=None) -> Call
         helpers.logError("Marketplace.CRM.prsjobs.searchCandidates() ERROR: " + str(exc))
         return Callback(False, str(exc))
 
-def checkFilter(keywords, dataType: DT, string): #TODO get values in quotes
+
+def checkFilter(keywords, dataType: DT, string):
     if keywords.get(dataType.value["name"]):
         altered_list = []
         for word in keywords[dataType.value["name"]]:  # NOTE: Wrap words in single quotes
@@ -328,19 +302,12 @@ def checkFilter(keywords, dataType: DT, string): #TODO get values in quotes
 
 # TODO: Add filters
 def searchJobs(access_token, companyID, conversation, fields=None) -> Callback:
-    # Dummy conversation keywords:
-    # keywords = conversation['keywordsByDataType']
-    keywords = {'Job Location': ['London'], 'Job Title': ['chef'], 'Job Type': []}
-    # ===================================================
+
+    keywords = conversation['keywordsByDataType']
+    # keywords = {'Job Location': ['London'], 'Job Title': ['chef'], 'Job Type': []}
     print("keywords: ")
     print(keywords)
-    # PLAN:
-    # 1) Retrieve jobs with filters from conversation [CHECK]
-    # 2) Iterate through jobs [check]
-    # 3) Add jobs to database [check]
 
-    # Fields
-    # ID, Title, Description, Address, Salary, Skills, Start date, end date
     try:
         query = "WHERE+"
 
@@ -348,16 +315,9 @@ def searchJobs(access_token, companyID, conversation, fields=None) -> Callback:
 
         query += checkFilter(keywords, DT.JobLocation, "ts2__Location__c")
 
-        query += checkFilter(keywords, DT.JobType, "ts2__Employment_Type__c")  #--> [ts2__Employment_Type__c]
+        query += checkFilter(keywords, DT.JobType, "ts2__Employment_Type__c")
 
-        # ==================================================
-        # BUG: Salary
-        # salary = crm_services.getSalary(conversation, DT.JobSalary, Period.Annually) # --> [ts2__Target_Base_Salary__c]
-        # if salary > 0:
-        #     query += "ts2__Target_Base_Salary__c=" + str(salary) + "+or+"
-        # ==================================================
-
-        query += checkFilter(keywords, DT.JobDesiredSkills, "ts2__Job_Tag__c") # --> [ts2__Job_Tag__c]
+        query += checkFilter(keywords, DT.JobDesiredSkills, "ts2__Job_Tag__c")
 
         query += checkFilter(keywords, DT.JobStartDate, "ts2__Estimated_Start_Date__c")
 
@@ -365,16 +325,17 @@ def searchJobs(access_token, companyID, conversation, fields=None) -> Callback:
 
         query = query[:-4] # To remove final +or
 
-        #query += checkFilter(keywords, DT.JobYearsRequired, "yearsRequired") --> [N/A]
-
+        # NOTE: No years experience property available
         print(query)
+
         print("<-- SEARCH JOBS -->")
-        # send query (NOTE: Properties to return must be stated, no [*] operator)
+
+        # send query NOTE: Properties to return must be stated, no [*] operator
         sendQuery_callback: Callback = sendQuery(
             access_token, "get", "{}", "SELECT+Name,Rate_Type__c,ts2__Text_Description__c," +
                                        "ts2__Max_Salary__c,ts2__Location__c,ts2__Job_Tag__c," +
                                        "ts2__Estimated_Start_Date__c,ts2__Estimated_End_Date__c+from+ts2__Job__c+" +
-                                       query + "+LIMIT+500") # Limit set to 500
+                                       query + "+LIMIT+500")  # Return 500 records at most
         if not sendQuery_callback.Success:
             raise Exception(sendQuery_callback.Message)
 
@@ -418,9 +379,8 @@ def searchJobs(access_token, companyID, conversation, fields=None) -> Callback:
         helpers.logError("Marketplace.CRM.prsjobs.searchJobs() ERROR: " + str(exc))
         return Callback(False, str(exc))
 
-# TODO: Match to Bullhorn and trigger from chatbot
 
-def searchJobsCustomQuery(access_token, companyID, query, fields=None) -> Callback: # TODO
+def searchJobsCustomQuery(access_token, companyID, query, fields=None) -> Callback:
     print("SEARCH JOBS CUSTOM QUERY")
     try:
         # send query
@@ -428,7 +388,7 @@ def searchJobsCustomQuery(access_token, companyID, query, fields=None) -> Callba
             access_token, "get", "{}", "SELECT+Name,Rate_Type__c,ts2__Text_Description__c," +
                                        "ts2__Max_Salary__c,ts2__Location__c,ts2__Job_Tag__c," +
                                        "ts2__Estimated_Start_Date__c,ts2__Estimated_End_Date__c+from+ts2__Job__c" +
-                                       "+WHERE+ts2__Max_Salary__c+NOt+IN+(NULL)+LIMIT+500") # Limit set to 500
+                                       "+WHERE+ts2__Max_Salary__c+NOt+IN+(NULL)+LIMIT+500")  # Limit set to 500
         if not sendQuery_callback.Success:
             raise Exception(sendQuery_callback.Message)
 
@@ -461,8 +421,6 @@ def getAllCandidates(access_token, companyID, fields=None) -> Callback:
         helpers.logError("Marketplace.CRM.prsjobs.getAllCandidates() ERROR: " + str(exc))
         return Callback(False, str(exc))
 
-# TODO: Match to Bullhorn and trigger from chatbot
-
 
 def getAllJobs(access_token, companyID, fields=None) -> Callback:  # TODO: See this triggered.
     print("GET ALL JOBS HAS BEEN TRIGGERED")
@@ -492,13 +450,11 @@ def produceRecruiterValueReport(crm: CRM_Model, companyID) -> Callback: # TODO
 
 def sendQuery(access_token, method, body, query):
     try:
-        # get url
+
         url = buildUrl(query, method)
-        print(query)
-        print(method)
-        print(url)
-        print(method)
-        print("CONSTRUCTED URL IS: " + url)
+        print("url: " + url)
+        print("query: " + query)
+        print("method: " + method)
 
         # set headers
         headers = {
@@ -506,19 +462,15 @@ def sendQuery(access_token, method, body, query):
             'Authorization': "Bearer " + access_token,
             'cache-control': "no-cache"
         }
-        print(headers)
 
-        # set headers
-        #headers = {'Content-Type': 'application/json'}
+        response = marketplace_helpers.sendRequest(url, method, headers, json.dumps(body))
+        if not response.ok:
+            raise Exception(response.text + ". Query could not be sent")
 
-        r = marketplace_helpers.sendRequest(url, method, headers, json.dumps(body))
-        if not r.ok:
-            raise Exception(r.text + ". Query could not be sent")
-
-        elif not r.ok:
+        elif not response.ok:
             raise Exception("Rest url for query is incorrect")
 
-        return Callback(True, "Query was successful", r)
+        return Callback(True, "Query was successful", response)
 
     except Exception as exc:
         helpers.logError("Marketplace.CRM.prsjobs.sendQuery() ERROR: " + str(exc))

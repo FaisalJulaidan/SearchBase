@@ -16,7 +16,7 @@ class CRM(Enum):
     Bullhorn = 'Bullhorn'
     Vincere = 'Vincere'
     Greenhouse = 'Greenhouse'
-    PRSJobs = 'PRSJobs'
+    Jobscience = 'Jobscience'
 
     @classmethod
     def has_value(cls, value):

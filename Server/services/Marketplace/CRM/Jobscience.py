@@ -17,12 +17,12 @@ from utilities.enums import DataType as DT, Period, CRM
 # TODO: 29/07/2019
 # --> Draft filter Jobs [CHECK]
 # ---> Draft filter Candidates[CHECK]
-# ---> Code clean up []
-# --> Comment issues & unique features to prsjobs API []
+# ---> Code clean up [CHECK]
+# --> Comment issues & unique features to prsjobs API [CHECK]
 # --> Replace PRSJobs with JobScience
 
-CLIENT_ID = os.environ['PRSJOBS_CLIENT_ID']
-CLIENT_SECRET = os.environ['PRSJOBS_CLIENT_SECRET']
+CLIENT_ID = os.environ['JOBSCIENCE_CLIENT_ID']
+CLIENT_SECRET = os.environ['JOBSCIENCE_CLIENT_SECRET']
 
 
 def testConnection(auth, companyID):
@@ -38,7 +38,7 @@ def testConnection(auth, companyID):
         return Callback(True, 'Logged in successfully', callback.Data)
 
     except Exception as exc:
-        helpers.logError("Marketplace.CRM.prsjobs.testConnection() ERROR: " + str(exc))
+        helpers.logError("Marketplace.CRM.Jobscience.testConnection() ERROR: " + str(exc))
         return Callback(False, str(exc))
 
 
@@ -50,7 +50,7 @@ def login(auth):
 
         access_token_url = "https://test.salesforce.com/services/oauth2/token?" + \
                            "&grant_type=authorization_code" + \
-                           "&redirect_uri=" + helpers.getDomain() + "/dashboard/marketplace/PRSJobs" + \
+                           "&redirect_uri=" + helpers.getDomain() + "/dashboard/marketplace/Jobscience" + \
                            "&client_id=" + CLIENT_ID + \
                            "&client_secret=" + CLIENT_SECRET + \
                            "&code=" + authCopy.get("code")
@@ -88,7 +88,7 @@ def login(auth):
         return Callback(True, 'Logged in successfully', result_body.get('access_token'))  # No refresh token currently
 
     except Exception as exc:
-        helpers.logError("Marketplace.CRM.prmjobs.login() ERROR: " + str(exc))
+        helpers.logError("Marketplace.CRM.Jobscience.login() ERROR: " + str(exc))
         return Callback(False, str(exc))
 
 
@@ -107,7 +107,7 @@ def logout(access_token, companyID):  # QUESTION: Purpose of companyID param?
 
         print(r.status_code)
     except Exception as exc:
-        helpers.logError("Marketplace.CRM.prsjobs.logout() ERROR: " + str(exc))
+        helpers.logError("Marketplace.CRM.Jobscience.logout() ERROR: " + str(exc))
         return Callback(False, str(exc))
 
 
@@ -137,7 +137,7 @@ def insertCandidate(access_token, conversation: Conversation) -> Callback:
         return Callback(True, sendQuery_callback.Data.text)
 
     except Exception as exc:
-        helpers.logError("Marketplace.CRM.Bullhorn.insertCandidate() ERROR: " + str(exc))
+        helpers.logError("Marketplace.CRM.Jobscience.insertCandidate() ERROR: " + str(exc))
         return Callback(False, str(exc))
 
 
@@ -165,7 +165,7 @@ def insertClient(auth, conversation: Conversation) -> Callback:
         return Callback(True, insertClient_callback.Message)
 
     except Exception as exc:
-        helpers.logError("Marketplace.CRM.prsjobs.insertClient() ERROR: " + str(exc))
+        helpers.logError("Marketplace.CRM.Jobscience.insertClient() ERROR: " + str(exc))
         return Callback(False, str(exc))
 
 
@@ -195,7 +195,7 @@ def insertClientContact(access_token, conversation: Conversation, prsCompanyID) 
         return Callback(True, sendQuery_callback.Data.text)
 
     except Exception as exc:
-        helpers.logError("Marketplace.CRM.PRSJobs.insertClientContact() ERROR: " + str(exc))
+        helpers.logError("Marketplace.CRM.Jobscience.insertClientContact() ERROR: " + str(exc))
         return Callback(False, str(exc))
 
 
@@ -220,7 +220,7 @@ def insertCompany(auth, conversation: Conversation) -> Callback:
         return Callback(True, sendQuery_callback.Message, return_body)
 
     except Exception as exc:
-        helpers.logError("Marketplace.CRM.prsjobs.insertCompany() ERROR: " + str(exc))
+        helpers.logError("Marketplace.CRM.Jobscience.insertCompany() ERROR: " + str(exc))
         return Callback(False, str(exc))
 
 
@@ -281,10 +281,10 @@ def searchCandidates(access_token, companyID, conversation, fields=None) -> Call
                                                                   desiredSalary=record.get('ts2__Desired_Salary__c'),
                                                                   currency=Currency("GBP"),
                                                                   payPeriod=Period("Annually"),
-                                                                  source="prsjobs"))
+                                                                  source="Jobscience"))
         return Callback(True, sendQuery_callback.Message, result)
     except Exception as exc:
-        helpers.logError("Marketplace.CRM.prsjobs.searchCandidates() ERROR: " + str(exc))
+        helpers.logError("Marketplace.CRM.Jobscience.searchCandidates() ERROR: " + str(exc))
         return Callback(False, str(exc))
 
 
@@ -371,12 +371,12 @@ def searchJobs(access_token, companyID, conversation, fields=None) -> Callback:
                                                             linkURL=None,
                                                             currency=Currency("GBP"),
                                                             payPeriod=Period("Annually"),  # May need to derive this
-                                                            source="prsjobs"))
+                                                            source="Jobscience"))
 
         return Callback(True, sendQuery_callback.Message, result)
 
     except Exception as exc:
-        helpers.logError("Marketplace.CRM.prsjobs.searchJobs() ERROR: " + str(exc))
+        helpers.logError("Marketplace.CRM.Jobscience.searchJobs() ERROR: " + str(exc))
         return Callback(False, str(exc))
 
 
@@ -397,7 +397,7 @@ def searchJobsCustomQuery(access_token, companyID, query, fields=None) -> Callba
         return Callback(True, sendQuery_callback.Message, return_body)
 
     except Exception as exc:
-        helpers.logError("Marketplace.CRM.prsjobs.searchJobs() ERROR: " + str(exc))
+        helpers.logError("Marketplace.CRM.Jobscience.searchJobs() ERROR: " + str(exc))
         return Callback(False, str(exc))
 
 # TODO: Match to Bullhorn and trigger from chatbot
@@ -418,7 +418,7 @@ def getAllCandidates(access_token, companyID, fields=None) -> Callback:
         return Callback(True, sendQuery_callback.Message, return_body)
 
     except Exception as exc:
-        helpers.logError("Marketplace.CRM.prsjobs.getAllCandidates() ERROR: " + str(exc))
+        helpers.logError("Marketplace.CRM.Jobscience.getAllCandidates() ERROR: " + str(exc))
         return Callback(False, str(exc))
 
 
@@ -440,7 +440,7 @@ def getAllJobs(access_token, companyID, fields=None) -> Callback:  # TODO: See t
         return Callback(True, sendQuery_callback.Message, return_body)
 
     except Exception as exc:
-        helpers.logError("Marketplace.CRM.prsjobs.getAllJobs() ERROR: " + str(exc))
+        helpers.logError("Marketplace.CRM.Jobscience.getAllJobs() ERROR: " + str(exc))
         return Callback(False, str(exc))
 
 
@@ -473,7 +473,7 @@ def sendQuery(access_token, method, body, query):
         return Callback(True, "Query was successful", response)
 
     except Exception as exc:
-        helpers.logError("Marketplace.CRM.prsjobs.sendQuery() ERROR: " + str(exc))
+        helpers.logError("Marketplace.CRM.Jobscience.sendQuery() ERROR: " + str(exc))
         return Callback(False, str(exc))
 
 

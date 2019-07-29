@@ -48,15 +48,13 @@ def verifyRequest(token):
         if appointment:
             appointment = helpers.getDictFromLimitedQuery(["Status", "ID", "DateTime", "Data"], appointment)
             if appointment['Status'] == 'Pending':
-                return Callback(True, "Succesfully gathered appointment data", appointment)
+                return Callback(True, "Successfully gathered appointment data", appointment)
             else :
                 return Callback(False, "Appointment status has already been set")
     except Exception as  e:
         print(e)
         return Callback(False, "Could not gather appointment")
 
-
-# ----- Getters ----- #
 
 def setAppointmentStatusPublic(token, appointmentID, status):
     try:

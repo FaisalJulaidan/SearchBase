@@ -18,8 +18,8 @@
     },
     {
       "title": "Mercury",
-      "desc": "Calendar is the calendar and scheduling component of Outlook that is fully integrated with email, contacts, and other features.",
-      "image": "/static/images/CRM/mercury.png",
+      "desc": "Mercury xRM empowers the world’s recruiters to shortcut the recruitment process and deliver an exceptional client and candidate experience.",
+      "image": "/static/images/CRM/mercury.svg",
       "type": "Mercury",
       "disabled": true,
       "status": "NOT_CONNECTED"
@@ -42,7 +42,7 @@
     },
     {
       "title": "Outlook",
-      "desc": "Calendar is the calendar and scheduling component of Outlook that is fully integrated with email, contacts, and other features.",
+      "desc": "Outlook is the Microsoft Email Service provider. You can easily integrate your Outlook into SearchBase and if you have scheduled any appointments or calendar events, we will automatically create the events in your calendar.",
       "image": "/static/images/CRM/outlook.svg",
       "type": "Outlook",
       "disabled": true,
@@ -50,7 +50,7 @@
     },
     {
       "title": "Twilio",
-      "desc": "Twilio is a messaging service allowing SearchBase to send SMS-s to users on behalf of Recruiters.",
+      "desc": "Twilio two-way SMS and MMS messages allow you to carry on a conversation by both sending and receiving text and multimedia messages. You can integrate all of your Chatbots to natively reach your Talent Pools, Clients and candidates from within SearchBase",
       "image": "/static/images/CRM/twilio.svg",
       "type": "Twilio",
       "disabled": true,

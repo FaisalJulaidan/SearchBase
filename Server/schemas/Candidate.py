@@ -1,8 +1,5 @@
 from models import db
 from sqlalchemy_utils import CurrencyType
-from sqlalchemy import Enum
-from utilities import enums
-
 
 class Candidate(db.Model):
     ID = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
@@ -18,7 +15,6 @@ class Candidate(db.Model):
     CandidateYearsExperience = db.Column(db.Float(), nullable=True)
     CandidateDesiredSalary = db.Column(db.Float(), nullable=True)
     Currency = db.Column(CurrencyType, nullable=False) # Required
-    PayPeriod = db.Column(Enum(enums.Period), nullable=False) # Required
 
     # Relationships:
     DatabaseID = db.Column(db.Integer, db.ForeignKey('database.ID', ondelete='cascade'), nullable=False)

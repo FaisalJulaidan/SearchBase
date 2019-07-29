@@ -10,9 +10,8 @@ from models import db, Assistant
 from utilities import json_schemas, enums
 
 
-# NOTE: Make sure to take a backup of the database before running this function
+# NOTE: Make sure to take a backup of the database before running these functions
 # =============================================================================
-
 
 def migrateFlows():
     try:
@@ -71,9 +70,12 @@ def __migrateFlow(flow):
         for group in newFlow['groups']: # loop groups
             for block in group['blocks']: # loop blocks
 
+                if block['DataType'] == "JobDesiredSkills":
+                    block['DataType'] = enums.DataType.JobEssentialSkills.name
+
                 if block['Type'] == enums.BlockType.Question.value:
-                    for answer in block['Content']['answers']:
-                      pass
+                    pass
+                    # for answer in block['Content']['answers']:
 
                 if block['Type'] == enums.BlockType.UserInput.value:
                     pass
@@ -94,6 +96,6 @@ def __migrateFlow(flow):
         return newFlow
 
     except Exception as exc:
-        print(exc.args)
+        # print(exc.args)
         print("Flow migration failed :(")
         return None

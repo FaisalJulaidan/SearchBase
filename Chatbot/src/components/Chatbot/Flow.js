@@ -1,9 +1,9 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { connect } from 'react-redux';
+import React, {useEffect, useRef, useState} from 'react';
+import {connect} from 'react-redux';
 // Actions
-import { addBotMessage, addUserMessage, rewindToMessage, setChatbotStatus } from '../../store/actions';
+import {addBotMessage, addUserMessage, rewindToMessage, setChatbotStatus} from '../../store/actions';
 // Utils
-import { dataHandler } from '../../utils';
+import {dataHandler} from '../../utils';
 // Styles
 import './styles/Flow.css';
 import './styles/Animations.css';
@@ -85,17 +85,26 @@ const Flow = ({ messages, setChatbotStatus, addUserMessage, addBotMessage, think
 
     let groupedMessages = groupMessages(messages);
 
+    const isIE11 = !!window.MSInputMethodContext && !!document.documentMode;
+    const getSender = (sender) => {
+        switch (sender) {
+            case 'BOT':
+                return isIE11 ? 'BOT_IE11' : 'BOT';
+            case 'USER':
+                return isIE11 ? 'USER_IE11' : 'USER'
+        }
+    };
     return (
-        <div className={['Flow', (inputOpen ? '' : 'Extended')].join(' ')} ref={flowRef}>
+        <div className={[isIE11 ? 'Flow_IE11' : 'Flow', (inputOpen ? '' : 'Extended')].join(' ')} ref={flowRef}>
             {
                 groupedMessages.map((group, i) =>
-                    <div className={[group[0].sender, 'BounceIn'].join(' ')} key={i}>
+                    <div className={[getSender(group[0].sender), 'BounceIn'].join(' ')} key={i}>
                         {group.map(message => addStatus(getBySender(message), message))}
                     </div>
                 )
             }
             {thinking ? <Thinking/> : null}
-            <div className={'FlowBottom'} ref={scrollRef}/>
+            <div className={isIE11 ? 'FlowBottom_IE11' : 'FlowBottom'} ref={scrollRef}/>
         </div>
     );
 };

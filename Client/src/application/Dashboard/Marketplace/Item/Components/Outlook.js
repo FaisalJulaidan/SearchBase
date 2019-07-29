@@ -47,7 +47,7 @@ export const OutlookFeatures = () =>
 
 export const OutlookHeader = () =>
     <Paragraph type="secondary">
-        Outlook description
+        Outlook is the Microsoft Email Service provider. You can easily integrate your Outlook into SearchBase and if you have scheduled any appointments or calendar events, we will automatically create the events in your calendar.
     </Paragraph>;
 
 

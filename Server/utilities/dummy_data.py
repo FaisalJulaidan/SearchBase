@@ -67,7 +67,7 @@ def generate():
                             ],
                             "text": "what?"
                         },
-                        "DataType": "CandidateSkills",
+                        "DataType": enums.DataType.CandidateSkills.value['enumName'],
                         "ID": "8EDEBiDHa",
                         "SkipAction": "End Chat",
                         "SkipBlockToGoID": None,
@@ -83,7 +83,7 @@ def generate():
                         "SkipText": "Not found what you're looking for?",
                         "SkipAction": "Go To Next Block",
                         "SkipBlockToGoID": None,
-                        "DataType": "NoType",
+                        "DataType": enums.DataType.NoType.value['enumName'],
                         "Content": {
                             "showTop": 5,
                             "action": "Go To Next Block",
@@ -262,8 +262,7 @@ def addCandidate(db, name, desiredSalary, jobTitle, skills, exp, location):
                      CandidateSkills =skills,
                      CandidateYearsExperience = exp,
                      CandidateLocation = location,
-                     Currency= Currency('USD'),
-                     PayPeriod= enums.Period.Annually)
+                     Currency= Currency('USD'))
 
 
 def addJob(db, title, description, salary, location, currency: Currency or None):
@@ -272,5 +271,4 @@ def addJob(db, title, description, salary, location, currency: Currency or None)
                JobDescription=description,
                JobLocation=location,
                JobSalary=salary,
-               Currency= currency,
-               PayPeriod= enums.Period.Annually)
+               Currency= currency)

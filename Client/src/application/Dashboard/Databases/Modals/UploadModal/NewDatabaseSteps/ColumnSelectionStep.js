@@ -81,7 +81,7 @@ class ColumnSelectionStep extends Component {
         let validatedData;
 
 
-        if (TSBcolumnOption.column === "Currency" || TSBcolumnOption.column === "PayPeriod")
+        if (TSBcolumnOption.column === "Currency")
             validatedData = userColumns.join('');
         else
             validatedData = userColumns.map(userColumn => userRecord[userColumn]).filter(item => item).join(' ').trim();
@@ -228,22 +228,6 @@ class ColumnSelectionStep extends Component {
                                             {databaseOptions.currencyCodes.map(
                                                 (currencyCode, index) =>
                                                     <Option key={index} value={currencyCode}>{currencyCode}</Option>
-                                            )}
-                                        </Select>
-                                    )}
-                                </FormItem>
-                            );
-
-                            else if (type.column === "PayPeriod") return (
-                                <FormItem label={type.column} {...formItemLayout} key={index}>
-                                    {getFieldDecorator(type.column, {
-                                        rules: [{required: !type.nullable, message: 'This is required field',}]
-                                    })
-                                    (
-                                        <Select key={index} placeholder="Please select currency">
-                                            {databaseOptions.payPeriods.map(
-                                                (period, index) =>
-                                                    <Option key={index} value={period}>{period}</Option>
                                             )}
                                         </Select>
                                     )}

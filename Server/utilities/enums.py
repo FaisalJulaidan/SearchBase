@@ -52,6 +52,14 @@ class Period(Enum):
 
 
 @unique
+class EmploymentType(Enum):
+    Permanent = 'Permanent'
+    Temporary = 'Temporary'
+    Contract = 'Contract'
+    # Any = 'Any'
+
+
+@unique
 class BlockType(Enum):
     UserInput = 'User Input'
     Question = 'Question'
@@ -86,6 +94,7 @@ class UserType(Enum):
     def has_value(cls, value):
         return any(value == item.value for item in cls)
 
+
 @unique
 class DatabaseType(Enum):
     # multiplying userTypes by x will help detect the user type in the chatbot
@@ -95,7 +104,6 @@ class DatabaseType(Enum):
     @classmethod
     def has_value(cls, value):
         return any(value == item.value for item in cls)
-
 
 @unique
 class DataTypeSection(Enum):
@@ -121,7 +129,7 @@ class ValidationType(Enum):
     Time = 'Time'
     Date = 'Date'
     DateTime = 'DateTime'
-    Salary = 'Salary'
+    Salary = 'Salary' # Ex: 1000-5000 GBP Annually
 
     @classmethod
     def has_value(cls, value):
@@ -136,6 +144,7 @@ def dataTypeCreator(name: str, enumName: str, validation: ValidationType, sectio
             'validation': validation.value,
             'dataTypeSection': section.value,
             'userTypes': [ut.value for ut in userTypes],
+            # 'blockTypes': ,
             }
 
 
@@ -226,10 +235,24 @@ class DataType(Enum):
         DataTypeSection.Candidate,
         [UserType.Candidate])
 
+    # CandidateEmploymentPreference = dataTypeCreator(
+    #     'Candidate Employment Preference',
+    #     'CandidateEmploymentPreference',
+    #     ValidationType.String,
+    #     DataTypeSection.Candidate,
+    #     [UserType.Candidate])
+
     # Example: Less Than 5000 GBP Annually
-    CandidateDesiredSalary = dataTypeCreator(
-        'Candidate Desired Salary',
-        'CandidateDesiredSalary',
+    CandidateDailyDesiredSalary = dataTypeCreator(
+        'Candidate Daily Desired Salary',
+        'CandidateDailyDesiredSalary',
+        ValidationType.Salary,
+        DataTypeSection.Candidate,
+        [UserType.Candidate])
+
+    CandidateAnnualDesiredSalary = dataTypeCreator(
+        'Candidate Annual Desired Salary',
+        'CandidateAnnualDesiredSalary',
         ValidationType.Salary,
         DataTypeSection.Candidate,
         [UserType.Candidate])
@@ -275,6 +298,13 @@ class DataType(Enum):
         DataTypeSection.Client,
         [UserType.Client] * 6)
 
+    ClientAvailability = dataTypeCreator(
+        'Client Availability',
+        'ClientAvailability',
+        ValidationType.DateTime,
+        DataTypeSection.Client,
+        [UserType.Client] * 6)
+
     # ======================================================================
     # Job
 
@@ -299,10 +329,16 @@ class DataType(Enum):
         DataTypeSection.Job,
         [UserType.Candidate, UserType.Client])
 
-    # Example: Less Than 5000 GBP Annually
-    JobSalary = dataTypeCreator(
-        'Job Salary',
-        'JobSalary',
+    JobAnnualSalary = dataTypeCreator(
+        'Job Annual Salary',
+        'JobAnnualSalary',
+        ValidationType.Salary,
+        DataTypeSection.Job,
+        [UserType.Candidate, UserType.Client])
+
+    JobDayRate = dataTypeCreator(
+        'Job Day Rate',
+        'JobDayRate',
         ValidationType.Salary,
         DataTypeSection.Job,
         [UserType.Candidate, UserType.Client])
@@ -310,13 +346,6 @@ class DataType(Enum):
     JobEssentialSkills = dataTypeCreator(
         'Job Essential Skills',
         'JobEssentialSkills',
-        ValidationType.String,
-        DataTypeSection.Job,
-        [UserType.Candidate, UserType.Client])
-
-    JobDesiredSkills = dataTypeCreator(
-        'Job Desired Skills',
-        'JobDesiredSkills',
         ValidationType.String,
         DataTypeSection.Job,
         [UserType.Candidate, UserType.Client])

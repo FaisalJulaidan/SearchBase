@@ -2,6 +2,7 @@ import base64
 import json
 
 import requests
+from sqlalchemy_utils import Currency
 
 from models import Callback, StoredFile
 from services import databases_services, stored_file_services
@@ -201,7 +202,7 @@ def searchCandidates(auth) -> Callback:
                                                                   getValue(record.get("educations"), "degree"),
                                                                   yearsExperience=0,
                                                                   desiredSalary=0,
-                                                                  currency=None,
+                                                                  currency=Currency("GBP"),
                                                                   source="Greenhouse"))
 
         return Callback(True, sendQuery_callback.Message, result)
@@ -294,11 +295,10 @@ def getAllCandidates(auth) -> Callback:
                                                                   linkdinURL=None,
                                                                   availability=None,
                                                                   jobTitle=None,
-                                                                  education=
-                                                                  getValue(record.get("educations"), "degree"),
+                                                                  education= getValue(record.get("educations"), "degree"),
                                                                   yearsExperience=0,
                                                                   desiredSalary=0,
-                                                                  currency=None,
+                                                                  currency=Currency("GBP"),
                                                                   source="Greenhouse"))
 
         return Callback(True, sendQuery_callback.Message, result)

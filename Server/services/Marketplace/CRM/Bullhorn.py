@@ -29,9 +29,8 @@ Auth =
     "access_token": "91:184cd487-b4b0-4114-be56-67f70f50d358",
     "refresh_token": "91:260a1587-41fd-4c2b-9769-0356049554f3"
  }
- 
- 
 """
+
 CLIENT_ID = os.environ['BULLHORN_CLIENT_ID']
 CLIENT_SECRET = os.environ['BULLHORN_CLIENT_SECRET']
 
@@ -406,7 +405,6 @@ def searchCandidates(auth, companyID, conversation, fields=None) -> Callback:
                                                                   desiredSalary=record.get("salary") or
                                                                                 record.get("dayRate", 0),
                                                                   currency=Currency("GBP"),
-                                                                  payPeriod=payPeriod,
                                                                   source="Bullhorn"))
 
         return Callback(True, sendQuery_callback.Message, result)
@@ -430,7 +428,7 @@ def searchJobs(auth, companyID, conversation, fields=None) -> Callback:
 
         query += checkFilter(keywords, DT.JobType, "employmentType")
 
-        query += checkFilter(keywords, DT.JobDesiredSkills, "skills")
+        query += checkFilter(keywords, DT.JobEssentialSkills, "skills")
 
         query += checkFilter(keywords, DT.JobStartDate, "startDate")
 
@@ -467,7 +465,6 @@ def searchJobs(auth, companyID, conversation, fields=None) -> Callback:
                                                             endDate=record.get("dateEnd"),
                                                             linkURL=None,
                                                             currency=Currency("GBP"),
-                                                            payPeriod=Period("Annually"),
                                                             source="Bullhorn"))
 
         return Callback(True, sendQuery_callback.Message, result)

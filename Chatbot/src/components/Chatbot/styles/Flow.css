@@ -11,14 +11,30 @@
     will-change: transform;
 }
 
+.Flow_IE11 {
+    height: calc(100% - 150px);
+    width: 100%;
+    flex-flow: column;
+    padding: 10px 15px 15px;
+    overflow-x: hidden;
+    transition: height 0.5s;
+    overflow-y: auto;
+    will-change: transform;
+}
+
 .FlowBottom {
+}
+
+.FlowBottom_IE11 {
+    float: left;
 }
 
 .Extended {
     height: calc(100% - 110px)
 }
 
-.Flow > p {
+.Flow > p,
+.Flow_IE11 p {
     font-size: 15px;
 }
 
@@ -35,12 +51,8 @@
 }
 
 .BOT_IE11 {
-    position: relative;
-    /*padding: 10px 15px;*/
-    background: #f2f2f2;
-    color: black;
-    margin: 5px;
-    max-width: 100%;
+    width: 100%;
+    float: left;
 }
 
 .USER {
@@ -49,7 +61,11 @@
     position: relative;
 }
 
-.solution_margin{
+.USER_IE11 {
+    float: right;
+}
+
+.solution_margin {
 
 }
 

@@ -25,8 +25,8 @@ export const MercuryFeatures = () =>
             You can request both information by heading to this link:
             <Text code style={{margin: '0 0 0 5px'}}>
                 {/*<a href="https://www.Mercury.com/uk/technical-support-2/" target={'_blank'}*/}
-                   {/*style={{cursor: 'pointer'}}>*/}
-                    {/*https://www.Mercury.com/uk/technical-support-2/*/}
+                {/*style={{cursor: 'pointer'}}>*/}
+                {/*https://www.Mercury.com/uk/technical-support-2/*/}
                 {/*</a>*/}
             </Text>.
         </Paragraph>
@@ -48,7 +48,10 @@ export const MercuryFeatures = () =>
 
 export const MercuryHeader = () =>
     <Paragraph type="secondary">
-        Mercury description
+        Mercury xRM empowers the world’s recruiters to shortcut the recruitment process and deliver an exceptional
+        client and candidate experience. Powered by Microsoft Dynamics 365, Mercury xRM is designed to fit with the way
+        your people work now. Whether you choose to use Mercury xRM within a web browser, as an app, or inside Microsoft
+        Outlook, you get an intuitive user interface that’s designed to work with Microsoft tools you know.
     </Paragraph>;
 
 export const MercuryFormItems = ({

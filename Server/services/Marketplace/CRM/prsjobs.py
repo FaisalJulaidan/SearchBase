@@ -14,10 +14,10 @@ from services.Marketplace.CRM import crm_services
 from utilities import helpers
 from utilities.enums import DataType as DT, Period, CRM
 
-# TODO: 26/07/2019
-# --> Match logout&login to Bullhorn [CHECK]
-# --> Add remaining inserts [CHECK]
-# --> Call functions from chatbot []
+# TODO: 29/07/2019
+# --> Draft filter Jobs[]
+#---> Draft filter Candiates[]
+# ---> Code clean up []
 # --> Comment issues & unique features to prsjobs API []
 
 CLIENT_ID = os.environ['PRSJOBS_CLIENT_ID']
@@ -73,6 +73,8 @@ def login(auth):
         # FETCH ALL CANDIDATES: getAllCandidates(result_body.get("access_token"), None, None)
         # SEARCH ALL JOBS:
         # searchJobs(result_body.get("access_token"), None, None, None)
+        # SEARCH JOBS WITH FILTER:
+        searchJobs(result_body.get("access_token"), None, None, None)
         # SEARCH ALL CANDIDATES:
         # searchCandidates(result_body.get("access_token"), None, None, None)
         # INSERT A CANDIDATE:
@@ -298,27 +300,67 @@ def searchCandidates(access_token, companyID, conversation, fields=None) -> Call
         helpers.logError("Marketplace.CRM.prsjobs.searchCandidates() ERROR: " + str(exc))
         return Callback(False, str(exc))
 
+def checkFilter(keywords, dataType: DT, string): #TODO get values in quotes
+    if keywords.get(dataType.value["name"]):
+        altered_list = []
+        for word in keywords[dataType.value["name"]]:  # NOTE: Wrap words in single quotes
+            print(word)
+            word = "'"+word+"'"
+            altered_list.append(word)
+            print(word)
+        return string + "=" + "".join(altered_list) + "+or+"  #  TODO: Multi-values, AND instead of OR?
+    return ""
+
+
 # TODO: Add filters
 def searchJobs(access_token, companyID, conversation, fields=None) -> Callback:
-    print("Recieved search request: ")
-    print("Conversation is:")
-    print(conversation)
+    # Dummy conversation keywords:
+    # keywords = conversation['keywordsByDataType']
+    keywords = {'Job Location': ['London'], 'Job Title': ['chef'], 'Job Type': []}
+    # ===================================================
+    print("keywords: ")
+    print(keywords)
     # PLAN:
-    # 1) Retrieve jobs with filters from conversation
-    # 2) Iterate through jobs
-    # 3) Add jobs to database
+    # 1) Retrieve jobs with filters from conversation [CHECK]
+    # 2) Iterate through jobs [check]
+    # 3) Add jobs to database [check]
 
     # Fields
-    # ID, Title, Description, Address, Salary, Skills, Start date, end data
+    # ID, Title, Description, Address, Salary, Skills, Start date, end date
     try:
-        # Retrieve jobs
+        query = "WHERE+"
+
+        query += checkFilter(keywords, DT.JobTitle, "Name")
+
+        query += checkFilter(keywords, DT.JobLocation, "ts2__Location__c")
+
+        query += checkFilter(keywords, DT.JobType, "ts2__Employment_Type__c")  #--> [ts2__Employment_Type__c]
+
+        # ==================================================
+        # BUG: Salary
+        # salary = crm_services.getSalary(conversation, DT.JobSalary, Period.Annually) # --> [ts2__Target_Base_Salary__c]
+        # if salary > 0:
+        #     query += "ts2__Target_Base_Salary__c=" + str(salary) + "+or+"
+        # ==================================================
+
+        query += checkFilter(keywords, DT.JobDesiredSkills, "ts2__Job_Tag__c") # --> [ts2__Job_Tag__c]
+
+        query += checkFilter(keywords, DT.JobStartDate, "ts2__Estimated_Start_Date__c")
+
+        query += checkFilter(keywords, DT.JobEndDate, "ts2__Estimated_End_Date__c")
+
+        query = query[:-4] # To remove final +or
+
+        #query += checkFilter(keywords, DT.JobYearsRequired, "yearsRequired") --> [N/A]
+
+        print(query)
         print("<-- SEARCH JOBS -->")
-        # send query (note that properties to return must be stated, no [*] operator)
+        # send query (NOTE: Properties to return must be stated, no [*] operator)
         sendQuery_callback: Callback = sendQuery(
             access_token, "get", "{}", "SELECT+Name,Rate_Type__c,ts2__Text_Description__c," +
                                        "ts2__Max_Salary__c,ts2__Location__c,ts2__Job_Tag__c," +
-                                       "ts2__Estimated_Start_Date__c,ts2__Estimated_End_Date__c+from+ts2__Job__c" +
-                                       "+WHERE+ts2__Max_Salary__c+NOt+IN+(NULL)+LIMIT+5")
+                                       "ts2__Estimated_Start_Date__c,ts2__Estimated_End_Date__c+from+ts2__Job__c+" +
+                                       query + "+LIMIT+500") # Limit set to 500
         if not sendQuery_callback.Success:
             raise Exception(sendQuery_callback.Message)
 
@@ -363,8 +405,26 @@ def searchJobs(access_token, companyID, conversation, fields=None) -> Callback:
         return Callback(False, str(exc))
 
 # TODO: Match to Bullhorn and trigger from chatbot
-def searchJobsCustomQuery(auth, companyID, query, fields=None) -> Callback: # TODO
+
+def searchJobsCustomQuery(access_token, companyID, query, fields=None) -> Callback: # TODO
     print("SEARCH JOBS CUSTOM QUERY")
+    try:
+        # send query
+        sendQuery_callback: Callback = sendQuery(
+            access_token, "get", "{}", "SELECT+Name,Rate_Type__c,ts2__Text_Description__c," +
+                                       "ts2__Max_Salary__c,ts2__Location__c,ts2__Job_Tag__c," +
+                                       "ts2__Estimated_Start_Date__c,ts2__Estimated_End_Date__c+from+ts2__Job__c" +
+                                       "+WHERE+ts2__Max_Salary__c+NOt+IN+(NULL)+LIMIT+500") # Limit set to 500
+        if not sendQuery_callback.Success:
+            raise Exception(sendQuery_callback.Message)
+
+        return_body = json.loads(sendQuery_callback.Data.text)
+
+        return Callback(True, sendQuery_callback.Message, return_body)
+
+    except Exception as exc:
+        helpers.logError("Marketplace.CRM.prsjobs.searchJobs() ERROR: " + str(exc))
+        return Callback(False, str(exc))
 
 # TODO: Match to Bullhorn and trigger from chatbot
 

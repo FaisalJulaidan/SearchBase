@@ -385,7 +385,7 @@ def searchJobs(auth, companyID, conversation) -> Callback:
 
         query += checkFilter(keywords, DT.JobType, "employmentType")
 
-        query += checkFilter(keywords, DT.JobDesiredSkills, "skills")
+        query += checkFilter(keywords, DT.JobEssentialSkills, "skills")
 
         query += checkFilter(keywords, DT.JobYearsRequired, "yearsRequired")
 

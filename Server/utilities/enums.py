@@ -350,13 +350,6 @@ class DataType(Enum):
         DataTypeSection.Job,
         [UserType.Candidate, UserType.Client])
 
-    JobDesiredSkills = dataTypeCreator(
-        'Job Desired Skills',
-        'JobDesiredSkills',
-        ValidationType.String,
-        DataTypeSection.Job,
-        [UserType.Candidate, UserType.Client])
-
     JobLinkURL = dataTypeCreator(
         'Job Link URL',
         'JobLinkURL',

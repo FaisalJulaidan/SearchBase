@@ -321,7 +321,6 @@ def scanCandidates(session, dbIDs, extraCandidates=None):
 
         # Skills
         __wordsCounter(DT.CandidateSkills, Candidate.CandidateSkills, keywords, df, 2)
-        __wordsCounter(DT.JobDesiredSkills, Candidate.CandidateSkills, keywords, df, 2)
         __wordsCounter(DT.JobEssentialSkills, Candidate.CandidateSkills, keywords, df, 2)
 
         # Availability

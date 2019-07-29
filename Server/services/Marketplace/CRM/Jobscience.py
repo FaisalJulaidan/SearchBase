@@ -19,7 +19,7 @@ from utilities.enums import DataType as DT, Period, CRM
 # ---> Draft filter Candidates[CHECK]
 # ---> Code clean up [CHECK]
 # --> Comment issues & unique features to prsjobs API [CHECK]
-# --> Replace PRSJobs with JobScience
+# --> Replace PRSJobs with JobScience [CHECK]
 
 CLIENT_ID = os.environ['JOBSCIENCE_CLIENT_ID']
 CLIENT_SECRET = os.environ['JOBSCIENCE_CLIENT_SECRET']
@@ -110,27 +110,32 @@ def logout(access_token, companyID):  # QUESTION: Purpose of companyID param?
         helpers.logError("Marketplace.CRM.Jobscience.logout() ERROR: " + str(exc))
         return Callback(False, str(exc))
 
+# TODO: BASIC TEST [CHECK]
+
 
 def insertCandidate(access_token, conversation: Conversation) -> Callback:
-    print("Should be attempting candidate insert...")
+
     try:
         name = (conversation.Name or " ").split(" ")
         body = {
-            "FirstName": "dummy", #helpers.getListValue(name, 0, " "),
-            "LastName":  "dummy", #helpers.getListValue(name, 1, "NONE"), #  Requires last name entry (need agreed value for None)
+            "FirstName": helpers.getListValue(name, 0, " ") or "",
+            "LastName":  helpers.getListValue(name, 1, "") or "DEFAULT",  # LastName is only required field
             "phone": conversation.PhoneNumber or " ",
-            "MailingCity": "TEMP_CITY",#"".join(conversation.Data.get('keywordsByDataType').get(DT.CandidateLocation.value['name'], [" "])),
+            "MailingCity": "".join(conversation.Data.get('keywordsByDataType').get(DT.CandidateLocation.value['name'],
+                                                                                   [""])),
             "email": conversation.Email or " ",
-            "ts2__Education__c": "TEMP_EDUCATION", #conversation.Data.get('keywordsByDataType').get(DT.CandidateEducation.value['name'], [""]),
-            "ts2__Desired_Salary__c": str(crm_services.getSalary(conversation, DT.CandidateDesiredSalary, Period.Annually)),
-            "RecordTypeId": "0120O000000tJIAQA2"  # ID for a candidate person
+            "ts2__Education__c": "".join(conversation.Data.get('keywordsByDataType')
+                                         .get(DT.CandidateEducation.value['name'],
+                                              [""])),
+            "RecordTypeId": "0120O000000tJIAQA2"  # ID for a candidate person record type
             }
 
-        print("BODY IS")
+        print("Body to insert is:")
         print(body)
-        # Attempt Dummy Insert:
-        print("<-- INSERT CANDIDATE -->")
+
+        # Send query
         sendQuery_callback: Callback = sendQuery(access_token, "post", body, "sobjects/Contact/")
+
         if not sendQuery_callback.Success:
             raise Exception(sendQuery_callback.Message)
 
@@ -144,19 +149,20 @@ def insertCandidate(access_token, conversation: Conversation) -> Callback:
 def uploadFile(auth, storedFile: StoredFile):  # ISSUE: NO CURRENT API OPTION FOR RESUME UPLOAD
     print("UPLOAD FILE")
 
+# TODO BASIC TEST [CHECK]
+
 
 def insertClient(auth, conversation: Conversation) -> Callback:
     try:
-        print("<-- ATTEMPTING CLIENT INSERT -->")
-        print("Auth passed in is: ")
-        print(auth)
-        # get query url
+        # Insert client company
         insertCompany_callback: Callback = insertCompany(auth, conversation)
         if not insertCompany_callback.Success:
             raise Exception(insertCompany_callback.Message)
-        print("STUFF RETURNED")
+
         print(insertCompany_callback.Message)
         print(insertCompany_callback.Data)
+
+        # Insert client account
         insertClient_callback: Callback = insertClientContact(auth, conversation,
                                                               insertCompany_callback.Data.get("id"))
         if not insertClient_callback.Success:                  # Needs to  fetch the Account ID
@@ -168,17 +174,21 @@ def insertClient(auth, conversation: Conversation) -> Callback:
         helpers.logError("Marketplace.CRM.Jobscience.insertClient() ERROR: " + str(exc))
         return Callback(False, str(exc))
 
+# TODO BASIC TEST [CHECK]
+
 
 def insertClientContact(access_token, conversation: Conversation, prsCompanyID) -> Callback:
     try:
-        print("INSERT CONTACT FOR CLIENT")
+        print("INSERT CLIENT CONTACT")
         # New candidate details
         emails = conversation.Data.get('keywordsByDataType').get(DT.ClientEmail.value['name'], [" "])
 
-        # TODO: Ensure name is split into first and last as required by API (no name option)
+        # NOTE: Name is split into first and last, LastName required by API
+        names = str.split(conversation.Name)
+
         body = {
-            "FirstName": conversation.Name or " ",
-            "LastName": "NoLastName",
+            "FirstName": names[0] or " ",
+            "LastName": names[1] or "DEFAULT",
             "phone": conversation.PhoneNumber or " ",
             "MailingCity": "".join(conversation.Data.get('keywordsByDataType').get(
                     DT.ClientLocation.value['name'], [" "])),
@@ -198,11 +208,12 @@ def insertClientContact(access_token, conversation: Conversation, prsCompanyID) 
         helpers.logError("Marketplace.CRM.Jobscience.insertClientContact() ERROR: " + str(exc))
         return Callback(False, str(exc))
 
+# TODO TEST [CHECK]
 
 
 def insertCompany(auth, conversation: Conversation) -> Callback:
     try:
-        print("INSERT COMPANY")
+        print("INSERT CLIENT COMPANY")
 
         body = {
             "Name": " ".join(conversation.Data.get('keywordsByDataType').get(
@@ -224,7 +235,8 @@ def insertCompany(auth, conversation: Conversation) -> Callback:
         return Callback(False, str(exc))
 
 
-# TODO: Add filters
+# TODO BASIC CHECK [CHECK]
+
 def searchCandidates(access_token, companyID, conversation, fields=None) -> Callback:
 
     print(conversation)
@@ -236,10 +248,10 @@ def searchCandidates(access_token, companyID, conversation, fields=None) -> Call
     try:
         # TODO: Add more filters
         query = "WHERE+"
-        query += checkFilter(keywords, DT.CandidateLocation, "MailingCity")
+        query += checkFilter(keywords, DT.CandidateLocation, "MailingCity", quote_wrap=True)
 
         query = query[:-4]
-        query += "+AND+RecordType.Name+IN+('Candidate')" # Fetch contacts who are candidates
+        query += "+AND+RecordType.Name+IN+('Candidate')"  # Fetch contacts who are candidates
         print("QUERY IS: ")
         print(query)
         # Retrieve candidates
@@ -288,19 +300,26 @@ def searchCandidates(access_token, companyID, conversation, fields=None) -> Call
         return Callback(False, str(exc))
 
 
-def checkFilter(keywords, dataType: DT, string):
+def checkFilter(keywords, dataType: DT, string, quote_wrap):
     if keywords.get(dataType.value["name"]):
         altered_list = []
-        for word in keywords[dataType.value["name"]]:  # NOTE: Wrap words in single quotes
+        for word in keywords[dataType.value["name"]]:  # NOTE: Wrap string types in single quotes
             print(word)
-            word = "'"+word+"'"
-            altered_list.append(word)
-            print(word)
-        return string + "=" + "".join(altered_list) + "+or+"  #  TODO: Multi-values, AND instead of OR?
+            if quote_wrap:
+                word = "'"+word+"'"
+                altered_list.append(word)
+            else:
+                # Convert date format:
+                new_date = datetime.strptime(word, "%m/%d/%Y").strftime("%Y-%m-%d")
+                altered_list.append(new_date)
+
+        return string + "=" + "".join(altered_list) + "+or+"  # TODO: Multi-values, AND instead of OR?
     return ""
 
 
-# TODO: Add filters
+# TODO: BASIC CHECK [CHECK]
+
+
 def searchJobs(access_token, companyID, conversation, fields=None) -> Callback:
 
     keywords = conversation['keywordsByDataType']
@@ -311,19 +330,19 @@ def searchJobs(access_token, companyID, conversation, fields=None) -> Callback:
     try:
         query = "WHERE+"
 
-        query += checkFilter(keywords, DT.JobTitle, "Name")
+        query += checkFilter(keywords, DT.JobTitle, "Name", quote_wrap=True)
 
-        query += checkFilter(keywords, DT.JobLocation, "ts2__Location__c")
+        query += checkFilter(keywords, DT.JobLocation, "ts2__Location__c", quote_wrap=True)
 
-        query += checkFilter(keywords, DT.JobType, "ts2__Employment_Type__c")
+        query += checkFilter(keywords, DT.JobType, "ts2__Employment_Type__c", quote_wrap=True)
 
-        query += checkFilter(keywords, DT.JobDesiredSkills, "ts2__Job_Tag__c")
+        query += checkFilter(keywords, DT.JobDesiredSkills, "ts2__Job_Tag__c", quote_wrap=True)
 
-        query += checkFilter(keywords, DT.JobStartDate, "ts2__Estimated_Start_Date__c")
+        query += checkFilter(keywords, DT.JobStartDate, "ts2__Estimated_Start_Date__c", quote_wrap=False)
 
-        query += checkFilter(keywords, DT.JobEndDate, "ts2__Estimated_End_Date__c")
+        query += checkFilter(keywords, DT.JobEndDate, "ts2__Estimated_End_Date__c", quote_wrap=False)
 
-        query = query[:-4] # To remove final +or
+        query = query[:-4]  # To remove final +or
 
         # NOTE: No years experience property available
         print(query)
@@ -424,9 +443,9 @@ def getAllCandidates(access_token, companyID, fields=None) -> Callback:
 
 def getAllJobs(access_token, companyID, fields=None) -> Callback:  # TODO: See this triggered.
     print("GET ALL JOBS HAS BEEN TRIGGERED")
+
     try:
 
-        # send query (note that properties to return must be stated, no [*] operator)
         sendQuery_callback: Callback = sendQuery(
             access_token, "get", "{}", "SELECT+Name,Rate_Type__c,ts2__Text_Description__c," +
                                        "ts2__Max_Salary__c,ts2__Location__c,ts2__Job_Tag__c," +
@@ -442,10 +461,6 @@ def getAllJobs(access_token, companyID, fields=None) -> Callback:  # TODO: See t
     except Exception as exc:
         helpers.logError("Marketplace.CRM.Jobscience.getAllJobs() ERROR: " + str(exc))
         return Callback(False, str(exc))
-
-
-def produceRecruiterValueReport(crm: CRM_Model, companyID) -> Callback: # TODO
-    print("PRODUCE RECRUITER VALUE REPORT")
 
 
 def sendQuery(access_token, method, body, query):

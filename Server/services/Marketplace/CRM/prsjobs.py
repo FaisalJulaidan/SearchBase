@@ -71,8 +71,10 @@ def login(auth):
         # FETCH ALL JOBS:
         # getAllJobs(result_body.get("access_token"), None, None)
         # FETCH ALL CANDIDATES: getAllCandidates(result_body.get("access_token"), None, None)
-        # SEARCH ALL JOBS: searchJobs(result_body.get("access_token"), None, None, None)
-        # SEARCH ALL CANDIDATES: searchCandidates(result_body.get("access_token"), None, None, None)
+        # SEARCH ALL JOBS:
+        # searchJobs(result_body.get("access_token"), None, None, None)
+        # SEARCH ALL CANDIDATES:
+        # searchCandidates(result_body.get("access_token"), None, None, None)
         # INSERT A CANDIDATE:
         # insertCandidate(result_body.get("access_token"), None)
         # INSERT A  CLIENT COMPANY:
@@ -239,7 +241,7 @@ def insertCompany(auth, conversation: Conversation) -> Callback:
         return Callback(False, str(exc))
 
 
-# TODO: Match to Bullhorn & Trigger from chatbot
+# TODO: Add filters
 def searchCandidates(access_token, companyID, conversation, fields=None) -> Callback:
 
 
@@ -254,18 +256,25 @@ def searchCandidates(access_token, companyID, conversation, fields=None) -> Call
 
         # Retrieve candidates
         print("<-- SEARCH CANDIDATES -->")
-        candidate_fetch = sendQuery(access_token, "get", "{}", "SELECT+Name,email,phone,MailingAddress,ts2__Desired_Salary__c" +
+        sendQuery_callback: Callback = sendQuery(access_token, "get", "{}", "SELECT+Name,email,phone,MailingCity,ts2__Desired_Salary__c" +
                                     ",ts2__Desired_Hourly__c,ts2__EduDegreeName1__c,ts2__Education__c+from+Contact" +
-                                    "+WHERE+RecordType.Name+IN+('Candidate')+LIMIT+10") # Limit set to 10 TODO: Customize
-        print(candidate_fetch)
+                                    "+WHERE+RecordType.Name+IN+('Candidate')+LIMIT+500") # Limit set to 10 TODO: Customize
+
+        if not sendQuery_callback.Success:
+            raise Exception(sendQuery_callback.Message)
+
+        candidate_fetch = json.loads(sendQuery_callback.Data.text)
+
+        print(candidate_fetch['records'])
+
 
         result = []
-        for record in candidate_fetch:
+        for record in candidate_fetch['records']:
             print("<-- New Record -->")
             print("Name: " + str(record.get('Name')))
             print("Email:" + str(record.get('Email')))
             print("Phone: " + str(record.get('Phone')))
-            print("Mailing Address: " + str(record.get('MailingAddress')))
+            print("Mailing Address: " + str(record.get('MailingCity')))
             print("Education: " + str(record.get('ts2__EduDegreeName1__c')))
             print("Desired Salary: " + str(record.get('ts2__Desired_Salary__c')))
 
@@ -273,8 +282,8 @@ def searchCandidates(access_token, companyID, conversation, fields=None) -> Call
                                                                   name=record.get("Name"),
                                                                   email=record.get("Email"),
                                                                   mobile=record.get("Phone"),
-                                                                  location=record.get("MailingAddress"),
-                                                                  skills="",
+                                                                  location=record.get("MailingCity"),
+                                                                  skills="Engineering",  # Set temporarily to engineering
                                                                   linkdinURL=None,
                                                                   availability=record.get("status"),
                                                                   jobTitle=None,
@@ -284,15 +293,18 @@ def searchCandidates(access_token, companyID, conversation, fields=None) -> Call
                                                                   currency=Currency("GBP"),
                                                                   payPeriod=Period("Annually"),
                                                                   source="prsjobs"))
-
+        return Callback(True, sendQuery_callback.Message, result)
     except Exception as exc:
         helpers.logError("Marketplace.CRM.prsjobs.searchCandidates() ERROR: " + str(exc))
         return Callback(False, str(exc))
 
-# TODO: Match to Bullhorn and trigger from chatbot
+# TODO: Add filters
 def searchJobs(access_token, companyID, conversation, fields=None) -> Callback:
+    print("Recieved search request: ")
+    print("Conversation is:")
+    print(conversation)
     # PLAN:
-    # 1) Retrieve jobs
+    # 1) Retrieve jobs with filters from conversation
     # 2) Iterate through jobs
     # 3) Add jobs to database
 
@@ -301,16 +313,24 @@ def searchJobs(access_token, companyID, conversation, fields=None) -> Callback:
     try:
         # Retrieve jobs
         print("<-- SEARCH JOBS -->")
-        job_fetch = sendQuery(access_token, "get", "{}", "SELECT+Name,Rate_Type__c,ts2__Text_Description__c," +
-                              "ts2__Max_Salary__c,ts2__Location__c,ts2__Job_Tag__c," +
-                              "ts2__Estimated_Start_Date__c,ts2__Estimated_End_Date__c+from+ts2__Job__c" +
-                              "+WHERE+ts2__Max_Salary__c+NOt+IN+(NULL)+LIMIT+10")  # Limit set to 10 TODO: Customize
-        print(job_fetch)
+        # send query (note that properties to return must be stated, no [*] operator)
+        sendQuery_callback: Callback = sendQuery(
+            access_token, "get", "{}", "SELECT+Name,Rate_Type__c,ts2__Text_Description__c," +
+                                       "ts2__Max_Salary__c,ts2__Location__c,ts2__Job_Tag__c," +
+                                       "ts2__Estimated_Start_Date__c,ts2__Estimated_End_Date__c+from+ts2__Job__c" +
+                                       "+WHERE+ts2__Max_Salary__c+NOt+IN+(NULL)+LIMIT+5")
+        if not sendQuery_callback.Success:
+            raise Exception(sendQuery_callback.Message)
+
+        job_fetch = json.loads(sendQuery_callback.Data.text)
+
+        print(job_fetch['records'])
 
         # Iterate through jobs
         result = []
-        for record in job_fetch:
+        for record in job_fetch['records']:
             print("<-- New Record -->")
+            print(record)
             print("Name: " + str(record.get('Name')))
             print("Description:" + str(record.get('ts2__Text_Description__c')))
             print("Salary: " + str(record.get('ts2__Max_Salary__c')))
@@ -336,6 +356,7 @@ def searchJobs(access_token, companyID, conversation, fields=None) -> Callback:
                                                             payPeriod=Period("Annually"),  # May need to derive this
                                                             source="prsjobs"))
 
+        return Callback(True, sendQuery_callback.Message, result)
 
     except Exception as exc:
         helpers.logError("Marketplace.CRM.prsjobs.searchJobs() ERROR: " + str(exc))

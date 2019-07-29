@@ -68,11 +68,14 @@ def searchCandidates(assistant: Assistant, session):
         return Vincere.searchCandidates(assistant.CRM.Auth, assistant.CompanyID, session)
     elif assistant.CRM.Type is CRM.Greenhouse:
         return Greenhouse.searchCandidates(assistant.CRM.Auth)
+    elif assistant.CRM.Type is CRM.PRSJobs:
+        return prsjobs.searchCandidates(assistant.CRM.Auth, assistant.CompanyID, session)
     else:
         return Callback(False, "CRM type did not match with those on the system")
 
 
 def searchJobs(assistant: Assistant, session):
+    print("SHOULD BE SEARCHING JOBS")
     # Check CRM type
     # if assistant.CRM.Type is CRM.Adapt:
     #     return Adapt.pullAllCadidates(assistant.CRM.Auth)
@@ -82,11 +85,14 @@ def searchJobs(assistant: Assistant, session):
         return Vincere.searchJobs(assistant.CRM.Auth, assistant.CompanyID, session)
     elif assistant.CRM.Type is CRM.Greenhouse:
         return Greenhouse.searchJobs(assistant.CRM.Auth, session)
+    elif assistant.CRM.Type is CRM.PRSJobs:
+        return prsjobs.searchJobs(assistant.CRM.Auth, assistant.CompanyID, session)
     else:
         return Callback(False, "CRM type did not match with those on the system")
 
 
 def getAllCandidates(assistant: Assistant):
+    print("SHOULD BE RETURNING CANDIDATES")
     # Check CRM type
     # if assistant.CRM.Type is CRM.Adapt:
     #     return Adapt.pullAllCadidates(assistant.CRM.Auth)
@@ -101,6 +107,7 @@ def getAllCandidates(assistant: Assistant):
 
 
 def getAllJobs(assistant: Assistant):
+    print("SHOULD BE RETURNING JOBS")
     # Check CRM type
     # if assistant.CRM.Type is CRM.Adapt:
     #     return Adapt.pullAllCadidates(assistant.CRM.Auth)

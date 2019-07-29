@@ -96,7 +96,10 @@ if os.environ['FLASK_ENV'] in ['production', 'staging']:
         helpers.seed()
 
     # Start scheduled tasks
-    scheduler_services.scheduler.start()
+    if not os.environ.get("scheduler_lock"):
+        print("Scheduler starting...")
+        scheduler_services.scheduler.start()
+        os.environ["scheduler_lock"] = "True"
 
     print('Production mode running...')
 
@@ -118,7 +121,10 @@ elif os.environ['FLASK_ENV'] == 'development':
         dummy_data.generate()
 
     # Start scheduled tasks
-    scheduler_services.scheduler.start()
+    if not os.environ.get("scheduler_lock"):
+        print("Scheduler starting...")
+        scheduler_services.scheduler.start()
+        os.environ["scheduler_lock"] = "True"
 
     print('Development mode running...')
 

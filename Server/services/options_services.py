@@ -55,7 +55,7 @@ def getOptions(industry=None) -> Callback:
                                            if (c.key != 'ID' and c.key != 'DatabaseID')
                                            ],
             'currencyCodes': ['GBP', 'USD', 'EUR', 'CAD'],
-            'payPeriods': [p.name for p in enums.Period]
+            'periods': [p.name for p in enums.Period]
         },
         'assistantTemplates':
         [

@@ -262,8 +262,7 @@ def addCandidate(db, name, desiredSalary, jobTitle, skills, exp, location):
                      CandidateSkills =skills,
                      CandidateYearsExperience = exp,
                      CandidateLocation = location,
-                     Currency= Currency('USD'),
-                     PayPeriod= enums.Period.Annually)
+                     Currency= Currency('USD'))
 
 
 def addJob(db, title, description, salary, location, currency: Currency or None):
@@ -272,5 +271,4 @@ def addJob(db, title, description, salary, location, currency: Currency or None)
                JobDescription=description,
                JobLocation=location,
                JobSalary=salary,
-               Currency= currency,
-               PayPeriod= enums.Period.Annually)
+               Currency= currency)

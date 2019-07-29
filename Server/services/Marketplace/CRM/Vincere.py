@@ -362,8 +362,7 @@ def searchCandidates(auth, companyID, conversation) -> Callback:
                                                                       record.get("educations", {}).get("data")),
                                                                   yearsExperience=0,
                                                                   desiredSalary=record.get("dayRate", 0) * 365,
-                                                                  currency= Currency(), # TODO
-                                                                  payPeriod=Period.Annually,
+                                                                  currency= Currency("GBP"), # TODO
                                                                   source="Bullhorn"))
 
         return Callback(True, sendQuery_callback.Message, result)
@@ -419,7 +418,6 @@ def searchJobs(auth, companyID, conversation) -> Callback:
                                                             endDate=record.get("dateEnd"),
                                                             linkURL=None,
                                                             currency=Currency('GBP'.upper()),
-                                                            payPeriod=Period.Annually,
                                                             source="Bullhorn"))
 
         return Callback(True, sendQuery_callback.Message, result)

@@ -177,11 +177,6 @@ const CandidateColumns = [{
     key: 'Currency',
     dataIndex: 'Currency',
     render: (text, record, index) => (<p>{record.Currency}</p>),
-}, {
-    title: 'Pay Period',
-    key: 'PayPeriod',
-    dataIndex: 'PayPeriod',
-    render: (text, record, index) => (<p>{record.PayPeriod}</p>),
 }];
 
 // Job Columns
@@ -221,20 +216,10 @@ const JobColumns = [{
     dataIndex: 'Currency',
     render: (text, record, index) => (<p>{record.Currency}</p>),
 }, {
-    title: 'Pay Period',
-    key: 'PayPeriod',
-    dataIndex: 'PayPeriod',
-    render: (text, record, index) => (<p>{record.PayPeriod}</p>),
-}, {
     title: 'Essential Skills',
     key: 'JobEssentialSkills',
     dataIndex: 'JobEssentialSkills',
     render: (text, record, index) => (<p>{record.JobEssentialSkills}</p>),
-}, {
-    title: 'Desired Skills',
-    key: 'JobDesiredSkills',
-    dataIndex: 'JobDesiredSkills',
-    render: (text, record, index) => (<p>{record.JobDesiredSkills}</p>),
 }, {
     title: 'Education',
     key: 'CandidateEducation',

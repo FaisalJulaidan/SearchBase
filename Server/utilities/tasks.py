@@ -13,7 +13,6 @@ from utilities import json_schemas, enums
 # NOTE: Make sure to take a backup of the database before running these functions
 # =============================================================================
 
-
 def migrateFlows():
     try:
         for assistant in db.session.query(Assistant).all():

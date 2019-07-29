@@ -4,7 +4,7 @@ from models import db, Callback, Appointment, Conversation, Assistant
 from utilities import helpers, enums
 
 
-def add(conversationID, assistantID, dateTime, confirmed=False):
+def add(conversationID, dateTime):
     try:
         if not datetime: raise Exception('Time slot (datetime) is required')
 
@@ -13,9 +13,8 @@ def add(conversationID, assistantID, dateTime, confirmed=False):
         db.session.add(
             Appointment(
                 DateTime=datetime.strptime(dateTime, "%Y-%m-%d %H:%M"),  # 2019-06-23 16:04
-                AssistantID=assistantID,
                 ConversationID=conversationID,
-                Confirmed= confirmed
+                Status= enums.Status.Pending
             )
         )
 

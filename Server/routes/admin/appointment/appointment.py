@@ -105,13 +105,11 @@ def open_times(payload):
         if appointment:
             return helpers.jsonResponse(False, 404,
                                         "Sorry, but your already have an appointment on " +
-                                        '{0:%Y-%m-%d %H:%M:%S}'.format(appointment))
+                                        '{0:%Y-%m-%d %H:%M:%S}'.format(appointment.DateTime))
 
         # Add new appointment
         appointment_callback: Callback = appointment_services.add(data['conversationID'],
-                                                                  data['assistantID'],
-                                                                  request.json.get('pickedTimeSlot'),
-                                                                  confirmed=False)
+                                                                  request.json.get('pickedTimeSlot'))
 
         if not appointment_callback.Success:
             return helpers.jsonResponse(False, 400, "Sorry, we couldn't add your appointment")

@@ -268,7 +268,7 @@ class AutoPilot extends React.Component {
                                         <div style={{marginLeft: 3}}>
                                             <Switch onChange={this.onAppointmentChange}
                                                     checked={this.state.sendCandidatesAppointments}
-                                                    disabled={true}/>
+                                            />
                                         </div>
                                     )}
                                 </FormItem>

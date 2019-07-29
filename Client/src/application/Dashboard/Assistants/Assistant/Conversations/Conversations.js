@@ -82,7 +82,7 @@ class Conversations extends React.Component {
                 render: (text, record) => {
                     return (
                         <div style={{width: 100}}>
-                            <Progress percent={record.Score * 100} size="small"
+                            <Progress percent={Math.round(record.Score * 100)} size="small"
                                       status={record.Score < 0.1 ? "exception" : "active"}/>
                         </div>
                     );

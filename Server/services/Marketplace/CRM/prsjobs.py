@@ -15,10 +15,11 @@ from utilities import helpers
 from utilities.enums import DataType as DT, Period, CRM
 
 # TODO: 29/07/2019
-# --> Draft filter Jobs[]
+# --> Draft filter Jobs [CHECK]
 #---> Draft filter Candiates[]
 # ---> Code clean up []
 # --> Comment issues & unique features to prsjobs API []
+# --> Replace PRSJobs with JobScience
 
 CLIENT_ID = os.environ['PRSJOBS_CLIENT_ID']
 CLIENT_SECRET = os.environ['PRSJOBS_CLIENT_SECRET']
@@ -74,9 +75,11 @@ def login(auth):
         # SEARCH ALL JOBS:
         # searchJobs(result_body.get("access_token"), None, None, None)
         # SEARCH JOBS WITH FILTER:
-        searchJobs(result_body.get("access_token"), None, None, None)
+        # searchJobs(result_body.get("access_token"), None, None, None)
         # SEARCH ALL CANDIDATES:
         # searchCandidates(result_body.get("access_token"), None, None, None)
+        # SEARCH CANDIDATES WITH FILTER
+        searchCandidates(result_body.get("access_token"), None, None, None)
         # INSERT A CANDIDATE:
         # insertCandidate(result_body.get("access_token"), None)
         # INSERT A  CLIENT COMPANY:
@@ -246,21 +249,32 @@ def insertCompany(auth, conversation: Conversation) -> Callback:
 # TODO: Add filters
 def searchCandidates(access_token, companyID, conversation, fields=None) -> Callback:
 
+    # Dummy conversation keywords:
+    # keywords = conversation['keywordsByDataType']
+    keywords = {'Candidate Location': ['London']}
+    print(keywords)
 
-    # PLAN:
-    # 1) Retrieve candidates
-    # 2) Iterate through candidates
-    # 3) Add candidates to database
-
-    # Fields
-    # ID, Name, Email, Mobile, Address, Primary Skills, Status, Education, Day Rate, Salary
     try:
-
+        # TODO: Add more filters
+        query = "WHERE+"
+        query += checkFilter(keywords, DT.CandidateLocation, "MailingCity")
+        # =================================================================================
+        # BUG: Salary
+        # salary = crm_services.getSalary(conversation, DT.CandidateDesiredSalary, Period.Annually)
+        #
+        # if salary:
+        #     query += " salary:" + str(salary) + " or"
+        # ======================================================================================
+        query = query[:-4]
+        query += "+AND+RecordType.Name+IN+('Candidate')" # Fetch contacts who are candidates
+        print("QUERY IS: ")
+        print(query)
         # Retrieve candidates
         print("<-- SEARCH CANDIDATES -->")
-        sendQuery_callback: Callback = sendQuery(access_token, "get", "{}", "SELECT+Name,email,phone,MailingCity,ts2__Desired_Salary__c" +
-                                    ",ts2__Desired_Hourly__c,ts2__EduDegreeName1__c,ts2__Education__c+from+Contact" +
-                                    "+WHERE+RecordType.Name+IN+('Candidate')+LIMIT+500") # Limit set to 10 TODO: Customize
+        sendQuery_callback: Callback = sendQuery(access_token, "get", "{}", "SELECT+Name,email,phone,MailingCity," +
+                                                 "ts2__Desired_Salary__c,ts2__Desired_Hourly__c," +
+                                                 "ts2__EduDegreeName1__c,ts2__Education__c+from+Contact+" + query +
+                                                 "+LIMIT+500")  # Limit set to 10 TODO: Customize
 
         if not sendQuery_callback.Success:
             raise Exception(sendQuery_callback.Message)
@@ -269,7 +283,7 @@ def searchCandidates(access_token, companyID, conversation, fields=None) -> Call
 
         print(candidate_fetch['records'])
 
-
+        # Iterate through candidates
         result = []
         for record in candidate_fetch['records']:
             print("<-- New Record -->")

@@ -31,6 +31,7 @@ POST REQUEST EXAMPLE:
 
 @appointment_router.route("/appointments/set_status", methods=['POST'])
 @jwt_required
+@helpers.validOwner('Appointment', 'appointmentID')
 def set_appointment_status():
     data = request.get_json()
     callback = appointment_services.setAppointmentStatus(data['appointmentID'], data['status'])
@@ -114,4 +115,7 @@ def allocation_time(payload):
             return helpers.jsonResponse(False, 400, "Sorry, we couldn't add your appointment")
         return helpers.jsonResponse(True, 200, "Appointment has been added. You should receive a confirmation email")
 
-
+@appointment_router.route("/allocation_times_list/<id>", methods=['GET'])
+@jwt_required
+def allocation_time_list(id):
+    allocation_times_callback: Callback = appointment_services.getAll()

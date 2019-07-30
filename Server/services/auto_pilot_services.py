@@ -132,11 +132,9 @@ def fetchAll(companyID) -> Callback:
 
 # Add openTimes to the autoPilot object after parsing it
 def parseAutoPilot(autoPilot: AutoPilot) -> dict:
-    if(autoPilot.AppointmentAllocationTime):
-        print(helpers.getListFromSQLAlchemyList(autoPilot.AppointmentAllocationTime.Info))
     return {
         **helpers.getDictFromSQLAlchemyObj(autoPilot),
-        "AppointmentAllocationTime": helpers.getListFromSQLAlchemyList(autoPilot.AppointmentAllocationTime)
+        "AppointmentAllocationTime": helpers.getDictFromSQLAlchemyObj(autoPilot.AppointmentAllocationTime)
     }
 
 # ----- Updaters ----- #

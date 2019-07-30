@@ -107,14 +107,32 @@ def setAppointmentStatus(appointmentID, status):
 
 def getAppointments(companyID):
     try:
-        print(generateEmailUrl(1))
         assistants = db.session.query(Assistant).filter(Assistant.CompanyID == companyID).all()
         appointments = []
         for assistant in assistants:
-            for idx, appointment in enumerate(helpers.getListFromSQLAlchemyList(assistant.appointments)):
-                appointment['Conversation'] = assistant.appointments[idx].Conversation.Data
+            for idx, appointment in enumerate(helpers.getListFromSQLAlchemyList(assistant.Appointments)):
+                appointment['Conversation'] = assistant.Appointments[idx].Conversation.Data
                 appointments.append(appointment)
         return Callback(True, 'Successfully gathered appointments.', appointments)
     except Exception as exc:
         helpers.logError("appointment_services.getAppointments(): " + str(exc))
         return Callback(False, 'Could not get appointments.')
+
+def hasAppointment(companyID, id):
+    try:
+        assistants = db.session.query(Assistant).filter(Assistant.CompanyID == companyID).all()
+        valid = False
+        for assistant in assistants:
+            for idx, appointment in enumerate(helpers.getListFromSQLAlchemyList(assistant.Appointments)):
+                appointment['Conversation'] = assistant.Appointments[idx].Conversation.Data
+                if appointment['ID'] == id:
+                    valid = True
+                    break
+                if valid:
+                    break
+        if not valid:
+            raise Exception("You do not own this appointment")
+        return Callback(True, 'You own this appointment')
+    except Exception as exc:
+        helpers.logError("appointment_services.getAppointments(): " + str(exc))
+        return Callback(False, 'You do not have access to this appointment.')

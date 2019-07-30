@@ -1,9 +1,10 @@
 // AAT = AppointmentAllocationTime
 import * as actionTypes from "./actionTypes";
 
-const fetchAAT = (isSuccess) => ({
+const fetchAAT = (isSuccess, id) => ({
     type: actionTypes.FETCH_AAT_REQUEST,
-    isSuccess
+    isSuccess,
+    id
 });
 
 const fetchAATSuccess = (error) => ({

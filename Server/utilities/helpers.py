@@ -16,13 +16,14 @@ from cryptography.fernet import Fernet
 from flask import json, after_this_request, request, Response
 from flask_jwt_extended import get_jwt_identity
 from forex_python.converter import CurrencyRates
+from flask_jwt_extended import get_jwt_identity
 from hashids import Hashids
 from itsdangerous import URLSafeTimedSerializer
 from sqlalchemy_utils import Currency
 
 from config import BaseConfig
 from models import db, Assistant, Job, Callback, Role
-from services import flow_services, assistant_services
+from services import flow_services, assistant_services, appointment_services
 from utilities.enums import Period
 
 # ======== Global Variables ======== #
@@ -295,6 +296,36 @@ def validAssistant(func):
 
     wrapper.__name__ = func.__name__
     return wrapper
+
+class owns(object):
+    def getOwner(self, type, jwt, *args):
+        method_name = "owns_" + str(type)
+        method = getattr(self, method_name, lambda: "Invalid Function type")
+        return method(jwt, *args)
+    def owns_Appointment(self, jwt, key):
+        id = request.get_json()[key]
+        callback: Callback = appointment_services.hasAppointment(jwt['companyID'], id)
+        if not callback.Success:
+            return jsonResponse(False, 401, "You do not own this appointment", None)
+        return True
+
+
+def validOwner(type, *args):
+    def wrap(func):
+        def wrapper():
+            jwt = get_jwt_identity()['user']
+            Owns = owns()
+            valid = Owns.getOwner(type, jwt, *args)
+            if valid != True:
+                return valid
+            return func()
+        wrapper.__name__ = func.__name__
+        return wrapper
+    wrap.__name__ = type #needs to change
+    return wrap
+
+
+
 
 
 def findIndexOfKeyInArray(key, value, array):

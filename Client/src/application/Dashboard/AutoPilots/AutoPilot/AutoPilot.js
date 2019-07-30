@@ -7,6 +7,7 @@ import 'types/TimeSlots_Types'
 import {history} from "helpers";
 import TimeSlots from "./TimeSlots/TimeSlots";
 import {autoPilotActions} from "store/actions";
+import {appointmentAllocationTimeActions} from "store/actions";
 
 const FormItem = Form.Item;
 const confirm = Modal.confirm;
@@ -33,6 +34,8 @@ class AutoPilot extends React.Component {
 
     componentDidMount() {
         console.log(this.props)
+
+        this.props.dispatch(appointmentAllocationTimeActions.fetchAAT(this.props.match.params.id));
         this.props.dispatch(autoPilotActions.fetchAutoPilot(this.props.match.params.id))
             .then(()=> {
                 const {autoPilot} = this.props;

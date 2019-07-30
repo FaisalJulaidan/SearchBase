@@ -6,6 +6,7 @@ const initialState = {allocationTimes: [], isLoading: true, errorMsg: null};
 export const appointmentAllocationTime = (state = initialState, action) => {
     switch (action.type) {
         case actionTypes.FETCH_AAT_REQUEST:
+            console.log('lolo')
             return updateObject(state, {
                 allocationTimes: [],
                 isLoading: true,

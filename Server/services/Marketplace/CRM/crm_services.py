@@ -2,7 +2,7 @@ from sqlalchemy.sql import and_
 
 from utilities.enums import CRM, UserType, DataType, Period
 from models import db, Callback, Conversation, Assistant, CRM as CRM_Model, StoredFile
-from services.Marketplace.CRM import Greenhouse, Adapt, Bullhorn, Vincere, Jobscience
+from services.Marketplace.CRM import Greenhouse, Adapt, Bullhorn, Vincere, Jobscience, Mercury
 # Process chatbot session
 from utilities import helpers
 
@@ -23,8 +23,12 @@ def insertCandidate(assistant: Assistant, conversation: Conversation):
     # Check CRM type
     if assistant.CRM.Type is CRM.Bullhorn:
         return Bullhorn.insertCandidate(assistant.CRM.Auth, conversation)
+    elif assistant.CRM.Type is CRM.Mercury:
+        return Mercury.insertCandidate(assistant.CRM.Auth, conversation)
     elif assistant.CRM.Type is CRM.Vincere:
         return Vincere.insertCandidate(assistant.CRM.Auth, conversation)
+    # elif assistant.CRM.Type is CRM.Mercury:
+    #     return Mercury.insertCandidate(assistant.CRM.Auth, conversation)
     elif assistant.CRM.Type is CRM.Adapt:
         return Adapt.insertCandidate(assistant.CRM.Auth, conversation)
     elif assistant.CRM.Type is CRM.Greenhouse:
@@ -40,6 +44,8 @@ def insertClient(assistant: Assistant, conversation: Conversation):
     # Check CRM type
     if assistant.CRM.Type is CRM.Bullhorn:
         return Bullhorn.insertClient(assistant.CRM.Auth, conversation)
+    elif assistant.CRM.Type is CRM.Mercury:
+        return Mercury.insertClient(assistant.CRM.Auth, conversation)
     elif assistant.CRM.Type is CRM.Vincere:
         return Vincere.insertClient(assistant.CRM.Auth, conversation)
     elif assistant.CRM.Type is CRM.Adapt:
@@ -56,6 +62,8 @@ def uploadFile(assistant: Assistant, storedFile: StoredFile):
     # Check CRM type
     if assistant.CRM.Type is CRM.Bullhorn:
         return Bullhorn.uploadFile(assistant.CRM.Auth, storedFile)
+    # elif assistant.CRM.Type is CRM.Mercury: TODO
+    #     return Mercury.uploadFile(assistant.CRM.Auth, storedFile)
     elif assistant.CRM.Type is CRM.Vincere:
         return Vincere.uploadFile(assistant.CRM.Auth, storedFile)
     elif assistant.CRM.Type is CRM.Greenhouse:
@@ -73,6 +81,8 @@ def searchCandidates(assistant: Assistant, session):
     #     return Adapt.searchCandidates(assistant.CRM.Auth)
     if assistant.CRM.Type is CRM.Bullhorn:
         return Bullhorn.searchCandidates(assistant.CRM.Auth, assistant.CompanyID, session)
+    elif assistant.CRM.Type is CRM.Mercury:
+        return Mercury.searchCandidates(assistant.CRM.Auth, assistant.CompanyID, session)
     elif assistant.CRM.Type is CRM.Vincere:
         return Vincere.searchCandidates(assistant.CRM.Auth, assistant.CompanyID, session)
     elif assistant.CRM.Type is CRM.Greenhouse:
@@ -94,46 +104,14 @@ def searchJobs(assistant: Assistant, session):
     #     return Adapt.pullAllCadidates(assistant.CRM.Auth)
     if assistant.CRM.Type is CRM.Bullhorn:
         return Bullhorn.searchJobs(assistant.CRM.Auth, assistant.CompanyID, session)
+    elif assistant.CRM.Type is CRM.Mercury:
+        return Mercury.searchJobs(assistant.CRM.Auth, assistant.CompanyID, session)
     elif assistant.CRM.Type is CRM.Vincere:
         return Vincere.searchJobs(assistant.CRM.Auth, assistant.CompanyID, session)
     elif assistant.CRM.Type is CRM.Greenhouse:
         return Greenhouse.searchJobs(assistant.CRM.Auth, session)
     elif assistant.CRM.Type is CRM.Jobscience:
         return Jobscience.searchJobs(assistant.CRM.Auth, assistant.CompanyID, session)
-    else:
-        return Callback(False, "CRM type did not match with those on the system")
-
-
-def getAllCandidates(assistant: Assistant):
-    print("SHOULD BE RETURNING CANDIDATES")
-    # Check CRM type
-    # if assistant.CRM.Type is CRM.Adapt:
-    #     return Adapt.pullAllCadidates(assistant.CRM.Auth)
-    if assistant.CRM.Type is CRM.Bullhorn:
-        return Bullhorn.getAllCandidates(assistant.CRM.Auth, assistant.CompanyID)
-    elif assistant.CRM.Type is CRM.Vincere:
-        return Vincere.getAllCandidates(assistant.CRM.Auth, assistant.CompanyID)
-    elif assistant.CRM.Type is CRM.Greenhouse:
-        return Greenhouse.getAllCandidates(assistant.CRM.Auth)
-    elif assistant.CRM.Type is CRM.Jobscience:
-        return Jobscience.getAllCandidates(assistant.CRM.Auth, assistant.CompanyID)
-    else:
-        return Callback(False, "CRM type did not match with those on the system")
-
-
-def getAllJobs(assistant: Assistant):
-    print("SHOULD BE RETURNING JOBS")
-    # Check CRM type
-    # if assistant.CRM.Type is CRM.Adapt:
-    #     return Adapt.pullAllCadidates(assistant.CRM.Auth)
-    if assistant.CRM.Type is CRM.Bullhorn:
-        return Bullhorn.getAllJobs(assistant.CRM.Auth, assistant.CompanyID)
-    elif assistant.CRM.Type is CRM.Vincere:
-        return Vincere.getAllJobs(assistant.CRM.Auth, assistant.CompanyID)
-    elif assistant.CRM.Type is CRM.Greenhouse:
-        return Greenhouse.getAllJobs(assistant.CRM.Auth)
-    elif assistant.CRM.Type is CRM.Jobscience:
-        return Jobscience.getAllJobs(assistant.CRM.Auth, assistant.CompanyID)
     else:
         return Callback(False, "CRM type did not match with those on the system")
 
@@ -182,10 +160,12 @@ def connect(type, auth, companyID) -> Callback:
 def testConnection(type, auth, companyID) -> Callback:
     try:
         crm_type: CRM = CRM[type]
-        print("TESTING CONNECTION FOR: " + type)
+
         # test connection
         if crm_type == CRM.Bullhorn:
             return Bullhorn.testConnection(auth, companyID)  # oauth2
+        elif crm_type == CRM.Mercury:
+            return Mercury.testConnection(auth, companyID)  # oauth2
         elif crm_type == CRM.Adapt:
             return Adapt.testConnection(auth)
         elif crm_type == CRM.Greenhouse:
@@ -297,7 +277,7 @@ def getAll(companyID) -> Callback:
         return Callback(False, 'Could not fetch all CRMs.')
 
 
-def updateByType(type: CRM, newAuth, companyID):
+def updateByType(type, newAuth, companyID):
     try:
         crm = db.session.query(CRM_Model).filter(and_(CRM_Model.CompanyID == companyID, CRM_Model.Type == type)).first()
         crm.Auth = dict(newAuth)
@@ -312,7 +292,7 @@ def updateByType(type: CRM, newAuth, companyID):
 
 def getSalary(conversation: Conversation, dataType: DataType, toPeriod: Period):
     # Less Than 5000 GBP Monthly
-    salary = conversation.get('keywordsByDataType').get(dataType.value['name'], 0)
+    salary = conversation.Data.get('keywordsByDataType').get(dataType.value['name'], 0)
     if salary:
         salarySplitted = salary[0].split(" ")
         salary = helpers.convertSalaryPeriod(salarySplitted[2], Period[salarySplitted[4]], toPeriod)

@@ -22,6 +22,7 @@ def serve(path=''):
     response.headers["Cache-Control"] = "no-store, no-cache"
     return response
 
+
 # Serve React App
 @public_router.route('/login')
 def login():

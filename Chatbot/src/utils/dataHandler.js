@@ -13,7 +13,7 @@ export const dataHandler = (() => {
     let instance;
     const init = () => {
         const CancelToken = axios.CancelToken;
-        let source
+        let source;
 
         let assistantID = undefined;
         let sessionID = undefined;
@@ -44,50 +44,57 @@ export const dataHandler = (() => {
                 keywordsByDataType: result.keywordsByDataType,
                 databaseType: databaseType
             };
-            const cancel = {
-                cancelToken: source.token
-            };
-            // fetch solutions
-            const {data, error} = await promiseWrapper(axios.post(`${getServerDomain()}/api/assistant/${assistantID}/chatbot/solutions`, payload, cancel));
+
+            let headers = new Headers();
+            headers.append('Content-Type', 'application/json');
+            headers.append('Accept', 'application/json');
+
+            const {data, error} = await promiseWrapper(
+                axios.post(`${getServerDomain()}/api/assistant/${assistantID}/chatbot/solutions`, payload, {
+                    headers,
+                    cancelToken: source.token
+                })
+            );
             const solutions = data ? data.data.data : []; // :) // lol faisal 🔫
             if (axios.isCancel(error)) {
                 console.log('cancelled');
-                resolve.cancelled = true
+                resolve.cancelled = true;
             }
             if (error) {
-                console.log("fetchSolutions: ", error)
+                console.log('fetchSolutions: ', error);
             }
             // Check the userTypes associated with the solutions and record them
             fetchedSolutions = fetchedSolutions.concat(solutions);
-            resolve.solutions = fetchedSolutions;
+            resolve.solutions = solutions;
             return resolve;
         };
 
         const cancelRequest = (message) => {
-            if (source) source.cancel(message)
-        }
+            if (source) source.cancel(message);
+        };
 
         const sendData = async (completed) => {
             source = CancelToken.source();
+            let cancelled;
             const result = processMessages(completed); // loop messages
-            if (!completed && result.collectedData.length < 3) return;
-            let cancelled
+            if ((!completed && result.collectedData.length < 3) || sessionID) return {cancelled};
 
             const cancel = {
                 cancelToken: source.token
-            }
-            console.log("============>>>>>")
-            console.log(result)
+            };
+            console.log('============>>>>>');
+            console.log(result);
             console.log('sending data...');
             // send data to server
             const {data, error} = await promiseWrapper(axios.post(`${getServerDomain()}/api/assistant/${assistantID}/chatbot`, result, cancel));
             sessionID = data ? data.data.data.sessionID : null; // :) // lol faisal 🔫
+            setSessionID(sessionID);
             if (axios.isCancel(error)) {
-                console.log('cancelled')
-                cancelled = true
+                console.log('cancelled');
+                cancelled = true;
             }
             if (error) {
-                console.log("SendData: ", error)
+                console.log('SendData: ', error);
             }
 
             console.log('sending files...');
@@ -101,8 +108,8 @@ export const dataHandler = (() => {
                 const {data, error} = await promiseWrapper(axios.post(`${getServerDomain()}/api/assistant/${assistantID}/chatbot/${sessionID}/file`, formData, config));
 
                 if (error) {
-                    console.error('file sending failed')
-                    filesSentFailed = true
+                    console.error('file sending failed');
+                    filesSentFailed = true;
                 }
             }
 
@@ -151,43 +158,34 @@ export const dataHandler = (() => {
                     dataType: name,
                     keywords
                 });
-                console.log(collectedData);
             };
 
             const __detectUserType = () => {
                 let userType = 'Unknown'; // default
+                recordedUserTypes = recordedUserTypes.filter(t => t !== userType);
                 if (recordedUserTypes.length === 0)
-                    return [];
+                    return userType;
 
                 let types = {};
-                // let maxEl = recordedUserTypes[0]
                 let maxCount = 1;
-                for (var i = 0; i < recordedUserTypes.length; i++) {
-                    let el = recordedUserTypes[i];
-                    if (types[el] == null)
-                        types[el] = 1;
+                for (let type of recordedUserTypes) {
+                    let key = type;
+                    if (types[key] == null)
+                        types[key] = 1;
                     else
-                        types[el]++;
-                    if (types[el] > maxCount) {
-                        // maxEl = el;
-                        maxCount = types[el];
-                    }
+                        types[key]++;
+                    if (types[key] > maxCount)
+                        maxCount = types[key];
                 }
-
-                types = Object.keys(types).filter(key => types[key] === maxCount && key !== 'Unknown');
-                if (types.length === 1) {
+                types = Object.keys(types).filter(key => types[key] === maxCount);
+                if (types.length === 1)
                     userType = types[0];
-                }
-                console.log(userType);
                 return userType;
             };
 
             const __accumulateScore = (earnedScore, total) => {
                 _curScore += earnedScore;
                 _totalScore += total;
-                console.log("ACUMELATED")
-                console.log(_curScore)
-                console.log(_totalScore)
             };
 
             const __recordUserTypes = (types) => {
@@ -215,8 +213,6 @@ export const dataHandler = (() => {
                     modifiedKeywords,
                     content.skipped);
                 __accumulateScore(score, Math.max(...answers.map(answer => answer.score)));
-                console.log(score)
-                console.log(Math.max(...answers.map(answer => answer.score)))
             };
 
             const __processUserInput = (message) => {
@@ -294,7 +290,6 @@ export const dataHandler = (() => {
                     email = personalData.ClientEmail;
                     phone = personalData.ClientTelephone;
                 }
-                console.log('USER', userType);
                 return {
                     collectedData: collectedData,
                     keywords: collectedKeywords,
@@ -318,15 +313,12 @@ export const dataHandler = (() => {
             for (message of messages) {
                 if (message.sender === 'USER') {
                     const {blockRef} = message;
-                    console.log(message);
                     __recordUserTypes(blockRef[flowAttributes.DATA_TYPE][flowAttributes.DATA_TYPE_USER_TYPES]);
                     // don't process if data should not be stored in db
 
                     if (!blockRef[flowAttributes.STORE_IN_DB]) continue;
-                    console.log("HERE")
                     switch (blockRef[flowAttributes.TYPE]) {
                         case messageTypes.QUESTION:
-                            console.log("QUESTION");
                             __processQuestion(message);
                             break;
                         case messageTypes.USER_INPUT:

@@ -28,133 +28,75 @@ def generate():
                          TopBarText="Aramco Bot", SecondsUntilPopup=1,
                          Active=True, Company=aramco)
 
-
-
     flow = {
         "groups": [
             {
-                "id": "tisd83f4",
-                "name": "group 1",
-                "description": "The best group",
                 "blocks": [
                     {
-                        "ID":"8EDEBiDHa",
-                        "Type":"Question",
-                        "StoreInDB":True,
-                        "Skippable":False,
-                        "SkipText":"Skip!",
-                        "SkipAction":"End Chat",
-                        "SkipBlockToGoID": None,
-                        "DataType":"CandidateAvailability",
-                        "Content":{
-                            "text":"what?",
-                            "answers":[
+                        "Content": {
+                            "answers": [
                                 {
-                                    "id":"WZXp26mdL",
-                                    "text":"low",
-                                    "keywords":[],
-                                    "blockToGoID": '834hf',
-                                    "action":"Go To Next Block",
-                                    "afterMessage":"",
-                                    "score": 2
+                                    "action": "Go To Next Block",
+                                    "afterMessage": "",
+                                    "blockToGoID": "1Nto4DL8B",
+                                    "id": "WZXp26mdL",
+                                    "keywords": [
+                                        "python"
+                                    ],
+                                    "score": 2,
+                                    "text": "low"
                                 },
                                 {
-                                    "id":"godj9rom5",
-                                    "text":"medium",
-                                    "keywords":[],
-                                    "blockToGoID": '834hf',
-                                    "action":"Go To Next Block",
-                                    "afterMessage":"",
-                                    "score": 5
+                                    "action": "Go To Next Block",
+                                    "afterMessage": "",
+                                    "blockToGoID": "1Nto4DL8B",
+                                    "id": "godj9rom5",
+                                    "keywords": [],
+                                    "score": 5,
+                                    "text": "medium"
                                 },
                                 {
-                                    "id":"E6phkGY5u",
-                                    "text":"high",
-                                    "keywords":[],
-                                    "blockToGoID": '834hf',
-                                    "action":"Go To Next Block",
-                                    "afterMessage":"",
-                                    "score": 8
+                                    "action": "Go To Next Block",
+                                    "afterMessage": "",
+                                    "blockToGoID": "1Nto4DL8B",
+                                    "id": "E6phkGY5u",
+                                    "keywords": [],
+                                    "score": 8,
+                                    "text": "high"
                                 }
-                            ]
+                            ],
+                            "text": "what?"
                         },
+                        "DataType": enums.DataType.CandidateSkills.value['enumName'],
+                        "ID": "8EDEBiDHa",
+                        "SkipAction": "End Chat",
+                        "SkipBlockToGoID": None,
+                        "SkipText": "Skip!",
+                        "Skippable": False,
+                        "StoreInDB": True,
+                        "Type": "Question"
                     },
                     {
-                        "ID": "834hf",
-                        "DataType": enums.DataType.CandidateSkills.name,
-                        "Type": enums.BlockType.UserInput.value,
-                        "StoreInDB": True,
+                        "Type": "Solutions",
+                        "StoreInDB": False,
                         "Skippable": True,
-                        "SkipText": "Skip!",
-                        "SkipAction": enums.BlockAction.EndChat.value,
+                        "SkipText": "Not found what you're looking for?",
+                        "SkipAction": "Go To Next Block",
                         "SkipBlockToGoID": None,
+                        "DataType": enums.DataType.NoType.value['enumName'],
                         "Content": {
+                            "showTop": 5,
                             "action": "Go To Next Block",
-                            "text": "What's are your skills?",
-                            "blockToGoID": "by_GnLY-f",
-                            "afterMessage": "Your input is being processed...",
-                            "keywords": ['python', 'sql', 'java']
-                        }
-                    },
-                    # {
-                    #     "ID":"by_GnLY-f",
-                    #     "Type": enums.BlockType.Solutions.value,
-                    #     "StoreInDB":False,
-                    #     "Skippable":True,
-                    #     "SkipText": "Skip!",
-                    #     "SkipAction": enums.BlockAction.EndChat.value,
-                    #     "SkipBlockToGoID": None,
-                    #     "DataType":enums.DataType.NoType.name,
-                    #     "Content": {
-                    #         "showTop": 3,
-                    #         "action": "End Chat",
-                    #         "blockToGoID": None,
-                    #         "afterMessage": "We will contact you with this candidate",
-                    #         "databaseType": enums.DatabaseType.Candidates.value['enumName']
-                    #     },
-                    # },
-                    # {
-                    #     "ID": "gje6D",
-                    #     "DataType": enums.DataType.CandidateEmail.name,
-                    #     "Type": "User Input",
-                    #     "StoreInDB": True,
-                    #     "Skippable": False,
-                    #     "Content": {
-                    #         "action": "End Chat",
-                    #         "text": "What's your email",
-                    #         "blockToGoID": None,
-                    #         "afterMessage": "Your email is in good hands :) Bye!"
-                    #     }
-                    # },
-                    # {
-                    #     "ID": "hkwt845",
-                    #     "DataType": enums.DataType.CandidateSkills.name,
-                    #     "Type": "File Upload",
-                    #     "StoreInDB": True,
-                    #     "Skippable": True,
-                    #     "Content": {
-                    #         "action": "Go To Next Block",
-                    #         "text": "Upload CV1",
-                    #         "blockToGoID": "gjdfl34",
-                    #         "afterMessage": "File processed!",
-                    #         "fileTypes": ["docx", "txt", "png", "xml", "doc", "pdf", "jpg"]
-                    #     }
-                    # },
-                    # {
-                    #     "ID": "gjdfl34",
-                    #     "DataType": enums.DataType.CandidateSkills.value,
-                    #     "Type": "File Upload",
-                    #     "StoreInDB": True,
-                    #     "Skippable": True,
-                    #     "Content": {
-                    #         "action": "End Chat",
-                    #         "text": "Upload CV2",
-                    #         "blockToGoID": None,
-                    #         "afterMessage": "File processed!",
-                    #         "fileTypes": ["docx", "txt", "png", "xml", "doc", "pdf", "jpg"]
-                    #     }
-                    # },
-                ]
+                            "blockToGoID": None,
+                            "afterMessage": "123",
+                            "databaseType": "Candidates"
+                        },
+                        "ID": "1Nto4DL8B"
+                    }
+                ],
+                "description": "The best group",
+                "id": "tisd83f4",
+                "name": "group 1"
             }
         ]
     }
@@ -320,8 +262,7 @@ def addCandidate(db, name, desiredSalary, jobTitle, skills, exp, location):
                      CandidateSkills =skills,
                      CandidateYearsExperience = exp,
                      CandidateLocation = location,
-                     Currency= Currency('USD'),
-                     PayPeriod= enums.Period.Annually)
+                     Currency= Currency('USD'))
 
 
 def addJob(db, title, description, salary, location, currency: Currency or None):
@@ -330,5 +271,4 @@ def addJob(db, title, description, salary, location, currency: Currency or None)
                JobDescription=description,
                JobLocation=location,
                JobSalary=salary,
-               Currency= currency,
-               PayPeriod= enums.Period.Annually)
+               Currency= currency)

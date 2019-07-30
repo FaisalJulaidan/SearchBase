@@ -10,7 +10,6 @@ from utilities import helpers
 # process the redirect from the auth callback
 def connect(type, auth, companyID):
     try:
-
         # find the type and redirect to its service
         if CRM_Enum.has_value(type):
             return crm_services.connect(type, auth, companyID)
@@ -94,3 +93,17 @@ def sendRequest(url, method, headers, data=None):
     elif method is "get":
         request = requests.get(url, headers=headers, data=data)
     return request
+
+
+def convertSkillsToString(skills):
+    if skills:
+        if type(skills) is list:  # list
+            if type(skills[0]) is str:  # list of strings
+                skills = ", ".join(skills)
+
+            elif type(skills[0]) is dict:  # list of dicts
+                temp = ""
+                for skill in skills:
+                    temp += skill["name"] + ", "
+                    skills = temp[:-2]
+    return skills

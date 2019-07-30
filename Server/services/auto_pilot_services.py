@@ -32,15 +32,17 @@ def processConversation(conversation: Conversation, autoPilot: AutoPilot):
                            + "/" + logoPath
 
                 companyName = autoPilot.Company.Name
-
+                print(autoPilot)
+                print(autoPilot.SendAcceptanceEmail)
+                print(autoPilot.SendCandidatesAppointments)
                 # ======================
                 # Send Acceptance Letters
-                if status is Status.Accepted and AutoPilot.SendAcceptanceEmail:
+                if status is Status.Accepted and autoPilot.SendAcceptanceEmail:
 
 
                     # NOTE: Send appointment email before acceptance email if automatic appoitment manger set to active
                     # Process candidates Appointment email only if score is accepted
-                    if AutoPilot.SendCandidatesAppointments:
+                    if autoPilot.SendCandidatesAppointments:
 
                         appointments_callback: Callback = \
                             mail_services.sendAppointmentsPicker(
@@ -66,7 +68,7 @@ def processConversation(conversation: Conversation, autoPilot: AutoPilot):
 
                 # ======================
                 # Send Rejection Letters
-                elif status is Status.Rejected and AutoPilot.SendRejectionEmail:
+                elif status is Status.Rejected and autoPilot.SendRejectionEmail:
 
                     rejection_callback: Callback = \
                         mail_services.sendRejectionEmail(userName, email, logoPath, companyName)

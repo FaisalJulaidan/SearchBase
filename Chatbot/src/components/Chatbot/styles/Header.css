@@ -22,12 +22,15 @@
     margin: 3px;
 }
 
-.Danger:hover {
+.Button.Danger:hover {
     color: #fff !important;
     background-color: #ff4d4f !important;
     border-color: #ff4d4f !important;
 }
 
-.Danger {
-    color: red !important;
+.Button.Danger {
+    color: red;
+    background: #fff;
+    border: 1px solid #d9d9d9;
+    box-shadow: 0 2px 0 rgba(0, 0, 0, .015);
 }

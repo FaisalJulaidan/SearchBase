@@ -2,6 +2,7 @@ import base64
 import json
 
 import requests
+from sqlalchemy_utils import Currency
 
 from models import Callback, StoredFile
 from services import databases_services, stored_file_services
@@ -201,7 +202,7 @@ def searchCandidates(auth) -> Callback:
                                                                   getValue(record.get("educations"), "degree"),
                                                                   yearsExperience=0,
                                                                   desiredSalary=0,
-                                                                  currency=None,
+                                                                  currency=Currency("GBP"),
                                                                   source="Greenhouse"))
 
         return Callback(True, sendQuery_callback.Message, result)
@@ -249,7 +250,6 @@ def searchJobs(auth, conversation) -> Callback:
                                                             type=record.get("custom_fields", {}).get("employment_type"),
                                                             salary=mid_salary,
                                                             essentialSkills=None,
-                                                            desiredSkills=None,
                                                             yearsRequired=0,
                                                             startDate=None,
                                                             endDate=None,
@@ -294,11 +294,10 @@ def getAllCandidates(auth) -> Callback:
                                                                   linkdinURL=None,
                                                                   availability=None,
                                                                   jobTitle=None,
-                                                                  education=
-                                                                  getValue(record.get("educations"), "degree"),
+                                                                  education= getValue(record.get("educations"), "degree"),
                                                                   yearsExperience=0,
                                                                   desiredSalary=0,
-                                                                  currency=None,
+                                                                  currency=Currency("GBP"),
                                                                   source="Greenhouse"))
 
         return Callback(True, sendQuery_callback.Message, result)
@@ -337,7 +336,6 @@ def getAllJobs(auth) -> Callback:
                                                             type=record.get("custom_fields", {}).get("employment_type"),
                                                             salary=mid_salary,
                                                             essentialSkills=None,
-                                                            desiredSkills=None,
                                                             yearsRequired=0,
                                                             startDate=None,
                                                             endDate=None,

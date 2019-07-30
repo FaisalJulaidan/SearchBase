@@ -1,5 +1,5 @@
-import React, {useEffect, useRef, useState} from 'react';
-import {connect} from 'react-redux';
+import React, { useEffect, useRef, useState } from 'react';
+import { connect } from 'react-redux';
 import axios from 'axios';
 // Actions
 import {
@@ -12,26 +12,34 @@ import {
 } from '../../store/actions';
 // Styles
 import './styles/Chatbot.css';
-import 'antd/dist/antd.css';
 // Utils
-import {dataHandler, getServerDomain, isReady, optionalDelayExecution, promiseWrapper, useInterval} from '../../utils';
-import {fetchData, getCurBlock} from '../../utils/flowHandler';
+import {
+    dataHandler,
+    getServerDomain,
+    isReady,
+    optionalDelayExecution,
+    promiseWrapper,
+    useInterval
+} from '../../utils';
+import { fetchData, getCurBlock } from '../../utils/flowHandler';
 // Constants
 import * as flowAttributes from '../../constants/FlowAttributes';
+import * as messageTypes from '../../constants/MessageType';
 // Components
 import ChatButton from './ChatButton';
 import Header from './Header';
 import Flow from './Flow';
 import Input from './Input';
 import Signature from './Signature';
+import 'antd/dist/antd.css';
 
-const Chatbot = ({
+export const Chatbot = ({
                      isDirectLink, btnColor, assistantID,
                      addBotMessage, setChatbotStatus, chatbot, initChatbot,
                      resetChatbot, resetMessage, setChatbotAnimation, messageList
                  }) => {
     const { assistant, status, animation } = chatbot;
-    const { loading, thinking, open, disabled, started, curAction, finished } = status;
+    const { loading, thinking, open, disabled, active, started, curAction, finished } = status;
     const { open: animationOpen } = animation;
     let timer = useRef(null);
     let stopTimer = useRef(null);
@@ -39,7 +47,7 @@ const Chatbot = ({
     window.addEventListener('beforeunload', () => {
         if (!finished) {
             // localStorage.setItem('tsb_chatbot_draft', JSON.stringify({ver: '123', messages: messageList}))
-            setChatbotStatus({ curAction: 'End Chat' });
+            setChatbotStatus({ curAction: 'Early End Chat' });
         }
     });
 
@@ -54,7 +62,7 @@ const Chatbot = ({
 
     const resetAsync = () => {
         dataHandler.cancelRequest();
-        stopTimer.current.reset()
+        stopTimer.current.reset();
     };
 
     const closeWindow = () => {
@@ -82,6 +90,7 @@ const Chatbot = ({
                 setChatbotStatus({ open: true });
             } else {
                 const { SecondsUntilPopup } = assistant;
+                if (SecondsUntilPopup === 0) return;
                 setTimeout(() => {
                     setChatbotAnimation({ open: true });
                 }, SecondsUntilPopup * 1000);
@@ -107,9 +116,11 @@ const Chatbot = ({
 
     // Every time the chatbot changes, call to flowHandler
     useEffect(() => {
-        const setChatbotWaiting = (block, overrideAction = null) => {
+        // if(disabled) return;
+        const setChatbotWaiting = (block) => {
+            if(!block.Content   ) return
             setChatbotStatus({
-                curAction: overrideAction,
+                curAction: null,
                 waitingForUser: false,
                 curBlockID: block.ID,
                 curBlock: block,
@@ -118,22 +129,26 @@ const Chatbot = ({
             });
         };
 
-        const endChat = async (completed) => {
-            return await dataHandler.sendData(completed);
-        };
-
         const botRespond = (block, chatbot) => {
+            if(!block.Content) return
             stopTimer.current = optionalDelayExecution(() => {
                 setChatbotStatus({ thinking: false, waitingForUser: true });
                 addBotMessage(block.Content.text, block.Type, block);
-                if (block.selfContinue) {
+                    if (block.selfContinue) {
                     setChatbotStatus({
                         curBlockID: block.selfContinue,
-                        curAction: 'Go To Next Block'
+                        curAction: block.selfContinue === 'End Chat' ? 'End Chat' : 'Go To Next Block'
                     });
+                }
+                if (block[flowAttributes.TYPE] === messageTypes.RAW_TEXT) {
+                    setChatbotStatus({
+                        curBlockID: block[flowAttributes.CONTENT][flowAttributes.BLOCKTOGOID],
+                        curAction: block[flowAttributes.CONTENT][flowAttributes.SUPER_ACTION]
+                    })
                 }
             }, !block.extra.needsToFetch, block.delay);
         };
+
         const fetch = async (block) => {
             let [key, data, cancelled] = await fetchData(block);
             let fetchedData = {};
@@ -143,36 +158,39 @@ const Chatbot = ({
             if (cancelled) return {};
             if (!data.length) {
                 setChatbotStatus({
-                    curAction: 'Not Found',
+                    curAction: block[flowAttributes.SKIP_ACTION] || 'Go To Next Block',
+                    afterMessage: 'Sorry, I could not find what you want!',
                     curBlockID: block[flowAttributes.CONTENT][flowAttributes.BLOCKTOGOID]
                 });
                 return {};
             }
-            return fetchedData
-        }
+            return fetchedData;
+        };
 
 
-            const setNextBlock = async (chatbot, started, curAction, assistant) => {
-            if (!isReady(chatbot) || !assistant) return
-            if(!started){
+        const setNextBlock = async (chatbot, started, curAction, assistant) => {
+            if (!isReady(chatbot) || !assistant) return;
+            if (!started) {
                 setChatbotStatus({ started: true });
                 return;
             }
             let nextBlock = getCurBlock(curAction, assistant, chatbot);
-            if (!nextBlock) return
+            console.log(nextBlock)
+            if (!nextBlock) return;
 
-            setChatbotWaiting(nextBlock, chatbot.status.afterMessage ? chatbot.status.curAction: null);
-            let fetchedData = {}
+            setChatbotWaiting(nextBlock);
+            let fetchedData = {};
             if (nextBlock.extra.needsToFetch) {
-               fetchedData = await fetch(nextBlock)
+                fetchedData = await fetch(nextBlock);
             }
             if (nextBlock.extra.end) {
                 setChatbotStatus({ finished: true });
-                let { cancelled } = await endChat(true);
-                if (!cancelled) return;
+                let { cancelled } = await dataHandler.sendData(nextBlock.extra.finished);
+                if (cancelled) return;
             }
             botRespond({ ...nextBlock, fetchedData }, chatbot);
-        }
+            // }, 600)
+        };
         setNextBlock(chatbot, started, curAction, assistant);
     }, [chatbot, setChatbotStatus, addBotMessage, assistant, curAction, started]);
 
@@ -187,46 +205,50 @@ const Chatbot = ({
             }
 
             const { assistant, isDisabled } = data.data.data;
-
-            if (!assistant.Active)
-                return;
+            if (isDisabled)
+                return setChatbotStatus({ disabled: isDisabled, active: assistant.Active, loading: false });
 
             dataHandler.setAssistantID(assistantID);
-
-            initChatbot(assistant, [].concat(assistant.Flow.groups.map(group => group.blocks)).flat(1), { disabled: isDisabled })
+            initChatbot(
+                assistant,
+                [].concat(assistant.Flow.groups.map(group => group.blocks)).flat(1),
+                { disabled: isDisabled, active: assistant.Active });
         };
-        if(!assistant){
+        if (!assistant) {
             fetchChatbot();
         }
     }, [initChatbot, setChatbotStatus]);
 
-
-
     return (
         <>
-            {open && !loading ?
-                <div style={{ position: isDirectLink ? 'relative' : '' }}
-                     className={[
-                         animation.open ? 'ZoomIn' : 'ZoomOut',
-                         isDirectLink ? 'Chatbot_DirectLink' : 'Chatbot'
-                     ].join(' ')}>
-                    <Header isDirectLink={isDirectLink}
-                            title={assistant.TopBarText}
-                            logoPath={assistant.LogoPath}
-                            resetChatbot={reset}
-                            closeWindow={closeWindow}/>
-                    <Flow inputOpen={animation.inputOpen} thinking={thinking}
-                          resetAsync={resetAsync}/>
-                    <Input isDirectLink={isDirectLink}
-                           visible={animation.inputOpen}/>
-                    <Signature isDirectLink={isDirectLink}/>
-                </div>
-                :
-                <ChatButton btnColor={btnColor}
-                            disabled={disabled}
-                            loading={loading}
-                            openWindow={openWindow}/>
-            }
+            {active ?
+                <>
+                    {open && !loading ?
+                        <div style={{ position: isDirectLink ? 'relative' : '' }}
+                             className={[
+                                 animation.open ? 'ZoomIn' : 'ZoomOut',
+                                 isDirectLink ? 'Chatbot_DirectLink' : 'Chatbot'
+                             ].join(' ')}>
+                            <Header isDirectLink={isDirectLink}
+                                    title={assistant.TopBarText}
+                                    logoPath={assistant.LogoPath}
+                                    resetChatbot={reset}
+                                    closeWindow={closeWindow}/>
+                            <Flow inputOpen={animation.inputOpen} thinking={thinking}
+                                  resetAsync={resetAsync}/>
+                            <Input isDirectLink={isDirectLink}
+                                   visible={animation.inputOpen}/>
+                            <Signature isDirectLink={isDirectLink}/>
+                        </div>
+                        :
+                        <ChatButton btnColor={btnColor}
+                                    disabled={disabled}
+                                    active={active}
+                                    loading={loading}
+                                    openWindow={openWindow}/>
+                    }
+                </>
+                : null}
         </>
     );
 };

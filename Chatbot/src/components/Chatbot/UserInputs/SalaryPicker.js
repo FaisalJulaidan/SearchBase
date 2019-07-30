@@ -15,9 +15,10 @@ const getDotNotation = (val, currency) => {
     return new Intl.NumberFormat('en-GB', { style: 'currency', currency, minimumFractionDigits: 0 }).format(val);
 };
 
-const SalaryPicker = ({ message, submitMessage }) => {
+const SalaryPicker = ({ message, submitMessage, period }) => {
 
-    let [payRate, setPayRate] = useState('Daily');
+
+    let [payRate, setPayRate] = useState(period === "CandidateAnnualDesiredSalary" || period === "JobAnnualSalary" ? "Annual" : "Daily");
     let [min, setMin] = useState(0);
     let [max, setMax] = useState(2000);
     let [salary, setSalary] = useState([0.3 * max, 0.7 * max]);
@@ -104,6 +105,7 @@ const SalaryPicker = ({ message, submitMessage }) => {
             <div>
                 <h2 className={'SettingsOption'}>Currency</h2>
                 <Dropdown overlay={currencyMenu}
+                          placement="topCenter"
                           getPopupContainer={() => {
                                             if (document.getElementById('TheSearchBase_Chatbot_Input'))
                                                 return document.getElementById('TheSearchBase_Chatbot_Input');
@@ -111,7 +113,7 @@ const SalaryPicker = ({ message, submitMessage }) => {
                                                 return document.getElementById('TheSearchBase_Chatbot')
                                         }}>
 
-                    <a className="ant-dropdown-link" href="#a">
+                    <a className="ant-dropdown-link">
                         {currency} <Icon type="down"/>
                     </  a>
                 </Dropdown>
@@ -122,8 +124,9 @@ const SalaryPicker = ({ message, submitMessage }) => {
                                             else
                                                 return document.getElementById('TheSearchBase_Chatbot')
                                         }}
+                          placement="topCenter"
                           overlay={payRateMenu}>
-                    <a className="ant-dropdown-link" href="#a">
+                    <a className="ant-dropdown-link">
                         {payRate} <Icon type="down"/>
                     </a>
                 </Dropdown>

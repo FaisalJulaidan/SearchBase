@@ -13,7 +13,7 @@ class Signature extends React.Component {
                 <p>
                     Chat By
                     <FontAwesomeIcon icon={faCloud} style={{color: '#673AB7', marginLeft: 5}} />
-                    <a target="_blank" rel="noopener noreferrer" href="https://thesearchbase.com/">TheSearchBase</a>
+                    <a target="_blank" rel="noopener noreferrer" href="https://thesearchbase.com/">SearchBase</a>
                 </p>
             </div>
         );

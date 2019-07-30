@@ -444,7 +444,7 @@ def searchJobs(access_token, companyID, conversation, fields=None) -> Callback:
                                                             endDate=record.get('ts2__Estimated_End_Date__c'),
                                                             linkURL=None,
                                                             currency=Currency("GBP"),
-                                                            payPeriod=Period("Annually"),  # May need to derive this
+                                                            payPeriod=Period("Annually"),
                                                             source="Jobscience"))
 
         return Callback(True, sendQuery_callback.Message, result)

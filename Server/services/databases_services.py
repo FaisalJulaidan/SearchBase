@@ -440,7 +440,7 @@ def scanJobs(session, dbIDs, extraJobs=None):
                 else:
                     desc[0] += ". "
 
-            essentialSkills = convertSkillsToString(record[Job.JobEssentialSkills.name])
+            essentialSkills = record[Job.JobEssentialSkills.name]
 
             if record[Job.JobYearsRequired.name] and essentialSkills:
                 desc.append(random.choice(requiredYearsSkills)
@@ -569,8 +569,8 @@ def createPandaJob(id, title, desc, location, type, salary: float, essentialSkil
             "JobLocation": location or '',
             "JobType": type or '',
             "JobSalary": salary or 0,
-            "JobEssentialSkills": essentialSkills or '',
-            "JobDesiredSkills": desiredSkills or '',
+            "JobEssentialSkills": convertSkillsToString(essentialSkills) or '',
+            "JobDesiredSkills": convertSkillsToString(desiredSkills) or '',
             "JobYearsRequired": yearsRequired or 0,
             "JobStartDate": startDate or '',
             "JobEndDate": endDate,

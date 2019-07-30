@@ -111,7 +111,6 @@ def getByID(id: int, companyID: int) -> Callback:
         result: AutoPilot = db.session.query(AutoPilot) \
             .filter(and_(AutoPilot.ID == id, AutoPilot.CompanyID == companyID)).first()
         if not result: raise Exception
-
         return Callback(True, "Got AutoPilot successfully.", result)
 
     except Exception as exc:
@@ -133,9 +132,11 @@ def fetchAll(companyID) -> Callback:
 
 # Add openTimes to the autoPilot object after parsing it
 def parseAutoPilot(autoPilot: AutoPilot) -> dict:
+    if(autoPilot.AppointmentAllocationTime):
+        print(helpers.getListFromSQLAlchemyList(autoPilot.AppointmentAllocationTime.Info))
     return {
         **helpers.getDictFromSQLAlchemyObj(autoPilot),
-        "OpenTimes": helpers.getListFromSQLAlchemyList(autoPilot.OpenTimes)
+        "AppointmentAllocationTime": helpers.getListFromSQLAlchemyList(autoPilot.AppointmentAllocationTime)
     }
 
 # ----- Updaters ----- #

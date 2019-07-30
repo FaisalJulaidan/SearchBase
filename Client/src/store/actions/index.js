@@ -10,4 +10,4 @@ export * from "./autoPilot.actions";
 export * from "./analytics.actions";
 export * from "./appointmentsPicker.actions";
 export * from "./appointment.actions"
-
+export * from "./appointmentAllocationTime.actions"

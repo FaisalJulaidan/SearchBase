@@ -32,7 +32,7 @@ class AutoPilot extends React.Component {
 
 
     componentDidMount() {
-
+        console.log(this.props)
         this.props.dispatch(autoPilotActions.fetchAutoPilot(this.props.match.params.id))
             .then(()=> {
                 const {autoPilot} = this.props;
@@ -273,11 +273,11 @@ class AutoPilot extends React.Component {
                                     )}
                                 </FormItem>
 
-                                <TimeSlots ref={this.TimeSlotsRef}
-                                           getFieldDecorator={getFieldDecorator}
-                                           autoPilot={autoPilot}
-                                           layout={layout}
-                                           showSetAppointment={this.state.sendCandidatesAppointments}/>
+                                {/*<TimeSlots ref={this.TimeSlotsRef}*/}
+                                {/*           getFieldDecorator={getFieldDecorator}*/}
+                                {/*           autoPilot={autoPilot}*/}
+                                {/*           layout={layout}*/}
+                                {/*           showSetAppointment={this.state.sendCandidatesAppointments}/>*/}
                             </Form>
                         }
 
@@ -313,6 +313,7 @@ function mapStateToProps(state) {
         autoPilot: state.autoPilot.autoPilot,
         autoPilotsList: state.autoPilot.autoPilotsList,
         isLoading: state.autoPilot.isLoading,
+        appointmentAllocationTime: state.appointmentAllocationTime.allocationTimes
     };
 }
 

@@ -59,9 +59,8 @@ def verify_get_appointment(token):
     else:
         return helpers.jsonResponse(False, 401, callback.Message)
 
-# Get all open times for a user to pick up from, it uses the payload to know for which company and other details...
-@appointment_router.route("/open_times/<payload>", methods=['GET', 'POST'])
-def open_times(payload):
+@appointment_router.route("/allocation_times/<payload>", methods=['GET', 'POST'])
+def allocation_time(payload):
     try:
         # Token expires in 5 days
         data = helpers.verificationSigner.loads(payload, salt='appointment-key', max_age=432000)
@@ -85,7 +84,7 @@ def open_times(payload):
         data = {
             "companyName": assistant.Company.Name,
             "companyLogoURL": assistant.Company.LogoPath,
-            "openTimes": helpers.getListFromSQLAlchemyList(times_callback.Data.Info or []),
+            "appointmentAllocationTime": helpers.getListFromSQLAlchemyList(times_callback.Data.Info or []),
             "takenTimeSlots": helpers.getListFromSQLAlchemyList(assistant.Appointments),
             "userName": data['userName']
         }
@@ -109,8 +108,10 @@ def open_times(payload):
 
         # Add new appointment
         appointment_callback: Callback = appointment_services.addNewAppointment(data['conversationID'],
-                                                                  request.json.get('pickedTimeSlot'))
+                                                                                request.json.get('pickedTimeSlot'))
 
         if not appointment_callback.Success:
             return helpers.jsonResponse(False, 400, "Sorry, we couldn't add your appointment")
         return helpers.jsonResponse(True, 200, "Appointment has been added. You should receive a confirmation email")
+
+

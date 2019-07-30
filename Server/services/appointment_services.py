@@ -53,8 +53,6 @@ def addNewAppointment(conversationID, dateTime):
 def generateEmailUrl(appointmentID):
     try:
         appointment = db.session.query(Appointment).filter(Appointment.ID == appointmentID).first()
-        print(appointment)
-        print(appointment.Status)
         if appointment:
             if appointment.Status != enums.Status.Pending:
                 raise Exception("Appointment status has already been set!")

@@ -395,8 +395,7 @@ def searchCandidates(auth, companyID, conversation, fields=None) -> Callback:
                                                                   email=record.get("email"),
                                                                   mobile=record.get("mobile"),
                                                                   location=record.get("address", {}).get("city") or "",
-                                                                  skills=convertSkillsToString(
-                                                                      record.get("primarySkills", {}).get("data")),
+                                                                  skills=record.get("primarySkills", {}).get("data"),
                                                                   linkdinURL=None,
                                                                   availability=record.get("status"),
                                                                   jobTitle=None,#

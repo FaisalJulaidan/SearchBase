@@ -388,7 +388,6 @@ def searchJobs(auth, companyID, conversation, fields=None) -> Callback:
                                                             salary=record.get("mercury_permanentsalary_mc") or
                                                                    record.get("mercury_tempcandidatepay_mc"),
                                                             essentialSkills=None,
-                                                            desiredSkills=None,
                                                             yearsRequired=0,
                                                             startDate=record.get("crimson_startdate"),
                                                             endDate=None,

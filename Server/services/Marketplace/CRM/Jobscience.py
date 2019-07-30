@@ -14,6 +14,21 @@ from utilities.enums import DataType as DT, Period
 CLIENT_ID = os.environ['JOBSCIENCE_CLIENT_ID']
 CLIENT_SECRET = os.environ['JOBSCIENCE_CLIENT_SECRET']
 
+# TODO 30/07/2019
+# Test with dummy entries for BUGS and 'full reply'[]
+# Declare standard properties []
+# Remove prints & trim comments []
+
+# ISSUE: USING REFRESH TOKEN []
+# Session timeout set to 24 hours
+# 'If you use refresh tokens, your code should first try the regular API call, and if you get a 4xx result,
+# try using the refresh token to get a new session token, and if that fails, then you've been kicked out,
+# and the user needs to re-authenticate to continue. If you don't use refresh tokens,
+# you can skip the middle step, obviously'.
+# Will receive 401 for expired access token -> will then need to fetch new one using the refresh token
+
+# NOTE: Before use in dev or prod, the callback url must be changed both in items.js and on the Salesforce dashboard
+
 
 def testConnection(auth, companyID):
     try:
@@ -47,11 +62,17 @@ def login(auth):
 
         # get the access token and refresh token
         access_token_request = requests.post(access_token_url, headers=headers)
-        print(access_token_request)
+
         if not access_token_request.ok:
             raise Exception(access_token_request.text)
 
         result_body = json.loads(access_token_request.text)
+
+        print("ACCESS TOKEN:")
+        print(result_body.get('access_token'))
+        print("")
+        print("REFRESH TOKEN:")
+        print(result_body.get('refresh_token'))
 
         # //////////////////////////// TESTING QUERIES ///////////////////////////////////////////////
         # GENERIC QUERY: sendQuery(result_body.get("access_token"), "get", "SELECT+name+from+Account")
@@ -96,16 +117,15 @@ def logout(access_token, companyID):  # QUESTION: Purpose of companyID param?
         helpers.logError("Marketplace.CRM.Jobscience.logout() ERROR: " + str(exc))
         return Callback(False, str(exc))
 
-# TODO: BASIC TEST [CHECK]
 
-
+# TODO: BASIC TEST []
+# NOTE: Standard fields to insert -> [FirstName, LastName, Phone, City, Email, Education, (skills)Attributes, Education]
 def insertCandidate(access_token, conversation: Conversation) -> Callback:
-
     try:
         name = (conversation.Name or " ").split(" ")
         body = {
-            "FirstName": helpers.getListValue(name, 0, " ") or "",
-            "LastName":  helpers.getListValue(name, 1, "") or "DEFAULT",  # LastName is only required field
+            "FirstName": "Tim",  # helpers.getListValue(name, 0, " ") or "",
+            "LastName": helpers.getListValue(name, 1, "") or "DEFAULT",  # LastName is only required field
             "phone": conversation.PhoneNumber or " ",
             "MailingCity": "".join(conversation.Data.get('keywordsByDataType').get(DT.CandidateLocation.value['name'],
                                                                                    [""])),
@@ -113,8 +133,10 @@ def insertCandidate(access_token, conversation: Conversation) -> Callback:
             "ts2__Education__c": "".join(conversation.Data.get('keywordsByDataType')
                                          .get(DT.CandidateEducation.value['name'],
                                               [""])),
+            "Attributes__c": "; ".join(
+                conversation.Data.get('keywordsByDataType').get(DT.CandidateSkills.value['name'], [" "])),
             "RecordTypeId": "0120O000000tJIAQA2"  # ID for a candidate person record type
-            }
+        }
 
         print("Body to insert is:")
         print(body)
@@ -135,6 +157,7 @@ def insertCandidate(access_token, conversation: Conversation) -> Callback:
 def uploadFile(auth, storedFile: StoredFile):  # ISSUE: NO CURRENT API OPTION FOR RESUME UPLOAD
     print("UPLOAD FILE")
 
+
 # TODO BASIC TEST [CHECK]
 
 
@@ -151,7 +174,7 @@ def insertClient(auth, conversation: Conversation) -> Callback:
         # Insert client account
         insertClient_callback: Callback = insertClientContact(auth, conversation,
                                                               insertCompany_callback.Data.get("id"))
-        if not insertClient_callback.Success:                  # Needs to  fetch the Account ID
+        if not insertClient_callback.Success:  # Needs to  fetch the Account ID
             raise Exception(insertClient_callback.Message)
 
         return Callback(True, insertClient_callback.Message)
@@ -160,8 +183,9 @@ def insertClient(auth, conversation: Conversation) -> Callback:
         helpers.logError("Marketplace.CRM.Jobscience.insertClient() ERROR: " + str(exc))
         return Callback(False, str(exc))
 
-# TODO BASIC TEST [CHECK]
 
+# TODO BASIC TEST [ ]
+# NOTE: Standard fields to insert -> [FirstName, LastName, Phone, City, Email, Client account ID]
 
 def insertClientContact(access_token, conversation: Conversation, prsCompanyID) -> Callback:
     try:
@@ -177,7 +201,7 @@ def insertClientContact(access_token, conversation: Conversation, prsCompanyID) 
             "LastName": names[1] or "DEFAULT",
             "phone": conversation.PhoneNumber or " ",
             "MailingCity": "".join(conversation.Data.get('keywordsByDataType').get(
-                    DT.ClientLocation.value['name'], [" "])),
+                DT.ClientLocation.value['name'], [" "])),
             # check number of emails and submit them
             "email": emails[0],
             "AccountId": prsCompanyID
@@ -194,8 +218,9 @@ def insertClientContact(access_token, conversation: Conversation, prsCompanyID) 
         helpers.logError("Marketplace.CRM.Jobscience.insertClientContact() ERROR: " + str(exc))
         return Callback(False, str(exc))
 
-# TODO TEST [CHECK]
 
+# TODO TEST [ ]
+# NOTE: Standard fields to insert -> [Name] -> TODO: Add more fields here?
 
 def insertCompany(auth, conversation: Conversation) -> Callback:
     try:
@@ -205,7 +230,7 @@ def insertCompany(auth, conversation: Conversation) -> Callback:
             "Name": " ".join(conversation.Data.get('keywordsByDataType').get(
                 DT.CompanyName.value['name'],
                 ["Undefined Company - TSB"]))
-            }
+        }
 
         sendQuery_callback: Callback = sendQuery(auth, "post", body, "sobjects/Account/")
 
@@ -224,7 +249,6 @@ def insertCompany(auth, conversation: Conversation) -> Callback:
 # TODO BASIC CHECK [CHECK]
 
 def searchCandidates(access_token, companyID, conversation, fields=None) -> Callback:
-
     print(conversation)
     # Dummy conversation keywords:
     keywords = conversation['keywordsByDataType']
@@ -270,7 +294,8 @@ def searchCandidates(access_token, companyID, conversation, fields=None) -> Call
                                                                   email=record.get("Email"),
                                                                   mobile=record.get("Phone"),
                                                                   location=record.get("MailingCity"),
-                                                                  skills="Engineering",  # Set temporarily to engineering
+                                                                  skills="Engineering",
+                                                                  # Set temporarily to engineering
                                                                   linkdinURL=None,
                                                                   availability=record.get("status"),
                                                                   jobTitle=None,
@@ -292,7 +317,7 @@ def checkFilter(keywords, dataType: DT, string, quote_wrap):
         for word in keywords[dataType.value["name"]]:  # NOTE: Wrap string types in single quotes
             print(word)
             if quote_wrap:
-                word = "'"+word+"'"
+                word = "'" + word + "'"
                 altered_list.append(word)
             else:
                 # Convert date format:
@@ -307,7 +332,6 @@ def checkFilter(keywords, dataType: DT, string, quote_wrap):
 
 
 def searchJobs(access_token, companyID, conversation, fields=None) -> Callback:
-
     keywords = conversation['keywordsByDataType']
     # keywords = {'Job Location': ['London'], 'Job Title': ['chef'], 'Job Type': []}
     print("keywords: ")
@@ -404,6 +428,7 @@ def searchJobsCustomQuery(access_token, companyID, query, fields=None) -> Callba
     except Exception as exc:
         helpers.logError("Marketplace.CRM.Jobscience.searchJobs() ERROR: " + str(exc))
         return Callback(False, str(exc))
+
 
 # TODO: Match to Bullhorn and trigger from chatbot
 

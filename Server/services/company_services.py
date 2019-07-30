@@ -1,4 +1,4 @@
-from models import db, Callback, Company, User
+from models import db, Callback, Company, User, AppointmentAllocationTime
 from services import stored_file_services
 from utilities import helpers
 from werkzeug.utils import secure_filename
@@ -30,6 +30,13 @@ def create(name, url, ownerEmail) -> Company or None:
         return Callback(False, "Couldn't create a company entity.")
 
 
+def getAppointmentAllocationTimes(id):
+    try:
+        result = db.session.query(AppointmentAllocationTime).filter(AppointmentAllocationTime.CompanyID == id).all()
+        if not result: raise Exception
+        return Callback(True, 'Gathered Appointment Allocation Times', result)
+    except Exception as exc:
+        return Callback(False, 'Failed to get any Appointment Allocation Times')
 
 def getByID(id) -> Company or None:
     try:

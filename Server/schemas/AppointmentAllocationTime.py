@@ -1,16 +1,12 @@
 from models import db
-from .AppointmentAllocationTimeInfo import AppointmentAllocationTimeInfo
 
 class AppointmentAllocationTime(db.Model):
 
-    # @property
-    # def info(self):
-    #     q = AppointmentAllocationTime.query.join(AppointmentAllocationTimeInfo).filter(AppointmentAllocationTimeInfo.AppointmentAllocationTime == self)
-    #     return q.all()
-
     ID = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
     Name = db.Column(db.String(128), nullable=False)
+    Default = db.Column(db.Boolean, nullable=False, default=False)
 
+    # Default = db.Column(db)
     # Relationships:
     #  - Bidirectional
     CompanyID = db.Column(db.Integer, db.ForeignKey('company.ID', ondelete='cascade'), nullable=False)

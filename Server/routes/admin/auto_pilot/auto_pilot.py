@@ -85,7 +85,7 @@ def auto_pilot_configs(autoPilotID):
                            data.get('rejectionScore'),
                            data.get('sendRejectionEmail'),
                            data.get('sendCandidatesAppointments'),
-                           data.get('openTimes'),  # TODO OpenTimeSlots & Appointments Feature
+                           data.get('appointmentAllocationTimes'),  # TODO OpenTimeSlots & Appointments Feature
                            user['companyID'])
         if not callback.Success:
             return helpers.jsonResponse(False, 400, callback.Message, None)

@@ -161,11 +161,11 @@ def update(id, name, desc, companyID: int) -> Callback:
 
 
 def updateConfigs(id, name, desc, active, acceptApplications, acceptanceScore, sendAcceptanceEmail, rejectApplications,
-                  rejectionScore, sendRejectionEmail, SendCandidatesAppointments, openTimes, companyID: int) -> Callback:
+                  rejectionScore, sendRejectionEmail, SendCandidatesAppointments, appointmentAllocationTime, companyID: int) -> Callback:
     try:
 
         # Check all OpenTimes are given
-        if len(openTimes) != 7: raise Exception("Number of open time slots should be 7")
+        # if len(openTimes) != 7: raise Exception("Number of open time slots should be 7")
 
         # Get AutoPilot
         autoPilot_callback: Callback = getByID(id, companyID)
@@ -181,6 +181,8 @@ def updateConfigs(id, name, desc, active, acceptApplications, acceptanceScore, s
         autoPilot.AcceptanceScore = acceptanceScore
         autoPilot.SendAcceptanceEmail = sendAcceptanceEmail
 
+        autoPilot.AppointmentAllocationTimeID = appointmentAllocationTime
+
         autoPilot.RejectApplications = rejectApplications
         autoPilot.RejectionScore = rejectionScore
         autoPilot.SendRejectionEmail = sendRejectionEmail
@@ -188,14 +190,14 @@ def updateConfigs(id, name, desc, active, acceptApplications, acceptanceScore, s
         autoPilot.SendCandidatesAppointments = SendCandidatesAppointments
 
         # Update the openTimes
-        for (oldSlot, newSlot) in zip(autoPilot_temp.OpenTimes, openTimes):
-            if oldSlot.Day == newSlot['day']:
-                oldSlot.Active = newSlot['active']
-                oldSlot.From = time(newSlot['from'][0], newSlot['from'][1])
-                oldSlot.To = time(newSlot['to'][0], newSlot['to'][1])
-                oldSlot.Duration = newSlot['duration']
-
+        # for (oldSlot, newSlot) in zip(autoPilot_temp.OpenTimes, openTimes):
+        #     if oldSlot.Day == newSlot['day']:
+        #         oldSlot.Active = newSlot['active']
+        #         oldSlot.From = time(newSlot['from'][0], newSlot['from'][1])
+        #         oldSlot.To = time(newSlot['to'][0], newSlot['to'][1])
+        #         oldSlot.Duration = newSlot['duration']
         # Save all changes
+
         db.session.commit()
         return Callback(True, "Updated the AutoPilot successfully.", autoPilot)
 

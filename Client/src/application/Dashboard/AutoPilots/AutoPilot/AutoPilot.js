@@ -2,7 +2,7 @@ import React from 'react'
 import {connect} from 'react-redux';
 import styles from "./AutoPilot.module.less";
 import NoHeaderPanel from 'components/NoHeaderPanel/NoHeaderPanel'
-import {Button, Form, Input, InputNumber, Switch, Typography, Divider, Spin, Modal, Breadcrumb} from 'antd';
+import {Button, Form, Input, InputNumber, Switch, Typography, Divider, Spin, Modal, Breadcrumb, Select} from 'antd';
 import 'types/TimeSlots_Types'
 import {history} from "helpers";
 import TimeSlots from "./TimeSlots/TimeSlots";
@@ -34,8 +34,7 @@ class AutoPilot extends React.Component {
 
     componentDidMount() {
         console.log(this.props)
-
-        this.props.dispatch(appointmentAllocationTimeActions.fetchAAT(this.props.match.params.id));
+        this.props.dispatch(appointmentAllocationTimeActions.fetchAAT());
         this.props.dispatch(autoPilotActions.fetchAutoPilot(this.props.match.params.id))
             .then(()=> {
                 const {autoPilot} = this.props;
@@ -72,23 +71,11 @@ class AutoPilot extends React.Component {
     };
 
     onSubmit = () => this.props.form.validateFields((err, values) => {
-
+        console.log(err)
         if(!err){
             const /**@type AutoPilot*/ autoPilot = this.props.autoPilot || {};
             const {state, TimeSlotsRef} = this;
-            const timeSlots = TimeSlotsRef.current.state.weekDays;
-
-            let weekDays = [];
-            for (let i = 0; i < 7; i++) {
-                weekDays.push({
-                    day: i,
-                    from: [timeSlots[i].from.hours(), timeSlots[i].from.minutes()],
-                    to: [timeSlots[i].to.hours(), timeSlots[i].to.minutes()],
-                    duration: +TimeSlotsRef.current.state.duration.split('min')[0],
-                    active: timeSlots[i].active
-                })
-            }
-
+            // const timeSlots = TimeSlotsRef.current.state.weekDays;
             let payload = {
                 active: autoPilot.Active,
                 name: values.name,
@@ -99,9 +86,10 @@ class AutoPilot extends React.Component {
                 sendRejectionEmail: state.sendRejectionEmail,
                 acceptanceScore: state.acceptanceScore / 100,
                 rejectionScore: state.rejectionScore / 100,
+                appointmentAllocationTimes: values.AppointmentAllocationTimes,
                 sendCandidatesAppointments: state.sendCandidatesAppointments,
 
-                openTimes: weekDays
+                // openTimes: weekDays
             };
 
             this.props.dispatch(autoPilotActions.updateAutoPilotConfigs(autoPilot.ID, payload));
@@ -109,12 +97,15 @@ class AutoPilot extends React.Component {
 
     });
 
+
+
     render() {
         const /**@type AutoPilot*/ autoPilot = this.props.autoPilot;
         const layout = {
             labelCol: {span: 4},
             wrapperCol: {span: 18},
         };
+        const allocTime =  this.props.autoPilot.AppointmentAllocationTimeID
         const {getFieldDecorator} = this.props.form;
         return (
             <>
@@ -254,7 +245,24 @@ class AutoPilot extends React.Component {
                                         </div>
                                     )}
                                 </FormItem>
+                                <br />
+                                <Divider/>
+                                <h2> Appointment Allocation Times</h2>
+                                <Form.Item label="Choose a timetable from the list to allocate when you would like to have your appointments"
+                                    help="Select from the dropdown list">
+                                    {getFieldDecorator('AppointmentAllocationTimes', {
+                                        initialValue: allocTime ? allocTime : this.props.appointmentAllocationTime[0].ID,
+                                        rules: [],
+                                    })(
+                                        <Select>
+                                            {this.props.appointmentAllocationTime.map(time => {
+                                                console.log(time)
+                                                return (<Select.Option value={time.ID}>{time.Name}</Select.Option>)
+                                            })}
+                                        </Select>
+                                    )}
 
+                                </Form.Item>
                                 <br />
                                 <Divider/>
                                 <h2> Manage Appointments Automation (coming soon)</h2>

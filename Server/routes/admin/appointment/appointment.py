@@ -2,7 +2,7 @@ from flask import Blueprint, request
 from flask_jwt_extended import jwt_required, get_jwt_identity
 
 from models import Callback, Assistant, Conversation, Appointment
-from services import assistant_services, conversation_services, appointment_services
+from services import assistant_services, conversation_services, appointment_services, company_services
 from utilities import helpers
 
 appointment_router: Blueprint = Blueprint('appointment_router', __name__, template_folder="../../templates")
@@ -115,7 +115,12 @@ def allocation_time(payload):
             return helpers.jsonResponse(False, 400, "Sorry, we couldn't add your appointment")
         return helpers.jsonResponse(True, 200, "Appointment has been added. You should receive a confirmation email")
 
-@appointment_router.route("/allocation_times_list/<id>", methods=['GET'])
+@appointment_router.route("/allocation_times_list/", methods=['GET'])
 @jwt_required
-def allocation_time_list(id):
-    allocation_times_callback: Callback = appointment_services.getAll()
+def allocation_time_list():
+    companyID = get_jwt_identity()['user']['companyID']
+    times_callback: Callback = company_services.getAppointmentAllocationTimes(companyID)
+
+    if not times_callback.Success:
+        return helpers.jsonResponse(False, 400, times_callback.Message)
+    return helpers.jsonResponse(True, 200, times_callback.Message, helpers.getListFromSQLAlchemyList(times_callback.Data))

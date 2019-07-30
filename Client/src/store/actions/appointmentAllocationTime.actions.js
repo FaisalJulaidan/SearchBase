@@ -7,9 +7,9 @@ const fetchAAT = (isSuccess, id) => ({
     id
 });
 
-const fetchAATSuccess = (error) => ({
+const fetchAATSuccess = (data) => ({
     type: actionTypes.FETCH_AAT_SUCCESS,
-    error
+    allocationTimes: data
 });
 
 const fetchAATFailure = (error) => ({

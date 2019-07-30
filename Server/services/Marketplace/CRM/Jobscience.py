@@ -14,6 +14,7 @@ from utilities.enums import DataType as DT, Period
 CLIENT_ID = os.environ['JOBSCIENCE_CLIENT_ID']
 CLIENT_SECRET = os.environ['JOBSCIENCE_CLIENT_SECRET']
 
+
 # TODO 30/07/2019
 # Test with dummy entries for BUGS and 'full reply'[]
 # Declare standard properties []
@@ -119,53 +120,35 @@ def logout(access_token, companyID):  # QUESTION: Purpose of companyID param?
         return Callback(False, str(exc))
 
 
-def insertCandidateSkills(access_token, conversation: Conversation) -> Callback:
+def insertCandidateSkills(access_token, conversation: Conversation, contactID) -> Callback:
     try:
-        print("ATTEMPT SKILL INSERT")
-        print(conversation.Data.get('keywordsByDataType').get(DT.CandidateSkills.value['name'], [" "]))
+        print("INSERT SKILLS")
         skills = conversation.Data.get('keywordsByDataType').get(DT.CandidateSkills.value['name'], [" "])
 
         entries = []
         counter = 0
+
         for skill in skills:
             entry = {
-                "attributes": {"type": "ts2__Skill__c", "referenceId": "ref" + str(counter+5)},
-                "ts2__Contact__c": "0034E00000vFs8kQAC",
+                "attributes": {"type": "ts2__Skill__c", "referenceId": "ref" + str(counter + 5)},  # Add unique ID
+                "ts2__Contact__c": contactID,
                 "ts2__Skill_Name__c": skill
             }
             entries.append(entry)
-            counter = counter+1
+            counter = counter + 1
 
         body = {
-            "records": entries
+            "records": entries  # Add entries to request body
         }
-        # body = {
-        #     "records": [
-        #
-        #         {
-        #             "attributes": {"type": "ts2__Skill__c", "referenceId": "ref1"},
-        #             "ts2__Contact__c": "0034E00000vFs8kQAC",
-        #             "ts2__Skill_Name__c": "C Programming Language"
-        #         },
-        #
-        #         {
-        #             "attributes": {"type": "ts2__Skill__c", "referenceId": "ref2"},
-        #             "ts2__Contact__c": "0034E00000vFs8kQAC",
-        #             "ts2__Skill_Name__c": "SQL"
-        #         }
-        #     ]
-        # }
-        print("Body to insert is:")
-        print(body)
 
         # Send query
         sendQuery_callback: Callback = sendQuery(access_token, "post", body, "composite/tree/ts2__Skill__c/")
-        # Will need returned ID for adding skills
+
         if not sendQuery_callback.Success:
             raise Exception(sendQuery_callback.Message)
 
         return Callback(True, sendQuery_callback.Data.text)
-    #
+
     except Exception as exc:
         helpers.logError("Marketplace.CRM.Jobscience.insertCandidateSkills() ERROR: " + str(exc))
         return Callback(False, str(exc))
@@ -191,16 +174,18 @@ def insertCandidate(access_token, conversation: Conversation) -> Callback:
             "RecordTypeId": "0120O000000tJIAQA2"  # ID for a candidate person record type
         }
 
-        print("Body to insert is:")
-        print(body)
-
         # Send query
         sendQuery_callback: Callback = sendQuery(access_token, "post", body, "sobjects/Contact/")
+
         # Will need returned ID for adding skills
+
         if not sendQuery_callback.Success:
             raise Exception(sendQuery_callback.Message)
+        return_body = json.loads(sendQuery_callback.Data.text)
 
-        insertCandidateSkills_callback: Callback = insertCandidateSkills(access_token, conversation)  # Attempt dummy skill insert
+        # Insert candidate skills
+        insertCandidateSkills_callback: Callback = insertCandidateSkills(
+            access_token, conversation, return_body.get("id"))
 
         if not insertCandidateSkills_callback.Success:  # Needs to  fetch the Account ID
             raise Exception(insertCandidateSkills_callback.Message)
@@ -304,7 +289,7 @@ def insertCompany(auth, conversation: Conversation) -> Callback:
 
 
 # TODO BASIC CHECK [CHECK]
-
+# NOTE: Standard fields to search -> [fields=id,name,email,mobile,address,primarySkills,status,educations,dayRate,salary]
 def searchCandidates(access_token, companyID, conversation, fields=None) -> Callback:
     print(conversation)
     # Dummy conversation keywords:
@@ -337,6 +322,7 @@ def searchCandidates(access_token, companyID, conversation, fields=None) -> Call
 
         # Iterate through candidates
         result = []
+        # TODO: Fetch job title
         for record in candidate_fetch['records']:
             print("<-- New Record -->")
             print("Name: " + str(record.get('Name')))
@@ -351,7 +337,7 @@ def searchCandidates(access_token, companyID, conversation, fields=None) -> Call
                                                                   email=record.get("Email"),
                                                                   mobile=record.get("Phone"),
                                                                   location=record.get("MailingCity"),
-                                                                  skills="Engineering",
+                                                                  skills="SQL",  # Need to fetch from skills
                                                                   # Set temporarily to engineering
                                                                   linkdinURL=None,
                                                                   availability=record.get("status"),
@@ -362,6 +348,8 @@ def searchCandidates(access_token, companyID, conversation, fields=None) -> Call
                                                                   currency=Currency("GBP"),
                                                                   payPeriod=Period("Annually"),
                                                                   source="Jobscience"))
+        print("RESULT IS")
+        print(result)
         return Callback(True, sendQuery_callback.Message, result)
     except Exception as exc:
         helpers.logError("Marketplace.CRM.Jobscience.searchCandidates() ERROR: " + str(exc))
@@ -421,7 +409,7 @@ def searchJobs(access_token, companyID, conversation, fields=None) -> Callback:
             access_token, "get", "{}", "SELECT+Name,Rate_Type__c,ts2__Text_Description__c," +
                                        "ts2__Max_Salary__c,ts2__Location__c,ts2__Job_Tag__c," +
                                        "ts2__Estimated_Start_Date__c,ts2__Estimated_End_Date__c+from+ts2__Job__c+" +
-                                       query + "+LIMIT+500")  # Return 500 records at most
+                                       query + "+LIMIT+5")  # Return 500 records at most
         if not sendQuery_callback.Success:
             raise Exception(sendQuery_callback.Message)
 

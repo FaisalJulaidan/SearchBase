@@ -78,9 +78,13 @@ def searchCandidates(assistant: Assistant, session):
     elif assistant.CRM.Type is CRM.Greenhouse:
         return Greenhouse.searchCandidates(assistant.CRM.Auth)
     elif assistant.CRM.Type is CRM.Jobscience:
-        return Jobscience.searchCandidates(assistant.CRM.Auth, assistant.CompanyID, session)
+        print("****")
+        t = Jobscience.searchCandidates(assistant.CRM.Auth, assistant.CompanyID, session)
+        print(t)
+        return t
     else:
         return Callback(False, "CRM type did not match with those on the system")
+
 
 
 def searchJobs(assistant: Assistant, session):

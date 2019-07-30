@@ -548,6 +548,8 @@ def __salary(row, dbSalaryColumn, dbCurrencyColumn, dbPayPeriodColumn, salaryInp
 def createPandaCandidate(id, name, email, mobile, location, skills,
                          linkdinURL, availability, jobTitle, education,
                          yearsExperience: int, desiredSalary: float, currency: Currency, payPeriod: Period, source):
+    print("SHOULD BE CREATING CANDIDATE ENTRY")
+    print(skills)
     return {"ID": id,
             "CandidateName": name or '',
             "CandidateEmail": email or '',

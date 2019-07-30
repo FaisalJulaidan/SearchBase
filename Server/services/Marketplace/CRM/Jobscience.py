@@ -26,6 +26,7 @@ CLIENT_SECRET = os.environ['JOBSCIENCE_CLIENT_SECRET']
 # and the user needs to re-authenticate to continue. If you don't use refresh tokens,
 # you can skip the middle step, obviously'.
 # Will receive 401 for expired access token -> will then need to fetch new one using the refresh token
+# Note that skill may have to be added separately
 
 # NOTE: Before use in dev or prod, the callback url must be changed both in items.js and on the Salesforce dashboard
 
@@ -118,6 +119,58 @@ def logout(access_token, companyID):  # QUESTION: Purpose of companyID param?
         return Callback(False, str(exc))
 
 
+def insertCandidateSkills(access_token, conversation: Conversation) -> Callback:
+    try:
+        print("ATTEMPT SKILL INSERT")
+        print(conversation.Data.get('keywordsByDataType').get(DT.CandidateSkills.value['name'], [" "]))
+        skills = conversation.Data.get('keywordsByDataType').get(DT.CandidateSkills.value['name'], [" "])
+
+        entries = []
+        counter = 0
+        for skill in skills:
+            entry = {
+                "attributes": {"type": "ts2__Skill__c", "referenceId": "ref" + str(counter+5)},
+                "ts2__Contact__c": "0034E00000vFs8kQAC",
+                "ts2__Skill_Name__c": skill
+            }
+            entries.append(entry)
+            counter = counter+1
+
+        body = {
+            "records": entries
+        }
+        # body = {
+        #     "records": [
+        #
+        #         {
+        #             "attributes": {"type": "ts2__Skill__c", "referenceId": "ref1"},
+        #             "ts2__Contact__c": "0034E00000vFs8kQAC",
+        #             "ts2__Skill_Name__c": "C Programming Language"
+        #         },
+        #
+        #         {
+        #             "attributes": {"type": "ts2__Skill__c", "referenceId": "ref2"},
+        #             "ts2__Contact__c": "0034E00000vFs8kQAC",
+        #             "ts2__Skill_Name__c": "SQL"
+        #         }
+        #     ]
+        # }
+        print("Body to insert is:")
+        print(body)
+
+        # Send query
+        sendQuery_callback: Callback = sendQuery(access_token, "post", body, "composite/tree/ts2__Skill__c/")
+        # Will need returned ID for adding skills
+        if not sendQuery_callback.Success:
+            raise Exception(sendQuery_callback.Message)
+
+        return Callback(True, sendQuery_callback.Data.text)
+    #
+    except Exception as exc:
+        helpers.logError("Marketplace.CRM.Jobscience.insertCandidateSkills() ERROR: " + str(exc))
+        return Callback(False, str(exc))
+
+
 # TODO: BASIC TEST []
 # NOTE: Standard fields to insert -> [FirstName, LastName, Phone, City, Email, Education, (skills)Attributes, Education]
 def insertCandidate(access_token, conversation: Conversation) -> Callback:
@@ -143,10 +196,14 @@ def insertCandidate(access_token, conversation: Conversation) -> Callback:
 
         # Send query
         sendQuery_callback: Callback = sendQuery(access_token, "post", body, "sobjects/Contact/")
-
+        # Will need returned ID for adding skills
         if not sendQuery_callback.Success:
             raise Exception(sendQuery_callback.Message)
 
+        insertCandidateSkills_callback: Callback = insertCandidateSkills(access_token, conversation)  # Attempt dummy skill insert
+
+        if not insertCandidateSkills_callback.Success:  # Needs to  fetch the Account ID
+            raise Exception(insertCandidateSkills_callback.Message)
         return Callback(True, sendQuery_callback.Data.text)
 
     except Exception as exc:
@@ -193,12 +250,12 @@ def insertClientContact(access_token, conversation: Conversation, prsCompanyID) 
         # New candidate details
         emails = conversation.Data.get('keywordsByDataType').get(DT.ClientEmail.value['name'], [" "])
 
-        # NOTE: Name is split into first and last, LastName required by API
-        names = str.split(conversation.Name)
+        # TODO: NOTE: Name is split into first and last, LastName required by API
+        # names = str.split(conversation.Name) names[0] names[1]
 
         body = {
-            "FirstName": names[0] or " ",
-            "LastName": names[1] or "DEFAULT",
+            "FirstName": conversation.Name or "FIRST_DEFAULT",
+            "LastName": conversation.Name or "DEFAULT",
             "phone": conversation.PhoneNumber or " ",
             "MailingCity": "".join(conversation.Data.get('keywordsByDataType').get(
                 DT.ClientLocation.value['name'], [" "])),

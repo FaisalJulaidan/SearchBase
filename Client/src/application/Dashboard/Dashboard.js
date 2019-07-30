@@ -24,7 +24,7 @@ const Account = lazy(() => import('./ControlPanel/Account/Account'));
 const Billing = lazy(() => import('./ControlPanel/Billing/Billing'));
 const UsersManagement = lazy(() => import('./ControlPanel/UsersManagement/UsersManagement'));
 const Documentation = lazy(() => import('./Documentation/Documentation'));
-const Calendar = lazy(() => import('./Calendar/Calendar'));
+const CalendarPage = lazy(() => import('./Calendar/CalendarPage'));
 const AutoPilots = lazy(() => import('./AutoPilots/AutoPilots'));
 const AutoPilot = lazy(() => import('./AutoPilots/AutoPilot/AutoPilot'));
 const Marketplace = lazy(() => import('./Marketplace/Marketplace'));
@@ -271,7 +271,7 @@ class Dashboard extends Component {
                                                    exact/>
                                             <Route path={`${match.path}/documentation`} component={Documentation}
                                                    exact/>
-                                            <Route path={`${match.path}/calendar`} component={Calendar} exact/>
+                                            <Route path={`${match.path}/calendar`} component={CalendarPage} exact/>
 
                                             <Route path="/dashboard" component={Home}/>
                                         </Switch>

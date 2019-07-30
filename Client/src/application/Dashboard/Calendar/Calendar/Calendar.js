@@ -22,9 +22,6 @@ class Calendar extends React.Component {
         };
     }
 
-    componentDidMount() {
-        this.props.dispatch(appointmentActions.fetchAppointments())
-    }
 
     onCloseModal = () => {
         this.setState({appointmentModalVisible: false});

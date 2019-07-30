@@ -5,7 +5,6 @@ import NoHeaderPanel from 'components/NoHeaderPanel/NoHeaderPanel'
 import {Button, Form, Input, InputNumber, Switch, Typography, Divider, Spin, Modal, Breadcrumb, Select} from 'antd';
 import 'types/TimeSlots_Types'
 import {history} from "helpers";
-import TimeSlots from "./TimeSlots/TimeSlots";
 import {autoPilotActions} from "store/actions";
 import {appointmentAllocationTimeActions} from "store/actions";
 

@@ -120,7 +120,18 @@ def allocation_time(payload):
 def allocation_time_list():
     companyID = get_jwt_identity()['user']['companyID']
     times_callback: Callback = company_services.getAppointmentAllocationTimes(companyID)
+    list = helpers.getListFromSQLAlchemyList(times_callback.Data)
+    returnObj = []
+
+    for aat in times_callback.Data:
+        appItem = helpers.getDictFromSQLAlchemyObj(aat)
+        info = []
+        for item in aat.Info:
+            info.append(helpers.getDictFromSQLAlchemyObj(item))
+        appItem['Info'] = info
+        returnObj.append(appItem)
+
 
     if not times_callback.Success:
         return helpers.jsonResponse(False, 400, times_callback.Message)
-    return helpers.jsonResponse(True, 200, times_callback.Message, helpers.getListFromSQLAlchemyList(times_callback.Data))
+    return helpers.jsonResponse(True, 200, times_callback.Message, returnObj)

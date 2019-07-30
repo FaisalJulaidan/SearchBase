@@ -1,9 +1,11 @@
 import React from 'react'
-import styles from "../AutoPilot.module.less";
+import styles from "../../AutoPilots/AutoPilot/AutoPilot.module.less";
 import moment from "moment";
+import {connect} from 'react-redux'
 import {Badge, Checkbox, Col, Form, List, Radio, Tag, TimePicker} from 'antd'
 import 'types/TimeSlots_Types'
 import 'types/AutoPilot_Types'
+import {appointmentAllocationTimeActions} from "store/actions";
 
 const FormItem = Form.Item;
 
@@ -11,14 +13,18 @@ class TimeSlots extends React.Component {
 
     componentDidMount() {
         const /**@type AutoPilot*/x = this.props.autoPilot;
-        this.setState(state => {
-            state.duration = x.OpenTimes[0].Duration + 'min';
-            state.weekDays.forEach((weekDay, i) => {
-                weekDay.active = x.OpenTimes[i].Active;
-                weekDay.from = moment(x.OpenTimes[i].From, "HHmmss");
-                weekDay.to = moment(x.OpenTimes[i].To, "HHmmss");
-            })
-        })
+
+        this.props.dispatch(appointmentAllocationTimeActions.fetchAAT());
+        console.log(this.props)
+        // this.setState(state => {
+        //     state.duration = x.OpenTimes[0].Duration + 'min';
+        //     state.weekDays.forEach((weekDay, i) => {
+        //         weekDay.active = x.OpenTimes[i].Active;
+        //         weekDay.from = moment(x.OpenTimes[i].From, "HHmmss");
+        //         weekDay.to = moment(x.OpenTimes[i].To, "HHmmss");
+        //     })
+        // })
+
     }
 
     state = {
@@ -74,6 +80,7 @@ class TimeSlots extends React.Component {
     handleChangeTime = (time, day, origin) => this.setState(state => state.weekDays.find(wd => wd.day === day)[origin] = time);
 
     render() {
+        const { getFieldDecorator } = this.props.form
         const TimeRange = /** @type {WeekDay}*/weekDay => {
             return (
                 <>
@@ -116,12 +123,12 @@ class TimeSlots extends React.Component {
         };
 
         return (
-            <div className={this.props.showSetAppointment ? null : styles.BlurContent}>
+            <Form>
                 <FormItem
                     label="Appointment Duration"
                     extra="This is will change the number of appointment slots per day"
                     {...this.props.layout}>
-                    {this.props.getFieldDecorator('appointmentDuration', {
+                    {getFieldDecorator('appointmentDuration', {
                         initialValue: this.state.duration,
                         onChange: (e) => this.setState({duration: e.target.value}),
                         rules: [{}],
@@ -172,9 +179,13 @@ class TimeSlots extends React.Component {
                     }
                 </div>
 
-            </div>
+            </Form>
         )
     }
 }
 
-export default TimeSlots
+const mapStateToProps = (state) => ({
+    appointmentAllocationTime: state.appointmentAllocationTime.allocationTimes
+})
+
+export default connect(mapStateToProps, null)(Form.create()(TimeSlots))

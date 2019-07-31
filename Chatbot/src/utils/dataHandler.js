@@ -162,28 +162,24 @@ export const dataHandler = (() => {
 
             const __detectUserType = () => {
                 let userType = 'Unknown'; // default
+                recordedUserTypes = recordedUserTypes.filter(t => t !== userType);
                 if (recordedUserTypes.length === 0)
                     return userType;
 
                 let types = {};
-                // let maxEl = recordedUserTypes[0]
                 let maxCount = 1;
-                for (var i = 0; i < recordedUserTypes.length; i++) {
-                    let el = recordedUserTypes[i];
-                    if (types[el] == null)
-                        types[el] = 1;
+                for (let type of recordedUserTypes) {
+                    let key = type;
+                    if (types[key] == null)
+                        types[key] = 1;
                     else
-                        types[el]++;
-                    if (types[el] > maxCount) {
-                        // maxEl = el;
-                        maxCount = types[el];
-                    }
+                        types[key]++;
+                    if (types[key] > maxCount)
+                        maxCount = types[key];
                 }
-
-                types = Object.keys(types).filter(key => types[key] === maxCount && key !== 'Unknown');
-                if (types.length === 1) {
+                types = Object.keys(types).filter(key => types[key] === maxCount);
+                if (types.length === 1)
                     userType = types[0];
-                }
                 return userType;
             };
 

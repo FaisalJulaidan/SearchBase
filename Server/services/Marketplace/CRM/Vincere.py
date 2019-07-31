@@ -412,7 +412,6 @@ def searchJobs(auth, companyID, conversation) -> Callback:
                                                             type=record.get("employmentType"),
                                                             salary=record.get("salary"),
                                                             essentialSkills=record.get("skills", {}).get("data"),
-                                                            desiredSkills=None,
                                                             yearsRequired=record.get("yearsRequired", 0),
                                                             startDate=record.get("startDate"),
                                                             endDate=record.get("dateEnd"),

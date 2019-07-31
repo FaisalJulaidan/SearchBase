@@ -16,6 +16,7 @@ class CRM(Enum):
     Bullhorn = 'Bullhorn'
     Vincere = 'Vincere'
     Greenhouse = 'Greenhouse'
+    Jobscience = 'Jobscience'
     Mercury = 'Mercury'
 
     @classmethod

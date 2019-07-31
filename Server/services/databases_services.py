@@ -410,9 +410,7 @@ def scanJobs(session, dbIDs, extraJobs=None):
 
         # Skills
         # __wordsCounter(DT.JobEssentialSkills, Job.JobEssentialSkills, keywords, df, 3)
-        # __wordsCounter(DT.JobDesiredSkills, Job.JobDesiredSkills, keywords, df, 3)
         # __wordsCounter(DT.CandidateSkills, Job.JobEssentialSkills, keywords, df, 3)
-        # __wordsCounter(DT.CandidateSkills, Job.JobDesiredSkills, keywords, df, 3)
 
 
         # Results
@@ -424,8 +422,6 @@ def scanJobs(session, dbIDs, extraJobs=None):
         location = [" located in [location]. "]
         requiredYearsSkills = ["It requires [yearsRequired] year(s) with [essentialSkills]. ",
                                "This role requires [yearsRequired] year(s) with [essentialSkills]. "]
-        desiredSkills = ["Candidates who also have experience with [desirableSkills] are highly desired.",
-                         "Desirable skills include [desirableSkills]."]
 
         data = []
         for record in topResults:
@@ -446,10 +442,6 @@ def scanJobs(session, dbIDs, extraJobs=None):
                 desc.append(random.choice(requiredYearsSkills)
                             .replace("[yearsRequired]", str(int(record[Job.JobYearsRequired.name])))
                             .replace("[essentialSkills]", essentialSkills))
-
-            if record[Job.JobDesiredSkills.name]:
-                desc.append(random.choice(desiredSkills).replace("[desirableSkills]",
-                                                                 record[Job.JobDesiredSkills.name]))
 
             # Build job subtitles
             subTitles = []
@@ -542,7 +534,9 @@ def __salary(row, dbSalaryColumn, dbCurrencyColumn, salaryInput: str, plus=4, fo
 
 def createPandaCandidate(id, name, email, mobile, location, skills,
                          linkdinURL, availability, jobTitle, education,
-                         yearsExperience: int, desiredSalary: float, currency: Currency, source):
+                         yearsExperience: int, desiredSalary: float, currency: Currency, payPeriod: Period, source):
+    print("SHOULD BE CREATING CANDIDATE ENTRY")
+    print(skills)
     return {"ID": id,
             "CandidateName": name or '',
             "CandidateEmail": email or '',
@@ -561,7 +555,7 @@ def createPandaCandidate(id, name, email, mobile, location, skills,
             }
 
 
-def createPandaJob(id, title, desc, location, type, salary: float, essentialSkills, desiredSkills, yearsRequired,
+def createPandaJob(id, title, desc, location, type, salary: float, essentialSkills, yearsRequired,
                    startDate, endDate, linkURL, currency: Currency, source):
     return {"ID": id,
             "JobTitle": title or '',
@@ -570,7 +564,6 @@ def createPandaJob(id, title, desc, location, type, salary: float, essentialSkil
             "JobType": type or '',
             "JobSalary": salary or 0,
             "JobEssentialSkills": convertSkillsToString(essentialSkills) or '',
-            "JobDesiredSkills": convertSkillsToString(desiredSkills) or '',
             "JobYearsRequired": yearsRequired or 0,
             "JobStartDate": startDate or '',
             "JobEndDate": endDate,

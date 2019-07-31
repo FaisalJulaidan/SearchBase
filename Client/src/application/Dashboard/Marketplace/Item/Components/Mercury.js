@@ -80,7 +80,7 @@ export const MercuryFormItems = ({
                 onClick={
                     () => validateFields((err, values) =>
                         window.location =
-                            `https://login.microsoftonline.com/common/oauth2/v2.0/authorize?response_type=code&client_id=b49f9e03-5586-4248-8585-8640c4b2539c&response_mode=query&scope=https://admin.services.crm.dynamics.com/user_impersonation+offline_access&redirect_uri=${getLink("/dashboard/marketplace/Mercury")}&state=${values.domain}`
+                            `https://login.microsoftonline.com/common/oauth2/authorize?response_type=code&client_id=b49f9e03-5586-4248-8585-8640c4b2539c&response_mode=query&scope=https://admin.services.crm.dynamics.com/user_impersonation offline_access&redirect_uri=${getLink("/dashboard/marketplace/Mercury")}&state=${values.domain}`
                     )
                 }
                 size={'large'}>

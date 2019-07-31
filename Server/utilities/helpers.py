@@ -168,26 +168,14 @@ def gzipped(f):
 def convertSalaryPeriod(salary, fromPeriod: Period, toPeriod: Period):
 
     if fromPeriod == Period.Annually:
-        if toPeriod == Period.Monthly:
-            return salary / 12
-        elif toPeriod == Period.Weekly:
-            return salary / 52.1429
+        if toPeriod == Period.Daily:
+            return salary / 365
         else:
             return salary
 
-    elif fromPeriod == Period.Monthly:
+    elif fromPeriod == Period.Daily:
         if toPeriod == Period.Annually:
-            return salary * 12
-        elif toPeriod == Period.Weekly:
-            return salary / 4
-        else:
-            return salary
-
-    elif fromPeriod == Period.Weekly:
-        if toPeriod == Period.Annually:
-            return salary * 52.1429
-        elif toPeriod == Period.Monthly:
-            return salary * 4.33
+            return salary * 365
         else:
             return salary
 

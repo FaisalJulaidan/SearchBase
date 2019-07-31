@@ -50,6 +50,7 @@ class Period(Enum):
     Annually = 'Annually'
     Monthly = 'Monthly'
     Weekly = 'Weekly'
+    Daily = 'Daily'
 
 
 @unique

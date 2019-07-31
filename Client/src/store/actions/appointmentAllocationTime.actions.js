@@ -17,10 +17,28 @@ const fetchAATFailure = (error) => ({
     error
 });
 
+const saveAAT = (newSettings) => ({
+    type: actionTypes.SAVE_AAT_REQUEST,
+    newSettings
+});
+
+const saveAATSuccess = () => ({
+    type: actionTypes.SAVE_AAT_SUCCESS,
+});
+
+const saveAATFailure = (error) => ({
+    type: actionTypes.SAVE_AAT_FAILURE,
+    error
+});
+
+
 
 
 export const appointmentAllocationTimeActions = {
     fetchAAT,
     fetchAATSuccess,
     fetchAATFailure,
+    saveAAT,
+    saveAATSuccess,
+    saveAATFailure
 };

@@ -2,10 +2,11 @@ import React from 'react'
 import styles from "../../AutoPilots/AutoPilot/AutoPilot.module.less";
 import moment from "moment";
 import {connect} from 'react-redux'
-import {Badge, Checkbox, Col, Form, List, Radio, Tag, TimePicker, Dropdown, Menu, Icon, message, Button} from 'antd'
+import {Badge, Checkbox, Col, Form, List, Radio, Tag, Input,TimePicker, Dropdown, Menu, Icon, message, Button} from 'antd'
 import 'types/TimeSlots_Types'
 import 'types/AutoPilot_Types'
 import {appointmentAllocationTimeActions} from "store/actions";
+import UserInput from "../../Assistants/Assistant/Flow/Blocks/CardTypes/UserInput";
 
 const FormItem = Form.Item;
 
@@ -14,24 +15,26 @@ class TimeSlots extends React.Component {
     componentDidMount() {
 
         this.props.dispatch(appointmentAllocationTimeActions.fetchAAT());
-        console.log(this.props.appointmentAllocationTime)
         let active = this.props.appointmentAllocationTime.find(time => time.Default)
         let activeID = active ? active.ID : this.props.appointmentAllocationTime[0].ID
 
-        let aat = this.props.appointmentAllocationTime.find(time => time.ID === activeID).Info
+        let aat = this.props.appointmentAllocationTime.find(time => time.ID === activeID)
 
         this.setState(state => {
             state.activeID = activeID
-            state.duration = aat[0].Duration + 'min';
+            state.name= aat.Name
+            state.duration = aat.Info[0].Duration + 'min';
             state.weekDays.forEach((weekDay, i) => {
-                weekDay.active = aat[i].Active;
-                weekDay.from = moment(aat[i].From, "HHmmss");
-                weekDay.to = moment(aat[i].To, "HHmmss");
+                weekDay.active = aat.Info[i].Active;
+                weekDay.from = moment(aat.Info[i].From, "HHmmss");
+                weekDay.to = moment(aat.Info[i].To, "HHmmss");
             })
         })
     }
 
     state = {
+        saved: false,
+        name: "",
         duration: '60min',
         activeID: 0,
         weekDays: [
@@ -127,46 +130,71 @@ class TimeSlots extends React.Component {
                     return totalHalfHours;
             }
         };
+        const saveSettings = () => {
+            console.log(this.state)
+            let savedSettings = {
+                name: this.state.name,
+                duration: this.state.duration,
+                weekDays: this.state.weekDays
+            }
+            this.props.dispatch(appointmentAllocationTimeActions.saveAAT(savedSettings))
+            this.setState({saved: true})
+        }
+
 
         const handleActiveDayChange = event => {
-            console.log(event.key)
-            let aat = this.props.appointmentAllocationTime.find(time => time.ID === parseInt(event.key)).Info
-            console.log(aat)
+            let aat = this.props.appointmentAllocationTime.find(time => time.ID === parseInt(event.key))
+
             this.setState(state => ({
-                activeID: 1,
-                duration: aat[0].Duration + 'min',
-                weekDays: state.weekDays.map((weekDay, i) => {
-                    weekDay.active = aat[i].Active;
-                    weekDay.from = moment(aat[i].From, "HHmmss");
-                    weekDay.to = moment(aat[i].To, "HHmmss");
-                })
+                activeID: parseInt(event.key),
+                saved: false,
+                name: aat.Name,
+                duration: aat.Info[0].Duration + 'min',
+                weekDays: state.weekDays.map((weekDay, i) => ({
+                    active: aat.Info[i].Active,
+                    from: moment(aat.Info[i].From, "HHmmss"),
+                    to:  moment(aat.Info[i].To, "HHmmss"),
+                }))
             }))
         }
 
-        const menu = (
+        const menu = () => {
+            return (
             <Menu onClick={handleActiveDayChange}>
                 {this.props.appointmentAllocationTime.map(time => {
                     return (
-                        <Menu.Item key={time.ID} rowKey={time.ID}>
+                        <Menu.Item key={time.ID}>
                             {time.Name}
                         </Menu.Item>
                     )
                 })}
             </Menu>
-        );
-        console.log(menu)
+        )}
         const active = this.props.appointmentAllocationTime.find(time => time.ID === this.state.activeID)
         return (
             <>
                 {active ?
                     <>
                         <h1>Select the timetable you would like to change</h1>
-                <Dropdown overlay={menu}>
+                <Dropdown overlay={menu()}>
                     <Button>
                     {active.Name}
                     </Button>
                 </Dropdown>
                 <Form>
+                    <FormItem
+                        label="Timetable name"
+                        extra="An identifier for you to easily separate timetables">
+                        {getFieldDecorator('aatName', {
+                            initialValue: active.Name,
+                            onChange: (e) => this.setState({name: e.target.value}),
+                            rules: [{}],
+                        })(
+                            <Input>
+
+                            </Input>,
+                        )}
+                    </FormItem>
                     <FormItem
                         label="Appointment Duration"
                         extra="This is will change the number of appointment slots per day"
@@ -184,11 +212,10 @@ class TimeSlots extends React.Component {
                     </FormItem>
 
                     <div style={{ width: 850}}>
-                        {
                             <List bordered
                                   dataSource={this.state.weekDays}
-                                  renderItem={weekDay => (
-                                      <List.Item>
+                                  renderItem={(weekDay, i) => (
+                                      <List.Item key={i}>
                                           <Col span={6}>
                                               {CheckBox(weekDay.day, weekDay.active)}
                                               <Tag style={{marginTop: 6}}
@@ -219,10 +246,10 @@ class TimeSlots extends React.Component {
 
                                       </List.Item>
                                   )}/>
-                        }
                     </div>
-
                 </Form>
+                <br />
+                <Button onClick={saveSettings}>Save Changes </Button>
             </> : null }
             </>
         )

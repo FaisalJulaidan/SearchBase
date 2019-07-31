@@ -21,7 +21,20 @@ export const appointmentAllocationTime = (state = initialState, action) => {
                 isLoading: false,
                 errorMsg: action.error
             });
-
+        case actionTypes.SAVE_AAT_REQUEST:
+            return updateObject(state, {
+                isLoading: true,
+                newSettings: action.newSetttings
+            });
+        case actionTypes.SAVE_AAT_SUCCESS:
+            return updateObject(state, {
+                isLoading: false
+            });
+        case actionTypes.SAVE_AAT_FAILURE:
+            return updateObject(state, {
+                isLoading: false,
+                errorMsg: action.error
+            });
         default:
             return state
     }

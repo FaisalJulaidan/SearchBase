@@ -40,9 +40,8 @@ const loadNextBlock = (chatbot) => {
         const { curBlockID, finished } = chatbot.status;
         let potential = finished ? null : chatbot.blocks.find(block => block.ID === curBlockID);
         let block = potential ? potential : null;
-        console.log(block)
-        console.log(curBlockID)
         if(!block) return endBlock();
+
         let extra = block.extra ? { ...block.extra, ...checkFetchData(block[flowAttributes.TYPE]) } : checkFetchData(block[flowAttributes.TYPE]);
         let selfContinue = checkSelfContinue(block[flowAttributes.TYPE], block[flowAttributes.CONTENT][flowAttributes.BLOCKTOGOID]);
         return { ...block, delay: delayMessageLength(block[flowAttributes.CONTENT][flowAttributes.TEXT]), selfContinue,  extra };

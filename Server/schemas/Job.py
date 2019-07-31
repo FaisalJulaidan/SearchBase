@@ -6,11 +6,11 @@ class Job(db.Model):
     JobTitle = db.Column(db.String(64), nullable=False) # Required
     JobDescription = db.Column(db.String(5000), nullable=True)
     JobLocation = db.Column(db.String(64), nullable=False) # Required
-    JobSalary = db.Column(db.Float(), nullable=True)
+    JobSalary = db.Column(db.Float(), nullable=False, default=0)
     Currency = db.Column(CurrencyType, nullable=False) # Required
     JobType = db.Column(db.String(64), nullable=True)
     JobEssentialSkills = db.Column(db.String(5000), nullable=True)
-    JobYearsRequired = db.Column(db.Integer, nullable=True)
+    JobYearsRequired = db.Column(db.Integer, nullable=True, default=0)
     JobStartDate = db.Column(db.DateTime(), nullable=True)
     JobEndDate = db.Column(db.DateTime(), nullable=True)
     JobLinkURL = db.Column(db.String(612), nullable=True)

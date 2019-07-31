@@ -56,10 +56,6 @@ def admin_pay(planID):
         token = data['token']['id']
         coupon = data['coupon']
 
-        # print(">>>>>>>>>>>")
-        # print(token)
-        # print(coupon)
-
         if token is "Error" or not token:
             return helpers.jsonResponse(False, 404, "No token provided to complete the payment!", None)
 
@@ -107,12 +103,8 @@ def unsubscribe():
 def webhooks_subscription_cancelled():
     if request.method == "POST":
         try:
-            print("STRIPE TRIGGER FOR UNSUBSCRIPTION...")
             event_json = request.get_json(force=True)
             customerID = event_json['data']['object']['customer']
-
-            print("Webhooks: Customer ID")
-            print(customerID)
 
             # Get the admin user who is logged in and wants to create a new user.
             callback: Callback = company_services.getByStripeID(customerID)
@@ -129,7 +121,6 @@ def webhooks_subscription_cancelled():
                 for assistant in assistants:
                     assistant.Active = False
 
-            print("Company with " + customerID + " has been unsubscribed successfully")
             return helpers.jsonResponse(True, 200, "Company with " + customerID + " has been unsubscribed successfully")
 
         except Exception as e:

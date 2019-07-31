@@ -3,6 +3,7 @@ import os
 from twilio.rest import Client
 
 from models import Callback
+from utilities import helpers
 
 account_sid = os.environ["ACCOUNT_SID"]
 auth_token = os.environ["AUTH_TOKEN"]
@@ -24,7 +25,7 @@ def exampleFunc(dueIn, payment):
 
         return Callback(True, "Payment Notification SMS has been sent")
     except Exception as e:
-        print("sms_services.sendPaymentDueNotification() ERROR: ", e)
+        helpers.logError("sms_services.sendPaymentDueNotification() ERROR: " + str(e))
         return Callback(False, "Error in sending Payment Notification SMS")
 
 

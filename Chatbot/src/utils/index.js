@@ -6,11 +6,11 @@ const isReady = (chatbot) => {
 
 const getLink = (src) => {
     // include the colon if there is port number, which means localhost and not real server
-    let colon = "";
-    if (window.location.port !== "")
-        colon = ":";
+    let colon = '';
+    if (window.location.port !== '')
+        colon = ':';
 
-    const {protocol, port, hostname} = window.location;
+    const { protocol, port, hostname } = window.location;
     return protocol + '//' + hostname + colon + port + src;
 };
 
@@ -32,11 +32,11 @@ const optionalDelayExecution = (cb, delay, time) => {
     } else {
         cb();
     }
-    const reset = () => clearTimeout(timeout)
-    return { reset }
+    const reset = () => clearTimeout(timeout);
+    return { reset };
 };
 
-const createBlock = (Content, Type, delay, ID = null, DataType = null, selfContinue = null, extra = {}, deferredAction=null) => ({
+const createBlock = (Content, Type, delay, ID = null, DataType = null, selfContinue = null, extra = {}, deferredAction = null) => ({
     Content,
     Type,
     DataType,
@@ -62,7 +62,7 @@ const delayMessageLength = (message) => {
 };
 
 
-export {isReady, getServerDomain, optionalDelayExecution, createBlock, delayMessageLength, getLink};
+export { isReady, getServerDomain, optionalDelayExecution, createBlock, delayMessageLength, getLink };
 
 export * from './flowHandler';
 export * from './dataHandler';

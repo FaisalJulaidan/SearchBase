@@ -7,6 +7,7 @@ from sqlalchemy_utils import Currency
 
 from models import Callback, Conversation, StoredFile
 from services import databases_services
+from services.Marketplace.CRM import crm_services
 from services.Marketplace import marketplace_helpers
 from utilities import helpers
 from utilities.enums import DataType as DT, Period
@@ -155,8 +156,32 @@ def insertCandidateSkills(access_token, conversation: Conversation, contactID) -
 
 # TODO: BASIC TEST []
 # NOTE: Standard fields to insert -> [FirstName, LastName, Phone, City, Email, Education, (skills)Attributes, Education]
+# BUG: Education not showing, may need to add to EDU object
+# TODO: Fix the salary -> May need to insert a min & max
 def insertCandidate(access_token, conversation: Conversation) -> Callback:
     try:
+        print("DESIRED ANNUAL SALARY: ")
+        salary = conversation.Data.get('keywordsByDataType').get(DT.CandidateAnnualDesiredSalary.value['name'], [""])
+        print(salary)
+
+        # NOTE: Splitting salary
+        salary_splitted = salary[0].split(" ")
+        low_and_high= salary_splitted[0].split("-")
+
+        print("MINIMAL DESIRED SALARY: ")
+        min_sal = low_and_high[0]
+        print(min_sal)
+
+        print("MAX DESIRED SALARY: ")
+        max_sal= low_and_high[1]
+        print(max_sal)
+
+        print("AVERAGE DESIRED SALARY: ")
+        avg_sal = str(0.5*(int(min_sal) + int(max_sal)))
+        print(avg_sal)
+        print("EDUCATION:")
+        print(conversation.Data.get('keywordsByDataType').get(DT.CandidateEducation.value['name'], [""]))
+        #exit(0)
         # NOTE: Should require on front-end that a full name is provided --> reduce data inconsistency
         name = (conversation.Name or " ").split(" ")
         body = {
@@ -165,10 +190,12 @@ def insertCandidate(access_token, conversation: Conversation) -> Callback:
             "phone": conversation.PhoneNumber or " ",
             "MailingCity": "".join(conversation.Data.get('keywordsByDataType').get(DT.CandidateLocation.value['name'],
                                                                                    [""])),
+            # "ts2__Desired_Salary__c": conversation.Data.get(DT.CandidateDailyDesiredSalary.value['name']),
             "email": conversation.Email or " ",
             "ts2__Education__c": "".join(conversation.Data.get('keywordsByDataType')
                                          .get(DT.CandidateEducation.value['name'],
                                               [""])),
+            "ts2__Desired_Salary__c": avg_sal,
             "Attributes__c": "; ".join(
                 conversation.Data.get('keywordsByDataType').get(DT.CandidateSkills.value['name'], [" "])),
             "RecordTypeId": "0120O000000tJIAQA2"  # ID for a candidate person record type

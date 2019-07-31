@@ -28,7 +28,7 @@ class CalendarPage extends React.Component {
                     <Calendar />
                 </Tabs.TabPane>
                 <Tabs.TabPane tab="Time Slots" key="2">
-                    <TimeSlots />
+                    <TimeSlots/>
                 </Tabs.TabPane>
             </Tabs>
             </NoHeaderPanel>

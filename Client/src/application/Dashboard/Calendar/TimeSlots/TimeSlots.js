@@ -2,7 +2,7 @@ import React from 'react'
 import styles from "../../AutoPilots/AutoPilot/AutoPilot.module.less";
 import moment from "moment";
 import {connect} from 'react-redux'
-import {Badge, Checkbox, Col, Form, List, Radio, Tag, TimePicker} from 'antd'
+import {Badge, Checkbox, Col, Form, List, Radio, Tag, TimePicker, Dropdown, Menu, Icon, message, Button} from 'antd'
 import 'types/TimeSlots_Types'
 import 'types/AutoPilot_Types'
 import {appointmentAllocationTimeActions} from "store/actions";
@@ -12,24 +12,28 @@ const FormItem = Form.Item;
 class TimeSlots extends React.Component {
 
     componentDidMount() {
-        const /**@type AutoPilot*/x = this.props.autoPilot;
 
         this.props.dispatch(appointmentAllocationTimeActions.fetchAAT());
-        console.log(this.props)
-        // this.setState(state => {
-        //     state.duration = x.OpenTimes[0].Duration + 'min';
-        //     state.weekDays.forEach((weekDay, i) => {
-        //         weekDay.active = x.OpenTimes[i].Active;
-        //         weekDay.from = moment(x.OpenTimes[i].From, "HHmmss");
-        //         weekDay.to = moment(x.OpenTimes[i].To, "HHmmss");
-        //     })
-        // })
+        console.log(this.props.appointmentAllocationTime)
+        let active = this.props.appointmentAllocationTime.find(time => time.Default)
+        let activeID = active ? active.ID : this.props.appointmentAllocationTime[0].ID
 
+        let aat = this.props.appointmentAllocationTime.find(time => time.ID === activeID).Info
+
+        this.setState(state => {
+            state.activeID = activeID
+            state.duration = aat[0].Duration + 'min';
+            state.weekDays.forEach((weekDay, i) => {
+                weekDay.active = aat[i].Active;
+                weekDay.from = moment(aat[i].From, "HHmmss");
+                weekDay.to = moment(aat[i].To, "HHmmss");
+            })
+        })
     }
 
     state = {
         duration: '60min',
-        /** @type {WeekDay[]}*/
+        activeID: 0,
         weekDays: [
             {
                 day: 'Monday',
@@ -79,6 +83,8 @@ class TimeSlots extends React.Component {
     handleActivateDay = (event, day) => this.setState(state => state.weekDays.find(wd => wd.day === day).active = event.target.checked);
     handleChangeTime = (time, day, origin) => this.setState(state => state.weekDays.find(wd => wd.day === day)[origin] = time);
 
+
+
     render() {
         const { getFieldDecorator } = this.props.form
         const TimeRange = /** @type {WeekDay}*/weekDay => {
@@ -122,64 +128,103 @@ class TimeSlots extends React.Component {
             }
         };
 
+        const handleActiveDayChange = event => {
+            console.log(event.key)
+            let aat = this.props.appointmentAllocationTime.find(time => time.ID === parseInt(event.key)).Info
+            console.log(aat)
+            this.setState(state => ({
+                activeID: 1,
+                duration: aat[0].Duration + 'min',
+                weekDays: state.weekDays.map((weekDay, i) => {
+                    weekDay.active = aat[i].Active;
+                    weekDay.from = moment(aat[i].From, "HHmmss");
+                    weekDay.to = moment(aat[i].To, "HHmmss");
+                })
+            }))
+        }
+
+        const menu = (
+            <Menu onClick={handleActiveDayChange}>
+                {this.props.appointmentAllocationTime.map(time => {
+                    return (
+                        <Menu.Item key={time.ID} rowKey={time.ID}>
+                            {time.Name}
+                        </Menu.Item>
+                    )
+                })}
+            </Menu>
+        );
+        console.log(menu)
+        const active = this.props.appointmentAllocationTime.find(time => time.ID === this.state.activeID)
         return (
-            <Form>
-                <FormItem
-                    label="Appointment Duration"
-                    extra="This is will change the number of appointment slots per day"
-                    {...this.props.layout}>
-                    {getFieldDecorator('appointmentDuration', {
-                        initialValue: this.state.duration,
-                        onChange: (e) => this.setState({duration: e.target.value}),
-                        rules: [{}],
-                    })(
-                        <Radio.Group>
-                            <Radio.Button value="60min">1 Hour</Radio.Button>
-                            <Radio.Button value="30min">30 Minutes</Radio.Button>
-                        </Radio.Group>,
-                    )}
-                </FormItem>
+            <>
+                {active ?
+                    <>
+                        <h1>Select the timetable you would like to change</h1>
+                <Dropdown overlay={menu}>
+                    <Button>
+                    {active.Name}
+                    </Button>
+                </Dropdown>
+                <Form>
+                    <FormItem
+                        label="Appointment Duration"
+                        extra="This is will change the number of appointment slots per day"
+                        {...this.props.layout}>
+                        {getFieldDecorator('appointmentDuration', {
+                            initialValue: this.state.duration,
+                            onChange: (e) => this.setState({duration: e.target.value}),
+                            rules: [{}],
+                        })(
+                            <Radio.Group>
+                                <Radio.Button value="60min">1 Hour</Radio.Button>
+                                <Radio.Button value="30min">30 Minutes</Radio.Button>
+                            </Radio.Group>,
+                        )}
+                    </FormItem>
 
-                <div style={{ width: 850}}>
-                    {
-                        <List bordered
-                              dataSource={this.state.weekDays}
-                              renderItem={weekDay => (
-                                  <List.Item>
-                                      <Col span={6}>
-                                          {CheckBox(weekDay.day, weekDay.active)}
-                                          <Tag style={{marginTop: 6}}
-                                               color={weekDay.active ? 'purple' : 'grey'}>
-                                              {weekDay.day}
-                                          </Tag>
-                                      </Col>
+                    <div style={{ width: 850}}>
+                        {
+                            <List bordered
+                                  dataSource={this.state.weekDays}
+                                  renderItem={weekDay => (
+                                      <List.Item>
+                                          <Col span={6}>
+                                              {CheckBox(weekDay.day, weekDay.active)}
+                                              <Tag style={{marginTop: 6}}
+                                                   color={weekDay.active ? 'purple' : 'grey'}>
+                                                  {weekDay.day}
+                                              </Tag>
+                                          </Col>
 
-                                      <Col span={12}>
-                                          {TimeRange(weekDay)}
-                                      </Col>
+                                          <Col span={12}>
+                                              {TimeRange(weekDay)}
+                                          </Col>
 
-                                      <Col span={6}>
-                                          {
-                                              weekDay.to && weekDay.from && weekDay.active &&
-                                              <div style={{display: 'flex'}}>
-                                                  <p style={{margin: 0}}>Total slots: </p>
-                                                  <Badge count={TotalSlots(weekDay.from, weekDay.to)}
-                                                         style={{
-                                                             backgroundColor: '#fff',
-                                                             color: 'black',
-                                                             marginTop: 2,
-                                                             width: 30
-                                                         }}/>
-                                              </div>
-                                          }
-                                      </Col>
+                                          <Col span={6}>
+                                              {
+                                                  weekDay.to && weekDay.from && weekDay.active &&
+                                                  <div style={{display: 'flex'}}>
+                                                      <p style={{margin: 0}}>Total slots: </p>
+                                                      <Badge count={TotalSlots(weekDay.from, weekDay.to)}
+                                                             style={{
+                                                                 backgroundColor: '#fff',
+                                                                 color: 'black',
+                                                                 marginTop: 2,
+                                                                 width: 30
+                                                             }}/>
+                                                  </div>
+                                              }
+                                          </Col>
 
-                                  </List.Item>
-                              )}/>
-                    }
-                </div>
+                                      </List.Item>
+                                  )}/>
+                        }
+                    </div>
 
-            </Form>
+                </Form>
+            </> : null }
+            </>
         )
     }
 }

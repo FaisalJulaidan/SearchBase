@@ -130,7 +130,7 @@ class ValidationType(Enum):
     Time = 'Time'
     Date = 'Date'
     DateTime = 'DateTime'
-    Salary = 'Salary' # Ex: 1000-5000 GBP Annually
+    Salary = 'Salary' # Ex: 1000-5000 GBP Annual
 
     @classmethod
     def has_value(cls, value):

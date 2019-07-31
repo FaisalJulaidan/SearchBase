@@ -366,9 +366,7 @@ def scanJobs(session, dbIDs, extraJobs=None):
     try:
 
         df = pandas.read_sql(db.session.query(Job).filter(Job.DatabaseID.in_(dbIDs)).statement,
-                             con=db.session.bind)\
-            .fillna({Job.JobSalary.name: 0, Job.JobYearsRequired.name: 0})\
-            .fillna('')
+                             con=db.session.bind).fillna('')
 
         df = df.drop('DatabaseID', axis=1)  # Drop column
 

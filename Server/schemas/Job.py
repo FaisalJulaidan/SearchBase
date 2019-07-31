@@ -10,7 +10,7 @@ class Job(db.Model):
     Currency = db.Column(CurrencyType, nullable=False) # Required
     JobType = db.Column(db.String(64), nullable=True)
     JobEssentialSkills = db.Column(db.String(5000), nullable=True)
-    JobYearsRequired = db.Column(db.Integer, nullable=False, default=0)
+    JobYearsRequired = db.Column(db.Integer, nullable=True, default=0)
     JobStartDate = db.Column(db.DateTime(), nullable=True)
     JobEndDate = db.Column(db.DateTime(), nullable=True)
     JobLinkURL = db.Column(db.String(612), nullable=True)

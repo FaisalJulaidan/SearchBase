@@ -49,10 +49,11 @@ def login(auth):
             "client_id": CLIENT_ID,
             "client_secret": CLIENT_SECRET,
             "redirect_uri": helpers.getDomain() + "/dashboard/marketplace/Mercury",
-            "code": auth.get("code")
+            "code": auth.get("code"),
+            "resource": "https://" + auth.get("state") + ".dynamics.com"
         }
 
-        url = "https://login.microsoftonline.com/ded6800a-6adb-4fc5-b14e-76747a56d913/oauth2/v2.0/token"
+        url = "https://login.microsoftonline.com/common/oauth2/token"
 
         get_access_token = requests.post(url, headers=headers, data=body)
         if not get_access_token.ok:

@@ -8,6 +8,7 @@ import styles from './Item.module.less'
 import {DefaultButton} from './Components/Common'
 import {AdaptFeatures, AdaptFormItems, AdaptHeader} from "./Components/Adapt";
 import {BullhornFeatures, BullhornHeader} from "./Components/Bullhorn";
+import {JobscienceFeatures, JobscienceHeader} from "./Components/Jobscience";
 import {VincereFeatures, VincereHeader} from "./Components/Vincere";
 import {GreenhouseFeatures, GreenhouseFormItem, GreenhouseHeader} from "./Components/Greenhouse";
 import {GoogleFeatures, GoogleHeader} from './Components/Google'
@@ -44,7 +45,7 @@ class Item extends React.Component {
         let type = location.pathname.split('/').slice(-1)[0]; // ex. Bullhorn, Adapt...
         let params = queryString.parse(location.search);
 
-        if( (type === "Bullhorn" || type === "Vincere" || type === "Outlook" || type === "Mercury") && params['code']){
+        if( (type === "Bullhorn" || type === "Vincere" || type === "Outlook" || type === "Jobscience" || type === "Mercury") && params['code']){
             dispatch(marketplaceActions.connectMarketplace(type, {...params})); // connect
             this.props.history.replace("/dashboard/marketplace/" + type) // clean the url from args
 
@@ -163,6 +164,21 @@ class Item extends React.Component {
                             </Button>
                         </Dropdown>
                     )
+                }
+                break;
+
+            case "Jobscience":
+                if (place === 'header')
+                    return <JobscienceHeader/>;
+                if (place === 'features')
+                    return <JobscienceFeatures/>;
+                if (place === 'button') {
+                    windowObject.url = "https://prsjobs--jsfull.cs83.my.salesforce.com/services/oauth2/authorize?" +
+                        "response_type=code&client_id=3MVG9w8uXui2aB_pIyoEOL_U6UgvUQqi5KNnTkD95XSD2NQjWfWakra7aHmltLO8e.xdwY.1WgkJAp7KUWsCN&" +
+                        "redirect_uri=" + getLink("/dashboard/marketplace/Jobscience");
+                    return <DefaultButton buttonText={'Connect to Jobscience Recruitment'}
+                                          windowObject={windowObject}
+                                          {...buttonsOptions}/>;
                 }
                 break;
 

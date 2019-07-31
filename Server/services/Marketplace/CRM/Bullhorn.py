@@ -405,7 +405,6 @@ def searchCandidates(auth, companyID, conversation, fields=None) -> Callback:
                                                                   desiredSalary=record.get("salary") or
                                                                                 record.get("dayRate", 0),
                                                                   currency=Currency("GBP"),
-                                                                  payPeriod=payPeriod,
                                                                   source="Bullhorn"))
 
         return Callback(True, sendQuery_callback.Message, result)
@@ -429,7 +428,7 @@ def searchJobs(auth, companyID, conversation, fields=None) -> Callback:
 
         query += checkFilter(keywords, DT.JobType, "employmentType")
 
-        query += checkFilter(keywords, DT.JobDesiredSkills, "skills")
+        query += checkFilter(keywords, DT.JobEssentialSkills, "skills")
 
         query += checkFilter(keywords, DT.JobStartDate, "startDate")
 
@@ -460,13 +459,11 @@ def searchJobs(auth, companyID, conversation, fields=None) -> Callback:
                                                             type=record.get("employmentType"),
                                                             salary=record.get("salary"),
                                                             essentialSkills=record.get("skills", {}).get("data"),
-                                                            desiredSkills=None,
                                                             yearsRequired=record.get("yearsRequired", 0),
                                                             startDate=record.get("startDate"),
                                                             endDate=record.get("dateEnd"),
                                                             linkURL=None,
                                                             currency=Currency("GBP"),
-                                                            payPeriod=Period("Annually"),
                                                             source="Bullhorn"))
 
         return Callback(True, sendQuery_callback.Message, result)

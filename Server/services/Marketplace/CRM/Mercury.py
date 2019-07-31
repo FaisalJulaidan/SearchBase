@@ -321,7 +321,6 @@ def searchCandidates(auth, companyID, conversation, fields=None) -> Callback:
                                                                   desiredSalary=record.get("crimson_expsalaryp") or
                                                                                 record.get("crimson_expratec", 0),
                                                                   currency=Currency("GBP"),
-                                                                  payPeriod=payPeriod,
                                                                   source="Mercury"))
 
         return Callback(True, sendQuery_callback.Message, result)
@@ -389,13 +388,11 @@ def searchJobs(auth, companyID, conversation, fields=None) -> Callback:
                                                             salary=record.get("mercury_permanentsalary_mc") or
                                                                    record.get("mercury_tempcandidatepay_mc"),
                                                             essentialSkills=None,
-                                                            desiredSkills=None,
                                                             yearsRequired=0,
                                                             startDate=record.get("crimson_startdate"),
                                                             endDate=None,
                                                             linkURL=None,
                                                             currency=Currency("GBP"),
-                                                            payPeriod=payPeriod,
                                                             source="Mercury"))
 
         return Callback(True, sendQuery_callback.Message, result)

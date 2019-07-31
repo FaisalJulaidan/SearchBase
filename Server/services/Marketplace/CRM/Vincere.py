@@ -362,8 +362,7 @@ def searchCandidates(auth, companyID, conversation) -> Callback:
                                                                       record.get("educations", {}).get("data")),
                                                                   yearsExperience=0,
                                                                   desiredSalary=record.get("dayRate", 0) * 365,
-                                                                  currency= Currency(), # TODO
-                                                                  payPeriod=Period.Annually,
+                                                                  currency= Currency("GBP"), # TODO
                                                                   source="Bullhorn"))
 
         return Callback(True, sendQuery_callback.Message, result)
@@ -385,7 +384,7 @@ def searchJobs(auth, companyID, conversation) -> Callback:
 
         query += checkFilter(keywords, DT.JobType, "employmentType")
 
-        query += checkFilter(keywords, DT.JobDesiredSkills, "skills")
+        query += checkFilter(keywords, DT.JobEssentialSkills, "skills")
 
         query += checkFilter(keywords, DT.JobYearsRequired, "yearsRequired")
 
@@ -413,13 +412,11 @@ def searchJobs(auth, companyID, conversation) -> Callback:
                                                             type=record.get("employmentType"),
                                                             salary=record.get("salary"),
                                                             essentialSkills=record.get("skills", {}).get("data"),
-                                                            desiredSkills=None,
                                                             yearsRequired=record.get("yearsRequired", 0),
                                                             startDate=record.get("startDate"),
                                                             endDate=record.get("dateEnd"),
                                                             linkURL=None,
                                                             currency=Currency('GBP'.upper()),
-                                                            payPeriod=Period.Annually,
                                                             source="Bullhorn"))
 
         return Callback(True, sendQuery_callback.Message, result)

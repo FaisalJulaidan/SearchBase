@@ -2,7 +2,7 @@ from sqlalchemy.sql import and_
 
 from utilities.enums import CRM, UserType, DataType, Period
 from models import db, Callback, Conversation, Assistant, CRM as CRM_Model, StoredFile
-from services.Marketplace.CRM import Greenhouse, Adapt, Bullhorn, Vincere, Mercury
+from services.Marketplace.CRM import Greenhouse, Adapt, Bullhorn, Vincere, Jobscience, Mercury
 # Process chatbot session
 from utilities import helpers
 
@@ -19,6 +19,7 @@ def processConversation(assistant: Assistant, conversation: Conversation) -> Cal
 
 
 def insertCandidate(assistant: Assistant, conversation: Conversation):
+    print("SHOULD BE INSERTING CANDIDATE")
     # Check CRM type
     if assistant.CRM.Type is CRM.Bullhorn:
         return Bullhorn.insertCandidate(assistant.CRM.Auth, conversation)
@@ -32,11 +33,14 @@ def insertCandidate(assistant: Assistant, conversation: Conversation):
         return Adapt.insertCandidate(assistant.CRM.Auth, conversation)
     elif assistant.CRM.Type is CRM.Greenhouse:
         return Callback(True, "Greenhouse does not accept candidates at this stage")
+    elif assistant.CRM.Type is CRM.Jobscience:
+        return Jobscience.insertCandidate(assistant.CRM.Auth, conversation)
     else:
         return Callback(False, "CRM type did not match with those on the system")
 
 
 def insertClient(assistant: Assistant, conversation: Conversation):
+    print("SHOULD BE INSERTING CLIENT")
     # Check CRM type
     if assistant.CRM.Type is CRM.Bullhorn:
         return Bullhorn.insertClient(assistant.CRM.Auth, conversation)
@@ -48,6 +52,8 @@ def insertClient(assistant: Assistant, conversation: Conversation):
         return Adapt.insertClient(assistant.CRM.Auth, conversation)
     elif assistant.CRM.Type is CRM.Greenhouse:
         return Callback(True, "Greenhouse does not accept clients")
+    elif assistant.CRM.Type is CRM.Jobscience:
+        return Jobscience.insertClient(assistant.CRM.Auth, conversation)
     else:
         return Callback(False, "CRM type did not match with those on the system")
 
@@ -62,11 +68,14 @@ def uploadFile(assistant: Assistant, storedFile: StoredFile):
         return Vincere.uploadFile(assistant.CRM.Auth, storedFile)
     elif assistant.CRM.Type is CRM.Greenhouse:
         return Greenhouse.uploadFile(assistant.CRM.Auth, storedFile)
+    elif assistant.CRM.Type is CRM.Jobscience:
+        return Callback(True, "Jobscience does not support file upload at this time")
     else:
         return Callback(False, "CRM type did not match with those on the system")
 
 
 def searchCandidates(assistant: Assistant, session):
+    print("SHOULD BE SEARCHING CANDIDATES")
     # Check CRM type
     # if assistant.CRM.Type is CRM.Adapt:
     #     return Adapt.searchCandidates(assistant.CRM.Auth)
@@ -78,11 +87,18 @@ def searchCandidates(assistant: Assistant, session):
         return Vincere.searchCandidates(assistant.CRM.Auth, assistant.CompanyID, session)
     elif assistant.CRM.Type is CRM.Greenhouse:
         return Greenhouse.searchCandidates(assistant.CRM.Auth)
+    elif assistant.CRM.Type is CRM.Jobscience:
+        print("****")
+        t = Jobscience.searchCandidates(assistant.CRM.Auth, assistant.CompanyID, session)
+        print(t)
+        return t
     else:
         return Callback(False, "CRM type did not match with those on the system")
 
 
+
 def searchJobs(assistant: Assistant, session):
+    print("SHOULD BE SEARCHING JOBS")
     # Check CRM type
     # if assistant.CRM.Type is CRM.Adapt:
     #     return Adapt.pullAllCadidates(assistant.CRM.Auth)
@@ -94,6 +110,8 @@ def searchJobs(assistant: Assistant, session):
         return Vincere.searchJobs(assistant.CRM.Auth, assistant.CompanyID, session)
     elif assistant.CRM.Type is CRM.Greenhouse:
         return Greenhouse.searchJobs(assistant.CRM.Auth, session)
+    elif assistant.CRM.Type is CRM.Jobscience:
+        return Jobscience.searchJobs(assistant.CRM.Auth, assistant.CompanyID, session)
     else:
         return Callback(False, "CRM type did not match with those on the system")
 
@@ -154,6 +172,8 @@ def testConnection(type, auth, companyID) -> Callback:
             return Greenhouse.login(auth)
         elif crm_type == CRM.Vincere:
             return Vincere.testConnection(auth, companyID)  # oauth2
+        elif crm_type == CRM.Jobscience:
+            return Jobscience.testConnection(auth, companyID) # oauth2
 
         return Callback(False, 'Connection failure. Please check entered details')
 
@@ -272,7 +292,7 @@ def updateByType(type, newAuth, companyID):
 
 def getSalary(conversation: Conversation, dataType: DataType, toPeriod: Period):
     # Less Than 5000 GBP Monthly
-    salary = conversation.get('keywordsByDataType').get(dataType.value['name'], 0)
+    salary = conversation.Data.get('keywordsByDataType').get(dataType.value['name'], 0)
     if salary:
         salarySplitted = salary[0].split(" ")
         salary = helpers.convertSalaryPeriod(salarySplitted[2], Period[salarySplitted[4]], toPeriod)

@@ -322,8 +322,32 @@ def insertCompany(auth, conversation: Conversation) -> Callback:
 # TODO BASIC CHECK [CHECK]
 # NOTE: Standard fields to search -> [id,name,email,mobile,address,primarySkills,status,educations,dayRate,salary]
 
+# TODO: Check speed of this approach
+# NOTE: This needs to be a query!
+def fetchSkillsForCandidateSearch(list_of_contactIDs: list, access_token):
+
+    # [1] Need set of contact ID's returned from searchCandidates()
+    print("Contact IDs: ")
+    print(list_of_contactIDs)
+    # [2] Use a IN(CID1,CID2,...,CIDx) to retrieve all associated skills
+    query_segment = ",".join(list_of_contactIDs)
+    print(query_segment)
+    sendQuery_callback: Callback = sendQuery(access_token, "get", "{}",
+                                             "SELECT+ts2__Skill_Name__c+FROM+ts2__Skill__c+WHERE+" +
+                                             "ts2__Contact__c+IN+(" + query_segment + ")")
+
+    if not sendQuery_callback.Success:
+        raise Exception(sendQuery_callback.Message)
+
+    candidate_skills_fetch = json.loads(sendQuery_callback.Data.text)
+    print(candidate_skills_fetch)
+    return candidate_skills_fetch['records']
+
+    # [3] Match skills to candidates -> Simple loop search O(N^2)
+
 
 def searchCandidates(access_token, companyID, conversation, fields=None) -> Callback:
+    list_of_contactIDs = []
     # print(conversation)
     # Dummy conversation keywords:
     keywords = conversation['keywordsByDataType']
@@ -331,7 +355,10 @@ def searchCandidates(access_token, companyID, conversation, fields=None) -> Call
     # #print(keywords)
 
     try:
-        # TODO: Add more filters
+        # TODO: Add more filters, perhaps with a hierarchy of what to search on (maybe skills more important than
+        # education) --> Could be set by user and sent with the conversation.
+        # Note: Date will need to be reversed for comparison, also dates could be compared with a range rather than
+        # requiring an exact match --> unrealistic
         query = ""
         a = checkFilter(keywords, DT.CandidateLocation, "MailingCity", quote_wrap=True)
         if a != "":
@@ -347,7 +374,7 @@ def searchCandidates(access_token, companyID, conversation, fields=None) -> Call
         # print(query)
         # Retrieve candidates
         # print("<-- SEARCH CANDIDATES -->")
-        sendQuery_callback: Callback = sendQuery(access_token, "get", "{}", "SELECT+Name,email,phone,MailingCity," +
+        sendQuery_callback: Callback = sendQuery(access_token, "get", "{}", "SELECT+X18_Digit_ID__c,Name,email,phone,MailingCity," +
                                                  "ts2__Desired_Salary__c,ts2__Desired_Hourly__c," +
                                                  "ts2__EduDegreeName1__c,ts2__Education__c+from+Contact+" + query +
                                                  "+LIMIT+100")  # Limit set to 10 TODO: Customize
@@ -363,6 +390,8 @@ def searchCandidates(access_token, companyID, conversation, fields=None) -> Call
         result = []
         # TODO: Fetch job title
         for record in candidate_fetch['records']:
+            list_of_contactIDs.append("'" + record.get("X18_Digit_ID__c") + "'")
+
             # print("<-- New Record -->")
             # print("Name: " + str(record.get('Name')))
             # print("Email:" + str(record.get('Email')))
@@ -371,6 +400,12 @@ def searchCandidates(access_token, companyID, conversation, fields=None) -> Call
             # print("Education: " + str(record.get('ts2__EduDegreeName1__c')))
             # print("Desired Salary: " + str(record.get('ts2__Desired_Salary__c')))
 
+        # Fetch associated candidate skills
+        candidate_skills = fetchSkillsForCandidateSearch(list_of_contactIDs, access_token)
+
+        for record in candidate_fetch['records']:
+            # TODO (THURS): Loop through candidate_skills, match on id into array, then format array and set to skills
+            # NOTE: Serious review of efficiency is needed also should try to find years experience field
             result.append(databases_services.createPandaCandidate(id=record.get("id", ""),
                                                                   name=record.get("Name"),
                                                                   email=record.get("Email"),
@@ -382,13 +417,15 @@ def searchCandidates(access_token, companyID, conversation, fields=None) -> Call
                                                                   availability=record.get("status"),
                                                                   jobTitle=None,
                                                                   education=record.get('ts2__EduDegreeName1__c'),
-                                                                  yearsExperience=0,  # When 0 -> No skills displayed
+                                                                  yearsExperience=3,  # When 0 -> No skills displayed
                                                                   desiredSalary=record.get('ts2__Desired_Salary__c'),
                                                                   currency=Currency("GBP"),
                                                                   payPeriod=Period("Annually"),
                                                                   source="Jobscience"))
         # print("RESULT IS")
         # print(result)
+
+
         return Callback(True, sendQuery_callback.Message, result)
     except Exception as exc:
         helpers.logError("Marketplace.CRM.Jobscience.searchCandidates() ERROR: " + str(exc))

@@ -19,10 +19,11 @@ class TimeSlots extends React.Component {
         let activeID = active ? active.ID : this.props.appointmentAllocationTime[0].ID
 
         let aat = this.props.appointmentAllocationTime.find(time => time.ID === activeID)
-
+        console.log(aat)
         this.setState(state => {
             state.activeID = activeID
             state.name= aat.Name
+            state.default= aat.Default
             state.duration = aat.Info[0].Duration + 'min';
             state.weekDays.forEach((weekDay, i) => {
                 weekDay.active = aat.Info[i].Active;
@@ -35,6 +36,7 @@ class TimeSlots extends React.Component {
     state = {
         saved: false,
         name: "",
+        default: false,
         duration: '60min',
         activeID: 0,
         weekDays: [
@@ -131,11 +133,12 @@ class TimeSlots extends React.Component {
             }
         };
         const saveSettings = () => {
-            console.log(this.state)
             let savedSettings = {
+                id: this.state.activeID,
+                default: this.state.default,
                 name: this.state.name,
-                duration: this.state.duration,
-                weekDays: this.state.weekDays
+                duration: parseInt(this.state.duration.replace("min", "")),
+                weekDays: this.state.weekDays.map(fullDay => ({...fullDay, day: moment().day(fullDay.day).isoWeekday()-1 , from: fullDay.from.format("HH:mm:ss"), to: fullDay.to.format("HH:mm:ss")}))
             }
             this.props.dispatch(appointmentAllocationTimeActions.saveAAT(savedSettings))
             this.setState({saved: true})
@@ -148,6 +151,7 @@ class TimeSlots extends React.Component {
             this.setState(state => ({
                 activeID: parseInt(event.key),
                 saved: false,
+                default: aat.Default,
                 name: aat.Name,
                 duration: aat.Info[0].Duration + 'min',
                 weekDays: state.weekDays.map((weekDay, i) => ({
@@ -157,6 +161,11 @@ class TimeSlots extends React.Component {
                 }))
             }))
         }
+
+        const setDefault = e => {
+            this.setState({default: e.target.checked})
+        }
+
 
         const menu = () => {
             return (
@@ -209,6 +218,14 @@ class TimeSlots extends React.Component {
                                 <Radio.Button value="30min">30 Minutes</Radio.Button>
                             </Radio.Group>,
                         )}
+                    </FormItem>
+                    {console.log(this.state.default)}
+                    <FormItem
+                        label="Default timetable"
+                        extra="This is will change the default timetable that your autopilot will use"
+                        >
+
+                            <Checkbox checked={this.state.default} onChange={setDefault}>Set as default</Checkbox>
                     </FormItem>
 
                     <div style={{ width: 850}}>

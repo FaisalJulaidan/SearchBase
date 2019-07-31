@@ -2,6 +2,7 @@ from datetime import datetime, time
 
 from models import db, Callback, Appointment, Conversation, Assistant,\
     AppointmentAllocationTime, AppointmentAllocationTimeInfo
+from sqlalchemy import and_
 from utilities import helpers, enums
 
 def createAppointmentAllocationTime(name, companyID: int):
@@ -22,6 +23,32 @@ def createAppointmentAllocationTime(name, companyID: int):
         db.session.add_all(times)
         db.session.commit()
         return Callback(True, "Created successfully.", allocationTime)
+
+    except Exception as exc:
+        helpers.logError("appointment_services.createAppointmentAllocationTime(): " + str(exc))
+        db.session.rollback()
+        return Callback(False, 'Could not create a new Appointment Allocation Time.')
+
+def saveAppointmentAllocationTime(companyID, ID, name, times, duration, default):
+    try:
+
+        appointmentAllocationTime = db.session.query(AppointmentAllocationTime)\
+                                                .filter(and_(AppointmentAllocationTime.ID == ID,
+                                                             AppointmentAllocationTime.CompanyID == companyID))\
+                                                .first()
+        appointmentAllocationTime.Name = name
+        appointmentAllocationTime.Default = default
+        for day in appointmentAllocationTime.Info:
+            for newDay in times:
+                if newDay['day'] == day.Day:
+                    day.Active = newDay['active']
+                    day.From = newDay['from']
+                    day.Duration = duration
+                    day.To = newDay['to']
+                    break
+        # Create the AppointmentAllocationTime with default times info
+        db.session.commit()
+        return Callback(True, "Timetable saved succesfully.")
 
     except Exception as exc:
         helpers.logError("appointment_services.createAppointmentAllocationTime(): " + str(exc))

@@ -115,6 +115,18 @@ def allocation_time(payload):
             return helpers.jsonResponse(False, 400, "Sorry, we couldn't add your appointment")
         return helpers.jsonResponse(True, 200, "Appointment has been added. You should receive a confirmation email")
 
+@appointment_router.route("/allocation_times/save", methods=['POST'])
+@jwt_required
+def save_allocation_time():
+    companyID = get_jwt_identity()['user']['companyID']
+    data = request.get_json()
+    save_callback : Callback = appointment_services.saveAppointmentAllocationTime(companyID, data['id'], data['name'], data['weekDays'], data['duration'], data['default'])
+
+    if not save_callback.Success:
+        return helpers.jsonResponse(False, 400, "Sorry, we couldn't save your timetable changes")
+    return helpers.jsonResponse(True, 200, "Timetable changes have succesfully been saved")
+
+
 @appointment_router.route("/allocation_times_list/", methods=['GET'])
 @jwt_required
 def allocation_time_list():

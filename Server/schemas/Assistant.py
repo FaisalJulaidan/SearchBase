@@ -8,7 +8,6 @@ class Assistant(db.Model):
         q = Appointment.query.join(Conversation).filter(Conversation.Assistant == self)
         return q.all()
 
-
     ID = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
     Name = db.Column(db.String(128), nullable=False)
     Description = db.Column(db.String(260), nullable=True)
@@ -34,9 +33,9 @@ class Assistant(db.Model):
     Calendar = db.relationship('Calendar', back_populates='Assistants')
 
     AutoPilotID = db.Column(db.Integer, db.ForeignKey('auto_pilot.ID', ondelete='cascade'))
-    AutoPilot = db.relationship("AutoPilot", back_populates="Assistants")
+    AutoPilot = db.relationship("AutoPilot", back_populates="Assistants", foreign_keys=[AutoPilotID])
 
-    # - Many to one
+    #  - Many to one
     Conversations = db.relationship('Conversation', back_populates='Assistant')
 
     # Constraints:

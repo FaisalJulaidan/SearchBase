@@ -32,8 +32,7 @@ class AutoPilot extends React.Component {
 
 
     componentDidMount() {
-        console.log(this.props)
-        this.props.dispatch(appointmentAllocationTimeActions.fetchAAT());
+        this.props.dispatch(appointmentAllocationTimeActions.fetchAAT())
         this.props.dispatch(autoPilotActions.fetchAutoPilot(this.props.match.params.id))
             .then(()=> {
                 const {autoPilot} = this.props;
@@ -104,7 +103,9 @@ class AutoPilot extends React.Component {
             labelCol: {span: 4},
             wrapperCol: {span: 18},
         };
-        const allocTime =  this.props.autoPilot.AppointmentAllocationTimeID
+        console.log(this.props)
+        const allocTime =  this.props.autoPilot?.AppointmentAllocationTimeID
+        console.log(this.props)
         const {getFieldDecorator} = this.props.form;
         return (
             <>
@@ -131,7 +132,7 @@ class AutoPilot extends React.Component {
                     </div>
 
                     <div className={styles.Body}>
-                        {!autoPilot ? <Spin/> :
+                        {!autoPilot || this.props.appointmentAllocationTime.length === 0 ? <Spin/> :
                             <Form layout='vertical' wrapperCol = {{span: 10}} style={{width: '100%'}}>
                                 <FormItem
                                     label="Name"

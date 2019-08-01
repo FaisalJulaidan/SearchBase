@@ -12,6 +12,7 @@ export const appointmentAllocationTime = (state = initialState, action) => {
                 isLoading: true,
             });
         case actionTypes.FETCH_AAT_SUCCESS:
+            console.log(action)
             return updateObject(state, {
                 allocationTimes: action.allocationTimes,
                 aat: action.aat,

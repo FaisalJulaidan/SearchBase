@@ -27,6 +27,7 @@ class Company(db.Model):
     Roles = db.relationship('Role', back_populates='Company')
     CRMs = db.relationship('CRM', back_populates='Company')
     Calendars = db.relationship('Calendar', back_populates='Company')
+    Messengers = db.relationship('Messenger', back_populates='Company')
     AutoPilots = db.relationship('AutoPilot', back_populates='Company')
 
     def __repr__(self):

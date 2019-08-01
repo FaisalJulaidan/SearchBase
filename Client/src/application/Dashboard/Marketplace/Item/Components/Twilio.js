@@ -36,7 +36,6 @@ export const TwilioFormItems = ({
                     {getFieldDecorator('auth_token', {
                         rules: [{
                             required: true,
-                            max: 20,
                             message: "Auth Token is required",
                         }],
                     })(
@@ -49,7 +48,6 @@ export const TwilioFormItems = ({
                     {getFieldDecorator('phone_number', {
                         rules: [{
                             required: true,
-                            max: 20,
                             message: "The Phone number you got in Twilio is required",
                         }],
                     })(

@@ -47,7 +47,6 @@
         {# Conversation details #}
         <span style="color:black"> <b>Completed Chatbot:</b> {{ conversation.completed }}</span><br/>
         {% for key, value in conversation.data["keywordsByDataType"].items() %}
-
             {% if "&FILE_UPLOAD&" in value %}
                 <span style="color:black">
 
@@ -56,11 +55,9 @@
 
                     {# increment the counter assocaited for its incement function#}
                     {{ increment(counters, outer_loop.index) }}
-
                 </span>
                 <br/>
-
-            {% else %}
+            {% elif key != "No Type" %}
                 <span style="color:black">
                     <b>{{ key.replace(conversation.userType, "") }}:</b>  {{ " ".join(value) }}
                 </span>

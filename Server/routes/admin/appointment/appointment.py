@@ -140,13 +140,23 @@ def create_allocation_time():
         return helpers.jsonResponse(False, 400, "Sorry, we couldn't save your timetable changes")
     return helpers.jsonResponse(True, 200, "Timetable changes have succesfully been saved", __parseAppointmentAllocationlist(save_callback.Data))
 
+@appointment_router.route("/allocation_times/<id>/delete", methods=['GET'])
+@jwt_required
+def delete_allocation_time(id):
+    companyID = get_jwt_identity()['user']['companyID']
+    save_callback : Callback = appointment_services.deleteAppointmentAllocationTime(companyID, id)
+
+    if not save_callback.Success:
+        return helpers.jsonResponse(False, 400, "Sorry, we couldn't delete your timetable")
+    return helpers.jsonResponse(True, 200, "Timetable has been successfully deleted")
+
 
 @appointment_router.route("/allocation_times_list/", methods=['GET'])
 @jwt_required
 def allocation_time_list():
     companyID = get_jwt_identity()['user']['companyID']
-    times_callback: Callback = company_services.getAppointmentAllocationTimes(companyID)
-    returnObj = __parseAppointmentAllocationlist(times_callback.Data)
+    times_callback: Callback = appointment_services.getAppointmentAllocationTimes(companyID)
+    returnObj =__parseAppointmentAllocationlist(times_callback.Data) if times_callback.Data is not None else []
 
     if not times_callback.Success:
         return helpers.jsonResponse(False, 400, times_callback.Message)

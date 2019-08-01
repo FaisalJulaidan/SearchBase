@@ -30,17 +30,7 @@ def create(name, url, ownerEmail) -> Company or None:
         return Callback(False, "Couldn't create a company entity.")
 
 
-def getAppointmentAllocationTimes(id):
-    try:
-        result = db.session.query(AppointmentAllocationTime) \
-            .join(AppointmentAllocationTimeInfo)\
-            .filter(AppointmentAllocationTime.CompanyID == id) \
-            .all()
-        if not result: raise Exception
-        return Callback(True, 'Gathered Appointment Allocation Times', result)
-    except Exception as exc:
-        print(exc)
-        return Callback(False, 'Failed to get any Appointment Allocation Times')
+
 
 def getByID(id) -> Company or None:
     try:

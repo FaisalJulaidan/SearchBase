@@ -37,34 +37,48 @@ function* createAppointmentAllocationTime({aat}) {
         yield put(appointmentAllocationTimeActions.createAATSuccess(res.data.data[0]));
         successMessage("Successfully created Appointment Allocation Timetable")
     } catch (error) {
-        const msg = error.response?.data?.msg || 'Couldn\'t creat Appointment Allocation Timetable';
+        const msg = error.response?.data?.msg || 'Couldn\'t create Appointment Allocation Timetable';
         errorMessage(msg);
         console.log(error)
-        // yield put(appointmentAllocationTimeActions.saveAATFailure(msg));
+        yield put(appointmentAllocationTimeActions.deleteAATFailure(msg));
+    }
+}
+
+function* deleteAppointmentAllocationTime({id}) {
+    try {
+        yield http.get(`/allocation_times/${id}/delete`,
+            {headers: {'Content-Type': 'application/json'}});
+        yield put(appointmentAllocationTimeActions.deleteAATSuccess(id));
+        successMessage("Successfully delete Appointment Allocation Timetable")
+    } catch (error) {
+        const msg = error.response?.data?.msg || 'Couldn\'t delete Appointment Allocation Timetable';
+        errorMessage(msg);
+        console.log(error)
+        yield put(appointmentAllocationTimeActions.deleteAATFailure(msg));
     }
 }
 
 function* watchCreateAppointmentAllocationTime() {
-    // console.log('taking')
     yield takeEvery(actionTypes.CREATE_AAT_REQUEST, createAppointmentAllocationTime)
 }
 
 function* watchFetchAppointmentAllocationTime() {
-    // console.log('taking')
     yield takeEvery(actionTypes.FETCH_AAT_REQUEST, fetchAppointmentAllocationTime)
 }
 
 function* watchSaveAppointmentAllocationTime() {
-    // console.log('taking')
     yield takeEvery(actionTypes.SAVE_AAT_REQUEST, saveAppointmentAllocationTime)
 }
 
-
+function* watchDeleteAppointmentAllocationTime() {
+    yield takeEvery(actionTypes.DELETE_AAT_REQUEST, deleteAppointmentAllocationTime)
+}
 
 export function* appointmentAllocationTimeSaga() {
     yield all([
         watchFetchAppointmentAllocationTime(),
         watchSaveAppointmentAllocationTime(),
-        watchCreateAppointmentAllocationTime()
+        watchCreateAppointmentAllocationTime(),
+        watchDeleteAppointmentAllocationTime()
     ])
 }

@@ -54,6 +54,22 @@ const switchActiveAAT = (id) => ({
     id
 })
 
+const deleteAATRequest = (id) => ({
+    type: actionTypes.DELETE_AAT_REQUEST,
+    id
+})
+
+const deleteAATSuccess = (id) => ({
+    type: actionTypes.DELETE_AAT_SUCCESS,
+    id
+});
+
+const deleteAATFailure = (error) => ({
+    type: actionTypes.DELETE_AAT_FAILURE,
+    error
+});
+
+
 
 export const appointmentAllocationTimeActions = {
     fetchAAT,
@@ -65,5 +81,8 @@ export const appointmentAllocationTimeActions = {
     createAAT,
     createAATSuccess,
     createAATFailure,
-    switchActiveAAT
+    switchActiveAAT,
+    deleteAATRequest,
+    deleteAATSuccess,
+    deleteAATFailure
 };

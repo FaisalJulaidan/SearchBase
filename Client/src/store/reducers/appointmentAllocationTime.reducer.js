@@ -15,7 +15,6 @@ export const appointmentAllocationTime = (state = initialState, action) => {
             console.log(action)
             return updateObject(state, {
                 allocationTimes: action.allocationTimes,
-                aat: action.aat,
                 isLoading: false
             });
         case actionTypes.FETCH_AAT_FAILURE:
@@ -27,11 +26,12 @@ export const appointmentAllocationTime = (state = initialState, action) => {
         case actionTypes.SAVE_AAT_REQUEST:
             return updateObject(state, {
                 isLoading: true,
-                newSettings: action.newSetttings
+                newSettings: action.newSettings
             });
         case actionTypes.SAVE_AAT_SUCCESS:
             return updateObject(state, {
-                isLoading: false
+                isLoading: false,
+                aat: null
             });
         case actionTypes.SAVE_AAT_FAILURE:
             return updateObject(state, {
@@ -53,10 +53,19 @@ export const appointmentAllocationTime = (state = initialState, action) => {
                 isLoading: false,
                 errorMsg: action.error
             });
-        case actionTypes.SWITCH_ACTIVE_AAT:
+        case actionTypes.DELETE_AAT_REQUEST:
+            return updateObject(state, {
+                isLoading: true
+            });
+        case actionTypes.DELETE_AAT_SUCCESS:
             console.log(action)
             return updateObject(state, {
-                aat: state.allocationTimes.find(aat => aat.ID == action.id)
+                isLoading: false,
+                allocationTimes: state.allocationTimes.filter(aat => aat.ID !== parseInt(action.id))
+            });
+        case actionTypes.DELETE_AAT_FAILURE:
+            return updateObject(state, {
+                errorMsg: action.error
             });
         default:
             return state

@@ -51,10 +51,22 @@ def saveAppointmentAllocationTime(companyID, ID, name, times, duration):
         return Callback(True, "Timetable saved succesfully.", appointmentAllocationTime)
 
     except Exception as exc:
-        helpers.logError("appointment_services.createAppointmentAllocationTime(): " + str(exc))
+        helpers.logError("appointment_services.saveAppointmentAllocationTime(): " + str(exc))
         db.session.rollback()
         return Callback(False, 'Could not create a new Appointment Allocation Time.')
 
+def deleteAppointmentAllocationTime(companyID, ID):
+    try:
+        db.session.query(AppointmentAllocationTime) \
+            .filter(and_(AppointmentAllocationTime.ID == ID,
+                         AppointmentAllocationTime.CompanyID == companyID)) \
+            .delete()
+        db.session.commit()
+        return Callback(True, 'Deleted Appointment Allocation Time.')
+    except Exception as exc:
+        helpers.logError("appointment_services.deleteAppointmentAllocationTime(): " + str(exc))
+        db.session.rollback()
+        return Callback(False, 'Could not create a new Appointment Allocation Time.')
 
 def createAppointmentAllocationTime(companyID, name, times, duration):
     try:
@@ -175,6 +187,18 @@ def getAppointments(companyID):
     except Exception as exc:
         helpers.logError("appointment_services.getAppointments(): " + str(exc))
         return Callback(False, 'Could not get appointments.')
+
+def getAppointmentAllocationTimes(id):
+    try:
+        result = db.session.query(AppointmentAllocationTime) \
+            .join(AppointmentAllocationTimeInfo) \
+            .filter(AppointmentAllocationTime.CompanyID == id) \
+            .all()
+        if not result: raise Exception
+        return Callback(True, 'Gathered Appointment Allocation Times', result)
+    except Exception as exc:
+        print(exc)
+        return Callback(False, 'Failed to get any Appointment Allocation Times')
 
 def hasAppointment(companyID, id):
     try:

@@ -11,16 +11,16 @@ const {Title, Paragraph} = Typography;
 const { TextArea } = Input;
 const { confirm } = Modal;
 
-class CalendarPage extends React.Component {
+class Appointment extends React.Component {
     render(){
         return (
             <NoHeaderPanel>
                 <div className={styles.Header}>
                     <Title className={styles.Title}>
-                        <Icon type="calendar"/> Calendar
+                        <Icon type="calendar"/> Appointments
                     </Title>
                     <Paragraph type="secondary">
-                        Here you can find all assigned calendars
+                        Here you can find all data relating to your appointments
                     </Paragraph>
                 </div>
                 <Tabs>
@@ -36,4 +36,4 @@ class CalendarPage extends React.Component {
     }
 }
 
-export default CalendarPage
+export default Appointment

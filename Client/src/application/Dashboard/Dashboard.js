@@ -24,7 +24,7 @@ const Account = lazy(() => import('./ControlPanel/Account/Account'));
 const Billing = lazy(() => import('./ControlPanel/Billing/Billing'));
 const UsersManagement = lazy(() => import('./ControlPanel/UsersManagement/UsersManagement'));
 const Documentation = lazy(() => import('./Documentation/Documentation'));
-const CalendarPage = lazy(() => import('./Calendar/CalendarPage'));
+const CalendarPage = lazy(() => import('./Appointment/Appointment'));
 const AutoPilots = lazy(() => import('./AutoPilots/AutoPilots'));
 const AutoPilot = lazy(() => import('./AutoPilots/AutoPilot/AutoPilot'));
 const Marketplace = lazy(() => import('./Marketplace/Marketplace'));
@@ -186,7 +186,7 @@ class Dashboard extends Component {
 
                         <Menu.Item disabled={false} key="calendar">
                             <Icon type="calendar"/>
-                            <span>Calendar</span>
+                            <span>Appointments</span>
                         </Menu.Item>
 
                         <Divider/>

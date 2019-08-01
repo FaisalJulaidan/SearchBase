@@ -52,7 +52,7 @@ def getDomain():
     if os.environ['FLASK_ENV'] == 'development':
         return 'http://localhost:3000'
     elif os.environ['FLASK_ENV'] == 'staging':
-        return 'https://www.staging.thesearchbase.com'
+        return 'https://staging.thesearchbase.com'
     elif os.environ['FLASK_ENV'] == 'production':
         return 'https://www.thesearchbase.com'
     return None
@@ -168,26 +168,14 @@ def gzipped(f):
 def convertSalaryPeriod(salary, fromPeriod: Period, toPeriod: Period):
 
     if fromPeriod == Period.Annually:
-        if toPeriod == Period.Monthly:
-            return salary / 12
-        elif toPeriod == Period.Weekly:
-            return salary / 52.1429
+        if toPeriod == Period.Daily:
+            return salary / 365
         else:
             return salary
 
-    elif fromPeriod == Period.Monthly:
+    elif fromPeriod == Period.Daily:
         if toPeriod == Period.Annually:
-            return salary * 12
-        elif toPeriod == Period.Weekly:
-            return salary / 4
-        else:
-            return salary
-
-    elif fromPeriod == Period.Weekly:
-        if toPeriod == Period.Annually:
-            return salary * 52.1429
-        elif toPeriod == Period.Monthly:
-            return salary * 4.33
+            return salary * 365
         else:
             return salary
 

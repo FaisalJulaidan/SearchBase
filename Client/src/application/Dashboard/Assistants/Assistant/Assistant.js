@@ -1,25 +1,25 @@
-import React, {Component} from 'react';
-import {connect} from 'react-redux';
-import {Prompt} from "react-router-dom";
-import {Breadcrumb, Col, Modal, Row, Spin, Switch, Tabs, Typography} from 'antd';
+import React, { Component } from 'react';
+import { connect } from 'react-redux';
+import { Prompt } from 'react-router-dom';
+import { Breadcrumb, Col, Modal, Row, Spin, Switch, Tabs, Typography } from 'antd';
 import './Assistant.less';
-import styles from "./Assistant.module.less";
+import styles from './Assistant.module.less';
 
-import Conversations from "./Conversations/Conversations"
-import Settings from "./Settings/Settings"
-import Integration from "./Integration/Integration"
-import Analytics from "./Analytics/Analytics"
-import Flow from "./Flow/Flow"
-import Connections from "./Connections/Connections"
+import Conversations from './Conversations/Conversations';
+import Settings from './Settings/Settings';
+import Integration from './Integration/Integration';
+import Analytics from './Analytics/Analytics';
+import Flow from './Flow/Flow';
+import Connections from './Connections/Connections';
 
-import {history} from "helpers";
-import {assistantActions, autoPilotActions, marketplaceActions, optionsActions} from "store/actions";
-import NoHeaderPanel from 'components/NoHeaderPanel/NoHeaderPanel'
-import queryString from 'query-string'
+import { history } from 'helpers';
+import { assistantActions, optionsActions, conversationActions } from 'store/actions';
+import NoHeaderPanel from 'components/NoHeaderPanel/NoHeaderPanel';
+import queryString from 'query-string';
 
 
-const {Title, Paragraph} = Typography;
-const {TabPane} = Tabs;
+const { Title, Paragraph } = Typography;
+const { TabPane } = Tabs;
 const confirm = Modal.confirm;
 
 class Assistant extends Component {
@@ -43,23 +43,23 @@ class Assistant extends Component {
 
         // Set tab from url search params
         let params = queryString.parse(this.props.location.search);
-        if (["Analytics", "Conversations", "Script", "Connections", "Settings"].includes(params["tab"]))
-            this.setState({defaultTab: params["tab"]});
+        if (['Analytics', 'Conversations', 'Script', 'Connections', 'Settings'].includes(params['tab']))
+            this.setState({ defaultTab: params['tab'] });
 
         window.onbeforeunload = () => {
             if (!this.state.isFlowSaved)
-                return "You are leaving the page";
+                return 'You are leaving the page';
             else
-                return null
-        }
+                return null;
+        };
     }
 
     componentDidMount() {
-        setTimeout(() => this.firstHead = [...document.head.children], 1000)
+        setTimeout(() => this.firstHead = [...document.head.children], 1000);
     }
 
     componentWillUnmount() {
-        this.removeChatbot()
+        this.removeChatbot();
     }
 
     onScriptTabChanges = () => {
@@ -78,30 +78,33 @@ class Assistant extends Component {
                 title: `Deactivate assistant`,
                 content: <p>Are you sure you want to deactivate this assistant</p>,
                 onOk: () => {
-                    this.props.dispatch(assistantActions.changeAssistantStatus(this.props.assistant.ID, checked))
+                    this.props.dispatch(assistantActions.changeAssistantStatus(this.props.assistant.ID, checked));
                 }
             });
             return;
         }
-        this.props.dispatch(assistantActions.changeAssistantStatus(this.props.assistant.ID, checked))
+        this.props.dispatch(assistantActions.changeAssistantStatus(this.props.assistant.ID, checked));
     };
 
     onTabClick = (key, e) => {
         // this.firstHead = [...document.head.children];
-        if ("Script" !== key){
+        if (key !== 'Script') {
             this.removeChatbot();
             this.onScriptTabChanges();
         }
-
+        if (key === 'Conversations'){
+            // Ensure moving to conversation tab refresh conversations list
+            this.props.dispatch(conversationActions.fetchConversations(this.props.assistant.ID));
+        }
     };
 
     setIsFlowSaved = (bool) => {
-        this.setState({isFlowSaved: !!bool})
+        this.setState({ isFlowSaved: !!bool });
     };
 
     removeChatbot = () => {
-        let oldBot = document.getElementById("TheSearchBase_Chatbot");
-        let oldBotScript = document.getElementById("oldBotScript");
+        let oldBot = document.getElementById('TheSearchBase_Chatbot');
+        let oldBotScript = document.getElementById('oldBotScript');
 
         if (oldBot && oldBotScript) {
             console.log('removing the chatbot');
@@ -123,17 +126,17 @@ class Assistant extends Component {
     };
 
     render() {
-        const {assistant, location} = this.props;
+        const { assistant, location } = this.props;
 
         return (
             <>
                 <NoHeaderPanel>
                     <div className={styles.Header}>
 
-                        <div style={{marginBottom: 20}}>
+                        <div style={{ marginBottom: 20 }}>
                             <Breadcrumb>
                                 <Breadcrumb.Item>
-                                    <a href={"javascript:void(0);"}
+                                    <a href={'javascript:void(0);'}
                                        onClick={() => history.push('/dashboard/assistants')}>
                                         Assistants
                                     </a>
@@ -156,7 +159,7 @@ class Assistant extends Component {
                                         checked={assistant?.Active}
                                         loading={this.props.isStatusChanging}
                                         onChange={this.onActivateHandler}
-                                        style={{marginTop: '17%', marginLeft: '70%'}}/>
+                                        style={{ marginTop: '17%', marginLeft: '70%' }}/>
                             </Col>
                         </Row>
                     </div>
@@ -164,7 +167,7 @@ class Assistant extends Component {
                     <div className={[styles.Body, 'assistantTabs'].join(' ')}>
                         {!assistant ? <Spin/> :
 
-                            <Tabs defaultActiveKey={this.state.defaultTab} size={"large"} animated={false}
+                            <Tabs defaultActiveKey={this.state.defaultTab} size={'large'} animated={false}
                                   onTabClick={this.onTabClick}>
                                 <TabPane tab="Analytics" key="Analytics">
                                     <Analytics assistant={assistant}
@@ -206,7 +209,7 @@ class Assistant extends Component {
                 <Prompt when={!this.state.isFlowSaved}
                         message={() => `Your script is not saved are you sure you want leave without saving it?`}/>
             </>
-        )
+        );
     }
 }
 
@@ -217,12 +220,12 @@ const isNodeExist = (element, inArray) => {
             isExist = true;
             break;
         }
-    return isExist
+    return isExist;
 };
 
 
-(function (arr) {
-    arr.forEach(function (item) {
+(function(arr) {
+    arr.forEach(function(item) {
         if (item.hasOwnProperty('remove')) {
             return;
         }
@@ -233,8 +236,8 @@ const isNodeExist = (element, inArray) => {
             value: function remove() {
                 this.parentNode.removeChild(this);
             }
-        })
-    })
+        });
+    });
 })([Element.prototype, CharacterData.prototype, DocumentType.prototype]);
 
 
@@ -245,7 +248,7 @@ function mapStateToProps(state) {
         isAssistantLoading: state.assistant.isLoading,
         options: state.options.options,
         isLoading: state.assistant.isLoading,
-        isStatusChanging: state.assistant.isStatusChanging,
+        isStatusChanging: state.assistant.isStatusChanging
     };
 }
 

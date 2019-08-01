@@ -19,7 +19,6 @@ def processConversation(assistant: Assistant, conversation: Conversation) -> Cal
 
 
 def insertCandidate(assistant: Assistant, conversation: Conversation):
-    print("SHOULD BE INSERTING CANDIDATE")
     # Check CRM type
     if assistant.CRM.Type is CRM.Bullhorn:
         return Bullhorn.insertCandidate(assistant.CRM.Auth, conversation)
@@ -40,7 +39,6 @@ def insertCandidate(assistant: Assistant, conversation: Conversation):
 
 
 def insertClient(assistant: Assistant, conversation: Conversation):
-    print("SHOULD BE INSERTING CLIENT")
     # Check CRM type
     if assistant.CRM.Type is CRM.Bullhorn:
         return Bullhorn.insertClient(assistant.CRM.Auth, conversation)
@@ -75,7 +73,6 @@ def uploadFile(assistant: Assistant, storedFile: StoredFile):
 
 
 def searchCandidates(assistant: Assistant, session):
-    print("SHOULD BE SEARCHING CANDIDATES")
     # Check CRM type
     # if assistant.CRM.Type is CRM.Adapt:
     #     return Adapt.searchCandidates(assistant.CRM.Auth)
@@ -88,9 +85,7 @@ def searchCandidates(assistant: Assistant, session):
     elif assistant.CRM.Type is CRM.Greenhouse:
         return Greenhouse.searchCandidates(assistant.CRM.Auth)
     elif assistant.CRM.Type is CRM.Jobscience:
-        print("****")
         t = Jobscience.searchCandidates(assistant.CRM.Auth, assistant.CompanyID, session)
-        print(t)
         return t
     else:
         return Callback(False, "CRM type did not match with those on the system")
@@ -98,7 +93,6 @@ def searchCandidates(assistant: Assistant, session):
 
 
 def searchJobs(assistant: Assistant, session):
-    print("SHOULD BE SEARCHING JOBS")
     # Check CRM type
     # if assistant.CRM.Type is CRM.Adapt:
     #     return Adapt.pullAllCadidates(assistant.CRM.Auth)
@@ -290,10 +284,25 @@ def updateByType(type, newAuth, companyID):
         return Callback(False, str(exc))
 
 
-def getSalary(conversation: Conversation, dataType: DataType, toPeriod: Period):
+def getSalary(conversation: Conversation, dataType: DataType, salaryType, toPeriod=None):  # type Period
     # Less Than 5000 GBP Monthly
     salary = conversation.Data.get('keywordsByDataType').get(dataType.value['name'], 0)
     if salary:
         salarySplitted = salary[0].split(" ")
-        salary = helpers.convertSalaryPeriod(salarySplitted[2], Period[salarySplitted[4]], toPeriod)
+        salaryAmmount = salarySplitted[0].split("-")
+        if toPeriod:
+            if salaryType == "Average":
+                salary = helpers.convertSalaryPeriod(str(float(salaryAmmount[1]) - float(salaryAmmount[0])),
+                                                     Period[salarySplitted[2]], toPeriod)
+            elif salaryType == "Min":
+                salary = helpers.convertSalaryPeriod(salaryAmmount[0], Period[salarySplitted[2]], toPeriod)
+            elif salaryType == "Max":
+                salary = helpers.convertSalaryPeriod(salaryAmmount[1], Period[salarySplitted[2]], toPeriod)
+        else:
+            if salaryType == "Average":
+                salary = str(float(salaryAmmount[1]) - float(salaryAmmount[0]))
+            elif salaryType == "Min":
+                salary = salaryAmmount[0]
+            elif salaryType == "Max":
+                salary = salaryAmmount[1]
     return salary

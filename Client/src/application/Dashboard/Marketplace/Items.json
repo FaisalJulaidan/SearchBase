@@ -17,18 +17,18 @@
       "status": "NOT_CONNECTED"
     },
     {
-      "title": "Jobscience",
-      "desc": " Jobscience provides customer relationship management, applicant tracking system and operations software for the staffing industry.",
-      "image": "/static/images/CRM/jobscience.svg",
-      "type": "Jobscience",
-      "disabled": false,
-      "status": "NOT_CONNECTED"
-    },
-    {
       "title": "Mercury",
       "desc": "Mercury xRM empowers the world’s recruiters to shortcut the recruitment process and deliver an exceptional client and candidate experience.",
       "image": "/static/images/CRM/mercury.svg",
       "type": "Mercury",
+      "disabled": false,
+      "status": "NOT_CONNECTED"
+    },
+    {
+      "title": "Jobscience",
+      "desc": " Jobscience provides customer relationship management, applicant tracking system and operations software for the staffing industry.",
+      "image": "/static/images/CRM/jobscience.svg",
+      "type": "Jobscience",
       "disabled": true,
       "status": "NOT_CONNECTED"
     },
@@ -37,7 +37,7 @@
       "desc": "Vincere provides customer relationship management, applicant tracking system and operations software for the staffing industry.",
       "image": "/static/images/CRM/vincere.svg",
       "type": "Vincere",
-      "disabled": true,
+      "disabled": false,
       "status": "NOT_CONNECTED"
     },
     {
@@ -45,7 +45,7 @@
       "desc": "Greenhouse works seamlessly with over 220 partners and third-party apps and technologies, enabling you to solve specific problems.",
       "image": "/static/images/CRM/greenhouse.svg",
       "type": "Greenhouse",
-      "disabled": true,
+      "disabled": false,
       "status": "NOT_CONNECTED"
     },
     {

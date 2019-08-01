@@ -56,6 +56,7 @@ export const Chatbot = ({
         resetChatbot();
         resetMessage();
         dataHandler.resetTimeElapsed();
+        dataHandler.setSessionID(undefined);
         clearTimeout(timer.current);
         resetAsync();
     };
@@ -175,7 +176,6 @@ export const Chatbot = ({
                 return;
             }
             let nextBlock = getCurBlock(curAction, assistant, chatbot);
-            console.log(nextBlock)
             if (!nextBlock) return;
 
             setChatbotWaiting(nextBlock);

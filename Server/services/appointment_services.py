@@ -30,15 +30,13 @@ def add(conversationID, assistantID, dateTime, confirmed=False):
 def generateEmailUrl(appointmentID):
     try:
         appointment = db.session.query(Appointment).filter(Appointment.ID == appointmentID).first()
-        print(appointment)
-        print(appointment.Status)
         if appointment:
             if appointment.Status != enums.Status.Pending:
                 raise(Exception("Appointment status has already been set!"))
             else:
                 return helpers.verificationSigner.dumps({'id': appointmentID}, salt='verify-appointment')
     except Exception as e:
-        print(e)
+        helpers.logError("appointment_services.generateEmailUrl ERROR: " + str(e))
 
 def verifyRequest(token):
     try:
@@ -52,7 +50,7 @@ def verifyRequest(token):
             else :
                 return Callback(False, "Appointment status has already been set")
     except Exception as  e:
-        print(e)
+        helpers.logError("appointment_services.generateEmailUrl ERROR: " + str(e))
         return Callback(False, "Could not gather appointment")
 
 
@@ -67,7 +65,7 @@ def setAppointmentStatusPublic(token, appointmentID, status):
         return Callback(True, "Appointment status has been set to {}.".format(appointment.Status.value))
 
     except Exception as exc:
-        print(exc)
+        helpers.logError(exc)
         return Callback(False, 'Could not set appointment status.')
 
 def setAppointmentStatus(appointmentID, status):
@@ -80,7 +78,7 @@ def setAppointmentStatus(appointmentID, status):
         return Callback(True, "Appointment status has been set to {}.".format(appointment.Status.value))
 
     except Exception as exc:
-        print(exc)
+        helpers.logError(exc)
         return Callback(False, 'Could not set appointment status.')
 
 def getAppointments(companyID):

@@ -282,7 +282,6 @@ def scanCandidates(session, dbIDs, extraCandidates=None):
         df['Source'] = "Internal Database"  # Source of solution e.g. Bullhorn, Adapt...
         if extraCandidates:
             df = df.append(extraCandidates, ignore_index=True)  # TODO
-            # print("df: ", df["CandidateLocation"])
 
         # Fill None values with 0 for numeric columns and with empty string for string columns
         df = df.fillna({Candidate.CandidateDesiredSalary.name: 0, Candidate.CandidateYearsExperience: 0}).fillna('')
@@ -366,9 +365,7 @@ def scanJobs(session, dbIDs, extraJobs=None):
     try:
 
         df = pandas.read_sql(db.session.query(Job).filter(Job.DatabaseID.in_(dbIDs)).statement,
-                             con=db.session.bind)\
-            .fillna({Job.JobSalary.name: 0, Job.JobYearsRequired.name: 0})\
-            .fillna('')
+                             con=db.session.bind).fillna('')
 
         df = df.drop('DatabaseID', axis=1)  # Drop column
 
@@ -436,7 +433,7 @@ def scanJobs(session, dbIDs, extraJobs=None):
                 else:
                     desc[0] += ". "
 
-            essentialSkills = convertSkillsToString(record[Job.JobEssentialSkills.name])
+            essentialSkills = record[Job.JobEssentialSkills.name]
 
             if record[Job.JobYearsRequired.name] and essentialSkills:
                 desc.append(random.choice(requiredYearsSkills)
@@ -534,9 +531,7 @@ def __salary(row, dbSalaryColumn, dbCurrencyColumn, salaryInput: str, plus=4, fo
 
 def createPandaCandidate(id, name, email, mobile, location, skills,
                          linkdinURL, availability, jobTitle, education,
-                         yearsExperience: int, desiredSalary: float, currency: Currency, payPeriod: Period, source):
-    print("SHOULD BE CREATING CANDIDATE ENTRY")
-    print(skills)
+                         yearsExperience: int, desiredSalary: float, currency: Currency, source):
     return {"ID": id,
             "CandidateName": name or '',
             "CandidateEmail": email or '',
@@ -563,7 +558,7 @@ def createPandaJob(id, title, desc, location, type, salary: float, essentialSkil
             "JobLocation": location or '',
             "JobType": type or '',
             "JobSalary": salary or 0,
-            "JobEssentialSkills": essentialSkills or '',
+            "JobEssentialSkills": convertSkillsToString(essentialSkills) or '',
             "JobYearsRequired": yearsRequired or 0,
             "JobStartDate": startDate or '',
             "JobEndDate": endDate,

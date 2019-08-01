@@ -313,10 +313,9 @@ export const dataHandler = (() => {
             for (message of messages) {
                 if (message.sender === 'USER') {
                     const {blockRef} = message;
+                    // const storeInDB = blockRef[flowAttributes.STORE_IN_DB];
                     __recordUserTypes(blockRef[flowAttributes.DATA_TYPE][flowAttributes.DATA_TYPE_USER_TYPES]);
-                    // don't process if data should not be stored in db
 
-                    if (!blockRef[flowAttributes.STORE_IN_DB]) continue;
                     switch (blockRef[flowAttributes.TYPE]) {
                         case messageTypes.QUESTION:
                             __processQuestion(message);

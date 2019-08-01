@@ -41,7 +41,7 @@ const BotMessage = ({ type, message, addUserMessage, addBotMessage, setChatbotSt
     };
 
 
-    const submitSolution = (text, type, content, skip = false) => {
+    const submitSolution = (text, type, content) => {
         const { block } = message;
         addUserMessage(text, type, block, content);
         const afterMessage = block[flowAttributes.CONTENT][flowAttributes.CONTENT_AFTER_MESSAGE];

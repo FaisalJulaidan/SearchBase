@@ -352,7 +352,6 @@ def searchCandidates(access_token, companyID, conversation, fields=None) -> Call
     # Dummy conversation keywords:
     keywords = conversation['keywordsByDataType']
     # keywords = {'Candidate Location': ['London'], 'Candidate Desired Salary': '20000'}
-    # #print(keywords)
 
     try:
         # TODO: Add more filters, perhaps with a hierarchy of what to search on (maybe skills more important than
@@ -425,13 +424,13 @@ def searchCandidates(access_token, companyID, conversation, fields=None) -> Call
                                                                   email=record.get("Email"),
                                                                   mobile=record.get("Phone"),
                                                                   location=record.get("MailingCity"),
-                                                                  skills=skills_string,  # Need to fetch from skills
+                                                                  skills="SQL",  # Need to fetch from skills
                                                                   # Set temporarily to engineering
                                                                   linkdinURL=None,
                                                                   availability=record.get("status"),
                                                                   jobTitle=None,
                                                                   education=record.get('ts2__EduDegreeName1__c'),
-                                                                  yearsExperience=1,  # When 0 -> No skills displayed
+                                                                  yearsExperience=0,  # When 0 -> No skills displayed
                                                                   desiredSalary=record.get('ts2__Desired_Salary__c'),
                                                                   currency=Currency("GBP"),
                                                                   payPeriod=Period("Annually"),
@@ -504,22 +503,10 @@ def searchJobs(access_token, companyID, conversation, fields=None) -> Callback:
 
         job_fetch = json.loads(sendQuery_callback.Data.text)
 
-        # print(job_fetch['records'])
-
         # Iterate through jobs
         result = []
         for record in job_fetch['records']:
-            # print("<-- New Record -->")
-            # print(record)
-            # print("Name: " + str(record.get('Name')))
-            # print("Description:" + str(record.get('ts2__Text_Description__c')))
-            # print("Salary: " + str(record.get('ts2__Max_Salary__c')))
-            # print("Rate of pay: " + str(record.get('Rate_Type__c')))
-            # print("Start Date: " + str(record.get('ts2__Estimated_Start_Date__c')))
-            # print("End Date: " + str(record.get('ts2__Estimated_End_Date__c')))
-            # print("Location " + str(record.get('ts2__Location__c')))
-            # print("Job Tag " + str(record.get('ts2__Job_Tag__c')))
-            # Add jobs to database
+          # Add jobs to database
             result.append(databases_services.createPandaJob(id=record.get('id'),
                                                             title=record.get('Name'),
                                                             desc=record.get('ts2__Text_Description__c'),

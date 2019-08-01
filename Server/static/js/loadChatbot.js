@@ -307,19 +307,19 @@
                         }
 
                         if (this._bodyBlob) {
-                            return Promise.resolve(this._bodyBlob)
+                            return window.Promise.resolve(this._bodyBlob)
                         } else if (this._bodyArrayBuffer) {
-                            return Promise.resolve(new Blob([this._bodyArrayBuffer]))
+                            return window.Promise.resolve(new Blob([this._bodyArrayBuffer]))
                         } else if (this._bodyFormData) {
                             throw new Error('could not read FormData body as blob')
                         } else {
-                            return Promise.resolve(new Blob([this._bodyText]))
+                            return window.Promise.resolve(new Blob([this._bodyText]))
                         }
                     };
 
                     this.arrayBuffer = function() {
                         if (this._bodyArrayBuffer) {
-                            return consumed(this) || Promise.resolve(this._bodyArrayBuffer)
+                            return consumed(this) || window.Promise.resolve(this._bodyArrayBuffer)
                         } else {
                             return this.blob().then(readBlobAsArrayBuffer)
                         }
@@ -335,11 +335,11 @@
                     if (this._bodyBlob) {
                         return readBlobAsText(this._bodyBlob)
                     } else if (this._bodyArrayBuffer) {
-                        return Promise.resolve(readArrayBufferAsText(this._bodyArrayBuffer))
+                        return window.Promise.resolve(readArrayBufferAsText(this._bodyArrayBuffer))
                     } else if (this._bodyFormData) {
                         throw new Error('could not read FormData body as text')
                     } else {
-                        return Promise.resolve(this._bodyText)
+                        return window.Promise.resolve(this._bodyText)
                     }
                 };
 
@@ -497,7 +497,7 @@
             }
 
             function fetch(input, init) {
-                return new Promise(function(resolve, reject) {
+                return new window.Promise(function(resolve, reject) {
                     var request = new Request(input, init);
 
                     if (request.signal && request.signal.aborted) {

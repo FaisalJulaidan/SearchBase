@@ -250,8 +250,6 @@ def notifyNewConversation(assistant: Assistant, conversation: Conversation):
 
         }]
 
-        print(conversations[0]['link'])
-
         # send emails, jobs applied for
         for user in users_callback.Data:
             email_callback: Callback = __sendEmail(to=user.Email,

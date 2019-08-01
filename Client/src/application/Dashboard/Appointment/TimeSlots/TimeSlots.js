@@ -48,7 +48,7 @@ class TimeSlots extends React.Component {
             this.setState({activeID:  this.props.appointmentAllocationTime[0].ID })
         }
         this.setState({saved: true, creating: false})
-    }
+    }are
 
     infoKVChange = (activeID, day, key, value) => {
         let aat = this.getCurrent()
@@ -143,6 +143,7 @@ class TimeSlots extends React.Component {
                         <Dropdown overlay={menu}>
                             <Button>
                                 {active.Name}
+                                <Icon type="down" />
                             </Button>
                         </Dropdown>
                         <Button icon="plus" onClick={this.createNewAAT}>
@@ -152,7 +153,7 @@ class TimeSlots extends React.Component {
                     <FormItem
                         label="Appoitment Allocation Table Name"
                         extra="Set a unique name for your timetable">
-                        <Input value={active.Name} onChange={e => this.mainKVChange(this.state.activeID, 'Name', e.target.value)} />
+                        <Input value={active.Name} placeholder="Enter the name for your Appoitment Allocation Table" onChange={e => this.mainKVChange(this.state.activeID, 'Name', e.target.value)} />
                     </FormItem>
                     <FormItem
                         label="Appointment Duration"

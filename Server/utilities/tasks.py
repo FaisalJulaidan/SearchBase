@@ -13,7 +13,6 @@ from utilities import json_schemas, enums
 # NOTE: Make sure to take a backup of the database before running these functions
 # =============================================================================
 
-
 def migrateFlows():
     try:
         for assistant in db.session.query(Assistant).all():
@@ -71,17 +70,12 @@ def __migrateFlow(flow):
         for group in newFlow['groups']: # loop groups
             for block in group['blocks']: # loop blocks
 
-
-                if block['DataType'] == "JobSalary":
-                    block['DataType'] = enums.DataType.JobAnnualSalary.name
-
-                if block['DataType'] == "CandidateDesiredSalary":
-                    block['DataType'] = enums.DataType.CandidateAnnualDesiredSalary.name
+                if block['DataType'] == "JobDesiredSkills":
+                    block['DataType'] = enums.DataType.JobEssentialSkills.name
 
                 if block['Type'] == enums.BlockType.Question.value:
-                    for answer in block['Content']['answers']:
-                        if not answer.get('score', None):
-                            answer['score'] = 0
+                    pass
+                    # for answer in block['Content']['answers']:
 
                 if block['Type'] == enums.BlockType.UserInput.value:
                     pass

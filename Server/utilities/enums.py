@@ -16,6 +16,7 @@ class CRM(Enum):
     Bullhorn = 'Bullhorn'
     Vincere = 'Vincere'
     Greenhouse = 'Greenhouse'
+    Jobscience = 'Jobscience'
     Mercury = 'Mercury'
 
     @classmethod
@@ -346,13 +347,6 @@ class DataType(Enum):
     JobEssentialSkills = dataTypeCreator(
         'Job Essential Skills',
         'JobEssentialSkills',
-        ValidationType.String,
-        DataTypeSection.Job,
-        [UserType.Candidate, UserType.Client])
-
-    JobDesiredSkills = dataTypeCreator(
-        'Job Desired Skills',
-        'JobDesiredSkills',
         ValidationType.String,
         DataTypeSection.Job,
         [UserType.Candidate, UserType.Client])

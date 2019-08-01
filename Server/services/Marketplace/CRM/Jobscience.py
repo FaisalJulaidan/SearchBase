@@ -27,7 +27,7 @@ CLIENT_SECRET = os.environ['JOBSCIENCE_CLIENT_SECRET']
 # and the user needs to re-authenticate to continue. If you don't use refresh tokens,
 # you can skip the middle step, obviously'.
 # Will receive 401 for expired access token -> will then need to fetch new one using the refresh token
-# Note: that skill may have to be added separately
+# Note: that skill may have to be added separately [CHECK]
 
 # NOTE: Before use in dev or prod, the callback url must be changed both in items.js and on the Salesforce dashboard
 
@@ -333,7 +333,7 @@ def fetchSkillsForCandidateSearch(list_of_contactIDs: list, access_token):
     query_segment = ",".join(list_of_contactIDs)
     print(query_segment)
     sendQuery_callback: Callback = sendQuery(access_token, "get", "{}",
-                                             "SELECT+ts2__Skill_Name__c+FROM+ts2__Skill__c+WHERE+" +
+                                             "SELECT+ts2__Skill_Name__c,ts2__Contact__c+FROM+ts2__Skill__c+WHERE+" +
                                              "ts2__Contact__c+IN+(" + query_segment + ")")
 
     if not sendQuery_callback.Success:
@@ -374,23 +374,23 @@ def searchCandidates(access_token, companyID, conversation, fields=None) -> Call
         # print(query)
         # Retrieve candidates
         # print("<-- SEARCH CANDIDATES -->")
-        sendQuery_callback: Callback = sendQuery(access_token, "get", "{}", "SELECT+X18_Digit_ID__c,Name,email,phone,MailingCity," +
+        sendQuery_callback: Callback = sendQuery(access_token, "get", "{}", "SELECT+X18_Digit_ID__c,ID,Name,email,phone,MailingCity," +
                                                  "ts2__Desired_Salary__c,ts2__Desired_Hourly__c," +
                                                  "ts2__EduDegreeName1__c,ts2__Education__c+from+Contact+" + query +
-                                                 "+LIMIT+100")  # Limit set to 10 TODO: Customize
+                                                 "+LIMIT+50")  # Limit set to 10 TODO: Customize
 
         if not sendQuery_callback.Success:
             raise Exception(sendQuery_callback.Message)
 
         candidate_fetch = json.loads(sendQuery_callback.Data.text)
 
-        # print(candidate_fetch['records'])
+        print(candidate_fetch['records'])  # BUG: Why is this not matching up?
 
         # Iterate through candidates
         result = []
         # TODO: Fetch job title
         for record in candidate_fetch['records']:
-            list_of_contactIDs.append("'" + record.get("X18_Digit_ID__c") + "'")
+            list_of_contactIDs.append("'" + record.get("Id") + "'")
 
             # print("<-- New Record -->")
             # print("Name: " + str(record.get('Name')))
@@ -402,22 +402,36 @@ def searchCandidates(access_token, companyID, conversation, fields=None) -> Call
 
         # Fetch associated candidate skills
         candidate_skills = fetchSkillsForCandidateSearch(list_of_contactIDs, access_token)
+        # TODO (THURS): Loop through candidate_skills []
+        #  match on id into array []
+        #  then format array and set to skills []
 
+        # NOTE: Possibly add restriction on how many skills to show
         for record in candidate_fetch['records']:
-            # TODO (THURS): Loop through candidate_skills, match on id into array, then format array and set to skills
+            skills_string = ""
+            for skill in candidate_skills:
+                # print("otherwise: ")
+                # print(skill.get("ts2__Skill_Name__c"))
+                if skill.get("ts2__Contact__c") == record.get("Id"):
+                    skills_string += skill.get("ts2__Skill_Name__c") + ", "
+                    print("THE SKILL IS: " + skill.get("ts2__Skill_Name__c"))
+            print("SKILLS STRING IS: ")
+            print(skills_string)
+            #  Remove final semicolon:
+            skills_string = skills_string[:-1]
             # NOTE: Serious review of efficiency is needed also should try to find years experience field
             result.append(databases_services.createPandaCandidate(id=record.get("id", ""),
                                                                   name=record.get("Name"),
                                                                   email=record.get("Email"),
                                                                   mobile=record.get("Phone"),
                                                                   location=record.get("MailingCity"),
-                                                                  skills="SQL",  # Need to fetch from skills
+                                                                  skills=skills_string,  # Need to fetch from skills
                                                                   # Set temporarily to engineering
                                                                   linkdinURL=None,
                                                                   availability=record.get("status"),
                                                                   jobTitle=None,
                                                                   education=record.get('ts2__EduDegreeName1__c'),
-                                                                  yearsExperience=3,  # When 0 -> No skills displayed
+                                                                  yearsExperience=1,  # When 0 -> No skills displayed
                                                                   desiredSalary=record.get('ts2__Desired_Salary__c'),
                                                                   currency=Currency("GBP"),
                                                                   payPeriod=Period("Annually"),

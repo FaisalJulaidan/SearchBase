@@ -120,11 +120,25 @@ def allocation_time(payload):
 def save_allocation_time():
     companyID = get_jwt_identity()['user']['companyID']
     data = request.get_json()
-    save_callback : Callback = appointment_services.saveAppointmentAllocationTime(companyID, data['id'], data['name'], data['weekDays'], data['duration'], data['default'])
+    #e(companyID, name, times, duration)
+    save_callback : Callback = appointment_services.saveAppointmentAllocationTime(companyID, data['id'], data['name'], data['weekDays'], data['duration'])
+
 
     if not save_callback.Success:
         return helpers.jsonResponse(False, 400, "Sorry, we couldn't save your timetable changes")
-    return helpers.jsonResponse(True, 200, "Timetable changes have succesfully been saved")
+    return helpers.jsonResponse(True, 200, "Timetable changes have succesfully been saved", __parseAppointmentAllocationlist(save_callback.Data))
+
+@appointment_router.route("/allocation_times/create", methods=['POST'])
+@jwt_required
+def create_allocation_time():
+    companyID = get_jwt_identity()['user']['companyID']
+    data = request.get_json()
+    #e(companyID, name, times, duration)
+    save_callback : Callback = appointment_services.createAppointmentAllocationTime(companyID, data['name'], data['weekDays'], data['duration'])
+
+    if not save_callback.Success:
+        return helpers.jsonResponse(False, 400, "Sorry, we couldn't save your timetable changes")
+    return helpers.jsonResponse(True, 200, "Timetable changes have succesfully been saved", __parseAppointmentAllocationlist(save_callback.Data))
 
 
 @appointment_router.route("/allocation_times_list/", methods=['GET'])
@@ -132,18 +146,21 @@ def save_allocation_time():
 def allocation_time_list():
     companyID = get_jwt_identity()['user']['companyID']
     times_callback: Callback = company_services.getAppointmentAllocationTimes(companyID)
-    list = helpers.getListFromSQLAlchemyList(times_callback.Data)
-    returnObj = []
+    returnObj = __parseAppointmentAllocationlist(times_callback.Data)
 
-    for aat in times_callback.Data:
+    if not times_callback.Success:
+        return helpers.jsonResponse(False, 400, times_callback.Message)
+    return helpers.jsonResponse(True, 200, times_callback.Message, returnObj)
+
+# hmm should move tihs
+def __parseAppointmentAllocationlist(aatList):
+    returnObj = []
+    ret = aatList if type(aatList) is list else [aatList]
+    for aat in ret:
         appItem = helpers.getDictFromSQLAlchemyObj(aat)
         info = []
         for item in aat.Info:
             info.append(helpers.getDictFromSQLAlchemyObj(item))
         appItem['Info'] = info
         returnObj.append(appItem)
-
-
-    if not times_callback.Success:
-        return helpers.jsonResponse(False, 400, times_callback.Message)
-    return helpers.jsonResponse(True, 200, times_callback.Message, returnObj)
+    return returnObj

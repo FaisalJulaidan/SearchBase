@@ -134,7 +134,7 @@ export const Chatbot = ({
             stopTimer.current = optionalDelayExecution(() => {
                 setChatbotStatus({ thinking: false, waitingForUser: true });
                 addBotMessage(block.Content.text, block.Type, block);
-                    if (block.selfContinue) {
+                if (block.selfContinue) {
                     setChatbotStatus({
                         curBlockID: block.selfContinue,
                         curAction: block.selfContinue === 'End Chat' ? 'End Chat' : 'Go To Next Block'

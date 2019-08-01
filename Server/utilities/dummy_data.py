@@ -247,7 +247,7 @@ def generate():
     reader_a.AutoPilot = auto_pilot_services.getByID(1,1).Data
 
 
-    appointment_services.createAppointmentAllocationTime("Test Times", aramco.ID)
+    appointment_services.dummyCreateAppointmentAllocationTime("Test Times", aramco.ID)
 
     # Add Appointment
     a = Appointment(DateTime=datetime.now() + timedelta(days=5), Conversation=conversation1)

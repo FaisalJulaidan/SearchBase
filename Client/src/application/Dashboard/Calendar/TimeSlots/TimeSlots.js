@@ -10,234 +10,175 @@ import UserInput from "../../Assistants/Assistant/Flow/Blocks/CardTypes/UserInpu
 
 const FormItem = Form.Item;
 
+const dupeData = (day) => ({
+    Day: day,
+    Duration: 30,
+    Active: false,
+    From: "08:30:00",
+    To: "12:00:00",
+})
+
+
+const emptyAAT = (id) =>  ({
+    Name: "",
+    ID: id,
+    Info: new Array(7).fill(0).map((index, i) => dupeData(i))
+});
+
+
 class TimeSlots extends React.Component {
 
+    state = {
+        creating: false,
+        saved: false,
+        Name: "",
+        ID: null,
+        Info: emptyAAT().Info
+    }
+
+    getCurrent = () => this.state.creating ? ({Info: this.state.Info, ID: this.state.ID, Name: this.state.Name}) : this.props.active
+
+
     componentDidMount() {
-
         this.props.dispatch(appointmentAllocationTimeActions.fetchAAT());
-        let active = this.props.appointmentAllocationTime.find(time => time.Default)
-        let activeID = active ? active.ID : this.props.appointmentAllocationTime[0].ID
+    }
 
-        let aat = this.props.appointmentAllocationTime.find(time => time.ID === activeID)
-        console.log(aat)
-        this.setState(state => {
-            state.activeID = activeID
-            state.name= aat.Name
-            state.default= aat.Default
-            state.duration = aat.Info[0].Duration + 'min';
-            state.weekDays.forEach((weekDay, i) => {
-                weekDay.active = aat.Info[i].Active;
-                weekDay.from = moment(aat.Info[i].From, "HHmmss");
-                weekDay.to = moment(aat.Info[i].To, "HHmmss");
-            })
+    componentWillReceiveProps() {
+        if(!this.state.activeID && this.props.appointmentAllocationTime.length !== 0){
+            this.setState({activeID:  this.props.appointmentAllocationTime[0].ID })
+        }
+        this.setState({saved: true, creating: false})
+    }
+
+    infoKVChange = (activeID, day, key, value) => {
+        let aat = this.getCurrent()
+        if(day === null) {
+            aat.Info = aat.Info.map(day => ({...day, [key]: value}))
+        } else {
+            aat.Info.find(wd => wd.Day === day)[key] = value
+        }
+        this.setState({Info: aat.Info}, () => console.log(this.state))
+    }
+
+    mainKVChange = (activeID, key, value) => {
+        let currentAAT = this.getCurrent()
+        currentAAT[key] = value
+        this.setState({[key]: value})
+    }
+
+    saveSettings = () => {
+        let active = this.getCurrent()
+        let savedSettings = {
+            name: active.Name,
+            duration: active.Info[0].Duration,
+            weekDays: active.Info.map(fullDay => ({...fullDay, day: fullDay.Day , from: fullDay.From, to: fullDay.To}))
+        }
+        if(this.state.creating){
+            this.props.dispatch(appointmentAllocationTimeActions.createAAT(savedSettings))
+        } else {
+            this.props.dispatch(appointmentAllocationTimeActions.saveAAT({...savedSettings, id: active.ID}))
+        }
+    }
+
+    handleActiveDayChange = event => {
+        this.props.dispatch(appointmentAllocationTimeActions.switchActiveAAT(event.key))
+        this.setState({
+            saved: false,
         })
     }
 
-    state = {
-        saved: false,
-        name: "",
-        default: false,
-        duration: '60min',
-        activeID: 0,
-        weekDays: [
-            {
-                day: 'Monday',
-                active: false,
-                from: null,
-                to: null,
-            },
-            {
-                day: 'Tuesday',
-                active: false,
-                from: null,
-                to: null,
-            },
-            {
-                day: 'Wednesday',
-                active: false,
-                from: null,
-                to: null,
-            },
-            {
-                day: 'Thursday',
-                active: false,
-                from: null,
-                to: null,
-            },
-            {
-                day: 'Friday',
-                active: false,
-                from: null,
-                to: null,
-            },
-            {
-                day: 'Saturday',
-                active: false,
-                from: null,
-                to: null,
-            },
-            {
-                day: 'Sunday',
-                active: false,
-                from: null,
-                to: null,
-            },
-        ]
-    };
-
-    handleActivateDay = (event, day) => this.setState(state => state.weekDays.find(wd => wd.day === day).active = event.target.checked);
-    handleChangeTime = (time, day, origin) => this.setState(state => state.weekDays.find(wd => wd.day === day)[origin] = time);
-
-
+    createNewAAT = () => {
+        this.setState({...emptyAAT(Math.random().toString(36).slice(2)), creating: true})
+    }
 
     render() {
-        const { getFieldDecorator } = this.props.form
-        const TimeRange = /** @type {WeekDay}*/weekDay => {
+        const active = this.getCurrent()
+        const menu = (<Menu onClick={this.handleActiveDayChange}>
+            {this.props.appointmentAllocationTime.map(time => {
+                return (
+                    <Menu.Item key={time.ID}>
+                        {time.Name}
+                    </Menu.Item>
+                )
+            })}
+        </Menu>)
+
+        const TimeRange = weekDay => {
+            let to = moment(weekDay.To, "HH:mm:ss")
+            let from = moment(weekDay.From, "HH:mm:ss")
             return (
                 <>
                     <span className={styles.TimeRange}>
-                        <TimePicker value={weekDay.from} format={'HH:mm'} minuteStep={30}
-                                    onChange={time => this.handleChangeTime(time, weekDay.day, 'from')}
-                                    disabled={!weekDay.active}/>
+                        <TimePicker value={from} format={'HH:mm'} minuteStep={30}
+                                    onChange={time => this.infoKVChange(active.ID, weekDay.Day,'From', time)}
+                                    disabled={!weekDay.Active}/>
                     </span>
-
                     <span style={{marginRight: '5px', marginLeft: '5px'}}>-</span>
-
                     <span className={styles.TimeRange}>
-                        <TimePicker value={weekDay.to} format={'HH:mm'} minuteStep={30}
-                                    disabledHours={() => Array.apply(null, {length: weekDay.from.hours() + 1}).map(Number.call, Number)}
-                                    onChange={time => this.handleChangeTime(time, weekDay.day, 'to')}
-                                    disabled={!weekDay.active || !weekDay.from}/>
+                        <TimePicker value={to} format={'HH:mm'} minuteStep={30}
+                                    disabledHours={() => Array.apply(null, {length: from.hours() + 1}).map(Number.call, Number)}
+                                    onChange={time => this.infoKVChange(active.ID, weekDay.Day,'To', time)}
+                                    disabled={!weekDay.Active || !weekDay.From}/>
                     </span>
                 </>
             );
         };
-        const CheckBox = (day, active) => <Checkbox className={styles.CheckBox}
-                                                    checked={active}
-                                                    onChange={event => this.handleActivateDay(event, day)}/>;
-        const TotalSlots = (From, To) => {
-            if (From && To) {
-                // 7:30 -> 11:00
-                const hours = moment.duration(To.diff(From)).hours(); // 3
-                const minutes = moment.duration(To.diff(From)).minutes();// 30
-                const totalHalfHours = (minutes / 30) + (hours * 2); // 1 + 6 = 7
 
-                if (this.state.duration === "60min")
-                    if (totalHalfHours < 2) {
-                        return 'Non';
-                    }
-                    else
-                        return Math.ceil(totalHalfHours / 2);
-                else
-                    return totalHalfHours;
-            }
+        const TotalSlots = (From, To, duration) => {
+            let from = moment(From, "HH:mm:ss")
+            let to = moment(To, "HH:mm:ss")
+            let minutes = to.diff(from, 'minutes')
+            return Math.round(minutes/duration)
         };
-        const saveSettings = () => {
-            let savedSettings = {
-                id: this.state.activeID,
-                default: this.state.default,
-                name: this.state.name,
-                duration: parseInt(this.state.duration.replace("min", "")),
-                weekDays: this.state.weekDays.map(fullDay => ({...fullDay, day: moment().day(fullDay.day).isoWeekday()-1 , from: fullDay.from.format("HH:mm:ss"), to: fullDay.to.format("HH:mm:ss")}))
-            }
-            this.props.dispatch(appointmentAllocationTimeActions.saveAAT(savedSettings))
-            this.setState({saved: true})
-        }
 
-
-        const handleActiveDayChange = event => {
-            let aat = this.props.appointmentAllocationTime.find(time => time.ID === parseInt(event.key))
-
-            this.setState(state => ({
-                activeID: parseInt(event.key),
-                saved: false,
-                default: aat.Default,
-                name: aat.Name,
-                duration: aat.Info[0].Duration + 'min',
-                weekDays: state.weekDays.map((weekDay, i) => ({
-                    active: aat.Info[i].Active,
-                    from: moment(aat.Info[i].From, "HHmmss"),
-                    to:  moment(aat.Info[i].To, "HHmmss"),
-                }))
-            }))
-        }
-
-        const setDefault = e => {
-            this.setState({default: e.target.checked})
-        }
-
-
-        const menu = () => {
-            return (
-            <Menu onClick={handleActiveDayChange}>
-                {this.props.appointmentAllocationTime.map(time => {
-                    return (
-                        <Menu.Item key={time.ID}>
-                            {time.Name}
-                        </Menu.Item>
-                    )
-                })}
-            </Menu>
-        )}
-        const active = this.props.appointmentAllocationTime.find(time => time.ID === this.state.activeID)
         return (
             <>
                 {active ?
                     <>
-                        <h1>Select the timetable you would like to change</h1>
-                <Dropdown overlay={menu()}>
-                    <Button>
-                    {active.Name}
-                    </Button>
-                </Dropdown>
+
                 <Form>
                     <FormItem
-                        label="Timetable name"
-                        extra="An identifier for you to easily separate timetables">
-                        {getFieldDecorator('aatName', {
-                            initialValue: active.Name,
-                            onChange: (e) => this.setState({name: e.target.value}),
-                            rules: [{}],
-                        })(
-                            <Input>
-
-                            </Input>,
-                        )}
+                        label="Select the timetable you would like to change"
+                        extra="Pick the timetable you would like to modify, or create a new one">
+                        <Dropdown overlay={menu}>
+                            <Button>
+                                {active.Name}
+                            </Button>
+                        </Dropdown>
+                        <Button icon="plus" onClick={this.createNewAAT}>
+                            Create new
+                        </Button>
+                    </FormItem>
+                    <FormItem
+                        label="Appoitment Allocation Table Name"
+                        extra="Set a unique name for your timetable">
+                        <Input value={active.Name} onChange={e => this.mainKVChange(this.state.activeID, 'Name', e.target.value)} />
                     </FormItem>
                     <FormItem
                         label="Appointment Duration"
                         extra="This is will change the number of appointment slots per day"
-                        {...this.props.layout}>
-                        {getFieldDecorator('appointmentDuration', {
-                            initialValue: this.state.duration,
-                            onChange: (e) => this.setState({duration: e.target.value}),
-                            rules: [{}],
-                        })(
-                            <Radio.Group>
-                                <Radio.Button value="60min">1 Hour</Radio.Button>
-                                <Radio.Button value="30min">30 Minutes</Radio.Button>
-                            </Radio.Group>,
-                        )}
-                    </FormItem>
-                    {console.log(this.state.default)}
-                    <FormItem
-                        label="Default timetable"
-                        extra="This is will change the default timetable that your autopilot will use"
                         >
-
-                            <Checkbox checked={this.state.default} onChange={setDefault}>Set as default</Checkbox>
+                        <Radio.Group value={active.Info[0].Duration} onChange={e => this.infoKVChange(active.ID, null, 'Duration', e.target.value)}>
+                            <Radio.Button value={60}>1 Hour</Radio.Button>
+                            <Radio.Button value={30}>30 Minutes</Radio.Button>
+                        </Radio.Group>
                     </FormItem>
-
-                    <div style={{ width: 850}}>
+                    <FormItem
+                        label="Timetable selection"
+                        extra="Select the days, and times in those days in which you would like to have appointments">
                             <List bordered
-                                  dataSource={this.state.weekDays}
+                                  dataSource={active.Info}
+                                  style={{width: 700}}
                                   renderItem={(weekDay, i) => (
                                       <List.Item key={i}>
                                           <Col span={6}>
-                                              {CheckBox(weekDay.day, weekDay.active)}
+                                              <Checkbox className={styles.CheckBox}
+                                                        checked={weekDay.Active}
+                                                        onChange={event => this.infoKVChange(this.state.activeID, weekDay.Day, 'Active', event.target.checked)}/>
                                               <Tag style={{marginTop: 6}}
-                                                   color={weekDay.active ? 'purple' : 'grey'}>
-                                                  {weekDay.day}
+                                                   color={weekDay.Active ? 'purple' : 'grey'}>
+                                                  {console.log(weekDay.Day)}
+                                                  {moment().isoWeekday(weekDay.Day+1).format('dddd')}
                                               </Tag>
                                           </Col>
 
@@ -246,27 +187,25 @@ class TimeSlots extends React.Component {
                                           </Col>
 
                                           <Col span={6}>
-                                              {
-                                                  weekDay.to && weekDay.from && weekDay.active &&
+                                              {weekDay.To && weekDay.From && weekDay.Active &&
                                                   <div style={{display: 'flex'}}>
                                                       <p style={{margin: 0}}>Total slots: </p>
-                                                      <Badge count={TotalSlots(weekDay.from, weekDay.to)}
+                                                      <Badge count={TotalSlots(weekDay.From, weekDay.To, weekDay.Duration)}
                                                              style={{
                                                                  backgroundColor: '#fff',
                                                                  color: 'black',
                                                                  marginTop: 2,
                                                                  width: 30
                                                              }}/>
-                                                  </div>
-                                              }
+                                                  </div>}
                                           </Col>
 
                                       </List.Item>
                                   )}/>
-                    </div>
+                    </FormItem>
                 </Form>
                 <br />
-                <Button onClick={saveSettings}>Save Changes </Button>
+                <Button onClick={() => this.saveSettings(active.ID)}>Save Changes</Button>
             </> : null }
             </>
         )
@@ -274,7 +213,8 @@ class TimeSlots extends React.Component {
 }
 
 const mapStateToProps = (state) => ({
-    appointmentAllocationTime: state.appointmentAllocationTime.allocationTimes
+    appointmentAllocationTime: state.appointmentAllocationTime.allocationTimes,
+    active: state.appointmentAllocationTime.aat
 })
 
-export default connect(mapStateToProps, null)(Form.create()(TimeSlots))
+export default connect(mapStateToProps, null)(TimeSlots)

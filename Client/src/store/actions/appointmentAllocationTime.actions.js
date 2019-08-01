@@ -7,9 +7,10 @@ const fetchAAT = (isSuccess, id) => ({
     id
 });
 
-const fetchAATSuccess = (data) => ({
+const fetchAATSuccess = (data, aat) => ({
     type: actionTypes.FETCH_AAT_SUCCESS,
-    allocationTimes: data
+    allocationTimes: data,
+    aat: aat
 });
 
 const fetchAATFailure = (error) => ({
@@ -22,8 +23,10 @@ const saveAAT = (newSettings) => ({
     newSettings
 });
 
-const saveAATSuccess = () => ({
+const saveAATSuccess = (customID, id) => ({
     type: actionTypes.SAVE_AAT_SUCCESS,
+    customID,
+    id
 });
 
 const saveAATFailure = (error) => ({
@@ -31,7 +34,25 @@ const saveAATFailure = (error) => ({
     error
 });
 
+const createAAT = (aat) => ({
+    type: actionTypes.CREATE_AAT_REQUEST,
+    aat
+})
 
+const createAATSuccess = (aat) => ({
+    type: actionTypes.CREATE_AAT_SUCCESS,
+    aat
+});
+
+const createAATFailure = (error) => ({
+    type: actionTypes.CREATE_AAT_FAILURE,
+    error
+});
+
+const switchActiveAAT = (id) => ({
+    type: actionTypes.SWITCH_ACTIVE_AAT,
+    id
+})
 
 
 export const appointmentAllocationTimeActions = {
@@ -40,5 +61,9 @@ export const appointmentAllocationTimeActions = {
     fetchAATFailure,
     saveAAT,
     saveAATSuccess,
-    saveAATFailure
+    saveAATFailure,
+    createAAT,
+    createAATSuccess,
+    createAATFailure,
+    switchActiveAAT
 };

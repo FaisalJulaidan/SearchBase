@@ -4,7 +4,6 @@ class AppointmentAllocationTime(db.Model):
 
     ID = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
     Name = db.Column(db.String(128), nullable=False)
-    Default = db.Column(db.Boolean, nullable=False, default=False)
 
     # Default = db.Column(db)
     # Relationships:

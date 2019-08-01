@@ -5,12 +5,15 @@ from twilio.rest import Client
 from models import Callback
 from utilities import helpers
 
+# Fetched from the twilio console:
 account_sid = os.environ["ACCOUNT_SID"]
 auth_token = os.environ["AUTH_TOKEN"]
 
 client = Client(account_sid, auth_token)
 
-sendNumber = "441143032341"
+sendNumber = "+441143032341"
+# Purpose? --> Send sms containing links for various usages
+# Functionality required? --> send_sms
 
 
 def exampleFunc(dueIn, payment):
@@ -30,6 +33,7 @@ def exampleFunc(dueIn, payment):
 
 
 def send_sms(sendto, body):
+    print("Attempting to send message")
     try:
         message = client.messages.create(
             to=sendto,
@@ -42,3 +46,7 @@ def send_sms(sendto, body):
     except Exception as e:
         print("sms_services.send_sms() ERROR: ", e)
         return Callback(False, "Error in sending SMS")
+
+
+# NOTE: Temp for testing sms
+# send_sms("+447860285032", "Place TEXT above: \n https://www.thesearchbase.com/")

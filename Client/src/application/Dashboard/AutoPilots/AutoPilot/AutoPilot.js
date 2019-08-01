@@ -1,17 +1,17 @@
-import React from 'react'
-import {connect} from 'react-redux';
-import styles from "./AutoPilot.module.less";
-import NoHeaderPanel from 'components/NoHeaderPanel/NoHeaderPanel'
-import {Button, Form, Input, InputNumber, Switch, Typography, Divider, Spin, Modal, Breadcrumb} from 'antd';
-import 'types/TimeSlots_Types'
-import {history} from "helpers";
-import TimeSlots from "./TimeSlots/TimeSlots";
-import {autoPilotActions} from "store/actions";
+import React from 'react';
+import { connect } from 'react-redux';
+import styles from './AutoPilot.module.less';
+import NoHeaderPanel from 'components/NoHeaderPanel/NoHeaderPanel';
+import { Button, Form, Input, InputNumber, Switch, Typography, Divider, Spin, Modal, Breadcrumb } from 'antd';
+import 'types/TimeSlots_Types';
+import { history } from 'helpers';
+import TimeSlots from './TimeSlots/TimeSlots';
+import { autoPilotActions, assistantActions } from 'store/actions';
 
 const FormItem = Form.Item;
 const confirm = Modal.confirm;
 
-const {Title, Paragraph} = Typography;
+const { Title, Paragraph } = Typography;
 
 class AutoPilot extends React.Component {
 
@@ -19,42 +19,44 @@ class AutoPilot extends React.Component {
         super(props);
         this.TimeSlotsRef = React.createRef();
     }
+
     state = {
         rejectApplications: false,
         acceptApplications: false,
         sendAcceptanceEmail: false,
         sendRejectionEmail: false,
+        sendAcceptanceSMS: false,
+        sendRejectionSMS: false,
         sendCandidatesAppointments: false,
-
         acceptanceScore: null,
         rejectionScore: null
     };
 
-
     componentDidMount() {
-
         this.props.dispatch(autoPilotActions.fetchAutoPilot(this.props.match.params.id))
-            .then(()=> {
-                const {autoPilot} = this.props;
+            .then(() => {
+                const { autoPilot } = this.props;
                 this.setState({
                     rejectApplications: autoPilot.RejectApplications,
                     acceptApplications: autoPilot.AcceptApplications,
                     sendAcceptanceEmail: autoPilot.SendAcceptanceEmail,
                     sendRejectionEmail: autoPilot.SendRejectionEmail,
+                    sendAcceptanceSMS: autoPilot.SendAcceptanceSMS,
+                    sendRejectionSMS: autoPilot.SendRejectionSMS,
                     sendCandidatesAppointments: autoPilot.SendCandidatesAppointments,
                     acceptanceScore: autoPilot.AcceptanceScore * 100,
                     rejectionScore: autoPilot.RejectionScore * 100
-                })
+                });
             }).catch(() => history.push(`/dashboard/auto_pilots`));
-
-
     }
 
-    onRejectChange = (checked) => this.setState({rejectApplications: checked});
-    onAcceptChange = (checked) => this.setState({acceptApplications: checked});
-    onAppointmentChange = (checked) => this.setState({sendCandidatesAppointments: checked});
-    onSendAcceptanceEmailChange = (checked) => this.setState({sendAcceptanceEmail: checked});
-    onSendRejectionEmailChange = (checked) => this.setState({sendRejectionEmail: checked});
+    onRejectChange = (checked) => this.setState({ rejectApplications: checked });
+    onAcceptChange = (checked) => this.setState({ acceptApplications: checked });
+    onAppointmentChange = (checked) => this.setState({ sendCandidatesAppointments: checked });
+    onSendAcceptanceEmailChange = (checked) => this.setState({ sendAcceptanceEmail: checked });
+    onSendRejectionEmailChange = (checked) => this.setState({ sendRejectionEmail: checked });
+    onSendAcceptanceSMSChange = (checked) => this.setState({ sendAcceptanceSMS: checked });
+    onSendRejectionSMSChange = (checked) => this.setState({ sendRejectionSMS: checked });
 
     handleDelete = () => {
         confirm({
@@ -70,9 +72,9 @@ class AutoPilot extends React.Component {
 
     onSubmit = () => this.props.form.validateFields((err, values) => {
 
-        if(!err){
+        if (!err) {
             const /**@type AutoPilot*/ autoPilot = this.props.autoPilot || {};
-            const {state, TimeSlotsRef} = this;
+            const { state, TimeSlotsRef } = this;
             const timeSlots = TimeSlotsRef.current.state.weekDays;
 
             let weekDays = [];
@@ -83,7 +85,7 @@ class AutoPilot extends React.Component {
                     to: [timeSlots[i].to.hours(), timeSlots[i].to.minutes()],
                     duration: +TimeSlotsRef.current.state.duration.split('min')[0],
                     active: timeSlots[i].active
-                })
+                });
             }
 
             let payload = {
@@ -94,6 +96,8 @@ class AutoPilot extends React.Component {
                 rejectApplications: state.rejectApplications,
                 sendAcceptanceEmail: state.sendAcceptanceEmail,
                 sendRejectionEmail: state.sendRejectionEmail,
+                sendAcceptanceSMS: state.sendAcceptanceSMS,
+                sendRejectionSMS: state.sendRejectionSMS,
                 acceptanceScore: state.acceptanceScore / 100,
                 rejectionScore: state.rejectionScore / 100,
                 sendCandidatesAppointments: state.sendCandidatesAppointments,
@@ -109,18 +113,18 @@ class AutoPilot extends React.Component {
     render() {
         const /**@type AutoPilot*/ autoPilot = this.props.autoPilot;
         const layout = {
-            labelCol: {span: 4},
-            wrapperCol: {span: 18},
+            labelCol: { span: 4 },
+            wrapperCol: { span: 18 }
         };
-        const {getFieldDecorator} = this.props.form;
+        const { getFieldDecorator } = this.props.form;
         return (
             <>
                 <NoHeaderPanel>
                     <div className={styles.Header}>
-                        <div style={{marginBottom: 20}}>
+                        <div style={{ marginBottom: 20 }}>
                             <Breadcrumb>
                                 <Breadcrumb.Item>
-                                    <a href={"javascript:void(0);"}
+                                    <a href={'javascript:void(0);'}
                                        onClick={() => history.push('/dashboard/auto_pilots')}>
                                         Auto Pilots
                                     </a>
@@ -139,26 +143,31 @@ class AutoPilot extends React.Component {
 
                     <div className={styles.Body}>
                         {!autoPilot ? <Spin/> :
-                            <Form layout='vertical' wrapperCol = {{span: 10}} style={{width: '100%'}}>
+                            <Form layout='vertical' wrapperCol={{ span: 15 }} style={{ width: '100%' }}>
                                 <FormItem
                                     label="Name"
-                                    >
+                                >
                                     {getFieldDecorator('name', {
                                         initialValue: autoPilot.Name,
                                         rules: [
-                                            {whitespace: true, required: true, message: "Enter a name for your auto pilot"},
-                                            {validator: (_, value, callback) => {
-                                                // check if the value equals any of the name from
-                                                // this.props.autoPilotsSlots
-                                                // if there is an error return the callback with the message
-                                                if (this.props.autoPilotsList?.some(autoPilot => autoPilot.Name === value
-                                                    && this.props.autoPilot.Name !== value))
-                                                    return callback(value + ' is duplicated');
-                                                else
-                                                    return callback()
+                                            {
+                                                whitespace: true,
+                                                required: true,
+                                                message: 'Enter a name for your auto pilot'
+                                            },
+                                            {
+                                                validator: (_, value, callback) => {
+                                                    // check if the value equals any of the name from
+                                                    // this.props.autoPilotsSlots
+                                                    // if there is an error return the callback with the message
+                                                    if (this.props.autoPilotsList?.some(autoPilot => autoPilot.Name === value
+                                                        && this.props.autoPilot.Name !== value))
+                                                        return callback(value + ' is duplicated');
+                                                    else
+                                                        return callback();
                                                 }
                                             }
-                                        ],
+                                        ]
                                     })(
                                         <Input placeholder="Auto Pilot Name"/>
                                     )}
@@ -169,45 +178,45 @@ class AutoPilot extends React.Component {
                                 >
                                     {getFieldDecorator('description', {
                                         initialValue: autoPilot?.Description,
-                                        rules: [{}],
+                                        rules: [{}]
                                     })(
                                         <Input placeholder="Auto Pilot Description"/>
                                     )}
                                 </FormItem>
 
-                                <br />
+                                <br/>
                                 <Divider/>
                                 <h2> Applications Acceptance Automation</h2>
                                 <FormItem label="Auto accept applicants "
                                           help="Select the percentage to auto accept the applicants">
                                     {getFieldDecorator('acceptApplications', {
-                                        valuePropName: 'checked',
+                                        valuePropName: 'checked'
                                     })(
                                         <>
                                             <Switch onChange={this.onAcceptChange}
-                                                    style={{marginRight: 15}}
+                                                    style={{ marginRight: 15 }}
                                                     checked={this.state.acceptApplications}
                                             />
                                             A score greater than
                                             <InputNumber min={0} max={100}
-                                                         onChange={value => this.setState({acceptanceScore: value})}
+                                                         onChange={value => this.setState({ acceptanceScore: value })}
                                                          value={this.state.acceptanceScore}
                                                          key={autoPilot?.AcceptanceScore ? 'notLoadedYet' : 'loaded'}
                                                          formatter={value => `${value}%`}
-                                                         style={{marginLeft: 15}}
+                                                         style={{ marginLeft: 15 }}
                                                          disabled={!this.state.acceptApplications}/>
                                         </>
                                     )}
                                 </FormItem>
 
                                 <FormItem label="Auto send acceptance emails"
-                                          help="Accepted applicants will be notified via email if email is provided (candidates applications only)"
+                                          help="Accepted applicants will be notified via email if email is provided in the chat  (candidates applications only)"
                                 >
                                     {getFieldDecorator('sendAcceptanceEmail', {
                                         initialValue: autoPilot?.SendAcceptanceEmail,
-                                        rules: [],
+                                        rules: []
                                     })(
-                                        <div style={{marginLeft: 3}}>
+                                        <div style={{ marginLeft: 3 }}>
                                             <Switch onChange={this.onSendAcceptanceEmailChange}
                                                     checked={this.state.sendAcceptanceEmail}
                                             />
@@ -215,44 +224,72 @@ class AutoPilot extends React.Component {
                                     )}
                                 </FormItem>
 
-                                <br />
+                                <FormItem label="Auto send SMS"
+                                          help="Accepted applicants will be notified via SMS if telephone number is provided in the chat  (candidates applications only)"
+                                >
+                                    {getFieldDecorator('sendAcceptanceSMS', {
+                                        initialValue: autoPilot?.SendAcceptanceSMS,
+                                        rules: []
+                                    })(
+                                        <div style={{ marginLeft: 3 }}>
+                                            <Switch onChange={this.onSendAcceptanceSMSChange}
+                                                    checked={this.state.sendAcceptanceSMS}
+                                            />
+                                        </div>
+                                    )}
+                                </FormItem>
+
+                                <br/>
                                 <Divider/>
                                 <h2> Applications Rejection Automation</h2>
 
                                 <Form.Item label="Auto reject applicants "
                                            help="Select the percentage to auto reject the applicants">
                                     {getFieldDecorator('rejectApplications', {
-                                        valuePropName: 'checked',
+                                        valuePropName: 'checked'
                                     })(
                                         <>
-                                            <Switch onChange={this.onRejectChange} style={{marginRight: 15}}
+                                            <Switch onChange={this.onRejectChange} style={{ marginRight: 15 }}
                                                     checked={this.state.rejectApplications}/>
                                             A score less than
                                             <InputNumber min={1} max={100}
-                                                         onChange={value => this.setState({rejectionScore: value})}
+                                                         onChange={value => this.setState({ rejectionScore: value })}
                                                          formatter={value => `${value}%`}
                                                          key={autoPilot?.RejectionScore ? 'notLoadedYet' : 'loaded'}
                                                          value={this.state.rejectionScore}
-                                                         style={{marginLeft: 15}}
+                                                         style={{ marginLeft: 15 }}
                                                          disabled={!this.state.rejectApplications}/>
                                         </>
                                     )}
                                 </Form.Item>
 
-                                <FormItem label="Auto send rejection emails"
-                                          help="Rejected applicants will be notified via email if email is provided (candidates applications only)">
+                                <FormItem label="Auto send rejection email"
+                                          help="Rejected applicants will be notified via email if email is provided in the chat (candidates applications only)">
                                     {getFieldDecorator('sendRejectionEmail', {
                                         initialValue: autoPilot.SendRejectionEmail,
-                                        rules: [],
+                                        rules: []
                                     })(
-                                        <div style={{marginLeft: 3}}>
+                                        <div style={{ marginLeft: 3 }}>
                                             <Switch onChange={this.onSendRejectionEmailChange}
                                                     checked={this.state.sendRejectionEmail}/>
                                         </div>
                                     )}
                                 </FormItem>
 
-                                <br />
+                                <FormItem label="Auto send rejection SMS"
+                                          help="Rejected applicants will be notified via SMS if telephone number is provided in the chat  (candidates applications only)">
+                                    {getFieldDecorator('sendRejectionEmail', {
+                                        initialValue: autoPilot.SendRejectionSMS,
+                                        rules: []
+                                    })(
+                                        <div style={{ marginLeft: 3 }}>
+                                            <Switch onChange={this.onSendRejectionSMSChange}
+                                                    checked={this.state.sendRejectionSMS}/>
+                                        </div>
+                                    )}
+                                </FormItem>
+
+                                <br/>
                                 <Divider/>
                                 <h2> Manage Appointments Automation (coming soon)</h2>
                                 <FormItem label="Auto manage candidates appointments"
@@ -263,9 +300,9 @@ class AutoPilot extends React.Component {
                                 >
                                     {getFieldDecorator('sendCandidatesAppointments', {
                                         initialValue: autoPilot.SendCandidatesAppointments,
-                                        rules: [],
+                                        rules: []
                                     })(
-                                        <div style={{marginLeft: 3}}>
+                                        <div style={{ marginLeft: 3 }}>
                                             <Switch onChange={this.onAppointmentChange}
                                                     checked={this.state.sendCandidatesAppointments}
                                                     disabled={true}/>
@@ -283,17 +320,17 @@ class AutoPilot extends React.Component {
 
 
                         <Button type={'primary'} size={'large'} onClick={this.onSubmit}
-                                style={{marginTop:30}}>
+                                style={{ marginTop: 30 }}>
                             Save changes
                         </Button>
 
-                        <br />
+                        <br/>
                         <Divider/>
                         <Button type={'danger'} size={'large'} onClick={this.handleDelete}>Delete Auto Pilot</Button>
 
 
                         {/*Blur Effect (Hidden) */}
-                        <div style={{display: 'none'}}>
+                        <div style={{ display: 'none' }}>
                             <svg id="svg-filter">
                                 <filter id="svg-blur">
                                     <feGaussianBlur in="SourceGraphic" stdDeviation="2"></feGaussianBlur>
@@ -304,7 +341,7 @@ class AutoPilot extends React.Component {
                     </div>
                 </NoHeaderPanel>
             </>
-        )
+        );
     }
 }
 
@@ -313,6 +350,7 @@ function mapStateToProps(state) {
         autoPilot: state.autoPilot.autoPilot,
         autoPilotsList: state.autoPilot.autoPilotsList,
         isLoading: state.autoPilot.isLoading,
+        assistantList: state.assistant.assistantList
     };
 }
 

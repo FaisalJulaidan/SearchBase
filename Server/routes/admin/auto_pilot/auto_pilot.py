@@ -81,9 +81,11 @@ def auto_pilot_configs(autoPilotID):
                            data.get('acceptApplications'),
                            data.get('acceptanceScore'),
                            data.get('sendAcceptanceEmail'),
+                           data.get('sendAcceptanceSMS'),
                            data.get('rejectApplications'),
                            data.get('rejectionScore'),
                            data.get('sendRejectionEmail'),
+                           data.get('sendRejectionSMS'),
                            data.get('sendCandidatesAppointments'),
                            data.get('openTimes'),  # TODO OpenTimeSlots & Appointments Feature
                            user['companyID'])

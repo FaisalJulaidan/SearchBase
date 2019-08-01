@@ -177,8 +177,9 @@ def update(id, name, desc, companyID: int) -> Callback:
         return Callback(False, "Couldn't update the AutoPilot.")
 
 
-def updateConfigs(id, name, desc, active, acceptApplications, acceptanceScore, sendAcceptanceEmail, rejectApplications,
-                  rejectionScore, sendRejectionEmail, SendCandidatesAppointments, openTimes, companyID: int) -> Callback:
+def updateConfigs(id, name, desc, active, acceptApplications, acceptanceScore, sendAcceptanceEmail,
+                  sendAcceptanceSMS, rejectApplications, rejectionScore, sendRejectionEmail, sendRejectionSMS,
+                  SendCandidatesAppointments, openTimes, companyID: int) -> Callback:
     try:
 
         # Check all OpenTimes are given
@@ -197,10 +198,12 @@ def updateConfigs(id, name, desc, active, acceptApplications, acceptanceScore, s
         autoPilot.AcceptApplications = acceptApplications
         autoPilot.AcceptanceScore = acceptanceScore
         autoPilot.SendAcceptanceEmail = sendAcceptanceEmail
+        autoPilot.SendAcceptanceSMS = sendAcceptanceSMS
 
         autoPilot.RejectApplications = rejectApplications
         autoPilot.RejectionScore = rejectionScore
         autoPilot.SendRejectionEmail = sendRejectionEmail
+        autoPilot.SendRejectionSMS = sendRejectionSMS
 
         autoPilot.SendCandidatesAppointments = SendCandidatesAppointments
 

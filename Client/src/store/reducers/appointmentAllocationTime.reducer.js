@@ -61,6 +61,7 @@ export const appointmentAllocationTime = (state = initialState, action) => {
             console.log(action)
             return updateObject(state, {
                 isLoading: false,
+                aat: null,
                 allocationTimes: state.allocationTimes.filter(aat => aat.ID !== parseInt(action.id))
             });
         case actionTypes.DELETE_AAT_FAILURE:

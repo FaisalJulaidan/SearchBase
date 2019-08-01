@@ -51,6 +51,9 @@ class TimeSlots extends React.Component {
         if(this.props.appointmentAllocationTime.length !== 0 && !this.state.activeKey){
             this.setState({activeKey: this.props.appointmentAllocationTime[0].ID})
         }
+        if(!this.props.isLoading && this.props.appointmentAllocationTime.length === 0 && !this.state.creating){
+            this.setState({creating: true, activeKey: "new"})
+        }
     }
 
 
@@ -67,15 +70,18 @@ class TimeSlots extends React.Component {
     }
 
     remove = (key) => {
-        Modal.confirm({
+        return Modal.confirm({
             title: 'Are you sure you want to delete this timetable?',
             content: 'You will lose this timetable foreve if it is deleted',
             okText: 'Yes',
             cancelText: 'No',
-            onOk: () => this.props.dispatch(appointmentAllocationTimeActions.deleteAATRequest(key)),
+            onOk: (e) => {
+                console.log(e)
+                this.props.dispatch(appointmentAllocationTimeActions.deleteAATRequest(key))
+                e()
+            },
+            maskClosable: true
         });
-
-        // this.props.dispatch(appointmentAllocationTimeActions.deleteAATRequest(key))
     }
 
     onEdit = (key, action) => {
@@ -84,7 +90,6 @@ class TimeSlots extends React.Component {
 
 
     render() {
-        if(this.props.appointmentAllocationTime.length === 0){ return null }
         let tabList = this.props.appointmentAllocationTime.concat(this.state.creating ? [emptyAAT()] : [])
          return (
             <Tabs onChange={this.onChange}
@@ -92,7 +97,7 @@ class TimeSlots extends React.Component {
                   activeKey={`${this.state.activeKey}`}
                   onEdit={this.onEdit}>
             {tabList.map((timeSlot, i) => {
-                return (<TabPane tab={timeSlot.Name} key={`${timeSlot.ID}`} closable={true}>
+                return (<TabPane tab={timeSlot.Name} key={`${timeSlot.ID}`} closable={timeSlot.ID === "new" ? false :true}>
                     <TimeSlot
                         info={timeSlot.Info}
                         id={timeSlot.ID}
@@ -108,6 +113,7 @@ class TimeSlots extends React.Component {
 
 const mapStateToProps = (state) => ({
     appointmentAllocationTime: state.appointmentAllocationTime.allocationTimes,
+    isLoading: state.appointmentAllocationTime.isLoading,
     active: state.appointmentAllocationTime.aat
 })
 

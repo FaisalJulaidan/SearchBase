@@ -194,7 +194,6 @@ def getAppointmentAllocationTimes(id):
             .join(AppointmentAllocationTimeInfo) \
             .filter(AppointmentAllocationTime.CompanyID == id) \
             .all()
-        if not result: raise Exception
         return Callback(True, 'Gathered Appointment Allocation Times', result)
     except Exception as exc:
         print(exc)

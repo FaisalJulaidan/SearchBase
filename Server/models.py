@@ -86,6 +86,9 @@ Job: Job = Job
 from schemas.Newsletter import Newsletter
 Newsletter: Newsletter = Newsletter
 
+from schemas.Messenger import Messenger
+Messenger: Messenger = Messenger
+
 from schemas.OpenTimes import OpenTimes
 OpenTimes: OpenTimes = OpenTimes
 

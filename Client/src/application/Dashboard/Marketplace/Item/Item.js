@@ -14,6 +14,7 @@ import {GreenhouseFeatures, GreenhouseFormItem, GreenhouseHeader} from "./Compon
 import {GoogleFeatures, GoogleHeader} from './Components/Google'
 import {OutlookFeatures, OutlookHeader} from "./Components/Outlook";
 import {MercuryFeatures, MercuryFormItems, MercuryHeader} from "./Components/Mercury";
+import {TwilioFeatures, TwilioFormItems, TwilioHeader} from "./Components/Twilio";
 import {CSVLink} from "react-csv";
 import data from '../Items.json'
 import {connect} from 'react-redux';
@@ -45,7 +46,7 @@ class Item extends React.Component {
         let type = location.pathname.split('/').slice(-1)[0]; // ex. Bullhorn, Adapt...
         let params = queryString.parse(location.search);
 
-        if( (type === "Bullhorn" || type === "Vincere" || type === "Outlook" || type === "Jobscience" || type === "Mercury") && params['code']){
+        if( (type === "Bullhorn" || type === "Vincere" || type === "Outlook" || type === "Jobscience" || type === "Mercury" || type === "Twilio") && params['code']){
             dispatch(marketplaceActions.connectMarketplace(type, {...params})); // connect
             this.props.history.replace("/dashboard/marketplace/" + type) // clean the url from args
 
@@ -249,6 +250,18 @@ class Item extends React.Component {
                                           // windowObject={windowObject}
                                           {...buttonsOptions}/>;
                 }
+                break;
+
+
+            case "Twilio":
+                if (place === 'header')
+                    return <TwilioHeader/>;
+                if (place === 'features')
+                    return <TwilioFeatures/>;
+                if (place === 'form')
+                    return <TwilioFormItems {...formOptions}/>;
+                if (place === 'button')
+                    return <DefaultButton buttonText={'Connect to Twilio'} {...buttonsOptions}/>;
                 break;
         }
     };

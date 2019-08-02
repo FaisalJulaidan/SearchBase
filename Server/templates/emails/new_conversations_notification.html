@@ -66,21 +66,20 @@
         {% endfor %}
 
         {# Selected solutions list #}
-        {% if conversation.data.get("selectedSolutions") %}
-            {% for solution in conversation.data["selectedSolutions"] %}
-                {% if solution["databaseType"] == 'Jobs' %}
-                    <span style="font-size: 18px;color:black;font-weight: bold; padding-top: 10px; display:block;">
-                    He also applied for
-                        <span style="font-weight: bold; color: #9254de">{{ solution|length }} Job(s)</span>
-                </span>
-                {% else %}
-                    <span style="font-size: 18px;color:black;font-weight: bold; padding-top: 10px; display:block;">
-                        He also enquired for
-                        <span style="font-weight: bold; color: #9254de">{{ solution|length }} Candidates(s)</span>
-                </span>
-                {% endif %}
-
-            {% endfor %}
+        {% set solutions = conversation.data.get("selectedSolutions") %}
+        {% if solutions|length %}
+            {% set solutionsLength = solutions|length %}
+            {% if solutions[0]["databaseType"] == 'Jobs' %}
+                <span style="font-size: 18px;color:black;font-weight: bold; padding-top: 10px; display:block;">
+                They also applied for
+                    <span style="font-weight: bold; color: #9254de">{{ solutionsLength }} Job(s)</span>
+            </span>
+            {% else %}
+                <span style="font-size: 18px;color:black;font-weight: bold; padding-top: 10px; display:block;">
+                    They also enquired for
+                    <span style="font-weight: bold; color: #9254de">{{ solutionsLength }} Candidates(s)</span>
+            </span>
+            {% endif %}
         {% endif %}
         <a href="{{ conversation.link }}">View conversation</a> <br/>
         <span>{{ conversation.dateTime }}</span>

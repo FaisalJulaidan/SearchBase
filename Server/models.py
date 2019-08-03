@@ -53,7 +53,7 @@ class AAAAAAAA(db.Model):
     ID = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
 
     def __repr__(self):
-        return '<Database {}>'.format(self.Name)
+        return '<Database {}>'.format(self.ID)
 
 from schemas.Appointment import Appointment
 Appointment: Appointment = Appointment

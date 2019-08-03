@@ -120,10 +120,8 @@ def logout(access_token, companyID):  # QUESTION: Purpose of companyID param?
         return Callback(False, str(exc))
 
 
-def insertCandidateSkills(access_token, conversation: Conversation, contactID) -> Callback:
+def insertCandidateSkills(access_token, skills, contactID) -> Callback:
     try:
-        # print("INSERT SKILLS")
-        skills = conversation.Data.get('keywordsByDataType').get(DT.CandidateSkills.value['name'], [" "])
 
         entries = []
         counter = 0
@@ -158,50 +156,37 @@ def insertCandidateSkills(access_token, conversation: Conversation, contactID) -
 # NOTE: Standard fields to insert -> [FirstName, LastName, Phone, City, Email, Education, (skills)Attributes, Education]
 # BUG: Education not showing, may need to add to EDU object [~]
 # TODO: Fix the salary -> May need to insert a min & max [CHECK]
-def insertCandidate(access_token, conversation: Conversation) -> Callback:
+def insertCandidate(access_token, data) -> Callback:
     try:
-        print("DESIRED ANNUAL SALARY: ")
-        salary = conversation.Data.get('keywordsByDataType').get(DT.CandidateAnnualDesiredSalary.value['name'], [""])
-        print(salary)
+        salary = data.get("salary")
         avg_sal = 0
         if salary[0] != "":
             # NOTE: Splitting salary
             salary_splitted = salary[0].split(" ")
             low_and_high = salary_splitted[0].split("-")
 
-            print("MINIMAL DESIRED SALARY: ")
             min_sal = low_and_high[0]
-            print(min_sal)
 
-            print("MAX DESIRED SALARY: ")
             max_sal = low_and_high[1]
-            print(max_sal)
 
-            print("AVERAGE DESIRED SALARY: ")
             avg_sal = str(0.5 * (int(min_sal) + int(max_sal)))
-            print(avg_sal)
-        print("EDUCATION:")
-        print(conversation.Data.get('keywordsByDataType').get(DT.CandidateEducation.value['name'], [""]))
 
         # NOTE: Should require on front-end that a full name is provided --> reduce data inconsistency
-        name = (conversation.Name or " ").split(" ")
         body = {
-            "FirstName": helpers.getListValue(name, 0, "") or "FIRST_DEFAULT",
-            "LastName": helpers.getListValue(name, 1, "") or "LAST_DEFAULT",  # LastName is only required field
-            "Title": "".join(conversation.Data.get('keywordsByDataType').get(DT.CandidateJobTitle.value['name'],
-                                                                             [" "])),
-            "phone": conversation.PhoneNumber or " ",
-            "MailingCity": "".join(conversation.Data.get('keywordsByDataType').get(DT.CandidateLocation.value['name'],
-                                                                                   [""])),
+            "FirstName": data.get("firstName"),
+            "LastName": data.get("lastName"),  # LastName is only required field
+            # "Title": "".join(conversation.Data.get('keywordsByDataType').get(DT.CandidateJobTitle.value['name'],
+            #                                                                  [" "])),
+            "phone": data.get("mobile"),
+            "MailingCity": data.get("city"),
             # "ts2__Desired_Salary__c": conversation.Data.get(DT.CandidateDailyDesiredSalary.value['name']),
-            "email": conversation.Email or " ",
+            "email": data.get("email"),
             "ts2__Education__c": "",  # Needs to be in a separate post request
             "ts2__Desired_Salary__c": avg_sal,
-            "ts2__LinkedIn_Profile__c": "".join(conversation.Data.get('keywordsByDataType').get(
-                DT.CandidateLinkdinURL.value['name'],
-                [""])),
-            "Attributes__c": "; ".join(
-                conversation.Data.get('keywordsByDataType').get(DT.CandidateSkills.value['name'], [" "])),
+            # "ts2__LinkedIn_Profile__c": "".join(conversation.Data.get('keywordsByDataType').get(
+            #     DT.CandidateLinkdinURL.value['name'],
+            #     [""])),
+            "Attributes__c": data.get("skills"),
             "RecordTypeId": "0120O000000tJIAQA2"  # ID for a candidate person record type
         }
 
@@ -216,7 +201,7 @@ def insertCandidate(access_token, conversation: Conversation) -> Callback:
 
         # Insert candidate skills
         insertCandidateSkills_callback: Callback = insertCandidateSkills(
-            access_token, conversation, return_body.get("id"))
+            access_token, data.get("skills"), return_body.get("id"))
 
         if not insertCandidateSkills_callback.Success:  # Needs to  fetch the Account ID
             raise Exception(insertCandidateSkills_callback.Message)
@@ -234,10 +219,10 @@ def uploadFile(auth, storedFile: StoredFile):  # ISSUE: NO CURRENT API OPTION FO
 # TODO BASIC TEST [CHECK]
 
 
-def insertClient(auth, conversation: Conversation) -> Callback:
+def insertClient(auth, data) -> Callback:
     try:
         # Insert client company
-        insertCompany_callback: Callback = insertCompany(auth, conversation)
+        insertCompany_callback: Callback = insertCompany(auth, data)
         if not insertCompany_callback.Success:
             raise Exception(insertCompany_callback.Message)
 
@@ -245,7 +230,7 @@ def insertClient(auth, conversation: Conversation) -> Callback:
         # print(insertCompany_callback.Data)
 
         # Insert client account
-        insertClient_callback: Callback = insertClientContact(auth, conversation,
+        insertClient_callback: Callback = insertClientContact(auth, data,
                                                               insertCompany_callback.Data.get("id"))
         if not insertClient_callback.Success:  # Needs to  fetch the Account ID
             raise Exception(insertClient_callback.Message)
@@ -260,23 +245,15 @@ def insertClient(auth, conversation: Conversation) -> Callback:
 # TODO BASIC TEST [ ]
 # NOTE: Standard fields to insert -> [FirstName, LastName, Phone, City, Email, Client account ID]
 
-def insertClientContact(access_token, conversation: Conversation, prsCompanyID) -> Callback:
+def insertClientContact(access_token, data, prsCompanyID) -> Callback:
     try:
-        # print("INSERT CLIENT CONTACT")
-        # New candidate details
-        emails = conversation.Data.get('keywordsByDataType').get(DT.ClientEmail.value['name'], [" "])
-
-        # TODO: NOTE: Name is split into first and last, LastName required by API
-        # names = str.split(conversation.Name) names[0] names[1]
-
         body = {
-            "FirstName": conversation.Name or "FIRST_DEFAULT",
-            "LastName": conversation.Name or "DEFAULT",
-            "phone": conversation.PhoneNumber or " ",
-            "MailingCity": "".join(conversation.Data.get('keywordsByDataType').get(
-                DT.ClientLocation.value['name'], [" "])),
+            "FirstName": data.get("firstName"),
+            "LastName": data.get("lastName"),
+            "phone": data.get("mobile"),
+            "MailingCity": data.get("city"),
             # check number of emails and submit them
-            "email": emails[0],
+            "email": data.get("emails")[0],
             "AccountId": prsCompanyID
         }
 
@@ -295,14 +272,12 @@ def insertClientContact(access_token, conversation: Conversation, prsCompanyID) 
 # TODO TEST [ ]
 # NOTE: Standard fields to insert -> [Name] -> TODO: Add more fields here?
 
-def insertCompany(auth, conversation: Conversation) -> Callback:
+def insertCompany(auth, data) -> Callback:
     try:
         # print("INSERT CLIENT COMPANY")
 
         body = {
-            "Name": " ".join(conversation.Data.get('keywordsByDataType').get(
-                DT.CompanyName.value['name'],
-                ["Undefined Company - TSB"]))
+            "Name": data.get("companyName")
         }
 
         sendQuery_callback: Callback = sendQuery(auth, "post", body, "sobjects/Account/")
@@ -346,20 +321,16 @@ def fetchSkillsForCandidateSearch(list_of_contactIDs: list, access_token):
     # [3] Match skills to candidates -> Simple loop search O(N^2)
 
 
-def searchCandidates(access_token, companyID, conversation, fields=None) -> Callback:
+def searchCandidates(access_token, data) -> Callback:
     list_of_contactIDs = []
     # print(conversation)
-    # Dummy conversation keywords:
-    keywords = conversation['keywordsByDataType']
-    # keywords = {'Candidate Location': ['London'], 'Candidate Desired Salary': '20000'}
 
     try:
         # TODO: Add more filters, perhaps with a hierarchy of what to search on (maybe skills more important than
         # education) --> Could be set by user and sent with the conversation.
         # Note: Date will need to be reversed for comparison, also dates could be compared with a range rather than
         # requiring an exact match --> unrealistic
-        query = ""
-        a = checkFilter(keywords, DT.CandidateLocation, "MailingCity", quote_wrap=True)
+        a = populateFilter(data.get("location"), "MailingCity", True)
         if a != "":
             query = "WHERE+"
             query += a
@@ -383,21 +354,13 @@ def searchCandidates(access_token, companyID, conversation, fields=None) -> Call
 
         candidate_fetch = json.loads(sendQuery_callback.Data.text)
 
-        print(candidate_fetch['records'])  # BUG: Why is this not matching up?
+        # print(candidate_fetch['records'])  # BUG: Why is this not matching up?
 
         # Iterate through candidates
         result = []
         # TODO: Fetch job title
         for record in candidate_fetch['records']:
             list_of_contactIDs.append("'" + record.get("Id") + "'")
-
-            # print("<-- New Record -->")
-            # print("Name: " + str(record.get('Name')))
-            # print("Email:" + str(record.get('Email')))
-            # print("Phone: " + str(record.get('Phone')))
-            # print("Mailing Address: " + str(record.get('MailingCity')))
-            # print("Education: " + str(record.get('ts2__EduDegreeName1__c')))
-            # print("Desired Salary: " + str(record.get('ts2__Desired_Salary__c')))
 
         # Fetch associated candidate skills
         candidate_skills = fetchSkillsForCandidateSearch(list_of_contactIDs, access_token)
@@ -414,8 +377,7 @@ def searchCandidates(access_token, companyID, conversation, fields=None) -> Call
                 if skill.get("ts2__Contact__c") == record.get("Id"):
                     skills_string += skill.get("ts2__Skill_Name__c") + ", "
                     print("THE SKILL IS: " + skill.get("ts2__Skill_Name__c"))
-            print("SKILLS STRING IS: ")
-            print(skills_string)
+
             #  Remove final semicolon:
             skills_string = skills_string[:-1]
             # NOTE: Serious review of efficiency is needed also should try to find years experience field
@@ -433,7 +395,6 @@ def searchCandidates(access_token, companyID, conversation, fields=None) -> Call
                                                                   yearsExperience=0,  # When 0 -> No skills displayed
                                                                   desiredSalary=record.get('ts2__Desired_Salary__c'),
                                                                   currency=Currency("GBP"),
-                                                                  payPeriod=Period("Annually"),
                                                                   source="Jobscience"))
         # print("RESULT IS")
         # print(result)
@@ -445,27 +406,17 @@ def searchCandidates(access_token, companyID, conversation, fields=None) -> Call
         return Callback(False, str(exc))
 
 
-def checkFilter(keywords, dataType: DT, string, quote_wrap):
-    if keywords.get(dataType.value["name"]):
-        altered_list = []
-        for word in keywords[dataType.value["name"]]:  # NOTE: Wrap string types in single quotes
-            # print(word)
-            if quote_wrap:
-                word = "'" + word + "'"
-                altered_list.append(word)
-            else:
-                # Convert date format:
-                new_date = datetime.strptime(word, "%m/%d/%Y").strftime("%Y-%m-%d")
-                altered_list.append(new_date)
-
-        return string + "=" + "".join(altered_list) + "+or+"  # TODO: Multi-values, AND instead of OR?
+def populateFilter(value, string, quote_wrap):
+    if value:
+        if quote_wrap:
+            value = "'" + value + "'"
+        return string + "=" + value + "+or+"  # TODO: Multi-values, AND instead of OR?
     return ""
 
 
 # TODO: BASIC CHECK [CHECK]
 
-def searchJobs(access_token, companyID, conversation, fields=None) -> Callback:
-    keywords = conversation['keywordsByDataType']
+def searchJobs(access_token, data) -> Callback:
     # keywords = {'Job Location': ['London'], 'Job Title': ['chef'], 'Job Type': []}
     # print("keywords: ")
     # print(keywords)
@@ -473,17 +424,17 @@ def searchJobs(access_token, companyID, conversation, fields=None) -> Callback:
     try:
         query = "WHERE+"
 
-        query += checkFilter(keywords, DT.JobTitle, "Name", quote_wrap=True)
+        query += populateFilter(data.get("jobTitle"), "Name", True)
 
-        query += checkFilter(keywords, DT.JobLocation, "ts2__Location__c", quote_wrap=True)
+        query += populateFilter(data.get("city"), "ts2__Location__c", True)
 
-        query += checkFilter(keywords, DT.JobType, "ts2__Employment_Type__c", quote_wrap=True)
+        query += populateFilter(data.get("employmentType"), "ts2__Employment_Type__c", True)
 
-        query += checkFilter(keywords, DT.JobEssentialSkills, "ts2__Job_Tag__c", quote_wrap=True)
+        query += populateFilter(data.get("skills"), "ts2__Job_Tag__c", True)
 
-        query += checkFilter(keywords, DT.JobStartDate, "ts2__Estimated_Start_Date__c", quote_wrap=False)
+        query += populateFilter(data.get("startDate"), "ts2__Estimated_Start_Date__c", False)
 
-        query += checkFilter(keywords, DT.JobEndDate, "ts2__Estimated_End_Date__c", quote_wrap=False)
+        query += populateFilter(data.get("endDate"), "ts2__Estimated_End_Date__c", False)
 
         query = query[:-4]  # To remove final +or
 

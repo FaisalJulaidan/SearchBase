@@ -152,37 +152,23 @@ def buildUrl(query, domain, optionalParams=None):
     return url
 
 
-def insertCandidate(auth, conversation: Conversation) -> Callback:
+def insertCandidate(auth, data, companyID) -> Callback:
     try:
-        # New candidate details
-        emails = conversation.Data.get('keywordsByDataType').get(DT.CandidateEmail.value['name'], [" "])
-        name = (conversation.Name or " ").split(" ")
-
         # availability, yearsExperience
         body = {
-            "crimson_firstname": helpers.getListValue(name, 0, " "),
-            "crimson_surname": helpers.getListValue(name, 1, " "),
-            "crimson_mobile": conversation.PhoneNumber or None,
-            "crimson_town": " ".join(
-                conversation.Data.get('keywordsByDataType').get(DT.CandidateLocation.value['name'], [" "])),
-            "crimson_email": conversation.Email or " ",
-            "crimson_availability": " ".join(
-                    conversation.Data.get('keywordsByDataType').get(DT.CandidateAvailability.value['name'], [])) or None,
-            "crimson_jobtitle": " ".join(
-                    conversation.Data.get('keywordsByDataType').get(DT.JobTitle.value['name'], [])),
-            "crimson_expsalaryp": float(crm_services.getSalary(conversation, DT.CandidateAnnualDesiredSalary, "Average")),
-            "crimson_expratec": float(crm_services.getSalary(conversation, DT.CandidateAnnualDesiredSalary or
-                                                             DT.CandidateDailyDesiredSalary, "Average"))
+            "crimson_firstname": data.get("firstName"),
+            "crimson_surname": data.get("lastName"),
+            "crimson_mobile": data.get("mobile"),
+            "crimson_town": data.get("city"),
+            "crimson_email": data.get("email"),
+            "crimson_availability": data.get("availability"),
+            "crimson_jobtitle": data.get("jobTitle"),
+            "crimson_expsalaryp": float(data.get("salary")),
+            "crimson_expratec": float(data.get("rate"))
         }
-        # Add additional emails to email2 and email3
-        # for email in emails:
-        #     index = emails.index(email)
-        #     if index != 0:
-        #         body["email" + str(index + 1)] = email
 
         # send filter
-        sendQuery_callback: Callback = sendQuery(auth, "crimson_candidates", "post", body,
-                                                 conversation.Assistant.CompanyID)
+        sendQuery_callback: Callback = sendQuery(auth, "crimson_candidates", "post", body, companyID)
 
         if not sendQuery_callback.Success:
             raise Exception(sendQuery_callback.Message)
@@ -238,25 +224,18 @@ def uploadFile(auth, storedFile: StoredFile):  # TODO
         return Callback(False, str(exc))
 
 
-def insertClient(auth, conversation: Conversation) -> Callback:
+def insertClient(auth, data, companyID) -> Callback:
     try:
-        # New candidate details
-        emails = conversation.Data.get('keywordsByDataType').get(DT.ClientEmail.value['name'], [" "])
-        name = (conversation.Name or " ").split(" ")
-
         body = {
-            "firstname": name[0],
-            "lastname": name[-1],
-            "address1_city": " ".join(
-                    conversation.Data.get('keywordsByDataType').get(DT.ClientLocation.value['name'], [])),
+            "firstname": data.get("firstName"),
+            "lastname": data.get("lastName"),
+            "address1_city": data.get("city"),
             # check number of emails and submit them
-            "emailaddress1": emails[0],
-            "telephone1": " ".join(
-                    conversation.Data.get('keywordsByDataType').get(DT.ClientTelephone.value['name'], [])),
+            "emailaddress1": data.get("emails")[0],
+            "telephone1": data.get("mobile"),
         }
         # send filter
-        sendQuery_callback: Callback = sendQuery(auth, "contacts", "post", body,
-                                                 conversation.Assistant.CompanyID)
+        sendQuery_callback: Callback = sendQuery(auth, "contacts", "post", body, companyID)
         if not sendQuery_callback.Success:
             raise Exception(sendQuery_callback.Message)
 
@@ -267,7 +246,7 @@ def insertClient(auth, conversation: Conversation) -> Callback:
         return Callback(False, str(exc))
 
 
-def searchCandidates(auth, companyID, conversation, fields=None) -> Callback:
+def searchCandidates(auth, companyID, data, fields=None) -> Callback:
     try:
         filter = "$filter="
         if not fields:
@@ -275,10 +254,8 @@ def searchCandidates(auth, companyID, conversation, fields=None) -> Callback:
                      "expsalaryp,crimson_jobtitle,crimson_mobile,crimson_name,crimson_town," + \
                      "crimson_workpref_permanent,crimson_workpref_temp,mercury_cvurl,_transactioncurrencyid_value"
 
-        keywords = conversation['keywordsByDataType']
-
         # populate filter
-        filter += checkFilter(keywords, DT.CandidateLocation, "crimson_town")
+        filter += populateFilter(data.get("location"), "crimson_town")
 
         filter = filter[:-4]
 
@@ -327,27 +304,26 @@ def searchCandidates(auth, companyID, conversation, fields=None) -> Callback:
         return Callback(False, str(exc))
 
 
-def searchJobs(auth, companyID, conversation, fields=None) -> Callback:
+def searchJobs(auth, companyID, data, fields=None) -> Callback:
     try:
         filter = "$filter="
         if not fields:
             fields = "$select=crimson_addresscity,crimson_jobsummary,crimson_jobtitle,crimson_startdate," + \
                      "crimson_typeofposition,crimson_vacancyid,mercury_permanentsalary_mc," + \
                      "mercury_tempcandidatepay_mc,_mercury_vacancytype_value,_transactioncurrencyid_value"
-        keywords = conversation['keywordsByDataType']
 
         # populate filter TODO
-        filter += checkFilter(keywords, DT.JobTitle, "crimson_jobtitle")
+        filter += populateFilter(data.get("jobTitle"), "crimson_jobtitle")
 
-        filter += checkFilter(keywords, DT.JobLocation, "crimson_addresscity")
+        filter += populateFilter(data.get("city"), "crimson_addresscity")
 
-        # filter += checkFilter(keywords, DT.JobType, "employmentType")
+        # filter += populateFilter(keywords, DT.JobType, "employmentType")
 
         # salary = crm_services.getSalary(conversation, DT.JobSalary, Period.Annually)
         # if salary > 0:
         #     filter += "salary:" + str(salary) + " or"
 
-        # filter += checkFilter(keywords, DT.JobStartDate, "crimson_startdate")
+        # filter += populateFilter(keywords, DT.JobStartDate, "crimson_startdate")
 
         filter = filter[:-4]
 
@@ -399,9 +375,15 @@ def searchJobs(auth, companyID, conversation, fields=None) -> Callback:
         return Callback(False, str(exc))
 
 
-def checkFilter(keywords, dataType: DT, string):
+def populateFilter(keywords, dataType: DT, string):
     if keywords.get(dataType.value["name"]):
         return "contains(" + string + ", '" + "".join(keywords[dataType.value["name"]]) + "') and "
+    return ""
+
+
+def populateFilter(value, string):
+    if value:
+        return "contains(" + string + ", '" + value + "') and "
     return ""
 
 

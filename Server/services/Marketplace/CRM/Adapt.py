@@ -39,7 +39,7 @@ def login(auth):
         return Callback(False, str(exc))
 
 
-def insertCandidate(auth, conversation: Conversation) -> Callback:
+def insertCandidate(auth, data) -> Callback:
     try:
         callback: Callback = login(auth) # callback.Data is the SID used in authorised requests
         if not callback.Success:
@@ -54,26 +54,25 @@ def insertCandidate(auth, conversation: Conversation) -> Callback:
             "defaultRole": "TEMP_CAND",
             "PERSON_GEN": {
                 "TITLE": 1303812,
-                "FIRST_NAME": conversation.Name or "Name Unavailable - TSB",
-                "LAST_NAME": " ",
+                "FIRST_NAME": data.get("firstName"),
+                "LAST_NAME": data.get("lastName"),
                 "SALUTATION": " "
             },
             "EMAIL": [
                 {
                     "OCC_ID": "Home",
-                    "EMAIL_ADD": conversation.Email or "Email_Unavailable@TSB.com"
+                    "EMAIL_ADD": data.get("email")
                 }
             ],
             "TELEPHONE": [
                 {
                     "OCC_ID": "Mobile",
-                    "TEL_NUMBER": conversation.PhoneNumber or "Telephone Unavailable - TSB"
+                    "TEL_NUMBER": data.get("mobile")
                 }
             ],
             "ADDRESS": [{
                 "OCC_ID": "Primary",
-                "STREET1": " ".join(conversation.Data.get('keywordsByDataType')
-                                    .get(DT.CandidateLocation.value['name'], "Location Unavailable - TSB")),
+                "STREET1": data.get("city"),
             }],
         }
 
@@ -92,7 +91,7 @@ def insertCandidate(auth, conversation: Conversation) -> Callback:
         return Callback(False, str(exc))
 
 
-def insertClient(auth, conversation: Conversation) -> Callback:
+def insertClient(auth, data) -> Callback:
     try:
         callback: Callback = login(auth)
         if not callback.Success:
@@ -105,20 +104,19 @@ def insertClient(auth, conversation: Conversation) -> Callback:
         body = {
             "CLIENT_GEN": {
                 "CLIENT_TYPE": 8252178,
-                "NAME": conversation.Name or "Name Unavailable - TSB",
+                "NAME": data.get("name"),
             },
             "TELEPHONE": [
                 {
                     "OCC_ID": "Work",
-                    "TEL_NUMBER": conversation.PhoneNumber or "Telephone Unavailable - TSB"
+                    "TEL_NUMBER": data.get("mobile")
                 }
             ],
             "ADDRESS": [{
                 "OCC_ID": "Primary",
-                "STREET1": " ".join(conversation.Data.get('keywordsByDataType')
-                                    .get(DT.ClientLocation.value['name'], " Location Unavailable - TSB")),
+                "STREET1": data.get("city"),
             }],
-            "NOTES": conversation.Email or "Email_Unavailable@TSB.com",
+            "NOTES": data.get("email", "NotProvided@adapt.required"),
         }
 
         # Send request to insert new client

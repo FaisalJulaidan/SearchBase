@@ -49,6 +49,11 @@ class Callback():
 
 # ============= Models ===================
 
+class AAAAAAAA(db.Model):
+    ID = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
+
+    def __repr__(self):
+        return '<Database {}>'.format(self.Name)
 
 from schemas.Appointment import Appointment
 Appointment: Appointment = Appointment

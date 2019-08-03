@@ -29,9 +29,10 @@ const setAppointmentStatusRequest = (appointmentID, status) => {
     };
 };
 
-const setAppointmentStatusSuccess = (status) => {
+const setAppointmentStatusSuccess = (id, status) => {
     return {
         type: actionTypes.SET_APPOINTMENT_STATUS_SUCCESS,
+        id,
         status
     };
 };

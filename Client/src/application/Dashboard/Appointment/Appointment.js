@@ -4,6 +4,7 @@ import {Icon, Input, Modal,Typography, Tabs} from 'antd';
 import NoHeaderPanel from 'components/NoHeaderPanel/NoHeaderPanel'
 import Calendar from './Calendar/Calendar'
 import TimeSlots from './TimeSlots/TimeSlots'
+import Appointments from './Appointments/Appointments'
 import styles from "./Calendar/Calendar.module.less";
 
 
@@ -29,6 +30,9 @@ class Appointment extends React.Component {
                 </Tabs.TabPane>
                 <Tabs.TabPane tab="Time Slots" key="2">
                     <TimeSlots/>
+                </Tabs.TabPane>
+                <Tabs.TabPane tab="Appointments" key="3">
+                    <Appointments/>
                 </Tabs.TabPane>
             </Tabs>
             </NoHeaderPanel>

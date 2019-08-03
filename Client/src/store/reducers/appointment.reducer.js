@@ -27,8 +27,9 @@ export const appointment = (state = initialState, action) => {
                 isLoading: true,
             });
         case actionTypes.SET_APPOINTMENT_STATUS_SUCCESS:
+            console.log(action  )
             return updateObject(state, {
-                appointments: state.appointments.map(a => ({...a, status: action.status})),
+                appointments: state.appointments.map(a => ({...a, Status: a.ID === action.id ? action.status : a.Status})),
                 isLoading: false
             });
         case actionTypes.SET_APPOINTMENT_STATUS_FAILURE:

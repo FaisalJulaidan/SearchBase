@@ -1,6 +1,6 @@
 import React from 'react'
 import {connect} from 'react-redux'
-import { Modal, Button, message, Tabs} from 'antd'
+import { Modal, Tooltip, Button, message, Tabs} from 'antd'
 import 'types/TimeSlots_Types'
 import 'types/AutoPilot_Types'
 import {appointmentAllocationTimeActions} from "store/actions";
@@ -28,11 +28,19 @@ class TimeSlots extends React.Component {
 
     state = {
         creating: false,
-        activeKey: null
+        activeKey: null,
+        initPopup: false,
     }
 
     componentDidMount() {
         this.props.dispatch(appointmentAllocationTimeActions.fetchAAT());
+        // this.setState({initPopup: true})
+        setTimeout(() =>{
+            this.setState({initPopup: true})
+        }, 1200)
+        setTimeout(() =>{
+            this.setState({initPopup: false})
+        }, 5500)
     }
 
     saveTimeSlot = (id, newSettings) => {
@@ -44,9 +52,9 @@ class TimeSlots extends React.Component {
         }
     }
 
-    componentDidUpdate(){
-        if(this.props.active && this.state.activeKey !== this.props.active?.ID){
-            this.setState({activeKey: this.props.active.ID, creating: false})
+    componentDidUpdate(prevProps){
+        if(this.state.creating && prevProps.appointmentAllocationTime.length < this.props.appointmentAllocationTime.length){
+            this.setState({activeKey: this.props.appointmentAllocationTime[this.props.appointmentAllocationTime.length-1].ID, creating: false})
         }
         if(this.props.appointmentAllocationTime.length !== 0 && !this.state.activeKey){
             this.setState({activeKey: this.props.appointmentAllocationTime[0].ID})
@@ -65,14 +73,14 @@ class TimeSlots extends React.Component {
         if(!this.state.creating) {
             this.setState({creating: true, activeKey: `new`})
         } else {
-            message.warn("Please finish working on your new timetable before you create a new one!")
+            message.warn("Please finish working on your new timetable before you create another one!")
         }
     }
 
     remove = (key) => {
         return Modal.confirm({
             title: 'Are you sure you want to delete this timetable?',
-            content: 'You will lose this timetable foreve if it is deleted',
+            content: 'You will lose this timetable forever if it is deleted',
             okText: 'Yes',
             cancelText: 'No',
             onOk: (e) => {
@@ -89,11 +97,17 @@ class TimeSlots extends React.Component {
     }
 
 
+
     render() {
+        const button = (<Tooltip title={"Click here to create a new timeslot!"} visible={this.state.initPopup} placement={"left"}>
+            <Button style={{fontSize: "11px"}} onClick={this.add} icon={"plus"}/>
+        </Tooltip>);
         let tabList = this.props.appointmentAllocationTime.concat(this.state.creating ? [emptyAAT()] : [])
          return (
-            <Tabs onChange={this.onChange}
+            <Tabs tabBarExtraContent={button}
+                onChange={this.onChange}
                   type="editable-card"
+                  hideAdd
                   activeKey={`${this.state.activeKey}`}
                   onEdit={this.onEdit}>
             {tabList.map((timeSlot, i) => {

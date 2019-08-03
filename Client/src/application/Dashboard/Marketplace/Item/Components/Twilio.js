@@ -91,14 +91,14 @@ export const TwilioFormItems = ({
 export const TwilioFeatures = ({}) =>
     <Typography style={{padding: '0 60px'}}>
         <Title>Introduction</Title>
-        <Paragraph>
-            Twilio users can very simply benefit from using their systems directly by logging in
-            through our software to connect their CRM to our platform.
-        </Paragraph>
-        <Paragraph>
-            Once you have the required information and have successfully logged in – you are all
-            done.
-        </Paragraph>
+        {/*<Paragraph>*/}
+            {/*Twilio users can very simply benefit from using their systems directly by logging in*/}
+            {/*through our software to connect their CRM to our platform.*/}
+        {/*</Paragraph>*/}
+        {/*<Paragraph>*/}
+            {/*Once you have the required information and have successfully logged in – you are all*/}
+            {/*done.*/}
+        {/*</Paragraph>*/}
         <Paragraph>
             What you’ll need:
             <ul>
@@ -107,30 +107,11 @@ export const TwilioFeatures = ({}) =>
                 <li>Specified Number</li>
             </ul>
         </Paragraph>
-        <Paragraph>
-            We can start using your data to connect to the chatbots and help you with the
-            automation of your tasks.
-        </Paragraph>
-        <Title level={2}>Guidelines and Resources</Title>
-        <Paragraph>
-            From the list below, choose your CRM or ATS for your account to be directly
-            connected.
-            If you need help with the setup or wish to contact us to arrange an integration with
-            your
-            provider,
-            please contact us at:
-            <Text code><a target={'_blank'}
-                          href={"mailto:info@thesearchbase.com"}>
-                info@thesearchbase.com
-            </a></Text>.
-        </Paragraph>
     </Typography>;
 
 export const TwilioHeader = () =>
     <Paragraph type="secondary">
-        Bond Twilio, specialist portfolio of recruitment software applications has earned a
-        reputation for increasing business growth and profitability throughout the global staffing
-        market. 100% configurable and fully scalable, Twilio manages the entire placement cycle and
-        is chosen by leading recruitment organisations including Hays,
-        Adecco and Michael Page.
+        Twilio two-way SMS and MMS messages allow you to carry on a conversation by both sending and receiving text and
+        multimedia messages. You can integrate all of your Chatbots to natively reach your Talent Pools, Clients and
+        candidates from within SearchBase.
     </Paragraph>;

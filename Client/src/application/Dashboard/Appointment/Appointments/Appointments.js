@@ -1,11 +1,15 @@
 import React from 'react';
 
-import {Table, Button} from 'antd'
+import {Table, Button, Spin, Icon} from 'antd'
 import {appointmentActions} from "store/actions";
 
-import Appointment from './Appointment'
+import LoadingSpinner from "components/LoadingSpinner/LoadingSpinner";
+
+import styles from './Appointments.module.less'
 
 import { connect } from 'react-redux'
+
+const antIcon = <Icon type="loading" style={{ fontSize: 24 }} spin />
 
 class Appointments extends React.Component {
 
@@ -19,6 +23,11 @@ class Appointments extends React.Component {
 
     reject = (id) => {
         this.props.dispatch(appointmentActions.setAppointmentStatusRequest(id, 'Rejected'))
+    }
+
+
+    refresh = () => {
+        this.props.dispatch(appointmentActions.fetchAppointments())
     }
 
 
@@ -37,30 +46,38 @@ class Appointments extends React.Component {
             title: 'Approve',
             dataIndex: 'approve',
             key: 'approve',
-            render: item => item.Status === "Pending" ?  <Button onClick={() => this.approve(item.ID)}>Approve</Button> : "Status has already been set"
+            render: item => item.isLoading ? <Spin indicator={antIcon} /> : item.Status === "Pending" ?  <Button onClick={() => this.approve(item.ID)}>Approve</Button> : "Status has already been set"
         },
         {
             title: 'Reject',
             dataIndex: 'reject',
             key: 'reject',
-            render: item => item.Status === "Pending" ?  <Button onClick={() => this.reject(item.ID)}>Reject</Button> : "Status has already been set"
+            render: item =>  item.isLoading ? <Spin indicator={antIcon} />  : item.Status === "Pending" ?  <Button onClick={() => this.reject(item.ID)}>Reject</Button> : "Status has already been set"
         },
     ]
     render() {
-        if(this.props.appointments.length === 0 ) { return null }
         const realList = this.props.appointments.map(item => ({ email : item.Conversation.keywordsByDataType.Email[0],
                                                                          status: item.Status,
                                                                          approve: item,
                                                                          reject: item}))
         return (<>
-                    <h1>Appointment list</h1>
-                    <Table dataSource={realList} columns={this.columns} />;
+                    <h1>Appointment list
+                        <div className={styles.refresh_button}>
+                            <Button type="primary" icon="sync" disabled={this.props.isLoading}
+                                                    onClick={this.refresh}>
+                                Refresh
+                            </Button>
+                        </div>
+                    </h1>
+                    {this.props.isLoading ? <LoadingSpinner /> :<Table dataSource={realList} columns={this.columns}/>}
                 </>)
     }
 }
 function mapStateToProps(state) {
+    console.log(state.appointment.isLoading)
     return {
         appointments: state.appointment.appointments,
+        isLoading: state.appointment.isLoading
     };
 }
 

@@ -13,7 +13,7 @@ export const appointment = (state = initialState, action) => {
             });
         case actionTypes.FETCH_APPOINTMENTS_SUCCESS:
             return updateObject(state, {
-                appointments: action.appointments,
+                appointments: action.appointments.map(a => ({...a, isLoading: false})),
                 isLoading: false
             });
         case actionTypes.FETCH_APPOINTMENTS_FAILURE:
@@ -23,13 +23,14 @@ export const appointment = (state = initialState, action) => {
                 errorMsg: action.error
             });
         case actionTypes.SET_APPOINTMENT_STATUS_REQUEST:
+            console.log(action)
             return updateObject(state, {
-                isLoading: true,
+                appointments: state.appointments.map(a => ({...a, isLoading: a.ID === action.appointmentID ? true : a.isLoading})),
             });
         case actionTypes.SET_APPOINTMENT_STATUS_SUCCESS:
             console.log(action  )
             return updateObject(state, {
-                appointments: state.appointments.map(a => ({...a, Status: a.ID === action.id ? action.status : a.Status})),
+                appointments: state.appointments.map(a => ({...a, ...(a.ID === action.id ? ({isLoading: false, Status: action.status}): ({}) )})),
                 isLoading: false
             });
         case actionTypes.SET_APPOINTMENT_STATUS_FAILURE:

@@ -13,6 +13,9 @@ const { TextArea } = Input;
 const { confirm } = Modal;
 
 class Appointment extends React.Component {
+    state = {
+        key: null
+    }
     render(){
         return (
             <NoHeaderPanel>
@@ -24,12 +27,12 @@ class Appointment extends React.Component {
                         Here you can find all data relating to your appointments
                     </Paragraph>
                 </div>
-                <Tabs>
+                <Tabs onChange={key => this.setState({key: key})}>
                 <Tabs.TabPane tab="Calendar" key="1">
                     <Calendar />
                 </Tabs.TabPane>
                 <Tabs.TabPane tab="Time Slots" key="2">
-                    <TimeSlots/>
+                    <TimeSlots openTab={this.state.key === "2" ? true : false}/>
                 </Tabs.TabPane>
                 <Tabs.TabPane tab="Appointments" key="3">
                     <Appointments/>

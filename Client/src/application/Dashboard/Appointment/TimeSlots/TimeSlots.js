@@ -5,6 +5,7 @@ import 'types/TimeSlots_Types'
 import 'types/AutoPilot_Types'
 import {appointmentAllocationTimeActions} from "store/actions";
 import TimeSlot from "./TimeSlot";
+import LoadingSpinner from "components/LoadingSpinner/LoadingSpinner";
 
 const { TabPane } = Tabs
 
@@ -25,34 +26,38 @@ const emptyAAT = (id) =>  ({
 
 
 class TimeSlots extends React.Component {
-
     state = {
         creating: false,
         activeKey: null,
-        initPopup: false,
+        initPopup: false
     }
 
     componentDidMount() {
+        this.timer = React.createRef()
         this.props.dispatch(appointmentAllocationTimeActions.fetchAAT());
-        // this.setState({initPopup: true})
         setTimeout(() =>{
             this.setState({initPopup: true})
         }, 1200)
-        setTimeout(() =>{
-            this.setState({initPopup: false})
+        this.timer.current = setTimeout(() =>{
+            this.clearPopup()
         }, 5500)
     }
+
+    clearPopup = () => {
+        this.setState({initPopup: false})
+    }
+
 
     saveTimeSlot = (id, newSettings) => {
         if(id === "new"){
             this.props.dispatch(appointmentAllocationTimeActions.createAAT(newSettings))
-
         } else {
             this.props.dispatch(appointmentAllocationTimeActions.saveAAT({...newSettings, id: id}))
         }
     }
 
     componentDidUpdate(prevProps){
+        console.log(this.props)
         if(this.state.creating && prevProps.appointmentAllocationTime.length < this.props.appointmentAllocationTime.length){
             this.setState({activeKey: this.props.appointmentAllocationTime[this.props.appointmentAllocationTime.length-1].ID, creating: false})
         }
@@ -61,6 +66,10 @@ class TimeSlots extends React.Component {
         }
         if(!this.props.isLoading && this.props.appointmentAllocationTime.length === 0 && !this.state.creating){
             this.setState({creating: true, activeKey: "new"})
+        }
+        if(this.props.openTab === false && this.state.initPopup){
+            clearTimeout(this.timer.current)
+            this.clearPopup()
         }
     }
 
@@ -98,28 +107,36 @@ class TimeSlots extends React.Component {
 
 
 
+
     render() {
-        const button = (<Tooltip title={"Click here to create a new timeslot!"} visible={this.state.initPopup} placement={"left"}>
-            <Button style={{fontSize: "11px"}} onClick={this.add} icon={"plus"}/>
-        </Tooltip>);
+
+        const button = (<>
+                <Tooltip title={"Click here to create a new timeslot!"} visible={this.state.initPopup} placement={"left"}>
+                    <Button style={{fontSize: "11px"}} onClick={this.add} icon={"plus"}/>
+                </Tooltip></>);
         let tabList = this.props.appointmentAllocationTime.concat(this.state.creating ? [emptyAAT()] : [])
          return (
-            <Tabs tabBarExtraContent={button}
-                onChange={this.onChange}
-                  type="editable-card"
-                  hideAdd
-                  activeKey={`${this.state.activeKey}`}
-                  onEdit={this.onEdit}>
-            {tabList.map((timeSlot, i) => {
-                return (<TabPane tab={timeSlot.Name} key={`${timeSlot.ID}`} closable={timeSlot.ID === "new" ? false :true}>
-                    <TimeSlot
-                        info={timeSlot.Info}
-                        id={timeSlot.ID}
-                        name={timeSlot.Name}
-                        save={newSettings => this.saveTimeSlot(timeSlot.ID, newSettings)}/>
-                </TabPane>)
-            })}
-            </Tabs>
+             <>
+                 {this.props.isLoading ? <LoadingSpinner/> :
+                     <Tabs tabBarExtraContent={button}
+                           onChange={this.onChange}
+                           type="editable-card"
+                           hideAdd
+                           activeKey={`${this.state.activeKey}`}
+                           onEdit={this.onEdit}>
+                         {tabList.map((timeSlot, i) => {
+                             return (<TabPane tab={timeSlot.Name} key={`${timeSlot.ID}`}
+                                              closable={timeSlot.ID === "new" ? false : true}>
+                                 <TimeSlot
+                                     info={timeSlot.Info}
+                                     id={timeSlot.ID}
+                                     name={timeSlot.Name}
+                                     save={newSettings => this.saveTimeSlot(timeSlot.ID, newSettings)}/>
+                             </TabPane>)
+                         })}
+                     </Tabs>
+                 }
+             </>
         )
 
     }

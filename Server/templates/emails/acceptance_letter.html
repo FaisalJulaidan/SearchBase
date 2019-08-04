@@ -9,7 +9,10 @@
 {% endblock %}
 
 {% block content_body %}
-    We are happy to announce that your application has been accepted based on your responses and we will get back to you very soon.
-    <br/><br/>
-    Regards,
+
+    {{ body|safe }}
+
+{#    We are happy to announce that your application has been accepted based on your responses and we will get back to you very soon.#}
+{#    <br/><br/>#}
+{#    Regards,#}
 {% endblock %}

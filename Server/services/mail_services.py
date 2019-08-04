@@ -64,13 +64,15 @@ def sendVerificationEmail(firstName, lastName, email, companyName, companyID) ->
         return Callback(False, 'Could not send a verification email to ' + email)
 
 
-def sendAcceptanceEmail(userName, email, logoPath, companyName):
+def sendAcceptanceEmail(title, body, userName, email, logoPath, companyName):
     try:
-
+        print(title)
+        print(body)
         callback: Callback = __sendEmail(
             email,
-            'Acceptance Letter',
+            title,
             '/emails/acceptance_letter.html',
+            body=body,
             companyName=companyName,
             logoPath=logoPath,
             userName=userName)

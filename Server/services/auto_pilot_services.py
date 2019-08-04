@@ -19,9 +19,9 @@ def processConversation(conversation: Conversation, autoPilot: AutoPilot):
 
         # Do automation only if the autoPilot is active
         if autoPilot.Active:
-
+            print("yes iam active")
             email = conversation.Email
-
+            print(email)
             def __processSendingEmails (email, status: Status, autoPilot: AutoPilot):
 
                 userName = conversation.Name # get candidate name
@@ -32,12 +32,12 @@ def processConversation(conversation: Conversation, autoPilot: AutoPilot):
                            + "/" + logoPath
 
                 companyName = autoPilot.Company.Name
-                print(autoPilot)
-                print(autoPilot.SendAcceptanceEmail)
-                print(autoPilot.SendCandidatesAppointments)
                 # ======================
                 # Send Acceptance Letters
+                print(status)
+                print(autoPilot.SendAcceptanceEmail)
                 if status is Status.Accepted and autoPilot.SendAcceptanceEmail:
+                    print("fllflflflf")
 
 
                     # NOTE: Send appointment email before acceptance email if automatic appoitment manger set to active
@@ -60,7 +60,8 @@ def processConversation(conversation: Conversation, autoPilot: AutoPilot):
 
                     # Process candidates Acceptance email
                     acceptance_callback: Callback = \
-                        mail_services.sendAcceptanceEmail(userName, email, logoPath, companyName)
+                        mail_services.sendAcceptanceEmail(autoPilot.AcceptanceEmailTitle, autoPilot.AcceptanceEmailBody,
+                                                          userName, email, logoPath, companyName)
 
                     if acceptance_callback.Success:
                         result['acceptanceEmailSentAt'] = datetime.now()

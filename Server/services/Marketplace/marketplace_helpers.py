@@ -30,7 +30,6 @@ def connect(type, auth, companyID):
 def testConnection(type, companyID):
     try:
 
-        print(0)
         # find the type and redirect to its service
         if CRM_Enum.has_value(type):
 
@@ -47,7 +46,6 @@ def testConnection(type, companyID):
                             })
 
         elif Calendar_Enum.has_value(type):
-            print(1)
             # Check if connection exist
             exist_callback: Callback = calendar_services.getCalendarByType(type, companyID)
             if not exist_callback.Success:
@@ -61,7 +59,6 @@ def testConnection(type, companyID):
                              })
 
         elif Messenger_Enum.has_value(type):
-            print(2)
             # Check if connection exist
             exist_callback: Callback = mesenger_services.getMessengerByType(type, companyID)
             if not exist_callback.Success:

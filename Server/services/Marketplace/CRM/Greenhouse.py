@@ -224,9 +224,8 @@ def getValue(variable, objectName):
         return None
 
 
-def searchJobs(auth, conversation) -> Callback:
+def searchJobs(auth) -> Callback:
     try:
-        keywords = conversation['keywordsByDataType']  # maybe filter by office location name for location
 
         body = {
             "per_page": 500,

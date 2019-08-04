@@ -8,12 +8,18 @@ class AutoPilot(db.Model):
     AcceptApplications = db.Column(db.Boolean, nullable=False, default=False)
     AcceptanceScore = db.Column(db.Float(), nullable=False, default=1)
     SendAcceptanceEmail = db.Column(db.Boolean, nullable=False, default=False)
+    AcceptanceEmailTitle = db.Column(db.String(128), nullable=True)
+    AcceptanceEmailBody = db.Column(db.Text, nullable=True)
     SendAcceptanceSMS = db.Column(db.Boolean, nullable=False, default=False)
+    AcceptanceSMSBody = db.Column(db.Text, nullable=True)
 
     RejectApplications = db.Column(db.Boolean, nullable=False, default=False)
     RejectionScore = db.Column(db.Float(), nullable=False, default=0.05)
     SendRejectionEmail = db.Column(db.Boolean, nullable=False, default=False)
+    RejectionEmailTitle = db.Column(db.String(128), nullable=True)
+    RejectionEmailBody = db.Column(db.Text, nullable=True)
     SendRejectionSMS = db.Column(db.Boolean, nullable=False, default=False)
+    RejectionSMSBody = db.Column(db.Text, nullable=True)
 
     SendCandidatesAppointments = db.Column(db.Boolean, nullable=False, default=False)
 

@@ -177,43 +177,38 @@ def update(id, name, desc, companyID: int) -> Callback:
         return Callback(False, "Couldn't update the AutoPilot.")
 
 
-def updateConfigs(id, name, desc, active, acceptApplications, acceptanceScore, sendAcceptanceEmail,
-                  sendAcceptanceSMS, rejectApplications, rejectionScore, sendRejectionEmail, sendRejectionSMS,
-                  SendCandidatesAppointments, openTimes, companyID: int) -> Callback:
+def updateConfigs(id, name, desc, active, acceptApplications, acceptanceScore, sendAcceptanceEmail, acceptanceEmailTitle,
+                  acceptanceEmailBody, sendAcceptanceSMS, acceptanceSMSBody, rejectApplications, rejectionScore,
+                  sendRejectionEmail, rejectionEmailTitle, rejectionEmailBody, sendRejectionSMS, rejectionSMSBody,
+                  sendCandidatesAppointments, companyID: int) -> Callback:
     try:
-
-        # Check all OpenTimes are given
-        if len(openTimes) != 7: raise Exception("Number of open time slots should be 7")
-
         # Get AutoPilot
         autoPilot_callback: Callback = getByID(id, companyID)
         if not autoPilot_callback.Success: return autoPilot_callback
         autoPilot = autoPilot_callback.Data
-        autoPilot_temp = autoPilot_callback.Data
 
         # Update the autoPilot
         autoPilot.Name = name
         autoPilot.Description = desc
         autoPilot.Active = active
+
         autoPilot.AcceptApplications = acceptApplications
         autoPilot.AcceptanceScore = acceptanceScore
         autoPilot.SendAcceptanceEmail = sendAcceptanceEmail
+        autoPilot.AcceptanceEmailTitle = acceptanceEmailTitle
+        autoPilot.AcceptanceEmailBody = acceptanceEmailBody
         autoPilot.SendAcceptanceSMS = sendAcceptanceSMS
+        autoPilot.AcceptanceSMSBody = acceptanceSMSBody
 
         autoPilot.RejectApplications = rejectApplications
         autoPilot.RejectionScore = rejectionScore
         autoPilot.SendRejectionEmail = sendRejectionEmail
+        autoPilot.RejectionEmailTitle = rejectionEmailTitle
+        autoPilot.RejectionEmailBody = rejectionEmailBody
         autoPilot.SendRejectionSMS = sendRejectionSMS
+        autoPilot.RejectionSMSBody = rejectionSMSBody
 
-        autoPilot.SendCandidatesAppointments = SendCandidatesAppointments
-
-        # Update the openTimes
-        for (oldSlot, newSlot) in zip(autoPilot_temp.OpenTimes, openTimes):
-            if oldSlot.Day == newSlot['day']:
-                oldSlot.Active = newSlot['active']
-                oldSlot.From = time(newSlot['from'][0], newSlot['from'][1])
-                oldSlot.To = time(newSlot['to'][0], newSlot['to'][1])
-                oldSlot.Duration = newSlot['duration']
+        autoPilot.SendCandidatesAppointments = sendCandidatesAppointments
 
         # Save all changes
         db.session.commit()

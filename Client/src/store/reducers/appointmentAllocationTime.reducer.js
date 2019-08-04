@@ -14,7 +14,7 @@ export const appointmentAllocationTime = (state = initialState, action) => {
         case actionTypes.FETCH_AAT_SUCCESS:
             console.log(action)
             return updateObject(state, {
-                allocationTimes: action.allocationTimes,
+                allocationTimes: action.allocationTimes.map(aat => ({...aat, isLoading: false})),
                 isLoading: false
             });
         case actionTypes.FETCH_AAT_FAILURE:
@@ -25,12 +25,14 @@ export const appointmentAllocationTime = (state = initialState, action) => {
             });
         case actionTypes.SAVE_AAT_REQUEST:
             return updateObject(state, {
-                isLoading: true,
-                newSettings: action.newSettings
+                // isLoading: true,
+                allocationTimes: state.allocationTimes.map(aat => aat.ID === action.newSettings.ID ? ({...aat, isLoading: true}) : aat)
             });
         case actionTypes.SAVE_AAT_SUCCESS:
+            console.log(action)
             return updateObject(state, {
                 isLoading: false,
+                allocationTimes: state.allocationTimes.map(aat => aat.ID === action.newSettings.ID ? ({...action.newSettings, isLoading: false}) : aat),
                 aat: null
             });
         case actionTypes.SAVE_AAT_FAILURE:

@@ -20,7 +20,7 @@ function* saveAppointmentAllocationTime({newSettings}) {
     try {
         const res = yield http.post(`/allocation_times/save`, newSettings,
             {headers: {'Content-Type': 'application/json'}});
-        yield put(appointmentAllocationTimeActions.saveAATSuccess(res.data.data));
+        yield put(appointmentAllocationTimeActions.saveAATSuccess(newSettings));
         successMessage("Successfully saved Appointment Allocation Timetable")
     } catch (error) {
         const msg = error.response?.data?.msg || 'Couldn\'t save Appointment Allocation Timetable';

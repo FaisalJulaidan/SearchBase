@@ -1,11 +1,13 @@
 import React from 'react'
 import {connect} from 'react-redux'
-import { Modal, Tooltip, Button, message, Tabs} from 'antd'
+import { Modal, Tooltip, Button, message, Tabs, Icon, Spin} from 'antd'
 import 'types/TimeSlots_Types'
 import 'types/AutoPilot_Types'
 import {appointmentAllocationTimeActions} from "store/actions";
 import TimeSlot from "./TimeSlot";
 import LoadingSpinner from "components/LoadingSpinner/LoadingSpinner";
+
+import styles from './Timeslots.module.less'
 
 const { TabPane } = Tabs
 
@@ -24,13 +26,26 @@ const emptyAAT = (id) =>  ({
     Info: new Array(7).fill(0).map((index, i) => dupeData(i))
 });
 
+const antIcon = <Icon className={styles.spinner} type="loading" style={{ fontSize: 18 }} spin />
+
 
 class TimeSlots extends React.Component {
-    state = {
-        creating: false,
-        activeKey: null,
-        initPopup: false
+
+    constructor(props){
+        super(props)
+        this.state = {
+            creating: false,
+            activeKey: null,
+            initPopup: false
+        }
+        this.checkNameAllowed = this.checkNameAllowed.bind(this)
     }
+
+
+    checkNameAllowed(name, selfName) {
+        return this.props.appointmentAllocationTime.filter(aat => aat.Name === name).length === 0 || name === selfName
+    }
+
 
     componentDidMount() {
         this.timer = React.createRef()
@@ -52,7 +67,7 @@ class TimeSlots extends React.Component {
         if(id === "new"){
             this.props.dispatch(appointmentAllocationTimeActions.createAAT(newSettings))
         } else {
-            this.props.dispatch(appointmentAllocationTimeActions.saveAAT({...newSettings, id: id}))
+            this.props.dispatch(appointmentAllocationTimeActions.saveAAT({...newSettings, ID: id}))
         }
     }
 
@@ -112,10 +127,13 @@ class TimeSlots extends React.Component {
 
     render() {
 
+        const tab = (name, loading) => (<>{name} {loading ? <Spin indicator={antIcon}/> : null}</>)
+
         const button = (<>
                 <Tooltip title={"Click here to create a new timeslot!"} visible={this.state.initPopup} placement={"left"}>
                     <Button style={{fontSize: "11px"}} onClick={this.add} icon={"plus"}/>
                 </Tooltip></>);
+        console.log(this.props.appointmentAllocationTime)
         let tabList = this.props.appointmentAllocationTime.concat(this.state.creating ? [emptyAAT()] : [])
          return (
              <>
@@ -127,12 +145,13 @@ class TimeSlots extends React.Component {
                            activeKey={`${this.state.activeKey}`}
                            onEdit={this.onEdit}>
                          {tabList.map((timeSlot, i) => {
-                             return (<TabPane tab={timeSlot.Name} key={`${timeSlot.ID}`}
+                             return (<TabPane tab={tab(timeSlot.Name, timeSlot.isLoading)} key={`${timeSlot.ID}`}
                                               closable={timeSlot.ID === "new" ? false : true}>
                                  <TimeSlot
                                      info={timeSlot.Info}
                                      id={timeSlot.ID}
                                      name={timeSlot.Name}
+                                     checkNameAllowed={this.checkNameAllowed}
                                      save={newSettings => this.saveTimeSlot(timeSlot.ID, newSettings)}/>
                              </TabPane>)
                          })}

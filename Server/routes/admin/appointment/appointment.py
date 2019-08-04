@@ -121,7 +121,7 @@ def save_allocation_time():
     companyID = get_jwt_identity()['user']['companyID']
     data = request.get_json()
     #e(companyID, name, times, duration)
-    save_callback : Callback = appointment_services.saveAppointmentAllocationTime(companyID, data['id'], data['name'], data['weekDays'], data['duration'])
+    save_callback : Callback = appointment_services.saveAppointmentAllocationTime(companyID, data['ID'], data['Name'], data['Info'], data['Duration'])
 
 
     if not save_callback.Success:

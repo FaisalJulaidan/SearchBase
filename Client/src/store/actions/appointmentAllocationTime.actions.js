@@ -23,10 +23,9 @@ const saveAAT = (newSettings) => ({
     newSettings
 });
 
-const saveAATSuccess = (customID, id) => ({
+const saveAATSuccess = (newSettings) => ({
     type: actionTypes.SAVE_AAT_SUCCESS,
-    customID,
-    id
+    newSettings
 });
 
 const saveAATFailure = (error) => ({

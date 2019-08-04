@@ -2,7 +2,7 @@ import React from 'react'
 import styles from "../../AutoPilots/AutoPilot/AutoPilot.module.less";
 import moment from "moment";
 import {connect} from 'react-redux'
-import {Badge, Checkbox, Col, Form, List, Radio, Tag, Input,TimePicker, Dropdown, Menu, Icon, message, Button, Tabs} from 'antd'
+import {Badge, Checkbox, Col, Form, List, Radio, Tag, Input,TimePicker, message, Button} from 'antd'
 import 'types/TimeSlots_Types'
 import 'types/AutoPilot_Types'
 import {appointmentAllocationTimeActions} from "store/actions";
@@ -20,14 +20,15 @@ class TimeSlot extends React.Component {
             saved: false,
             Name: props.name,
             ID: props.id,
-            Info: props.info
+            Info: props.info,
+            nameError: null
         }
 
     }
 
     infoKVChange = (day, key, value) => {
         let aat = this.state.Info.slice()
-        if(day === null) {
+        if (day === null) {
             aat = aat.map(day => ({...day, [key]: value}))
         } else {
             aat.find(wd => wd.Day === day)[key] = value
@@ -36,14 +37,24 @@ class TimeSlot extends React.Component {
     }
 
     mainKVChange = (key, value) => {
-        this.setState({[key]: value})
+        let nameError = null
+        if(key === "Name"){
+            if(!this.props.checkNameAllowed(value, this.props.name)){
+                nameError = "Name is already taken! Please chose something else!"
+            }
+        }
+        this.setState({[key]: value, nameError})
     }
 
     saveSettings = () => {
+        if(this.state.nameError){
+            message.error("Your inputs have errors, please check them and try again!");
+            return;
+        }
         let savedSettings = {
-            name: this.state.Name,
-            duration: this.state.Info[0].Duration,
-            weekDays: this.state.Info.map(fullDay => ({...fullDay, day: fullDay.Day , from: fullDay.From, to: fullDay.To}))
+            Name: this.state.Name,
+            Duration: this.state.Info[0].Duration,
+            Info: this.state.Info.map(fullDay => ({...fullDay, day: fullDay.Day , from: fullDay.From, to: fullDay.To}))
         }
         this.props.save(savedSettings)
     }
@@ -82,6 +93,8 @@ class TimeSlot extends React.Component {
             <Form>
                 <FormItem
                     label="Appoitment Allocation Table Name"
+                    validateStatus={this.state.nameError ? "error" : ""}
+                    help={this.state.nameError}
                     extra="Set a unique name for your timetable">
                     <Input value={this.state.Name} placeholder="Enter the name for your Appoitment Allocation Table"
                            onChange={e => this.mainKVChange('Name', e.target.value)}/>

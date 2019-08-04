@@ -50,7 +50,7 @@ sagaMiddleware.run(autoPilotSaga);
 sagaMiddleware.run(analyticsSaga);
 sagaMiddleware.run(appointmentsPickerSaga);
 sagaMiddleware.run(appointmentSaga);
-sagaMiddleware.run(appointmentAllocationTimeSaga)
+sagaMiddleware.run(appointmentAllocationTimeSaga);
 
 
 export { store, persistor }

@@ -24,7 +24,7 @@ def processConversation(conversation: Conversation, autoPilot: AutoPilot):
             print(email)
             def __processSendingEmails (email, status: Status, autoPilot: AutoPilot):
 
-                userName = conversation.Name # get candidate name
+                userName = conversation.Name or 'Anonymous'
                 logoPath = autoPilot.Company.LogoPath
                 if logoPath:
                     logoPath = sfs.PUBLIC_URL\
@@ -34,13 +34,22 @@ def processConversation(conversation: Conversation, autoPilot: AutoPilot):
                 companyName = autoPilot.Company.Name
                 # ======================
                 # Send Acceptance Letters
-                print(status)
-                print(autoPilot.SendAcceptanceEmail)
                 if status is Status.Accepted and autoPilot.SendAcceptanceEmail:
-                    print("fllflflflf")
 
+                    # Process candidates Acceptance email
+                    emailTitle = autoPilot.AcceptanceEmailTitle \
+                        .replace("${candidateName}$", userName) \
+                        .replace("${candidateEmail}$", email)
+                    emailBody = autoPilot.AcceptanceEmailBody \
+                        .replace("${candidateName}$", userName) \
+                        .replace("${candidateEmail}$", email)
 
-                    # NOTE: Send appointment email before acceptance email if automatic appoitment manger set to active
+                    acceptance_callback: Callback = \
+                        mail_services.sendAcceptanceEmail(emailTitle, emailBody, userName, email, logoPath, companyName)
+
+                    if acceptance_callback.Success:
+                        result['acceptanceEmailSentAt'] = datetime.now()
+
                     # Process candidates Appointment email only if score is accepted
                     if autoPilot.SendCandidatesAppointments:
 
@@ -58,21 +67,19 @@ def processConversation(conversation: Conversation, autoPilot: AutoPilot):
                             result['appointmentEmailSentAt'] = datetime.now()
 
 
-                    # Process candidates Acceptance email
-                    acceptance_callback: Callback = \
-                        mail_services.sendAcceptanceEmail(autoPilot.AcceptanceEmailTitle, autoPilot.AcceptanceEmailBody,
-                                                          userName, email, logoPath, companyName)
-
-                    if acceptance_callback.Success:
-                        result['acceptanceEmailSentAt'] = datetime.now()
-
-
                 # ======================
                 # Send Rejection Letters
                 elif status is Status.Rejected and autoPilot.SendRejectionEmail:
 
+                    emailTitle = autoPilot.AcceptanceEmailTitle \
+                        .replace("${candidateName}$", userName) \
+                        .replace("${candidateEmail}$", email)
+                    emailBody = autoPilot.AcceptanceEmailBody \
+                        .replace("${candidateName}$", userName) \
+                        .replace("${candidateEmail}$", email)
+
                     rejection_callback: Callback = \
-                        mail_services.sendRejectionEmail(userName, email, logoPath, companyName)
+                        mail_services.sendRejectionEmail(emailTitle, emailBody, userName, email, logoPath, companyName)
 
                     if rejection_callback.Success:
                         result['rejectionEmailSentAt'] = datetime.now()

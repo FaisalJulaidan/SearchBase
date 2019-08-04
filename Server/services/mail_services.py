@@ -70,9 +70,8 @@ def sendAcceptanceEmail(title, body, userName, email, logoPath, companyName):
         print(body)
         callback: Callback = __sendEmail(
             email,
-            title,
+            title or 'Acceptance Letter',
             '/emails/acceptance_letter.html',
-            body=body,
             companyName=companyName,
             logoPath=logoPath,
             userName=userName)
@@ -87,13 +86,14 @@ def sendAcceptanceEmail(title, body, userName, email, logoPath, companyName):
         return Callback(False, 'Could not send a acceptance email to ' + email)
 
 
-def sendRejectionEmail(userName, email, logoPath, companyName):
+def sendRejectionEmail(title, body, userName, email, logoPath, companyName):
     try:
 
         callback: Callback = __sendEmail(
             email,
-            'Rejection Letter',
+            title or 'Rejection Letter',
             '/emails/rejection_letter.html',
+            body=body,
             companyName=companyName,
             logoPath=logoPath,
             userName=userName)

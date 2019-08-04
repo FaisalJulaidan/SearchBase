@@ -24,11 +24,13 @@ const Account = lazy(() => import('./ControlPanel/Account/Account'));
 const Billing = lazy(() => import('./ControlPanel/Billing/Billing'));
 const UsersManagement = lazy(() => import('./ControlPanel/UsersManagement/UsersManagement'));
 const Documentation = lazy(() => import('./Documentation/Documentation'));
-const CalendarPage = lazy(() => import('./Appointment/Appointment'));
 const AutoPilots = lazy(() => import('./AutoPilots/AutoPilots'));
 const AutoPilot = lazy(() => import('./AutoPilots/AutoPilot/AutoPilot'));
 const Marketplace = lazy(() => import('./Marketplace/Marketplace'));
 const Item = lazy(() => import('./Marketplace/Item/Item'));
+// const AppointmentRoutes = lazy(() => import('./Appointment/AppointmentRoutes'));
+
+const Appointment = lazy(() => import('./Appointment/Appointment'));
 
 
 const {SubMenu} = Menu;
@@ -69,8 +71,8 @@ class Dashboard extends Component {
     };
 
     render() {
-
         const {match, location} = this.props;
+        console.log(match)
         const user = getUser();
         let userInfo = null;
         // User Information at the top
@@ -112,7 +114,7 @@ class Dashboard extends Component {
         const newLayoutRoutes = [
             "/dashboard/assistants",
             "/dashboard/marketplace",
-            "/dashboard/calendar",
+            "/dashboard/appointments",
             "/dashboard/auto_pilot",
             "/dashboard/databases",
             "/dashboard/account",
@@ -184,7 +186,7 @@ class Dashboard extends Component {
                             <span>Database</span>
                         </Menu.Item>
 
-                        <Menu.Item disabled={false} key="calendar">
+                        <Menu.Item disabled={false} key="appointments">
                             <Icon type="calendar"/>
                             <span>Appointments</span>
                         </Menu.Item>
@@ -270,9 +272,8 @@ class Dashboard extends Component {
                                             <Route path={`${match.path}/users_management`} component={UsersManagement}
                                                    exact/>
                                             <Route path={`${match.path}/documentation`} component={Documentation}
-                                                   exact/>
-                                            <Route path={`${match.path}/calendar`} component={CalendarPage} exact/>
-
+                                                   exact/>}
+                                            <Route path={`${match.path}/appointments`} component={Appointment} exact/>
                                             <Route path="/dashboard" component={Home}/>
                                         </Switch>
                                     </Suspense>

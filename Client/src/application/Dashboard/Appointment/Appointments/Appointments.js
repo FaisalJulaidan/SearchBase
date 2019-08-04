@@ -56,7 +56,8 @@ class Appointments extends React.Component {
         },
     ]
     render() {
-        const realList = this.props.appointments.map(item => ({ email : item.Conversation.keywordsByDataType.Email[0],
+        const realList = this.props.appointments.map(item => ({ key: item.ID,
+                                                                         email : item.Conversation.keywordsByDataType.Email[0],
                                                                          status: item.Status,
                                                                          approve: item,
                                                                          reject: item}))
@@ -74,7 +75,6 @@ class Appointments extends React.Component {
     }
 }
 function mapStateToProps(state) {
-    console.log(state.appointment.isLoading)
     return {
         appointments: state.appointment.appointments,
         isLoading: state.appointment.isLoading

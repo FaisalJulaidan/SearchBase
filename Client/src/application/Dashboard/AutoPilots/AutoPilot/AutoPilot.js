@@ -61,7 +61,6 @@ class AutoPilot extends React.Component {
             title: `Delete auto pilot confirmation`,
             content: `If you click OK, this auto pilot will be deleted and disconnected from all assistants that are connected to it`,
             onOk: () => {
-                console.log(this.props);
                 this.props.dispatch(autoPilotActions.deleteAutoPilot(this.props.autoPilot.ID))
                     .then(() => history.push('/dashboard/auto_pilots'));
             }
@@ -103,10 +102,9 @@ class AutoPilot extends React.Component {
             labelCol: {span: 4},
             wrapperCol: {span: 18},
         };
-        console.log(this.props)
         const allocTime =  this.props.autoPilot?.AppointmentAllocationTimeID
-        console.log(this.props)
         const {getFieldDecorator} = this.props.form;
+        console.log(autoPilot)
         return (
             <>
                 <NoHeaderPanel>
@@ -132,7 +130,7 @@ class AutoPilot extends React.Component {
                     </div>
 
                     <div className={styles.Body}>
-                        {!autoPilot || this.props.appointmentAllocationTime.length === 0 ? <Spin/> :
+                        {!autoPilot || this.props.aatLoading ? <Spin/> :
                             <Form layout='vertical' wrapperCol = {{span: 10}} style={{width: '100%'}}>
                                 <FormItem
                                     label="Name"
@@ -247,24 +245,6 @@ class AutoPilot extends React.Component {
                                 </FormItem>
                                 <br />
                                 <Divider/>
-                                <h2> Appointment Allocation Times</h2>
-                                <Form.Item label="Choose a timetable from the list to allocate when you would like to have your appointments"
-                                    help="Select from the dropdown list">
-                                    {getFieldDecorator('AppointmentAllocationTimes', {
-                                        initialValue: allocTime ? allocTime : this.props.appointmentAllocationTime[0].ID,
-                                        rules: [],
-                                    })(
-                                        <Select>
-                                            {this.props.appointmentAllocationTime.map(time => {
-                                                console.log(time)
-                                                return (<Select.Option value={time.ID}>{time.Name}</Select.Option>)
-                                            })}
-                                        </Select>
-                                    )}
-
-                                </Form.Item>
-                                <br />
-                                <Divider/>
                                 <h2> Manage Appointments Automation (coming soon)</h2>
                                 <FormItem label="Auto manage candidates appointments"
                                           help="Accepted candidates will receive an email (if provided) to pick
@@ -283,6 +263,21 @@ class AutoPilot extends React.Component {
                                         </div>
                                     )}
                                 </FormItem>
+                                <Form.Item label="Choose a timetable from the list to allocate when you would like to have your appointments"
+                                           help="Select from the dropdown list">
+                                    {getFieldDecorator('AppointmentAllocationTimes', {
+                                        initialValue: allocTime ? allocTime : this.props.appointmentAllocationTime[0] ?
+                                            this.props.appointmentAllocationTime[0].ID : "You have no timetables, please create one!",
+                                        rules: [],
+                                    })(
+                                        <Select disabled={this.props.appointmentAllocationTime.length === 0}>
+                                            {this.props.appointmentAllocationTime.map(time => {
+                                                return (<Select.Option value={time.ID}>{time.Name}</Select.Option>)
+                                            })}
+                                        </Select>
+                                    )}
+
+                                </Form.Item>
 
                                 {/*<TimeSlots ref={this.TimeSlotsRef}*/}
                                 {/*           getFieldDecorator={getFieldDecorator}*/}
@@ -320,11 +315,13 @@ class AutoPilot extends React.Component {
 }
 
 function mapStateToProps(state) {
+    console.log(state.appointmentAllocationTime)
     return {
         autoPilot: state.autoPilot.autoPilot,
         autoPilotsList: state.autoPilot.autoPilotsList,
         isLoading: state.autoPilot.isLoading,
-        appointmentAllocationTime: state.appointmentAllocationTime.allocationTimes
+        appointmentAllocationTime: state.appointmentAllocationTime.allocationTimes,
+        aatLoading: state.appointmentAllocationTime.isLoading
     };
 }
 

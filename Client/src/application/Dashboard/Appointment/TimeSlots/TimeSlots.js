@@ -57,7 +57,6 @@ class TimeSlots extends React.Component {
     }
 
     componentDidUpdate(prevProps){
-        console.log(this.props)
         if(this.state.creating && prevProps.appointmentAllocationTime.length < this.props.appointmentAllocationTime.length){
             this.setState({activeKey: this.props.appointmentAllocationTime[this.props.appointmentAllocationTime.length-1].ID, creating: false})
         }
@@ -73,6 +72,9 @@ class TimeSlots extends React.Component {
         }
     }
 
+    componentWillUnmount() {
+        clearTimeout(this.timer.current)
+    }
 
     onChange = (key, action) => {
         this.setState({activeKey: key})

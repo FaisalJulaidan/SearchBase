@@ -23,12 +23,10 @@ export const appointment = (state = initialState, action) => {
                 errorMsg: action.error
             });
         case actionTypes.SET_APPOINTMENT_STATUS_REQUEST:
-            console.log(action)
             return updateObject(state, {
                 appointments: state.appointments.map(a => ({...a, isLoading: a.ID === action.appointmentID ? true : a.isLoading})),
             });
         case actionTypes.SET_APPOINTMENT_STATUS_SUCCESS:
-            console.log(action  )
             return updateObject(state, {
                 appointments: state.appointments.map(a => ({...a, ...(a.ID === action.id ? ({isLoading: false, Status: action.status}): ({}) )})),
                 isLoading: false

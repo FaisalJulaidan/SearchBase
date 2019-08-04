@@ -134,7 +134,7 @@ def create_allocation_time():
     companyID = get_jwt_identity()['user']['companyID']
     data = request.get_json()
     #e(companyID, name, times, duration)
-    save_callback : Callback = appointment_services.createAppointmentAllocationTime(companyID, data['name'], data['weekDays'], data['duration'])
+    save_callback : Callback = appointment_services.createAppointmentAllocationTime(companyID, data['Name'], data['Info'], data['Duration'])
 
     if not save_callback.Success:
         return helpers.jsonResponse(False, 400, "Sorry, we couldn't save your timetable changes")

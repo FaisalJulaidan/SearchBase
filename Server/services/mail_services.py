@@ -63,6 +63,7 @@ def sendVerificationEmail(firstName, lastName, email, companyName, companyID) ->
         helpers.logError("mail_service.sendVerificationEmail(): " + str(exc))
         return Callback(False, 'Could not send a verification email to ' + email)
 
+
 def sendAcceptanceEmail(userName, email, logoPath, companyName):
     try:
 

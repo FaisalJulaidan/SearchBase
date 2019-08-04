@@ -35,6 +35,15 @@ class Calendar(Enum):
 
 
 @unique
+class Messenger(Enum):
+    Twilio = 'Twilio'
+
+    @classmethod
+    def has_value(cls, value):
+        return any(value == item.value for item in cls)
+
+
+@unique
 class Status(Enum):
     Pending = 'Pending'
     Accepted = 'Accepted'

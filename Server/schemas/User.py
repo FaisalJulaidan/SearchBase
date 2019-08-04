@@ -17,7 +17,7 @@ class User(db.Model):
     ))
 
     Verified = db.Column(db.Boolean(), nullable=False, default=False)
-    ChatbotNotifications = db.Column(db.Boolean, nullable=False, default=False)
+    ChatbotNotifications = db.Column(db.Boolean, nullable=False, default=True)
     LastAccess = db.Column(db.DateTime(), nullable=True)
     CreatedOn = db.Column(db.DateTime(), nullable=False, default=datetime.now)
 

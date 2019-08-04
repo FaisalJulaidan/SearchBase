@@ -1,6 +1,7 @@
 import requests
 
-from utilities.enums import Calendar as Calendar_Enum, CRM as CRM_Enum
+from services.Marketplace.Messenger import mesenger_services
+from utilities.enums import Calendar as Calendar_Enum, CRM as CRM_Enum, Messenger as Messenger_Enum
 from models import Callback
 from services.Marketplace.CRM import crm_services
 from services.Marketplace.Calendar import calendar_services
@@ -15,6 +16,8 @@ def connect(type, auth, companyID):
             return crm_services.connect(type, auth, companyID)
         elif Calendar_Enum.has_value(type):
             return calendar_services.connect(type, auth, companyID)
+        elif Messenger_Enum.has_value(type):
+            return mesenger_services.connect(type, auth, companyID)
         else:
             return Callback(False, "The Marketplace object did not match any on the system")
 
@@ -27,6 +30,7 @@ def connect(type, auth, companyID):
 def testConnection(type, companyID):
     try:
 
+        print(0)
         # find the type and redirect to its service
         if CRM_Enum.has_value(type):
 
@@ -43,7 +47,7 @@ def testConnection(type, companyID):
                             })
 
         elif Calendar_Enum.has_value(type):
-
+            print(1)
             # Check if connection exist
             exist_callback: Callback = calendar_services.getCalendarByType(type, companyID)
             if not exist_callback.Success:
@@ -53,6 +57,20 @@ def testConnection(type, companyID):
             return Callback(True, "",
                             {"Status":
                                  "CONNECTED" if calendar_services
+                                 .testConnection(type, exist_callback.Data.Auth, companyID).Success else "FAILED"
+                             })
+
+        elif Messenger_Enum.has_value(type):
+            print(2)
+            # Check if connection exist
+            exist_callback: Callback = mesenger_services.getMessengerByType(type, companyID)
+            if not exist_callback.Success:
+                return Callback(True, "", {"Status": "NOT_CONNECTED"})
+
+            # If yes test connection
+            return Callback(True, "",
+                            {"Status":
+                                 "CONNECTED" if mesenger_services
                                  .testConnection(type, exist_callback.Data.Auth, companyID).Success else "FAILED"
                              })
 
@@ -75,6 +93,8 @@ def disconnect(type, companyID):
             return crm_services.disconnectByType(type, companyID)
         elif Calendar_Enum.has_value(type):
             return calendar_services.disconnectByType(type, companyID)
+        elif Messenger_Enum.has_value(type):
+            return mesenger_services.disconnectByType(type, companyID)
         else:
             return Callback(False, "The Marketplace object did not match any on the system")
 

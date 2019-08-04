@@ -61,7 +61,7 @@
       "desc": "Twilio two-way SMS and MMS messages allow you to carry on a conversation by both sending and receiving text and multimedia messages. You can integrate all of your Chatbots to natively reach your Talent Pools, Clients and candidates from within SearchBase",
       "image": "/static/images/CRM/twilio.svg",
       "type": "Twilio",
-      "disabled": true,
+      "disabled": false,
       "status": "NOT_CONNECTED"
     },
     {

@@ -25,7 +25,6 @@ function* fetchAssistant({assistantID, meta}) {
     }
 }
 
-
 function* addAssistant({type, newAssistant}) {
     try {
         loadingMessage('Building assistant...', 0);
@@ -63,16 +62,16 @@ function* updateAssistantConfigs({assistantID, updatedSettings}) {
     }
 }
 
-function* deleteAssistant({assistantID}) {
+function* deleteAssistant({assistantID, meta}) {
     try {
         loadingMessage('Removing assistant...', 0);
         const res = yield http.delete(`/assistant/${assistantID}`);
-        yield put(assistantActions.deleteAssistantSuccess(assistantID, res.data?.msg));
+        yield put({...assistantActions.deleteAssistantSuccess(assistantID, res.data?.msg), meta});
         successMessage('Assistant deleted');
     } catch (error) {
         const msg = error.response?.data?.msg || "Couldn't delete assistant";
         errorMessage(msg);
-        yield put(assistantActions.deleteAssistantFailure(msg));
+        yield put({...assistantActions.deleteAssistantFailure(msg), meta});
     }
 }
 

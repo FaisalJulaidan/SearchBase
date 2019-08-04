@@ -2,16 +2,29 @@ import React from 'react';
 import { connect } from 'react-redux';
 import styles from './AutoPilot.module.less';
 import NoHeaderPanel from 'components/NoHeaderPanel/NoHeaderPanel';
-import { Button, Form, Input, InputNumber, Switch, Typography, Divider, Spin, Modal, Breadcrumb } from 'antd';
+import { Breadcrumb, Button, Divider, Form, Input, InputNumber, Modal, Spin, Switch, Typography } from 'antd';
 import 'types/TimeSlots_Types';
 import { history } from 'helpers';
 import TimeSlots from './TimeSlots/TimeSlots';
 import { autoPilotActions, assistantActions } from 'store/actions';
+import CKEditor from '@ckeditor/ckeditor5-react';
+import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
 
+const ButtonGroup = Button.Group;
 const FormItem = Form.Item;
 const confirm = Modal.confirm;
 
 const { Title, Paragraph } = Typography;
+const toolbar = [
+    'heading',
+    'bold',
+    'italic',
+    'link',
+    'bulletedList',
+    'numberedList',
+    'undo',
+    'redo',
+];
 
 class AutoPilot extends React.Component {
 
@@ -29,7 +42,10 @@ class AutoPilot extends React.Component {
         sendRejectionSMS: false,
         sendCandidatesAppointments: false,
         acceptanceScore: null,
-        rejectionScore: null
+        acceptanceEmailBody: "<p>Congrats you got accepted</p>",
+
+        rejectionScore: null,
+        rejectionEmailBody: "<p>Sorry you are not accepted.</p>"
     };
 
     componentDidMount() {
@@ -99,11 +115,15 @@ class AutoPilot extends React.Component {
                 sendAcceptanceSMS: state.sendAcceptanceSMS,
                 sendRejectionSMS: state.sendRejectionSMS,
                 acceptanceScore: state.acceptanceScore / 100,
+                acceptanceEmailBody: state.acceptanceEmailBody,
                 rejectionScore: state.rejectionScore / 100,
+                rejectionEmailBody: state.rejectionEmailBody,
                 sendCandidatesAppointments: state.sendCandidatesAppointments,
 
                 openTimes: weekDays
             };
+
+            console.log(payload)
 
             this.props.dispatch(autoPilotActions.updateAutoPilotConfigs(autoPilot.ID, payload));
         }
@@ -241,6 +261,7 @@ class AutoPilot extends React.Component {
 
                                 <br/>
                                 <Divider/>
+
                                 <h2> Applications Rejection Automation</h2>
 
                                 <Form.Item label="Auto reject applicants "
@@ -262,6 +283,85 @@ class AutoPilot extends React.Component {
                                         </>
                                     )}
                                 </Form.Item>
+
+
+                                <FormItem label="Acceptance Email Title">
+                                    {getFieldDecorator('AcceptanceEmailTitle', {
+                                        initialValue: autoPilot?.AcceptanceEmailTitle,
+                                    })(
+                                        <Input placeholder="Congrats you got accepted"/>
+                                    )}
+                                </FormItem>
+
+                                <div style={{margin: '20px 0', width: '50%'}}>
+                                    <h4>Acceptance letter</h4>
+                                    <ButtonGroup style={{margin: '5px 0'}}>
+                                        <Button
+                                            onClick={() =>
+                                                this.setState({
+                                                    acceptanceEmailBody: this.state.acceptanceEmailBody + ' ${candidate_name}'
+                                                })
+                                            }>
+                                            Candidate Name
+                                        </Button>
+                                        <Button
+                                            onClick={() =>
+                                                this.setState({
+                                                    acceptanceEmailBody: this.state.acceptanceEmailBody + ' ${candidate_email}'
+                                                })
+                                            }>
+                                            Candidate Email
+                                        </Button>
+                                    </ButtonGroup>
+
+                                    {/* TODO: [data] has to be dynamic which renders the data from Server*/}
+                                    <CKEditor
+                                        editor={ClassicEditor}
+                                        config={{toolbar: toolbar}}
+                                        data={this.state.acceptanceEmailBody}
+                                        onChange={(event, editor) => this.setState(state => state.acceptanceEmailBody = editor?.getData())}
+                                        onInit={editor => this.setState(state => state.acceptanceEmailBody = editor?.getData())}
+                                    />
+                                </div>
+
+
+                                <FormItem label="Rejection Email Title">
+                                    {getFieldDecorator('RejectionEmailTitle', {
+                                        initialValue: autoPilot?.RejectionEmailTitle,
+                                    })(
+                                        <Input placeholder="Sorry you got rejected"/>
+                                    )}
+                                </FormItem>
+
+                                <div style={{margin: '20px 0', width: '50%'}}>
+                                    <h4>Rejection Letter</h4>
+                                    <ButtonGroup style={{margin: '5px 0px'}}>
+                                        <Button
+                                            onClick={() =>
+                                                this.setState({
+                                                    rejectionEmailBody: this.state.rejectionEmailBody + ' ${candidate_name}'
+                                                })
+                                            }>
+                                            Candidate Name
+                                        </Button>
+                                        <Button
+                                            onClick={() =>
+                                                this.setState({
+                                                    rejectionEmailBody: this.state.rejectionEmailBody + ' ${candidate_email}'
+                                                })
+                                            }>
+                                            Candidate Email
+                                        </Button>
+                                    </ButtonGroup>
+                                    {/* TODO: [data] has to be dynamic which renders the data from Server*/}
+                                    <CKEditor
+                                        editor={ClassicEditor}
+                                        config={{toolbar: toolbar}}
+                                        data={this.state.rejectionEmailBody}
+                                        onChange={(event, editor) => this.setState(state => state.rejectionEmailBody = editor?.getData())}
+                                        onInit={editor => this.setState(state => state.rejectionEmailBody = editor?.getData())}
+                                    />
+                                </div>
 
                                 <FormItem label="Auto send rejection email"
                                           help="Rejected applicants will be notified via email if email is provided in the chat (candidates applications only)">

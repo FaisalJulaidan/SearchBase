@@ -133,7 +133,7 @@ class TimeSlots extends React.Component {
                     )}
                 </FormItem>
 
-                <div style={{paddingLeft: '16.66666667%', width: 850}}>
+                <div style={{paddingLeft: '16.66666667%', width: '70%'}}>
                     {
                         <List bordered
                               dataSource={this.state.weekDays}

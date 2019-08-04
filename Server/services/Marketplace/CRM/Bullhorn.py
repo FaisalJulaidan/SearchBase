@@ -199,10 +199,18 @@ def insertCandidate(auth, data, companyID) -> Callback:
                 "city": data.get("city"),
             },
             "email": data.get("email"),
+
             "primarySkills": data.get("skills"),
+            "experience": data.get("yearsExperience"),
+
+            "secondaryAddress": data.get("preferredWorkCity"),
+
             "educations": {
                 "data": data.get("educations"),
-            }
+            },
+            "dateAvailable": data.get("availability"),  # TODO CHECK
+            "salary": data.get("salary"),
+            "dayRate": data.get("dayRate")
         }
 
         # Add additional emails to email2 and email3
@@ -407,19 +415,19 @@ def searchJobs(auth, companyID, data, fields=None) -> Callback:
             fields = "fields=id,title,publicDescription,address,employmentType,salary,skills,yearsRequired,startDate,dateEnd"
 
         # populate filter TODO
-        query += populateFilter(data.get("jobTitle"), "title")
+        # query += populateFilter(data.get("jobTitle"), "title")
 
         query += populateFilter(data.get("city"), "address.city")
 
         query += populateFilter(data.get("employmentType"), "employmentType")
 
-        query += populateFilter(data.get("skills"), "skills")
+        # query += populateFilter(data.get("skills"), "skills")
 
-        query += populateFilter(data.get("startDate"), "startDate")
+        # query += populateFilter(data.get("startDate"), "startDate")
 
-        query += populateFilter(data.get("endDate"), "dateEnd")
+        # query += populateFilter(data.get("endDate"), "dateEnd")
 
-        query += populateFilter(data.get("yearsRequired"), "yearsRequired")
+        # query += populateFilter(data.get("yearsRequired"), "yearsRequired")
 
         query = query[:-3]
 
@@ -460,7 +468,7 @@ def searchJobs(auth, companyID, data, fields=None) -> Callback:
 
 def populateFilter(value, string):
     if value:
-        return string + ":" + value + " or"
+        return string + ":" + value + " and"
     return ""
 
 

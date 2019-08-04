@@ -30,16 +30,27 @@ def insertCandidate(assistant: Assistant, conversation: Conversation):
             conversation.Data.get('keywordsByDataType').get(DT.CandidateLocation.value['name'], [" "])),
         "email": conversation.Email or " ",
         "emails": conversation.Data.get('keywordsByDataType').get(DT.CandidateEmail.value['name'], [" "]),
+
         "skills": ", ".join(
-            conversation.Data.get('keywordsByDataType').get(DT.CandidateSkills.value['name'], [" "])),
+            conversation.Data.get('keywordsByDataType').get(DT.CandidateSkills.value['name']) or
+            conversation.Data.get('keywordsByDataType').get(DT.JobEssentialSkills.value['name'], [" "])),
+        "yearsExperience": ", ".join(
+            conversation.Data.get('keywordsByDataType').get(DT.CandidateYearsExperience.value['name']) or
+            conversation.Data.get('keywordsByDataType').get(DT.JobYearsRequired.value['name'], [" "])),
+
+        "preferredWorkCity": ", ".join(
+            conversation.Data.get('keywordsByDataType').get(DT.JobLocation.value['name'], [" "])),
+        "preferredJobTitle": ", ".join(
+            conversation.Data.get('keywordsByDataType').get(DT.JobTitle.value['name'], [])),
+        "preferredJobType": ", ".join(
+            conversation.Data.get('keywordsByDataType').get(DT.JobType.value['name'], [])),  # cant be used until predefined values
+
         "educations": conversation.Data.get('keywordsByDataType').get(DT.CandidateEducation.value['name'], []),
         "availability": ", ".join(
             conversation.Data.get('keywordsByDataType').get(DT.CandidateAvailability.value['name'], [])) or None,
-        "jobTitle": ", ".join(
-            conversation.Data.get('keywordsByDataType').get(DT.JobTitle.value['name'], [])),
-        "salary": getSalary(conversation, DT.CandidateAnnualDesiredSalary, "Average"),
-        "rate": getSalary(conversation, DT.CandidateAnnualDesiredSalary or
-                          DT.CandidateDailyDesiredSalary, "Average")
+
+        "annualSalary": getSalary(conversation, DT.CandidateAnnualDesiredSalary or DT.JobAnnualSalary, "Average"),
+        "dayRate": getSalary(conversation, DT.CandidateDailyDesiredSalary or DT.JobDayRate, "Average")
     }
 
     crm_type = assistant.CRM.Type.value
@@ -62,12 +73,15 @@ def insertClient(assistant: Assistant, conversation: Conversation):
         "name": conversation.Name or " ",
         "firstName": name[0],
         "lastName": name[-1],
-        "emails": emails,
         "mobile": conversation.PhoneNumber or " ",
         "city": " ".join(
                 conversation.Data.get('keywordsByDataType').get(DT.ClientLocation.value['name'], [])),
         # check number of emails and submit them
         "email": emails[0],
+        "emails": emails,
+        "availability": " ".join(
+                conversation.Data.get('keywordsByDataType').get(DT.ClientAvailability.value['name'], [])),
+
         "companyName": " ".join(
                 conversation.Data.get('keywordsByDataType').get(DT.CompanyName.value['name'],
                                                                 ["Undefined Company - TSB"]))
@@ -117,12 +131,15 @@ def searchCandidates(assistant: Assistant, session):
 
 def searchJobs(assistant: Assistant, session):
     data = {
-        "jobTitle": checkFilter(session['keywordsByDataType'], DT.JobTitle),
-        "city": checkFilter(session['keywordsByDataType'], DT.JobLocation),
+        "jobTitle": checkFilter(session['keywordsByDataType'], DT.JobTitle) or
+                    checkFilter(session['keywordsByDataType'], DT.CandidateJobTitle),
+        "city": checkFilter(session['keywordsByDataType'], DT.JobLocation) or
+                checkFilter(session['keywordsByDataType'], DT.CandidateLocation),
         "employmentType": checkFilter(session['keywordsByDataType'], DT.JobType),
-        "skills": checkFilter(session['keywordsByDataType'], DT.JobEssentialSkills),
-        "startDate": checkFilter(session['keywordsByDataType'], DT.JobStartDate),
-        "endDate": checkFilter(session['keywordsByDataType'], DT.JobEndDate),
+        "skills": checkFilter(session['keywordsByDataType'], DT.JobEssentialSkills)or
+                  checkFilter(session['keywordsByDataType'], DT.CandidateSkills),
+        # "startDate": checkFilter(session['keywordsByDataType'], DT.JobStartDate),
+        # "endDate": checkFilter(session['keywordsByDataType'], DT.JobEndDate),
         "yearsRequired": checkFilter(session['keywordsByDataType'], DT.JobYearsRequired),
     }
 

@@ -163,8 +163,8 @@ def insertCandidate(auth, data, companyID) -> Callback:
             "crimson_email": data.get("email"),
             "crimson_availability": data.get("availability"),
             "crimson_jobtitle": data.get("jobTitle"),
-            "crimson_expsalaryp": float(data.get("salary")),
-            "crimson_expratec": float(data.get("rate"))
+            "crimson_expsalaryp": float(data.get("annualSalary")),
+            "crimson_expratec": float(data.get("dayRate"))
         }
 
         # send filter

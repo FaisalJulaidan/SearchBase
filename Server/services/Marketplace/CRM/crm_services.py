@@ -1,10 +1,10 @@
 from sqlalchemy.sql import and_
 
-from utilities.enums import CRM, UserType, DataType, Period
 from models import db, Callback, Conversation, Assistant, CRM as CRM_Model, StoredFile
-from services.Marketplace.CRM import Greenhouse, Adapt, Bullhorn, Vincere, Jobscience, Mercury
+from services.Marketplace.CRM import Greenhouse, Bullhorn
 # Process chatbot session
 from utilities import helpers
+from utilities.enums import CRM, UserType, DataType, Period
 
 
 def processConversation(assistant: Assistant, conversation: Conversation) -> Callback:
@@ -176,12 +176,11 @@ def disconnectByID(crmID, companyID) -> Callback:
 
 def logoutOfCRM(auth, crm_type, companyID) -> Callback:
     try:
-
         if crm_type == CRM.Bullhorn:
             return Bullhorn.logout(auth, companyID)
 
         return Callback(False, 'Logout failed')
-        
+
     except Exception as exc:
         helpers.logError("crm_services.logoutOfCRM(): " + str(exc))
         return Callback(False, "CRM logout failed.")
@@ -239,7 +238,7 @@ def updateByType(type, newAuth, companyID):
 
 
 def getSalary(conversation: Conversation, dataType: DataType, salaryType, toPeriod=None):  # type Period
-    # Less Than 5000 GBP Monthly
+    # ex. Less Than 5000 GBP Monthly
     salary = conversation.Data.get('keywordsByDataType').get(dataType.value['name'], 0)
     if salary:
         salarySplitted = salary[0].split(" ")

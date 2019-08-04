@@ -12,6 +12,11 @@ from utilities import helpers
 # Greenhouse Notes:
 # auth is done by submitting a header "Authorization" with value "Basic " + base64encoded(api token + ":")
 
+
+def testConnection(auth):
+    return login(auth)
+
+
 # login requires: API key
 def login(auth):
     try:

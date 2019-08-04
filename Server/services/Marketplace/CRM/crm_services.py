@@ -19,93 +19,60 @@ def processConversation(assistant: Assistant, conversation: Conversation) -> Cal
 
 
 def insertCandidate(assistant: Assistant, conversation: Conversation):
-    # Check CRM type
-    if assistant.CRM.Type is CRM.Bullhorn:
-        return Bullhorn.insertCandidate(assistant.CRM.Auth, conversation)
-    elif assistant.CRM.Type is CRM.Mercury:
-        return Mercury.insertCandidate(assistant.CRM.Auth, conversation)
-    elif assistant.CRM.Type is CRM.Vincere:
-        return Vincere.insertCandidate(assistant.CRM.Auth, conversation)
-    # elif assistant.CRM.Type is CRM.Mercury:
-    #     return Mercury.insertCandidate(assistant.CRM.Auth, conversation)
-    elif assistant.CRM.Type is CRM.Adapt:
-        return Adapt.insertCandidate(assistant.CRM.Auth, conversation)
-    elif assistant.CRM.Type is CRM.Greenhouse:
-        return Callback(True, "Greenhouse does not accept candidates at this stage")
-    elif assistant.CRM.Type is CRM.Jobscience:
-        return Jobscience.insertCandidate(assistant.CRM.Auth, conversation)
+    crm_type = assistant.CRM.Type.value
+    if CRM.has_value(crm_type):
+        if assistant.CRM.Type is CRM.Greenhouse:
+            return Callback(True, "Greenhouse does not accept candidates at this stage")
+
+        return eval(crm_type + ".insertCandidate(assistant.CRM.Auth, conversation)")
     else:
         return Callback(False, "CRM type did not match with those on the system")
 
 
 def insertClient(assistant: Assistant, conversation: Conversation):
-    # Check CRM type
-    if assistant.CRM.Type is CRM.Bullhorn:
-        return Bullhorn.insertClient(assistant.CRM.Auth, conversation)
-    elif assistant.CRM.Type is CRM.Mercury:
-        return Mercury.insertClient(assistant.CRM.Auth, conversation)
-    elif assistant.CRM.Type is CRM.Vincere:
-        return Vincere.insertClient(assistant.CRM.Auth, conversation)
-    elif assistant.CRM.Type is CRM.Adapt:
-        return Adapt.insertClient(assistant.CRM.Auth, conversation)
-    elif assistant.CRM.Type is CRM.Greenhouse:
-        return Callback(True, "Greenhouse does not accept clients")
-    elif assistant.CRM.Type is CRM.Jobscience:
-        return Jobscience.insertClient(assistant.CRM.Auth, conversation)
+    crm_type = assistant.CRM.Type.value
+    if CRM.has_value(crm_type):
+        if assistant.CRM.Type is CRM.Greenhouse:
+            return Callback(True, "Greenhouse does not accept clients")
+
+        return eval(crm_type + ".insertClient(assistant.CRM.Auth, conversation)")
     else:
         return Callback(False, "CRM type did not match with those on the system")
 
 
 def uploadFile(assistant: Assistant, storedFile: StoredFile):
-    # Check CRM type
-    if assistant.CRM.Type is CRM.Bullhorn:
-        return Bullhorn.uploadFile(assistant.CRM.Auth, storedFile)
-    # elif assistant.CRM.Type is CRM.Mercury: TODO
-    #     return Mercury.uploadFile(assistant.CRM.Auth, storedFile)
-    elif assistant.CRM.Type is CRM.Vincere:
-        return Vincere.uploadFile(assistant.CRM.Auth, storedFile)
-    elif assistant.CRM.Type is CRM.Greenhouse:
-        return Greenhouse.uploadFile(assistant.CRM.Auth, storedFile)
-    elif assistant.CRM.Type is CRM.Jobscience:
-        return Callback(True, "Jobscience does not support file upload at this time")
+    crm_type = assistant.CRM.Type.value
+    if CRM.has_value(crm_type):
+        if assistant.CRM.Type is CRM.Jobscience or assistant.CRM.Type is CRM.Mercury:
+            return Callback(True, "CRM does not support file upload at this time")
+
+        return eval(crm_type + ".uploadFile(assistant.CRM.Auth, storedFile)")
     else:
         return Callback(False, "CRM type did not match with those on the system")
 
 
 def searchCandidates(assistant: Assistant, session):
-    # Check CRM type
-    # if assistant.CRM.Type is CRM.Adapt:
-    #     return Adapt.searchCandidates(assistant.CRM.Auth)
-    if assistant.CRM.Type is CRM.Bullhorn:
-        return Bullhorn.searchCandidates(assistant.CRM.Auth, assistant.CompanyID, session)
-    elif assistant.CRM.Type is CRM.Mercury:
-        return Mercury.searchCandidates(assistant.CRM.Auth, assistant.CompanyID, session)
-    elif assistant.CRM.Type is CRM.Vincere:
-        return Vincere.searchCandidates(assistant.CRM.Auth, assistant.CompanyID, session)
-    elif assistant.CRM.Type is CRM.Greenhouse:
-        return Greenhouse.searchCandidates(assistant.CRM.Auth)
-    elif assistant.CRM.Type is CRM.Jobscience:
-        t = Jobscience.searchCandidates(assistant.CRM.Auth, assistant.CompanyID, session)
-        return t
+    crm_type = assistant.CRM.Type.value
+    if CRM.has_value(crm_type):
+        if assistant.CRM.Type is CRM.Adapt:
+            return Callback(True, "CRM does not support candidate search at this time")
+        if assistant.CRM.Type is CRM.Greenhouse:
+            return Greenhouse.searchCandidates(assistant.CRM.Auth)
+
+        return eval(crm_type + ".searchCandidates(assistant.CRM.Auth, assistant.CompanyID, session)")
     else:
         return Callback(False, "CRM type did not match with those on the system")
 
 
-
 def searchJobs(assistant: Assistant, session):
-    # Check CRM type
-    # if assistant.CRM.Type is CRM.Adapt:
-    #     return Adapt.pullAllCadidates(assistant.CRM.Auth)
-    if assistant.CRM.Type is CRM.Bullhorn:
-        return Bullhorn.searchJobs(assistant.CRM.Auth, assistant.CompanyID, session)
-    elif assistant.CRM.Type is CRM.Mercury:
-        return Mercury.searchJobs(assistant.CRM.Auth, assistant.CompanyID, session)
-    elif assistant.CRM.Type is CRM.Vincere:
-        return Vincere.searchJobs(assistant.CRM.Auth, assistant.CompanyID, session)
-    elif assistant.CRM.Type is CRM.Greenhouse:
-        return Greenhouse.searchJobs(assistant.CRM.Auth, session)
-    elif assistant.CRM.Type is CRM.Jobscience:
-        return Jobscience.searchJobs(assistant.CRM.Auth, assistant.CompanyID, session)
+    crm_type = assistant.CRM.Type.value
+    if CRM.has_value(crm_type):
+        if assistant.CRM.Type is CRM.Adapt:
+            return Callback(True, "CRM does not support job search at this time")
+        if assistant.CRM.Type is CRM.Greenhouse:
+            return Greenhouse.searchJobs(assistant.CRM.Auth, session)
+
+        return eval(crm_type + ".searchJobs(assistant.CRM.Auth, assistant.CompanyID, session)")
     else:
         return Callback(False, "CRM type did not match with those on the system")
 
@@ -151,25 +118,18 @@ def connect(type, auth, companyID) -> Callback:
 
 
 # Test connection to a CRM
-def testConnection(type, auth, companyID) -> Callback:
+def testConnection(crm_type, auth, companyID) -> Callback:
     try:
         crm_type: CRM = CRM[type]
 
         # test connection
-        if crm_type == CRM.Bullhorn:
-            return Bullhorn.testConnection(auth, companyID)  # oauth2
-        elif crm_type == CRM.Mercury:
-            return Mercury.testConnection(auth, companyID)  # oauth2
-        elif crm_type == CRM.Adapt:
-            return Adapt.testConnection(auth)
-        elif crm_type == CRM.Greenhouse:
-            return Greenhouse.login(auth)
-        elif crm_type == CRM.Vincere:
-            return Vincere.testConnection(auth, companyID)  # oauth2
-        elif crm_type == CRM.Jobscience:
-            return Jobscience.testConnection(auth, companyID) # oauth2
+        if CRM.has_value(crm_type):
+            if crm_type == CRM.Adapt or crm_type == CRM.Greenhouse:
+                return eval(crm_type + ".testConnection(auth)")
 
-        return Callback(False, 'Connection failure. Please check entered details')
+            return eval(crm_type + ".testConnection(auth, companyID)")
+        else:
+            return Callback(False, "CRM type did not match with those on the system")
 
     except Exception as exc:
         helpers.logError("crm_services.connect(): " + str(exc))
@@ -219,12 +179,6 @@ def logoutOfCRM(auth, crm_type, companyID) -> Callback:
 
         if crm_type == CRM.Bullhorn:
             return Bullhorn.logout(auth, companyID)
-        # elif crm_type == CRM.Adapt:
-        #     return Adapt.testConnection(auth)
-        # elif crm_type == CRM.Greenhouse:
-        #     return Greenhouse.login(auth)
-        # elif crm_type == CRM.Vincere:
-        #     return Vincere.testConnection(auth, companyID)
 
         return Callback(False, 'Logout failed')
         

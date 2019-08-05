@@ -186,32 +186,35 @@ def buildUrl(rest_data, query, optionalParams=None):
     return url
 
 
-def insertCandidate(auth, conversation: Conversation) -> Callback:
+def insertCandidate(auth, data, companyID) -> Callback:
     try:
-        # New candidate details
-        emails = conversation.Data.get('keywordsByDataType').get(DT.CandidateEmail.value['name'], [" "])
-        name = (conversation.Name or " ").split(" ")
-
         # availability, yearsExperience
         body = {
 
-            "name": conversation.Name or " ",
-            "firstName": helpers.getListValue(name, 0, " "),
-            "lastName": helpers.getListValue(name, 1, " "),
-            "mobile": conversation.PhoneNumber or " ",
+            "name": data.get("name"),
+            "firstName": data.get("firstName"),
+            "lastName": data.get("lastName"),
+            "mobile": data.get("mobile"),
             "address": {
-                "city": "".join(
-                    conversation.Data.get('keywordsByDataType').get(DT.CandidateLocation.value['name'], [" "])),
+                "city": data.get("city"),
             },
-            "email": conversation.Email or " ",
-            "primarySkills": "".join(
-                conversation.Data.get('keywordsByDataType').get(DT.CandidateSkills.value['name'], [" "])),
+            "email": data.get("email"),
+
+            "primarySkills": data.get("skills"),
+            "experience": data.get("yearsExperience"),
+
+            "secondaryAddress": data.get("preferredWorkCity"),
+
             "educations": {
-                "data": conversation.Data.get('keywordsByDataType').get(DT.CandidateEducation.value['name'], [])
-            }
+                "data": data.get("educations"),
+            },
+            "dateAvailable": data.get("availability"),  # TODO CHECK
+            "salary": data.get("salary"),
+            "dayRate": data.get("dayRate")
         }
 
         # Add additional emails to email2 and email3
+        emails = data.get("emails")
         for email in emails:
             index = emails.index(email)
             if index != 0:
@@ -221,8 +224,7 @@ def insertCandidate(auth, conversation: Conversation) -> Callback:
             body["dayRate"] = None
 
         # send query
-        sendQuery_callback: Callback = sendQuery(auth, "entity/Candidate", "put", body,
-                                                 conversation.Assistant.CompanyID)
+        sendQuery_callback: Callback = sendQuery(auth, "entity/Candidate", "put", body, companyID)
 
         if not sendQuery_callback.Success:
             raise Exception(sendQuery_callback.Message)
@@ -278,14 +280,14 @@ def uploadFile(auth, storedFile: StoredFile):
         return Callback(False, str(exc))
 
 
-def insertClient(auth, conversation: Conversation) -> Callback:
+def insertClient(auth, data, companyID) -> Callback:
     try:
         # get query url
-        insertCompany_callback: Callback = insertCompany(auth, conversation)
+        insertCompany_callback: Callback = insertCompany(auth, data, companyID)
         if not insertCompany_callback.Success:
             raise Exception(insertCompany_callback.Message)
 
-        insertClient_callback: Callback = insertClientContact(auth, conversation,
+        insertClient_callback: Callback = insertClientContact(auth, data, companyID,
                                                               insertCompany_callback.Data.get("changedEntityId"))
         if not insertClient_callback.Success:
             raise Exception(insertClient_callback.Message)
@@ -297,32 +299,29 @@ def insertClient(auth, conversation: Conversation) -> Callback:
         return Callback(False, str(exc))
 
 
-def insertClientContact(auth, conversation: Conversation, bhCompanyID) -> Callback:
+def insertClientContact(auth, data, companyID, bhCompanyID) -> Callback:
     try:
-        # New candidate details
-        emails = conversation.Data.get('keywordsByDataType').get(DT.ClientEmail.value['name'], [" "])
 
         body = {
-            "name": conversation.Name or " ",
-            "mobile": conversation.PhoneNumber or " ",
+            "name": data.get("name"),
+            "mobile": data.get("mobile"),
             "address": {
-                "city": " ".join(
-                    conversation.Data.get('keywordsByDataType').get(DT.ClientLocation.value['name'], [])),
+                "city": data.get("city"),
             },
             # check number of emails and submit them
-            "email": emails[0],
+            "email": data.get("email"),
             "clientCorporation": {"id": bhCompanyID}
         }
 
         # add additional emails to email2 and email3
+        emails = data.get("name")
         for email in emails:
             index = emails.index(email)
             if index != 0:
                 body["email" + str(index + 1)] = email
 
         # send query
-        sendQuery_callback: Callback = sendQuery(auth, "entity/ClientContact", "put", body,
-                                                 conversation.Assistant.CompanyID)
+        sendQuery_callback: Callback = sendQuery(auth, "entity/ClientContact", "put", body, companyID)
         if not sendQuery_callback.Success:
             raise Exception(sendQuery_callback.Message)
 
@@ -333,18 +332,15 @@ def insertClientContact(auth, conversation: Conversation, bhCompanyID) -> Callba
         return Callback(False, str(exc))
 
 
-def insertCompany(auth, conversation: Conversation) -> Callback:
+def insertCompany(auth, data, companyID) -> Callback:
     try:
         # New candidate details
         body = {
-            "name": " ".join(
-                conversation.Data.get('keywordsByDataType').get(DT.CompanyName.value['name'],
-                                                                ["Undefined Company - TSB"])),
+            "name": data.get("companyName"),
         }
 
         # send query
-        sendQuery_callback: Callback = sendQuery(auth, "entity/ClientCorporation", "put", body,
-                                                 conversation.Assistant.CompanyID)
+        sendQuery_callback: Callback = sendQuery(auth, "entity/ClientCorporation", "put", body, companyID)
         if not sendQuery_callback.Success:
             raise Exception(sendQuery_callback.Message)
 
@@ -357,15 +353,14 @@ def insertCompany(auth, conversation: Conversation) -> Callback:
         return Callback(False, str(exc))
 
 
-def searchCandidates(auth, companyID, conversation, fields=None) -> Callback:
+def searchCandidates(auth, companyID, data, fields=None) -> Callback:
     try:
         query = "query="
         if not fields:
             fields = "fields=id,name,email,mobile,address,primarySkills,status,educations,dayRate,salary"
-        keywords = conversation['keywordsByDataType']
 
         # populate filter
-        query += checkFilter(keywords, DT.CandidateLocation, "address.city")
+        query += populateFilter(data.get("location"), "address.city")
 
         # if keywords[DT.CandidateSkills.value["name"]]:
         #     query += "primarySkills.data:" + keywords[DT.CandidateSkills.name] + " or"
@@ -413,27 +408,26 @@ def searchCandidates(auth, companyID, conversation, fields=None) -> Callback:
         return Callback(False, str(exc))
 
 
-def searchJobs(auth, companyID, conversation, fields=None) -> Callback:
+def searchJobs(auth, companyID, data, fields=None) -> Callback:
     try:
         query = "query="
         if not fields:
             fields = "fields=id,title,publicDescription,address,employmentType,salary,skills,yearsRequired,startDate,dateEnd"
-        keywords = conversation['keywordsByDataType']
 
         # populate filter TODO
-        query += checkFilter(keywords, DT.JobTitle, "title")
+        # query += populateFilter(data.get("jobTitle"), "title")
 
-        query += checkFilter(keywords, DT.JobLocation, "address.city")
+        query += populateFilter(data.get("city"), "address.city")
 
-        query += checkFilter(keywords, DT.JobType, "employmentType")
+        query += populateFilter(data.get("employmentType"), "employmentType")
 
-        query += checkFilter(keywords, DT.JobEssentialSkills, "skills")
+        # query += populateFilter(data.get("skills"), "skills")
 
-        query += checkFilter(keywords, DT.JobStartDate, "startDate")
+        # query += populateFilter(data.get("startDate"), "startDate")
 
-        query += checkFilter(keywords, DT.JobEndDate, "dateEnd")
+        # query += populateFilter(data.get("endDate"), "dateEnd")
 
-        query += checkFilter(keywords, DT.JobYearsRequired, "yearsRequired")
+        # query += populateFilter(data.get("yearsRequired"), "yearsRequired")
 
         query = query[:-3]
 
@@ -472,9 +466,9 @@ def searchJobs(auth, companyID, conversation, fields=None) -> Callback:
         return Callback(False, str(exc))
 
 
-def checkFilter(keywords, dataType: DT, string):
-    if keywords.get(dataType.value["name"]):
-        return string + ":" + "".join(keywords[dataType.value["name"]]) + " or"
+def populateFilter(value, string):
+    if value:
+        return string + ":" + value + " and"
     return ""
 
 

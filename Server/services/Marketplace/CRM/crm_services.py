@@ -1,10 +1,10 @@
 from sqlalchemy.sql import and_
 
-from utilities.enums import CRM, UserType, DataType, Period
 from models import db, Callback, Conversation, Assistant, CRM as CRM_Model, StoredFile
-from services.Marketplace.CRM import Greenhouse, Adapt, Bullhorn, Vincere, Jobscience, Mercury
+from services.Marketplace.CRM import Greenhouse, Bullhorn
 # Process chatbot session
 from utilities import helpers
+from utilities.enums import CRM, UserType, DataType, Period, DataType as DT
 
 
 def processConversation(assistant: Assistant, conversation: Conversation) -> Callback:
@@ -19,95 +19,148 @@ def processConversation(assistant: Assistant, conversation: Conversation) -> Cal
 
 
 def insertCandidate(assistant: Assistant, conversation: Conversation):
-    # Check CRM type
-    if assistant.CRM.Type is CRM.Bullhorn:
-        return Bullhorn.insertCandidate(assistant.CRM.Auth, conversation)
-    elif assistant.CRM.Type is CRM.Mercury:
-        return Mercury.insertCandidate(assistant.CRM.Auth, conversation)
-    elif assistant.CRM.Type is CRM.Vincere:
-        return Vincere.insertCandidate(assistant.CRM.Auth, conversation)
-    # elif assistant.CRM.Type is CRM.Mercury:
-    #     return Mercury.insertCandidate(assistant.CRM.Auth, conversation)
-    elif assistant.CRM.Type is CRM.Adapt:
-        return Adapt.insertCandidate(assistant.CRM.Auth, conversation)
-    elif assistant.CRM.Type is CRM.Greenhouse:
-        return Callback(True, "Greenhouse does not accept candidates at this stage")
-    elif assistant.CRM.Type is CRM.Jobscience:
-        return Jobscience.insertCandidate(assistant.CRM.Auth, conversation)
+    name = (conversation.Name or " ").split(" ")
+
+    data = {
+        "name": conversation.Name or " ",
+        "firstName": helpers.getListValue(name, 0, " "),
+        "lastName": helpers.getListValue(name, 1, " "),
+        "mobile": conversation.PhoneNumber or " ",
+        "city": ", ".join(
+            conversation.Data.get('keywordsByDataType').get(DT.CandidateLocation.value['name'], [" "])),
+        "email": conversation.Email or " ",
+        "emails": conversation.Data.get('keywordsByDataType').get(DT.CandidateEmail.value['name'], [" "]),
+
+        "skills": ", ".join(
+            conversation.Data.get('keywordsByDataType').get(DT.CandidateSkills.value['name']) or
+            conversation.Data.get('keywordsByDataType').get(DT.JobEssentialSkills.value['name'], [" "])),
+        "yearsExperience": ", ".join(
+            conversation.Data.get('keywordsByDataType').get(DT.CandidateYearsExperience.value['name']) or
+            conversation.Data.get('keywordsByDataType').get(DT.JobYearsRequired.value['name'], [" "])),
+
+        "preferredWorkCity": ", ".join(
+            conversation.Data.get('keywordsByDataType').get(DT.JobLocation.value['name'], [" "])),
+        "preferredJobTitle": ", ".join(
+            conversation.Data.get('keywordsByDataType').get(DT.JobTitle.value['name'], [])),
+        "preferredJobType": ", ".join(
+            conversation.Data.get('keywordsByDataType').get(DT.JobType.value['name'], [])),  # cant be used until predefined values
+
+        "educations": conversation.Data.get('keywordsByDataType').get(DT.CandidateEducation.value['name'], []),
+        "availability": ", ".join(
+            conversation.Data.get('keywordsByDataType').get(DT.CandidateAvailability.value['name'], [])) or None,
+
+        "annualSalary": getSalary(conversation, DT.CandidateAnnualDesiredSalary or DT.JobAnnualSalary, "Average"),
+        "dayRate": getSalary(conversation, DT.CandidateDailyDesiredSalary or DT.JobDayRate, "Average")
+    }
+
+    crm_type = assistant.CRM.Type.value
+    if CRM.has_value(crm_type):
+        if assistant.CRM.Type is CRM.Greenhouse:
+            return Callback(True, "Greenhouse does not accept candidates at this stage")
+        if assistant.CRM.Type is CRM.Adapt or assistant.CRM.Type is CRM.Jobscience:
+            return eval(crm_type + ".insertCandidate(assistant.CRM.Auth, data)")
+
+        return eval(crm_type + ".insertCandidate(assistant.CRM.Auth, data, assistant.CompanyID)")
     else:
         return Callback(False, "CRM type did not match with those on the system")
 
 
 def insertClient(assistant: Assistant, conversation: Conversation):
-    # Check CRM type
-    if assistant.CRM.Type is CRM.Bullhorn:
-        return Bullhorn.insertClient(assistant.CRM.Auth, conversation)
-    elif assistant.CRM.Type is CRM.Mercury:
-        return Mercury.insertClient(assistant.CRM.Auth, conversation)
-    elif assistant.CRM.Type is CRM.Vincere:
-        return Vincere.insertClient(assistant.CRM.Auth, conversation)
-    elif assistant.CRM.Type is CRM.Adapt:
-        return Adapt.insertClient(assistant.CRM.Auth, conversation)
-    elif assistant.CRM.Type is CRM.Greenhouse:
-        return Callback(True, "Greenhouse does not accept clients")
-    elif assistant.CRM.Type is CRM.Jobscience:
-        return Jobscience.insertClient(assistant.CRM.Auth, conversation)
+    emails = conversation.Data.get('keywordsByDataType').get(DT.ClientEmail.value['name'], [" "])
+    name = (conversation.Name or " ").split(" ")
+
+    data = {
+        "name": conversation.Name or " ",
+        "firstName": name[0],
+        "lastName": name[-1],
+        "mobile": conversation.PhoneNumber or " ",
+        "city": " ".join(
+                conversation.Data.get('keywordsByDataType').get(DT.ClientLocation.value['name'], [])),
+        # check number of emails and submit them
+        "email": emails[0],
+        "emails": emails,
+        "availability": " ".join(
+                conversation.Data.get('keywordsByDataType').get(DT.ClientAvailability.value['name'], [])),
+
+        "companyName": " ".join(
+                conversation.Data.get('keywordsByDataType').get(DT.CompanyName.value['name'],
+                                                                ["Undefined Company - TSB"]))
+    }
+
+    crm_type = assistant.CRM.Type.value
+    if CRM.has_value(crm_type):
+        if assistant.CRM.Type is CRM.Greenhouse:
+            return Callback(True, "Greenhouse does not accept clients")
+        if assistant.CRM.Type is CRM.Adapt or assistant.CRM.Type is CRM.Jobscience:
+            return eval(crm_type + ".insertClient(assistant.CRM.Auth, data)")
+
+        return eval(crm_type + ".insertClient(assistant.CRM.Auth, data, assistant.CompanyID)")
     else:
         return Callback(False, "CRM type did not match with those on the system")
 
 
 def uploadFile(assistant: Assistant, storedFile: StoredFile):
-    # Check CRM type
-    if assistant.CRM.Type is CRM.Bullhorn:
-        return Bullhorn.uploadFile(assistant.CRM.Auth, storedFile)
-    # elif assistant.CRM.Type is CRM.Mercury: TODO
-    #     return Mercury.uploadFile(assistant.CRM.Auth, storedFile)
-    elif assistant.CRM.Type is CRM.Vincere:
-        return Vincere.uploadFile(assistant.CRM.Auth, storedFile)
-    elif assistant.CRM.Type is CRM.Greenhouse:
-        return Greenhouse.uploadFile(assistant.CRM.Auth, storedFile)
-    elif assistant.CRM.Type is CRM.Jobscience:
-        return Callback(True, "Jobscience does not support file upload at this time")
+    crm_type = assistant.CRM.Type.value
+    if CRM.has_value(crm_type):
+        if assistant.CRM.Type is CRM.Jobscience or assistant.CRM.Type is CRM.Mercury:
+            return Callback(True, "CRM does not support file upload at this time")
+
+        return eval(crm_type + ".uploadFile(assistant.CRM.Auth, storedFile)")
     else:
         return Callback(False, "CRM type did not match with those on the system")
 
 
 def searchCandidates(assistant: Assistant, session):
-    # Check CRM type
-    # if assistant.CRM.Type is CRM.Adapt:
-    #     return Adapt.searchCandidates(assistant.CRM.Auth)
-    if assistant.CRM.Type is CRM.Bullhorn:
-        return Bullhorn.searchCandidates(assistant.CRM.Auth, assistant.CompanyID, session)
-    elif assistant.CRM.Type is CRM.Mercury:
-        return Mercury.searchCandidates(assistant.CRM.Auth, assistant.CompanyID, session)
-    elif assistant.CRM.Type is CRM.Vincere:
-        return Vincere.searchCandidates(assistant.CRM.Auth, assistant.CompanyID, session)
-    elif assistant.CRM.Type is CRM.Greenhouse:
-        return Greenhouse.searchCandidates(assistant.CRM.Auth)
-    elif assistant.CRM.Type is CRM.Jobscience:
-        t = Jobscience.searchCandidates(assistant.CRM.Auth, assistant.CompanyID, session)
-        return t
+    data = {
+        "location": checkFilter(session['keywordsByDataType'], DT.CandidateLocation)
+    }
+
+    crm_type = assistant.CRM.Type.value
+    if CRM.has_value(crm_type):
+        if assistant.CRM.Type is CRM.Adapt:
+            return Callback(True, "CRM does not support candidate search at this time")
+        if assistant.CRM.Type is CRM.Greenhouse:
+            return eval(crm_type + ".searchCandidates(assistant.CRM.Auth)")
+        if assistant.CRM.Type is CRM.Jobscience:
+            return eval(crm_type + ".searchCandidates(assistant.CRM.Auth, data)")
+
+        return eval(crm_type + ".searchCandidates(assistant.CRM.Auth, assistant.CompanyID, data)")
     else:
         return Callback(False, "CRM type did not match with those on the system")
-
 
 
 def searchJobs(assistant: Assistant, session):
-    # Check CRM type
-    # if assistant.CRM.Type is CRM.Adapt:
-    #     return Adapt.pullAllCadidates(assistant.CRM.Auth)
-    if assistant.CRM.Type is CRM.Bullhorn:
-        return Bullhorn.searchJobs(assistant.CRM.Auth, assistant.CompanyID, session)
-    elif assistant.CRM.Type is CRM.Mercury:
-        return Mercury.searchJobs(assistant.CRM.Auth, assistant.CompanyID, session)
-    elif assistant.CRM.Type is CRM.Vincere:
-        return Vincere.searchJobs(assistant.CRM.Auth, assistant.CompanyID, session)
-    elif assistant.CRM.Type is CRM.Greenhouse:
-        return Greenhouse.searchJobs(assistant.CRM.Auth, session)
-    elif assistant.CRM.Type is CRM.Jobscience:
-        return Jobscience.searchJobs(assistant.CRM.Auth, assistant.CompanyID, session)
+    data = {
+        "jobTitle": checkFilter(session['keywordsByDataType'], DT.JobTitle) or
+                    checkFilter(session['keywordsByDataType'], DT.CandidateJobTitle),
+        "city": checkFilter(session['keywordsByDataType'], DT.JobLocation) or
+                checkFilter(session['keywordsByDataType'], DT.CandidateLocation),
+        "employmentType": checkFilter(session['keywordsByDataType'], DT.JobType),
+        "skills": checkFilter(session['keywordsByDataType'], DT.JobEssentialSkills)or
+                  checkFilter(session['keywordsByDataType'], DT.CandidateSkills),
+        # "startDate": checkFilter(session['keywordsByDataType'], DT.JobStartDate),
+        # "endDate": checkFilter(session['keywordsByDataType'], DT.JobEndDate),
+        "yearsRequired": checkFilter(session['keywordsByDataType'], DT.JobYearsRequired),
+    }
+
+    crm_type = assistant.CRM.Type.value
+    if CRM.has_value(crm_type):
+        if assistant.CRM.Type is CRM.Adapt:
+            return Callback(True, "CRM does not support job search at this time")
+        if assistant.CRM.Type is CRM.Greenhouse:
+            return eval(crm_type + ".searchJobs(assistant.CRM.Auth)")
+        if assistant.CRM.Type is CRM.Jobscience:
+            return eval(crm_type + ".searchJobs(assistant.CRM.Auth, data)")
+
+        return eval(crm_type + ".searchJobs(assistant.CRM.Auth, assistant.CompanyID, data)")
     else:
         return Callback(False, "CRM type did not match with those on the system")
+
+
+def checkFilter(keywords, dataType: DT):
+    if keywords.get(dataType.value["name"]):
+        return " ".join(keywords[dataType.value["name"]])
+    return None
 
 
 def produceRecruiterValueReport(companyID, crmName):
@@ -151,25 +204,18 @@ def connect(type, auth, companyID) -> Callback:
 
 
 # Test connection to a CRM
-def testConnection(type, auth, companyID) -> Callback:
+def testConnection(crm_type, auth, companyID) -> Callback:
     try:
         crm_type: CRM = CRM[type]
 
         # test connection
-        if crm_type == CRM.Bullhorn:
-            return Bullhorn.testConnection(auth, companyID)  # oauth2
-        elif crm_type == CRM.Mercury:
-            return Mercury.testConnection(auth, companyID)  # oauth2
-        elif crm_type == CRM.Adapt:
-            return Adapt.testConnection(auth)
-        elif crm_type == CRM.Greenhouse:
-            return Greenhouse.login(auth)
-        elif crm_type == CRM.Vincere:
-            return Vincere.testConnection(auth, companyID)  # oauth2
-        elif crm_type == CRM.Jobscience:
-            return Jobscience.testConnection(auth, companyID) # oauth2
+        if CRM.has_value(crm_type):
+            if crm_type == CRM.Adapt or crm_type == CRM.Greenhouse:
+                return eval(crm_type + ".testConnection(auth)")
 
-        return Callback(False, 'Connection failure. Please check entered details')
+            return eval(crm_type + ".testConnection(auth, companyID)")
+        else:
+            return Callback(False, "CRM type did not match with those on the system")
 
     except Exception as exc:
         helpers.logError("crm_services.connect(): " + str(exc))
@@ -216,18 +262,11 @@ def disconnectByID(crmID, companyID) -> Callback:
 
 def logoutOfCRM(auth, crm_type, companyID) -> Callback:
     try:
-
         if crm_type == CRM.Bullhorn:
             return Bullhorn.logout(auth, companyID)
-        # elif crm_type == CRM.Adapt:
-        #     return Adapt.testConnection(auth)
-        # elif crm_type == CRM.Greenhouse:
-        #     return Greenhouse.login(auth)
-        # elif crm_type == CRM.Vincere:
-        #     return Vincere.testConnection(auth, companyID)
 
         return Callback(False, 'Logout failed')
-        
+
     except Exception as exc:
         helpers.logError("crm_services.logoutOfCRM(): " + str(exc))
         return Callback(False, "CRM logout failed.")
@@ -284,8 +323,9 @@ def updateByType(type, newAuth, companyID):
         return Callback(False, str(exc))
 
 
+# get min/max/average salary from the string and convert to specified period (daily, annually)
 def getSalary(conversation: Conversation, dataType: DataType, salaryType, toPeriod=None):  # type Period
-    # Less Than 5000 GBP Monthly
+    # ex. Less Than 5000 GBP Monthly
     salary = conversation.Data.get('keywordsByDataType').get(dataType.value['name'], 0)
     if salary:
         salarySplitted = salary[0].split(" ")

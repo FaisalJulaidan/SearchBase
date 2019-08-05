@@ -1,4 +1,5 @@
 import requests
+import json
 
 from services.Marketplace.Messenger import mesenger_services
 from utilities.enums import Calendar as Calendar_Enum, CRM as CRM_Enum, Messenger as Messenger_Enum
@@ -102,6 +103,7 @@ def disconnect(type, companyID):
 
 # send request with dynamic method
 def sendRequest(url, method, headers, data=None):
+    data = helpers.cleanDict(data)
     request = None
     if method is "put":
         request = requests.put(url, headers=headers, data=data)

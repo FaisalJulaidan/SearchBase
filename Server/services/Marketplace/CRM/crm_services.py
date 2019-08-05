@@ -27,25 +27,26 @@ def insertCandidate(assistant: Assistant, conversation: Conversation):
         "lastName": helpers.getListValue(name, 1, " "),
         "mobile": conversation.PhoneNumber or " ",
         "city": ", ".join(
-            conversation.Data.get('keywordsByDataType').get(DT.CandidateLocation.value['name'], [" "])),
+            conversation.Data.get('keywordsByDataType').get(DT.CandidateLocation.value['name'], [])),
         "email": conversation.Email or " ",
-        "emails": conversation.Data.get('keywordsByDataType').get(DT.CandidateEmail.value['name'], [" "]),
+        "emails": conversation.Data.get('keywordsByDataType').get(DT.CandidateEmail.value['name'], []),
 
         "skills": ", ".join(
-            conversation.Data.get('keywordsByDataType').get(DT.CandidateSkills.value['name']) or
-            conversation.Data.get('keywordsByDataType').get(DT.JobEssentialSkills.value['name'], [" "])),
+            conversation.Data.get('keywordsByDataType').get(DT.CandidateSkills.value['name'],) or
+            conversation.Data.get('keywordsByDataType').get(DT.JobEssentialSkills.value['name'], [])) or None,
         "yearsExperience": ", ".join(
             conversation.Data.get('keywordsByDataType').get(DT.CandidateYearsExperience.value['name']) or
-            conversation.Data.get('keywordsByDataType').get(DT.JobYearsRequired.value['name'], [" "])),
+            conversation.Data.get('keywordsByDataType').get(DT.JobYearsRequired.value['name'], [])) or None,
 
         "preferredWorkCity": ", ".join(
-            conversation.Data.get('keywordsByDataType').get(DT.JobLocation.value['name'], [" "])),
+            conversation.Data.get('keywordsByDataType').get(DT.JobLocation.value['name'], [])) or None,
         "preferredJobTitle": ", ".join(
-            conversation.Data.get('keywordsByDataType').get(DT.JobTitle.value['name'], [])),
+            conversation.Data.get('keywordsByDataType').get(DT.JobTitle.value['name'], [])) or None,
         "preferredJobType": ", ".join(
-            conversation.Data.get('keywordsByDataType').get(DT.JobType.value['name'], [])),  # cant be used until predefined values
+            conversation.Data.get('keywordsByDataType').get(DT.JobType.value['name'], [])) or None,  # cant be used until predefined values
 
-        "educations": conversation.Data.get('keywordsByDataType').get(DT.CandidateEducation.value['name'], []),
+        "educations": ", ".join(conversation.Data.get('keywordsByDataType').get(DT.CandidateEducation.value['name'],
+                                                                                [])) or None,
         "availability": ", ".join(
             conversation.Data.get('keywordsByDataType').get(DT.CandidateAvailability.value['name'], [])) or None,
 
@@ -181,11 +182,10 @@ def produceRecruiterValueReport(companyID, crmName):
 
 # Connect to a new CRM
 # type e.g. Bullhorn, Adapt etc.
-def connect(type, auth, companyID) -> Callback:
+def connect(crm_type, auth, companyID) -> Callback:
     try:
-        crm_type: CRM = CRM[type]
         # test connection
-        test_callback: Callback = testConnection(type, auth, companyID)
+        test_callback: Callback = testConnection(crm_type, auth, companyID)
         if not test_callback.Success:
             return test_callback
 
@@ -206,11 +206,10 @@ def connect(type, auth, companyID) -> Callback:
 # Test connection to a CRM
 def testConnection(crm_type, auth, companyID) -> Callback:
     try:
-        crm_type: CRM = CRM[type]
-
         # test connection
         if CRM.has_value(crm_type):
-            if crm_type == CRM.Adapt or crm_type == CRM.Greenhouse:
+            crm: CRM = CRM[crm_type]
+            if crm == CRM.Adapt or crm == CRM.Greenhouse:
                 return eval(crm_type + ".testConnection(auth)")
 
             return eval(crm_type + ".testConnection(auth, companyID)")
@@ -222,14 +221,14 @@ def testConnection(crm_type, auth, companyID) -> Callback:
         return Callback(False, "CRM testing failed.")
 
 
-def disconnectByType(type, companyID) -> Callback:
+def disconnectByType(crm_type, companyID) -> Callback:
     try:
-        crm_callback: Callback = getCRMByType(type, companyID)
+        crm_callback: Callback = getCRMByType(crm_type, companyID)
         if not crm_callback:
             return Callback(False, "Could not find CRM.")
 
         # no matter if it fails or not remove it from the system
-        logoutOfCRM(crm_callback.Data.Auth, type, companyID)
+        logoutOfCRM(crm_callback.Data.Auth, crm_type, companyID)
 
         db.session.delete(crm_callback.Data)
         db.session.commit()
@@ -310,9 +309,9 @@ def getAll(companyID) -> Callback:
         return Callback(False, 'Could not fetch all CRMs.')
 
 
-def updateByType(type, newAuth, companyID):
+def updateByType(crm_type, newAuth, companyID):
     try:
-        crm = db.session.query(CRM_Model).filter(and_(CRM_Model.CompanyID == companyID, CRM_Model.Type == type)).first()
+        crm = db.session.query(CRM_Model).filter(and_(CRM_Model.CompanyID == companyID, CRM_Model.Type == crm_type)).first()
         crm.Auth = dict(newAuth)
         db.session.commit()
         return Callback(True, "New auth has been saved")

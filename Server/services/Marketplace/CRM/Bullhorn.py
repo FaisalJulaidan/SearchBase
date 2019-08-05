@@ -150,7 +150,6 @@ def sendQuery(auth, query, method, body, companyID, optionalParams=None):
 
         # set headers
         headers = {'Content-Type': 'application/json'}
-
         # test the BhRestToken (rest_token)
         r = marketplace_helpers.sendRequest(url, method, headers, json.dumps(body))
         if r.status_code == 401:  # wrong rest token
@@ -203,11 +202,11 @@ def insertCandidate(auth, data, companyID) -> Callback:
             "primarySkills": data.get("skills"),
             "experience": data.get("yearsExperience"),
 
-            "secondaryAddress": data.get("preferredWorkCity"),
-
-            "educations": {
-                "data": data.get("educations"),
+            "secondaryAddress": {
+                "city": data.get("preferredWorkCity"),
             },
+
+            "educationDegree": data.get("educations"),
             "dateAvailable": data.get("availability"),  # TODO CHECK
             "salary": data.get("salary"),
             "dayRate": data.get("dayRate")

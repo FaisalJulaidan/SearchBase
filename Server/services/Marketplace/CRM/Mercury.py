@@ -154,15 +154,18 @@ def buildUrl(query, domain, optionalParams=None):
 
 def insertCandidate(auth, data, companyID) -> Callback:
     try:
-        # availability, yearsExperience
         body = {
             "crimson_firstname": data.get("firstName"),
             "crimson_surname": data.get("lastName"),
             "crimson_mobile": data.get("mobile"),
             "crimson_town": data.get("city"),
             "crimson_email": data.get("email"),
-            "crimson_availability": data.get("availability"),
+
+            "crimson_workarea": data.get("preferredWorkCity"),
             "crimson_jobtitle": data.get("jobTitle"),
+
+            "crimson_availability": data.get("availability"),
+
             "crimson_expsalaryp": float(data.get("annualSalary")),
             "crimson_expratec": float(data.get("dayRate"))
         }
@@ -233,6 +236,7 @@ def insertClient(auth, data, companyID) -> Callback:
             # check number of emails and submit them
             "emailaddress1": data.get("emails")[0],
             "telephone1": data.get("mobile"),
+            "company": data.get("companyName")
         }
         # send filter
         sendQuery_callback: Callback = sendQuery(auth, "contacts", "post", body, companyID)

@@ -240,11 +240,10 @@ def generate():
 
 
 # Create an AutoPilot for a Company
-    auto_pilot_services.create('First Pilot',
+    reader_a.AutoPilot = auto_pilot_services.create('First Pilot',
                                "First pilot to automate the acceptance and rejection of candidates application",
-                               aramco.ID)
+                               aramco.ID).Data
     auto_pilot_services.create('Second Pilot', '', aramco.ID)
-    reader_a.AutoPilot = auto_pilot_services.getByID(1,1).Data
 
     # Add Appointment
     a = Appointment(DateTime=datetime.now() + timedelta(days=5), Conversation=conversation1)

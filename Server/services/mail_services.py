@@ -66,12 +66,11 @@ def sendVerificationEmail(firstName, lastName, email, companyName, companyID) ->
 
 def sendAcceptanceEmail(title, body, userName, email, logoPath, companyName):
     try:
-        print(title)
-        print(body)
         callback: Callback = __sendEmail(
             email,
             title or 'Acceptance Letter',
             '/emails/acceptance_letter.html',
+            body=body,
             companyName=companyName,
             logoPath=logoPath,
             userName=userName)
@@ -88,7 +87,6 @@ def sendAcceptanceEmail(title, body, userName, email, logoPath, companyName):
 
 def sendRejectionEmail(title, body, userName, email, logoPath, companyName):
     try:
-
         callback: Callback = __sendEmail(
             email,
             title or 'Rejection Letter',

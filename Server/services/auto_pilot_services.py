@@ -19,9 +19,8 @@ def processConversation(conversation: Conversation, autoPilot: AutoPilot):
 
         # Do automation only if the autoPilot is active
         if autoPilot.Active:
-            print("yes iam active")
             email = conversation.Email
-            print(email)
+
             def __processSendingEmails (email, status: Status, autoPilot: AutoPilot):
 
                 userName = conversation.Name or 'Anonymous'
@@ -71,10 +70,10 @@ def processConversation(conversation: Conversation, autoPilot: AutoPilot):
                 # Send Rejection Letters
                 elif status is Status.Rejected and autoPilot.SendRejectionEmail:
 
-                    emailTitle = autoPilot.AcceptanceEmailTitle \
+                    emailTitle = autoPilot.RejectionEmailTitle \
                         .replace("${candidateName}$", userName) \
                         .replace("${candidateEmail}$", email)
-                    emailBody = autoPilot.AcceptanceEmailBody \
+                    emailBody = autoPilot.RejectionEmailBody \
                         .replace("${candidateName}$", userName) \
                         .replace("${candidateEmail}$", email)
 
@@ -105,20 +104,17 @@ def processConversation(conversation: Conversation, autoPilot: AutoPilot):
 # The new AutoPilot will be returned parsed
 def create(name, desc, companyID: int) -> Callback:
     try:
-
-        autoPilot= AutoPilot(Name=name, Description=desc, CompanyID=companyID) # Create new AutoPilot
-
-        # Create the AutoPilot with default open time slots
-        default = {"From": time(8,30), "To": time(12,0), "Duration": 30, "AutoPilot": autoPilot, "Active": False}
-        openTimes = [OpenTimes(Day=0, **default),  # Sunday
-                     OpenTimes(Day=1, **default),
-                     OpenTimes(Day=2, **default),
-                     OpenTimes(Day=3, **default),
-                     OpenTimes(Day=4, **default),
-                     OpenTimes(Day=5, **default),
-                     OpenTimes(Day=6, **default),  # Saturday
-                     ]
-        db.session.add_all(openTimes)
+        autoPilot= AutoPilot(Name=name,
+                             Description=desc,
+                             CompanyID=companyID,
+                             AcceptanceEmailTitle="Acceptance Letter",
+                             AcceptanceEmailBody="<h2>Hello ${candidateName},</h2><p>We are happy to announce that your application has been accepted based on your responses and we will get back to you very soon.</p><p>Regards,</p>",
+                             AcceptanceSMSBody="",
+                             RejectionEmailTitle="Rejection Letter",
+                             RejectionEmailBody="<h2>Hello ${candidateName},</h2><p>Unfortunately, we are very sorry to announce that your application has been rejected based on your responses.<br><br>Please feel free to visit our website and explore other opportunities that you feel may be better suited.<br>&nbsp;</p><p>Regards,</p>",
+                             RejectionSMSBody="",
+                             )
+        db.session.add(autoPilot)
         db.session.commit()
         return Callback(True, "Got AutoPilot successfully.", autoPilot)
 

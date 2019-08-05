@@ -267,7 +267,7 @@ class AutoPilot extends React.Component {
                                                     <Button
                                                         onClick={() =>
                                                             this.setState({
-                                                                acceptanceEmailBody: this.state.acceptanceEmailBody + ' ${candidateName}'
+                                                                acceptanceEmailBody: this.state.acceptanceEmailBody + ' ${candidateName}$'
                                                             })
                                                         }>
                                                         Candidate Name
@@ -275,7 +275,7 @@ class AutoPilot extends React.Component {
                                                     <Button
                                                         onClick={() =>
                                                             this.setState({
-                                                                acceptanceEmailBody: this.state.acceptanceEmailBody + ' ${candidateEmail}'
+                                                                acceptanceEmailBody: this.state.acceptanceEmailBody + ' ${candidateEmail}$'
                                                             })
                                                         }>
                                                         Candidate Email
@@ -284,7 +284,7 @@ class AutoPilot extends React.Component {
 
                                                 <CKEditor
                                                     editor={ClassicEditor}
-                                                    config={{toolbar: toolbar}}
+                                                    config={{toolbar: toolbar, width: "500px"}}
                                                     data={this.state.acceptanceEmailBody}
                                                     onChange={(event, editor) => this.setState(state => state.acceptanceEmailBody = editor?.getData())}
                                                     onInit={editor => this.setState(state => state.acceptanceEmailBody = editor?.getData())}
@@ -312,7 +312,7 @@ class AutoPilot extends React.Component {
                                                     <Button
                                                         onClick={() =>
                                                             this.setState({
-                                                                acceptanceSMSBody: this.state.acceptanceSMSBody + ' ${candidateName}'
+                                                                acceptanceSMSBody: this.state.acceptanceSMSBody + ' ${candidateName}$'
                                                             })
                                                         }>
                                                         Candidate Name
@@ -320,7 +320,7 @@ class AutoPilot extends React.Component {
                                                     <Button
                                                         onClick={() =>
                                                             this.setState({
-                                                                acceptanceSMSBody: this.state.acceptanceSMSBody + ' ${candidateEmail}'
+                                                                acceptanceSMSBody: this.state.acceptanceSMSBody + ' ${candidateEmail}$'
                                                             })
                                                         }>
                                                         Candidate Email
@@ -387,7 +387,7 @@ class AutoPilot extends React.Component {
                                                     <Button
                                                         onClick={() =>
                                                             this.setState({
-                                                                rejectionEmailBody: this.state.rejectionEmailBody + ' ${candidateName}'
+                                                                rejectionEmailBody: this.state.rejectionEmailBody + ' ${candidateName}$'
                                                             })
                                                         }>
                                                         Candidate Name
@@ -395,7 +395,7 @@ class AutoPilot extends React.Component {
                                                     <Button
                                                         onClick={() =>
                                                             this.setState({
-                                                                rejectionEmailBody: this.state.rejectionEmailBody + ' ${candidateEmail}'
+                                                                rejectionEmailBody: this.state.rejectionEmailBody + ' ${candidateEmail}$'
                                                             })
                                                         }>
                                                         Candidate Email
@@ -432,7 +432,7 @@ class AutoPilot extends React.Component {
                                                     <Button
                                                         onClick={() =>
                                                             this.setState({
-                                                                rejectionSMSBody: this.state.rejectionSMSBody + ' ${candidateName}'
+                                                                rejectionSMSBody: this.state.rejectionSMSBody + ' ${candidateName}$'
                                                             })
                                                         }>
                                                         Candidate Name
@@ -440,7 +440,7 @@ class AutoPilot extends React.Component {
                                                     <Button
                                                         onClick={() =>
                                                             this.setState({
-                                                                rejectionSMSBody: this.state.rejectionSMSBody + ' ${candidateEmail}'
+                                                                rejectionSMSBody: this.state.rejectionSMSBody + ' ${candidateEmail}$'
                                                             })
                                                         }>
                                                         Candidate Email

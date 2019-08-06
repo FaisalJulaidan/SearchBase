@@ -20,7 +20,6 @@ def processConversation(assistant: Assistant, conversation: Conversation) -> Cal
 
 def insertCandidate(assistant: Assistant, conversation: Conversation):
     name = (conversation.Name or " ").split(" ")
-
     data = {
         "name": conversation.Name or " ",
         "firstName": helpers.getListValue(name, 0, " "),
@@ -33,7 +32,7 @@ def insertCandidate(assistant: Assistant, conversation: Conversation):
         "emails": conversation.Data.get('keywordsByDataType').get(DT.CandidateEmail.value['name'], []),
 
         "skills": ", ".join(
-            conversation.Data.get('keywordsByDataType').get(DT.CandidateSkills.value['name'],) or
+            conversation.Data.get('keywordsByDataType').get(DT.CandidateSkills.value['name'], ) or
             conversation.Data.get('keywordsByDataType').get(DT.JobEssentialSkills.value['name'], [])) or None,
         "yearsExperience": ", ".join(
             conversation.Data.get('keywordsByDataType').get(DT.CandidateYearsExperience.value['name']) or
@@ -44,15 +43,17 @@ def insertCandidate(assistant: Assistant, conversation: Conversation):
         "preferredJobTitle": ", ".join(
             conversation.Data.get('keywordsByDataType').get(DT.JobTitle.value['name'], [])) or None,
         "preferredJobType": ", ".join(
-            conversation.Data.get('keywordsByDataType').get(DT.JobType.value['name'], [])) or None,  # cant be used until predefined values
+            conversation.Data.get('keywordsByDataType').get(DT.JobType.value['name'], [])) or None, # cant be used until predefined values
 
         "educations": ", ".join(conversation.Data.get('keywordsByDataType').get(DT.CandidateEducation.value['name'],
                                                                                 [])) or None,
         "availability": ", ".join(
             conversation.Data.get('keywordsByDataType').get(DT.CandidateAvailability.value['name'], [])) or None,
 
-        "annualSalary": getSalary(conversation, DT.CandidateAnnualDesiredSalary or DT.JobAnnualSalary, "Average"),
-        "dayRate": getSalary(conversation, DT.CandidateDailyDesiredSalary or DT.JobDayRate, "Average")
+        "annualSalary": getSalary(conversation, DT.CandidateAnnualDesiredSalary, "Min") or
+                        getSalary(conversation, DT.JobAnnualSalary, "Min"),
+        "dayRate": getSalary(conversation, DT.CandidateDailyDesiredSalary, "Min") or
+                   getSalary(conversation, DT.JobDayRate, "Min")
     }
 
     crm_type = assistant.CRM.Type.value
@@ -77,16 +78,16 @@ def insertClient(assistant: Assistant, conversation: Conversation):
         "lastName": name[-1],
         "mobile": conversation.PhoneNumber or " ",
         "city": " ".join(
-                conversation.Data.get('keywordsByDataType').get(DT.ClientLocation.value['name'], [])),
+            conversation.Data.get('keywordsByDataType').get(DT.ClientLocation.value['name'], [])),
         # check number of emails and submit them
         "email": emails[0],
         "emails": emails,
         "availability": " ".join(
-                conversation.Data.get('keywordsByDataType').get(DT.ClientAvailability.value['name'], [])),
+            conversation.Data.get('keywordsByDataType').get(DT.ClientAvailability.value['name'], [])),
 
         "companyName": " ".join(
-                conversation.Data.get('keywordsByDataType').get(DT.CompanyName.value['name'],
-                                                                ["Undefined Company - TSB"]))
+            conversation.Data.get('keywordsByDataType').get(DT.CompanyName.value['name'],
+                                                            ["Undefined Company - TSB"]))
     }
 
     crm_type = assistant.CRM.Type.value
@@ -138,7 +139,7 @@ def searchJobs(assistant: Assistant, session):
         "city": checkFilter(session['keywordsByDataType'], DT.JobLocation) or
                 checkFilter(session['keywordsByDataType'], DT.CandidateLocation),
         "employmentType": checkFilter(session['keywordsByDataType'], DT.JobType),
-        "skills": checkFilter(session['keywordsByDataType'], DT.JobEssentialSkills)or
+        "skills": checkFilter(session['keywordsByDataType'], DT.JobEssentialSkills) or
                   checkFilter(session['keywordsByDataType'], DT.CandidateSkills),
         # "startDate": checkFilter(session['keywordsByDataType'], DT.JobStartDate),
         # "endDate": checkFilter(session['keywordsByDataType'], DT.JobEndDate),
@@ -312,7 +313,8 @@ def getAll(companyID) -> Callback:
 
 def updateByType(crm_type, newAuth, companyID):
     try:
-        crm = db.session.query(CRM_Model).filter(and_(CRM_Model.CompanyID == companyID, CRM_Model.Type == crm_type)).first()
+        crm = db.session.query(CRM_Model).filter(
+            and_(CRM_Model.CompanyID == companyID, CRM_Model.Type == crm_type)).first()
         crm.Auth = dict(newAuth)
         db.session.commit()
         return Callback(True, "New auth has been saved")
@@ -325,11 +327,13 @@ def updateByType(crm_type, newAuth, companyID):
 
 # get min/max/average salary from the string and convert to specified period (daily, annually)
 def getSalary(conversation: Conversation, dataType: DataType, salaryType, toPeriod=None):  # type Period
-    # ex. Less Than 5000 GBP Monthly
+    # ex. 5000-20000 GBP Annual
     salary = conversation.Data.get('keywordsByDataType').get(dataType.value['name'], 0)
+
     if salary:
         salarySplitted = salary[0].split(" ")
         salaryAmmount = salarySplitted[0].split("-")
+
         if toPeriod:
             if salaryType == "Average":
                 salary = helpers.convertSalaryPeriod(str(float(salaryAmmount[1]) - float(salaryAmmount[0])),
@@ -345,8 +349,32 @@ def getSalary(conversation: Conversation, dataType: DataType, salaryType, toPeri
                 salary = salaryAmmount[0]
             elif salaryType == "Max":
                 salary = salaryAmmount[1]
+
     return salary
 
-# prevent IDEA from automatically removing dependencies that are used in eval
+
+# create a paragraph regarding the candidate with data that the API cannot accept
+def additionalCandidateNotesBuilder(data):
+    data = helpers.cleanDict(data)
+    if not data:
+        return ""
+    
+    sentences = {
+        "yearsExperience": "They have [yearsExperience] years experience with their qualifications. ",
+        "preferredJobTitle": "They have stated that their preferred jobs are connected with \"[preferredJobTitle]\". ",
+        "preferredJobType": "They also prefer [preferredJobType] roles. ",
+        "skills": "They are also well versed in [skills]. ",
+        "educations": "For education they have provided \"[educations]\". "
+    }
+
+    paragraph = "SearchBase has also collected the following information regarding this candidate: "
+    for key, value in data.items():
+        paragraph += sentences[key].replace("[" + key + "]", value)
+
+    return paragraph
+
+
+# prevents IDEA from automatically removing dependencies that are used in eval
 def ideaCalmer():
     print(Jobscience, Mercury, Greenhouse)
+

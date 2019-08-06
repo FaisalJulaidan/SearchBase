@@ -173,7 +173,6 @@ export const Chatbot = ({
 
 
         const setNextBlock = async (chatbot, started, curAction, assistant) => {
-            console.log(loadByDefault)
             if (!isReady(chatbot) || !assistant) return;
             if (!started) {
                 setChatbotStatus({ started: true });
@@ -226,7 +225,7 @@ export const Chatbot = ({
 
 
         };
-        if (!assistant && loadByDefault === "true") {
+        if (!assistant && (loadByDefault === "true" || !loadByDefault)) {
             fetchChatbot()
         }
         if (!window.__TSB_CHATBOT){

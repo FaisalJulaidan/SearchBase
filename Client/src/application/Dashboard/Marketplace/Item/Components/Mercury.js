@@ -21,6 +21,7 @@ export const MercuryFeatures = () =>
                 <li>Password</li>
             </ul>
         </Paragraph>
+
         <Paragraph>
             You can request both information by heading to this link:
             <Text code style={{margin: '0 0 0 5px'}}>
@@ -33,6 +34,14 @@ export const MercuryFeatures = () =>
 
         <Paragraph>
             Once you have the necessary information, you can simply start using Mercury + TheSearchBase.
+        </Paragraph>
+
+        <Paragraph>
+            If at any point you wish to log out from our system you can visit <a href="https://myapps.microsoft.com" target={'_blank'}
+                style={{cursor: 'pointer'}}>
+                https://myapps.microsoft.com
+                </a>,
+            go to Profile at the top right and press 'Sign out everywhere'.
         </Paragraph>
 
         <Title level={2}>Guidelines and Resources</Title>

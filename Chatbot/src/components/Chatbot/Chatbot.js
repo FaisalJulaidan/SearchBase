@@ -226,7 +226,7 @@ export const Chatbot = ({
 
 
         };
-        if (!assistant && loadByDefault === "true") {
+        if (!assistant && (loadByDefault === "true" || !loadByDefault)) {
             fetchChatbot()
         }
         if (!window.__TSB_CHATBOT){

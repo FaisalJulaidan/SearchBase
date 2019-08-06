@@ -253,11 +253,14 @@ export const Chatbot = ({
                                     logoPath={assistant.LogoPath}
                                     resetChatbot={reset}
                                     closeWindow={closeWindow}/>
-                            <Flow inputOpen={animation.inputOpen} thinking={thinking}
+                            <Flow inputOpen={animation.inputOpen}
+                                  hideSignature={assistant.HideSignature}
+                                  thinking={thinking}
                                   resetAsync={resetAsync}/>
                             <Input isDirectLink={isDirectLink}
+                                   hideSignature={assistant.HideSignature}
                                    visible={animation.inputOpen}/>
-                            <Signature isDirectLink={isDirectLink}/>
+                            {assistant.HideSignature ? null : <Signature isDirectLink={isDirectLink}/>}
                         </div>
                         :
                         <ChatButton btnColor={btnColor}

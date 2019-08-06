@@ -33,6 +33,10 @@
     height: calc(100% - 110px)
 }
 
+.Extended_Without_Signature {
+    height: calc(100% - 60px)
+}
+
 .Flow > p,
 .Flow_IE11 p {
     font-size: 15px;

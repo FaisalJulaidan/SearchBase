@@ -58,6 +58,14 @@ def getDomain():
     return None
 
 
+def cleanDict(target):
+    if type(target) is str:
+        return json.dumps({k: v for k, v in json.loads(target).items() if v is not None and v is not 0})
+    elif type(target) is dict:
+        return {k: v for k, v in target.items() if v is not None and v is not 0}
+    return target
+
+
 def logError(exception):
     if os.environ['FLASK_ENV'] == 'development':
         print(exception)

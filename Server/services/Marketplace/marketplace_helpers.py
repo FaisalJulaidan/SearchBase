@@ -1,4 +1,5 @@
 import requests
+import json
 
 from services.Marketplace.Messenger import mesenger_services
 from utilities.enums import Calendar as Calendar_Enum, CRM as CRM_Enum, Messenger as Messenger_Enum
@@ -30,7 +31,6 @@ def connect(type, auth, companyID):
 def testConnection(type, companyID):
     try:
 
-        print(0)
         # find the type and redirect to its service
         if CRM_Enum.has_value(type):
 
@@ -47,7 +47,6 @@ def testConnection(type, companyID):
                             })
 
         elif Calendar_Enum.has_value(type):
-            print(1)
             # Check if connection exist
             exist_callback: Callback = calendar_services.getCalendarByType(type, companyID)
             if not exist_callback.Success:
@@ -61,7 +60,6 @@ def testConnection(type, companyID):
                              })
 
         elif Messenger_Enum.has_value(type):
-            print(2)
             # Check if connection exist
             exist_callback: Callback = mesenger_services.getMessengerByType(type, companyID)
             if not exist_callback.Success:
@@ -105,6 +103,7 @@ def disconnect(type, companyID):
 
 # send request with dynamic method
 def sendRequest(url, method, headers, data=None):
+    data = helpers.cleanDict(data)
     request = None
     if method is "put":
         request = requests.put(url, headers=headers, data=data)

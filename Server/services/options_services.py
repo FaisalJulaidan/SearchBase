@@ -65,6 +65,7 @@ def getOptions(industry=None) -> Callback:
                     {'label': 'Main Website', 'fileName': 'main'},
                     {'label': 'Appointment Scheduler', 'fileName': 'appointment'},
                     {'label': 'Join Us', 'fileName': 'join-us'},
+                    {'label': 'Template 1', 'fileName': 'template-1'},
                 ]
             }
         ],

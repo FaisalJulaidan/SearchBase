@@ -29,9 +29,9 @@ def login():
     return serve()
 
 
-@public_router.route('/signup')
-def signup():
-    return serve()
+# @public_router.route('/signup')
+# def signup():
+#     return serve()
 
 
 @public_router.route('/forget_password')

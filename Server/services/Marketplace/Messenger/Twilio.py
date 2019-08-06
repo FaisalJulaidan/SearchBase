@@ -7,9 +7,11 @@ from twilio.rest import Client
 def testConnection(auth):
     try:
 
-        sms_message = "Test"
+        sms_message = "If you are receiving this message then the Twilio test was successful. " + \
+                      "If you do not know why you are receiving this, please contact SearchBase on " + \
+                      "support@thesearchbase.com"
 
-        send_sms_callback: Callback = sendMessage(auth.get("phone_number"), sms_message, auth)
+        send_sms_callback: Callback = sendMessage("+447578721001", sms_message, auth)
         if not send_sms_callback.Success:
             raise Exception(send_sms_callback.Message)
 

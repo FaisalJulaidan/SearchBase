@@ -2,7 +2,21 @@ import React from 'react';
 import {connect} from 'react-redux';
 import styles from './AutoPilot.module.less';
 import NoHeaderPanel from 'components/NoHeaderPanel/NoHeaderPanel';
-import {Breadcrumb, Button, Collapse, Divider, Form, Input, InputNumber, Modal, Spin, Switch, Typography} from 'antd';
+import {
+    Breadcrumb,
+    Button,
+    Col,
+    Collapse,
+    Divider,
+    Form,
+    Input,
+    InputNumber,
+    Modal,
+    Row,
+    Spin,
+    Switch,
+    Typography
+} from 'antd';
 import 'types/TimeSlots_Types';
 import './AutoPilot.less'
 import {history} from 'helpers';
@@ -52,6 +66,11 @@ class AutoPilot extends React.Component {
         rejectionScore: null,
         rejectionEmailBody: "<p>Sorry you are not accepted.</p>",
         rejectionSMSBody: "Sorry you are not accepted.",
+
+        sendAcceptanceEmailErrors: false,
+        sendAcceptanceSMSErrors: false,
+        sendRejectionEmailErrors: false,
+        sendRejectionSMSErrors: false,
 
     };
 
@@ -106,27 +125,61 @@ class AutoPilot extends React.Component {
                 active: autoPilot.Active,
                 name: values.name,
                 description: values.description,
+
                 acceptApplications: state.acceptApplications,
                 rejectApplications: state.rejectApplications,
 
-                sendAcceptanceEmail: state.sendAcceptanceEmail,
-                sendRejectionEmail: state.sendRejectionEmail,
-                sendAcceptanceSMS: state.sendAcceptanceSMS,
-                sendRejectionSMS: state.sendRejectionSMS,
-
                 acceptanceScore: state.acceptanceScore / 100,
+                rejectionScore: state.rejectionScore / 100,
+
+                sendAcceptanceEmail: state.sendAcceptanceEmail,
                 acceptanceEmailTitle: values.acceptanceEmailTitle || autoPilot.AcceptanceEmailTitle,
                 acceptanceEmailBody: state.acceptanceEmailBody,
-                acceptanceSMSBody: state.acceptanceSMSBody,
 
-                rejectionScore: state.rejectionScore / 100,
+                sendAcceptanceSMS: state.sendAcceptanceSMS,
+                acceptanceSMSBody: state.acceptanceSMSBody.replace(/<[^>]*>/g, ''),
+
+                sendRejectionEmail: state.sendRejectionEmail,
                 rejectionEmailTitle: values.rejectionEmailTitle || autoPilot.RejectionEmailTitle,
                 rejectionEmailBody: state.rejectionEmailBody,
-                rejectionSMSBody: state.rejectionSMSBody,
+
+                sendRejectionSMS: state.sendRejectionSMS,
+                rejectionSMSBody: state.rejectionSMSBody.replace(/<[^>]*>/g, ''),
 
                 sendCandidatesAppointments: state.sendCandidatesAppointments,
-
             };
+
+            if (payload.sendAcceptanceEmail) {
+                if (!payload.acceptanceEmailTitle || !payload.acceptanceEmailBody)
+                    return this.setState({sendAcceptanceEmailErrors: true});
+                else
+                    this.setState({sendAcceptanceEmailErrors: false})
+            } else
+                this.setState({sendAcceptanceEmailErrors: false});
+
+            if (payload.sendAcceptanceSMS) {
+                if (!payload.acceptanceSMSBody)
+                    return this.setState({sendAcceptanceSMSErrors: true});
+                else
+                    this.setState({sendAcceptanceSMSErrors: false})
+            } else
+                this.setState({sendAcceptanceSMSErrors: false});
+
+            if (payload.sendRejectionEmail) {
+                if (!payload.rejectionEmailTitle || !payload.rejectionEmailBody)
+                    return this.setState({sendRejectionEmailErrors: true});
+                else
+                    this.setState({sendRejectionEmailErrors: false})
+            } else
+                this.setState({sendRejectionEmailErrors: false});
+
+            if (payload.sendRejectionSMS) {
+                if (!payload.rejectionSMSBody)
+                    return this.setState({sendRejectionSMSErrors: true});
+                else
+                    this.setState({sendRejectionSMSErrors: false})
+            } else
+                this.setState({sendRejectionSMSErrors: false});
 
             console.log(payload)
 
@@ -206,7 +259,6 @@ class AutoPilot extends React.Component {
                                     )}
                                 </FormItem>
 
-                                <br/>
                                 <Divider/>
 
                                 <Collapse bordered={false}>
@@ -248,11 +300,13 @@ class AutoPilot extends React.Component {
                                                 </div>
                                             )}
                                         </FormItem>
+
                                         {
                                             this.state.sendAcceptanceEmail &&
                                             <FormItem label="Acceptance Email Title" vi>
                                                 {getFieldDecorator('acceptanceEmailTitle', {
                                                     initialValue: autoPilot?.AcceptanceEmailTitle,
+                                                    rules: [{required: true,}]
                                                 })(
                                                     <Input placeholder="Congrats you got accepted"/>
                                                 )}
@@ -261,8 +315,14 @@ class AutoPilot extends React.Component {
 
                                         {
                                             this.state.sendAcceptanceEmail &&
-                                            <div className={styles.CEKwrapper}>
+                                            <Row className={styles.CEKwrapper}>
                                                 <h4>Acceptance letter</h4>
+
+                                                {
+                                                    this.state.sendAcceptanceEmailErrors &&
+                                                    <p style={{color: 'red'}}> * Title and Body field are requierd</p>
+                                                }
+
                                                 <ButtonGroup style={{margin: '5px 0'}}>
                                                     <Button
                                                         onClick={() =>
@@ -282,14 +342,18 @@ class AutoPilot extends React.Component {
                                                     </Button>
                                                 </ButtonGroup>
 
-                                                <CKEditor
-                                                    editor={ClassicEditor}
-                                                    config={{toolbar: toolbar, width: "500px"}}
-                                                    data={this.state.acceptanceEmailBody}
-                                                    onChange={(event, editor) => this.setState(state => state.acceptanceEmailBody = editor?.getData())}
-                                                    onInit={editor => this.setState(state => state.acceptanceEmailBody = editor?.getData())}
-                                                />
-                                            </div>
+                                                <Row>
+                                                    <Col span={15}>
+                                                        <CKEditor
+                                                            editor={ClassicEditor}
+                                                            config={{toolbar: toolbar}}
+                                                            data={this.state.acceptanceEmailBody}
+                                                            onChange={(event, editor) => this.setState(state => state.acceptanceEmailBody = editor?.getData())}
+                                                            onInit={editor => this.setState(state => state.acceptanceEmailBody = editor?.getData())}
+                                                        />
+                                                    </Col>
+                                                </Row>
+                                            </Row>
                                         }
 
                                         <FormItem label="Auto send SMS"
@@ -304,10 +368,15 @@ class AutoPilot extends React.Component {
                                                 </div>
                                             )}
                                         </FormItem>
+
                                         {
                                             this.state.sendAcceptanceSMS &&
-                                            <div className={styles.CEKwrapper}>
+                                            <Row className={styles.CEKwrapper}>
                                                 <h4>Acceptance letter</h4>
+                                                {
+                                                    this.state.sendAcceptanceSMSErrors &&
+                                                    <p style={{color: 'red'}}> * Body field is requierd</p>
+                                                }
                                                 <ButtonGroup style={{margin: '5px 0'}}>
                                                     <Button
                                                         onClick={() =>
@@ -327,9 +396,18 @@ class AutoPilot extends React.Component {
                                                     </Button>
                                                 </ButtonGroup>
 
-                                                <Input.TextArea value={this.state.acceptanceSMSBody}
-                                                                onChange={(e) => this.setState({acceptanceSMSBody: e.target.value})}/>
-                                            </div>
+                                                <Row>
+                                                    <Col span={15}>
+                                                        <CKEditor
+                                                            editor={ClassicEditor}
+                                                            config={{toolbar: ['undo', 'redo']}}
+                                                            data={this.state.acceptanceSMSBody}
+                                                            onChange={(event, editor) => this.setState(state => state.acceptanceSMSBody = editor?.getData())}
+                                                            onInit={editor => this.setState(state => state.acceptanceSMSBody = editor?.getData())}
+                                                        />
+                                                    </Col>
+                                                </Row>
+                                            </Row>
                                         }
                                     </Panel>
 
@@ -373,6 +451,7 @@ class AutoPilot extends React.Component {
                                             <FormItem label="Rejection Email Title">
                                                 {getFieldDecorator('rejectionEmailTitle', {
                                                     initialValue: autoPilot?.RejectionEmailTitle,
+                                                    rules: [{required: true,}]
                                                 })(
                                                     <Input placeholder="Sorry you got rejected"/>
                                                 )}
@@ -381,8 +460,14 @@ class AutoPilot extends React.Component {
 
                                         {
                                             this.state.sendRejectionEmail &&
-                                            <div className={styles.CEKwrapper}>
+                                            <Row className={styles.CEKwrapper}>
                                                 <h4>Rejection Letter</h4>
+
+                                                {
+                                                    this.state.sendRejectionEmailErrors &&
+                                                    <p style={{color: 'red'}}> * Title and Body field are requierd</p>
+                                                }
+
                                                 <ButtonGroup style={{margin: '5px 0px'}}>
                                                     <Button
                                                         onClick={() =>
@@ -401,14 +486,19 @@ class AutoPilot extends React.Component {
                                                         Candidate Email
                                                     </Button>
                                                 </ButtonGroup>
-                                                <CKEditor
-                                                    editor={ClassicEditor}
-                                                    config={{toolbar: toolbar}}
-                                                    data={this.state.rejectionEmailBody}
-                                                    onChange={(event, editor) => this.setState(state => state.rejectionEmailBody = editor?.getData())}
-                                                    onInit={editor => this.setState(state => state.rejectionEmailBody = editor?.getData())}
-                                                />
-                                            </div>
+
+                                                <Row>
+                                                    <Col span={15}>
+                                                        <CKEditor
+                                                            editor={ClassicEditor}
+                                                            config={{toolbar: toolbar}}
+                                                            data={this.state.rejectionEmailBody}
+                                                            onChange={(event, editor) => this.setState(state => state.rejectionEmailBody = editor?.getData())}
+                                                            onInit={editor => this.setState(state => state.rejectionEmailBody = editor?.getData())}
+                                                        />
+                                                    </Col>
+                                                </Row>
+                                            </Row>
                                         }
 
                                         <FormItem label="Auto send rejection SMS"
@@ -426,8 +516,13 @@ class AutoPilot extends React.Component {
 
                                         {
                                             this.state.sendRejectionSMS &&
-                                            <div className={styles.CEKwrapper}>
+                                            <Row className={styles.CEKwrapper}>
                                                 <h4>Rejection Letter</h4>
+
+                                                {
+                                                    this.state.sendRejectionSMSErrors &&
+                                                    <p style={{color: 'red'}}> * Body field is requierd</p>
+                                                }
                                                 <ButtonGroup style={{margin: '5px 0px'}}>
                                                     <Button
                                                         onClick={() =>
@@ -447,15 +542,23 @@ class AutoPilot extends React.Component {
                                                     </Button>
                                                 </ButtonGroup>
 
-                                                <Input.TextArea value={this.state.rejectionSMSBody}
-                                                                onChange={(e) => this.setState({rejectionSMSBody: e.target.value})}/>
-                                            </div>
+                                                <Row>
+                                                    <Col span={15}>
+                                                        <CKEditor
+                                                            editor={ClassicEditor}
+                                                            config={{toolbar: ['undo', 'redo']}}
+                                                            data={this.state.rejectionSMSBody}
+                                                            onChange={(event, editor) => this.setState(state => state.rejectionSMSBody = editor?.getData())}
+                                                            onInit={editor => this.setState(state => state.rejectionSMSBody = editor?.getData())}
+                                                        />
+                                                    </Col>
+                                                </Row>
+                                            </Row>
                                         }
 
                                     </Panel>
                                 </Collapse>
 
-                                <br/>
                                 <Divider/>
                                 <h2> Manage Appointments Automation (coming soon)</h2>
                                 <FormItem label="Auto manage candidates appointments"
@@ -485,7 +588,6 @@ class AutoPilot extends React.Component {
                             Save changes
                         </Button>
 
-                        <br/>
                         <Divider/>
                         <Button type={'danger'} size={'large'} onClick={this.handleDelete}>Delete Auto Pilot</Button>
 

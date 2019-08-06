@@ -27,7 +27,8 @@ def insertCandidate(assistant: Assistant, conversation: Conversation):
         "lastName": helpers.getListValue(name, 1, " "),
         "mobile": conversation.PhoneNumber or " ",
         "city": ", ".join(
-            conversation.Data.get('keywordsByDataType').get(DT.CandidateLocation.value['name'], [])),
+            conversation.Data.get('keywordsByDataType').get(DT.CandidateLocation.value['name']) or
+            conversation.Data.get('keywordsByDataType').get(DT.JobLocation.value['name'], [])),
         "email": conversation.Email or " ",
         "emails": conversation.Data.get('keywordsByDataType').get(DT.CandidateEmail.value['name'], []),
 
@@ -346,5 +347,6 @@ def getSalary(conversation: Conversation, dataType: DataType, salaryType, toPeri
                 salary = salaryAmmount[1]
     return salary
 
+# prevent IDEA from automatically removing dependencies that are used in eval
 def ideaCalmer():
     print(Jobscience, Mercury, Greenhouse)

@@ -17,6 +17,7 @@ const Flow = ({messages, setChatbotStatus, addUserMessage, addBotMessage, hideSi
     const scrollRef = useRef(null);
     let [lastBotMessage, setLastBotMessage] = useState(null)
     let [active, setActive] = useState(null);
+    let curHeight = useRef(0)
 
     const addStatus = (component, message) => {
         return React.cloneElement(component, {
@@ -48,6 +49,21 @@ const Flow = ({messages, setChatbotStatus, addUserMessage, addBotMessage, hideSi
     };
 
     useEffect(() => {
+        curHeight.current = window.innerHeight
+    }, [])
+
+
+    window.addEventListener('resize', () => {
+        if(window.innerHeight != curHeight.current){
+            console.log('scroll')
+            curHeight.current = window.innerHeight
+            flowRef.current.scrollTo({ top: scrollRef.current.offsetTop, behavior: 'smooth' });
+        }
+
+    })
+
+    useEffect(() => {
+        console.log(inputOpen)
         let timeOut = setTimeout(() => {
             flowRef.current.scrollTo({ top: scrollRef.current.offsetTop, behavior: 'smooth' });
         }, 200);

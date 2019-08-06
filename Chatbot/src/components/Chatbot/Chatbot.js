@@ -173,7 +173,6 @@ export const Chatbot = ({
 
 
         const setNextBlock = async (chatbot, started, curAction, assistant) => {
-            console.log(loadByDefault)
             if (!isReady(chatbot) || !assistant) return;
             if (!started) {
                 setChatbotStatus({ started: true });

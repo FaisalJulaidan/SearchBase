@@ -20,6 +20,8 @@ class Company(db.Model):
     TechnicalSupport = db.Column(db.Boolean, nullable=False, default=True)
     AccountSpecialist = db.Column(db.Boolean, nullable=False, default=False)
 
+    HideSignature = db.Column(db.Boolean, nullable=False, default=False)
+
     # Relationships:
     Users = db.relationship('User', back_populates='Company')
     Assistants = db.relationship('Assistant', back_populates='Company')

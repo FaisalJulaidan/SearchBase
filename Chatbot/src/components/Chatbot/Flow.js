@@ -12,7 +12,7 @@ import BotMessage from './BotMessage/BotMessage';
 import UserMessage from './UserMessage/UserMessage';
 import Thinking from './BotMessage/Thinking';
 
-const Flow = ({ messages, setChatbotStatus, addUserMessage, addBotMessage, thinking, inputOpen, rewindToMessage, resetAsync, status }) => {
+const Flow = ({messages, setChatbotStatus, addUserMessage, addBotMessage, hideSignature, thinking, inputOpen, rewindToMessage, resetAsync, status}) => {
     const flowRef = useRef(null);
     const scrollRef = useRef(null);
     let [lastBotMessage, setLastBotMessage] = useState(null)
@@ -94,8 +94,22 @@ const Flow = ({ messages, setChatbotStatus, addUserMessage, addBotMessage, think
                 return isIE11 ? 'USER_IE11' : 'USER'
         }
     };
+    const getFlowClass = () => {
+        if (!inputOpen && hideSignature) {
+            return 'Extended_Without_Signature'
+        }
+
+        if (inputOpen && hideSignature) {
+            return 'Extended'
+        }
+
+        if (!inputOpen && !hideSignature) {
+            return 'Extended'
+        }
+    };
     return (
-        <div className={[isIE11 ? 'Flow_IE11' : 'Flow', (inputOpen ? '' : 'Extended')].join(' ')} ref={flowRef}>
+        <div className={[isIE11 ? 'Flow_IE11' : 'Flow', getFlowClass()].join(' ')}
+             ref={flowRef}>
             {
                 groupedMessages.map((group, i) =>
                     <div className={[getSender(group[0].sender), 'BounceIn'].join(' ')} key={i}>

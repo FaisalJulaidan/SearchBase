@@ -214,6 +214,39 @@ const disconnectFromCalendarFailure = (error) => ({
 
 
 
+// Messenger
+const connectToMessenger = (messengerID, assistantID) => ({
+    type: actionTypes.CONNECT_ASSISTANT_TO_MESSENGER_REQUEST,
+    assistantID,
+    messengerID
+});
+
+const connectToMessengerSuccess = (messengerID) => ({
+    type: actionTypes.CONNECT_ASSISTANT_TO_MESSENGER_SUCCESS,
+    messengerID
+});
+
+const connectToMessengerFailure = (error) => ({
+    type: actionTypes.CONNECT_ASSISTANT_TO_MESSENGER_FAILURE,
+    error
+});
+
+const disconnectFromMessenger = (assistantID) => ({
+    type: actionTypes.DISCONNECT_ASSISTANT_FROM_MESSENGER_REQUEST,
+    assistantID,
+});
+
+const disconnectFromMessengerSuccess = (msg) => ({
+    type: actionTypes.DISCONNECT_ASSISTANT_FROM_MESSENGER_SUCCESS,
+    msg
+});
+
+const disconnectFromMessengerFailure = (error) => ({
+    type: actionTypes.DISCONNECT_ASSISTANT_FROM_MESSENGER_FAILURE,
+    error
+});
+
+
 // Auto Pilot
 const connectToAutoPilot = (autoPilotID, assistantID) => ({
     type: actionTypes.CONNECT_ASSISTANT_TO_AUTO_PILOT_REQUEST,
@@ -295,6 +328,14 @@ export const assistantActions = {
     disconnectFromCalendar,
     disconnectFromCalendarSuccess,
     disconnectFromCalendarFailure,
+
+    connectToMessenger,
+    connectToMessengerSuccess,
+    connectToMessengerFailure,
+
+    disconnectFromMessenger,
+    disconnectFromMessengerSuccess,
+    disconnectFromMessengerFailure,
 
     connectToAutoPilot,
     connectToAutoPilotSuccess,

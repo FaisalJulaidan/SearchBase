@@ -46,7 +46,6 @@ def create(name, desc, welcomeMessage, topBarText, template, companyID) -> Assis
         return Callback(False, 'Failed to create the assistant', None)
 
 
-
 # ----- Getters ----- #
 def getByHashID(hashID):
     try:
@@ -302,6 +301,41 @@ def disconnectFromCalendar(assistantID, companyID):
         helpers.logError("assistant_services.disconnectFromCalendar(): " + str(exc))
         db.session.rollback()
         return Callback(False, 'Error in disconnecting assistant from Calendar.')
+
+
+# ----- Messenger Connection ----- #
+def connectToMessenger(assistantID, messengerID, companyID):
+    try:
+
+        ap_callback: Callback = auto_pilot_services.getByID(messengerID, companyID)
+        if not ap_callback.Success:
+            raise Exception(ap_callback.Message)
+
+        db.session.query(Assistant).filter(and_(Assistant.ID == assistantID, Assistant.CompanyID == companyID)) \
+            .update({"MessengerID": messengerID})
+
+        db.session.commit()
+        return Callback(True, 'Assistant has been connected to Messenger.')
+
+    except Exception as exc:
+        helpers.logError("assistant_services.connectToAutoPilot(): " + str(exc))
+        db.session.rollback()
+        return Callback(False, 'Error in connecting assistant to Messenger.')
+
+
+def disconnectFromMessenger(assistantID, companyID):
+    try:
+
+        db.session.query(Assistant).filter(and_(Assistant.ID == assistantID, Assistant.CompanyID == companyID)) \
+            .update({"MessengerID": None})
+
+        db.session.commit()
+        return Callback(True, 'Assistant has been disconnected from Messenger.')
+
+    except Exception as exc:
+        helpers.logError("assistant_services.disconnectFromAutoPilot(): " + str(exc))
+        db.session.rollback()
+        return Callback(False, 'Error in disconnecting assistant from AutoPilot.')
 
 
 # ----- AutoPilot Connection ----- #

@@ -2,7 +2,7 @@ from datetime import datetime, timedelta
 
 from sqlalchemy_utils import Currency
 
-from models import db, Role, Company, Assistant, Conversation, Database, Candidate, CRM, Appointment, Job
+from models import db, Role, Company, Assistant, Conversation, Database, Candidate, CRM, Appointment, Job, Messenger
 from services import user_services, flow_services, auto_pilot_services
 from utilities import helpers, enums
 
@@ -236,6 +236,13 @@ def generate():
     db.session.add(CRM(Type=enums.CRM.Bullhorn, CompanyID=1, Auth={
         "access_token": "91:184cd487-b4b0-4114-be56-67f70f50d358",
         "refresh_token": "91:91aa0af7-67f8-4cac-a4bf-016413b51b4a"
+    }))
+
+    # Twilio
+    db.session.add(Messenger(Type=enums.Messenger.Twilio, CompanyID=1, Auth={
+        "account_sid": "AC7326ee584c07bf56782b1392df33bc50",
+        "auth_token": "34f86f89ee6f67deede6725bb6e7c9af",
+        "phone_number": "441143032341"
     }))
 
 

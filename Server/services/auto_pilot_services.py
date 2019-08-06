@@ -1,13 +1,14 @@
 from datetime import datetime, time
 
-from models import db, Callback, AutoPilot, OpenTimes, Conversation
+from models import db, Callback, AutoPilot, OpenTimes, Conversation, Assistant, Messenger
 from services import mail_services, stored_file_services as sfs
+from services.Marketplace.Messenger import mesenger_services
 from sqlalchemy import and_
 from utilities import helpers
 from utilities.enums import UserType, Status
 
 
-def processConversation(conversation: Conversation, autoPilot: AutoPilot):
+def processConversation(conversation: Conversation, autoPilot: AutoPilot, assistant: Assistant):
     try:
         result = {
             "applicationStatus": Status.Pending,
@@ -20,15 +21,16 @@ def processConversation(conversation: Conversation, autoPilot: AutoPilot):
         # Do automation only if the autoPilot is active
         if autoPilot.Active:
             email = conversation.Email
+            phone = conversation.PhoneNumber
 
-            def __processSendingEmails (email, status: Status, autoPilot: AutoPilot):
+            def __processSendingEmails(email, status: Status, autoPilot: AutoPilot):
 
                 userName = conversation.Name or 'Anonymous'
                 logoPath = autoPilot.Company.LogoPath
                 if logoPath:
-                    logoPath = sfs.PUBLIC_URL\
-                           + sfs.UPLOAD_FOLDER + sfs.COMPANY_LOGOS_PATH\
-                           + "/" + logoPath
+                    logoPath = sfs.PUBLIC_URL \
+                               + sfs.UPLOAD_FOLDER + sfs.COMPANY_LOGOS_PATH \
+                               + "/" + logoPath
 
                 companyName = autoPilot.Company.Name
                 # ======================
@@ -43,28 +45,27 @@ def processConversation(conversation: Conversation, autoPilot: AutoPilot):
                         .replace("${candidateName}$", userName) \
                         .replace("${candidateEmail}$", email)
 
-                    acceptance_callback: Callback = \
+                    acceptance_email_callback: Callback = \
                         mail_services.sendAcceptanceEmail(emailTitle, emailBody, userName, email, logoPath, companyName)
 
-                    if acceptance_callback.Success:
+                    if acceptance_email_callback.Success:
                         result['acceptanceEmailSentAt'] = datetime.now()
 
                     # Process candidates Appointment email only if score is accepted
                     if autoPilot.SendCandidatesAppointments:
 
-                        appointments_callback: Callback = \
+                        appointments_email_callback: Callback = \
                             mail_services.sendAppointmentsPicker(
                                 email,
                                 userName,
                                 logoPath,
                                 conversation.ID,
-                                conversation.Assistant.ID,
+                                assistant.ID,
                                 companyName,
                                 autoPilot.CompanyID)
 
-                        if appointments_callback.Success:
+                        if appointments_email_callback.Success:
                             result['appointmentEmailSentAt'] = datetime.now()
-
 
                 # ======================
                 # Send Rejection Letters
@@ -77,20 +78,57 @@ def processConversation(conversation: Conversation, autoPilot: AutoPilot):
                         .replace("${candidateName}$", userName) \
                         .replace("${candidateEmail}$", email)
 
-                    rejection_callback: Callback = \
+                    rejection_email_callback: Callback = \
                         mail_services.sendRejectionEmail(emailTitle, emailBody, userName, email, logoPath, companyName)
 
-                    if rejection_callback.Success:
+                    if rejection_email_callback.Success:
                         result['rejectionEmailSentAt'] = datetime.now()
 
+            def __processSendingSMS(phone, status: Status, autoPilot: AutoPilot):
+
+                messenger: Messenger = assistant.Messenger
+                userName = conversation.Name or 'Anonymous'
+                # companyName = autoPilot.Company.Name
+
+                # ======================
+                # Send Acceptance Letters
+                if status is Status.Accepted and autoPilot.SendAcceptanceSMS:
+                    # Process candidates Acceptance sms
+
+                    SMSBody = autoPilot.AcceptanceSMSBody \
+                        .replace("${candidateName}$", userName) \
+                        .replace("${candidateEmail}$", email or " ") \
+                        .replace("&nbsp;", "\n")
+
+                    acceptance_SMS_callback: Callback = \
+                        mesenger_services.sendMessage(messenger.Type, phone, SMSBody, messenger.Auth)
+
+                    if acceptance_SMS_callback.Success:
+                        result['acceptanceSMSSentAt'] = datetime.now()
+
+                # ======================
+                # Send Rejection Letters SMS
+                elif status is Status.Rejected and autoPilot.SendRejectionSMS:
+
+                    SMSBody = autoPilot.RejectionSMSBody \
+                        .replace("${candidateName}$", userName) \
+                        .replace("${candidateEmail}$", email)
+
+                    rejection_SMS_callback: Callback = \
+                        mesenger_services.sendMessage(messenger.Type, phone, SMSBody, messenger.Auth)
+
+                    if rejection_SMS_callback.Success:
+                        result['rejectionSMSSentAt'] = datetime.now()
 
             # Get application status
             result['applicationStatus'] = __getApplicationResult(conversation.Score, autoPilot)
 
             # Send candidates emails
-            if email and conversation.UserType is UserType.Candidate:
-                __processSendingEmails(email, result['applicationStatus'], autoPilot)
-
+            if conversation.UserType is UserType.Candidate:
+                if email:
+                    __processSendingEmails(email, result['applicationStatus'], autoPilot)
+                if phone and assistant.MessengerID:
+                    __processSendingSMS(phone, result['applicationStatus'], autoPilot)
 
         return Callback(True, "Automation done via " + autoPilot.Name + " pilot successfully.", result)
 
@@ -104,16 +142,16 @@ def processConversation(conversation: Conversation, autoPilot: AutoPilot):
 # The new AutoPilot will be returned parsed
 def create(name, desc, companyID: int) -> Callback:
     try:
-        autoPilot= AutoPilot(Name=name,
-                             Description=desc,
-                             CompanyID=companyID,
-                             AcceptanceEmailTitle="Acceptance Letter",
-                             AcceptanceEmailBody="<h2>Hello ${candidateName},</h2><p>We are happy to announce that your application has been accepted based on your responses and we will get back to you very soon.</p><p>Regards,</p>",
-                             AcceptanceSMSBody="",
-                             RejectionEmailTitle="Rejection Letter",
-                             RejectionEmailBody="<h2>Hello ${candidateName},</h2><p>Unfortunately, we are very sorry to announce that your application has been rejected based on your responses.<br><br>Please feel free to visit our website and explore other opportunities that you feel may be better suited.<br>&nbsp;</p><p>Regards,</p>",
-                             RejectionSMSBody="",
-                             )
+        autoPilot = AutoPilot(Name=name,
+                              Description=desc,
+                              CompanyID=companyID,
+                              AcceptanceEmailTitle="Acceptance Letter",
+                              AcceptanceEmailBody="<h2>Hello ${candidateName},</h2><p>We are happy to announce that your application has been accepted based on your responses and we will get back to you very soon.</p><p>Regards,</p>",
+                              AcceptanceSMSBody="Hello ${candidateName}$,\n\nWe are happy to announce that your application has been accepted based on your responses and we will get back to you very soon.\n\nRegard,",
+                              RejectionEmailTitle="Rejection Letter",
+                              RejectionEmailBody="<h2>Hello ${candidateName},</h2><p>Unfortunately, we are very sorry to announce that your application has been rejected based on your responses.<br><br>Please feel free to visit our website and explore other opportunities that you feel may be better suited.<br>&nbsp;</p><p>Regards,</p>",
+                              RejectionSMSBody="Hello ${candidateName}$,\n\nUnfortunately, we are very sorry to announce that your application has been rejected based on your responses.Please feel free to visit our website and explore other opportunities that you feel may be better suited.\n\nRegards,",
+                              )
         db.session.add(autoPilot)
         db.session.commit()
         return Callback(True, "Got AutoPilot successfully.", autoPilot)
@@ -158,6 +196,7 @@ def parseAutoPilot(autoPilot: AutoPilot) -> dict:
         "OpenTimes": helpers.getListFromSQLAlchemyList(autoPilot.OpenTimes)
     }
 
+
 # ----- Updaters ----- #
 def update(id, name, desc, companyID: int) -> Callback:
     try:
@@ -181,7 +220,8 @@ def update(id, name, desc, companyID: int) -> Callback:
         return Callback(False, "Couldn't update the AutoPilot.")
 
 
-def updateConfigs(id, name, desc, active, acceptApplications, acceptanceScore, sendAcceptanceEmail, acceptanceEmailTitle,
+def updateConfigs(id, name, desc, active, acceptApplications, acceptanceScore, sendAcceptanceEmail,
+                  acceptanceEmailTitle,
                   acceptanceEmailBody, sendAcceptanceSMS, acceptanceSMSBody, rejectApplications, rejectionScore,
                   sendRejectionEmail, rejectionEmailTitle, rejectionEmailBody, sendRejectionSMS, rejectionSMSBody,
                   sendCandidatesAppointments, companyID: int) -> Callback:
@@ -223,6 +263,7 @@ def updateConfigs(id, name, desc, active, acceptApplications, acceptanceScore, s
         db.session.rollback()
         return Callback(False, 'Could not update the AutoPilot.')
 
+
 def updateStatus(autoPilotID, newStatus, companyID):
     try:
 
@@ -254,7 +295,6 @@ def removeByID(id, companyID):
 # ----- Private Functions (shouldn't be accessed from the outside) ----- #
 
 def __getApplicationResult(score, autoPilot: AutoPilot) -> Status:
-
     if autoPilot.AcceptApplications and (score >= autoPilot.AcceptanceScore):
         return Status.Accepted
     if autoPilot.RejectApplications and (score < autoPilot.RejectionScore):

@@ -88,10 +88,10 @@ class AutoPilot extends React.Component {
                     sendCandidatesAppointments: autoPilot.SendCandidatesAppointments,
                     acceptanceScore: autoPilot.AcceptanceScore * 100,
                     acceptanceEmailBody: autoPilot.AcceptanceEmailBody,
-                    acceptanceSMSBody: autoPilot.AcceptanceSMSBody,
+                    acceptanceSMSBody: autoPilot.AcceptanceSMSBody.split('\n').map(x=>`<p>${x?x:'&nbsp;'}</p>`).join(' '),
                     rejectionScore: autoPilot.RejectionScore * 100,
                     rejectionEmailBody: autoPilot.RejectionEmailBody,
-                    rejectionSMSBody: autoPilot.RejectionSMSBody
+                    rejectionSMSBody: autoPilot.RejectionSMSBody.split('\n').map(x=>`<p>${x?x:'&nbsp;'}</p>`).join(' ')
                 });
             }).catch(() => history.push(`/dashboard/auto_pilots`));
     }
@@ -120,7 +120,7 @@ class AutoPilot extends React.Component {
         if (!err) {
             const /**@type AutoPilot*/ autoPilot = this.props.autoPilot || {};
             const {state} = this;
-
+            console.log(state.acceptanceSMSBody);
             let payload = {
                 active: autoPilot.Active,
                 name: values.name,
@@ -137,14 +137,14 @@ class AutoPilot extends React.Component {
                 acceptanceEmailBody: state.acceptanceEmailBody,
 
                 sendAcceptanceSMS: state.sendAcceptanceSMS,
-                acceptanceSMSBody: state.acceptanceSMSBody.replace(/<[^>]*>/g, ''),
+                acceptanceSMSBody: state.acceptanceSMSBody.replace(/<\/p>/g, '\n').replace(/<p>/g, '').replace(/&nbsp;/g, ''),
 
                 sendRejectionEmail: state.sendRejectionEmail,
                 rejectionEmailTitle: values.rejectionEmailTitle || autoPilot.RejectionEmailTitle,
                 rejectionEmailBody: state.rejectionEmailBody,
 
                 sendRejectionSMS: state.sendRejectionSMS,
-                rejectionSMSBody: state.rejectionSMSBody.replace(/<[^>]*>/g, ''),
+                rejectionSMSBody: state.rejectionSMSBody.replace(/<\/p>/g, '\n').replace(/<p>/g, '').replace(/&nbsp;/g, ''),
 
                 sendCandidatesAppointments: state.sendCandidatesAppointments,
             };
@@ -375,7 +375,7 @@ class AutoPilot extends React.Component {
                                                 <h4>Acceptance letter</h4>
                                                 {
                                                     this.state.sendAcceptanceSMSErrors &&
-                                                    <p style={{color: 'red'}}> * Body field is requierd</p>
+                                                    <p style={{color: 'red'}}> * Body field is required</p>
                                                 }
                                                 <ButtonGroup style={{margin: '5px 0'}}>
                                                     <Button

@@ -14,6 +14,8 @@ class Messenger(db.Model):
     CompanyID = db.Column(db.Integer, db.ForeignKey('company.ID', ondelete='cascade'), nullable=False)
     Company = db.relationship('Company', back_populates='Messengers')
 
+    Assistants = db.relationship('Assistant', back_populates='Messenger')
+
     # Constraints:
     # each company will have one Messenger of each type
     __table_args__ = (db.UniqueConstraint('Type', 'CompanyID', name='uix1_messenger'),)

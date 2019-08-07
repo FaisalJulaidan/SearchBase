@@ -21,6 +21,8 @@ class Company(db.Model):
     AccountSpecialist = db.Column(db.Boolean, nullable=False, default=False)
 
     HideSignature = db.Column(db.Boolean, nullable=False, default=False)
+    Active = db.Column(db.Boolean, nullable=False, default=False)
+
 
     # Relationships:
     Users = db.relationship('User', back_populates='Company')

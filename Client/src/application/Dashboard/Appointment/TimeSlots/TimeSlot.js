@@ -22,7 +22,12 @@ class TimeSlot extends React.Component {
             Info: props.info,
             nameError: null
         }
+    }
 
+    componentDidMount() {
+        this.setState({
+            Info: this.state.Info.map(item => ({...item, From: momentTZ.utc(item.From, "HH:mm:ss").tz(this.props.tz).format("HH:mm:ss"), To: momentTZ.utc(item.To, "HH:mm:ss").tz(this.props.tz).format("HH:mm:ss") }))
+        })
     }
 
     infoKVChange = (day, key, value) => {
@@ -53,9 +58,7 @@ class TimeSlot extends React.Component {
         }
 
         const setTimeToUTC  = (time, day) => {
-            console.log(time)
-           momentTZ(`${time} ${day}`, "HH:mm d").tz(this.props.tz).format("HH:mm")
-            return momentTZ(`${time} ${day}`, "HH:mm d").tz(this.props.tz).format("HH:mm")
+            return momentTZ.tz(`${time} ${day}`, "HH:mm:ss d", this.props.tz).utc().format("HH:mm")
         }
 
         let savedSettings = {
@@ -69,21 +72,21 @@ class TimeSlot extends React.Component {
 
     render() {
         const TimeRange = weekDay => {
-            let to = momentTZ.utc(weekDay.To,"HH:mm:ss").tz(this.props.tz)
-            let from = momentTZ.utc(weekDay.From, "HH:mm:ss").tz(this.props.tz)
+            let to = moment(weekDay.To, "HH:mm:ss")
+            let from = moment(weekDay.From, "HH:mm:ss")
 
             return (
                 <>
                     <span className={styles.TimeRange}>
                         <TimePicker value={from} format={'HH:mm'} minuteStep={30}
-                                    onChange={time => this.infoKVChange(weekDay.Day, 'From', time.format("HH:mm"))}
+                                    onChange={(time, str) => this.infoKVChange(weekDay.Day, 'From', str)}
                                     disabled={!weekDay.Active}/>
                     </span>
                     <span style={{marginRight: '5px', marginLeft: '5px'}}>-</span>
                     <span className={styles.TimeRange}>
                         <TimePicker value={to} format={'HH:mm'} minuteStep={30}
                                     disabledHours={() => Array.apply(null, {length: from.hours() + 1}).map(Number.call, Number)}
-                                    onChange={time => this.infoKVChange(weekDay.Day, 'From', time.format("HH:mm"))}
+                                    onChange={(time, str) => this.infoKVChange(weekDay.Day, 'To', str)}
                                     disabled={!weekDay.Active || !weekDay.From}/>
                     </span>
                 </>

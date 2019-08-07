@@ -2,7 +2,7 @@ from datetime import datetime, timedelta
 
 from sqlalchemy_utils import Currency
 
-from models import db, Role, Company, Assistant, Conversation, Database, Candidate, CRM, Appointment, Job
+from models import db, Role, Company, Assistant, Conversation, Database, Candidate, CRM, Appointment, Job, Messenger
 from services import user_services, flow_services, auto_pilot_services
 from utilities import helpers, enums
 
@@ -238,13 +238,19 @@ def generate():
         "refresh_token": "91:91aa0af7-67f8-4cac-a4bf-016413b51b4a"
     }))
 
+    # Twilio
+    db.session.add(Messenger(Type=enums.Messenger.Twilio, CompanyID=1, Auth={
+        "account_sid": "AC7326ee584c07bf56782b1392df33bc50",
+        "auth_token": "34f86f89ee6f67deede6725bb6e7c9af",
+        "phone_number": "441143032341"
+    }))
+
 
 # Create an AutoPilot for a Company
-    auto_pilot_services.create('First Pilot',
+    reader_a.AutoPilot = auto_pilot_services.create('First Pilot',
                                "First pilot to automate the acceptance and rejection of candidates application",
-                               aramco.ID)
+                               aramco.ID).Data
     auto_pilot_services.create('Second Pilot', '', aramco.ID)
-    reader_a.AutoPilot = auto_pilot_services.getByID(1,1).Data
 
     # Add Appointment
     a = Appointment(DateTime=datetime.now() + timedelta(days=5), Conversation=conversation1)

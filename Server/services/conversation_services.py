@@ -58,7 +58,7 @@ def processConversation(assistantHashID, data: dict) -> Callback:
 
         # AutoPilot Operations
         if assistant.AutoPilot and conversation.Completed:
-            ap_callback: Callback = auto_pilot_services.processConversation(conversation, assistant.AutoPilot)
+            ap_callback: Callback = auto_pilot_services.processConversation(conversation, assistant.AutoPilot, assistant)
             if ap_callback.Success:
                 conversation.AutoPilotStatus = True
                 conversation.ApplicationStatus = ap_callback.Data['applicationStatus']

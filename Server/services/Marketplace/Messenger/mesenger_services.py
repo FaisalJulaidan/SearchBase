@@ -7,12 +7,11 @@ from utilities.enums import Messenger
 
 
 # Test connection to a Messenger
-def sendMessage(type, recipient, body, auth) -> Callback:
+def sendMessage(type: Messenger, recipient, body, auth) -> Callback:
     try:
-        messenger_type: Messenger = Messenger[type]
 
         # test connection
-        if messenger_type == Messenger.Twilio:
+        if type is Messenger.Twilio:
             return Twilio.sendMessage(recipient, body, auth)  # oauth2
 
         return Callback(False, 'Connection failure. Please check entered details')

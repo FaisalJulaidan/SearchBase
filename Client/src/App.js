@@ -26,24 +26,24 @@ class App extends Component {
         // history.listen(() => destroyMessage());
     }
 
-    setTimezone = async () => {
-        let tz = await getTimezone();
-        this.setState({ timezone: tz });
-        this.pollTimezone();
-    };
-
-    pollTimezone = () => {
-        setInterval(async () => {
-            let tz = await getTimezone();
-            if (tz !== this.state.timezone) {
-                this.setState({ timezone: tz });
-            }
-        }, 5000);
-    };
-
-    componentDidMount() {
-        this.setTimezone();
-    }
+    // setTimezone = async () => {
+    //     let tz = await getTimezone();
+    //     this.setState({ timezone: tz });
+    //     this.pollTimezone();
+    // };
+    //
+    // pollTimezone = () => {
+    //     setInterval(async () => {
+    //         let tz = await getTimezone();
+    //         if (tz !== this.state.timezone) {
+    //             this.setState({ timezone: tz });
+    //         }
+    //     }, 5000);
+    // };
+    //
+    // componentDidMount() {
+    //     this.setTimezone();
+    // }
 
     state = {
         timezone: null

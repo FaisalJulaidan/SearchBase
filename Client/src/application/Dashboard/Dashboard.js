@@ -1,10 +1,11 @@
 import React, {Component, lazy, Suspense} from 'react';
 
 import {Avatar, Dropdown, Icon, Layout, Menu} from 'antd';
+import momenttz from 'moment-timezone'
 import "./Dashboard.less"
 import styles from "./Dashboard.module.less"
 
-import {getUser, history} from "helpers";
+import {getUser, history, getTimezone} from "helpers";
 import {Route, Switch, withRouter} from 'react-router-dom';
 import {authActions, optionsActions} from "store/actions";
 import {store} from "store/store";
@@ -14,6 +15,7 @@ import {CSSTransition, TransitionGroup} from "react-transition-group";
 
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
 import {faCloud} from '@fortawesome/free-solid-svg-icons'
+import {TimezoneContext} from "../../contexts/timezone";
 
 const Home = lazy(() => import('./Home/Home'));
 const Assistants = lazy(() => import('./Assistants/Assistants'));
@@ -49,6 +51,7 @@ class Dashboard extends Component {
     }
 
 
+
     toggle = () => {
         this.setState({
             collapsed: !this.state.collapsed,
@@ -73,6 +76,8 @@ class Dashboard extends Component {
 
     render() {
         const {match, location} = this.props;
+        const timezone = getTimezone()
+        const validTimezone = timezone ? timezone : momenttz.tz.guess()
         const user = getUser();
         let userInfo = null;
         // User Information at the top
@@ -255,40 +260,43 @@ class Dashboard extends Component {
                             :
                             {margin: 16, marginTop: 10, marginBottom: 0, height: '100%'}
                     }>
-                        <Route render={() =>
-                            <TransitionGroup style={{height: '100%'}}>
-                                <CSSTransition key={location.key} classNames="fade" timeout={550}>
-                                    <Suspense fallback={<div> Loading...</div>}>
-                                        <Switch location={location} style={{height: '100%'}}>
 
-                                            <Route path={`${match.path}/assistants`} component={Assistants} exact/>
-                                            <Route path={`${match.path}/assistants/:id`} component={Assistant} exact/>
+                        <TimezoneContext.Provider value={validTimezone}>
+                            <Route render={() =>
+                                <TransitionGroup style={{height: '100%'}}>
+                                    <CSSTransition key={location.key} classNames="fade" timeout={550}>
+                                        <Suspense fallback={<div> Loading...</div>}>
+                                            <Switch location={location} style={{height: '100%'}}>
 
-                                            <Route path={`${match.path}/marketplace`} component={Marketplace} exact/>
-                                            <Route path={`${match.path}/marketplace/:type`} component={Item} exact/>
+                                                <Route path={`${match.path}/assistants`} component={Assistants} exact/>
+                                                <Route path={`${match.path}/assistants/:id`} component={Assistant} exact/>
 
-                                            <Route path={`${match.path}/databases`} component={Databases} exact/>
-                                            <Route path={`${match.path}/databases/:id`} component={Database} exact/>
+                                                <Route path={`${match.path}/marketplace`} component={Marketplace} exact/>
+                                                <Route path={`${match.path}/marketplace/:type`} component={Item} exact/>
 
-                                            <Route path={`${match.path}/account`} component={Account} exact/>
-                                            <Route path={`${match.path}/billing`} component={Billing} exact/>
+                                                <Route path={`${match.path}/databases`} component={Databases} exact/>
+                                                <Route path={`${match.path}/databases/:id`} component={Database} exact/>
 
-                                            <Route path={`${match.path}/auto_pilots`} component={AutoPilots} exact/>
-                                            <Route path={`${match.path}/auto_pilots/:id`} component={AutoPilot} exact/>
+                                                <Route path={`${match.path}/account`} component={Account} exact/>
+                                                <Route path={`${match.path}/billing`} component={Billing} exact/>
 
-                                            <Route path={`${match.path}/users_management`} component={UsersManagement}
-                                                   exact/>
-                                            <Route path={`${match.path}/documentation`} component={Documentation}
-                                                   exact/>}
-                                            <Route path={`${match.path}/appointments`} component={Appointment} exact/>
-                                                   exact/>
-                                            <Route path={`${match.path}/campaign`} component={Campaign} exact/>
-                                            <Route path="/dashboard" component={Home}/>
-                                        </Switch>
-                                    </Suspense>
-                                </CSSTransition>
-                            </TransitionGroup>
-                        }/>
+                                                <Route path={`${match.path}/auto_pilots`} component={AutoPilots} exact/>
+                                                <Route path={`${match.path}/auto_pilots/:id`} component={AutoPilot} exact/>
+
+                                                <Route path={`${match.path}/users_management`} component={UsersManagement}
+                                                       exact/>
+                                                <Route path={`${match.path}/documentation`} component={Documentation}
+                                                       exact/>}
+                                                <Route path={`${match.path}/appointments`} component={Appointment} exact/>
+                                                       exact/>
+                                                <Route path={`${match.path}/campaign`} component={Campaign} exact/>
+                                                <Route path="/dashboard" component={Home}/>
+                                            </Switch>
+                                        </Suspense>
+                                    </CSSTransition>
+                                </TransitionGroup>
+                            }/>
+                        </TimezoneContext.Provider>
                     </Content>
 
                     <Footer style={{textAlign: 'center', padding: 10, zIndex: 1}}>
@@ -302,7 +310,7 @@ class Dashboard extends Component {
 
 function mapStateToProps(state) {
     return {
-        account: state.account.account
+        account: state.account.account.t
     };
 }
 

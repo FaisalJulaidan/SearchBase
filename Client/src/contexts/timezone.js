@@ -32,7 +32,5 @@ const isValid = (item) => {
 
 const checkExpiry = (item) => moment(item.expr).diff(moment(), 'hours') <= 24;
 
-console.log(TimezoneContext);
-
 
 export { TimezoneContext, getTimezone };

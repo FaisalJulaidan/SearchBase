@@ -119,7 +119,7 @@ class ProfileDetails extends React.Component {
                         help={'We\'ve guessed a default for you, however if you\'d like to change it simply enter the Continent/City you\'re from and select from the list!' +
                         ' If you cant find the country you\'re looking for on the list, try a more specific search.'}>
                         {getFieldDecorator('timeZone', {
-                            initialValue: account?.user?.TimeZone || moment.tz.guess(),
+                            initialValue: account?.user?.TimeZone,
                             rules: [{
                                 validator: (rule, val, callback) => {
                                     if (!tz.includes(val)) {
@@ -133,7 +133,7 @@ class ProfileDetails extends React.Component {
                             <AutoComplete
                                 dataSource={this.state.tzList}
                                 onSearch={this.searchTimezone}
-                                placeholder="input here"
+                                placeholder="Please search for a timezone"
                             />
                         )}
                     </FormItem>

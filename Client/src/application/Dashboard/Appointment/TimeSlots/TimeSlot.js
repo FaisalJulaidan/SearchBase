@@ -25,6 +25,7 @@ class TimeSlot extends React.Component {
     }
 
     componentDidMount() {
+        console.log(this.props.tz)
         this.setState({
             Info: this.state.Info.map(item => ({...item, From: momentTZ.utc(item.From, "HH:mm:ss").tz(this.props.tz).format("HH:mm:ss"), To: momentTZ.utc(item.To, "HH:mm:ss").tz(this.props.tz).format("HH:mm:ss") }))
         })

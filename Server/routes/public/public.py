@@ -13,44 +13,17 @@ CORS(public_router)
 
 
 # ======== Server React =========== #
-def serve(path=''):
-    if path != "" and os.path.exists("static/react_app/" + path):
-        response = make_response(send_from_directory('static/react_app', path))
-    else:
-        response = make_response(send_from_directory('static/react_app', 'index.html'))
-
-    response.headers["Cache-Control"] = "no-store, no-cache"
-    return response
-
-
 # Serve React App
-@public_router.route('/login')
-def login():
-    return serve()
+@public_router.route('/', defaults={'path': ''})
+@public_router.route('/<path:path>')
+def serve(path):
+    if os.environ['FLASK_ENV'] == 'development':
+        return redirect("http://localhost:3000/" + path, code=302)
 
-
-# @public_router.route('/signup')
-# def signup():
-#     return serve()
-
-
-@public_router.route('/forget_password')
-def forget_password():
-    return serve()
-
-
-@public_router.route('/reset_password/<payload>')
-def reset_password(payload):
-    return serve()
-
-@public_router.route('/appointments_picker/<payload>')
-def appointments_picker(payload):
-    return serve()
-
-
-@public_router.route('/chatbot_direct_link/<payload>')
-def chatbot_direct_link(payload):
-    return serve()
+    if path != "" and os.path.exists("static/react_app/" + path):
+        return send_from_directory("static/react_app/", path)
+    else:
+        return send_from_directory("static/react_app/", 'index.html')
 
 
 # LEGACY CODE
@@ -59,18 +32,6 @@ def chatbot_direct_link(payload):
 @public_router.route("/api/assistant/<string:assistantIDAsHash>/chatbot_direct_link", methods=['GET'])
 def chatbot_direct_link123(assistantIDAsHash):
     return redirect("/chatbot_direct_link/" + assistantIDAsHash, code=302)
-
-
-@public_router.route('/verify_account/<payload>')
-def verify_account_serve(payload):
-    return serve()
-
-
-@public_router.route('/dashboard', defaults={'path': ''})
-@public_router.route('/dashboard/<path:path>')
-def dashboard(path):
-    return serve(path)
-
 
 # ======== Static Pages =========== #
 

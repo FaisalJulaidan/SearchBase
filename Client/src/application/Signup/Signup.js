@@ -42,7 +42,7 @@ class Signup extends React.Component {
     compareToFirstPassword = (rule, value, callback) => {
         const form = this.props.form;
         if (value && value !== form.getFieldValue('password')) {
-            callback('The two passwords that you entered are inconsistent!');
+            callback('The two passwords are inconsistent!');
         } else {
             callback();
         }

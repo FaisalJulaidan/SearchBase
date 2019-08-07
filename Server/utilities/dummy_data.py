@@ -11,8 +11,8 @@ from utilities import helpers, enums
 def generate():
 
     # Companies creation
-    db.session.add(Company(Name='Aramco', URL='ff.com', StripeID='cus_00000000000000', SubID='sub_00000000000000'))
-    db.session.add(Company(Name='Sabic', URL='ff.com', StripeID='cus_DbgKupMRLNYXly'))
+    db.session.add(Company(Name='Aramco', URL='ff.com', StripeID='cus_00000000000000', SubID='sub_00000000000000', Active=True))
+    db.session.add(Company(Name='Sabic', URL='ff.com', StripeID='cus_DbgKupMRLNYXly', Active=True))
 
     # Get Companies
     aramco: Company = Company.query.filter(Company.Name == "Aramco").first()

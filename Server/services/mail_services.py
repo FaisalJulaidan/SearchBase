@@ -158,11 +158,19 @@ def sendPasswordResetEmail(email, userID):
         return Callback(False, 'Could not send a password reset email to ' + email)
 
 
-def sendNewUserHasRegistered(name, email, companyName, tel):
+def sendNewCompanyHasRegistered(name, email, companyName, companyID, tel):
     try:
 
-        callback: Callback = __sendEmail(tsbEmail, companyName + ' has signed up',
-                   '/emails/company_signup.html', name=name, email=email, companyName=companyName, tel=tel)
+        callback: Callback = __sendEmail("julaidan.faisal@gmail.com",
+                                         companyName + ' has signed up',
+                                         '/emails/company_registered.html',
+                                         name=name,
+                                         email=email,
+                                         companyName=companyName,
+                                         tel=tel,
+                                         activationLink= helpers.getDomain() + "/api/staff/activate_company/" + helpers.verificationSigner
+                                         .dumps({'email': email, 'companyID': companyID}, salt='company-activate-key')
+                                         )
 
         if not callback.Success:
             raise Exception(callback.Message)

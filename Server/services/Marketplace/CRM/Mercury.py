@@ -169,13 +169,13 @@ def insertCandidate(auth, data, companyID) -> Callback:
             "crimson_expsalaryp": float(data.get("annualSalary")),
             "crimson_expratec": float(data.get("dayRate")),
 
-            "crimson_comments": crm_services.additionalCandidateNotesBuilder(
+            "crimson_candidateselfsummary": crm_services.additionalCandidateNotesBuilder(
                 {
                     "yearsExperience": data.get("yearsExperience"),
                     "preferredJobType": data.get("preferredJobType"),
                     "skills": data.get("skills"),
                     "educations": data.get("educations")
-                }
+                }, data.get("selectedSolutions")
             )
         }
 

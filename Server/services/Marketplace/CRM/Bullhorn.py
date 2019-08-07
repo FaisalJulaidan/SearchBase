@@ -198,7 +198,7 @@ def insertCandidate(auth, data, companyID) -> Callback:
             },
             "email": data.get("email"),
 
-            "primarySkills": data.get("skills"),
+            # "primarySkills": data.get("skills"),
             "experience": data.get("yearsExperience"),
 
             "secondaryAddress": {
@@ -213,10 +213,11 @@ def insertCandidate(auth, data, companyID) -> Callback:
 
             "comments": crm_services.additionalCandidateNotesBuilder(
                 {
-                    "yearsExperience": data.get("yearsExperience"),
                     "preferredJobTitle": data.get("preferredJobTitle"),
-                    "preferredJobType": data.get("preferredJobType")
-                }
+                    "preferredJobType": data.get("preferredJobType"),
+                    "yearsExperience": data.get("yearsExperience"),
+                    "skills": data.get("skills")
+                }, data.get("selectedSolutions")
             )
         }
 

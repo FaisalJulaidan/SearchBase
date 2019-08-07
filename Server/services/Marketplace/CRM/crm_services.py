@@ -53,7 +53,9 @@ def insertCandidate(assistant: Assistant, conversation: Conversation):
         "annualSalary": getSalary(conversation, DT.CandidateAnnualDesiredSalary, "Min") or
                         getSalary(conversation, DT.JobAnnualSalary, "Min"),
         "dayRate": getSalary(conversation, DT.CandidateDailyDesiredSalary, "Min") or
-                   getSalary(conversation, DT.JobDayRate, "Min")
+                   getSalary(conversation, DT.JobDayRate, "Min"),
+
+        "selectedSolutions": conversation.Data.get("selectedSolutions")
     }
 
     crm_type = assistant.CRM.Type.value
@@ -354,11 +356,11 @@ def getSalary(conversation: Conversation, dataType: DataType, salaryType, toPeri
 
 
 # create a paragraph regarding the candidate with data that the API cannot accept
-def additionalCandidateNotesBuilder(data):
+def additionalCandidateNotesBuilder(data, selectedSolutions=None):
     data = helpers.cleanDict(data)
     if not data:
         return ""
-    
+
     sentences = {
         "yearsExperience": "They have [yearsExperience] years experience with their qualifications. ",
         "preferredJobTitle": "They have stated that their preferred jobs are connected with \"[preferredJobTitle]\". ",
@@ -370,6 +372,13 @@ def additionalCandidateNotesBuilder(data):
     paragraph = "SearchBase has also collected the following information regarding this candidate: "
     for key, value in data.items():
         paragraph += sentences[key].replace("[" + key + "]", value)
+
+    if selectedSolutions:
+        paragraph += "\n\nThe Candidate has also expressed interest in the following jobs: "
+        for solution in selectedSolutions:
+            for key, value in helpers.cleanDict(solution.get("data")).items():
+                paragraph += "\n " + str(key) + " : " + str(value)
+            paragraph += "\n"
 
     return paragraph
 

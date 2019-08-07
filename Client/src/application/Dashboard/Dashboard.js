@@ -25,6 +25,7 @@ const Billing = lazy(() => import('./ControlPanel/Billing/Billing'));
 const UsersManagement = lazy(() => import('./ControlPanel/UsersManagement/UsersManagement'));
 const Documentation = lazy(() => import('./Documentation/Documentation'));
 const Calendar = lazy(() => import('./Calendar/Calendar'));
+const Campaign = lazy(() => import('./Campaign/Campaign'));
 const AutoPilots = lazy(() => import('./AutoPilots/AutoPilots'));
 const AutoPilot = lazy(() => import('./AutoPilots/AutoPilot/AutoPilot'));
 const Marketplace = lazy(() => import('./Marketplace/Marketplace'));
@@ -170,6 +171,11 @@ class Dashboard extends Component {
                             <span>Assistants</span>
                         </Menu.Item>
 
+                        <Menu.Item key="campaign">
+                            <Icon type="rocket"/>
+                            <span>Campaign</span>
+                        </Menu.Item>
+
                         <Menu.Item key="auto_pilots">
                             <Icon type="clock-circle"/>
                             <span>Auto Pilot</span>
@@ -190,10 +196,6 @@ class Dashboard extends Component {
                             <span>Calendar (soon)</span>
                         </Menu.Item>
 
-                        <Menu.Item disabled={true} key="calendar">
-                            <Icon type="calendar"/>
-                            <span>Calendar (soon)</span>
-                        </Menu.Item>
 
                         <Divider/>
 
@@ -278,6 +280,8 @@ class Dashboard extends Component {
                                             <Route path={`${match.path}/documentation`} component={Documentation}
                                                    exact/>
                                             {/*<Route path={`${match.path}/calendar`} component={Calendar} exact/>*/}
+
+                                            <Route path={`${match.path}/campaign`} component={Campaign} exact/>
 
                                             <Route path="/dashboard" component={Home}/>
                                         </Switch>

@@ -1,10 +1,8 @@
 import json
-import os
-from datetime import datetime
 from sqlite3 import Connection as SQLite3Connection
 
 from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy import Enum, event, types
+from sqlalchemy import event, types
 from sqlalchemy.engine import Engine
 from sqlalchemy.ext import mutable
 
@@ -17,7 +15,6 @@ def _set_sqlite_pragma(dbapi_connection, connection_record):
 
     # if not isinstance(dbapi_connection, SQLite3Connection):
     #     cursor.execute("SET wait_timeout=31536000;")
-
     if isinstance(dbapi_connection, SQLite3Connection):
         cursor.execute("PRAGMA foreign_keys=ON;")
         cursor.close()
@@ -85,6 +82,9 @@ Job: Job = Job
 
 from schemas.Newsletter import Newsletter
 Newsletter: Newsletter = Newsletter
+
+from schemas.Messenger import Messenger
+Messenger: Messenger = Messenger
 
 from schemas.AppointmentAllocationTime import AppointmentAllocationTime
 AppointmentAllocationTime: AppointmentAllocationTime = AppointmentAllocationTime

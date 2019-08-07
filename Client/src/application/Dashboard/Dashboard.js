@@ -24,6 +24,8 @@ const Account = lazy(() => import('./ControlPanel/Account/Account'));
 const Billing = lazy(() => import('./ControlPanel/Billing/Billing'));
 const UsersManagement = lazy(() => import('./ControlPanel/UsersManagement/UsersManagement'));
 const Documentation = lazy(() => import('./Documentation/Documentation'));
+const Calendar = lazy(() => import('./Calendar/Calendar'));
+const Campaign = lazy(() => import('./Campaign/Campaign'));
 const AutoPilots = lazy(() => import('./AutoPilots/AutoPilots'));
 const AutoPilot = lazy(() => import('./AutoPilots/AutoPilot/AutoPilot'));
 const Marketplace = lazy(() => import('./Marketplace/Marketplace'));
@@ -72,7 +74,6 @@ class Dashboard extends Component {
 
     render() {
         const {match, location} = this.props;
-        console.log(match)
         const user = getUser();
         let userInfo = null;
         // User Information at the top
@@ -119,6 +120,7 @@ class Dashboard extends Component {
             "/dashboard/databases",
             "/dashboard/account",
             "/dashboard/users_management",
+            "/dashboard/campaign"
         ];
         const isNewLayout = newLayoutRoutes.some(a => this.props.location.pathname.indexOf(a) > -1);
         return (
@@ -171,6 +173,11 @@ class Dashboard extends Component {
                             <span>Assistants</span>
                         </Menu.Item>
 
+                        <Menu.Item key="campaign">
+                            <Icon type="rocket"/>
+                            <span>Campaign</span>
+                        </Menu.Item>
+
                         <Menu.Item key="auto_pilots">
                             <Icon type="clock-circle"/>
                             <span>Auto Pilot</span>
@@ -178,7 +185,7 @@ class Dashboard extends Component {
 
                         <Menu.Item key="marketplace">
                             <Icon type="interation"/>
-                            <span>Marketplaces</span>
+                            <span>Marketplace</span>
                         </Menu.Item>
 
                         <Menu.Item key="databases">
@@ -274,6 +281,8 @@ class Dashboard extends Component {
                                             <Route path={`${match.path}/documentation`} component={Documentation}
                                                    exact/>}
                                             <Route path={`${match.path}/appointments`} component={Appointment} exact/>
+                                                   exact/>
+                                            <Route path={`${match.path}/campaign`} component={Campaign} exact/>
                                             <Route path="/dashboard" component={Home}/>
                                         </Switch>
                                     </Suspense>

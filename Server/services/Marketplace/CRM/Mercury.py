@@ -38,7 +38,6 @@ def testConnection(auth, companyID):
 
 
 def login(auth):
-    print("AUTH: ", auth)
     from utilities import helpers
     try:
 
@@ -49,10 +48,11 @@ def login(auth):
             "client_id": CLIENT_ID,
             "client_secret": CLIENT_SECRET,
             "redirect_uri": helpers.getDomain() + "/dashboard/marketplace/Mercury",
-            "code": auth.get("code")
+            "code": auth.get("code"),
+            "resource": "https://" + auth.get("state") + ".dynamics.com"
         }
 
-        url = "https://login.microsoftonline.com/common/oauth2/v2.0/token"
+        url = "https://login.microsoftonline.com/common/oauth2/token"
 
         get_access_token = requests.post(url, headers=headers, data=body)
         if not get_access_token.ok:
@@ -65,7 +65,7 @@ def login(auth):
                             "access_token": result_body.get("access_token"),
                             "refresh_token": result_body.get("refresh_token"),
                             "id_token": result_body.get("id_token"),
-                            "domain": auth.get("domain")
+                            "domain": auth.get("state")
                         })
 
     except Exception as exc:
@@ -117,21 +117,15 @@ def sendQuery(auth, query, method, body, companyID, optionalParams=None):
 
         # set headers
         headers = {'Content-Type': 'application/json', "Authorization": "Bearer " + auth.get("access_token")}
-
         r = marketplace_helpers.sendRequest(url, method, headers, json.dumps(body))
-        print("refresh toekn", auth.get("refresh_token"))
-        print("CODE: ", r.status_code)
-        print("TEXT", r.text)
         if r.status_code == 401:  # wrong rest token
             callback: Callback = retrieveAccessToken(auth, companyID)
             if not callback.Success:
                 raise Exception(callback.Message)
 
             headers["Authorization"] = "Bearer " + callback.Data.get("access_token")
-            print(headers)
+
             r = marketplace_helpers.sendRequest(url, method, headers, json.dumps(body))
-            print("CODE 2", r.status_code)
-            print("TEXT 2", r.text)
             if not r.ok:
                 raise Exception(r.text + ". Query could not be sent")
 
@@ -152,40 +146,41 @@ def buildUrl(query, domain, optionalParams=None):
     if optionalParams:
         url += "?"
         for param in optionalParams:
-            url += "&" + param
+            url += param + "&"
+        url = url[:-1]
     # return the url
     return url
 
 
-def insertCandidate(auth, conversation: Conversation) -> Callback:
+def insertCandidate(auth, data, companyID) -> Callback:
     try:
-        # New candidate details
-        emails = conversation.Data.get('keywordsByDataType').get(DT.CandidateEmail.value['name'], [" "])
-        name = (conversation.Name or " ").split(" ")
-
-        # availability, yearsExperience
         body = {
-            "crimson_firstname": helpers.getListValue(name, 0, " "),
-            "crimson_surname": helpers.getListValue(name, 1, " "),
-            "crimson_mobile": conversation.PhoneNumber or " ",
-            "crimson_town": " ".join(
-                conversation.Data.get('keywordsByDataType').get(DT.CandidateLocation.value['name'], [" "])),
-            "crimson_email": conversation.Email or " ",
-            "crimson_availability": DT.CandidateAvailability,
-            "crimson_jobtitle": DT.JobTitle,
-            "crimson_expsalaryp": str(crm_services.getSalary(conversation, DT.CandidateDesiredSalary, Period.Annually)),
-            "crimson_expratec": str(crm_services.getSalary(conversation, DT.CandidateDesiredSalary, Period.Daily))
+            "crimson_firstname": data.get("firstName"),
+            "crimson_surname": data.get("lastName"),
+            "crimson_mobile": data.get("mobile"),
+            "crimson_town": data.get("city"),
+            "crimson_email": data.get("email"),
+
+            "crimson_workarea": data.get("preferredWorkCity"),
+            "crimson_jobtitle": data.get("jobTitle"),
+
+            "crimson_availability": data.get("availability"),
+
+            "crimson_expsalaryp": float(data.get("annualSalary")),
+            "crimson_expratec": float(data.get("dayRate")),
+
+            "crimson_candidateselfsummary": crm_services.additionalCandidateNotesBuilder(
+                {
+                    "yearsExperience": data.get("yearsExperience"),
+                    "preferredJobType": data.get("preferredJobType"),
+                    "skills": data.get("skills"),
+                    "educations": data.get("educations")
+                }, data.get("selectedSolutions")
+            )
         }
 
-        # Add additional emails to email2 and email3
-        # for email in emails:
-        #     index = emails.index(email)
-        #     if index != 0:
-        #         body["email" + str(index + 1)] = email
-
         # send filter
-        sendQuery_callback: Callback = sendQuery(auth, "entity/Candidate", "post", body,
-                                                 conversation.Assistant.CompanyID)
+        sendQuery_callback: Callback = sendQuery(auth, "crimson_candidates", "post", body, companyID)
 
         if not sendQuery_callback.Success:
             raise Exception(sendQuery_callback.Message)
@@ -197,7 +192,7 @@ def insertCandidate(auth, conversation: Conversation) -> Callback:
         return Callback(False, str(exc))
 
 
-def uploadFile(auth, storedFile: StoredFile):
+def uploadFile(auth, storedFile: StoredFile):  # TODO
     try:
         conversation = storedFile.Conversation
 
@@ -241,25 +236,19 @@ def uploadFile(auth, storedFile: StoredFile):
         return Callback(False, str(exc))
 
 
-def insertClient(auth, conversation: Conversation) -> Callback:
+def insertClient(auth, data, companyID) -> Callback:
     try:
-        # New candidate details
-        emails = conversation.Data.get('keywordsByDataType').get(DT.ClientEmail.value['name'], [" "])
-
         body = {
-            "firstname": conversation.Name or " ",
-            "lastname": conversation.PhoneNumber or " ",
-            "address": {
-                "city": " ".join(
-                    conversation.Data.get('keywordsByDataType').get(DT.ClientLocation.value['name'], [])),
-            },
+            "firstname": data.get("firstName"),
+            "lastname": data.get("lastName"),
+            "address1_city": data.get("city"),
             # check number of emails and submit them
-            "email": emails[0],
+            "emailaddress1": data.get("emails")[0],
+            "telephone1": data.get("mobile"),
+            "company": data.get("companyName")
         }
-
         # send filter
-        sendQuery_callback: Callback = sendQuery(auth, "contacts", "post", body,
-                                                 conversation.Assistant.CompanyID)
+        sendQuery_callback: Callback = sendQuery(auth, "contacts", "post", body, companyID)
         if not sendQuery_callback.Success:
             raise Exception(sendQuery_callback.Message)
 
@@ -270,7 +259,7 @@ def insertClient(auth, conversation: Conversation) -> Callback:
         return Callback(False, str(exc))
 
 
-def searchCandidates(auth, companyID, conversation, fields=None) -> Callback:
+def searchCandidates(auth, companyID, data, fields=None) -> Callback:
     try:
         filter = "$filter="
         if not fields:
@@ -278,12 +267,10 @@ def searchCandidates(auth, companyID, conversation, fields=None) -> Callback:
                      "expsalaryp,crimson_jobtitle,crimson_mobile,crimson_name,crimson_town," + \
                      "crimson_workpref_permanent,crimson_workpref_temp,mercury_cvurl,_transactioncurrencyid_value"
 
-        keywords = conversation['keywordsByDataType']
-
         # populate filter
-        filter += checkFilter(keywords, DT.CandidateLocation, "crimson_town")
+        filter += populateFilter(data.get("location"), "crimson_town")
 
-        filter = filter[:-3]
+        filter = filter[:-4]
 
         # check if no conditions submitted
         if len(filter) < 6:
@@ -330,29 +317,28 @@ def searchCandidates(auth, companyID, conversation, fields=None) -> Callback:
         return Callback(False, str(exc))
 
 
-def searchJobs(auth, companyID, conversation, fields=None) -> Callback:
+def searchJobs(auth, companyID, data, fields=None) -> Callback:
     try:
         filter = "$filter="
         if not fields:
             fields = "$select=crimson_addresscity,crimson_jobsummary,crimson_jobtitle,crimson_startdate," + \
                      "crimson_typeofposition,crimson_vacancyid,mercury_permanentsalary_mc," + \
                      "mercury_tempcandidatepay_mc,_mercury_vacancytype_value,_transactioncurrencyid_value"
-        keywords = conversation['keywordsByDataType']
 
         # populate filter TODO
-        filter += checkFilter(keywords, DT.JobTitle, "crimson_jobtitle")
+        filter += populateFilter(data.get("jobTitle"), "crimson_jobtitle")
 
-        filter += checkFilter(keywords, DT.JobLocation, "crimson_addresscity")
+        filter += populateFilter(data.get("city"), "crimson_addresscity")
 
-        # filter += checkFilter(keywords, DT.JobType, "employmentType")
+        # filter += populateFilter(keywords, DT.JobType, "employmentType")
 
         # salary = crm_services.getSalary(conversation, DT.JobSalary, Period.Annually)
         # if salary > 0:
         #     filter += "salary:" + str(salary) + " or"
 
-        filter += checkFilter(keywords, DT.JobStartDate, "crimson_startdate")
+        # filter += populateFilter(keywords, DT.JobStartDate, "crimson_startdate")
 
-        filter = filter[:-3]
+        filter = filter[:-4]
 
         # check if no conditions submitted
         if len(filter) < 4:
@@ -367,7 +353,7 @@ def searchJobs(auth, companyID, conversation, fields=None) -> Callback:
         return_body = json.loads(sendQuery_callback.Data.text)
         result = []
         # not found match for JobLinkURL
-        for record in return_body["data"]:
+        for record in return_body["value"]:
             # crimson_typeofposition    - code for job type (143570000 is permanent, 143570001 is contract)
             # TODO make it retrieve the job type from code from their api
             if record.get("crimson_typeofposition") == 143570000:
@@ -402,9 +388,15 @@ def searchJobs(auth, companyID, conversation, fields=None) -> Callback:
         return Callback(False, str(exc))
 
 
-def checkFilter(keywords, dataType: DT, string):
+def populateFilter(keywords, dataType: DT, string):
     if keywords.get(dataType.value["name"]):
-        return string + " eq '" + "".join(keywords[dataType.value["name"]]) + "' or"
+        return "contains(" + string + ", '" + "".join(keywords[dataType.value["name"]]) + "') and "
+    return ""
+
+
+def populateFilter(value, string):
+    if value:
+        return "contains(" + string + ", '" + value + "') and "
     return ""
 
 

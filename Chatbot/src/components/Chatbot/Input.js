@@ -13,7 +13,7 @@ import './UserInputs/styles/Inputs.css';
 import { DatePicker, FileUpload, SalaryPicker, Text } from './UserInputs';
 
 
-const Input = ({ setChatbotStatus, isDirectLink, addUserMessage, lastMessage, addBotMessage, setChatbotAnimation, visible }) => {
+const Input = ({setChatbotStatus, hideSignature, addUserMessage, lastMessage, addBotMessage, setChatbotAnimation, visible}) => {
 
     const submitMessage = (text, type, newState, afterMessage, block, content) => {
         addUserMessage(text, type, block, content);
@@ -62,6 +62,7 @@ const Input = ({ setChatbotStatus, isDirectLink, addUserMessage, lastMessage, ad
                 {
                     component ?
                         (<div id={'TheSearchBase_Chatbot_Input'} className={[
+                            hideSignature ? 'WithOutSignature' : null,
                             'Input',
                             visible ? 'Visible' : ''
                         ].join(' ')}>

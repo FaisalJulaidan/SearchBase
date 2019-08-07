@@ -21,6 +21,7 @@ export const MercuryFeatures = () =>
                 <li>Password</li>
             </ul>
         </Paragraph>
+
         <Paragraph>
             You can request both information by heading to this link:
             <Text code style={{margin: '0 0 0 5px'}}>
@@ -33,6 +34,14 @@ export const MercuryFeatures = () =>
 
         <Paragraph>
             Once you have the necessary information, you can simply start using Mercury + TheSearchBase.
+        </Paragraph>
+
+        <Paragraph>
+            If at any point you wish to log out from our system you can visit <a href="https://myapps.microsoft.com" target={'_blank'}
+                style={{cursor: 'pointer'}}>
+                https://myapps.microsoft.com
+                </a>,
+            go to Profile at the top right and press 'Sign out everywhere'.
         </Paragraph>
 
         <Title level={2}>Guidelines and Resources</Title>
@@ -80,7 +89,7 @@ export const MercuryFormItems = ({
                 onClick={
                     () => validateFields((err, values) =>
                         window.location =
-                            `https://login.microsoftonline.com/common/oauth2/v2.0/authorize?response_type=code&client_id=b49f9e03-5586-4248-8585-8640c4b2539c&response_mode=query&scope=https://admin.services.crm.dynamics.com/user_impersonation+offline_access&redirect_uri=${getLink("/dashboard/marketplace/Mercury")}&state=${values.domain}`
+                            `https://login.microsoftonline.com/common/oauth2/authorize?response_type=code&client_id=b49f9e03-5586-4248-8585-8640c4b2539c&response_mode=query&scope=https://admin.services.crm.dynamics.com/user_impersonation offline_access&redirect_uri=${getLink("/dashboard/marketplace/Mercury")}&state=${values.domain}`
                     )
                 }
                 size={'large'}>

@@ -20,6 +20,10 @@ class Company(db.Model):
     TechnicalSupport = db.Column(db.Boolean, nullable=False, default=True)
     AccountSpecialist = db.Column(db.Boolean, nullable=False, default=False)
 
+    HideSignature = db.Column(db.Boolean, nullable=False, default=False)
+    Active = db.Column(db.Boolean, nullable=False, default=False)
+
+
     # Relationships:
     Users = db.relationship('User', back_populates='Company')
     Assistants = db.relationship('Assistant', back_populates='Company')
@@ -27,6 +31,7 @@ class Company(db.Model):
     Roles = db.relationship('Role', back_populates='Company')
     CRMs = db.relationship('CRM', back_populates='Company')
     Calendars = db.relationship('Calendar', back_populates='Company')
+    Messengers = db.relationship('Messenger', back_populates='Company')
     AutoPilots = db.relationship('AutoPilot', back_populates='Company')
     AppointmentAllocationTimes = db.relationship('AppointmentAllocationTime', back_populates='Company')
 

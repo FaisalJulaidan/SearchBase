@@ -158,6 +158,25 @@ def assistant_calendar_connect(assistantID):
     return helpers.jsonResponse(True, 200, callback.Message, None)
 
 
+# Connect assistant to Messenger
+@assistant_router.route("/assistant/<int:assistantID>/messenger", methods=['POST', 'DELETE'])
+@jwt_required
+def assistant_messenger_connect(assistantID):
+    # Authenticate
+    user = get_jwt_identity()['user']
+
+    callback: Callback = Callback(False, 'Error!')
+    if request.method == "POST":
+        callback: Callback = assistant_services.connectToMessenger(assistantID, request.json.get('messengerID'),
+                                                                  user['companyID'])
+
+    if request.method == "DELETE":
+        callback: Callback = assistant_services.disconnectFromMessenger(assistantID, user['companyID'])
+
+    if not callback.Success:
+        return helpers.jsonResponse(False, 400, callback.Message, None)
+    return helpers.jsonResponse(True, 200, callback.Message, None)
+
 # Connect assistant to AutoPilot
 @assistant_router.route("/assistant/<int:assistantID>/auto_pilot", methods=['POST', 'DELETE'])
 @jwt_required

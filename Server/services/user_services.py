@@ -16,10 +16,10 @@ def getTimezone(id) -> Callback:
 def create(firstname, surname, email, password, phone, companyID: int, roleID: int, timeZone: str, verified=False, ) -> Callback:
     try:
 
-
         # Create a new user with its associated company and role
         newUser: User = User(Firstname=firstname, Surname=surname, Email=email.lower(), Verified=verified,
-                             Password=password, PhoneNumber=phone, CompanyID=companyID, RoleID=roleID, TimeZone=timeZone)
+                             Password=password, PhoneNumber=phone, CompanyID=companyID, RoleID=roleID,
+                             ChatbotNotifications=True, TimeZone=timeZone)
         db.session.add(newUser)
         db.session.commit()
         return Callback(True, 'User has been created successfully!', newUser)

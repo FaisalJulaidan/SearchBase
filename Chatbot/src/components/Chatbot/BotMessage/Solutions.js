@@ -25,6 +25,7 @@ const Solutions = ({responded, submitSolution, skipResponse, solutions, skippabl
 
     const handleSubmit = () => {
         const selected = selectedSolutions.map(key => solutions[key]);
+        console.log(selected)
         submitSolution(
             '✅',
             messageTypes.TEXT,

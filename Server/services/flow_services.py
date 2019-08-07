@@ -17,8 +17,9 @@ def getChatbot(assistantHashID) -> Callback:
             return Callback(False, "Assistant not found!", None)
 
         assistant: Assistant = db.session.query(Assistant.Name, Assistant.Flow, Assistant.Message, Assistant.TopBarText,
-                                          Assistant.SecondsUntilPopup, Assistant.Active, Assistant.Config,
-                                          Company.Name.label("CompanyName"), Company.LogoPath.label("LogoPath"))\
+                                                Assistant.SecondsUntilPopup, Assistant.Active, Assistant.Config,
+                                                Company.HideSignature,
+                                                Company.Name.label("CompanyName"), Company.LogoPath.label("LogoPath")) \
             .join(Company)\
             .filter(Assistant.ID == assistantID[0]).first()
 
@@ -43,7 +44,8 @@ def getChatbot(assistantHashID) -> Callback:
 
         data = {
             "assistant": helpers.getDictFromLimitedQuery(['Name', 'Flow', 'Message', 'TopBarText', 'SecondsUntilPopup',
-                                                          'Active', 'Config', 'CompanyName', 'LogoPath'], assistant),
+                                                          'Active', 'Config', 'HideSignature', 'CompanyName',
+                                                          'LogoPath'], assistant),
             "isDisabled": False,
             "currencies": options_services.getOptions().Data['databases']['currencyCodes']
         }

@@ -26,6 +26,7 @@
                 var scriptTag = document.querySelector('script[data-name="tsb-widget"][data-id]');
                 var isDirectLink = scriptTag.getAttribute('directLink') || '';
                 var assistantID = scriptTag.getAttribute('data-id');
+                var loadByDefault = scriptTag.getAttribute('data-load');
                 var btnColor = scriptTag.getAttribute('data-circle') || '#1890ff';
                 var s = document.createElement("script");
                 s.src = getLink("/api/static/widgets/chatbot".concat(manifest.files['main.js']));
@@ -34,6 +35,7 @@
                 s.setAttribute('data-directLink', isDirectLink || '');
                 s.setAttribute('data-name', 'tsb-widget');
                 s.setAttribute('data-id', assistantID);
+                s.setAttribute('data-load', loadByDefault);
                 s.setAttribute('data-circle', btnColor);
                 s.setAttribute("id", "oldBotScript");
                 document.body.appendChild(s);
@@ -307,19 +309,19 @@
                         }
 
                         if (this._bodyBlob) {
-                            return Promise.resolve(this._bodyBlob)
+                            return window.Promise.resolve(this._bodyBlob)
                         } else if (this._bodyArrayBuffer) {
-                            return Promise.resolve(new Blob([this._bodyArrayBuffer]))
+                            return window.Promise.resolve(new Blob([this._bodyArrayBuffer]))
                         } else if (this._bodyFormData) {
                             throw new Error('could not read FormData body as blob')
                         } else {
-                            return Promise.resolve(new Blob([this._bodyText]))
+                            return window.Promise.resolve(new Blob([this._bodyText]))
                         }
                     };
 
                     this.arrayBuffer = function() {
                         if (this._bodyArrayBuffer) {
-                            return consumed(this) || Promise.resolve(this._bodyArrayBuffer)
+                            return consumed(this) || window.Promise.resolve(this._bodyArrayBuffer)
                         } else {
                             return this.blob().then(readBlobAsArrayBuffer)
                         }
@@ -335,11 +337,11 @@
                     if (this._bodyBlob) {
                         return readBlobAsText(this._bodyBlob)
                     } else if (this._bodyArrayBuffer) {
-                        return Promise.resolve(readArrayBufferAsText(this._bodyArrayBuffer))
+                        return window.Promise.resolve(readArrayBufferAsText(this._bodyArrayBuffer))
                     } else if (this._bodyFormData) {
                         throw new Error('could not read FormData body as text')
                     } else {
-                        return Promise.resolve(this._bodyText)
+                        return window.Promise.resolve(this._bodyText)
                     }
                 };
 
@@ -497,7 +499,7 @@
             }
 
             function fetch(input, init) {
-                return new Promise(function(resolve, reject) {
+                return new window.Promise(function(resolve, reject) {
                     var request = new Request(input, init);
 
                     if (request.signal && request.signal.aborted) {

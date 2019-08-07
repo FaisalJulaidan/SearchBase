@@ -64,8 +64,8 @@ def chatbot(assistantIDAsHash):
         # Get blocks for the chatbot to use
         callback: Callback = flow_services.getChatbot(assistantIDAsHash)
         if not callback.Success:
-            return helpers.jsonResponse(False, 400, callback.Message)
-        return helpers.jsonResponse(True, 200, "No Message", callback.Data)
+            return helpers.jsonResponseFlask(False, 400, callback.Message)
+        return helpers.jsonResponseFlask(True, 200, "No Message", callback.Data)
 
     # Process sent data coming from the chatbot
     if request.method == "POST":
@@ -74,9 +74,9 @@ def chatbot(assistantIDAsHash):
         data = request.json
         callback: Callback = conversation_services.processConversation(assistantIDAsHash, data)
         if not callback.Success:
-            return helpers.jsonResponse(False, 400, callback.Message, callback.Data)
+            return helpers.jsonResponseFlask(False, 400, callback.Message, callback.Data)
 
-        return helpers.jsonResponse(True, 200,
+        return helpers.jsonResponseFlask(True, 200,
                                     "Collected data is successfully processed",
                                     {'sessionID': callback.Data.ID})
 
@@ -100,7 +100,7 @@ def getSolutions_forChatbot(assistantHashID):
 def chatbot_upload_files(assistantIDAsHash, sessionID):
     callback: Callback = conversation_services.getByID(sessionID, helpers.decodeID(assistantIDAsHash)[0])
     if not callback.Success:
-        return helpers.jsonResponse(False, 404, "Session not found.", None)
+        return helpers.jsonResponseFlask(False, 404, "Session not found.", None)
     conversation: Conversation = callback.Data
 
     if request.method == 'POST':
@@ -109,7 +109,7 @@ def chatbot_upload_files(assistantIDAsHash, sessionID):
             assistant: Assistant = conversation.Assistant
             # Check if the post request has the file part
             if 'file' not in request.files:
-                return helpers.jsonResponse(False, 404, "No file part")
+                return helpers.jsonResponseFlask(False, 404, "No file part")
 
             files = request.files.getlist('file')
             filenames = ''
@@ -117,7 +117,7 @@ def chatbot_upload_files(assistantIDAsHash, sessionID):
             for file in files:
 
                 if file.filename == '':
-                    return helpers.jsonResponse(False, 404, "No selected file")
+                    return helpers.jsonResponseFlask(False, 404, "No selected file")
                 # Generate unique name: hash_sessionIDEncrypted.extension
                 filename = str(uuid.uuid4()) + '_' + helpers.encodeID(sessionID) + '.' + \
                            secure_filename(file.filename).rsplit('.', 1)[1].lower()
@@ -158,5 +158,5 @@ def chatbot_upload_files(assistantIDAsHash, sessionID):
                     raise Exception("Could not submit file to CRM")
 
         except Exception as exc:
-            return helpers.jsonResponse(False, 404, "I am having difficulties saving your uploaded the files :(")
-        return helpers.jsonResponse(True, 200, "File uploaded successfully!!")
+            return helpers.jsonResponseFlask(False, 404, "I am having difficulties saving your uploaded the files :(")
+        return helpers.jsonResponseFlask(True, 200, "File uploaded successfully!!")

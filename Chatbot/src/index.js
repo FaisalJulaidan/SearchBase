@@ -6,15 +6,12 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
 import * as serviceWorker from './serviceWorker';
-
-import {compose, createStore} from 'redux';
 import {Provider} from 'react-redux';
-import reducers from './store/reducers';
 import WebFont from 'webfontloader';
 import Chatbot from './components/Chatbot/Chatbot';
+import Store from '../src/store/store'
 
-const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
-const store = createStore(reducers, composeEnhancers());
+
 
 // kick off the polyfill!
 smoothscroll.polyfill();
@@ -24,6 +21,7 @@ WebFont.load({ google: { families: ['Source Sans Pro', 'sans-serif'] } });
 const scriptTag = document.querySelector('script[data-name="tsb-widget"][data-id]');
 const isDirectLink = scriptTag.getAttribute('directLink') === '';
 const assistantID = scriptTag.getAttribute('data-id');
+const loadByDefault = scriptTag.getAttribute('data-load');
 const btnColor = scriptTag.getAttribute('data-circle') || '#1890ff';
 
 let root = document.createElement('div');
@@ -36,8 +34,9 @@ else
     document.body.appendChild(root);
 
 ReactDOM.render(
-    <Provider store={store}>
+    <Provider store={Store}>
         <Chatbot isDirectLink={isDirectLink} btnColor={btnColor}
+                 loadByDefault={loadByDefault}
                  assistantID={assistantID}/>
     </Provider>, root
 );

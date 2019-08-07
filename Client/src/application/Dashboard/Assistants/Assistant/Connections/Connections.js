@@ -1,10 +1,10 @@
-import React, {Component} from 'react';
-import {connect} from 'react-redux';
-import {store} from "store/store";
+import React, { Component } from 'react';
+import { connect } from 'react-redux';
+import { store } from 'store/store';
 
-import {Button, Select, Form, Divider, Row, Col} from "antd";
-import {assistantActions, marketplaceActions, autoPilotActions} from "store/actions";
-import {history} from "helpers";
+import { Button, Select, Form, Divider } from 'antd';
+import { assistantActions, marketplaceActions, autoPilotActions } from 'store/actions';
+import { history } from 'helpers';
 
 const Option = Select.Option;
 
@@ -15,10 +15,12 @@ class Connections extends Component {
         selectedCRM: undefined,
         selectedAutoPilot: undefined,
         selectedCalendar: undefined,
+        selectedMessenger: undefined,
 
         defaultSelectedCRM: undefined,
         defaultSelectedAutoPilot: undefined,
-        defaultSelectedCalendar: undefined
+        defaultSelectedCalendar: undefined,
+        defaultSelectedMessenger: undefined
     };
 
     componentWillMount() {
@@ -27,49 +29,61 @@ class Connections extends Component {
     }
 
     componentWillReceiveProps(nextProps, nextContext) {
-        const {assistant, marketplaceItems, autoPilotsList} = nextProps;
+        const { assistant, marketplaceItems, autoPilotsList } = nextProps;
 
         this.setState({
             defaultSelectedCRM: marketplaceItems?.crms?.find(crm => crm.ID === assistant.CRMID),
+            defaultSelectedMessenger: marketplaceItems?.messengers?.find(messenger => messenger.ID === assistant.MessengerID),
             defaultSelectedCalendar: marketplaceItems?.calendars?.find(calendar => calendar.ID === assistant.CalendarID),
             defaultSelectedAutoPilot: autoPilotsList.find(ap => ap.ID === assistant.AutoPilotID)
-        })
+        });
     }
 
     // CRM
     handleConnectCRM = () => {
-        this.props.dispatch(assistantActions.connectToCRM(this.state.selectedCRM.ID, this.props.assistant.ID))
+        this.props.dispatch(assistantActions.connectToCRM(this.state.selectedCRM.ID, this.props.assistant.ID));
     };
 
     handleDisconnectCRM = () => {
-        this.props.dispatch(assistantActions.disconnectFromCRM(this.props.assistant.ID))
+        this.props.dispatch(assistantActions.disconnectFromCRM(this.props.assistant.ID));
     };
 
+    // Messenger
+    handleConnectMessenger = () => {
+        this.props.dispatch(assistantActions.connectToMessenger(this.state.selectedMessenger.ID, this.props.assistant.ID));
+    };
+
+    handleDisconnectMessenger = () => {
+        this.props.dispatch(assistantActions.disconnectFromMessenger(this.props.assistant.ID));
+    };
 
     // Calendar
     handleConnectCalendar = () => {
-        this.props.dispatch(assistantActions.connectToCalendar(this.state.selectedCalendar.ID, this.props.assistant.ID))
+        this.props.dispatch(assistantActions.connectToCalendar(this.state.selectedCalendar.ID, this.props.assistant.ID));
     };
 
     handleDisconnectCalendar = () => {
-        this.props.dispatch(assistantActions.disconnectFromCalendar(this.props.assistant.ID))
+        this.props.dispatch(assistantActions.disconnectFromCalendar(this.props.assistant.ID));
     };
 
 
     // Auto Pilot
     handleConnectAutoPilot = () => {
-        this.props.dispatch(assistantActions.connectToAutoPilot(this.state.selectedAutoPilot.ID, this.props.assistant.ID))
+        this.props.dispatch(assistantActions.connectToAutoPilot(this.state.selectedAutoPilot.ID, this.props.assistant.ID));
     };
 
     handleDisconnectAutoPilot = () => {
-        this.props.dispatch(assistantActions.disconnectFromAutoPilot(this.props.assistant.ID))
+        this.props.dispatch(assistantActions.disconnectFromAutoPilot(this.props.assistant.ID));
     };
 
 
     render() {
-        const {marketplaceItems, autoPilotsList} = this.props;
-        const {defaultSelectedCRM, selectedCRM, defaultSelectedCalendar, selectedCalendar, defaultSelectedAutoPilot, selectedAutoPilot} = this.state;
-        console.log(defaultSelectedAutoPilot)
+        const { marketplaceItems, autoPilotsList } = this.props;
+        const { defaultSelectedCRM, selectedCRM,
+            defaultSelectedCalendar, selectedCalendar,
+            defaultSelectedMessenger, selectedMessenger,
+            defaultSelectedAutoPilot, selectedAutoPilot } = this.state;
+
         return (
             <>
 
@@ -78,11 +92,11 @@ class Connections extends Component {
                     <Select
                         style={{ width: 500, marginBottom: 10 }}
                         placeholder="Select an Auto Pilot to be connected to this assistant"
-                        onChange={(autoPilotID) => this.setState({selectedAutoPilot: autoPilotsList.find(ap => ap.ID === autoPilotID)})}
-                        value={selectedAutoPilot ? selectedAutoPilot?.ID : (defaultSelectedAutoPilot?.ID || undefined) }
+                        onChange={(autoPilotID) => this.setState({ selectedAutoPilot: autoPilotsList.find(ap => ap.ID === autoPilotID) })}
+                        value={selectedAutoPilot ? selectedAutoPilot?.ID : (defaultSelectedAutoPilot?.ID || undefined)}
                     >
                         {autoPilotsList.map((ap, i) => {
-                            return <Option key={i} value={ap.ID}>{ap.Name}</Option>
+                            return <Option key={i} value={ap.ID}>{ap.Name}</Option>;
                         })}
                     </Select>
                 </div>
@@ -98,7 +112,7 @@ class Connections extends Component {
                             onClick={this.handleDisconnectAutoPilot}
                             disabled={!defaultSelectedAutoPilot}
                     >
-                        {!defaultSelectedAutoPilot ? "Disconnect" : `Disconnect from ${defaultSelectedAutoPilot.Name}`}
+                        {!defaultSelectedAutoPilot ? 'Disconnect' : `Disconnect from ${defaultSelectedAutoPilot.Name}`}
                     </Button>
                 </div>
 
@@ -110,11 +124,11 @@ class Connections extends Component {
                     <Select
                         style={{ width: 500, marginBottom: 10 }}
                         placeholder="Select a CRM to be connected to this assistant"
-                        onChange={(CRMID) => this.setState({selectedCRM: marketplaceItems?.crms?.find(crm => crm.ID === CRMID)})}
-                        value={selectedCRM ? selectedCRM?.ID : (defaultSelectedCRM?.ID || undefined) }
+                        onChange={(CRMID) => this.setState({ selectedCRM: marketplaceItems?.crms?.find(crm => crm.ID === CRMID) })}
+                        value={selectedCRM ? selectedCRM?.ID : (defaultSelectedCRM?.ID || undefined)}
                     >
                         {marketplaceItems?.crms?.map((crm, i) => {
-                            return <Option key={i} value={crm.ID}>{crm.Type}</Option>
+                            return <Option key={i} value={crm.ID}>{crm.Type}</Option>;
                         })}
                     </Select>
                 </div>
@@ -130,7 +144,39 @@ class Connections extends Component {
                             onClick={this.handleDisconnectCRM}
                             disabled={!defaultSelectedCRM}
                     >
-                        {!defaultSelectedCRM ? "Disconnect" : `Disconnect from ${defaultSelectedCRM.Type}`}
+                        {!defaultSelectedCRM ? 'Disconnect' : `Disconnect from ${defaultSelectedCRM.Type}`}
+                    </Button>
+                </div>
+
+
+                <br/>
+                <Divider/>
+                <h2> SMS Connection:</h2>
+                <div>
+                    <Select
+                        style={{ width: 500, marginBottom: 10 }}
+                        placeholder="Select a SMS service to be connected to this assistant"
+                        onChange={(MessengerID) => this.setState({ selectedMessenger: marketplaceItems?.messengers?.find(messenger => messenger.ID === MessengerID) })}
+                        value={selectedMessenger ? selectedMessenger?.ID : (defaultSelectedMessenger?.ID || undefined)}
+                    >
+                        {marketplaceItems?.messengers?.map((messenger, i) => {
+                            return <Option key={i} value={messenger.ID}>{messenger.Type}</Option>;
+                        })}
+                    </Select>
+                </div>
+                <div>
+                    <Button
+                        type={'primary'}
+                        onClick={this.handleConnectMessenger}
+                        disabled={!(selectedMessenger && selectedMessenger?.ID !== defaultSelectedMessenger?.ID)}
+                    >
+                        Connect
+                    </Button>
+                    <Button type={'danger'}
+                            onClick={this.handleDisconnectMessenger}
+                            disabled={!defaultSelectedMessenger}
+                    >
+                        {!defaultSelectedMessenger ? 'Disconnect' : `Disconnect from ${defaultSelectedMessenger.Type}`}
                     </Button>
                 </div>
 
@@ -140,13 +186,13 @@ class Connections extends Component {
                 <h2> Calendar Connection (Coming soon)</h2>
                 <div>
                     <Select disabled
-                        style={{ width: 500, marginBottom: 10 }}
-                        placeholder="Select a Calendar to be connected to this assistant"
-                        onChange={(calendarID) => this.setState({selectedCalendar: marketplaceItems?.calendars?.find(calendar => calendar.ID === calendarID)})}
-                        value={selectedCalendar ? selectedCalendar?.ID : (defaultSelectedCalendar?.ID || undefined) }
+                            style={{ width: 500, marginBottom: 10 }}
+                            placeholder="Select a Calendar to be connected to this assistant"
+                            onChange={(calendarID) => this.setState({ selectedCalendar: marketplaceItems?.calendars?.find(calendar => calendar.ID === calendarID) })}
+                            value={selectedCalendar ? selectedCalendar?.ID : (defaultSelectedCalendar?.ID || undefined)}
                     >
                         {marketplaceItems?.calendars?.map((calendar, i) => {
-                            return <Option key={i} value={calendar.ID}>{calendar.Type}</Option>
+                            return <Option key={i} value={calendar.ID}>{calendar.Type}</Option>;
                         })}
                     </Select>
                 </div>
@@ -162,7 +208,7 @@ class Connections extends Component {
                             onClick={this.handleDisconnectCalendar}
                             disabled={!defaultSelectedCalendar}
                     >
-                        {!defaultSelectedCalendar ? "Disconnect" : `Disconnect from ${defaultSelectedCalendar.Type}`}
+                        {!defaultSelectedCalendar ? 'Disconnect' : `Disconnect from ${defaultSelectedCalendar.Type}`}
                     </Button>
                 </div>
             </>
@@ -173,7 +219,7 @@ class Connections extends Component {
 function mapStateToProps(state) {
     return {
         marketplaceItems: state.marketplace.marketplaceItems,
-        autoPilotsList: state.autoPilot.autoPilotsList,
+        autoPilotsList: state.autoPilot.autoPilotsList
     };
 }
 

@@ -83,7 +83,7 @@ class AutoPilots extends React.Component {
                             <Icon type="interation"/> Auto Pilots
                         </Title>
                         <Paragraph type="secondary">
-                            Automate your assistants using auto pilots
+                            Connect your Assistants to an Auto Pilot to automate managing candidate acceptance and appointment scheduling
                         </Paragraph>
                     </div>
 

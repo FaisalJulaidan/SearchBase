@@ -43,7 +43,7 @@ class Solutions extends Component {
             const showTop = Number(values.showTop) > 10 ? 10 : Number(values.showTop);
             let options = {
                 Type: 'Solutions',
-                StoreInDB: false,
+                StoreInDB: true,
 
                 Skippable: values.isSkippable || false,
                 SkipText: values.SkipText || "Skip!",

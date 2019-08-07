@@ -18,7 +18,7 @@ class User(db.Model):
     ))
 
     Verified = db.Column(db.Boolean(), nullable=False, default=False)
-    ChatbotNotifications = db.Column(db.Boolean, nullable=False, default=False)
+    ChatbotNotifications = db.Column(db.Boolean, nullable=False, default=True)
     LastAccess = db.Column(db.DateTime(), nullable=True)
     CreatedOn = db.Column(db.DateTime(), nullable=False, default=datetime.now)
 
@@ -26,7 +26,7 @@ class User(db.Model):
     CompanyID = db.Column(db.Integer, db.ForeignKey('company.ID', ondelete='cascade'), nullable=False)
     Company = db.relationship('Company', back_populates='Users')
 
-    RoleID = db.Column(db.Integer, db.ForeignKey('role.ID'), nullable=False)
+    RoleID = db.Column(db.Integer, db.ForeignKey('role.ID', ondelete='SET NULL'))
     Role = db.relationship('Role', back_populates='Users')
 
     # Constraints:

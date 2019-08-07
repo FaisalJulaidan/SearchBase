@@ -36,7 +36,8 @@ import 'antd/dist/antd.css';
 export const Chatbot = ({
                             isDirectLink, btnColor, assistantID,
                             addBotMessage, setChatbotStatus, chatbot, initChatbot,
-                            resetChatbot, resetMessage, setChatbotAnimation, messageList
+                            resetChatbot, resetMessage, setChatbotAnimation, messageList,
+                        loadByDefault
                         }) => {
     const { assistant, status, animation } = chatbot;
     const { loading, thinking, open, disabled, active, started, curAction, finished } = status;
@@ -56,6 +57,7 @@ export const Chatbot = ({
         resetChatbot();
         resetMessage();
         dataHandler.resetTimeElapsed();
+        dataHandler.setSessionID(undefined);
         clearTimeout(timer.current);
         resetAsync();
     };
@@ -83,6 +85,8 @@ export const Chatbot = ({
     // }, [])
 
     // On boot first time animation
+
+
     useEffect(() => {
         if (assistant)
             if (isDirectLink) {
@@ -174,8 +178,11 @@ export const Chatbot = ({
                 setChatbotStatus({ started: true });
                 return;
             }
+
+
             let nextBlock = getCurBlock(curAction, assistant, chatbot);
             console.log(nextBlock);
+
             if (!nextBlock) return;
 
             setChatbotWaiting(nextBlock);
@@ -209,13 +216,23 @@ export const Chatbot = ({
                 return setChatbotStatus({ disabled: isDisabled, active: assistant.Active, loading: false });
 
             dataHandler.setAssistantID(assistantID);
+
             initChatbot(
                 assistant,
                 [].concat(assistant.Flow.groups.map(group => group.blocks)).flat(1),
                 { disabled: isDisabled, active: assistant.Active });
+
+
         };
-        if (!assistant) {
-            fetchChatbot();
+        if (!assistant && (loadByDefault === "true" || !loadByDefault)) {
+            fetchChatbot()
+        }
+        if (!window.__TSB_CHATBOT){
+            window.__TSB_CHATBOT = {}
+            window.__TSB_CHATBOT.ready = true
+            window.__TSB_CHATBOT.load = () => fetchChatbot()
+            window.__TSB_CHATBOT.open = () => openWindow()
+            window.__TSB_CHATBOT.close = () => closeWindow();
         }
     }, [initChatbot, setChatbotStatus]);
 
@@ -234,11 +251,14 @@ export const Chatbot = ({
                                     logoPath={assistant.LogoPath}
                                     resetChatbot={reset}
                                     closeWindow={closeWindow}/>
-                            <Flow inputOpen={animation.inputOpen} thinking={thinking}
+                            <Flow inputOpen={animation.inputOpen}
+                                  hideSignature={assistant.HideSignature}
+                                  thinking={thinking}
                                   resetAsync={resetAsync}/>
                             <Input isDirectLink={isDirectLink}
+                                   hideSignature={assistant.HideSignature}
                                    visible={animation.inputOpen}/>
-                            <Signature isDirectLink={isDirectLink}/>
+                            {assistant.HideSignature ? null : <Signature isDirectLink={isDirectLink}/>}
                         </div>
                         :
                         <ChatButton btnColor={btnColor}

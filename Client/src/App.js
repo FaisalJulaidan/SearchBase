@@ -1,11 +1,11 @@
-import React, {Component, lazy, Suspense} from 'react';
-import {Redirect, Route, Switch, withRouter} from 'react-router-dom';
-import {connect} from 'react-redux';
-import {PrivateRoute} from './hoc';
-import SentryBoundary from "components/SentryBoundary/SentryBoundary";
-import styles from "./components/LoadingSpinner/LoadingSpinner.module.less";
+import React, { Component, lazy, Suspense } from 'react';
+import { Redirect, Route, Switch, withRouter } from 'react-router-dom';
+import { connect } from 'react-redux';
+import { PrivateRoute } from './hoc';
+import SentryBoundary from 'components/SentryBoundary/SentryBoundary';
+import styles from './components/LoadingSpinner/LoadingSpinner.module.less';
 
-import { TimezoneContext, getTimezone } from 'contexts/timezone'
+import { TimezoneContext, getTimezone } from 'contexts/timezone';
 
 
 const Dashboard = lazy(() => import('./application/Dashboard/Dashboard'));
@@ -16,8 +16,7 @@ const NewResetPassword = lazy(() => import('./application/ForgetPassword/NewRese
 const AppointmentsPicker = lazy(() => import('./application/AppointmentsPicker/AppointmentsPicker'));
 const AccountVerification = lazy(() => import('./application/AccountVerification/AccountVerification'));
 const ChatbotDirectLink = lazy(() => import('./application/ChatbotDirectLink/ChatbotDirectLink'));
-const AppointmentStatus = lazy(() => import('./application/Public/AppointmentStatus/AppointmentStatus'))
-
+const AppointmentStatus = lazy(() => import('./application/Public/AppointmentStatus/AppointmentStatus'));
 
 
 class App extends Component {
@@ -26,28 +25,29 @@ class App extends Component {
         // Clear recent notifications boxes when route changes
         // history.listen(() => destroyMessage());
     }
+
     setTimezone = async () => {
-        let tz = await getTimezone()
-        this.setState({timezone: tz})
-        this.pollTimezone()
-    }
+        let tz = await getTimezone();
+        this.setState({ timezone: tz });
+        this.pollTimezone();
+    };
 
     pollTimezone = () => {
         setInterval(async () => {
-            let tz = await getTimezone()
-            if(tz !== this.state.timezone){
-                this.setState({timezone: tz})
+            let tz = await getTimezone();
+            if (tz !== this.state.timezone) {
+                this.setState({ timezone: tz });
             }
-        }, 5000)
-    }
+        }, 5000);
+    };
 
     componentDidMount() {
-        this.setTimezone()
+        this.setTimezone();
     }
 
     state = {
         timezone: null
-    }
+    };
 
     render() {
         return (
@@ -65,7 +65,7 @@ class App extends Component {
                             <Route path="/appointment_status/" component={AppointmentStatus}/>
                             <Route path="/chatbot_direct_link/" component={ChatbotDirectLink}/>
                             <PrivateRoute path="/dashboard" component={Dashboard}/>
-                            <Redirect to={{pathname: '/dashboard'}}/>
+                            <Redirect to={{ pathname: '/dashboard' }}/>
                         </Switch>
                     </TimezoneContext.Provider>
                 </Suspense>
@@ -75,9 +75,9 @@ class App extends Component {
 }
 
 const mapStateToProps = (state) => {
-    const {alert} = state;
+    const { alert } = state;
     return {
-        alert,
+        alert
     };
 };
 export default withRouter(connect(mapStateToProps)(App));

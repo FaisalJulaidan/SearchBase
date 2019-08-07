@@ -1,46 +1,38 @@
 import React from 'react';
-import {http} from 'helpers';
-import moment from 'moment'
+import { http } from 'helpers';
+import moment from 'moment';
 
 let TimezoneContext = React.createContext('Europe/London');
 
 const setTimezone = async () => {
-    let data = await http.get("/user/timezone")
-    let tomorrowTS = moment().add(1, "days").unix()
-    localStorage.setItem("TSB_TZ", JSON.stringify({expr: tomorrowTS, timezone: data.data.data}))
-}
+    let data = await http.get('/user/timezone');
+    let tomorrowTS = moment().add(1, 'days').unix();
+    localStorage.setItem('TSB_TZ', JSON.stringify({ expr: tomorrowTS, timezone: data.data.data }));
+};
 
 const getTimezone = () => {
-    let tz = localStorage.getItem("TSB_TZ")
-    if(isValid(tz)){
-        return JSON.parse(tz).timezone
-        return
+    let tz = localStorage.getItem('TSB_TZ');
+    if (isValid(tz)) {
+        return JSON.parse(tz).timezone;
     } else {
         return setTimezone().then(() => {
-            return getTimezone()
-        })
+            return getTimezone();
+        });
     }
-}
+};
 
 const isValid = (item) => {
-    if(item){
-        if(checkExpiry(JSON.parse(item))) {
-            return true
+    if (item) {
+        if (checkExpiry(JSON.parse(item))) {
+            return true;
         }
     }
-    return false
-}
+    return false;
+};
+
+const checkExpiry = (item) => moment(item.expr).diff(moment(), 'hours') <= 24;
+
+console.log(TimezoneContext);
 
 
-const checkExpiry = (item) => {
-    if(moment(item.expr).diff(moment(), "hours") > 24){
-        return false
-    }
-    return true
-}
-
-console.log(TimezoneContext)
-
-
-
-export { TimezoneContext, getTimezone }
+export { TimezoneContext, getTimezone };

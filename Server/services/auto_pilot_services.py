@@ -1,7 +1,6 @@
-from datetime import datetime, time
+from datetime import datetime
 
 from models import db, Callback, Conversation, AutoPilot, Assistant, Messenger
-from models import db, Callback, AutoPilot, Conversation,
 from services import mail_services, stored_file_services as sfs
 from services.Marketplace.Messenger import mesenger_services
 from sqlalchemy import and_
@@ -226,11 +225,8 @@ def updateConfigs(id, name, desc, active, acceptApplications, acceptanceScore, s
                   acceptanceEmailTitle,
                   acceptanceEmailBody, sendAcceptanceSMS, acceptanceSMSBody, rejectApplications, rejectionScore,
                   sendRejectionEmail, rejectionEmailTitle, rejectionEmailBody, sendRejectionSMS, rejectionSMSBody,
-                  sendCandidatesAppointments, companyID: int) -> Callback:
+                  sendCandidatesAppointments, appointmentAllocationTimes, companyID: int) -> Callback:
     try:
-
-        # Check all OpenTimes are given
-        # if len(openTimes) != 7: raise Exception("Number of open time slots should be 7")
 
         # Get AutoPilot
         autoPilot_callback: Callback = getByID(id, companyID)
@@ -250,7 +246,7 @@ def updateConfigs(id, name, desc, active, acceptApplications, acceptanceScore, s
         autoPilot.SendAcceptanceSMS = sendAcceptanceSMS
         autoPilot.AcceptanceSMSBody = acceptanceSMSBody
 
-        autoPilot.AppointmentAllocationTimeID = appointmentAllocationTime
+        autoPilot.AppointmentAllocationTimeID = appointmentAllocationTimes
 
         autoPilot.RejectApplications = rejectApplications
         autoPilot.RejectionScore = rejectionScore

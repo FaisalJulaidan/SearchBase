@@ -15,7 +15,8 @@ import {
     Row,
     Spin,
     Switch,
-    Typography
+    Typography,
+    Select
 } from 'antd';
 import 'types/TimeSlots_Types';
 import './AutoPilot.less'
@@ -636,7 +637,7 @@ function mapStateToProps(state) {
         autoPilotsList: state.autoPilot.autoPilotsList,
         isLoading: state.autoPilot.isLoading,
         appointmentAllocationTime: state.appointmentAllocationTime.allocationTimes,
-        aatLoading: state.appointmentAllocationTime.isLoading
+        aatLoading: state.appointmentAllocationTime.isLoading,
         assistantList: state.assistant.assistantList
     };
 }

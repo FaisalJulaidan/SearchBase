@@ -24,15 +24,14 @@ const Account = lazy(() => import('./ControlPanel/Account/Account'));
 const Billing = lazy(() => import('./ControlPanel/Billing/Billing'));
 const UsersManagement = lazy(() => import('./ControlPanel/UsersManagement/UsersManagement'));
 const Documentation = lazy(() => import('./Documentation/Documentation'));
-const Calendar = lazy(() => import('./Calendar/Calendar'));
 const Campaign = lazy(() => import('./Campaign/Campaign'));
 const AutoPilots = lazy(() => import('./AutoPilots/AutoPilots'));
 const AutoPilot = lazy(() => import('./AutoPilots/AutoPilot/AutoPilot'));
+const Appointment = lazy(() => import('./Appointment/Appointment'));
 const Marketplace = lazy(() => import('./Marketplace/Marketplace'));
 const Item = lazy(() => import('./Marketplace/Item/Item'));
 // const AppointmentRoutes = lazy(() => import('./Appointment/AppointmentRoutes'));
 
-const Appointment = lazy(() => import('./Appointment/Appointment'));
 
 
 const {SubMenu} = Menu;
@@ -183,10 +182,6 @@ class Dashboard extends Component {
                             <span>Auto Pilot</span>
                         </Menu.Item>
 
-                        <Menu.Item key="marketplace">
-                            <Icon type="interation"/>
-                            <span>Marketplace</span>
-                        </Menu.Item>
 
                         <Menu.Item key="databases">
                             <Icon type="database"/>
@@ -195,7 +190,12 @@ class Dashboard extends Component {
 
                         <Menu.Item disabled={false} key="appointments">
                             <Icon type="calendar"/>
-                            <span>Appointments</span>
+                            <span>Appointments (beta)</span>
+                        </Menu.Item>
+
+                        <Menu.Item key="marketplace">
+                            <Icon type="interation"/>
+                            <span>Marketplace</span>
                         </Menu.Item>
 
                         <Divider/>

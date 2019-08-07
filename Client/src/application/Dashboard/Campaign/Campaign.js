@@ -83,17 +83,6 @@ class Campaign extends React.Component {
                             <Input placeholder={"Please enter your job title"}/>
                         )}
                     </FormItem>
-                    <FormItem label={"Location"}>
-                        {getFieldDecorator("location", {
-                            rules: [{
-                                whitespace: true,
-                                required: true,
-                                message: "Please enter your location"
-                            }],
-                        })(
-                            <Input placeholder={"Please enter your location"}/>
-                        )}
-                    </FormItem>
                     <FormItem
                         label={"Skills"}
                         >

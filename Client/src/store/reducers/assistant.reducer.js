@@ -234,6 +234,36 @@ export const assistant = (state = initialState, action) => {
             });
 
 
+        // Messenger Connection
+        // Connect
+        case actionTypes.CONNECT_ASSISTANT_TO_MESSENGER_REQUEST:
+            return updateObject(state, {
+                errorMsg: null,
+            });
+        case actionTypes.CONNECT_ASSISTANT_TO_MESSENGER_SUCCESS:
+            return updateObject(state, {
+                assistant: {...state.assistant, MessengerID: action.messengerID}
+            });
+        case actionTypes.CONNECT_ASSISTANT_TO_MESSENGER_FAILURE:
+            return updateObject(state, {
+                errorMsg: action.error,
+            });
+
+        // Disconnect
+        case actionTypes.DISCONNECT_ASSISTANT_FROM_MESSENGER_REQUEST:
+            return updateObject(state, {
+                errorMsg: null,
+            });
+        case actionTypes.DISCONNECT_ASSISTANT_FROM_MESSENGER_SUCCESS:
+            return updateObject(state, {
+                assistant: {...state.assistant, MessengerID: null}
+            });
+        case actionTypes.DISCONNECT_ASSISTANT_FROM_MESSENGER_FAILURE:
+            return updateObject(state, {
+                errorMsg: action.error
+            });
+
+
 
         // AutoPilot Connection
         // Connect

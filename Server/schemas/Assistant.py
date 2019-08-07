@@ -8,7 +8,6 @@ class Assistant(db.Model):
         q = Appointment.query.join(Conversation).filter(Conversation.Assistant == self)
         return q.all()
 
-
     ID = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
     Name = db.Column(db.String(128), nullable=False)
     Description = db.Column(db.String(260), nullable=True)
@@ -27,16 +26,19 @@ class Assistant(db.Model):
     CompanyID = db.Column(db.Integer, db.ForeignKey('company.ID', ondelete='cascade'), nullable=False)
     Company = db.relationship('Company', back_populates='Assistants')
 
-    CRMID = db.Column(db.Integer, db.ForeignKey('CRM.ID'))
+    CRMID = db.Column(db.Integer, db.ForeignKey('CRM.ID', ondelete='SET NULL'))
     CRM = db.relationship('CRM', back_populates='Assistants')
 
-    CalendarID = db.Column(db.Integer, db.ForeignKey('calendar.ID'))
+    CalendarID = db.Column(db.Integer, db.ForeignKey('calendar.ID', ondelete='SET NULL'))
     Calendar = db.relationship('Calendar', back_populates='Assistants')
 
-    AutoPilotID = db.Column(db.Integer, db.ForeignKey('auto_pilot.ID', ondelete='cascade'))
-    AutoPilot = db.relationship("AutoPilot", back_populates="Assistants")
+    MessengerID = db.Column(db.Integer, db.ForeignKey('messenger.ID', ondelete='SET NULL'))
+    Messenger = db.relationship("Messenger", back_populates="Assistants")
 
-    # - Many to one
+    AutoPilotID = db.Column(db.Integer, db.ForeignKey('auto_pilot.ID', ondelete='SET NULL'))
+    AutoPilot = db.relationship("AutoPilot", back_populates="Assistants", foreign_keys=[AutoPilotID])
+
+    #  - Many to one
     Conversations = db.relationship('Conversation', back_populates='Assistant')
 
     # Constraints:

@@ -18,6 +18,7 @@ from routes.public.routers import public_router, reset_password_router, chatbot_
 from services import scheduler_services
 from services.auth_services import jwt
 from services.mail_services import mail
+from services import auto_pilot_services
 from utilities import helpers, tasks, dummy_data
 
 app = Flask(__name__, static_folder='static')

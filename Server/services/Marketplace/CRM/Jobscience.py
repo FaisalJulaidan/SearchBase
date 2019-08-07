@@ -7,7 +7,6 @@ from sqlalchemy_utils import Currency
 
 from models import Callback, Conversation, StoredFile
 from services import databases_services
-from services.Marketplace.CRM import crm_services
 from services.Marketplace import marketplace_helpers
 from utilities import helpers
 from utilities.enums import DataType as DT, Period
@@ -15,10 +14,6 @@ from utilities.enums import DataType as DT, Period
 CLIENT_ID = os.environ['JOBSCIENCE_CLIENT_ID']
 CLIENT_SECRET = os.environ['JOBSCIENCE_CLIENT_SECRET']
 
-
-# TODO 30/07/2019
-# Declare standard properties []
-# Remove prints & trim comments []
 
 # ISSUE: USING REFRESH TOKEN []
 # Session timeout set to 24 hours
@@ -28,7 +23,6 @@ CLIENT_SECRET = os.environ['JOBSCIENCE_CLIENT_SECRET']
 # you can skip the middle step, obviously'.
 # Will receive 401 for expired access token -> will then need to fetch new one using the refresh token
 # Note: that skill may have to be added separately [CHECK]
-
 # NOTE: Before use in dev or prod, the callback url must be changed both in items.js and on the Salesforce dashboard
 
 
@@ -49,8 +43,6 @@ def testConnection(auth, companyID):
 def login(auth):
     try:
 
-        # print("LOG IN")
-
         authCopy = dict(auth)
 
         headers = {'Content-Type': 'application/json'}
@@ -70,30 +62,6 @@ def login(auth):
 
         result_body = json.loads(access_token_request.text)
 
-        # print("ACCESS TOKEN:")
-        # print(result_body.get('access_token'))
-        # print("")
-        # print("REFRESH TOKEN:")
-        # print(result_body.get('refresh_token'))
-
-        # //////////////////////////// TESTING QUERIES ///////////////////////////////////////////////
-        # GENERIC QUERY: sendQuery(result_body.get("access_token"), "get", "SELECT+name+from+Account")
-        # FETCH ALL JOBS:
-        # getAllJobs(result_body.get("access_token"), None, None)
-        # FETCH ALL CANDIDATES: getAllCandidates(result_body.get("access_token"), None, None)
-        # SEARCH ALL JOBS:
-        # searchJobs(result_body.get("access_token"), None, None, None)
-        # SEARCH JOBS WITH FILTER:
-        # searchJobs(result_body.get("access_token"), None, None, None)
-        # SEARCH ALL CANDIDATES:
-        # searchCandidates(result_body.get("access_token"), None, None, None)
-        # SEARCH CANDIDATES WITH FILTER
-        # searchCandidates(result_body.get("access_token"), None, None, None)
-        # INSERT A CANDIDATE:
-        # insertCandidate(result_body.get("access_token"), None)
-        # INSERT A  CLIENT COMPANY:
-        # insertCompany(result_body.get("access_token"), None);
-        # ///////////////////////////////////////////////////////////////////////////////////////////////
         return Callback(True, 'Logged in successfully', result_body.get('access_token'))  # No refresh token currently
 
     except Exception as exc:
@@ -102,7 +70,6 @@ def login(auth):
 
 
 def logout(access_token, companyID):  # QUESTION: Purpose of companyID param?
-    # print("LOGOUT")
     try:
         # Attempt logout
         logout_url = "https://test.salesforce.com/services/oauth2/revoke?token=" + access_token
@@ -112,16 +79,16 @@ def logout(access_token, companyID):  # QUESTION: Purpose of companyID param?
             'cache-control': "no-cache"
         }
 
-        r = marketplace_helpers.sendRequest(logout_url, "get", headers, {})
+        response = marketplace_helpers.sendRequest(logout_url, "get", headers, {})
 
-        # print(r.status_code)
     except Exception as exc:
         helpers.logError("Marketplace.CRM.Jobscience.logout() ERROR: " + str(exc))
         return Callback(False, str(exc))
 
 
-def insertCandidateSkills(access_token, skills, contactID) -> Callback:
+def insertCandidateSkills(access_token, conversation: Conversation, contactID) -> Callback:
     try:
+        skills = conversation.Data.get('keywordsByDataType').get(DT.CandidateSkills.value['name'], [" "])
 
         entries = []
         counter = 0
@@ -152,41 +119,48 @@ def insertCandidateSkills(access_token, skills, contactID) -> Callback:
         return Callback(False, str(exc))
 
 
-# TODO: ADVANCED TEST [CHECK]
-# NOTE: Standard fields to insert -> [FirstName, LastName, Phone, City, Email, Education, (skills)Attributes, Education]
 # BUG: Education not showing, may need to add to EDU object [~]
-# TODO: Fix the salary -> May need to insert a min & max [CHECK]
-def insertCandidate(access_token, data) -> Callback:
+
+def insertCandidate(access_token, conversation: Conversation) -> Callback:
     try:
-        salary = data.get("salary")
+        salary = conversation.Data.get('keywordsByDataType').get(DT.CandidateAnnualDesiredSalary.value['name'], [""])
         avg_sal = 0
         if salary[0] != "":
             # NOTE: Splitting salary
             salary_splitted = salary[0].split(" ")
             low_and_high = salary_splitted[0].split("-")
 
+            # print("MINIMAL DESIRED SALARY: ")
             min_sal = low_and_high[0]
+            # print(min_sal)
 
+            # print("MAX DESIRED SALARY: ")
             max_sal = low_and_high[1]
+            # print(max_sal)
 
+            # print("AVERAGE DESIRED SALARY: ")
             avg_sal = str(0.5 * (int(min_sal) + int(max_sal)))
+            # print(avg_sal)
 
         # NOTE: Should require on front-end that a full name is provided --> reduce data inconsistency
+        name = (conversation.Name or " ").split(" ")
         body = {
-            "FirstName": data.get("firstName"),
-            "LastName": data.get("lastName"),  # LastName is only required field
-            # "Title": "".join(conversation.Data.get('keywordsByDataType').get(DT.CandidateJobTitle.value['name'],
-            #                                                                  [" "])),
-            "phone": data.get("mobile"),
-            "MailingCity": data.get("city"),
+            "FirstName": helpers.getListValue(name, 0, "") or "FIRST_DEFAULT",
+            "LastName": helpers.getListValue(name, 1, "") or "LAST_DEFAULT",  # LastName is only required field
+            "Title": "".join(conversation.Data.get('keywordsByDataType').get(DT.CandidateJobTitle.value['name'],
+                                                                             [" "])),
+            "phone": conversation.PhoneNumber or " ",
+            "MailingCity": "".join(conversation.Data.get('keywordsByDataType').get(DT.CandidateLocation.value['name'],
+                                                                                   [""])),
             # "ts2__Desired_Salary__c": conversation.Data.get(DT.CandidateDailyDesiredSalary.value['name']),
-            "email": data.get("email"),
+            "email": conversation.Email or " ",
             "ts2__Education__c": "",  # Needs to be in a separate post request
             "ts2__Desired_Salary__c": avg_sal,
-            # "ts2__LinkedIn_Profile__c": "".join(conversation.Data.get('keywordsByDataType').get(
-            #     DT.CandidateLinkdinURL.value['name'],
-            #     [""])),
-            "Attributes__c": data.get("skills"),
+            "ts2__LinkedIn_Profile__c": "".join(conversation.Data.get('keywordsByDataType').get(
+                DT.CandidateLinkdinURL.value['name'],
+                [""])),
+            "Attributes__c": "; ".join(
+                conversation.Data.get('keywordsByDataType').get(DT.CandidateSkills.value['name'], [" "])),
             "RecordTypeId": "0120O000000tJIAQA2"  # ID for a candidate person record type
         }
 
@@ -201,7 +175,7 @@ def insertCandidate(access_token, data) -> Callback:
 
         # Insert candidate skills
         insertCandidateSkills_callback: Callback = insertCandidateSkills(
-            access_token, data.get("skills"), return_body.get("id"))
+            access_token, conversation, return_body.get("id"))
 
         if not insertCandidateSkills_callback.Success:  # Needs to  fetch the Account ID
             raise Exception(insertCandidateSkills_callback.Message)
@@ -216,21 +190,15 @@ def uploadFile(auth, storedFile: StoredFile):  # ISSUE: NO CURRENT API OPTION FO
     print("UPLOAD FILE NOT SUPORTED")
 
 
-# TODO BASIC TEST [CHECK]
-
-
-def insertClient(auth, data) -> Callback:
+def insertClient(auth, conversation: Conversation) -> Callback:
     try:
         # Insert client company
-        insertCompany_callback: Callback = insertCompany(auth, data)
+        insertCompany_callback: Callback = insertCompany(auth, conversation)
         if not insertCompany_callback.Success:
             raise Exception(insertCompany_callback.Message)
 
-        # print(insertCompany_callback.Message)
-        # print(insertCompany_callback.Data)
-
         # Insert client account
-        insertClient_callback: Callback = insertClientContact(auth, data,
+        insertClient_callback: Callback = insertClientContact(auth, conversation,
                                                               insertCompany_callback.Data.get("id"))
         if not insertClient_callback.Success:  # Needs to  fetch the Account ID
             raise Exception(insertClient_callback.Message)
@@ -242,18 +210,19 @@ def insertClient(auth, data) -> Callback:
         return Callback(False, str(exc))
 
 
-# TODO BASIC TEST [ ]
-# NOTE: Standard fields to insert -> [FirstName, LastName, Phone, City, Email, Client account ID]
-
-def insertClientContact(access_token, data, prsCompanyID) -> Callback:
+def insertClientContact(access_token, conversation: Conversation, prsCompanyID) -> Callback:
     try:
+        # New candidate details
+        emails = conversation.Data.get('keywordsByDataType').get(DT.ClientEmail.value['name'], [" "])
+
         body = {
-            "FirstName": data.get("firstName"),
-            "LastName": data.get("lastName"),
-            "phone": data.get("mobile"),
-            "MailingCity": data.get("city"),
+            "FirstName": conversation.Name or "FIRST_DEFAULT",  # TODO: Decide on default values
+            "LastName": conversation.Name or "DEFAULT",
+            "phone": conversation.PhoneNumber or " ",
+            "MailingCity": "".join(conversation.Data.get('keywordsByDataType').get(
+                DT.ClientLocation.value['name'], [" "])),
             # check number of emails and submit them
-            "email": data.get("emails")[0],
+            "email": emails[0],
             "AccountId": prsCompanyID
         }
 
@@ -269,15 +238,13 @@ def insertClientContact(access_token, data, prsCompanyID) -> Callback:
         return Callback(False, str(exc))
 
 
-# TODO TEST [ ]
-# NOTE: Standard fields to insert -> [Name] -> TODO: Add more fields here?
-
-def insertCompany(auth, data) -> Callback:
+def insertCompany(auth, conversation: Conversation) -> Callback:
     try:
-        # print("INSERT CLIENT COMPANY")
 
         body = {
-            "Name": data.get("companyName")
+            "Name": " ".join(conversation.Data.get('keywordsByDataType').get(
+                DT.CompanyName.value['name'],
+                ["Undefined Company - TSB"]))
         }
 
         sendQuery_callback: Callback = sendQuery(auth, "post", body, "sobjects/Account/")
@@ -294,19 +261,15 @@ def insertCompany(auth, data) -> Callback:
         return Callback(False, str(exc))
 
 
-# TODO BASIC CHECK [CHECK]
-# NOTE: Standard fields to search -> [id,name,email,mobile,address,primarySkills,status,educations,dayRate,salary]
-
 # TODO: Check speed of this approach
 # NOTE: This needs to be a query!
 def fetchSkillsForCandidateSearch(list_of_contactIDs: list, access_token):
-
     # [1] Need set of contact ID's returned from searchCandidates()
-    print("Contact IDs: ")
-    print(list_of_contactIDs)
+    # print("Contact IDs: ")
+    # print(list_of_contactIDs)
     # [2] Use a IN(CID1,CID2,...,CIDx) to retrieve all associated skills
     query_segment = ",".join(list_of_contactIDs)
-    print(query_segment)
+    # print(query_segment)
     sendQuery_callback: Callback = sendQuery(access_token, "get", "{}",
                                              "SELECT+ts2__Skill_Name__c,ts2__Contact__c+FROM+ts2__Skill__c+WHERE+" +
                                              "ts2__Contact__c+IN+(" + query_segment + ")")
@@ -318,19 +281,18 @@ def fetchSkillsForCandidateSearch(list_of_contactIDs: list, access_token):
     print(candidate_skills_fetch)
     return candidate_skills_fetch['records']
 
-    # [3] Match skills to candidates -> Simple loop search O(N^2)
 
-
-def searchCandidates(access_token, data) -> Callback:
+def searchCandidates(access_token, companyID, conversation, fields=None) -> Callback:
     list_of_contactIDs = []
-    # print(conversation)
+    keywords = conversation['keywordsByDataType']
 
     try:
         # TODO: Add more filters, perhaps with a hierarchy of what to search on (maybe skills more important than
         # education) --> Could be set by user and sent with the conversation.
         # Note: Date will need to be reversed for comparison, also dates could be compared with a range rather than
         # requiring an exact match --> unrealistic
-        a = populateFilter(data.get("location"), "MailingCity", True)
+        query = ""
+        a = checkFilter(keywords, DT.CandidateLocation, "MailingCity", quote_wrap=True)
         if a != "":
             query = "WHERE+"
             query += a
@@ -340,11 +302,8 @@ def searchCandidates(access_token, data) -> Callback:
         else:
             query = "WHERE+RecordType.Name+=+'Candidate'"
 
-        # print("QUERY IS: ")
-        # print(query)
-        # Retrieve candidates
-        # print("<-- SEARCH CANDIDATES -->")
-        sendQuery_callback: Callback = sendQuery(access_token, "get", "{}", "SELECT+X18_Digit_ID__c,ID,Name,email,phone,MailingCity," +
+        sendQuery_callback: Callback = sendQuery(access_token, "get", "{}",
+                                                 "SELECT+X18_Digit_ID__c,ID,Name,email,phone,MailingCity," +
                                                  "ts2__Desired_Salary__c,ts2__Desired_Hourly__c," +
                                                  "ts2__EduDegreeName1__c,ts2__Education__c+from+Contact+" + query +
                                                  "+LIMIT+50")  # Limit set to 10 TODO: Customize
@@ -354,8 +313,6 @@ def searchCandidates(access_token, data) -> Callback:
 
         candidate_fetch = json.loads(sendQuery_callback.Data.text)
 
-        # print(candidate_fetch['records'])  # BUG: Why is this not matching up?
-
         # Iterate through candidates
         result = []
         # TODO: Fetch job title
@@ -364,21 +321,14 @@ def searchCandidates(access_token, data) -> Callback:
 
         # Fetch associated candidate skills
         candidate_skills = fetchSkillsForCandidateSearch(list_of_contactIDs, access_token)
-        # TODO (THURS): Loop through candidate_skills []
-        #  match on id into array []
-        #  then format array and set to skills []
 
         # NOTE: Possibly add restriction on how many skills to show
         for record in candidate_fetch['records']:
             skills_string = ""
             for skill in candidate_skills:
-                # print("otherwise: ")
-                # print(skill.get("ts2__Skill_Name__c"))
                 if skill.get("ts2__Contact__c") == record.get("Id"):
                     skills_string += skill.get("ts2__Skill_Name__c") + ", "
-                    print("THE SKILL IS: " + skill.get("ts2__Skill_Name__c"))
 
-            #  Remove final semicolon:
             skills_string = skills_string[:-1]
             # NOTE: Serious review of efficiency is needed also should try to find years experience field
             result.append(databases_services.createPandaCandidate(id=record.get("id", ""),
@@ -396,9 +346,6 @@ def searchCandidates(access_token, data) -> Callback:
                                                                   desiredSalary=record.get('ts2__Desired_Salary__c'),
                                                                   currency=Currency("GBP"),
                                                                   source="Jobscience"))
-        # print("RESULT IS")
-        # print(result)
-
 
         return Callback(True, sendQuery_callback.Message, result)
     except Exception as exc:
@@ -406,17 +353,32 @@ def searchCandidates(access_token, data) -> Callback:
         return Callback(False, str(exc))
 
 
-def populateFilter(value, string, quote_wrap):
-    if value:
-        if quote_wrap:
-            value = "'" + value + "'"
-        return string + "=" + value + "+or+"  # TODO: Multi-values, AND instead of OR?
+def checkFilter(keywords, dataType: DT, string, quote_wrap, exact: bool):
+    if keywords.get(dataType.value["name"]):
+        altered_list = []
+        for word in keywords[dataType.value["name"]]:  # NOTE: Wrap string types in single quotes
+            if quote_wrap:
+                word = "'" + word + "'"
+                altered_list.append(word)
+            else:
+                # Convert date format:
+                new_date = datetime.strptime(word, "%m/%d/%Y").strftime("%Y-%m-%d")
+                altered_list.append(new_date)
+
+        # TODO: Multi-values, AND instead of OR?
+        # if exact:
+        #     return string + "=" + "".join(altered_list) + "+and+"
+        # else:
+        return string + "=" + "".join(altered_list) + "+or+"
     return ""
 
 
 # TODO: BASIC CHECK [CHECK]
 
-def searchJobs(access_token, data) -> Callback:
+def searchJobs(access_token, companyID, conversation, fields=None) -> Callback:
+    # print("CONVERSATION IS: ")
+    # print(conversation)
+    keywords = conversation['keywordsByDataType']
     # keywords = {'Job Location': ['London'], 'Job Title': ['chef'], 'Job Type': []}
     # print("keywords: ")
     # print(keywords)
@@ -424,24 +386,22 @@ def searchJobs(access_token, data) -> Callback:
     try:
         query = "WHERE+"
 
-        query += populateFilter(data.get("jobTitle"), "Name", True)
+        query += checkFilter(keywords, DT.JobTitle, "Name", quote_wrap=True, exact=True)
 
-        query += populateFilter(data.get("city"), "ts2__Location__c", True)
+        query += checkFilter(keywords, DT.JobLocation, "ts2__Location__c", quote_wrap=True, exact=True)
 
-        query += populateFilter(data.get("employmentType"), "ts2__Employment_Type__c", True)
+        query += checkFilter(keywords, DT.JobType, "ts2__Employment_Type__c", quote_wrap=True, exact=False)
 
-        query += populateFilter(data.get("skills"), "ts2__Job_Tag__c", True)
+        query += checkFilter(keywords, DT.JobEssentialSkills, "ts2__Job_Tag__c", quote_wrap=True, exact=False)
 
-        query += populateFilter(data.get("startDate"), "ts2__Estimated_Start_Date__c", False)
+        query += checkFilter(keywords, DT.JobStartDate, "ts2__Estimated_Start_Date__c", quote_wrap=False, exact=False)
 
-        query += populateFilter(data.get("endDate"), "ts2__Estimated_End_Date__c", False)
+        query += checkFilter(keywords, DT.JobEndDate, "ts2__Estimated_End_Date__c", quote_wrap=False, exact=False)
 
         query = query[:-4]  # To remove final +or
-
+        print("QUERY IS: ")
+        print(query)
         # NOTE: No years experience property available
-        # print(query)
-
-        # print("<-- SEARCH JOBS -->")
 
         # send query NOTE: Properties to return must be stated, no [*] operator
         sendQuery_callback: Callback = sendQuery(
@@ -457,7 +417,7 @@ def searchJobs(access_token, data) -> Callback:
         # Iterate through jobs
         result = []
         for record in job_fetch['records']:
-          # Add jobs to database
+            # Add jobs to database
             result.append(databases_services.createPandaJob(id=record.get('id'),
                                                             title=record.get('Name'),
                                                             desc=record.get('ts2__Text_Description__c'),
@@ -480,7 +440,6 @@ def searchJobs(access_token, data) -> Callback:
 
 
 def searchJobsCustomQuery(access_token, companyID, query, fields=None) -> Callback:
-    # print("SEARCH JOBS CUSTOM QUERY")
     try:
         # send query
         sendQuery_callback: Callback = sendQuery(
@@ -504,7 +463,6 @@ def searchJobsCustomQuery(access_token, companyID, query, fields=None) -> Callba
 
 
 def getAllCandidates(access_token, companyID, fields=None) -> Callback:
-    # print("GET ALL CANDIDATES HAS BEEN TRIGGERED")
     try:
         # send query
         sendQuery_callback: Callback = sendQuery(access_token, "get", "{}", "SELECT+Name,email,phone+from+Contact+" +
@@ -523,8 +481,6 @@ def getAllCandidates(access_token, companyID, fields=None) -> Callback:
 
 
 def getAllJobs(access_token, companyID, fields=None) -> Callback:  # TODO: See this triggered.
-    # print("GET ALL JOBS HAS BEEN TRIGGERED")
-
     try:
 
         sendQuery_callback: Callback = sendQuery(
@@ -546,11 +502,7 @@ def getAllJobs(access_token, companyID, fields=None) -> Callback:  # TODO: See t
 
 def sendQuery(access_token, method, body, query):
     try:
-
         url = buildUrl(query, method)
-        # print("url: " + url)
-        # print("query: " + query)
-        # print("method: " + method)
 
         # set headers
         headers = {

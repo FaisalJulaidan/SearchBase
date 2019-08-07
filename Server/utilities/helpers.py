@@ -60,9 +60,13 @@ def getDomain():
 
 def cleanDict(target):
     if type(target) is str:
-        return json.dumps({k: v for k, v in json.loads(target).items() if v is not None and v is not 0})
+        return json.dumps({k: v for k, v in json.loads(target).items() if v})
     elif type(target) is dict:
-        return {k: v for k, v in target.items() if v is not None and v is not 0}
+        return {k: v for k, v in target.items() if v}
+    elif isinstance(target, type({}.items())):
+        return {k: v for k, v in target if v}
+    print(target)
+
     return target
 
 

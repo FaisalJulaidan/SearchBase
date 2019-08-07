@@ -189,7 +189,6 @@ def insertCandidate(auth, data, companyID) -> Callback:
     try:
         # availability, yearsExperience
         body = {
-
             "name": data.get("name"),
             "firstName": data.get("firstName"),
             "lastName": data.get("lastName"),
@@ -199,7 +198,7 @@ def insertCandidate(auth, data, companyID) -> Callback:
             },
             "email": data.get("email"),
 
-            "primarySkills": data.get("skills"),
+            # "primarySkills": data.get("skills"),
             "experience": data.get("yearsExperience"),
 
             "secondaryAddress": {
@@ -208,8 +207,18 @@ def insertCandidate(auth, data, companyID) -> Callback:
 
             "educationDegree": data.get("educations"),
             "dateAvailable": data.get("availability"),  # TODO CHECK
-            "salary": data.get("salary"),
-            "dayRate": data.get("dayRate")
+
+            "salary": data.get("annualSalary"),
+            "dayRate": data.get("dayRate"),
+
+            "comments": crm_services.additionalCandidateNotesBuilder(
+                {
+                    "preferredJobTitle": data.get("preferredJobTitle"),
+                    "preferredJobType": data.get("preferredJobType"),
+                    "yearsExperience": data.get("yearsExperience"),
+                    "skills": data.get("skills")
+                }, data.get("selectedSolutions")
+            )
         }
 
         # Add additional emails to email2 and email3

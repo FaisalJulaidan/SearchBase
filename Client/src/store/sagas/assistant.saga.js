@@ -88,7 +88,6 @@ function* updateFlow({assistant, meta}) {
     }
 }
 
-
 function* updateStatus({status, assistantID}) {
     try {
         loadingMessage('Updating status...', 0);
@@ -104,8 +103,7 @@ function* updateStatus({status, assistantID}) {
     }
 }
 
-
-function* connectAssistantCRM({assistantID, CRMID}) {
+function* connectToCRM({assistantID, CRMID}) {
     try {
         const res = yield http.post(`/assistant/${assistantID}/crm`, {CRMID});
         yield put(assistantActions.connectToCRMSuccess(CRMID, res.data?.msg));
@@ -117,7 +115,7 @@ function* connectAssistantCRM({assistantID, CRMID}) {
     }
 }
 
-function* disconnectAssistantCRM({assistantID}) {
+function* disconnectFromCRM({assistantID}) {
     try {
         const res = yield http.delete(`/assistant/${assistantID}/crm`);
         yield put(assistantActions.disconnectFromCRMSuccess(res.data?.msg));
@@ -129,12 +127,11 @@ function* disconnectAssistantCRM({assistantID}) {
     }
 }
 
-
-function* connectAssistantCalendar({assistantID, calendarID}) {
+function* connectToCalendar({assistantID, calendarID}) {
     try {
         const res = yield http.post(`/assistant/${assistantID}/calendar`, {calendarID});
         yield put(assistantActions.connectToCalendarSuccess(calendarID, res.data?.msg));
-        successMessage("Calendar connected successfully");
+        successMessage("CalendarID connected successfully");
     } catch (error) {
         const msg = error.response?.data?.msg || "Can't connect to calendar";
         errorMessage(msg);
@@ -142,7 +139,7 @@ function* connectAssistantCalendar({assistantID, calendarID}) {
     }
 }
 
-function* disconnectAssistantCalendar({assistantID}) {
+function* disconnectFromCalendar({assistantID}) {
     try {
         const res = yield http.delete(`/assistant/${assistantID}/calendar`);
         yield put(assistantActions.disconnectFromCalendarSuccess(res.data?.msg));
@@ -150,12 +147,35 @@ function* disconnectAssistantCalendar({assistantID}) {
     } catch (error) {
         const msg = error.response?.data?.msg || "Can't disconnect from calendar";
         errorMessage(msg);
-        yield put(assistantActions.disconnectFromCalendarFailure(msg));
+        yield put(assistantActions.disconnectFromCalendaFailure(msg));
     }
 }
 
+function* connectToMessenger({assistantID, messengerID}) {
+    try {
+        const res = yield http.post(`/assistant/${assistantID}/messenger`, {messengerID});
+        yield put(assistantActions.connectToMessengerSuccess(messengerID, res.data?.msg));
+        successMessage("SMS connected successfully");
+    } catch (error) {
+        const msg = error.response?.data?.msg || "Can't connect to SMS";
+        errorMessage(msg);
+        yield put(assistantActions.connectToMessengerFailure(msg));
+    }
+}
 
-function* connectAutoPilot({assistantID, autoPilotID}) {
+function* disconnectFromMessenger({assistantID}) {
+    try {
+        const res = yield http.delete(`/assistant/${assistantID}/messenger`);
+        yield put(assistantActions.disconnectFromMessengerSuccess(res.data?.msg));
+        successMessage("SMS disconnected successfully");
+    } catch (error) {
+        const msg = error.response?.data?.msg || "Can't disconnect from SMS";
+        errorMessage(msg);
+        yield put(assistantActions.disconnectFromMessengerFailure(msg));
+    }
+}
+
+function* connectToAutoPilot({assistantID, autoPilotID}) {
     try {
         const res = yield http.post(`/assistant/${assistantID}/auto_pilot`, {AutoPilotID: autoPilotID});
         successMessage(res.data?.msg || 'Auto pilot connected successfully');
@@ -167,7 +187,7 @@ function* connectAutoPilot({assistantID, autoPilotID}) {
     }
 }
 
-function* disconnectAutoPilot({assistantID, autoPilotID}) {
+function* disconnectFromAutoPilot({assistantID, autoPilotID}) {
     try {
         const res = yield http.delete(`/assistant/${assistantID}/auto_pilot`, {AutoPilotID: autoPilotID});
         successMessage(res.data?.msg || "Disconnected from auto pilot successfully");
@@ -180,30 +200,36 @@ function* disconnectAutoPilot({assistantID, autoPilotID}) {
 }
 
 function* watchDisconnectAutoPilot() {
-    yield takeEvery(actionTypes.DISCONNECT_ASSISTANT_FROM_AUTO_PILOT_REQUEST, disconnectAutoPilot)
+    yield takeEvery(actionTypes.DISCONNECT_ASSISTANT_FROM_AUTO_PILOT_REQUEST, disconnectFromAutoPilot)
 }
 
 function* watchConnectAutoPilot() {
-    yield takeEvery(actionTypes.CONNECT_ASSISTANT_TO_AUTO_PILOT_REQUEST, connectAutoPilot)
+    yield takeEvery(actionTypes.CONNECT_ASSISTANT_TO_AUTO_PILOT_REQUEST, connectToAutoPilot)
+}
+
+function* watchDisconnectMessenger() {
+    yield takeEvery(actionTypes.DISCONNECT_ASSISTANT_FROM_MESSENGER_REQUEST, disconnectFromMessenger)
+}
+
+function* watchConnectMessenger() {
+    yield takeEvery(actionTypes.CONNECT_ASSISTANT_TO_MESSENGER_REQUEST, connectToMessenger)
 }
 
 function* watchConnectAssistantCrm() {
-    yield takeEvery(actionTypes.CONNECT_ASSISTANT_TO_CRM_REQUEST, connectAssistantCRM)
+    yield takeEvery(actionTypes.CONNECT_ASSISTANT_TO_CRM_REQUEST, connectToCRM)
 }
 
-function* watchDisconnectAssistantCrm() {
-    yield takeEvery(actionTypes.DISCONNECT_ASSISTANT_FROM_CRM_REQUEST, disconnectAssistantCRM)
+function* watchDisconnectFromCrm() {
+    yield takeEvery(actionTypes.DISCONNECT_ASSISTANT_FROM_CRM_REQUEST, disconnectFromCRM)
 }
 
-function* watchConnectAssistantCalendar() {
-    yield takeEvery(actionTypes.CONNECT_ASSISTANT_TO_CALENDAR_REQUEST, connectAssistantCRM)
+function* watchConnectToCalendar() {
+    yield takeEvery(actionTypes.CONNECT_ASSISTANT_TO_CALENDAR_REQUEST, connectToCalendar)
 }
 
 function* watchDisconnectAssistantCalendar() {
-    yield takeEvery(actionTypes.DISCONNECT_ASSISTANT_FROM_CALENDAR_REQUEST, disconnectAssistantCRM)
+    yield takeEvery(actionTypes.DISCONNECT_ASSISTANT_FROM_CALENDAR_REQUEST, disconnectFromCalendar)
 }
-
-
 
 function* watchUpdateStatus() {
     yield takeLatest(actionTypes.CHANGE_ASSISTANT_STATUS_REQUEST, updateStatus)
@@ -253,10 +279,13 @@ export function* assistantSaga() {
         watchUpdateStatus(),
 
         watchConnectAssistantCrm(),
-        watchDisconnectAssistantCrm(),
+        watchDisconnectFromCrm(),
 
-        watchConnectAssistantCalendar(),
+        watchConnectToCalendar(),
         watchDisconnectAssistantCalendar(),
+
+        watchDisconnectMessenger(),
+        watchConnectMessenger(),
 
 
         watchConnectAutoPilot(),

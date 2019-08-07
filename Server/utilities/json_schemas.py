@@ -82,7 +82,7 @@ flow = {
 }
 
 # ==== Block Types Schemas ====
-# Note: the variables names start with capital letters intentionally
+# Note: the variables names start with capital letters to match the BlockType enums
 Question = {
     "type": "object",
     "properties": {

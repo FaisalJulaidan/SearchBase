@@ -24,6 +24,8 @@ class Conversation(db.Model):
 
     AcceptanceEmailSentAt = db.Column(db.DateTime(), default=None)
     RejectionEmailSentAt = db.Column(db.DateTime(), default=None)
+    AcceptanceSMSSentAt = db.Column(db.DateTime(), default=None)
+    RejectionSMSSentAt = db.Column(db.DateTime(), default=None)
     AppointmentEmailSentAt = db.Column(db.DateTime(), default=None)
 
     AutoPilotStatus = db.Column(db.Boolean, nullable=False, default=False)

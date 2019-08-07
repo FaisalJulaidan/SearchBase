@@ -117,6 +117,7 @@ class Dashboard extends Component {
             "/dashboard/databases",
             "/dashboard/account",
             "/dashboard/users_management",
+            "/dashboard/campaign"
         ];
         const isNewLayout = newLayoutRoutes.some(a => this.props.location.pathname.indexOf(a) > -1);
         return (
@@ -182,6 +183,11 @@ class Dashboard extends Component {
                         <Menu.Item key="databases">
                             <Icon type="database"/>
                             <span>Database</span>
+                        </Menu.Item>
+
+                        <Menu.Item disabled={true} key="calendar">
+                            <Icon type="calendar"/>
+                            <span>Calendar (soon)</span>
                         </Menu.Item>
 
                         <Menu.Item disabled={true} key="calendar">

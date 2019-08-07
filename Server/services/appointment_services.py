@@ -82,7 +82,7 @@ def createAppointmentAllocationTime(companyID, name, times, duration):
         for newDay in times:
             day = AppointmentAllocationTimeInfo(AppointmentAllocationTimeID=appointmentAllocationTime.ID,
                                                 Active=newDay['Active'],
-                                                Day=newDay['day'],
+                                                Day=newDay['Day'],
                                                 Duration=duration,
                                                 To=newDay['To'],
                                                 From=newDay['From'])

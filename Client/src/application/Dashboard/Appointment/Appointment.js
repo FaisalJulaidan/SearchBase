@@ -6,21 +6,19 @@ import Calendar from './Calendar/Calendar'
 import TimeSlots from './TimeSlots/TimeSlots'
 import Appointments from './Appointments/Appointments'
 import styles from "./Calendar/Calendar.module.less";
-import {history} from "../../../helpers";
-import {Switch, Route} from 'react-router-dom'
+// import {TimezoneContext} from "../../../contexts/timezone"
 
+import {  TimezoneContext } from "../../../contexts/timezone";
 
 const {Title, Paragraph} = Typography;
-const { TextArea } = Input;
-const { confirm } = Modal;
-
-const tabs = {"1": "", "2" : "calendar", "3": "timeslots"}
 
 class Appointment extends React.Component {
     state = {
         key: null
     }
 
+
+    static contextType = TimezoneContext;
 
     render(){
         const key = this.state.key ? this.state.key : this.props.defaultTab ? this.props.defaultTab : "1"
@@ -36,13 +34,13 @@ class Appointment extends React.Component {
                 </div>
                 <Tabs onChange={key =>  this.setState({key: key})} activeKey={key}>
                     <Tabs.TabPane tab="Appointments" key="1">
-                        <Appointments/>
+                        <Appointments tz={this.context}/>
                     </Tabs.TabPane>
                     <Tabs.TabPane tab="Calendar" key="2">
-                        <Calendar />
+                        <Calendar tz={this.context}/>
                     </Tabs.TabPane>
                     <Tabs.TabPane tab="Time Slots" key="3">
-                        <TimeSlots openTab={this.state.key === "2" ? true : false}/>
+                        <TimeSlots openTab={this.state.key === "2" ? true : false} tz={this.context}/>
                     </Tabs.TabPane>
                 </Tabs>
             </NoHeaderPanel>

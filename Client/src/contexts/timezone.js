@@ -1,6 +1,7 @@
 import React from 'react';
 import {http} from 'helpers';
 import moment from 'moment'
+
 let TimezoneContext = React.createContext('Europe/London');
 
 const setTimezone = async () => {
@@ -37,6 +38,8 @@ const checkExpiry = (item) => {
     }
     return true
 }
+
+console.log(TimezoneContext)
 
 
 

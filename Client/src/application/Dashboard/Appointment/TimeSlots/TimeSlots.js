@@ -30,7 +30,6 @@ const antIcon = <Icon className={styles.spinner} type="loading" style={{ fontSiz
 
 
 class TimeSlots extends React.Component {
-
     constructor(props){
         super(props)
         this.state = {
@@ -40,7 +39,6 @@ class TimeSlots extends React.Component {
         }
         this.checkNameAllowed = this.checkNameAllowed.bind(this)
     }
-
 
     checkNameAllowed(name, selfName) {
         return this.props.appointmentAllocationTime.filter(aat => aat.Name === name).length === 0 || name === selfName
@@ -122,18 +120,14 @@ class TimeSlots extends React.Component {
         this[action](key)
     }
 
-
-
-
     render() {
-
+        console.log(this.props.tz)
         const tab = (name, loading) => (<>{name} {loading ? <Spin indicator={antIcon}/> : null}</>)
 
         const button = (<>
                 <Tooltip title={"Click here to create a new timeslot!"} visible={this.state.initPopup} placement={"left"}>
                     <Button style={{fontSize: "11px"}} onClick={this.add} icon={"plus"}/>
                 </Tooltip></>);
-        console.log(this.props.appointmentAllocationTime)
         let tabList = this.props.appointmentAllocationTime.concat(this.state.creating ? [emptyAAT()] : [])
          return (
              <>
@@ -148,6 +142,7 @@ class TimeSlots extends React.Component {
                              return (<TabPane tab={tab(timeSlot.Name, timeSlot.isLoading)} key={`${timeSlot.ID}`}
                                               closable={timeSlot.ID === "new" ? false : true}>
                                  <TimeSlot
+                                     tz={this.props.tz}
                                      info={timeSlot.Info}
                                      id={timeSlot.ID}
                                      name={timeSlot.Name}

@@ -2,6 +2,7 @@ import React from 'react';
 
 import {Table, Button, Spin, Icon} from 'antd'
 import {appointmentActions} from "store/actions";
+import moment from 'moment-timezone'
 
 import LoadingSpinner from "components/LoadingSpinner/LoadingSpinner";
 
@@ -43,6 +44,11 @@ class Appointments extends React.Component {
             key: 'status',
         },
         {
+            title: 'Time',
+            dataIndex: 'time',
+            key: 'time',
+        },
+        {
             title: 'Approve',
             dataIndex: 'approve',
             key: 'approve',
@@ -57,6 +63,7 @@ class Appointments extends React.Component {
     ]
     render() {
         const realList = this.props.appointments.map(item => ({ key: item.ID,
+                                                                          time: moment.utc(item.DateTime).tz(this.props.tz).format("MMMM Do YYYY, h:mm:ss a"),
                                                                          email : item.Conversation.keywordsByDataType.Email[0],
                                                                          status: item.Status,
                                                                          approve: item,

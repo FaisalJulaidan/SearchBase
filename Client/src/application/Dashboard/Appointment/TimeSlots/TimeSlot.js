@@ -1,12 +1,11 @@
 import React from 'react'
 import styles from "../../AutoPilots/AutoPilot/AutoPilot.module.less";
 import moment from "moment";
-import {connect} from 'react-redux'
+import momentTZ from 'moment-timezone'
+
 import {Badge, Checkbox, Col, Form, List, Radio, Tag, Input,TimePicker, message, Button} from 'antd'
 import 'types/TimeSlots_Types'
 import 'types/AutoPilot_Types'
-import {appointmentAllocationTimeActions} from "store/actions";
-import UserInput from "../../Assistants/Assistant/Flow/Blocks/CardTypes/UserInput";
 
 
 const FormItem = Form.Item;
@@ -27,6 +26,7 @@ class TimeSlot extends React.Component {
     }
 
     infoKVChange = (day, key, value) => {
+        console.log(value)
         let aat = this.state.Info.slice()
         if (day === null) {
             aat = aat.map(day => ({...day, [key]: value}))
@@ -51,30 +51,39 @@ class TimeSlot extends React.Component {
             message.error("Your inputs have errors, please check them and try again!");
             return;
         }
+
+        const setTimeToUTC  = (time, day) => {
+            console.log(time)
+           momentTZ(`${time} ${day}`, "HH:mm d").tz(this.props.tz).format("HH:mm")
+            return momentTZ(`${time} ${day}`, "HH:mm d").tz(this.props.tz).format("HH:mm")
+        }
+
         let savedSettings = {
             Name: this.state.Name,
             Duration: this.state.Info[0].Duration,
-            Info: this.state.Info.map(fullDay => ({...fullDay, day: fullDay.Day , from: fullDay.From, to: fullDay.To}))
+            Info: this.state.Info.map(fullDay => ({...fullDay, Day: fullDay.Day , From: setTimeToUTC(fullDay.From, fullDay.Day), To: setTimeToUTC(fullDay.To, fullDay.Day)}))
         }
+        console.log(savedSettings)
         this.props.save(savedSettings)
     }
 
     render() {
         const TimeRange = weekDay => {
-            let to = moment(weekDay.To, "HH:mm:ss")
-            let from = moment(weekDay.From, "HH:mm:ss")
+            let to = momentTZ.utc(weekDay.To,"HH:mm:ss").tz(this.props.tz)
+            let from = momentTZ.utc(weekDay.From, "HH:mm:ss").tz(this.props.tz)
+
             return (
                 <>
                     <span className={styles.TimeRange}>
                         <TimePicker value={from} format={'HH:mm'} minuteStep={30}
-                                    onChange={time => this.infoKVChange(weekDay.Day, 'From', time)}
+                                    onChange={time => this.infoKVChange(weekDay.Day, 'From', time.format("HH:mm"))}
                                     disabled={!weekDay.Active}/>
                     </span>
                     <span style={{marginRight: '5px', marginLeft: '5px'}}>-</span>
                     <span className={styles.TimeRange}>
                         <TimePicker value={to} format={'HH:mm'} minuteStep={30}
                                     disabledHours={() => Array.apply(null, {length: from.hours() + 1}).map(Number.call, Number)}
-                                    onChange={time => this.infoKVChange( weekDay.Day, 'To', time)}
+                                    onChange={time => this.infoKVChange(weekDay.Day, 'From', time.format("HH:mm"))}
                                     disabled={!weekDay.Active || !weekDay.From}/>
                     </span>
                 </>

@@ -42,7 +42,6 @@ const toolbar = [
 ];
 
 const customPanelStyle = {
-    background: 'rgba(253, 253, 253, 1)',
     borderRadius: 4,
     marginBottom: 24,
     border: 0,
@@ -96,8 +95,8 @@ class AutoPilot extends React.Component {
             }).catch(() => history.push(`/dashboard/auto_pilots`));
     }
 
-    onRejectChange = (checked) => this.setState({rejectApplications: checked});
-    onAcceptChange = (checked) => this.setState({acceptApplications: checked});
+    onRejectChange = (checked) => this.setState({rejectApplications: checked, sendRejectionEmail: checked ? this.state.sendRejectionEmail : false, sendRejectionSMS: checked ? this.state.sendRejectionSMS : false});
+    onAcceptChange = (checked) => this.setState({acceptApplications: checked, sendAcceptanceEmail: checked ? this.state.sendAcceptanceEmail : false, sendAcceptanceSMS: checked ? this.state.sendAcceptanceSMS : false});
     onSendAcceptanceEmailChange = (checked) => this.setState({sendAcceptanceEmail: checked});
     onSendRejectionEmailChange = (checked) => this.setState({sendRejectionEmail: checked});
     onSendAcceptanceSMSChange = (checked) => this.setState({sendAcceptanceSMS: checked});
@@ -296,6 +295,8 @@ class AutoPilot extends React.Component {
                                                 <div style={{marginLeft: 3}}>
                                                     <Switch onChange={this.onSendAcceptanceEmailChange}
                                                             checked={this.state.sendAcceptanceEmail}
+                                                            disabled={!this.state.acceptApplications}
+
                                                     />
                                                 </div>
                                             )}
@@ -364,7 +365,9 @@ class AutoPilot extends React.Component {
                                             })(
                                                 <div style={{marginLeft: 3}}>
                                                     <Switch onChange={this.onSendAcceptanceSMSChange}
-                                                            checked={this.state.sendAcceptanceSMS}/>
+                                                            checked={this.state.sendAcceptanceSMS}
+                                                            disabled={!this.state.acceptApplications}/>
+
                                                 </div>
                                             )}
                                         </FormItem>
@@ -372,7 +375,7 @@ class AutoPilot extends React.Component {
                                         {
                                             this.state.sendAcceptanceSMS &&
                                             <Row className={styles.CEKwrapper}>
-                                                <h4>Acceptance letter</h4>
+                                                <h4>Acceptance message</h4>
                                                 {
                                                     this.state.sendAcceptanceSMSErrors &&
                                                     <p style={{color: 'red'}}> * Body field is required</p>
@@ -441,7 +444,8 @@ class AutoPilot extends React.Component {
                                             })(
                                                 <div style={{marginLeft: 3}}>
                                                     <Switch onChange={this.onSendRejectionEmailChange}
-                                                            checked={this.state.sendRejectionEmail}/>
+                                                            checked={this.state.sendRejectionEmail}
+                                                            disabled={!this.state.rejectApplications}/>
                                                 </div>
                                             )}
                                         </FormItem>
@@ -509,7 +513,8 @@ class AutoPilot extends React.Component {
                                             })(
                                                 <div style={{marginLeft: 3}}>
                                                     <Switch onChange={this.onSendRejectionSMSChange}
-                                                            checked={this.state.sendRejectionSMS}/>
+                                                            checked={this.state.sendRejectionSMS}
+                                                            disabled={!this.state.rejectApplications}/>
                                                 </div>
                                             )}
                                         </FormItem>

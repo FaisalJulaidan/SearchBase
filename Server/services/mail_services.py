@@ -161,7 +161,7 @@ def sendPasswordResetEmail(email, userID):
 def sendNewCompanyHasRegistered(name, email, companyName, companyID, tel):
     try:
 
-        callback: Callback = __sendEmail("julaidan.faisal@gmail.com",
+        callback: Callback = __sendEmail(tsbEmail,
                                          companyName + ' has signed up',
                                          '/emails/company_registered.html',
                                          name=name,

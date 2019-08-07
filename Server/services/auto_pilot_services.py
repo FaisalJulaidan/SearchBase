@@ -14,7 +14,9 @@ def processConversation(conversation: Conversation, autoPilot: AutoPilot, assist
             "applicationStatus": Status.Pending,
             "appointmentEmailSentAt": None,
             "acceptanceEmailSentAt": None,
+            "acceptanceSMSSentAt": None,
             "rejectionEmailSentAt": None,
+            "rejectionSMSSentAt": None,
             # "response": None
         }
 

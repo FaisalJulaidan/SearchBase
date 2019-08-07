@@ -1,16 +1,29 @@
 import React from "react";
-import {Button, Form, Input, Switch, Divider, Icon} from "antd";
+import {Button, Form, Input, Switch, Divider, Icon, AutoComplete} from "antd";
 import ChangePassword from "./ChangePassword"
+import moment from 'moment-timezone'
+import { TimezoneContext, getTimezone } from 'contexts/timezone'
 
 const FormItem = Form.Item;
+
+const tz = moment.tz.names()
 
 class ProfileDetails extends React.Component {
 
     state= {
         name: "",
         email: "",
-        companyName: ""
+        companyName: "",
+        tzList: [],
+        narrowSearch: false,
     };
+    //
+    static contextType = TimezoneContext;
+
+    setTimezone = async () => {
+        let tz = await getTimezone()
+        this.setState({timezone: tz})
+    }
 
     handleSubmit = (e) => {
         e.preventDefault();
@@ -19,9 +32,23 @@ class ProfileDetails extends React.Component {
                 this.props.saveProfileDetails(values);
             }
         });
+        setTimeout(() => {
+            let tz = localStorage.getItem("TSB_TZ")
+            if(tz){
+                localStorage.removeItem("TSB_TZ")
+                this.setTimezone()
+            }
+        }, 1000)
     };
 
+    searchTimezone = (input) => {
+        let filter = tz.filter(timezone => timezone.toLowerCase().indexOf(input.toLowerCase()) !== -1)
+        this.setState({tzList: filter.slice(0, 10), narrowSearch: filter.length > 10 ? true: false})
+    }
+
+
     render() {
+        console.log(this.context)
         const {account, form} = this.props;
         const {getFieldDecorator} = form;
 
@@ -82,6 +109,31 @@ class ProfileDetails extends React.Component {
                         })(
                             <Input prefix={<Icon type="phone" style={{color: 'rgba(0,0,0,.25)'}}/>}
                                    placeholder="+44 7502719493"/>
+                        )}
+                    </FormItem>
+
+                    <FormItem
+                        label={"Timezone"}
+                        help={"We've guessed a default for you, however if you'd like to change it simply enter the country/city/state you're from and select from the list!" +
+                        " If you cant find the country you're looking for on the list, try a more specific search."}>
+                        {getFieldDecorator("timeZone", {
+                            initialValue: account?.user?.TimeZone || moment.tz.guess(),
+                            rules: [{
+                                    validator: (rule, val, callback) => {
+                                        if (!tz.includes(val)) {
+                                            callback("Timezone must be identical to one on the list!")
+                                        } else {
+                                            callback()
+                                        }
+                                    }
+                                }]
+                        })(
+
+                            <AutoComplete
+                                dataSource={this.state.tzList}
+                                onSearch={this.searchTimezone}
+                                placeholder="input here"
+                            />
                         )}
                     </FormItem>
 

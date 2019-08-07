@@ -126,18 +126,18 @@ def generate():
     user_sabic = Role.query.filter(Role.Company == sabic).filter(Role.Name == "User").first()
 
     user_services.create(firstname='Sylvester', surname='Stallone', email='aa@aa.com', password='123', phone='43444236456',
-                         companyID=aramco.ID, roleID=ownerRole.ID, verified=True)
+                         companyID=aramco.ID, roleID=ownerRole.ID, verified=True, timeZone="Europe/London")
     user_services.create(firstname='Evg', surname='Test', email='evgeniy67@abv.bg', password='123', phone='43444236456',
-                         companyID=aramco.ID, roleID=admin_aramco.ID, verified=True)
+                         companyID=aramco.ID, roleID=admin_aramco.ID, verified=True, timeZone="Europe/London")
     user_services.create(firstname='firstname', surname='lastname', email='e2@e.com', password='123', phone='43444236456',
-                         companyID=aramco.ID, roleID=admin_aramco.ID, verified=True)
+                         companyID=aramco.ID, roleID=admin_aramco.ID, verified=True, timeZone="Europe/London")
     user_services.create(firstname='firstname', surname='lastname', email='e3@e.com', password='123', phone='43444236456',
-                         companyID=aramco.ID, roleID=user_aramco.ID, verified=True)
+                         companyID=aramco.ID, roleID=user_aramco.ID, verified=True, timeZone="Europe/London")
 
     user_services.create(firstname='Ali', surname='Khalid', email='bb@bb.com', password='123', phone='43444236456',
-                         companyID=sabic.ID, roleID=ownerRole.ID, verified=True)
+                         companyID=sabic.ID, roleID=ownerRole.ID, verified=True, timeZone="Europe/London")
     user_services.create(firstname='firstname', surname='lastname', email='e5@e.com', password='123', phone='43444236456',
-                         companyID=sabic.ID, roleID=admin_sabic.ID, verified=True)
+                         companyID=sabic.ID, roleID=admin_sabic.ID, verified=True, timeZone="Europe/London")
 
 
 

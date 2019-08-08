@@ -6,7 +6,6 @@ import {Typography, Form, Input, Icon, Button, Tag, AutoComplete} from 'antd';
 
 import googleMaps from '@google/maps'
 
-import styles from "../Calendar/Calendar.module.less";
 import Phone from "../../../components/Phone/Phone";
 import styles from "./Campaign.module.less";
 
@@ -29,7 +28,8 @@ class Campaign extends React.Component {
             skills: [],
             skillInput: "",
             location: "",
-            locations: []
+            locations: [],
+            textMessage: ""
         }
         this.setLocations = this.setLocations.bind(this)
     }
@@ -58,10 +58,8 @@ class Campaign extends React.Component {
 
 
     render() {
-        console.log(google)
         const { form } = this.props;
         const { getFieldDecorator } = form;
-        console.log(this.state.locations)
 
         return (<NoHeaderPanel>
             <div className={styles.Header}>
@@ -72,57 +70,57 @@ class Campaign extends React.Component {
                     Here you can use our Outreach engine to Engage with the candidates inside your CRM via SMS and Email. Campaigns are a great way for you to keep your CRM or database refreshed with GDPR compliant information.
                 </Paragraph>
             </div>
-            <div>
-                <Form layout='vertical' wrapperCol={{span: 10}} onSubmit={this.handleSubmit}>
-                    <FormItem label={"Job Title"}>
-                        {getFieldDecorator("jobTitle", {
-                            rules: [{
-                                whitespace: true,
-                                required: true,
-                                message: "Please enter your job title"
-                            }],
-                        })(
-                            <Input placeholder={"Please enter your job title"}/>
-                        )}
-                    </FormItem>
-                    <FormItem
-                        label={"Skills"}
-                        >
-                        <Input placeholder="Type in a skill and press enter to add to the list of skills"
-                               type="text"
-                               onKeyDown={this.submit}
-                               onChange={e => this.setState({skillInput: e.target.value})} value={this.state.skillInput}/>
+            <div className={styles.mainContainer}>
+                <div className={styles.formContainer}>
+                    <Form layout='vertical' onSubmit={this.handleSubmit}>
+                        <FormItem label={"Job Title"}>
+                            {getFieldDecorator("jobTitle", {
+                                rules: [{
+                                    whitespace: true,
+                                    required: true,
+                                    message: "Please enter your job title"
+                                }],
+                            })(
+                                <Input placeholder={"Please enter your job title"}/>
+                            )}
+                        </FormItem>
+                        <FormItem
+                            label={"Skills"}
+                            >
+                            <Input placeholder="Type in a skill and press enter to add to the list of skills"
+                                   type="text"
+                                   onKeyDown={this.submit}
+                                   onChange={e => this.setState({skillInput: e.target.value})} value={this.state.skillInput}/>
 
-                    </FormItem>
-                    <div>
-                    {this.state.skills.map((skill, i) => {
-                        return (<Tag closable key={i}>{skill}</Tag>)
-                    })}
-                    </div>
-                    <FormItem
-                        label={"Location"}
-                    >
-                        <AutoComplete placeholder="Type in your location"
-                                     type="text"
-                                      dataSource={this.state.locations}
-                            onChange={value => this.findLocation(value)}/>
+                        </FormItem>
+                        <div>
+                        {this.state.skills.map((skill, i) => {
+                            return (<Tag closable key={i}>{skill}</Tag>)
+                        })}
+                        </div>
+                        <FormItem label={"Location"}>
+                            <AutoComplete placeholder="Type in your location"
+                                         type="text"
+                                          dataSource={this.state.locations}
+                                onChange={value => this.findLocation(value)}/>
 
-                    </FormItem>
-                    <FormItem
-                        label={"Message"}
-                    >
-                        <TextArea placeholder="Type in the message you'd like to send"
-                               onKeyDown={this.submit}/>
+                        </FormItem>
+                        <FormItem label={"Message"}>
+                            <TextArea placeholder="Type in the message you'd like to send"
+                                    onChange={e => this.setState({textMessage: e.target.value})}/>
 
-                    </FormItem>
-                    <Button type="primary" icon="rocket" size={"large"}>
-                        Launch
-                    </Button>
-                </Form>
+                        </FormItem>
+                        <Button type="primary" icon="rocket" size={"large"}>
+                            Launch
+                        </Button>
+                    </Form>
+                </div>
+                <div className={styles.phoneContainer}>
+                    <h1 className={styles.phoneTitle}>Demo</h1>
+                    <Phone messages={this.state.textMessage === "" ? [] : [this.state.textMessage]} />
+                </div>
             </div>
-            <div>
-                <Phone />
-            </div>
+
         </NoHeaderPanel>)
     }
 

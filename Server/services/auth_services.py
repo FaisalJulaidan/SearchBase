@@ -51,7 +51,8 @@ def signup(details) -> Callback:
                                              details['password'],
                                              details['telephone'],
                                              company.ID,
-                                             2) # RoleID = 2 -> Owner
+                                             2,
+                                             details['timeZone']) # RoleID = 2 -> Owner
 
 
         # Subscribe to basic plan with 14 trial days
@@ -113,6 +114,7 @@ def authenticate(email: str, password_to_check: str) -> Callback:
                          "username": user.Firstname + ' ' + user.Surname,
                          "lastAccess": user.LastAccess,
                          "phoneNumber": user.PhoneNumber,
+                         "timezone": user.TimeZone
                          # "plan": helpers.getPlanNickname(user.Company.SubID),
                          },
                 'role': helpers.getDictFromSQLAlchemyObj(user.Role)

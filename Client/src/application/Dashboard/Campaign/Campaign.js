@@ -7,6 +7,7 @@ import {Typography, Form, Input, Icon, Button, Tag, AutoComplete} from 'antd';
 import googleMaps from '@google/maps'
 
 import styles from "../Calendar/Calendar.module.less";
+import Phone from "../../../components/Phone/Phone";
 
 const FormItem = Form.Item;
 
@@ -117,6 +118,9 @@ class Campaign extends React.Component {
                         Launch
                     </Button>
                 </Form>
+            </div>
+            <div>
+                <Phone />
             </div>
         </NoHeaderPanel>)
     }

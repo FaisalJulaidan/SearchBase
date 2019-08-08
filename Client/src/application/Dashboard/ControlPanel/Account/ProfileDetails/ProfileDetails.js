@@ -2,6 +2,8 @@ import React from "react";
 import {Button, Form, Input, Switch, Divider, Icon} from "antd";
 import ChangePassword from "./ChangePassword"
 
+
+
 const FormItem = Form.Item;
 
 class ProfileDetails extends React.Component {

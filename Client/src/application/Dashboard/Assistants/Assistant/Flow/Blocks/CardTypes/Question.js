@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {Button, Card, Collapse, Divider, Form, Icon, Input, Modal, Popconfirm, Tag, Tooltip} from "antd";
+import {Button, Card, Collapse, Divider, Form, Icon, Input, Modal, Popconfirm, Tag, Tooltip, Typography} from "antd";
 
 import {getInitialVariables, initActionType, initActionTypeSkip} from './CardTypesHelpers'
 import {
@@ -19,6 +19,9 @@ import {
     StoreInDBFormItem
 } from './CardTypesFormItems'
 import shortid from 'shortid';
+import './CardTypes.less'
+
+const {Paragraph} = Typography;
 
 const FormItem = Form.Item;
 
@@ -149,7 +152,7 @@ class Question extends Component {
 
         return (
             <Card style={{width: '100%'}} actions={buttons}>
-                <Form layout='horizontal'>
+                <Form layout='horizontal' id={'Flow_Questions'}>
                     <QuestionFormItem FormItem={FormItem} block={block}
                                       getFieldDecorator={getFieldDecorator}
                                       layout={layout}
@@ -166,29 +169,36 @@ class Question extends Component {
                         <Collapse accordion>
                             {
                                 this.state.answers.map((answer, i) => (
-                                    <Collapse.Panel header={answer.text} key={i}
-                                                    extra={
-                                                        <div style={{marginRight: 10}}>
-                                                            <Button type="default" icon="edit"
-                                                                    onClick={(event) => {
-                                                                        this.showEditAnswer(answer);
-                                                                        event.stopPropagation();
-                                                                    }}
-                                                                    size={"small"}></Button>
-                                                            <Popconfirm placement="topRight"
-                                                                        title="Are you sure delete this answer?"
-                                                                        onConfirm={(event) => {
-                                                                            this.removeAnswer(answer);
-                                                                            event.stopPropagation();
-                                                                        }}
-                                                                        okText="Yes" cancelText="No">
-                                                                <Button type="danger" icon="delete"
-                                                                        onClick={(event) => event.stopPropagation()}
-                                                                        style={{marginLeft: 5}}
-                                                                        size={"small"}></Button>
-                                                            </Popconfirm>
-                                                        </div>
-                                                    }>
+                                    <Collapse.Panel
+                                        header={
+                                            <Paragraph style={{width: 'calc(100% - 85px)', margin: 0}}
+                                                       ellipsis={{rows: 1}}>
+                                                {answer.text}
+                                            </Paragraph>
+                                        }
+                                        key={i}
+                                        extra={
+                                            <div>
+                                                <Button type="default" icon="edit"
+                                                        onClick={(event) => {
+                                                            this.showEditAnswer(answer);
+                                                            event.stopPropagation();
+                                                        }}
+                                                        size={"small"}></Button>
+                                                <Popconfirm placement="topRight"
+                                                            title="Are you sure delete this answer?"
+                                                            onConfirm={(event) => {
+                                                                this.removeAnswer(answer);
+                                                                event.stopPropagation();
+                                                            }}
+                                                            okText="Yes" cancelText="No">
+                                                    <Button type="danger" icon="delete"
+                                                            onClick={(event) => event.stopPropagation()}
+                                                            style={{marginLeft: 5}}
+                                                            size={"small"}></Button>
+                                                </Popconfirm>
+                                            </div>
+                                        }>
                                         <p>Action: {answer.action}</p>
                                         Keywords: <br/>
                                         {answer.keywords.map((keyword, i) => <Tag key={i}>{keyword}</Tag>)}

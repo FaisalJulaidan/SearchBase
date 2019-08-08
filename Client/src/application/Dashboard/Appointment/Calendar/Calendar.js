@@ -1,7 +1,5 @@
 import React from 'react';
 import {connect} from 'react-redux';
-import styles from './Calendar.module.less'
-import NoHeaderPanel from 'components/NoHeaderPanel/NoHeaderPanel'
 import {Badge, Calendar as AntdCalendar, Col, Divider, Icon, Input, Modal, Row, Typography, Button} from 'antd';
 import moment from 'moment';
 import {appointmentActions} from "store/actions";
@@ -22,9 +20,6 @@ class Calendar extends React.Component {
         };
     }
 
-    componentDidMount() {
-        this.props.dispatch(appointmentActions.fetchAppointments())
-    }
 
     onCloseModal = () => {
         this.setState({appointmentModalVisible: false});
@@ -105,15 +100,6 @@ class Calendar extends React.Component {
         const notRejectedAppointments = todayAppointments.filter(d => d.Status !== "Rejected")
         const visibleAppointments = notRejectedAppointments
         return (
-            <NoHeaderPanel>
-                <div className={styles.Header}>
-                    <Title className={styles.Title}>
-                        <Icon type="calendar"/> Calendar
-                    </Title>
-                    <Paragraph type="secondary">
-                        Here you can find all assigned calendars
-                    </Paragraph>
-                </div>
 
                 <div>
                     {this.props.appointments ?
@@ -172,7 +158,6 @@ class Calendar extends React.Component {
                     </React.Fragment>
                     : null}
                 </div>
-            </NoHeaderPanel>
         );
     }
 }

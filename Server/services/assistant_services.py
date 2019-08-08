@@ -46,7 +46,6 @@ def create(name, desc, welcomeMessage, topBarText, template, companyID) -> Assis
         return Callback(False, 'Failed to create the assistant', None)
 
 
-
 # ----- Getters ----- #
 def getByHashID(hashID):
     try:
@@ -133,7 +132,7 @@ def getAllWithEnabledNotifications(companyID) -> Callback:
 
 
 # Return the openTimes from the autoPilot connected to this assistant
-def getOpenTimes(assistantID) -> Callback:
+def getAppointmentAllocationTime(assistantID) -> Callback:
     try:
         # Get assistant and check if None then raise exception
         assistant: Assistant = db.session.query(Assistant).filter(Assistant.ID == assistantID).first()
@@ -146,7 +145,7 @@ def getOpenTimes(assistantID) -> Callback:
             return Callback(True,"There are no open time slots")
 
         # OpenTimes is an array of all open slots per day
-        return Callback(True, "Got open time slots successfully.", connectedAutoPilot.OpenTimes)
+        return Callback(True, "Got open time slots successfully.", connectedAutoPilot.AppointmentAllocationTime)
 
     except Exception as exc:
         helpers.logError("assistant_services.getOpenTimes(): " + str(exc))
@@ -302,6 +301,41 @@ def disconnectFromCalendar(assistantID, companyID):
         helpers.logError("assistant_services.disconnectFromCalendar(): " + str(exc))
         db.session.rollback()
         return Callback(False, 'Error in disconnecting assistant from Calendar.')
+
+
+# ----- Messenger Connection ----- #
+def connectToMessenger(assistantID, messengerID, companyID):
+    try:
+
+        ap_callback: Callback = auto_pilot_services.getByID(messengerID, companyID)
+        if not ap_callback.Success:
+            raise Exception(ap_callback.Message)
+
+        db.session.query(Assistant).filter(and_(Assistant.ID == assistantID, Assistant.CompanyID == companyID)) \
+            .update({"MessengerID": messengerID})
+
+        db.session.commit()
+        return Callback(True, 'Assistant has been connected to Messenger.')
+
+    except Exception as exc:
+        helpers.logError("assistant_services.connectToAutoPilot(): " + str(exc))
+        db.session.rollback()
+        return Callback(False, 'Error in connecting assistant to Messenger.')
+
+
+def disconnectFromMessenger(assistantID, companyID):
+    try:
+
+        db.session.query(Assistant).filter(and_(Assistant.ID == assistantID, Assistant.CompanyID == companyID)) \
+            .update({"MessengerID": None})
+
+        db.session.commit()
+        return Callback(True, 'Assistant has been disconnected from Messenger.')
+
+    except Exception as exc:
+        helpers.logError("assistant_services.disconnectFromAutoPilot(): " + str(exc))
+        db.session.rollback()
+        return Callback(False, 'Error in disconnecting assistant from AutoPilot.')
 
 
 # ----- AutoPilot Connection ----- #

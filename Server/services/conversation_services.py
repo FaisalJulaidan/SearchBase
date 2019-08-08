@@ -58,12 +58,14 @@ def processConversation(assistantHashID, data: dict) -> Callback:
 
         # AutoPilot Operations
         if assistant.AutoPilot and conversation.Completed:
-            ap_callback: Callback = auto_pilot_services.processConversation(conversation, assistant.AutoPilot)
+            ap_callback: Callback = auto_pilot_services.processConversation(conversation, assistant.AutoPilot, assistant)
             if ap_callback.Success:
                 conversation.AutoPilotStatus = True
                 conversation.ApplicationStatus = ap_callback.Data['applicationStatus']
                 conversation.AcceptanceEmailSentAt = ap_callback.Data['acceptanceEmailSentAt']
+                conversation.AcceptanceSMSSentAt = ap_callback.Data['acceptanceSMSSentAt']
                 conversation.RejectionEmailSentAt = ap_callback.Data['rejectionEmailSentAt']
+                conversation.RejectionSMSSentAt = ap_callback.Data['rejectionSMSSentAt']
                 conversation.AppointmentEmailSentAt = ap_callback.Data['appointmentEmailSentAt']
             conversation.AutoPilotResponse = ap_callback.Message
 

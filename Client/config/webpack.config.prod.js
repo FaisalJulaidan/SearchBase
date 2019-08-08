@@ -268,6 +268,7 @@ module.exports = {
             'components': path.resolve(__dirname, '../src/components/'),
             'helpers': path.resolve(__dirname, '../src/helpers/'),
             'store': path.resolve(__dirname, '../src/store/'),
+            'contexts': path.resolve(__dirname, '../src/contexts/'),
             'types': path.resolve(__dirname, '../src/types/'),
         },
         plugins: [

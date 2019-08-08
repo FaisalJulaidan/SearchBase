@@ -2,7 +2,7 @@ from flask import Blueprint, request
 from flask_jwt_extended import jwt_required, get_jwt_identity
 
 from models import Callback, Assistant, Conversation, Appointment
-from services import assistant_services, conversation_services, appointment_services
+from services import assistant_services, conversation_services, appointment_services, company_services
 from utilities import helpers
 
 appointment_router: Blueprint = Blueprint('appointment_router', __name__, template_folder="../../templates")
@@ -31,6 +31,7 @@ POST REQUEST EXAMPLE:
 
 @appointment_router.route("/appointments/set_status", methods=['POST'])
 @jwt_required
+@helpers.validOwner('Appointment', 'appointmentID')
 def set_appointment_status():
     data = request.get_json()
     callback = appointment_services.setAppointmentStatus(data['appointmentID'], data['status'])
@@ -59,9 +60,8 @@ def verify_get_appointment(token):
     else:
         return helpers.jsonResponse(False, 401, callback.Message)
 
-# Get all open times for a user to pick up from, it uses the payload to know for which company and other details...
-@appointment_router.route("/open_times/<payload>", methods=['GET', 'POST'])
-def open_times(payload):
+@appointment_router.route("/allocation_times/<payload>", methods=['GET', 'POST'])
+def allocation_time(payload):
     try:
         # Token expires in 5 days
         data = helpers.verificationSigner.loads(payload, salt='appointment-key', max_age=432000)
@@ -78,14 +78,14 @@ def open_times(payload):
         assistant: Assistant = assistant_callback.Data
 
         # Get open times slots associated with this assistant if exist
-        openTimes_callback: Callback = assistant_services.getOpenTimes(data['assistantID'])
-        if not openTimes_callback.Success:
+        times_callback: Callback = assistant_services.getAppointmentAllocationTime(data['assistantID'])
+        if not times_callback.Success:
             return helpers.jsonResponse(False, 404, "Couldn't load available time slots")
 
         data = {
             "companyName": assistant.Company.Name,
             "companyLogoURL": assistant.Company.LogoPath,
-            "openTimes": helpers.getListFromSQLAlchemyList(openTimes_callback.Data or []),
+            "appointmentAllocationTime": helpers.getListFromSQLAlchemyList(times_callback.Data.Info or []),
             "takenTimeSlots": helpers.getListFromSQLAlchemyList(assistant.Appointments),
             "userName": data['userName']
         }
@@ -105,14 +105,72 @@ def open_times(payload):
         if appointment:
             return helpers.jsonResponse(False, 404,
                                         "Sorry, but your already have an appointment on " +
-                                        '{0:%Y-%m-%d %H:%M:%S}'.format(appointment))
+                                        '{0:%Y-%m-%d %H:%M:%S}'.format(appointment.DateTime))
 
         # Add new appointment
-        appointment_callback: Callback = appointment_services.add(data['conversationID'],
-                                                                  data['assistantID'],
-                                                                  request.json.get('pickedTimeSlot'),
-                                                                  confirmed=False)
+        appointment_callback: Callback = appointment_services.addNewAppointment(data['conversationID'],
+                                                                                request.json.get('pickedTimeSlot'))
 
         if not appointment_callback.Success:
             return helpers.jsonResponse(False, 400, "Sorry, we couldn't add your appointment")
         return helpers.jsonResponse(True, 200, "Appointment has been added. You should receive a confirmation email")
+
+@appointment_router.route("/allocation_times/save", methods=['POST'])
+@jwt_required
+def save_allocation_time():
+    companyID = get_jwt_identity()['user']['companyID']
+    data = request.get_json()
+    #e(companyID, name, times, duration)
+    save_callback : Callback = appointment_services.saveAppointmentAllocationTime(companyID, data['ID'], data['Name'], data['Info'], data['Duration'])
+
+
+    if not save_callback.Success:
+        return helpers.jsonResponse(False, 400, "Sorry, we couldn't save your timetable changes")
+    return helpers.jsonResponse(True, 200, "Timetable changes have succesfully been saved", __parseAppointmentAllocationlist(save_callback.Data))
+
+@appointment_router.route("/allocation_times/create", methods=['POST'])
+@jwt_required
+def create_allocation_time():
+    companyID = get_jwt_identity()['user']['companyID']
+    data = request.get_json()
+    #e(companyID, name, times, duration)
+    save_callback : Callback = appointment_services.createAppointmentAllocationTime(companyID, data['Name'], data['Info'], data['Duration'])
+
+    if not save_callback.Success:
+        return helpers.jsonResponse(False, 400, "Sorry, we couldn't save your timetable changes")
+    return helpers.jsonResponse(True, 200, "Timetable changes have succesfully been saved", __parseAppointmentAllocationlist(save_callback.Data))
+
+@appointment_router.route("/allocation_times/<id>/delete", methods=['GET'])
+@jwt_required
+def delete_allocation_time(id):
+    companyID = get_jwt_identity()['user']['companyID']
+    save_callback : Callback = appointment_services.deleteAppointmentAllocationTime(companyID, id)
+
+    if not save_callback.Success:
+        return helpers.jsonResponse(False, 400, "Sorry, we couldn't delete your timetable")
+    return helpers.jsonResponse(True, 200, "Timetable has been successfully deleted")
+
+
+@appointment_router.route("/allocation_times_list/", methods=['GET'])
+@jwt_required
+def allocation_time_list():
+    companyID = get_jwt_identity()['user']['companyID']
+    times_callback: Callback = appointment_services.getAppointmentAllocationTimes(companyID)
+    returnObj =__parseAppointmentAllocationlist(times_callback.Data) if times_callback.Data is not None else []
+
+    if not times_callback.Success:
+        return helpers.jsonResponse(False, 400, times_callback.Message)
+    return helpers.jsonResponse(True, 200, times_callback.Message, returnObj)
+
+# hmm should move tihs
+def __parseAppointmentAllocationlist(aatList):
+    returnObj = []
+    ret = aatList if type(aatList) is list else [aatList]
+    for aat in ret:
+        appItem = helpers.getDictFromSQLAlchemyObj(aat)
+        info = []
+        for item in aat.Info:
+            info.append(helpers.getDictFromSQLAlchemyObj(item))
+        appItem['Info'] = info
+        returnObj.append(appItem)
+    return returnObj

@@ -37,7 +37,7 @@ export const Chatbot = ({
                             isDirectLink, btnColor, assistantID,
                             addBotMessage, setChatbotStatus, chatbot, initChatbot,
                             resetChatbot, resetMessage, setChatbotAnimation, messageList,
-                            loadByDefault
+                        loadByDefault
                         }) => {
     const { assistant, status, animation } = chatbot;
     const { loading, thinking, open, disabled, active, started, curAction, finished } = status;
@@ -122,7 +122,7 @@ export const Chatbot = ({
     useEffect(() => {
         // if(disabled) return;
         const setChatbotWaiting = (block) => {
-            if(!block.Content   ) return
+            if (!block.Content) return;
             setChatbotStatus({
                 curAction: null,
                 waitingForUser: false,
@@ -134,11 +134,11 @@ export const Chatbot = ({
         };
 
         const botRespond = (block, chatbot) => {
-            if(!block.Content) return
+            if (!block.Content) return;
             stopTimer.current = optionalDelayExecution(() => {
                 setChatbotStatus({ thinking: false, waitingForUser: true });
                 addBotMessage(block.Content.text, block.Type, block);
-                    if (block.selfContinue) {
+                if (block.selfContinue) {
                     setChatbotStatus({
                         curBlockID: block.selfContinue,
                         curAction: block.selfContinue === 'End Chat' ? 'End Chat' : 'Go To Next Block'
@@ -148,7 +148,7 @@ export const Chatbot = ({
                     setChatbotStatus({
                         curBlockID: block[flowAttributes.CONTENT][flowAttributes.BLOCKTOGOID],
                         curAction: block[flowAttributes.CONTENT][flowAttributes.SUPER_ACTION]
-                    })
+                    });
                 }
             }, !block.extra.needsToFetch, block.delay);
         };
@@ -181,6 +181,7 @@ export const Chatbot = ({
 
 
             let nextBlock = getCurBlock(curAction, assistant, chatbot);
+            console.log(nextBlock);
 
             if (!nextBlock) return;
 
@@ -214,8 +215,6 @@ export const Chatbot = ({
             if (isDisabled)
                 return setChatbotStatus({ disabled: isDisabled, active: assistant.Active, loading: false });
 
-
-            console.log()
             dataHandler.setAssistantID(assistantID);
 
             initChatbot(

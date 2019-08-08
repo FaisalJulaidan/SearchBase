@@ -81,11 +81,19 @@ def auto_pilot_configs(autoPilotID):
                            data.get('acceptApplications'),
                            data.get('acceptanceScore'),
                            data.get('sendAcceptanceEmail'),
+                           data.get('acceptanceEmailTitle'),
+                           data.get('acceptanceEmailBody'),
+                           data.get('sendAcceptanceSMS'),
+                           data.get('acceptanceSMSBody'),
                            data.get('rejectApplications'),
                            data.get('rejectionScore'),
                            data.get('sendRejectionEmail'),
+                           data.get('rejectionEmailTitle'),
+                           data.get('rejectionEmailBody'),
+                           data.get('sendRejectionSMS'),
+                           data.get('rejectionSMSBody'),
                            data.get('sendCandidatesAppointments'),
-                           data.get('openTimes'),  # TODO OpenTimeSlots & Appointments Feature
+                           data.get('appointmentAllocationTimes'),
                            user['companyID'])
         if not callback.Success:
             return helpers.jsonResponse(False, 400, callback.Message, None)

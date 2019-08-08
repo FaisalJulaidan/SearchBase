@@ -3,7 +3,6 @@ from utilities import helpers
 
 from twilio.rest import Client
 
-    
 def testConnection(auth):
     try:
 

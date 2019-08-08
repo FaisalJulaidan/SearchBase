@@ -64,13 +64,13 @@ def sendVerificationEmail(firstName, lastName, email, companyName, companyID) ->
         return Callback(False, 'Could not send a verification email to ' + email)
 
 
-def sendAcceptanceEmail(userName, email, logoPath, companyName):
+def sendAcceptanceEmail(title, body, userName, email, logoPath, companyName):
     try:
-
         callback: Callback = __sendEmail(
             email,
-            'Acceptance Letter',
+            title or 'Acceptance Letter',
             '/emails/acceptance_letter.html',
+            body=body,
             companyName=companyName,
             logoPath=logoPath,
             userName=userName)
@@ -85,13 +85,13 @@ def sendAcceptanceEmail(userName, email, logoPath, companyName):
         return Callback(False, 'Could not send a acceptance email to ' + email)
 
 
-def sendRejectionEmail(userName, email, logoPath, companyName):
+def sendRejectionEmail(title, body, userName, email, logoPath, companyName):
     try:
-
         callback: Callback = __sendEmail(
             email,
-            'Rejection Letter',
+            title or 'Rejection Letter',
             '/emails/rejection_letter.html',
+            body=body,
             companyName=companyName,
             logoPath=logoPath,
             userName=userName)
@@ -158,11 +158,19 @@ def sendPasswordResetEmail(email, userID):
         return Callback(False, 'Could not send a password reset email to ' + email)
 
 
-def sendNewUserHasRegistered(name, email, companyName, tel):
+def sendNewCompanyHasRegistered(name, email, companyName, companyID, tel):
     try:
 
-        callback: Callback = __sendEmail(tsbEmail, companyName + ' has signed up',
-                   '/emails/company_signup.html', name=name, email=email, companyName=companyName, tel=tel)
+        callback: Callback = __sendEmail(tsbEmail,
+                                         companyName + ' has signed up',
+                                         '/emails/company_registered.html',
+                                         name=name,
+                                         email=email,
+                                         companyName=companyName,
+                                         tel=tel,
+                                         activationLink= helpers.getDomain() + "/api/staff/activate_company/" + helpers.verificationSigner
+                                         .dumps({'email': email, 'companyID': companyID}, salt='company-activate-key')
+                                         )
 
         if not callback.Success:
             raise Exception(callback.Message)

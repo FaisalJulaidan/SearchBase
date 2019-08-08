@@ -69,7 +69,7 @@ def testConnection(type, companyID):
             return Callback(True, "",
                             {"Status":
                                  "CONNECTED" if mesenger_services
-                                 .testConnection(type, exist_callback.Data.Auth, companyID).Success else "FAILED"
+                                 .testConnection(type, exist_callback.Data.Auth).Success else "FAILED"
                              })
 
         else:

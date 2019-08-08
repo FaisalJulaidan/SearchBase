@@ -7,14 +7,13 @@ from typing import List
 import pandas
 
 from services.Marketplace.marketplace_helpers import convertSkillsToString
-from utilities.enums import DatabaseType, DataType as DT, Period
+from utilities.enums import DatabaseType, DataType as DT
 from models import db, Callback, Database, Candidate, Assistant, Job
 from services import assistant_services
 from services.Marketplace.CRM import crm_services
 from sqlalchemy import and_
 from sqlalchemy_utils import Currency
 from utilities import helpers
-import time
 
 
 def fetchDatabase(id, companyID: int, pageNumber: int) -> Callback:
@@ -537,7 +536,7 @@ def createPandaCandidate(id, name, email, mobile, location, skills,
             "CandidateEmail": email or '',
             "CandidateMobile": mobile or '',
             "CandidateLocation": location or '',
-            "CandidateSkills": skills or '',
+            "CandidateSkills": convertSkillsToString(skills) or '',
             "CandidateLinkdinURL": linkdinURL or '',
             "CandidateAvailability": availability or '',
             "CandidateJobTitle": jobTitle or '',

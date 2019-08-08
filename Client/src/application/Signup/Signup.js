@@ -1,6 +1,7 @@
 import React from 'react';
 import {connect} from 'react-redux';
 
+import momenttz from 'moment-timezone'
 import {authActions} from '../../store/actions/index';
 import styles from './Signup.module.less';
 import {Link} from 'react-router-dom';
@@ -28,6 +29,7 @@ class Signup extends React.Component {
         e.preventDefault();
         this.props.form.validateFields((err, values) => {
             if (!err) {
+                values.timeZone = momenttz.tz.guess()
                 console.log('Received values of form: ', values);
                 this.props.dispatch(authActions.signup(values));
             }
@@ -42,7 +44,7 @@ class Signup extends React.Component {
     compareToFirstPassword = (rule, value, callback) => {
         const form = this.props.form;
         if (value && value !== form.getFieldValue('password')) {
-            callback('The two passwords that you entered are inconsistent!');
+            callback('The two passwords are inconsistent!');
         } else {
             callback();
         }

@@ -8,6 +8,7 @@ class User(db.Model):
     Surname = db.Column(db.String(64), nullable=False)
     Email = db.Column(db.String(64), nullable=False)
     PhoneNumber = db.Column(db.String(30))
+    TimeZone = db.Column(db.String(200))
     Password = db.Column(PasswordType(
         schemes=[
             'pbkdf2_sha512',

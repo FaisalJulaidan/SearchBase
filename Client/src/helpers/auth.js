@@ -16,6 +16,13 @@ export const getUser = () => {
     return user;
 };
 
+export const getTimezone = () => {
+    // return user from local storage
+    let timezone = localStorage.getItem('timezone');
+    if(!timezone){return null;}
+    return timezone;
+};
+
 export const getRole = () => {
     // return user from local storage
     let role = JSON.parse(localStorage.getItem('role'));
@@ -24,6 +31,7 @@ export const getRole = () => {
 };
 
 // Update username in localStorage
+// Faisal small brain
 export const updateUsername = (firstname, surname) => {
     // get user from localStorage
     let user = JSON.parse(localStorage.getItem('user'));
@@ -32,6 +40,12 @@ export const updateUsername = (firstname, surname) => {
     user.username = firstname + ' ' + surname;
     localStorage.setItem("user", JSON.stringify(user));
 };
+
+export const updateTimezone = (timezone) => {
+    if(!timezone) return
+    localStorage.setItem("timezone", timezone);
+}
+
 
 
 export const checkAuthenticity = () => {

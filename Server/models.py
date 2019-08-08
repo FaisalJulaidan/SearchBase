@@ -86,8 +86,11 @@ Newsletter: Newsletter = Newsletter
 from schemas.Messenger import Messenger
 Messenger: Messenger = Messenger
 
-from schemas.OpenTimes import OpenTimes
-OpenTimes: OpenTimes = OpenTimes
+from schemas.AppointmentAllocationTime import AppointmentAllocationTime
+AppointmentAllocationTime: AppointmentAllocationTime = AppointmentAllocationTime
+
+from schemas.AppointmentAllocationTimeInfo import AppointmentAllocationTimeInfo
+AppointmentAllocationTimeInfo: AppointmentAllocationTimeInfo = AppointmentAllocationTimeInfo
 
 from schemas.Role import Role
 Role: Role = Role

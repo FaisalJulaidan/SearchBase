@@ -8,6 +8,7 @@ import googleMaps from '@google/maps'
 
 import styles from "../Calendar/Calendar.module.less";
 import Phone from "../../../components/Phone/Phone";
+import styles from "./Campaign.module.less";
 
 const FormItem = Form.Item;
 
@@ -16,9 +17,9 @@ const { TextArea } = Input;
 
 const google = googleMaps.createClient({
     key: 'AIzaSyDExVDw_47y0U4kukU1A0UscjXE7qDTRhk'
-})
+});
 
-let skills = ["Software engineer", "Sales"]
+let skills = ["Software engineer", "Sales"];
 
 class Campaign extends React.Component {
     constructor(props) {

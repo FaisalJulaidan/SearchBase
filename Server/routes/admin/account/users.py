@@ -51,6 +51,15 @@ def users():
                                     helpers.getDictFromSQLAlchemyObj(callback.Data))
 
 
+@users_router.route("/user/timezone", methods=['get'])
+@jwt_required
+def getTimezone():
+    user = get_jwt_identity()['user']
+
+    tz: Callback = user_services.getTimezone(user['id'])
+    if not tz.Success:
+        return helpers.jsonResponse(False, 400, tz.Message)
+    return helpers.jsonResponse(True, 200, "Gathered timezone information", tz.Data)
 
 @users_router.route("/user/<int:user_id>", methods=['PUT','DELETE'])
 @jwt_required

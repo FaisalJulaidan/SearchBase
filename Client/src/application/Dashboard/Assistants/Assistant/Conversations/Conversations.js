@@ -48,14 +48,16 @@ class Conversations extends React.Component {
                 render: (text, record) => (
                     <p style={{ textTransform: 'capitalize' }}>{record.Name}</p>)
 
-            }, {
-                title: 'Email',
-                key: 'Email',
-                render: (text, record) => (
-                    <p>{record.Email}</p>)
-
-            }, {
-                title: 'Time Spent',
+            },
+            // {
+            //     title: 'Email',
+            //     key: 'Email',
+            //     render: (text, record) => (
+            //         <p>{record.Email}</p>)
+            //
+            // },
+            {
+                title: 'Duration',
                 key: 'TimeSpent',
                 sorter: (a, b) => a.TimeSpent - b.TimeSpent,
                 render: (_, record) => {
@@ -88,8 +90,9 @@ class Conversations extends React.Component {
                 }
 
             }, {
-                title: 'Application Status',
+                title: 'Status',
                 key: 'ApplicationStatus',
+                width: "120px",
                 // filters: [
                 //     {text: 'Completed', value: 'Completed'},
                 //     {text: 'Incomplete', value: 'Incomplete'},
@@ -143,8 +146,8 @@ class Conversations extends React.Component {
                         <Tag color="red">Incomplete</Tag>)
 
             }, {
-                title: 'Action',
-                key: 'action',
+                title: 'Actions',
+                key: 'actions',
                 render: (text, record, index) => (
                     <span>
               <a onClick={() => this.showViewModal(record)}>

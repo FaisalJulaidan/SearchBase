@@ -56,7 +56,7 @@ def updateDatabase(id, newName, companyID) -> Callback:
     except Exception as exc:
         helpers.logError("databases_service.updateDatabase(): " + str(exc))
         db.session.rollback()
-        return Callback(False,"Couldn't update database ")
+        return Callback(False, "Couldn't update database ")
 
 
 # ----- Uploader ----- #
@@ -290,17 +290,21 @@ def scanCandidates(session, dbIDs, extraCandidates=None):
         if salaryInputs and len(salaryInputs):
             df[['Score', Candidate.CandidateDesiredSalary.name, Candidate.Currency.name]] = \
                 df.apply(lambda row: __salary(row, Candidate.CandidateDesiredSalary, Candidate.Currency,
-                                              salaryInputs[-1], plus=8, forceLessThan=True), axis=1, result_type='expand')
+                                              salaryInputs[-1], plus=8, forceLessThan=True), axis=1,
+                         result_type='expand')
 
         # Salary comparision for CandidateDesiredSalary
-        salaryInputs: list = keywords.get(DT.CandidateAnnualDesiredSalary.value['name'], keywords.get(DT.CandidateDailyDesiredSalary.value['name']))
+        salaryInputs: list = keywords.get(DT.CandidateAnnualDesiredSalary.value['name'],
+                                          keywords.get(DT.CandidateDailyDesiredSalary.value['name']))
         if salaryInputs and len(salaryInputs):
             df[['Score', Candidate.CandidateDesiredSalary.name, Candidate.Currency.name]] = \
                 df.apply(lambda row: __salary(row, Candidate.CandidateDesiredSalary, Candidate.Currency,
-                                              salaryInputs[-1], plus=8, forceLessThan=False), axis=1, result_type='expand')
+                                              salaryInputs[-1], plus=8, forceLessThan=False), axis=1,
+                         result_type='expand')
 
         # Years of EXP
-        __numCounter(Candidate.CandidateYearsExperience, '>', DT.CandidateYearsExperience, keywords, df, plus=5, addInputToScore=True)
+        __numCounter(Candidate.CandidateYearsExperience, '>', DT.CandidateYearsExperience, keywords, df, plus=5,
+                     addInputToScore=True)
 
         # Education
         __wordsCounter(DT.CandidateEducation, Candidate.CandidateEducation, keywords, df, 1)
@@ -324,10 +328,16 @@ def scanCandidates(session, dbIDs, extraCandidates=None):
                                 .to_json(orient='records'))
 
         data = []  # List of candidates
-        location = ["Their preferred location for work would be [location].",
+        location = ["Candidate's preferred location of work is [location].",
                     "They prefer to work in [location]."]
-        yearsExp = ["This candidate has [yearsExp] years of experience in  [skills].",
-                    "They have experience with [skills] for [yearsExp] years."]
+        skills = ["Their skill set includes [skills].",
+                  "They are proficient in [skills].",
+                  "The candidate's skills include [skills]."]
+        yearsExp = ["The candidate also has [yearsExp] years of experience in their line of work.",
+                    "The candidate has also reported [yearsExp] years of experience in their area of work.",
+                    "They also have [yearsExp] years of experience."]
+        salary = ["Preferred salary for them is [salary] [currency].",
+                  "Their preferred salary is [salary] [currency]."]
 
         indexes = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q']
         for i, record in enumerate(topResults):
@@ -337,10 +347,18 @@ def scanCandidates(session, dbIDs, extraCandidates=None):
                 desc.append(random.choice(location).replace("[location]",
                                                             record[Candidate.CandidateLocation.name]))
 
-            if record[Candidate.CandidateYearsExperience.name] and record[Candidate.CandidateSkills.name]:
-                desc.append(random.choice(yearsExp)
-                            .replace("[yearsExp]", str(int(record[Candidate.CandidateYearsExperience.name])))
+            if record[Candidate.CandidateSkills.name]:
+                desc.append(random.choice(skills)
                             .replace("[skills]", record[Candidate.CandidateSkills.name]))
+
+            if record[Candidate.CandidateYearsExperience.name]:
+                desc.append(random.choice(yearsExp)
+                            .replace("[yearsExp]", str(int(record[Candidate.CandidateYearsExperience.name]))))
+
+            if record[Candidate.CandidateDesiredSalary.name] and record[Candidate.Currency.name]:
+                desc.append(random.choice(salary)
+                            .replace("[salary]", str(round(record[Candidate.CandidateDesiredSalary.name])))
+                            .replace("[currency]", record[Candidate.Currency.name]))
 
             random.shuffle(desc)
             data.append({
@@ -379,11 +397,16 @@ def scanJobs(session, dbIDs, extraJobs=None):
         df = df.fillna({Job.JobSalary.name: 0, Job.JobYearsRequired.name: 0}).fillna('')
 
         # Salary comparision
-        salaryInputs: list = keywords.get(DT.JobAnnualSalary.value['name'], keywords.get(DT.JobDayRate.value['name'], keywords.get(DT.CandidateAnnualDesiredSalary.value['name'], keywords.get(DT.CandidateDailyDesiredSalary.value['name']))))
+        salaryInputs: list = keywords.get(DT.JobAnnualSalary.value['name'], keywords.get(DT.JobDayRate.value['name'],
+                                                                                         keywords.get(
+                                                                                             DT.CandidateAnnualDesiredSalary.value[
+                                                                                                 'name'], keywords.get(
+                                                                                                 DT.CandidateDailyDesiredSalary.value[
+                                                                                                     'name']))))
         if salaryInputs and len(salaryInputs):
             df[['Score', Job.JobSalary.name, Job.Currency.name]] = \
                 df.apply(lambda row: __salary(row, Job.JobSalary, Job.Currency, salaryInputs[-1], 8),
-                                                                            axis=1, result_type='expand')
+                         axis=1, result_type='expand')
 
         # Job Year Required
         __numCounter(Job.JobYearsRequired, '<', DT.JobYearsRequired, keywords, df, plus=5, addInputToScore=True)
@@ -408,11 +431,9 @@ def scanJobs(session, dbIDs, extraJobs=None):
         # __wordsCounter(DT.JobEssentialSkills, Job.JobEssentialSkills, keywords, df, 3)
         # __wordsCounter(DT.CandidateSkills, Job.JobEssentialSkills, keywords, df, 3)
 
-
         # Results
         topResults = json.loads(df[df['Score'] > 0].nlargest(session.get('showTop', 0), 'Score')
                                 .to_json(orient='records'))
-
 
         jobType = ["This role is a [jobType]", "This job is a [jobType]"]
         location = [" located in [location]. "]
@@ -445,7 +466,7 @@ def scanJobs(session, dbIDs, extraJobs=None):
                 subTitles.append("Location: " + record[Job.JobLocation.name])
 
             if record[Job.JobSalary.name]:
-                currency = record[Job.Currency.name] or '' # it could be a Currency object e.g. {code: 'USD'...}
+                currency = record[Job.Currency.name] or ''  # it could be a Currency object e.g. {code: 'USD'...}
 
                 if isinstance(currency, dict): currency = currency['code']
 
@@ -455,7 +476,6 @@ def scanJobs(session, dbIDs, extraJobs=None):
 
             if essentialSkills:
                 subTitles.append("Essential Skills: " + essentialSkills)
-
 
             data.append({
                 "id": record["ID"],
@@ -494,14 +514,13 @@ def __numCounter(dbColumn, compareSign, dataType: DT, keywords, df, plus=1, addI
         if compareSign == '>':
             df.loc[df[dbColumn.name] >=
                    int(numberInput), 'Score'] += plus
-        else: # '<'
+        else:  # '<'
             df.loc[df[dbColumn.name] <=
                    int(numberInput), 'Score'] += plus
 
 
 # min-max currency period / ex. "10000-45000 GBP Annually" old: "Greater Than 5000 GBP Annually"
 def __salary(row, dbSalaryColumn, dbCurrencyColumn, salaryInput: str, plus=4, forceLessThan=False):
-
     userSalary = salaryInput.split(' ')
 
     # Get user's min and max salary

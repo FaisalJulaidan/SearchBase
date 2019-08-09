@@ -10,7 +10,7 @@ const errorBlock = () => {
 };
 
 
-const endBlock = (finished = true) => {
+const endBlock = (finished = false) => {
     const text = 'This conversation has ended, if you would like to have a new one please click the reset button!';
     // Content, Type, delay, ID = null, DataType = null, selfContinue = null, extra = {})
     return createBlock(null, messageTypes.TEXT, 0, null, null, null, { end: true, finished });
@@ -104,7 +104,7 @@ const getCurBlock = (action, assistant, chatbot) => {
         case 'Early End Chat':
             return endBlock(false);
         case 'End Chat':
-            return endBlock();
+            return endBlock(true);
         default:
             return null;
     }

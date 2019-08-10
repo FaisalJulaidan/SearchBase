@@ -2,7 +2,7 @@ from models import db, Callback, Company, User
 from services import stored_file_services
 from utilities import helpers
 from werkzeug.utils import secure_filename
-import logging , stripe
+import logging, stripe
 
 
 

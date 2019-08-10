@@ -16,7 +16,7 @@ class Plan(db.Model):
     Company = db.relationship('Company', back_populates='Plan')
 
     # Constraints:
-    __table_args__ = (db.UniqueConstraint('Name', 'CompanyID', name='uix1_role'),)
+    __table_args__ = (db.UniqueConstraint('Name', 'CompanyID', name='uix1_plan'),)
 
     def __repr__(self):
         return '<Plan {}>'.format(self.Name)

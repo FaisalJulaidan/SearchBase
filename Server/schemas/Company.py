@@ -31,7 +31,7 @@ class Company(db.Model):
     Calendars = db.relationship('Calendar', back_populates='Company')
     Messengers = db.relationship('Messenger', back_populates='Company')
     AutoPilots = db.relationship('AutoPilot', back_populates='Company')
-    Plan = db.relationship('Role', back_populates='Company')
+    Plan = db.relationship('Plan', back_populates='Company')
 
     def __repr__(self):
         return '<Company {}>'.format(self.Name)

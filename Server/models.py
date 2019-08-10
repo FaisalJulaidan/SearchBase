@@ -98,6 +98,9 @@ StoredFile: StoredFile = StoredFile
 from schemas.User import User
 User: User = User
 
+from schemas.Plan import Plan
+Plan: Plan = Plan
+
 # =================== Triggers ============================
 
 # Example of how triggers works

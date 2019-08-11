@@ -60,7 +60,7 @@ def login(auth):
 
         access_token_url = "https://auth9.bullhornstaffing.com/oauth/token?" + \
                            "&grant_type=authorization_code" + \
-                           "&redirect_uri=" + helpers.getDomain() + "/dashboard/marketplace/Bullhorn" + \
+                           "&redirect_uri=" + helpers.getDomain(3000) + "/dashboard/marketplace/Bullhorn" + \
                            "&client_id=" + CLIENT_ID + \
                            "&client_secret=" + CLIENT_SECRET + \
                            "&code=" + authCopy.get("code")

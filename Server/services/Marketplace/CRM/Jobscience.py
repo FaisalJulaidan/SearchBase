@@ -49,7 +49,7 @@ def login(auth):
 
         access_token_url = "https://test.salesforce.com/services/oauth2/token?" + \
                            "&grant_type=authorization_code" + \
-                           "&redirect_uri=" + helpers.getDomain() + "/dashboard/marketplace/Jobscience" + \
+                           "&redirect_uri=" + helpers.getDomain(3000) + "/dashboard/marketplace/Jobscience" + \
                            "&client_id=" + CLIENT_ID + \
                            "&client_secret=" + CLIENT_SECRET + \
                            "&code=" + authCopy.get("code")

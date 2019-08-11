@@ -356,9 +356,11 @@ def scanCandidates(session, dbIDs, extraCandidates=None):
                             .replace("[yearsExp]", str(int(record[Candidate.CandidateYearsExperience.name]))))
 
             if record[Candidate.CandidateDesiredSalary.name] and record[Candidate.Currency.name]:
+                currency = record[Job.Currency.name] or ''  # it could be a Currency object e.g. {code: 'USD'...}
+                if isinstance(currency, dict): currency = currency.get('code', '')
                 desc.append(random.choice(salary)
                             .replace("[salary]", str(round(record[Candidate.CandidateDesiredSalary.name])))
-                            .replace("[currency]", record[Candidate.Currency.name]))
+                            .replace("[currency]", currency))
 
             # random.shuffle(desc)
             data.append({
@@ -397,12 +399,12 @@ def scanJobs(session, dbIDs, extraJobs=None):
         df = df.fillna({Job.JobSalary.name: 0, Job.JobYearsRequired.name: 0}).fillna('')
 
         # Salary comparision
-        salaryInputs: list = keywords.get(DT.JobAnnualSalary.value['name'], keywords.get(DT.JobDayRate.value['name'],
-                                                                                         keywords.get(
-                                                                                             DT.CandidateAnnualDesiredSalary.value[
-                                                                                                 'name'], keywords.get(
-                                                                                                 DT.CandidateDailyDesiredSalary.value[
-                                                                                                     'name']))))
+        salaryInputs: list = \
+            keywords.get(DT.JobAnnualSalary.value['name'],
+                         keywords.get(DT.JobDayRate.value['name'],
+                            keywords.get(DT.CandidateAnnualDesiredSalary.value['name'],
+                                keywords.get(DT.CandidateDailyDesiredSalary.value[ 'name']))))
+
         if salaryInputs and len(salaryInputs):
             df[['Score', Job.JobSalary.name, Job.Currency.name]] = \
                 df.apply(lambda row: __salary(row, Job.JobSalary, Job.Currency, salaryInputs[-1], 8),
@@ -467,9 +469,7 @@ def scanJobs(session, dbIDs, extraJobs=None):
 
             if record[Job.JobSalary.name]:
                 currency = record[Job.Currency.name] or ''  # it could be a Currency object e.g. {code: 'USD'...}
-
-                if isinstance(currency, dict): currency = currency['code']
-
+                if isinstance(currency, dict): currency = currency.get('code', '')
                 subTitles.append("Salary: "
                                  + str(int(record[Job.JobSalary.name]))
                                  + ' ' + currency)

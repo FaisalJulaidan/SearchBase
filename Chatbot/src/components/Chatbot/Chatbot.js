@@ -43,6 +43,7 @@ export const Chatbot = ({
     const { loading, thinking, open, disabled, active, started, curAction, finished } = status;
     const { open: animationOpen } = animation;
     let timer = useRef(null);
+    let messageTimer = useRef(null)
     let stopTimer = useRef(null);
 
     window.addEventListener('beforeunload', () => {
@@ -77,14 +78,6 @@ export const Chatbot = ({
         setChatbotAnimation({ open: true });
     };
 
-    // useEffect(() => {
-    //   let chat = localStorage.getItem('tsb_chatbot_draft')
-    //   if(chat){
-    //     alert('Hello again, you left last time without finishing the chatbot, would you like to continue where you left off?')
-    //   }
-    // }, [])
-
-    // On boot first time animation
 
 
     useEffect(() => {
@@ -136,21 +129,28 @@ export const Chatbot = ({
         const botRespond = (block, chatbot) => {
             if (!block.Content) return;
             stopTimer.current = optionalDelayExecution(() => {
-                setChatbotStatus({ thinking: false, waitingForUser: true });
+                console.log('hm')
                 addBotMessage(block.Content.text, block.Type, block);
+                setChatbotStatus({ thinking: false, waitingForUser: true });
                 if (block.selfContinue) {
+                    console.log('self continue')
                     setChatbotStatus({
+                        thinking: false,
                         curBlockID: block.selfContinue,
                         curAction: block.selfContinue === 'End Chat' ? 'End Chat' : 'Go To Next Block'
                     });
+                    return
                 }
                 if (block[flowAttributes.TYPE] === messageTypes.RAW_TEXT) {
                     setChatbotStatus({
+                        thinking: false,
                         curBlockID: block[flowAttributes.CONTENT][flowAttributes.BLOCKTOGOID],
                         curAction: block[flowAttributes.CONTENT][flowAttributes.SUPER_ACTION]
                     });
+                    return
                 }
-            }, !block.extra.needsToFetch, block.delay);
+                // messageTimer.current = { timer: setInterval(() => console.log('lol'), 100), count: messageList.length }
+            }, block.extra.needsToFetch !== false, block.delay);
         };
 
         const fetch = async (block) => {
@@ -166,9 +166,9 @@ export const Chatbot = ({
                     afterMessage: 'Sorry, I could not find what you want!',
                     curBlockID: block[flowAttributes.CONTENT][flowAttributes.BLOCKTOGOID]
                 });
-                return {};
+                return ["Failed to fetch data", null];
             }
-            return fetchedData;
+            return [null, fetchedData];
         };
 
 
@@ -181,14 +181,21 @@ export const Chatbot = ({
 
 
             let nextBlock = getCurBlock(curAction, assistant, chatbot);
-            console.log(nextBlock);
 
             if (!nextBlock) return;
 
+            if(messageTimer.current){
+                clearInterval(messageTimer.current.timer)
+                messageTimer.current = null
+            }
+            console.log('waiting')
             setChatbotWaiting(nextBlock);
-            let fetchedData = {};
+            let fetchedData, err;
             if (nextBlock.extra.needsToFetch) {
-                fetchedData = await fetch(nextBlock);
+                [err, fetchedData] = await fetch(nextBlock);
+            }
+            if(err){
+                return
             }
             if (nextBlock.extra.end) {
                 setChatbotStatus({ finished: true });

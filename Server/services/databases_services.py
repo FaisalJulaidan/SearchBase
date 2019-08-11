@@ -360,7 +360,7 @@ def scanCandidates(session, dbIDs, extraCandidates=None):
                             .replace("[salary]", str(round(record[Candidate.CandidateDesiredSalary.name])))
                             .replace("[currency]", record[Candidate.Currency.name]))
 
-            random.shuffle(desc)
+            # random.shuffle(desc)
             data.append({
                 "id": record["ID"],
                 "databaseType": DatabaseType.Candidates.value,

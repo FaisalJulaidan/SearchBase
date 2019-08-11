@@ -89,7 +89,7 @@ def processConversation(conversation: Conversation, autoPilot: AutoPilot, assist
             def __processSendingSMS(phone, status: Status, autoPilot: AutoPilot):
 
                 messenger: Messenger = assistant.Messenger
-                userName = conversation.Name or 'Anonymous'
+                userName = conversation.Name or '[Candidate.Name]'
                 # companyName = autoPilot.Company.Name
 
                 # ======================
@@ -99,7 +99,7 @@ def processConversation(conversation: Conversation, autoPilot: AutoPilot, assist
 
                     SMSBody = autoPilot.AcceptanceSMSBody \
                         .replace("${candidateName}$", userName) \
-                        .replace("${candidateEmail}$", email or " ") \
+                        .replace("${candidateEmail}$", email or "[Candidate.Email]") \
                         .replace("&nbsp;", "\n")
 
                     acceptance_SMS_callback: Callback = \
@@ -114,7 +114,8 @@ def processConversation(conversation: Conversation, autoPilot: AutoPilot, assist
 
                     SMSBody = autoPilot.RejectionSMSBody \
                         .replace("${candidateName}$", userName) \
-                        .replace("${candidateEmail}$", email)
+                        .replace("${candidateEmail}$", email or "[Candidate.Email]") \
+                        .replace("&nbsp;", "\n")
 
                     rejection_SMS_callback: Callback = \
                         mesenger_services.sendMessage(messenger.Type, phone, SMSBody, messenger.Auth)

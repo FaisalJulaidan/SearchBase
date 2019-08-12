@@ -38,7 +38,9 @@ class Conversation(db.Model):
     AssistantID = db.Column(db.Integer, db.ForeignKey('assistant.ID', ondelete='cascade'), nullable=False)
     Assistant = db.relationship('Assistant', back_populates='Conversations')
 
-    StoredFile = db.relationship('StoredFile', uselist=False, back_populates='Conversation')
+    StoredFileID = db.Column(db.Integer, db.ForeignKey('stored_file.ID'), nullable=True)
+    StoredFile = db.relationship('StoredFile')
+
     Appointment = db.relationship('Appointment', uselist=False, back_populates='Conversation')
 
     def __repr__(self):

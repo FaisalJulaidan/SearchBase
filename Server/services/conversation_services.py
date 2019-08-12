@@ -104,15 +104,10 @@ def getAllByAssistantID(assistantID):
         conversations: List[Conversation] = db.session.query(Conversation) \
             .filter(Conversation.AssistantID == assistantID) \
             .order_by(desc(Conversation.DateTime)).all()
-
         for conversation in conversations:
-            filePaths = ""
-            storedFile_callback: Callback = stored_file_services.getByConversation(conversation)
-            if storedFile_callback.Success:
-                filePaths = storedFile_callback.Data.FilePath
-            conversation.FilePath = filePaths
+            if(conversation.StoredFile != None):
+                conversation.__Files = helpers.getListFromSQLAlchemyList(conversation.StoredFile.StoredFileInfo)
         return Callback(True, "Conversations retrieved successfully.", conversations)
-
     except Exception as exc:
         helpers.logError("conversation_services.getAllByAssistantID(): " + str(exc))
         db.session.rollback()

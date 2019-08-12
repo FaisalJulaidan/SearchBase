@@ -220,8 +220,10 @@ def getDictFromSQLAlchemyObj(obj) -> dict:
             if key == Assistant.Flow.name and dict[key]:  # Parse Flow !!
                 flow_services.parseFlow(dict[key])  # pass by reference
 
-    if hasattr(obj, "FilePath"):
-        dict["FilePath"] = obj.FilePath
+    for attr in obj.__dict__.keys():
+        if attr.startswith("__"):
+            print(getattr(obj, attr))
+            dict[attr[2:]] = getattr(obj, attr)
     return dict
 
 """Convert a SQLAlchemy list of objects to a list of dicts"""

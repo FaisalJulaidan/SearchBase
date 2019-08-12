@@ -25,7 +25,6 @@ def conversation(assistantID):
     # Get the assistant's user inputs/chatbot conversation
     if request.method == "GET":
         s_callback: Callback = conversation_services.getAllByAssistantID(assistantID)
-
         # Return response
         if not s_callback.Success:
             return helpers.jsonResponse(False, 400, "Error in retrieving conversation.")

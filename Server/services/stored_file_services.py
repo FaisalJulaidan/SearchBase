@@ -17,7 +17,8 @@ def getByID(id) -> StoredFile or None:
     try:
         if id:
             # Get result and check if None then raise exception
-            result = db.session.query(StoredFile).get(id)
+            result : StoredFile = db.session.query(StoredFile).get(id)
+            print(result.StoredFileInfo)
             if not result: raise Exception
 
             return Callback(True,
@@ -34,8 +35,8 @@ def getByID(id) -> StoredFile or None:
 
 def getByConversation(conversation: Conversation) -> StoredFile or None:
     try:
-        # Get result and check if None then raise exception
-        result = db.session.query(StoredFile).filter(StoredFile.Conversation == conversation).first()
+        result = db.session.query(StoredFile).filter(Conversation.StoredFileID == StoredFile.ID).first()
+        print(Conversation.StoredFile)
         if not result: return Callback(False, '')
         return Callback(True, 'StoredFile was successfully retrieved', result)
 

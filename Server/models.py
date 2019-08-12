@@ -98,6 +98,9 @@ Role: Role = Role
 from schemas.StoredFile import StoredFile
 StoredFile: StoredFile = StoredFile
 
+from schemas.StoredFileInfo import StoredFileInfo
+StoredFileInfo: StoredFileInfo = StoredFileInfo
+
 from schemas.User import User
 User: User = User
 

@@ -403,7 +403,7 @@ class Conversations extends React.Component {
                 {
                     this.state.destroyModal && <ViewsModal visible={this.state.viewModal}
                                                            closeViewModal={this.closeViewModal}
-                                                           filesPath={conversations.filesPath}
+                                                           filesPath={conversations.Files}
                                                            flowOptions={options?.flow}
                                                            conversation={this.state.selectedConversation}
                                                            assistant={assistant}

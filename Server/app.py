@@ -129,6 +129,9 @@ elif os.environ['FLASK_ENV'] == 'development':
 
     print('Development mode running...')
 
+    print(float("1500.5"))
+    print(int("1500.5"))
+
 else:
     raise Exception("Please set FLASK_ENV first to either 'production', 'development', or 'staging' in .env file")
 

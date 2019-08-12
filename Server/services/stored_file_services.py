@@ -3,7 +3,7 @@ import os
 import boto3
 from botocore.exceptions import ClientError
 
-from models import db, Callback, StoredFile, Conversation
+from models import db, Callback, StoredFile, Conversation, StoredFileInfo
 from utilities import helpers
 
 PUBLIC_URL = "https://tsb.ams3.digitaloceanspaces.com/"
@@ -13,6 +13,7 @@ USER_FILES_PATH = '/user_files'
 BUCKET= 'tsb'
 
 
+# NEEDS TO BE CONVERTED
 def getByID(id) -> StoredFile or None:
     try:
         if id:
@@ -56,13 +57,18 @@ def getAll():
         return Callback(False, 'StoredFiles could not be retrieved/empty')
 
 
-def createRef(filePath, conversation) -> StoredFile or None:
+def createRef(files, conversation, storedFileID) -> StoredFile or None:
     try:
-        if not filePath: raise Exception;
-        newStoredFile = StoredFile(FilePath=filePath, Conversation=conversation)
-        db.session.add(newStoredFile)
+        if not files: raise Exception;
+        conversation : Conversation = db.session.query(Conversation).filter(Conversation.ID == conversation.ID).first()
+        newFiles = []
+        for file in files:
+            newFiles.append(StoredFileInfo(StoredFileID=storedFileID, Key=None, FilePath=file.realFileName))
+        print(conversation)
+        conversation.StoredFileID = storedFileID
+        db.session.add_all(newFiles)
         db.session.commit()
-        return Callback(True, "Stored files reference was created successfully.", newStoredFile)
+        return Callback(True, "Stored files reference was created successfully.", helpers.getListFromSQLAlchemyList(newFiles))
 
     except Exception as exc:
         helpers.logError("stored_file_services.create(): " + str(exc))

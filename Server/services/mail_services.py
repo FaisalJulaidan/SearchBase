@@ -3,7 +3,7 @@ from threading import Thread
 from flask import render_template, current_app
 from flask_mail import Mail, Message
 
-from models import Callback, Assistant, Conversation, Company
+from models import Callback, Assistant, Conversation, Company, StoredFileInfo
 from services import user_services, stored_file_services as sfs
 from utilities import helpers
 
@@ -242,10 +242,10 @@ def notifyNewConversation(assistant: Assistant, conversation: Conversation):
         # Get pre singed url to download the file if there are files
         fileURLsSinged = []
         if conversation.StoredFile:
-            fileURLs :str = conversation.StoredFile.FilePath
-            if fileURLs:
-                for urls in fileURLs.split(','):
-                    fileURLsSinged.append(sfs.genPresigendURL(urls, sfs.USER_FILES_PATH, 2592000).Data) # Expires in a month
+            if conversation.StoredFile.StoredFileInfo:
+                for file in conversation.StoredFile.StoredFileInfo:
+                    fileURLsSinged.append(sfs.genPresigendURL(file.FilePath, sfs.USER_FILES_PATH, 2592000).Data) # Expires in a month
+
 
         conversations = [{
             'userType': conversation.UserType.name,
@@ -299,10 +299,9 @@ def notifyNewConversations(assistant: dict, conversations, lastNotificationDate)
             # Get pre singed url to download the file if there are files
             fileURLsSinged = []
             if conversation.StoredFile:
-                fileURLs :str = conversation.StoredFile.FilePath
-                if fileURLs:
-                    for urls in fileURLs.split(','):
-                        fileURLsSinged.append(sfs.genPresigendURL(urls, sfs.USER_FILES_PATH, 2592000).Data) # Expires in a month
+                if conversation.StoredFile.StoredFileInfo:
+                    for file in conversation.StoredFile.StoredFileInfo:
+                        fileURLsSinged.append(sfs.genPresigendURL(file.FilePath, sfs.USER_FILES_PATH, 2592000).Data) # Expires in a month
 
             conversationsList.append({
                 'userType': conversation.UserType.name,

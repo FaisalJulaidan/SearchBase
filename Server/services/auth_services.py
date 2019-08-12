@@ -115,9 +115,11 @@ def authenticate(email: str, password_to_check: str) -> Callback:
                          "phoneNumber": user.PhoneNumber,
                          # "plan": helpers.getPlanNickname(user.Company.SubID),
                          },
-                'role': helpers.getDictFromSQLAlchemyObj(user.Role)
-                }
-
+                'role': helpers.getDictFromSQLAlchemyObj(user.Role),
+                'plan': helpers.getListFromSQLAlchemyList(user.Company.Plan)[0]  # BUG: Stored as list currently
+        }
+        # print("here")
+        # print(helpers.getListFromSQLAlchemyList(user.Company.Plan))
         time_now = datetime.now()
         # for security, hide them in the token
         tokenData = {'user': {"id": user.ID, "companyID": user.CompanyID, "email": user.Email, "roleID": user.RoleID}}

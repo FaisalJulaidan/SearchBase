@@ -17,10 +17,19 @@ export const getUser = () => {
 };
 
 export const getRole = () => {
-    // return user from local storage
+    // return role from local storage
     let role = JSON.parse(localStorage.getItem('role'));
+    console.log('ROLE IS: ' + role);
     if(!role){return null;}
     return role;
+};
+
+export const getPlan = () => {
+    // return plan from local storage
+    let plan = JSON.parse(localStorage.getItem('plan'));
+    console.log('PLAN IS: ' + plan);
+    if(!plan){return null;}
+    return plan;
 };
 
 // Update username in localStorage

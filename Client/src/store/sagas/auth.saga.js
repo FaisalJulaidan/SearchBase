@@ -14,9 +14,10 @@ function* login({email, password, prevPath}) {
             headers: {'Content-Type': 'application/json'},
         });
 
-        const {user, role, token, refresh, expiresIn} = yield res.data.data;
+        const {user, role, plan, token, refresh, expiresIn} = yield res.data.data;
         yield localStorage.setItem("user", JSON.stringify(user));
         yield localStorage.setItem("role", JSON.stringify(role));
+        yield localStorage.setItem("plan", JSON.stringify(plan));
         yield localStorage.setItem("token", token);
         yield localStorage.setItem("refresh", refresh);
         yield localStorage.setItem("expiresIn", expiresIn);

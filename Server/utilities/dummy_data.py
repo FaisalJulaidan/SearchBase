@@ -2,7 +2,8 @@ from datetime import datetime, timedelta
 
 from sqlalchemy_utils import Currency
 
-from models import db, Role, Company, Assistant, Conversation, Database, Candidate, CRM, Appointment, Job, Messenger
+from models import db, Role, Company, Assistant, Conversation, Database, Candidate, CRM, Appointment, Job, Messenger, \
+    Plan
 from services import user_services, flow_services, auto_pilot_services
 from utilities import helpers, enums
 
@@ -18,6 +19,13 @@ def generate():
     aramco: Company = Company.query.filter(Company.Name == "Aramco").first()
     sabic: Company = Company.query.filter(Company.Name == "Sabic").first()
 
+    # Plan creation
+    db.session.add(Plan(Name='Aramco_Plan', AccessAssistants=True, AccessCampaigns=True,
+                   AccessAutoPilot=True, AccessAppointments=True, Company=aramco))
+
+    # Get plan
+    aramco_plan: Plan = Plan.query.filter(Plan.Name == 'Aramco_Plan').first()
+    print(aramco_plan)
     # Create and validate a flow for an assistant
 
     # job = scheduler_services.scheduler.add_job(func=scheduler_services.printSomething, trigger='interval', seconds=5, id="3559a1946b52419899e8841d4317d194", replace_existing=True)

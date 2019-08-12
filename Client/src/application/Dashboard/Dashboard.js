@@ -4,7 +4,7 @@ import {Avatar, Dropdown, Icon, Layout, Menu} from 'antd';
 import "./Dashboard.less"
 import styles from "./Dashboard.module.less"
 
-import {getUser, history} from "helpers";
+import {getUser, history, getPlan} from "helpers";
 import {Route, Switch, withRouter} from 'react-router-dom';
 import {authActions, optionsActions} from "store/actions";
 import {store} from "store/store";
@@ -14,6 +14,7 @@ import {CSSTransition, TransitionGroup} from "react-transition-group";
 
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
 import {faCloud} from '@fortawesome/free-solid-svg-icons'
+
 
 const Home = lazy(() => import('./Home/Home'));
 const Assistants = lazy(() => import('./Assistants/Assistants'));
@@ -72,6 +73,10 @@ class Dashboard extends Component {
 
         const {match, location} = this.props;
         const user = getUser();
+
+        // Test fetching user plan:
+        const plan = getPlan();
+        console.log(plan)
         let userInfo = null;
         // User Information at the top
         if (!user) {

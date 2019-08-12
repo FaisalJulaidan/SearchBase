@@ -123,7 +123,7 @@ def getByID(conversationID, assistantID):
 
         storedFile_callback: Callback = stored_file_services.getByConversation(conversation)
         if storedFile_callback.Success:
-            conversation.FilePath = storedFile_callback.Data.FilePath
+            conversation.__Files = storedFile_callback.Data.StoredFileInfo
 
         return Callback(True, "ChatbotConversation retrieved successfully.", conversation)
 

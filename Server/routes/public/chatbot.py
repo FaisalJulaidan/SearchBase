@@ -98,6 +98,7 @@ def getSolutions_forChatbot(assistantHashID):
 
 @chatbot_router.route("/assistant/<string:assistantIDAsHash>/chatbot/<int:sessionID>/file", methods=['POST'])
 def chatbot_upload_files(assistantIDAsHash, sessionID):
+    print('call')
     callback: Callback = conversation_services.getByID(sessionID, helpers.decodeID(assistantIDAsHash)[0])
     if not callback.Success:
         return helpers.jsonResponseFlask(False, 404, "Session not found.", None)

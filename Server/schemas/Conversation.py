@@ -39,7 +39,7 @@ class Conversation(db.Model):
     Assistant = db.relationship('Assistant', back_populates='Conversations')
 
     StoredFileID = db.Column(db.Integer, db.ForeignKey('stored_file.ID'), nullable=True)
-    StoredFile = db.relationship('StoredFile')
+    StoredFile = db.relationship('StoredFile', order_by="desc(StoredFile.ID)")
 
     Appointment = db.relationship('Appointment', uselist=False, back_populates='Conversation')
 

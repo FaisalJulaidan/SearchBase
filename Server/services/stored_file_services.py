@@ -35,8 +35,7 @@ def getByID(id) -> StoredFile or None:
 
 def getByConversation(conversation: Conversation) -> StoredFile or None:
     try:
-        result = db.session.query(StoredFile).filter(Conversation.StoredFileID == StoredFile.ID).first()
-        print(Conversation.StoredFile)
+        result = db.session.query(StoredFile).filter(conversation.StoredFileID == StoredFile.ID).first()
         if not result: return Callback(False, '')
         return Callback(True, 'StoredFile was successfully retrieved', result)
 

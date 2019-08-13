@@ -126,11 +126,11 @@ class NewAssistantModal extends Component {
                             <Select>
                                 <Option key={1} value={'none'}>None</Option>
                                 <Option key={2} value={'main'}>Main</Option>
-                                <Option key={2} value={'appointment'}>Appointment</Option>
-                                <Option key={2} value={'join-us'}>Join Us</Option>
-                                <Option key={2} value={'apply'}>Apply Chatbot</Option>
-                                <Option key={2} value={'template-1'}>Template 1</Option>
-                                <Option key={2} value={'pre-screen'}>Pre-Screen</Option>
+                                <Option key={3} value={'appointment'}>Appointment</Option>
+                                <Option key={4} value={'join-us'}>Join Us</Option>
+                                <Option key={5} value={'apply'}>Apply Chatbot</Option>
+                                <Option key={6} value={'template-1'}>Template 1</Option>
+                                <Option key={7} value={'pre-screen'}>Pre-Screen</Option>
                             </Select>
                         )}
                     </FormItem>

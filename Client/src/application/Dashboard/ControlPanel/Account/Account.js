@@ -41,6 +41,7 @@ class Account extends React.Component {
     componentWillMount() {
         this.props.dispatch(accountActions.getAccount());
         this.props.dispatch(developmentActions.fetchDevRequest())
+        // this.props.dispatch(developmentActions.fetch)
     }
 
     render() {
@@ -74,7 +75,7 @@ class Account extends React.Component {
                                                     deleteLogo={this.deleteLogo}/>
                                 </TabPane>
                                 <TabPane tab={"Development"} key={"3"}>
-                                    <Development webhooks={this.props.webhooks}/>
+                                    <Development webhooks={this.props.webhooks} availablWebhooks={this.props.availableWebhooks}/>
                                 </TabPane>
                             </Tabs>
                         }
@@ -89,7 +90,8 @@ function mapStateToProps(state) {
     console.log(state)
     return {
         account: state.account.account,
-        webhooks: state.development.webhooks
+        webhooks: state.development.webhooks,
+        availableWebhooks: state.development.availableWebhooks
     };
 }
 

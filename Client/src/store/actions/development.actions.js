@@ -5,10 +5,11 @@ const fetchDevRequest = () => {
     };
 };
 
-const fetchDevSuccess = (webhooks) => {
+const fetchDevSuccess = (webhooks, availableWebhooks) => {
     return {
         type: actionTypes.FETCH_DEV_SUCCESS,
-        webhooks
+        webhooks,
+        availableWebhooks
     };
 };
 

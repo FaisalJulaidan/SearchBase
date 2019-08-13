@@ -1,20 +1,25 @@
 import React from 'react';
 
 import {Table} from 'antd'
+import EditWebhookModal from './EditWebhookModal'
 
 class Development extends React.Component {
 
     state = {
-
+        activeID: this.props.webhooks[0].ID,
+        showModal: false
     };
 
     modifyWebhook = (id) => {
-        console.log(id)
+        this.setState({activeID: id, showModal: true})
     }
 
     deleteWebhook = (id) => {
 
-        console.log(id)
+    }
+
+    saveWebhook = (settings) => {
+
     }
 
     componentDidMount = () => {
@@ -45,10 +50,18 @@ class Development extends React.Component {
             }
         ]
         return (
-           <Table
-                dataSource={this.props.webhooks}
-                columns={columns}
-           />
+            <>
+                <h1>Webhooks</h1>
+               <Table
+                    dataSource={this.props.webhooks}
+                    columns={columns}
+               />
+               <EditWebhookModal
+                     webhook={this.props.webhooks.find(wh => wh.ID === this.state.activeID)}
+                    visible={this.state.showModal}
+                     available={this.props.availablWebhooks}
+                    save={this.saveWebhook}/>
+           </>
         );
     }
 }

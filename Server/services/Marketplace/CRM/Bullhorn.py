@@ -106,21 +106,26 @@ def retrieveRestToken(auth, companyID):
               authCopy.get("refresh_token") + \
               "&client_id=" + CLIENT_ID + \
               "&client_secret=" + CLIENT_SECRET
+        helpers.logError("--------------------------------------------------------------------------------------------")
+        helpers.logError("--------------------------------------------------------------------------------------------")
+        helpers.logError("TESTING BUG "+str(companyID)+" REQUEST: "+url)
         get_access_token = requests.post(url, headers=headers)
-        helpers.logError("BULLHORN ACCESS TOKEN ERROR: " + str(get_access_token.text))
+        helpers.logError("TESTING BUG "+str(companyID)+" TEXT: "+get_access_token.text)
+        helpers.logError("--------------------------------------------------------------------------------------------")
+        helpers.logError("--------------------------------------------------------------------------------------------")
         if get_access_token.ok:
             result_body = json.loads(get_access_token.text)
-            access_token = result_body.get("access_token")
-            authCopy["refresh_token"] = result_body.get("refresh_token")
+            access_token = result_body["access_token"]
+            authCopy["refresh_token"] = result_body["refresh_token"]
         else:
-            raise Exception("CRM not set up properly")
+            raise Exception(get_access_token.text)
 
         url = "https://rest.bullhornstaffing.com/rest-services/login?version=*&" + \
               "access_token=" + access_token
 
         get_rest_token = requests.put(url, headers=headers)
         if not get_rest_token.ok:
-            raise Exception("Failure in generating rest_token")
+            raise Exception(get_rest_token.text)
         result_body = json.loads(get_rest_token.text)
 
         authCopy["rest_token"] = result_body.get("BhRestToken")
@@ -139,7 +144,7 @@ def retrieveRestToken(auth, companyID):
     except Exception as exc:
         db.session.rollback()
         helpers.logError("Marketplace.CRM.Bullhorn.retrieveRestToken() ERROR: " + str(exc))
-        return Callback(False, str(exc))
+        return Callback(False, "Failed to retrieve CRM tokens. Please check login information")
 
 
 # create query url and also tests the BhRestToken to see if it still valid, if not it generates a new one and new url

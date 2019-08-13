@@ -211,6 +211,20 @@ class DataType(Enum):
         DataTypeSection.Candidate,
         [UserType.Candidate])
 
+    CandidateAvailableFrom = dataTypeCreator(
+        'Candidate Available From',
+        'CandidateAvailableFrom',
+        ValidationType.DateTime,
+        DataTypeSection.Candidate,
+        [UserType.Candidate])
+
+    CandidateAvailableTo = dataTypeCreator(
+        'Candidate Available To',
+        'CandidateAvailableTo',
+        ValidationType.DateTime,
+        DataTypeSection.Candidate,
+        [UserType.Candidate])
+
     CandidateLocation = dataTypeCreator(
         'Candidate Location',
         'CandidateLocation',
@@ -268,6 +282,71 @@ class DataType(Enum):
         DataTypeSection.Candidate,
         [UserType.Candidate])
 
+    CandidateVisa = dataTypeCreator(
+        'Candidate Visa',
+        'CandidateVisa',
+        ValidationType.String,
+        DataTypeSection.Candidate,
+        [UserType.Candidate])
+
+    CandidatePassport = dataTypeCreator(
+        'Candidate Passport',
+        'CandidatePassport',
+        ValidationType.String,
+        DataTypeSection.Candidate,
+        [UserType.Candidate])
+
+    CandidateWorkEligibility = dataTypeCreator(
+        'Candidate Work Eligibility',
+        'CandidateWorkEligibility',
+        ValidationType.String,
+        DataTypeSection.Candidate,
+        [UserType.Candidate])
+
+    CandidateCriminalConvictions = dataTypeCreator(
+        'Candidate Criminal Convictions',
+        'CandidateCriminalConvictions',
+        ValidationType.String,
+        DataTypeSection.Candidate,
+        [UserType.Candidate])
+
+    CandidateDrivingLicense = dataTypeCreator(
+        'Candidate Driving License',
+        'CandidateDrivingLicense',
+        ValidationType.String,
+        DataTypeSection.Candidate,
+        [UserType.Candidate])
+
+    CandidateDrugsTest = dataTypeCreator(
+        'Candidate Drugs Test',
+        'CandidateDrugsTest',
+        ValidationType.String,
+        DataTypeSection.Candidate,
+        [UserType.Candidate])
+
+    CandidateOver18 = dataTypeCreator(
+        'Candidate Over 18',
+        'CandidateOver18',
+        ValidationType.String,
+        DataTypeSection.Candidate,
+        [UserType.Candidate])
+
+    CandidateJobCategory = dataTypeCreator(
+        'Candidate Job Category',
+        'CandidateJobCategory',
+        ValidationType.String,
+        DataTypeSection.Candidate,
+        [UserType.Candidate])
+
+    CandidateOptIn = dataTypeCreator(
+        'CandidateOptIn',
+        'Candidate OptIn',
+        ValidationType.String,
+        DataTypeSection.Candidate,
+        [UserType.Candidate])
+
+
+    # Company
     CompanyName = dataTypeCreator(
         'Company Name',
         'CompanyName',
@@ -284,6 +363,13 @@ class DataType(Enum):
     ClientName = dataTypeCreator(
         'Client Name',
         'ClientName',
+        ValidationType.String,
+        DataTypeSection.Client,
+        [UserType.Client] * 6)
+
+    ClientOptIn = dataTypeCreator(
+        'ClientOptIn',
+        'ClientOptIn',
         ValidationType.String,
         DataTypeSection.Client,
         [UserType.Client] * 6)

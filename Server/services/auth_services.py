@@ -116,7 +116,7 @@ def authenticate(email: str, password_to_check: str) -> Callback:
                          # "plan": helpers.getPlanNickname(user.Company.SubID),
                          },
                 'role': helpers.getDictFromSQLAlchemyObj(user.Role),
-                'plan': helpers.getListFromSQLAlchemyList(user.Company.Plan)[0]  # BUG: Stored as list currently
+                'company': helpers.getDictFromSQLAlchemyObj(user.Company)  # BUG: Stored as list currently
         }
         # print("here")
         # print(helpers.getListFromSQLAlchemyList(user.Company.Plan))

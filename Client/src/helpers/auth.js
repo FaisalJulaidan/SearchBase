@@ -24,12 +24,11 @@ export const getRole = () => {
     return role;
 };
 
-export const getPlan = () => {
+export const getCompany = () => {
     // return plan from local storage
-    let plan = JSON.parse(localStorage.getItem('plan'));
-    console.log('PLAN IS: ' + plan);
-    if(!plan){return null;}
-    return plan;
+    let company = JSON.parse(localStorage.getItem('company'));
+    if(!company){return null;}
+    return company;
 };
 
 // Update username in localStorage

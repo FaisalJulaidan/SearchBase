@@ -2,6 +2,7 @@ from models import db, Callback, Webhook
 from typing import List
 from sqlalchemy import and_
 from utilities import helpers, enums
+from hashlib import sha256
 import requests
 
 # To implement:
@@ -49,12 +50,20 @@ def createWebhook(req, companyID: int) -> Callback:
         if len(invalidSubscriptions) != 0:
             return Callback(False, "Trying to subscribe to webhook(s): {} that do not exist".format(invalidSubscriptions), None)
 
+
+        #sha encoded stored, only
+        secret = None if resp['inputs']['secret'] is None else sha256(resp['inputs']['secret'].encode('utf-8')).hexdigest()
+
         #ping request
-        ping = requests.post(resp['inputs']['url'])
+        Headers = {} if resp['inputs']['secret'] is None else {'Authorization': 'Bearer {}'.format(secret)}
+        ping = requests.post(resp['inputs']['url'], headers=Headers)
         if ping.status_code != 200:
             return Callback(False, "Ping request returned status code {}, please check the URL supplied, or your server!".format(ping.status_code), None)
 
-        webhook: Webhook = Webhook(URL=resp['inputs']['url'], CompanyID=companyID, Subscriptions=",".join(resp['inputs']['subscriptions']), Secret=resp['inputs']['secret'])
+        webhook: Webhook = Webhook(URL=resp['inputs']['url'],
+                                   CompanyID=companyID,
+                                   Subscriptions=",".join(resp['inputs']['subscriptions']),
+                                   Secret=secret)
 
         db.session.add(webhook)
         db.session.commit()

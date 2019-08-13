@@ -57,6 +57,7 @@ def createWebhook(req, companyID: int) -> Callback:
         #ping request
         Headers = {} if resp['inputs']['secret'] is None else {'Authorization': 'Bearer {}'.format(secret)}
         ping = requests.post(resp['inputs']['url'], headers=Headers)
+
         if ping.status_code != 200:
             return Callback(False, "Ping request returned status code {}, please check the URL supplied, or your server!".format(ping.status_code), None)
 

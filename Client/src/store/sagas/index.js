@@ -11,3 +11,4 @@ export * from './analytics.saga';
 export * from './appointmentsPicker.saga';
 export * from './appointment.saga';
 export * from './appointmentAllocationTime.saga';
+export * from './development.saga';

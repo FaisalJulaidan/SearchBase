@@ -17,6 +17,7 @@ import {
     accountSaga,
     usersManagementSaga,
     appointmentAllocationTimeSaga,
+    developmentSaga,
     appointmentSaga
 } from './sagas'
 
@@ -51,6 +52,7 @@ sagaMiddleware.run(analyticsSaga);
 sagaMiddleware.run(appointmentsPickerSaga);
 sagaMiddleware.run(appointmentSaga);
 sagaMiddleware.run(appointmentAllocationTimeSaga);
+sagaMiddleware.run(developmentSaga);
 
 
 export { store, persistor }

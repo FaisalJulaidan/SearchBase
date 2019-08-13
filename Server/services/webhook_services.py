@@ -2,6 +2,7 @@ from models import db, Callback, Webhook
 from typing import List
 from sqlalchemy import and_
 from utilities import helpers, enums
+import requests
 
 # To implement:
 
@@ -48,15 +49,30 @@ def createWebhook(req, companyID: int) -> Callback:
         if len(invalidSubscriptions) != 0:
             return Callback(False, "Trying to subscribe to webhook(s): {} that do not exist".format(invalidSubscriptions), None)
 
+        #ping request
+        ping = requests.post(resp['inputs']['url'])
+        if ping.status_code != 200:
+            return Callback(False, "Ping request returned status code {}, please check the URL supplied, or your server!".format(ping.status_code), None)
 
         webhook: Webhook = Webhook(URL=resp['inputs']['url'], CompanyID=companyID, Subscriptions=",".join(resp['inputs']['subscriptions']), Secret=resp['inputs']['secret'])
+
         db.session.add(webhook)
         db.session.commit()
 
         return Callback(True, "Webhook created succesfully", helpers.getDictFromSQLAlchemyObj(webhook))
 
+    except requests.exceptions.InvalidURL as e:
+        return Callback(False, "URL {} is not valid".format(resp['inputs']['url']), None)
     except Exception as e:
         helpers.logError("webhook_serivces.createWebhook(): " + str(e))
         return Callback(False, str(e), None)
+
+def availableWebhooks() -> Callback:
+    try:
+        return Callback(True, "Gathered list of webhooks", [e.value for e in enums.Webhooks])
+    except Exception as e:
+        helpers.logError("webhook_serivces.availableWebhooks(): " + str(e))
+        return Callback(False, "Failed to gather list of webhooks", None)
+
 
 # def ping(webhookID: int) -> Callback:

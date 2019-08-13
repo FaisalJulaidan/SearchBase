@@ -47,6 +47,15 @@ def postWebhook():
     else:
         return helpers.jsonResponse(False, 401, callback.Message)
 
+@webhook_router.route("/webhooks/available", methods=['GET'])
+@jwt_required
+def getAvailableWebhooks():
+    callback: Callback = webhook_services.availableWebhooks()
+    if callback.Success:
+        return helpers.jsonResponse(True, 200, callback.Message, callback.Data)
+    else:
+        return helpers.jsonResponse(False, 401, callback.Message)
+
 
 @webhook_router.route("/webhook/<webhookid>", methods=['GET'])
 @jwt_required
@@ -60,4 +69,6 @@ def getawa(webhookid):
     else:
         return helpers.jsonResponse(False, 401, callback.Message)
 
-
+@webhook_router.route("/test", methods=['POST'])
+def pong():
+    return helpers.jsonResponse(True, 200, 'Pong')

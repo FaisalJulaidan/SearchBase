@@ -7,6 +7,7 @@ import styles from "./Account.module.less"
 
 import ProfileDetails from "./ProfileDetails/ProfileDetails";
 import CompanyDetails from "./CompanyDetails/CompanyDetails";
+import Webhooks from './Webhook/Webhooks'
 
 import {accountActions} from "store/actions/account.actions";
 import NoHeaderPanel from 'components/NoHeaderPanel/NoHeaderPanel'
@@ -69,6 +70,9 @@ class Account extends React.Component {
                                                     saveCompanyDetails={this.saveCompanyDetails}
                                                     uploadLogo={this.uploadLogo}
                                                     deleteLogo={this.deleteLogo}/>
+                                </TabPane>
+                                <TabPane tab={"Development"} key={"3"}>
+                                    <Webhooks />
                                 </TabPane>
                             </Tabs>
                         }

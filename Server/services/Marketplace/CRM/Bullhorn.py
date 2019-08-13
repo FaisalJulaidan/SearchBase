@@ -107,7 +107,7 @@ def retrieveRestToken(auth, companyID):
               "&client_id=" + CLIENT_ID + \
               "&client_secret=" + CLIENT_SECRET
         get_access_token = requests.post(url, headers=headers)
-
+        helpers.logError("BULLHORN ACCESS TOKEN ERROR: " + str(get_access_token.text))
         if get_access_token.ok:
             result_body = json.loads(get_access_token.text)
             access_token = result_body.get("access_token")

@@ -101,6 +101,9 @@ StoredFile: StoredFile = StoredFile
 from schemas.StoredFileInfo import StoredFileInfo
 StoredFileInfo: StoredFileInfo = StoredFileInfo
 
+from schemas.Webhook import Webhook
+Webhook: Webhook = Webhook
+
 from schemas.User import User
 User: User = User
 

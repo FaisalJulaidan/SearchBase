@@ -29,6 +29,7 @@ import * as messageTypes from '../../constants/MessageType';
 import ChatButton from './ChatButton';
 import Header from './Header';
 import Flow from './Flow';
+import Settings from './Settings'
 import Input from './Input';
 import Signature from './Signature';
 import 'antd/dist/antd.css';
@@ -44,6 +45,7 @@ export const Chatbot = ({
     const { open: animationOpen } = animation;
     let timer = useRef(null);
     let messageTimer = useRef(null)
+    let chatbotRef = useRef(null)
     let stopTimer = useRef(null);
 
     window.addEventListener('beforeunload', () => {
@@ -129,11 +131,9 @@ export const Chatbot = ({
         const botRespond = (block, chatbot) => {
             if (!block.Content) return;
             stopTimer.current = optionalDelayExecution(() => {
-                console.log('hm')
                 addBotMessage(block.Content.text, block.Type, block);
                 setChatbotStatus({ thinking: false, waitingForUser: true });
                 if (block.selfContinue) {
-                    console.log('self continue')
                     setChatbotStatus({
                         thinking: false,
                         curBlockID: block.selfContinue,
@@ -188,7 +188,6 @@ export const Chatbot = ({
                 clearInterval(messageTimer.current.timer)
                 messageTimer.current = null
             }
-            console.log('waiting')
             setChatbotWaiting(nextBlock);
             let fetchedData, err;
             if (nextBlock.extra.needsToFetch) {
@@ -248,7 +247,8 @@ export const Chatbot = ({
             {active ?
                 <>
                     {open && !loading ?
-                        <div style={{ position: isDirectLink ? 'relative' : '' }}
+                        <div    ref={chatbotRef}
+                            style={{ position: isDirectLink ? 'relative' : '' }}
                              className={[
                                  animation.open ? 'ZoomIn' : 'ZoomOut',
                                  isDirectLink ? 'Chatbot_DirectLink' : 'Chatbot'
@@ -266,6 +266,7 @@ export const Chatbot = ({
                                    hideSignature={assistant.HideSignature}
                                    visible={animation.inputOpen}/>
                             {assistant.HideSignature ? null : <Signature isDirectLink={isDirectLink}/>}
+                            <Settings />
                         </div>
                         :
                         <ChatButton btnColor={btnColor}

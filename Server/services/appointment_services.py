@@ -188,7 +188,7 @@ def getAppointments(companyID):
         helpers.logError("appointment_services.getAppointments(): " + str(exc))
         return Callback(False, 'Could not get appointments.')
 
-def getAppointmentAllocationTimes(id):
+def getAppointmentAllocationTimes(id) -> Callback:
     try:
         result = db.session.query(AppointmentAllocationTime) \
             .join(AppointmentAllocationTimeInfo) \

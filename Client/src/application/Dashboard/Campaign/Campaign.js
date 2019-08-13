@@ -2,7 +2,7 @@ import React from 'react';
 import {connect} from 'react-redux';
 import moment from 'moment';
 import NoHeaderPanel from 'components/NoHeaderPanel/NoHeaderPanel'
-import {Typography, Form, Input, Icon, Button, Tag, AutoComplete} from 'antd';
+import {Typography, Form, Input, Icon, Button, Tag, AutoComplete, Select} from 'antd';
 
 import googleMaps from '@google/maps'
 
@@ -45,6 +45,7 @@ class Campaign extends React.Component {
 
     setLocations = (err, response) => {
         if (!err) {
+            // GB Filter (in the future to remove replace with let resp = response.json.results.filter(address => address.address_components)
             let resp = response.json.results.filter(address => address.address_components.find(loc => loc.types.includes("country")).short_name === "GB")
             this.setState({locations: resp.map(item => item.formatted_address)})
         }
@@ -105,11 +106,17 @@ class Campaign extends React.Component {
                                 onChange={value => this.findLocation(value)}/>
 
                         </FormItem>
+                        <FormItem label="Hotlists" help={"Any Hotlists made in your CRM will be shown here"}>
+                            <Select>
+                                <Select.Option key={1}></Select.Option>
+                            </Select>
+                        </FormItem>
                         <FormItem label={"Message"}>
                             <TextArea placeholder="Type in the message you'd like to send"
                                     onChange={e => this.setState({textMessage: e.target.value})}/>
 
                         </FormItem>
+
                         <Button type="primary" icon="rocket" size={"large"}>
                             Launch
                         </Button>

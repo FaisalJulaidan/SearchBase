@@ -345,7 +345,6 @@ class DataType(Enum):
         DataTypeSection.Candidate,
         [UserType.Candidate])
 
-
     # Company
     CompanyName = dataTypeCreator(
         'Company Name',

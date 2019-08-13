@@ -5,9 +5,9 @@ from jsonschema import validate
 from sqlalchemy.sql import and_
 from sqlalchemy.sql import desc
 
-from utilities.enums import UserType, Status
+from utilities.enums import UserType, Status, Webhooks
 from models import db, Callback, Conversation, Assistant
-from services import assistant_services, stored_file_services, auto_pilot_services, mail_services
+from services import assistant_services, stored_file_services, auto_pilot_services, mail_services, webhook_services
 from services.Marketplace.CRM import crm_services
 from utilities import json_schemas, helpers
 
@@ -55,6 +55,8 @@ def processConversation(assistantHashID, data: dict) -> Callback:
                                     Score=round(data['score'], 2),
                                     ApplicationStatus=Status.Pending,
                                     Assistant=assistant)
+
+        webhook_services.fireRequests(helpers.getDictFromSQLAlchemyObj(conversation), callback.Data.CompanyID, Webhooks.Conversations)
 
         # AutoPilot Operations
         if assistant.AutoPilot and conversation.Completed:

@@ -6,6 +6,8 @@ class Webhook(db.Model):
     URL = db.Column(db.String(250), nullable=False)
     Secret = db.Column(db.String(250), nullable=True)
     Subscriptions = db.Column(db.String(250), nullable=False)
+    LastSent = db.Column(db.DateTime(), nullable=True)
+    LastError = db.Column(db.String(250), nullable=True)
 
     #Relationships
     CompanyID = db.Column(db.Integer, db.ForeignKey('company.ID', ondelete='cascade'), nullable=False)

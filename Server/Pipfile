@@ -79,6 +79,7 @@ msal = "*"
 authlib = "*"
 twilio = "*"
 sqlalchemy-stubs = "*"
+grequests = "*"
 
 [requires]
 python_version = "3.7"

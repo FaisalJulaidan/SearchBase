@@ -71,5 +71,5 @@ def getawa(webhookid):
 
 @webhook_router.route("/test", methods=['POST'])
 def pong():
-    print(request.headers)
+    print('webhook called')
     return helpers.jsonResponse(True, 200, 'Pong')

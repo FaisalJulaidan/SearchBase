@@ -16,7 +16,7 @@ def getWebhooks():
     callback: Callback = webhook_services.webhooks(user.get('companyID'))
 
     if callback.Success:
-        return helpers.jsonResponse(True, 200, callback.Message, callback.Data)
+        return helpers.jsonResponse(True, 200, callback.Message, helpers.getListFromSQLAlchemyList(callback.Data))
     else:
         return helpers.jsonResponse(False, 401, callback.Message)
 

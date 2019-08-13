@@ -7,9 +7,10 @@ import styles from "./Account.module.less"
 
 import ProfileDetails from "./ProfileDetails/ProfileDetails";
 import CompanyDetails from "./CompanyDetails/CompanyDetails";
-import Webhooks from './Webhook/Webhooks'
+import Development from './Development/Development'
 
 import {accountActions} from "store/actions/account.actions";
+import {developmentActions} from "store/actions/development.actions";
 import NoHeaderPanel from 'components/NoHeaderPanel/NoHeaderPanel'
 
 const TabPane = Tabs.TabPane;
@@ -39,6 +40,7 @@ class Account extends React.Component {
 
     componentWillMount() {
         this.props.dispatch(accountActions.getAccount());
+        this.props.dispatch(developmentActions.fetchDevRequest())
     }
 
     render() {
@@ -72,7 +74,7 @@ class Account extends React.Component {
                                                     deleteLogo={this.deleteLogo}/>
                                 </TabPane>
                                 <TabPane tab={"Development"} key={"3"}>
-                                    <Webhooks />
+                                    <Development webhooks={this.props.webhooks}/>
                                 </TabPane>
                             </Tabs>
                         }
@@ -84,8 +86,10 @@ class Account extends React.Component {
 }
 
 function mapStateToProps(state) {
+    console.log(state)
     return {
-        account: state.account.account
+        account: state.account.account,
+        webhooks: state.development.webhooks
     };
 }
 

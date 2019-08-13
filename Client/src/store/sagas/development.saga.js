@@ -7,8 +7,7 @@ import {errorMessage, http, loadingMessage, successMessage} from "helpers";
 function* getWebhookList() {
     try {
         const res = yield http.get(`/webhooks`);
-        console.log(res.data.data)
-        // yield put(developmentActions.fetchDevSuccess());
+        yield put(developmentActions.fetchDevSuccess(res.data.data));
     } catch (error) {
         const msg = error.response?.data?.msg || "Couldn't load webhook list";
         yield put(developmentActions.fetchDevFailure(msg));

@@ -4,6 +4,7 @@ from sqlalchemy import and_
 from utilities import helpers, enums
 from hashlib import sha256
 import requests
+import datetime
 import grequests
 # To implement:
 
@@ -87,15 +88,15 @@ def availableWebhooks() -> Callback:
 def fireRequests(data, companyID: int, event: enums.Webhooks):
     def handleExceptions(request, exception):
         print(exception)
+        # save error in db
     try:
         webhooks: List[Webhook] = db.session.query(Webhook).filter(Webhook.CompanyID == companyID).all()
         requestList = []
         for webhook in webhooks:
             if event.value in webhook.Subscriptions.split(","):
                 requestList.append(webhook.URL)
-
-        print(requestList)
-        rs = (grequests.post(u) for u in requestList)
+                webhook.LastSent = datetime.datetime.utcnow()
+        rs = (grequests.post(u, json=data) for u in requestList)
         grequests.map(rs, exception_handler=handleExceptions)
     except Exception as e:
         helpers.logError("webhook_serivces.fireRequests(): " + str(e))

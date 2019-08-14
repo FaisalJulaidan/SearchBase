@@ -1,6 +1,9 @@
 #/usr/bin/python3.5
-import os
 
+from gevent import monkey
+monkey.patch_all(thread=False, select=False)
+
+import os
 from flask import Flask, render_template, request
 from flask_api import status
 from flask_babel import Babel

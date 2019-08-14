@@ -50,16 +50,18 @@ const saveWebhookRequest = (ID, newSettings) => {
     };
 };
 
-const saveWebhookSuccess = () => {
+const saveWebhookSuccess = (ID) => {
     return {
         type: actionTypes.SAVE_WEBHOOK_SUCCESS,
+        ID,
     };
 }
 
-const saveWebhookFailure = (error) => {
+const saveWebhookFailure = (error, ID) => {
     return {
         type: actionTypes.SAVE_WEBHOOK_FAILURE,
-        error
+        error,
+        ID
     };
 }
 

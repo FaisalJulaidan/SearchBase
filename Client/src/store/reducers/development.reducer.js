@@ -15,7 +15,7 @@ export const development = (state = initialState, action) => {
         case actionTypes.FETCH_DEV_SUCCESS:
             return updateObject(state, {
                 isLoading: false,
-                webhooks: action.webhooks,
+                webhooks: action.webhooks.map(webhook => ({...webhook, isLoading: false})),
                 availableWebhooks: action.availableWebhooks
             });
 
@@ -27,18 +27,17 @@ export const development = (state = initialState, action) => {
 
         case actionTypes.SAVE_WEBHOOK_REQUEST:
             return updateObject(state, {
-                isLoading: true,
-                //map
+                webhooks: state.webhooks.map(webhook => ({...webhook, isLoading: action.ID === webhook.ID ? true : webhook.isLoading}))
             });
 
         case actionTypes.SAVE_WEBHOOK_SUCCESS:
             return updateObject(state, {
-                isLoading: false,
+                webhooks: state.webhooks.map(webhook => ({...webhook, isLoading: action.ID === webhook.ID ? false : webhook.isLoading}))
             });
 
         case actionTypes.SAVE_WEBHOOK_FAILURE:
             return updateObject(state, {
-                isLoading: false,
+                webhooks: state.webhooks.map(webhook => ({...webhook, isLoading: action.ID === webhook.ID ? false : webhook.isLoading}))
             });
 
         case actionTypes.CREATE_WEBHOOK_REQUEST:

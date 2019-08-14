@@ -47,6 +47,21 @@ def postWebhook():
     else:
         return helpers.jsonResponse(False, 401, callback.Message)
 
+@webhook_router.route("/webhook", methods=['PUT'])
+@jwt_required
+def putWebhook():
+    user = get_jwt_identity()['user']
+
+    req = request.get_json()
+
+    callback: Callback = webhook_services.saveWebhook(req, user.get('companyID'))
+
+    if callback.Success:
+        return helpers.jsonResponse(True, 200, callback.Message, callback.Data)
+    else:
+        return helpers.jsonResponse(False, 401, callback.Message)
+
+
 @webhook_router.route("/webhooks/available", methods=['GET'])
 @jwt_required
 def getAvailableWebhooks():

@@ -10,7 +10,6 @@ import CompanyDetails from "./CompanyDetails/CompanyDetails";
 import Development from './Development/Development'
 
 import {accountActions} from "store/actions/account.actions";
-import {developmentActions} from "store/actions/development.actions";
 import NoHeaderPanel from 'components/NoHeaderPanel/NoHeaderPanel'
 
 const TabPane = Tabs.TabPane;
@@ -40,7 +39,6 @@ class Account extends React.Component {
 
     componentWillMount() {
         this.props.dispatch(accountActions.getAccount());
-        this.props.dispatch(developmentActions.fetchDevRequest())
         // this.props.dispatch(developmentActions.fetch)
     }
 
@@ -75,7 +73,7 @@ class Account extends React.Component {
                                                     deleteLogo={this.deleteLogo}/>
                                 </TabPane>
                                 <TabPane tab={"Development"} key={"3"}>
-                                    <Development webhooks={this.props.webhooks} availablWebhooks={this.props.availableWebhooks}/>
+                                    <Development/>
                                 </TabPane>
                             </Tabs>
                         }
@@ -87,11 +85,8 @@ class Account extends React.Component {
 }
 
 function mapStateToProps(state) {
-    console.log(state)
     return {
-        account: state.account.account,
-        webhooks: state.development.webhooks,
-        availableWebhooks: state.development.availableWebhooks
+        account: state.account.account
     };
 }
 

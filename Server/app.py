@@ -1,7 +1,7 @@
 #/usr/bin/python3.5
 
 from gevent import monkey
-monkey.patch_all(thread=False, select=False)
+monkey.patch_all()
 
 import os
 from flask import Flask, render_template, request

@@ -1,5 +1,8 @@
 import React from 'react';
 
+import {connect} from 'react-redux'
+import {developmentActions} from "store/actions/development.actions";
+
 import {Table} from 'antd'
 import EditWebhookModal from './EditWebhookModal'
 
@@ -18,12 +21,17 @@ class Development extends React.Component {
 
     }
 
-    saveWebhook = (settings) => {
+    closeModal = () => {
+        this.setState({showModal: false})
+    }
 
+    saveWebhook = (settings) => {
+        this.props.dispatch(developmentActions.saveWebhookRequest(this.state.activeID, settings))
     }
 
     componentDidMount = () => {
         console.log(this.props)
+        this.props.dispatch(developmentActions.fetchDevRequest())
     }
 
     render() {
@@ -57,13 +65,24 @@ class Development extends React.Component {
                     columns={columns}
                />
                <EditWebhookModal
-                     webhook={this.props.webhooks.find(wh => wh.ID === this.state.activeID)}
+                    webhook={this.props.webhooks.find(wh => wh.ID === this.state.activeID)}
                     visible={this.state.showModal}
-                     available={this.props.availablWebhooks}
-                    save={this.saveWebhook}/>
+                    closeModal={this.closeModal}
+                    save={this.saveWebhook}
+                    available={this.props.availableWebhooks} />
            </>
         );
     }
 }
 
-export default Development;
+// ,
+
+
+function mapStateToProps(state) {
+    return {
+        webhooks: state.development.webhooks,
+        availableWebhooks: state.development.availableWebhooks
+    };
+}
+
+export default connect(mapStateToProps)(Development);

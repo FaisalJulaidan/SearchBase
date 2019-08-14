@@ -296,6 +296,10 @@ def validAssistant(func):
     wrapper.__name__ = func.__name__
     return wrapper
 
+class requestException(Exception):
+    pass
+
+
 def validateRequest(req, check: dict, throwIfNotValid: bool = True):
     returnDict = {}
     returnDict["missing"] = []
@@ -303,6 +307,8 @@ def validateRequest(req, check: dict, throwIfNotValid: bool = True):
     returnDict["inputs"] = {}
     returnDict["valid"] = True
     response = ""
+    if req is None:
+        raise requestException("No arguments supplied")
     for item in check:
         if check[item]['required']:
             if item not in req and check[item]['required']:
@@ -310,7 +316,7 @@ def validateRequest(req, check: dict, throwIfNotValid: bool = True):
             elif check[item]['type']:
                 if not isinstance(req[item], check[item]['type']):
                     returnDict["errors"].append("Parameter {} is not of required type {}".format(item, str(check[item]['type'].__name__)))
-        returnDict["inputs"][item] = req[item] if item in req else None
+        returnDict["inputs"][item] = req[item] if item in req and item is not None else None
     if len(returnDict["missing"]) != 0:
         returnDict["valid"] = False
         response += "Missing parameters {} in request".format(returnDict["missing"])
@@ -319,7 +325,7 @@ def validateRequest(req, check: dict, throwIfNotValid: bool = True):
         response += ", " if response != "" else ""
         response += "Errors in supplied parameters: {}".format(returnDict["errors"])
     if throwIfNotValid and response != "":
-        raise Exception(response)
+        raise requestException(response)
     else:
         return returnDict
 

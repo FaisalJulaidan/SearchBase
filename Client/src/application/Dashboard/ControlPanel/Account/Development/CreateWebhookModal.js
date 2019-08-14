@@ -2,12 +2,12 @@ import React from 'react'
 
 import {Modal, Form, Checkbox, Input, Button} from 'antd'
 
-class EditWebhookModal extends React.Component  {
+class CreateWebhookModal extends React.Component  {
     state = {
         webhook: {
-            subscriptions: this.props.webhook.Subscriptions.split(','),
-            url: this.props.webhook.URL,
-            secret: this.props.webhook.hasSecret ? "" : null
+            subscriptions: [],
+            url: '',
+            secret: null
         }
     }
 
@@ -23,10 +23,10 @@ class EditWebhookModal extends React.Component  {
         const { isLoading } = this.props.webhook
         const usedList = subscriptions
         return(
-            <Modal visible={this.props.visible} width={800} okText={"Save"}
+            <Modal visible={this.props.visible} width={800} okText={"Create"}
                    onCancel={() => this.props.closeModal()}
                    okButtonProps={{loading: isLoading}}
-                   onOk={() => this.props.save(this.state.webhook)}>
+                   onOk={() => this.props.create(this.state.webhook)}>
                 <h3>Webhook information</h3>
                 <Form>
                     <Form.Item label={"URL"}
@@ -35,13 +35,13 @@ class EditWebhookModal extends React.Component  {
                     </Form.Item>
                     <Form.Item label={"Events"}
                                help={"The events you'd like to subscribe to for this webhook"}>
-                    {this.props.available.map((webhook, i) => (
-                        <Checkbox key={i} checked={usedList.includes(webhook)} onChange={(e) => this.subscribeEvent(e.target.checked, webhook)}>{webhook}</Checkbox>
-                    ))}
+                        {this.props.available.map((webhook, i) => (
+                            <Checkbox key={i} checked={usedList.includes(webhook)} onChange={(e) => this.subscribeEvent(e.target.checked, webhook)}>{webhook}</Checkbox>
+                        ))}
                     </Form.Item>
                     <Form.Item label={"Secret"}
-                               help={"If you would like to keep the secret as is, please leave this field empty, otherwise put in a new secret"}>
-                        <Input type="text" value={secret} onChange={e =>  this.setWebhookAttribute('secret', e.target.value)} />
+                               help={"The secret is optional, and if provided when sent to the address specified, it will be sent SHA256 encoded"}>
+                        <Input type="text" value={secret} onChange={e =>  this.setWebhookAttribute('secret', e.target.value === "" ? null : e.target.value)} />
                     </Form.Item>
                 </Form>
             </Modal>
@@ -49,4 +49,4 @@ class EditWebhookModal extends React.Component  {
     }
 }
 
-export default EditWebhookModal
+export default CreateWebhookModal

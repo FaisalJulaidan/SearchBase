@@ -20,10 +20,9 @@ const fetchDevFailure = (error) => {
     };
 };
 
-const createWebhookRequest = (ID, settings) => {
+const createWebhookRequest = (settings) => {
     return {
         type: actionTypes.CREATE_WEBHOOK_REQUEST,
-        ID,
         settings
     };
 };
@@ -65,6 +64,27 @@ const saveWebhookFailure = (error, ID) => {
     };
 }
 
+const deleteWebhookRequest = (ID) => {
+    return {
+        type: actionTypes.DELETE_WEBHOOK_REQUEST,
+        ID,
+    };
+}
+
+const deleteWebhookSuccess = (ID) => {
+    return {
+        type: actionTypes.DELETE_WEBHOOK_SUCCESS,
+        ID,
+    };
+}
+
+
+const deleteWebhookFailure = () => {
+    return {
+        type: actionTypes.DELETE_WEBHOOK_FAILURE,
+    };
+}
+
 export const developmentActions = {
     fetchDevRequest,
     fetchDevSuccess,
@@ -77,4 +97,8 @@ export const developmentActions = {
     saveWebhookRequest,
     saveWebhookSuccess,
     saveWebhookFailure,
+
+    deleteWebhookRequest,
+    deleteWebhookSuccess,
+    deleteWebhookFailure
 };

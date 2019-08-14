@@ -40,6 +40,21 @@ export const development = (state = initialState, action) => {
                 webhooks: state.webhooks.map(webhook => ({...webhook, isLoading: action.ID === webhook.ID ? false : webhook.isLoading}))
             });
 
+        case actionTypes.DELETE_WEBHOOK_REQUEST:
+            return updateObject(state, {
+                webhooks: state.webhooks.map(webhook => ({...webhook, isLoading: action.ID === webhook.ID ? true : webhook.isLoading}))
+            });
+
+        case actionTypes.DELETE_WEBHOOK_SUCCESS:
+            return updateObject(state, {
+                webhooks: state.webhooks.filter(webhook => webhook.ID !== action.ID)
+            });
+
+        // case actionTypes.DELET_WEBHOOK_FAILURE:
+        //     return updateObject(state, {
+        //         webhooks: state.webhooks.map(webhook => ({...webhook, isLoading: action.ID === webhook.ID ? false : webhook.isLoading}))
+        //     });
+
         case actionTypes.CREATE_WEBHOOK_REQUEST:
             return updateObject(state, {
                 isLoading: true,
@@ -48,6 +63,7 @@ export const development = (state = initialState, action) => {
         case actionTypes.CREATE_WEBHOOK_SUCCESS:
             return updateObject(state, {
                 isLoading: false,
+                webhooks: state.webhooks.concat([{...action.webhook, isLoading: false}])
             });
 
         case actionTypes.CREATE_WEBHOOK_FAILURE:

@@ -47,15 +47,26 @@ def postWebhook():
     else:
         return helpers.jsonResponse(False, 401, callback.Message)
 
-@webhook_router.route("/webhook", methods=['PUT'])
+@webhook_router.route("/webhook/<id>/save", methods=['POST'])
 @jwt_required
-def putWebhook():
+def saveWebhook(id):
     user = get_jwt_identity()['user']
 
     req = request.get_json()
 
-    callback: Callback = webhook_services.saveWebhook(req, user.get('companyID'))
+    callback: Callback = webhook_services.saveWebhook(id, req, user.get('companyID'))
 
+    if callback.Success:
+        return helpers.jsonResponse(True, 200, callback.Message, callback.Data)
+    else:
+        return helpers.jsonResponse(False, 401, callback.Message)
+
+
+@webhook_router.route("/webhook/<id>/delete", methods=['GET'])
+@jwt_required
+def deleteWebhook(id):
+    user = get_jwt_identity()['user']
+    callback: Callback = webhook_services.deleteWebhook(id, user.get('companyID'))
     if callback.Success:
         return helpers.jsonResponse(True, 200, callback.Message, callback.Data)
     else:
@@ -72,6 +83,8 @@ def getAvailableWebhooks():
         return helpers.jsonResponse(False, 401, callback.Message)
 
 
+
+
 @webhook_router.route("/webhook/<webhookid>", methods=['GET'])
 @jwt_required
 def getawa(webhookid):
@@ -86,6 +99,5 @@ def getawa(webhookid):
 
 @webhook_router.route("/test", methods=['POST'])
 def pong():
-    print('barigato')
     print(request.get_json())
     return helpers.jsonResponse(True, 200, 'Pong')

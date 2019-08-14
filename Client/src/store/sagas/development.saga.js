@@ -21,7 +21,7 @@ function* getWebhookList() {
 function* saveWebhook({ID, newSettings}) {
     try {
         console.log(ID)
-        const res = yield http.put(`/webhook`, {id: ID, ...newSettings});
+        const res = yield http.post(`/webhook/${ID}/save`, newSettings);
         yield put(developmentActions.saveWebhookSuccess(ID));
         successMessage("Succesfully saved webhook")
     } catch (error) {
@@ -32,6 +32,37 @@ function* saveWebhook({ID, newSettings}) {
     }
 }
 
+function* createWebhook({settings}) {
+    try {
+        loadingMessage("Creating webhook")
+        const res = yield http.post(`/webhook`, settings);
+        yield put(developmentActions.createWebhookSuccess(res.data.data));
+        successMessage("Succesfully created webhook")
+    } catch (error) {
+        console.log(error)
+        const msg = error.response?.data?.msg || "Couldn't create webhook";
+        yield put(developmentActions.createWebhookFailure(msg));
+        errorMessage(msg);
+    }
+}
+
+function* deleteWebhook({ID}) {
+    try {
+        loadingMessage("Deleting webhook")
+        const res = yield http.get(`/webhook/${ID}/delete`);
+        yield put(developmentActions.deleteWebhookSuccess(ID));
+        successMessage("Succesfully deleted webhook")
+    } catch (error) {
+        console.log(error)
+        const msg = error.response?.data?.msg || "Couldn't delete webhook";
+        yield put(developmentActions.deleteWebhookFailure(msg));
+        errorMessage(msg);
+    }
+}
+
+
+
+
 function* watchGetWebhookList() {
     yield takeLatest(actionTypes.FETCH_DEV_REQUEST, getWebhookList)
 }
@@ -41,10 +72,22 @@ function* watchSaveWebhook() {
     yield takeLatest(actionTypes.SAVE_WEBHOOK_REQUEST, saveWebhook)
 }
 
+function* watchCreateWebhook() {
+    yield takeLatest(actionTypes.CREATE_WEBHOOK_REQUEST, createWebhook)
+}
+
+
+function* watchDeleteWebhook() {
+    yield takeLatest(actionTypes.DELETE_WEBHOOK_REQUEST, deleteWebhook)
+}
+
+
 
 export function* developmentSaga() {
     yield all([
         watchGetWebhookList(),
-        watchSaveWebhook()
+        watchSaveWebhook(),
+        watchCreateWebhook(),
+        watchDeleteWebhook()
     ])
 }

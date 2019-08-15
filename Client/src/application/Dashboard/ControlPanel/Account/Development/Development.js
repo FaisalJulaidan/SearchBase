@@ -13,7 +13,7 @@ const { confirm } = Modal
 class Development extends React.Component {
 
     state = {
-        activeID: this.props.webhooks[0].ID,
+        activeID: this.props.webhooks[0] ? this.props.webhooks[0].ID : null,
         showModal: false,
         createModal: false
     };
@@ -88,6 +88,8 @@ class Development extends React.Component {
                     dataSource={this.props.webhooks}
                     columns={columns}
                />
+            {this.state.activeID ?
+            <>
                <EditWebhookModal
                     webhook={this.props.webhooks.find(wh => wh.ID === this.state.activeID)}
                     visible={this.state.showModal}
@@ -100,6 +102,8 @@ class Development extends React.Component {
                     closeModal={this.closeCreate}
                     create={this.createWebhook}
                     available={this.props.availableWebhooks} />
+                </>
+                : null }
            </>
         );
     }

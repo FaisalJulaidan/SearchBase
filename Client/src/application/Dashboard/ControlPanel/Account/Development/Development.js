@@ -89,22 +89,19 @@ class Development extends React.Component {
                     columns={columns}
                />
             {this.state.activeID ?
-            <>
                <EditWebhookModal
                     webhook={this.props.webhooks.find(wh => wh.ID === this.state.activeID)}
                     visible={this.state.showModal}
                     closeModal={this.closeModal}
                     save={this.saveWebhook}
                     available={this.props.availableWebhooks} />
-                <CreateWebhookModal
-                    webhook={this.props.webhooks.find(wh => wh.ID === this.state.activeID)}
-                    visible={this.state.createModal }
-                    closeModal={this.closeCreate}
-                    create={this.createWebhook}
-                    available={this.props.availableWebhooks} />
-                </>
-                : null }
-           </>
+            : null }
+            <CreateWebhookModal
+                visible={this.state.createModal }
+                closeModal={this.closeCreate}
+                create={this.createWebhook}
+                available={this.props.availableWebhooks} />
+            </>
         );
     }
 }

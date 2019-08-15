@@ -20,12 +20,10 @@ class CreateWebhookModal extends React.Component  {
 
     render() {
         const { url, subscriptions, secret } = this.state.webhook
-        const { isLoading } = this.props.webhook
         const usedList = subscriptions
         return(
             <Modal visible={this.props.visible} width={800} okText={"Create"}
                    onCancel={() => this.props.closeModal()}
-                   okButtonProps={{loading: isLoading}}
                    onOk={() => this.props.create(this.state.webhook)}>
                 <h3>Webhook information</h3>
                 <Form>

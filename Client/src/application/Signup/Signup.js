@@ -92,7 +92,7 @@ class Signup extends React.Component {
                                     <FormItem className={styles.SignupFormItem}>
                                         {getFieldDecorator('websiteURL', {
                                             rules: [{required: true, message: 'Please input company website URL!'},
-                                                {pattern: /[-a-zA-Z0-9@:%_\+.~#?&//=]{2,256}\.[a-z]{2,4}\b(\/[-a-zA-Z0-9@:%_\+.~#?&//=]*)?/,
+                                                {pattern: /[-a-zA-Z0-9@:%_\+.~#?&//=]{2,256}\.[a-z]{2,16}\b(\/[-a-zA-Z0-9@:%_\+.~#?&//=]*)?/,
                                                     message: 'Please, enter a valid URL'}],
                                         })(
                                             <Input prefix={<Icon type="global" style={{color: 'rgba(0,0,0,.25)'}}/>}
@@ -135,7 +135,7 @@ class Signup extends React.Component {
                                         {getFieldDecorator('email', {
                                             rules: [
                                                 {required: true, message: 'Please input your email!'},
-                                                {pattern: /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/,
+                                                {pattern: /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,16})+$/,
                                                     message: 'Sorry, use a valid email'}
                                             ],
                                         })(

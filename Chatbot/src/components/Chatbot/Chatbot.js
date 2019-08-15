@@ -33,16 +33,19 @@ import Settings from './Settings'
 import Input from './Input';
 import Signature from './Signature';
 import 'antd/dist/antd.css';
+import { Tooltip } from "antd";
 
 export const Chatbot = ({
                             isDirectLink, btnColor, assistantID,
                             addBotMessage, setChatbotStatus, chatbot, initChatbot,
                             resetChatbot, resetMessage, setChatbotAnimation, messageList,
-                        loadByDefault
+                            loadByDefault, root
                         }) => {
     const { assistant, status, animation } = chatbot;
     const { loading, thinking, open, disabled, active, started, curAction, finished } = status;
     const { open: animationOpen } = animation;
+
+    let [initOpen, setInitOpen] = useState(false)
     let timer = useRef(null);
     let messageTimer = useRef(null)
     let chatbotRef = useRef(null)
@@ -83,7 +86,20 @@ export const Chatbot = ({
 
 
     useEffect(() => {
-        if (assistant)
+        const hasBeenUsed = () => {
+            let used = localStorage.getItem("TSB_CHATBOT_USED")
+            if(used === null){
+                localStorage.setItem("TSB_CHATBOT_USED", true)
+                return false
+            } else {
+                setInitOpen(true)
+                setTimeout(() => {
+                    setInitOpen(false)
+                }, 4000)
+                return true
+            }
+        }
+        if (assistant  && !hasBeenUsed())
             if (isDirectLink) {
                 setChatbotAnimation({ open: true });
                 setChatbotStatus({ open: true });
@@ -98,6 +114,7 @@ export const Chatbot = ({
 
     // When the chatbot animation has been set to true
     useEffect(() => {
+
         let startupTimeout;
         if (animationOpen) {
             startupTimeout = setTimeout(() => {
@@ -209,6 +226,8 @@ export const Chatbot = ({
 
     // initialize chatbot
     useEffect(() => {
+
+
         const fetchChatbot = async () => {
             const { data, error } = await promiseWrapper(axios.get(`${getServerDomain()}/api/assistant/${assistantID}/chatbot`));
             if (error) {
@@ -269,11 +288,13 @@ export const Chatbot = ({
                             <Settings />
                         </div>
                         :
-                        <ChatButton btnColor={btnColor}
-                                    disabled={disabled}
-                                    active={active}
-                                    loading={loading}
-                                    openWindow={openWindow}/>
+                        <Tooltip getPopupContainer={() => root} title={"Check out our chatbot!"} visible={initOpen} placement={"left"}>
+                            <ChatButton btnColor={btnColor}
+                                        disabled={disabled}
+                                        active={active}
+                                        loading={loading}
+                                        openWindow={openWindow}/>
+                        </Tooltip>
                     }
                 </>
                 : null}

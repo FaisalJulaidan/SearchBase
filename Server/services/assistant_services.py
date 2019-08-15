@@ -1,15 +1,14 @@
 from sqlalchemy import and_
-from werkzeug.utils import secure_filename
 
-from models import db, Assistant, Callback, Appointment, AutoPilot
-from services import stored_file_services, auto_pilot_services, conversation_services, flow_services
+from models import db, Assistant, Callback, AutoPilot
+from services import auto_pilot_services, flow_services
 from services.Marketplace.CRM import crm_services
 from services.Marketplace.Calendar import calendar_services
+from services.Marketplace.Messenger import mesenger_services
 from utilities import helpers, json_schemas
 from os.path import join
 from config import BaseConfig
 from jsonschema import validate
-from datetime import datetime
 import json
 
 
@@ -271,9 +270,9 @@ def disconnectFromCRM(assistantID, companyID):
 def connectToCalendar(assistantID, CalendarID, companyID):
     try:
 
-        crm_callback: Callback = calendar_services.getCalendarByID(CalendarID, companyID)
-        if not crm_callback.Success:
-            raise Exception(crm_callback.Message)
+        calendar_callback: Callback = calendar_services.getCalendarByID(CalendarID, companyID)
+        if not calendar_callback.Success:
+            raise Exception(calendar_callback.Message)
 
         db.session.query(Assistant).filter(and_(Assistant.ID == assistantID, Assistant.CompanyID == companyID)) \
             .update({"CalendarID": CalendarID})
@@ -307,9 +306,9 @@ def disconnectFromCalendar(assistantID, companyID):
 def connectToMessenger(assistantID, messengerID, companyID):
     try:
 
-        ap_callback: Callback = auto_pilot_services.getByID(messengerID, companyID)
-        if not ap_callback.Success:
-            raise Exception(ap_callback.Message)
+        messenger_callback: Callback = mesenger_services.getMessengerByID(messengerID, companyID)
+        if not messenger_callback.Success:
+            raise Exception(messenger_callback.Message)
 
         db.session.query(Assistant).filter(and_(Assistant.ID == assistantID, Assistant.CompanyID == companyID)) \
             .update({"MessengerID": messengerID})

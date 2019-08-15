@@ -421,6 +421,61 @@ def searchCandidates(auth, companyID, data, fields=None) -> Callback:
         return Callback(False, str(exc))
 
 
+def searchPerfectCandidates(auth, companyID, data, fields=None) -> Callback:
+    try:
+        query = "query="
+        if not fields:
+            fields = "fields=id,name,email,mobile,address,primarySkills,status,educations,dayRate,salary"
+
+        # populate filter
+        query += populateFilter(data.get("location"), "address.city")
+
+        # if keywords[DT.CandidateSkills.value["name"]]:
+        #     query += "primarySkills.data:" + keywords[DT.CandidateSkills.name] + " or"
+
+        query = query[:-3]
+
+        # check if no conditions submitted
+        if len(query) < 6:
+            query = "query=*:*"
+
+        # send query
+        sendQuery_callback: Callback = sendQuery(auth, "search/Candidate", "get", {}, companyID,
+                                                 [fields, query, "count=500"])
+        if not sendQuery_callback.Success:
+            raise Exception(sendQuery_callback.Message)
+
+        return_body = json.loads(sendQuery_callback.Data.text)
+        result = []
+        # TODO educations uses ids - need to retrieve them
+        for record in return_body["data"]:
+            if record.get("dayRate"):
+                payPeriod = Period("Daily")
+            else:
+                payPeriod = Period("Annually")
+            result.append(databases_services.createPandaCandidate(id=record.get("id", ""),
+                                                                  name=record.get("name"),
+                                                                  email=record.get("email"),
+                                                                  mobile=record.get("mobile"),
+                                                                  location=record.get("address", {}).get("city") or "",
+                                                                  skills=record.get("primarySkills", {}).get("data"),
+                                                                  linkdinURL=None,
+                                                                  availability=record.get("status"),
+                                                                  jobTitle=None,#
+                                                                  education=None,
+                                                                  yearsExperience=0,
+                                                                  desiredSalary=record.get("salary") or
+                                                                                record.get("dayRate", 0),
+                                                                  currency=Currency("GBP"),
+                                                                  source="Bullhorn"))
+
+        return Callback(True, sendQuery_callback.Message, result)
+
+    except Exception as exc:
+        helpers.logError("Marketplace.CRM.Bullhorn.searchCandidates() ERROR: " + str(exc))
+        return Callback(False, str(exc))
+
+
 def searchJobs(auth, companyID, data, fields=None) -> Callback:
     try:
         query = "query="

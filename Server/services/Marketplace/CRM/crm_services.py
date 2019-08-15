@@ -117,6 +117,13 @@ def uploadFile(assistant: Assistant, storedFile: StoredFile):
 
 def searchCandidates(assistant: Assistant, session):
     data = {
+        "location": checkFilter(session['keywordsByDataType'], DT.CandidateLocation),
+        "preferredJotTitle": checkFilter(session['keywordsByDataType'], DT.CandidateJobTitle),
+        "location": checkFilter(session['keywordsByDataType'], DT.Cand),
+        "location": checkFilter(session['keywordsByDataType'], DT.CandidateLocation),
+        "location": checkFilter(session['keywordsByDataType'], DT.CandidateLocation),
+        "location": checkFilter(session['keywordsByDataType'], DT.CandidateLocation),
+        "location": checkFilter(session['keywordsByDataType'], DT.CandidateLocation),
         "location": checkFilter(session['keywordsByDataType'], DT.CandidateLocation)
     }
 

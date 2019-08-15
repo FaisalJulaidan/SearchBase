@@ -45,7 +45,6 @@ export const Chatbot = ({
     const { loading, thinking, open, disabled, active, started, curAction, finished } = status;
     const { open: animationOpen } = animation;
 
-    let [initOpen, setInitOpen] = useState(false)
     let timer = useRef(null);
     let messageTimer = useRef(null)
     let chatbotRef = useRef(null)
@@ -92,10 +91,6 @@ export const Chatbot = ({
                 localStorage.setItem("TSB_CHATBOT_USED", true)
                 return false
             } else {
-                setInitOpen(true)
-                setTimeout(() => {
-                    setInitOpen(false)
-                }, 4000)
                 return true
             }
         }
@@ -129,6 +124,7 @@ export const Chatbot = ({
     useInterval(() => {
         dataHandler.incrementTimeElapsed(200);
     }, open === true ? 200 : null);
+
 
     // Every time the chatbot changes, call to flowHandler
     useEffect(() => {
@@ -288,13 +284,11 @@ export const Chatbot = ({
                             <Settings />
                         </div>
                         :
-                        <Tooltip getPopupContainer={() => root} title={"Check out our chatbot!"} visible={initOpen} placement={"left"}>
                             <ChatButton btnColor={btnColor}
                                         disabled={disabled}
                                         active={active}
                                         loading={loading}
                                         openWindow={openWindow}/>
-                        </Tooltip>
                     }
                 </>
                 : null}

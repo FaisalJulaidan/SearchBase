@@ -13,7 +13,7 @@ import Flow from './Flow/Flow';
 import Connections from './Connections/Connections';
 
 import { history } from 'helpers';
-import { assistantActions, optionsActions, conversationActions } from 'store/actions';
+import { assistantActions, conversationActions } from 'store/actions';
 import NoHeaderPanel from 'components/NoHeaderPanel/NoHeaderPanel';
 import queryString from 'query-string';
 
@@ -38,8 +38,6 @@ class Assistant extends Component {
         this.props.dispatch(assistantActions.fetchAssistant(this.props.match.params.id))
             .then(() => {
             }).catch(() => history.push(`/dashboard/assistants`));
-
-        if (!this.props.options) this.props.dispatch(optionsActions.getOptions());
 
         // Set tab from url search params
         let params = queryString.parse(this.props.location.search);

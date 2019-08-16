@@ -31,8 +31,13 @@ class Development extends React.Component {
         })
     }
 
+    componentDidUpdate(prevProps) {
+        if(!this.props.isLoading && this.state.createModal && !this.props.errorMsg && this.props.webhooks.length > prevProps.webhooks.length){
+            this.setState({createModal: false})
+        }
+    }
+
     closeModal = () => {
-        console.log('close')
         this.setState({showModal: false})
     }
 
@@ -46,15 +51,15 @@ class Development extends React.Component {
 
     createWebhook = (settings) => {
         this.props.dispatch(developmentActions.createWebhookRequest(settings))
-        this.setState({createModal: false})
+        // this.setState({createModal: false})
     }
 
-    componentDidMount = () => {
-        console.log(this.props)
+    componentDidMount() {
         this.props.dispatch(developmentActions.fetchDevRequest())
     }
 
     render() {
+        console.log('rahah')
         const columns = [
             {
                 title: "URL",
@@ -78,8 +83,11 @@ class Development extends React.Component {
                 )
             }
         ]
+
         return (
             <>
+            {this.props.webhooks && this.props.availableWebhooks ?
+                <>
                 <div style={{display: "flex", marginBottom: 10}}>
                     <h1 style={{alignSelf: "flex-start", margin: 0}}>Webhooks</h1>
                     <Button style={{alignSelf: "flex-end", margin: "0 0 0 auto"}} icon={"plus"} onClick={() => this.setState({createModal: true})}>Create</Button>
@@ -88,19 +96,21 @@ class Development extends React.Component {
                     dataSource={this.props.webhooks}
                     columns={columns}
                />
-            {this.state.activeID ?
-               <EditWebhookModal
-                    webhook={this.props.webhooks.find(wh => wh.ID === this.state.activeID)}
-                    visible={this.state.showModal}
-                    closeModal={this.closeModal}
-                    save={this.saveWebhook}
+                {this.state.activeID ?
+                   <EditWebhookModal
+                        webhook={this.props.webhooks.find(wh => wh.ID === this.state.activeID)}
+                        visible={this.state.showModal}
+                        closeModal={this.closeModal}
+                        save={this.saveWebhook}
+                        available={this.props.availableWebhooks} />
+                : null }
+                <CreateWebhookModal
+                    visible={this.state.createModal }
+                    closeModal={this.closeCreate}
+                    create={this.createWebhook}
                     available={this.props.availableWebhooks} />
+                </>
             : null }
-            <CreateWebhookModal
-                visible={this.state.createModal }
-                closeModal={this.closeCreate}
-                create={this.createWebhook}
-                available={this.props.availableWebhooks} />
             </>
         );
     }
@@ -112,7 +122,9 @@ class Development extends React.Component {
 function mapStateToProps(state) {
     return {
         webhooks: state.development.webhooks,
-        availableWebhooks: state.development.availableWebhooks
+        availableWebhooks: state.development.availableWebhooks,
+        isLoading: state.development.isLoading,
+        errorMsg: state.development.errorMsg
     };
 }
 

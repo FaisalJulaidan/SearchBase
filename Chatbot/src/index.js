@@ -37,7 +37,8 @@ else
 
 ReactDOM.render(
     <Provider store={Store}>
-        <Chatbot isDirectLink={isDirectLink} btnColor={btnColor}
+        <Chatbot root={root}
+                 isDirectLink={isDirectLink} btnColor={btnColor}
                  loadByDefault={loadByDefault}
                  assistantID={assistantID}/>
     </Provider>, root

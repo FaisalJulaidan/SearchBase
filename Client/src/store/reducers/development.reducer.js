@@ -63,11 +63,13 @@ export const development = (state = initialState, action) => {
         case actionTypes.CREATE_WEBHOOK_SUCCESS:
             return updateObject(state, {
                 isLoading: false,
+                errorMsg: null,
                 webhooks: state.webhooks.concat([{...action.webhook, isLoading: false}])
             });
 
         case actionTypes.CREATE_WEBHOOK_FAILURE:
             return updateObject(state, {
+                errorMsg: action.error,
                 isLoading: false,
             });
         default:

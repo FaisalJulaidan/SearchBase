@@ -50,7 +50,6 @@ class ProfileDetails extends React.Component {
 
 
     render() {
-        console.log(this.context);
         const { account, form } = this.props;
         const { getFieldDecorator } = form;
 

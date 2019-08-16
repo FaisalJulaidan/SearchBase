@@ -16,7 +16,6 @@ export const development = (state = initialState, action) => {
             return updateObject(state, {
                 isLoading: false,
                 webhooks: action.webhooks.map(webhook => ({...webhook, isLoading: false})),
-                availableWebhooks: action.availableWebhooks
             });
 
         case actionTypes.FETCH_DEV_FAILURE:

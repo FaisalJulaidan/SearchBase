@@ -1,6 +1,5 @@
 import * as actionTypes from '../actions/actionTypes';
 import {updateObject} from '../utility';
-import {deepClone} from "../../helpers";
 
 const initialState = {account: {}, isLoading: false, errorMsg: null};
 

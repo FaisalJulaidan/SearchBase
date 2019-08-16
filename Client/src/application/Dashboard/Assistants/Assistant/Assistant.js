@@ -246,7 +246,6 @@ function mapStateToProps(state) {
         assistantList: state.assistant.assistantList,
         assistant: state.assistant.assistant,
         isAssistantLoading: state.assistant.isLoading,
-        options: state.options.options,
         isLoading: state.assistant.isLoading,
         isStatusChanging: state.assistant.isStatusChanging
     };

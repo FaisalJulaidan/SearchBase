@@ -86,7 +86,7 @@ class Account extends React.Component {
 
 function mapStateToProps(state) {
     return {
-        account: state.account.account
+        account: state.account.account,
     };
 }
 

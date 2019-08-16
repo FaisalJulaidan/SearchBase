@@ -57,8 +57,7 @@ def getOptions(industry=None) -> Callback:
             'currencyCodes': ['GBP', 'USD', 'EUR', 'CAD'],
             'periods': [p.name for p in enums.Period]
         },
-        'assistantTemplates':
-        [
+        'assistantTemplates': [
             {
                 'group': 'Recruitment',
                 'children': [
@@ -69,5 +68,8 @@ def getOptions(industry=None) -> Callback:
                 ]
             }
         ],
+        'webhooks': {
+            'availableWebhooks': [e.value for e in enums.Webhooks]
+        }
     }
     return Callback(True, '', options)

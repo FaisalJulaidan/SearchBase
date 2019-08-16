@@ -59,8 +59,8 @@ class Development extends React.Component {
     }
 
     render() {
-        console.log('rahah')
-        const columns = [
+        const webhookOptions = this.props.options.webhooks;
+         const columns = [
             {
                 title: "URL",
                 dataIndex: "URL",
@@ -86,7 +86,7 @@ class Development extends React.Component {
 
         return (
             <>
-            {this.props.webhooks && this.props.availableWebhooks ?
+            {this.props.webhooks && webhookOptions.availableWebhooks ?
                 <>
                 <div style={{display: "flex", marginBottom: 10}}>
                     <h1 style={{alignSelf: "flex-start", margin: 0}}>Webhooks</h1>
@@ -102,13 +102,13 @@ class Development extends React.Component {
                         visible={this.state.showModal}
                         closeModal={this.closeModal}
                         save={this.saveWebhook}
-                        available={this.props.availableWebhooks} />
+                        available={webhookOptions.availableWebhooks} />
                 : null }
                 <CreateWebhookModal
                     visible={this.state.createModal }
                     closeModal={this.closeCreate}
                     create={this.createWebhook}
-                    available={this.props.availableWebhooks} />
+                    available={webhookOptions.availableWebhooks} />
                 </>
             : null }
             </>
@@ -122,7 +122,7 @@ class Development extends React.Component {
 function mapStateToProps(state) {
     return {
         webhooks: state.development.webhooks,
-        availableWebhooks: state.development.availableWebhooks,
+        options: state.options.options,
         isLoading: state.development.isLoading,
         errorMsg: state.development.errorMsg
     };

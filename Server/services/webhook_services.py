@@ -6,12 +6,15 @@ from hashlib import sha256
 import requests
 import datetime
 import grequests
+
+
 # To implement:
 
 # Ping client on create
 
 class webhookException(Exception):
     pass
+
 
 def webhooks(companyID: int) -> Callback:
     try:
@@ -20,30 +23,33 @@ def webhooks(companyID: int) -> Callback:
         if webhooks is None:
             raise Exception("No webhooks found")
 
-        return Callback(True, "Webhooks gathered succesfully", webhooks)
+        return Callback(True, "Webhooks gathered successfully", webhooks)
 
     except Exception as e:
         helpers.logError("webhook_serivces.webhooks(): " + str(e))
         return Callback(False, str(e), None)
 
+
 def webhook(ID: int, companyID: int) -> Callback:
     try:
-        webhook: Webhook = db.session.query(Webhook).filter(and_(Webhook.CompanyID == companyID, Webhook.ID == ID)).first()
+        webhook: Webhook = db.session.query(Webhook).filter(
+            and_(Webhook.CompanyID == companyID, Webhook.ID == ID)).first()
 
         if webhook is None:
             raise Exception("Webhook with specified ID not found")
 
-        return Callback(True, "Webhook gathered succesfully", webhook)
+        return Callback(True, "Webhook gathered successfully", webhook)
 
     except Exception as e:
         helpers.logError("webhook_serivces.webhook(): " + str(e))
         return Callback(False, str(e), None)
 
+
 def createWebhook(req, companyID: int) -> Callback:
     try:
         resp: dict = helpers.validateRequest(req, {"url": {"type": str, "required": True},
-                                                                  "secret": {"type": str, "required": False},
-                                                                  "subscriptions": {"type": List, "required": True}})
+                                                   "secret": {"type": str, "required": False},
+                                                   "subscriptions": {"type": List, "required": True}})
 
         invalidSubscriptions = []
 
@@ -52,21 +58,25 @@ def createWebhook(req, companyID: int) -> Callback:
                 invalidSubscriptions.append(subscription)
 
         if len(invalidSubscriptions) != 0:
-            return Callback(False, "Trying to subscribe to webhook(s): {} that do not exist".format(invalidSubscriptions), None)
+            return Callback(False,
+                            "Trying to subscribe to webhook(s): {} that do not exist".format(invalidSubscriptions),
+                            None)
 
         if len(resp['inputs']['subscriptions']) == 0:
             return Callback(False, "You must subscribe to at least one event!", None)
 
-        #sha encoded stored, only
-        secret = None if resp['inputs']['secret'] is None else sha256(resp['inputs']['secret'].encode('utf-8')).hexdigest()
-        print(secret)
-        print(resp['inputs']['secret'])
-        #ping request
+        # sha encoded stored, only
+        secret = None if resp['inputs']['secret'] is None else sha256(
+            resp['inputs']['secret'].encode('utf-8')).hexdigest()
+
+        # ping request
         Headers = {} if resp['inputs']['secret'] is None else {'Authorization': 'Bearer {}'.format(secret)}
         ping = requests.post(resp['inputs']['url'], headers=Headers)
 
         if ping.status_code != 200:
-            return Callback(False, "Ping request returned status code {}, please check the URL supplied, or your server!".format(ping.status_code), None)
+            return Callback(False,
+                            "Ping request returned status code {}, please check the URL supplied, or your server!".format(
+                                ping.status_code), None)
 
         webhook: Webhook = Webhook(URL=resp['inputs']['url'],
                                    CompanyID=companyID,
@@ -76,16 +86,17 @@ def createWebhook(req, companyID: int) -> Callback:
         db.session.add(webhook)
         db.session.commit()
 
-        return Callback(True, "Webhook created succesfully", helpers.getDictFromSQLAlchemyObj(webhook))
+        return Callback(True, "Webhook created successfully", helpers.getDictFromSQLAlchemyObj(webhook))
 
     except requests.exceptions.InvalidURL as e:
         return Callback(False, "URL {} is not valid".format(resp['inputs']['url']), None)
     except helpers.requestException as e:
-        helpers.logError("webhook_serivces.createWebhook(): " + str(e))
+        helpers.logError("webhook_services.createWebhook(): " + str(e))
         return Callback(False, str(e), None)
     except Exception as e:
-        helpers.logError("webhook_serivces.createWebhook(): " + str(e))
-        return Callback(False, "Failed to create         webhook", None)
+        helpers.logError("webhook_services.createWebhook(): " + str(e))
+        return Callback(False, "Failed to create webhook", None)
+
 
 def saveWebhook(id: int, req, companyID: int) -> Callback:
     try:
@@ -100,24 +111,28 @@ def saveWebhook(id: int, req, companyID: int) -> Callback:
                 invalidSubscriptions.append(subscription)
 
         if len(invalidSubscriptions) != 0:
-            return Callback(False, "Trying to subscribe to webhook(s): {} that do not exist".format(invalidSubscriptions), None)
+            return Callback(False,
+                            "Trying to subscribe to webhook(s): {} that do not exist".format(invalidSubscriptions),
+                            None)
 
         if len(resp['inputs']['subscriptions']) == 0:
             return Callback(False, "You must subscribe to at least one event!", None)
 
+        # sha encoded stored, only
+        secret = None if resp['inputs']['secret'] is None else sha256(
+            resp['inputs']['secret'].encode('utf-8')).hexdigest()
 
-        #sha encoded stored, only
-        secret = None if resp['inputs']['secret'] is None else sha256(resp['inputs']['secret'].encode('utf-8')).hexdigest()
-
-
-        #ping request
+        # ping request
         Headers = {} if resp['inputs']['secret'] is None else {'Authorization': 'Bearer {}'.format(secret)}
         ping = requests.post(resp['inputs']['url'], headers=Headers)
 
         if ping.status_code != 200:
-            return Callback(False, "Ping request returned status code {}, please check the URL supplied, or your server!".format(ping.status_code), None)
+            return Callback(False,
+                            "Ping request returned status code {}, please check the URL supplied, or your server!".format(
+                                ping.status_code), None)
 
-        webhook: Webhook = db.session.query(Webhook).filter(and_(Webhook.CompanyID == companyID, Webhook.ID == id)).first()
+        webhook: Webhook = db.session.query(Webhook).filter(
+            and_(Webhook.CompanyID == companyID, Webhook.ID == id)).first()
 
         if webhook is None:
             return Callback(False, "No webhook found!", None)
@@ -141,16 +156,10 @@ def saveWebhook(id: int, req, companyID: int) -> Callback:
         return Callback(False, "Failed to save webhook", None)
 
 
-def availableWebhooks() -> Callback:
-    try:
-        return Callback(True, "Gathered list of webhooks", [e.value for e in enums.Webhooks])
-    except Exception as e:
-        helpers.logError("webhook_serivces.availableWebhooks(): " + str(e))
-        return Callback(False, "Failed to gather list of webhooks", None)
-
 def deleteWebhook(id: int, companyID: int) -> Callback:
     try:
-        webhook: Webhook = db.session.query(Webhook).filter(and_(Webhook.CompanyID == companyID, Webhook.ID == id)).first()
+        webhook: Webhook = db.session.query(Webhook).filter(
+            and_(Webhook.CompanyID == companyID, Webhook.ID == id)).first()
         if webhook is None:
             raise Exception('You do not own this webhook')
 
@@ -159,13 +168,15 @@ def deleteWebhook(id: int, companyID: int) -> Callback:
 
         return Callback(True, "Deleted webhook")
     except Exception as e:
-        helpers.logError("webhook_serivces.deleteWebhook(): " + str(e))
+        helpers.logError("webhook_services.deleteWebhook(): " + str(e))
         return Callback(False, "Failed to delete webhook", None)
+
 
 def fireRequests(data, companyID: int, event: enums.Webhooks):
     def handleExceptions(request, exception):
         print(exception)
         # save error in db
+
     try:
         webhooks: List[Webhook] = db.session.query(Webhook).filter(Webhook.CompanyID == companyID).all()
         requestList = []
@@ -176,7 +187,7 @@ def fireRequests(data, companyID: int, event: enums.Webhooks):
         rs = (grequests.post(u, json=data) for u in requestList)
         grequests.map(rs, exception_handler=handleExceptions)
     except Exception as e:
-        helpers.logError("webhook_serivces.fireRequests(): " + str(e))
+        helpers.logError("webhook_services.fireRequests(): " + str(e))
         return Callback(False, "Failed to fire all requests", None)
 
 # def ping(webhookID: int) -> Callback:

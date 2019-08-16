@@ -8,6 +8,7 @@ from utilities import helpers
 
 webhook_router: Blueprint = Blueprint('webhook_router', __name__, template_folder="../../templates")
 
+
 @webhook_router.route("/webhooks", methods=['GET'])
 @jwt_required
 def getWebhooks():
@@ -19,6 +20,7 @@ def getWebhooks():
         return helpers.jsonResponse(True, 200, callback.Message, helpers.getListFromSQLAlchemyList(callback.Data))
     else:
         return helpers.jsonResponse(False, 401, callback.Message)
+
 
 @webhook_router.route("/webhook/<webhookid>", methods=['GET'])
 @jwt_required
@@ -47,6 +49,7 @@ def postWebhook():
     else:
         return helpers.jsonResponse(False, 401, callback.Message)
 
+
 @webhook_router.route("/webhook/<id>/save", methods=['POST'])
 @jwt_required
 def saveWebhook(id):
@@ -73,18 +76,6 @@ def deleteWebhook(id):
         return helpers.jsonResponse(False, 401, callback.Message)
 
 
-@webhook_router.route("/webhooks/available", methods=['GET'])
-@jwt_required
-def getAvailableWebhooks():
-    callback: Callback = webhook_services.availableWebhooks()
-    if callback.Success:
-        return helpers.jsonResponse(True, 200, callback.Message, callback.Data)
-    else:
-        return helpers.jsonResponse(False, 401, callback.Message)
-
-
-
-
 @webhook_router.route("/webhook/<webhookid>", methods=['GET'])
 @jwt_required
 def getawa(webhookid):
@@ -96,6 +87,7 @@ def getawa(webhookid):
         return helpers.jsonResponse(True, 200, callback.Message, callback.Data)
     else:
         return helpers.jsonResponse(False, 401, callback.Message)
+
 
 @webhook_router.route("/test", methods=['POST'])
 def pong():

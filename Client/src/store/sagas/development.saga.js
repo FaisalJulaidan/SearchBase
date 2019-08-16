@@ -1,86 +1,82 @@
 import * as actionTypes from '../actions/actionTypes';
-import {all, put, takeLatest} from 'redux-saga/effects'
-import {developmentActions} from "../actions";
-import {errorMessage, http, loadingMessage, successMessage} from "helpers";
+import { all, put, takeLatest } from 'redux-saga/effects';
+import { developmentActions } from '../actions';
+import { errorMessage, http, loadingMessage, successMessage } from 'helpers';
 
 
 function* getWebhookList() {
     try {
         const res = yield http.get(`/webhooks`);
-        const available = yield http.get(`/webhooks/available`);
-        yield put(developmentActions.fetchDevSuccess(res.data.data, available.data.data));
+        yield put(developmentActions.fetchDevSuccess(res.data.data));
     } catch (error) {
-        console.log(error)
-        const msg = error.response?.data?.msg || "Couldn't load webhook list";
+        console.log(error);
+        const msg = error.response?.data?.msg || 'Couldn\'t load webhook list';
         yield put(developmentActions.fetchDevFailure(msg));
         errorMessage(msg);
 
     }
 }
 
-function* saveWebhook({ID, newSettings}) {
+function* saveWebhook({ ID, newSettings }) {
     try {
-        console.log(ID)
+        console.log(ID);
         const res = yield http.post(`/webhook/${ID}/save`, newSettings);
         yield put(developmentActions.saveWebhookSuccess(ID));
-        successMessage("Succesfully saved webhook")
+        successMessage('Successfully saved webhook');
     } catch (error) {
-        console.log(error)
-        const msg = error.response?.data?.msg || "Couldn't save webhook";
+        console.log(error);
+        const msg = error.response?.data?.msg || 'Couldn\'t save webhook';
         yield put(developmentActions.saveWebhookFailure(msg, ID));
         errorMessage(msg);
     }
 }
 
-function* createWebhook({settings}) {
+function* createWebhook({ settings }) {
     try {
-        loadingMessage("Creating webhook")
+        loadingMessage('Creating webhook');
         const res = yield http.post(`/webhook`, settings);
         yield put(developmentActions.createWebhookSuccess(res.data.data));
-        successMessage("Succesfully created webhook")
+        successMessage('Succesfully created webhook');
     } catch (error) {
-        console.log(error)
-        const msg = error.response?.data?.msg || "Couldn't create webhook";
+        console.log(error);
+        const msg = error.response?.data?.msg || 'Couldn\'t create webhook';
         yield put(developmentActions.createWebhookFailure(msg));
         errorMessage(msg);
     }
 }
 
-function* deleteWebhook({ID}) {
+function* deleteWebhook({ ID }) {
     try {
-        loadingMessage("Deleting webhook")
+        loadingMessage('Deleting webhook');
         const res = yield http.get(`/webhook/${ID}/delete`);
         yield put(developmentActions.deleteWebhookSuccess(ID));
-        successMessage("Succesfully deleted webhook")
+        successMessage('Succesfully deleted webhook');
     } catch (error) {
-        console.log(error)
-        const msg = error.response?.data?.msg || "Couldn't delete webhook";
+        console.log(error);
+        const msg = error.response?.data?.msg || 'Couldn\'t delete webhook';
         yield put(developmentActions.deleteWebhookFailure(msg));
         errorMessage(msg);
     }
 }
 
 
-
-
 function* watchGetWebhookList() {
-    yield takeLatest(actionTypes.FETCH_DEV_REQUEST, getWebhookList)
+    yield takeLatest(actionTypes.FETCH_DEV_REQUEST, getWebhookList);
 }
 
 
 function* watchSaveWebhook() {
-    yield takeLatest(actionTypes.SAVE_WEBHOOK_REQUEST, saveWebhook)
+    yield takeLatest(actionTypes.SAVE_WEBHOOK_REQUEST, saveWebhook);
 }
 
 function* watchCreateWebhook() {
-    yield takeLatest(actionTypes.CREATE_WEBHOOK_REQUEST, createWebhook)
+    yield takeLatest(actionTypes.CREATE_WEBHOOK_REQUEST, createWebhook);
 }
 
 
 function* watchDeleteWebhook() {
-    yield takeLatest(actionTypes.DELETE_WEBHOOK_REQUEST, deleteWebhook)
+    yield takeLatest(actionTypes.DELETE_WEBHOOK_REQUEST, deleteWebhook);
 }
-
 
 
 export function* developmentSaga() {
@@ -89,5 +85,5 @@ export function* developmentSaga() {
         watchSaveWebhook(),
         watchCreateWebhook(),
         watchDeleteWebhook()
-    ])
+    ]);
 }

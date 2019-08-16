@@ -1,15 +1,15 @@
-import * as actionTypes from "./actionTypes";
+import * as actionTypes from './actionTypes';
+
 const fetchDevRequest = () => {
     return {
-        type: actionTypes.FETCH_DEV_REQUEST,
+        type: actionTypes.FETCH_DEV_REQUEST
     };
 };
 
-const fetchDevSuccess = (webhooks, availableWebhooks) => {
+const fetchDevSuccess = (webhooks) => {
     return {
         type: actionTypes.FETCH_DEV_SUCCESS,
-        webhooks,
-        availableWebhooks
+        webhooks
     };
 };
 
@@ -32,14 +32,14 @@ const createWebhookSuccess = (webhook) => {
         type: actionTypes.CREATE_WEBHOOK_SUCCESS,
         webhook
     };
-}
+};
 
 const createWebhookFailure = (error) => {
     return {
         type: actionTypes.CREATE_WEBHOOK_FAILURE,
         error
     };
-}
+};
 
 const saveWebhookRequest = (ID, newSettings) => {
     return {
@@ -52,9 +52,9 @@ const saveWebhookRequest = (ID, newSettings) => {
 const saveWebhookSuccess = (ID) => {
     return {
         type: actionTypes.SAVE_WEBHOOK_SUCCESS,
-        ID,
+        ID
     };
-}
+};
 
 const saveWebhookFailure = (error, ID) => {
     return {
@@ -62,28 +62,28 @@ const saveWebhookFailure = (error, ID) => {
         error,
         ID
     };
-}
+};
 
 const deleteWebhookRequest = (ID) => {
     return {
         type: actionTypes.DELETE_WEBHOOK_REQUEST,
-        ID,
+        ID
     };
-}
+};
 
 const deleteWebhookSuccess = (ID) => {
     return {
         type: actionTypes.DELETE_WEBHOOK_SUCCESS,
-        ID,
+        ID
     };
-}
+};
 
 
 const deleteWebhookFailure = () => {
     return {
-        type: actionTypes.DELETE_WEBHOOK_FAILURE,
+        type: actionTypes.DELETE_WEBHOOK_FAILURE
     };
-}
+};
 
 export const developmentActions = {
     fetchDevRequest,

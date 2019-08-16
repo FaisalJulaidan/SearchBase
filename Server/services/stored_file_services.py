@@ -196,8 +196,8 @@ def getUnusedFiles():
     try:
         files: List[StoredFileInfo] = db.session.query(StoredFileInfo).filter(StoredFileInfo.StoredFileID == None).all()
 
-        if files is None:
-            return Callback(True, "No files to delete", None)
+        if len(files) == 0 or files is None:
+            return Callback(False, "No files to delete", None)
         return Callback(True, "Files found to delete", files)
     except Exception as exc:
         helpers.logError("stored_file_services.getUnusedFiles(): " + str(exc))

@@ -108,9 +108,9 @@ def retrieveRestToken(auth, companyID):
               "&client_secret=" + CLIENT_SECRET
         helpers.logError("--------------------------------------------------------------------------------------------")
         helpers.logError("--------------------------------------------------------------------------------------------")
-        helpers.logError("TESTING BUG "+str(companyID)+" REQUEST: "+url)
+        helpers.logError("TESTING BUG " + str(companyID) + " REQUEST: " + url)
         get_access_token = requests.post(url, headers=headers)
-        helpers.logError("TESTING BUG "+str(companyID)+" TEXT: "+get_access_token.text)
+        helpers.logError("TESTING BUG " + str(companyID) + " TEXT: " + get_access_token.text)
         helpers.logError("--------------------------------------------------------------------------------------------")
         helpers.logError("--------------------------------------------------------------------------------------------")
         if get_access_token.ok:
@@ -406,7 +406,7 @@ def searchCandidates(auth, companyID, data, fields=None) -> Callback:
                                                                   skills=record.get("primarySkills", {}).get("data"),
                                                                   linkdinURL=None,
                                                                   availability=record.get("status"),
-                                                                  jobTitle=None,#
+                                                                  jobTitle=None,  #
                                                                   education=None,
                                                                   yearsExperience=0,
                                                                   desiredSalary=record.get("salary") or
@@ -428,7 +428,12 @@ def searchPerfectCandidates(auth, companyID, data, fields=None) -> Callback:
             fields = "fields=id,name,email,mobile,address,primarySkills,status,educations,dayRate,salary"
 
         # populate filter
+        query += populateFilter(data.get("preferredJotTitle"), "occupation")
         query += populateFilter(data.get("location"), "address.city")
+        query += populateFilter(data.get("jobCategory"), "employmentPreference")
+        # query += populateFilter(data.get("skills"), "primarySkills")
+        query += populateFilter(data.get("yearsExperience"), "experience")
+        # query += populateFilter(data.get("education"), "educationDegree")
 
         # if keywords[DT.CandidateSkills.value["name"]]:
         #     query += "primarySkills.data:" + keywords[DT.CandidateSkills.name] + " or"
@@ -439,20 +444,35 @@ def searchPerfectCandidates(auth, companyID, data, fields=None) -> Callback:
         if len(query) < 6:
             query = "query=*:*"
 
-        # send query
-        sendQuery_callback: Callback = sendQuery(auth, "search/Candidate", "get", {}, companyID,
-                                                 [fields, query, "count=500"])
-        if not sendQuery_callback.Success:
-            raise Exception(sendQuery_callback.Message)
+            # send query
+            sendQuery_callback: Callback = sendQuery(auth, "search/Candidate", "get", {}, companyID,
+                                                     [fields, query, "count=500"])
+            if not sendQuery_callback.Success:
+                raise Exception(sendQuery_callback.Message)
 
-        return_body = json.loads(sendQuery_callback.Data.text)
+            return_body = json.loads(sendQuery_callback.Data.text)
+
+        else:
+            records = []
+
+            while len(records) < 200:
+                # send query
+                sendQuery_callback: Callback = sendQuery(auth, "search/Candidate", "get", {}, companyID,
+                                                         [fields, query, "count=500"])
+                if not sendQuery_callback.Success:
+                    raise Exception(sendQuery_callback.Message)
+
+                return_body = json.loads(sendQuery_callback.Data.text)
+
+                records.append(list(return_body["data"]))
+
+                records = list(dict.fromkeys(records))
+
+                query = ",".join(query.split(",")[:-1])
+
         result = []
         # TODO educations uses ids - need to retrieve them
-        for record in return_body["data"]:
-            if record.get("dayRate"):
-                payPeriod = Period("Daily")
-            else:
-                payPeriod = Period("Annually")
+        for record in records:
             result.append(databases_services.createPandaCandidate(id=record.get("id", ""),
                                                                   name=record.get("name"),
                                                                   email=record.get("email"),
@@ -461,7 +481,7 @@ def searchPerfectCandidates(auth, companyID, data, fields=None) -> Callback:
                                                                   skills=record.get("primarySkills", {}).get("data"),
                                                                   linkdinURL=None,
                                                                   availability=record.get("status"),
-                                                                  jobTitle=None,#
+                                                                  jobTitle=None,  #
                                                                   education=None,
                                                                   yearsExperience=0,
                                                                   desiredSalary=record.get("salary") or

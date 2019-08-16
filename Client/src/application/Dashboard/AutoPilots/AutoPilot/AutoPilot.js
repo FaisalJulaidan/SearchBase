@@ -596,11 +596,7 @@ class AutoPilot extends React.Component {
                                         rules: [],
                                     })(
                                         <Select disabled={true}>
-<<<<<<< HEAD
-                                            <Select.Option value={null}>Please select one</Select.Option>
-=======
                                             <Select.Option value={null}>None selected</Select.Option>
->>>>>>> 59205dd4706d6a242815a2d794d6d32db23627d5
                                             {this.props.appointmentAllocationTime.map(time => {
                                                 return (<Select.Option value={time.ID}>{time.Name}</Select.Option>)
                                             })}

@@ -40,7 +40,6 @@ class Assistant extends Component {
             }).catch(() => history.push(`/dashboard/assistants`));
 
         if (!this.props.options) this.props.dispatch(optionsActions.getOptions());
-
         // Set tab from url search params
         let params = queryString.parse(this.props.location.search);
         if (['Analytics', 'Conversations', 'Script', 'Connections', 'Settings'].includes(params['tab']))
@@ -126,6 +125,7 @@ class Assistant extends Component {
     };
 
     render() {
+        console.log(this.props)
         const { assistant, location } = this.props;
 
         return (

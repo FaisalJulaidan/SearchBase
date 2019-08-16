@@ -3,7 +3,7 @@ from flask_jwt_extended import jwt_required, get_jwt_identity
 
 from models import Callback, StoredFileInfo
 from services import stored_file_services
-from typing import List
+
 from utilities import helpers
 
 files_router: Blueprint = Blueprint('files_router', __name__, template_folder="../../templates")

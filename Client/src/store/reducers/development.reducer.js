@@ -24,6 +24,7 @@ export const development = (state = initialState, action) => {
                 errorMsg: action.error
             });
 
+
         case actionTypes.SAVE_WEBHOOK_REQUEST:
             return updateObject(state, {
                 webhooks: state.webhooks.map(webhook => ({...webhook, isLoading: action.ID === webhook.ID ? true : webhook.isLoading}))
@@ -38,6 +39,7 @@ export const development = (state = initialState, action) => {
             return updateObject(state, {
                 webhooks: state.webhooks.map(webhook => ({...webhook, isLoading: action.ID === webhook.ID ? false : webhook.isLoading}))
             });
+
 
         case actionTypes.DELETE_WEBHOOK_REQUEST:
             return updateObject(state, {

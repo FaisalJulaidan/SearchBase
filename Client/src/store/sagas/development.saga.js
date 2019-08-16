@@ -17,10 +17,24 @@ function* getWebhookList() {
     }
 }
 
+function* createWebhook({ settings }) {
+    try {
+        loadingMessage('Creating webhook');
+        const res = yield http.post(`/webhook`, settings);
+        yield put(developmentActions.createWebhookSuccess(res.data.data));
+        successMessage('Successfully created webhook');
+    } catch (error) {
+        console.log(error);
+        const msg = error.response?.data?.msg || 'Couldn\'t create webhook';
+        yield put(developmentActions.createWebhookFailure(msg));
+        errorMessage(msg);
+    }
+}
+
 function* saveWebhook({ ID, newSettings }) {
     try {
         console.log(ID);
-        const res = yield http.post(`/webhook/${ID}/save`, newSettings);
+        const res = yield http.put(`/webhook/${ID}`, newSettings);
         yield put(developmentActions.saveWebhookSuccess(ID));
         successMessage('Successfully saved webhook');
     } catch (error) {
@@ -31,26 +45,12 @@ function* saveWebhook({ ID, newSettings }) {
     }
 }
 
-function* createWebhook({ settings }) {
-    try {
-        loadingMessage('Creating webhook');
-        const res = yield http.post(`/webhook`, settings);
-        yield put(developmentActions.createWebhookSuccess(res.data.data));
-        successMessage('Succesfully created webhook');
-    } catch (error) {
-        console.log(error);
-        const msg = error.response?.data?.msg || 'Couldn\'t create webhook';
-        yield put(developmentActions.createWebhookFailure(msg));
-        errorMessage(msg);
-    }
-}
-
 function* deleteWebhook({ ID }) {
     try {
         loadingMessage('Deleting webhook');
-        const res = yield http.get(`/webhook/${ID}/delete`);
+        const res = yield http.delete(`/webhook/${ID}`);
         yield put(developmentActions.deleteWebhookSuccess(ID));
-        successMessage('Succesfully deleted webhook');
+        successMessage('Successfully deleted webhook');
     } catch (error) {
         console.log(error);
         const msg = error.response?.data?.msg || 'Couldn\'t delete webhook';

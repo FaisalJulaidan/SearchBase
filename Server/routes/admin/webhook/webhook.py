@@ -22,19 +22,6 @@ def getWebhooks():
         return helpers.jsonResponse(False, 401, callback.Message)
 
 
-@webhook_router.route("/webhook/<webhookid>", methods=['GET'])
-@jwt_required
-def getWebhook(webhookid):
-    user = get_jwt_identity()['user']
-
-    callback: Callback = webhook_services.webhook(webhookid, user.get('companyID'))
-
-    if callback.Success:
-        return helpers.jsonResponse(True, 200, callback.Message, callback.Data)
-    else:
-        return helpers.jsonResponse(False, 401, callback.Message)
-
-
 @webhook_router.route("/webhook", methods=['POST'])
 @jwt_required
 def postWebhook():
@@ -50,43 +37,25 @@ def postWebhook():
         return helpers.jsonResponse(False, 401, callback.Message)
 
 
-@webhook_router.route("/webhook/<id>/save", methods=['POST'])
+@webhook_router.route("/webhook/<webhookID>", methods=['GET', 'PUT', 'DELETE'])
 @jwt_required
-def saveWebhook(id):
+def webhook(webhookID):
     user = get_jwt_identity()['user']
+    callback: Callback = Callback(False, "Error")
 
-    req = request.get_json()
+    if request.method == "GET":
+        callback: Callback = webhook_services.webhook(webhookID, user.get('companyID'))
 
-    callback: Callback = webhook_services.saveWebhook(id, req, user.get('companyID'))
+    if request.method == "PUT":
+        req = request.get_json()
+        callback: Callback = webhook_services.saveWebhook(webhookID, req, user.get('companyID'))
 
-    if callback.Success:
-        return helpers.jsonResponse(True, 200, callback.Message, callback.Data)
-    else:
+    if request.method == "DELETE":
+        callback: Callback = webhook_services.deleteWebhook(webhookID, user.get('companyID'))
+
+    if not callback.Success:
         return helpers.jsonResponse(False, 401, callback.Message)
-
-
-@webhook_router.route("/webhook/<id>/delete", methods=['GET'])
-@jwt_required
-def deleteWebhook(id):
-    user = get_jwt_identity()['user']
-    callback: Callback = webhook_services.deleteWebhook(id, user.get('companyID'))
-    if callback.Success:
-        return helpers.jsonResponse(True, 200, callback.Message, callback.Data)
-    else:
-        return helpers.jsonResponse(False, 401, callback.Message)
-
-
-@webhook_router.route("/webhook/<webhookid>", methods=['GET'])
-@jwt_required
-def getawa(webhookid):
-    user = get_jwt_identity()['user']
-
-    callback: Callback = webhook_services.webhook(webhookid, user.get('companyID'))
-
-    if callback.Success:
-        return helpers.jsonResponse(True, 200, callback.Message, callback.Data)
-    else:
-        return helpers.jsonResponse(False, 401, callback.Message)
+    return helpers.jsonResponse(True, 200, callback.Message, callback.Data)
 
 
 @webhook_router.route("/test", methods=['POST'])

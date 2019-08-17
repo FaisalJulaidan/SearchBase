@@ -181,8 +181,8 @@ class AutoPilot extends React.Component {
             } else
                 this.setState({sendRejectionSMSErrors: false});
 
+            payload.appointmentAllocationTimes = payload.appointmentAllocationTimes === "You have no timetables, please create one!" ? null : payload.appointmentAllocationTimes
             console.log(payload)
-
             this.props.dispatch(autoPilotActions.updateAutoPilotConfigs(autoPilot.ID, payload));
         }
 
@@ -587,7 +587,7 @@ class AutoPilot extends React.Component {
                                         </div>
                                     )}
                                 </FormItem>
-                                <Form.Item label="Choose a timetable from the list to allocate when you would like to have your appointments"
+                                <Form.Item label="Choose a timetable from the list to allocate when you would like to have your appointments (Coming Soon)"
                                            help="Select from the dropdown list">
                                     {getFieldDecorator('AppointmentAllocationTimes', {
                                         // initialValue: allocTime ? allocTime : this.props.appointmentAllocationTime[0] ?

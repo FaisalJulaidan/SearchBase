@@ -135,7 +135,6 @@ class Assistants extends Component {
 function mapStateToProps(state) {
     return {
         assistantList: state.assistant.assistantList,
-        options: state.options.options,
         isLoading: state.assistant.isLoading,
     };
 }

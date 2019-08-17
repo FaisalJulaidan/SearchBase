@@ -34,6 +34,7 @@ class Company(db.Model):
     Messengers = db.relationship('Messenger', back_populates='Company')
     AutoPilots = db.relationship('AutoPilot', back_populates='Company')
     AppointmentAllocationTimes = db.relationship('AppointmentAllocationTime', back_populates='Company')
+    Webhooks = db.relationship('Webhook', back_populates='Company')
 
     def __repr__(self):
         return '<Company {}>'.format(self.Name)

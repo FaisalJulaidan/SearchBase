@@ -29,11 +29,11 @@ import * as messageTypes from '../../constants/MessageType';
 import ChatButton from './ChatButton';
 import Header from './Header';
 import Flow from './Flow';
-import Settings from './Settings'
+import Settings from './Settings';
 import Input from './Input';
 import Signature from './Signature';
 import 'antd/dist/antd.css';
-import { Tooltip } from "antd";
+import { Tooltip } from 'antd';
 
 export const Chatbot = ({
                             isDirectLink, btnColor, assistantID,
@@ -45,10 +45,10 @@ export const Chatbot = ({
     const { loading, thinking, open, disabled, active, started, curAction, finished } = status;
     const { open: animationOpen } = animation;
 
-    let [initOpen, setInitOpen] = useState(false)
+
     let timer = useRef(null);
-    let messageTimer = useRef(null)
-    let chatbotRef = useRef(null)
+    let messageTimer = useRef(null);
+    let chatbotRef = useRef(null);
     let stopTimer = useRef(null);
 
     window.addEventListener('beforeunload', () => {
@@ -83,23 +83,17 @@ export const Chatbot = ({
         setChatbotAnimation({ open: true });
     };
 
-
-
     useEffect(() => {
         const hasBeenUsed = () => {
-            let used = localStorage.getItem("TSB_CHATBOT_USED")
-            if(used === null){
-                localStorage.setItem("TSB_CHATBOT_USED", true)
-                return false
+            let used = localStorage.getItem('TSB_CHATBOT_USED');
+            if (used === null) {
+                localStorage.setItem('TSB_CHATBOT_USED', true);
+                return false;
             } else {
-                setInitOpen(true)
-                setTimeout(() => {
-                    setInitOpen(false)
-                }, 4000)
-                return true
+                return true;
             }
-        }
-        if (assistant  && !hasBeenUsed())
+        };
+        if (assistant && !hasBeenUsed())
             if (isDirectLink) {
                 setChatbotAnimation({ open: true });
                 setChatbotStatus({ open: true });
@@ -130,6 +124,7 @@ export const Chatbot = ({
         dataHandler.incrementTimeElapsed(200);
     }, open === true ? 200 : null);
 
+
     // Every time the chatbot changes, call to flowHandler
     useEffect(() => {
         // if(disabled) return;
@@ -156,7 +151,7 @@ export const Chatbot = ({
                         curBlockID: block.selfContinue,
                         curAction: block.selfContinue === 'End Chat' ? 'End Chat' : 'Go To Next Block'
                     });
-                    return
+                    return;
                 }
                 if (block[flowAttributes.TYPE] === messageTypes.RAW_TEXT) {
                     setChatbotStatus({
@@ -164,7 +159,7 @@ export const Chatbot = ({
                         curBlockID: block[flowAttributes.CONTENT][flowAttributes.BLOCKTOGOID],
                         curAction: block[flowAttributes.CONTENT][flowAttributes.SUPER_ACTION]
                     });
-                    return
+                    return;
                 }
                 // messageTimer.current = { timer: setInterval(() => console.log('lol'), 100), count: messageList.length }
             }, block.extra.needsToFetch !== false, block.delay);
@@ -183,7 +178,7 @@ export const Chatbot = ({
                     afterMessage: 'Sorry, I could not find what you want!',
                     curBlockID: block[flowAttributes.CONTENT][flowAttributes.BLOCKTOGOID]
                 });
-                return ["Failed to fetch data", null];
+                return ['Failed to fetch data', null];
             }
             return [null, fetchedData];
         };
@@ -201,17 +196,17 @@ export const Chatbot = ({
 
             if (!nextBlock) return;
 
-            if(messageTimer.current){
-                clearInterval(messageTimer.current.timer)
-                messageTimer.current = null
+            if (messageTimer.current) {
+                clearInterval(messageTimer.current.timer);
+                messageTimer.current = null;
             }
             setChatbotWaiting(nextBlock);
             let fetchedData, err;
             if (nextBlock.extra.needsToFetch) {
                 [err, fetchedData] = await fetch(nextBlock);
             }
-            if(err){
-                return
+            if (err) {
+                return;
             }
             if (nextBlock.extra.end) {
                 setChatbotStatus({ finished: true });
@@ -249,14 +244,14 @@ export const Chatbot = ({
 
 
         };
-        if (!assistant && (loadByDefault === "true" || !loadByDefault)) {
-            fetchChatbot()
+        if (!assistant && (loadByDefault === 'true' || !loadByDefault)) {
+            fetchChatbot();
         }
-        if (!window.__TSB_CHATBOT){
-            window.__TSB_CHATBOT = {}
-            window.__TSB_CHATBOT.ready = true
-            window.__TSB_CHATBOT.load = () => fetchChatbot()
-            window.__TSB_CHATBOT.open = () => openWindow()
+        if (!window.__TSB_CHATBOT) {
+            window.__TSB_CHATBOT = {};
+            window.__TSB_CHATBOT.ready = true;
+            window.__TSB_CHATBOT.load = () => fetchChatbot();
+            window.__TSB_CHATBOT.open = () => openWindow();
             window.__TSB_CHATBOT.close = () => closeWindow();
         }
     }, [initChatbot, setChatbotStatus]);
@@ -266,8 +261,8 @@ export const Chatbot = ({
             {active ?
                 <>
                     {open && !loading ?
-                        <div    ref={chatbotRef}
-                            style={{ position: isDirectLink ? 'relative' : '' }}
+                        <div ref={chatbotRef}
+                             style={{ position: isDirectLink ? 'relative' : '' }}
                              className={[
                                  animation.open ? 'ZoomIn' : 'ZoomOut',
                                  isDirectLink ? 'Chatbot_DirectLink' : 'Chatbot'
@@ -285,16 +280,14 @@ export const Chatbot = ({
                                    hideSignature={assistant.HideSignature}
                                    visible={animation.inputOpen}/>
                             {assistant.HideSignature ? null : <Signature isDirectLink={isDirectLink}/>}
-                            <Settings />
+                            <Settings/>
                         </div>
                         :
-                        <Tooltip getPopupContainer={() => root} title={"Check out our chatbot!"} visible={initOpen} placement={"left"}>
                             <ChatButton btnColor={btnColor}
                                         disabled={disabled}
                                         active={active}
                                         loading={loading}
                                         openWindow={openWindow}/>
-                        </Tooltip>
                     }
                 </>
                 : null}

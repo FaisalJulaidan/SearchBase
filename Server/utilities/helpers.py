@@ -203,7 +203,7 @@ def getDictFromSQLAlchemyObj(obj) -> dict:
     # A nested for loop for joining two tables
     for attr in obj.__table__.columns:
         key = attr.name
-        if key not in ['Password', 'Auth']:
+        if key not in ['Password', 'Auth', 'Secret']:
             dict[key] = getattr(obj, key)
             if isinstance(dict[key], Enum):  # Convert Enums
                 dict[key] = dict[key].value
@@ -222,7 +222,6 @@ def getDictFromSQLAlchemyObj(obj) -> dict:
 
     for attr in obj.__dict__.keys():
         if attr.startswith("__"):
-            print(getattr(obj, attr))
             dict[attr[2:]] = getattr(obj, attr)
     return dict
 
@@ -296,6 +295,39 @@ def validAssistant(func):
 
     wrapper.__name__ = func.__name__
     return wrapper
+
+class requestException(Exception):
+    pass
+
+
+def validateRequest(req, check: dict, throwIfNotValid: bool = True):
+    returnDict = {}
+    returnDict["missing"] = []
+    returnDict["errors"] = []
+    returnDict["inputs"] = {}
+    returnDict["valid"] = True
+    response = ""
+    if req is None:
+        raise requestException("No arguments supplied")
+    for item in check:
+        if check[item]['required']:
+            if item not in req and check[item]['required']:
+                returnDict["missing"].append(item)
+            elif check[item]['type']:
+                if not isinstance(req[item], check[item]['type']):
+                    returnDict["errors"].append("Parameter {} is not of required type {}".format(item, str(check[item]['type'].__name__)))
+        returnDict["inputs"][item] = req[item] if item in req and item is not None else None
+    if len(returnDict["missing"]) != 0:
+        returnDict["valid"] = False
+        response += "Missing parameters {} in request".format(returnDict["missing"])
+    if len(returnDict["errors"]) != 0:
+        returnDict["valid"] = False
+        response += ", " if response != "" else ""
+        response += "Errors in supplied parameters: {}".format(returnDict["errors"])
+    if throwIfNotValid and response != "":
+        raise requestException(response)
+    else:
+        return returnDict
 
 class owns(object):
     def getOwner(self, type, jwt, *args):

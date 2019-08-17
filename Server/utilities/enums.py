@@ -107,6 +107,14 @@ class UserType(Enum):
 
 
 @unique
+class Webhooks(Enum):
+    Conversations = 'Conversations'
+    @classmethod
+    def has_value(cls, value):
+        return any(value == item.value for item in cls)
+
+
+@unique
 class DatabaseType(Enum):
     # multiplying userTypes by x will help detect the user type in the chatbot
     Candidates = {'enumName': 'Candidates', 'name': 'Candidates', 'userTypes': [UserType.Client.value] * 5}

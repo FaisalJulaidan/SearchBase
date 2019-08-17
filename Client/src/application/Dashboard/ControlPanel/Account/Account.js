@@ -72,9 +72,9 @@ class Account extends React.Component {
                                                     uploadLogo={this.uploadLogo}
                                                     deleteLogo={this.deleteLogo}/>
                                 </TabPane>
-                                <TabPane tab={"Development"} key={"3"}>
-                                    <Development/>
-                                </TabPane>
+                                {/*<TabPane tab={"Development"} key={"3"}>*/}
+                                {/*    <Development/>*/}
+                                {/*</TabPane>*/}
                             </Tabs>
                         }
                     </div>

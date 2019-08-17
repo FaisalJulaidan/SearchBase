@@ -1,13 +1,14 @@
-import React, { Component, lazy, Suspense } from 'react';
-import { Redirect, Route, Switch, withRouter } from 'react-router-dom';
-import { connect } from 'react-redux';
-import { PrivateRoute } from './hoc';
+import React, {Component, lazy, Suspense} from 'react';
+import {Redirect, Route, Switch, withRouter} from 'react-router-dom';
+import {connect} from 'react-redux';
+import {PrivateRoute} from './hoc';
 import SentryBoundary from 'components/SentryBoundary/SentryBoundary';
 import styles from './components/LoadingSpinner/LoadingSpinner.module.less';
 
-import { TimezoneContext, getTimezone } from 'contexts/timezone';
+import {TimezoneContext, getTimezone} from 'contexts/timezone';
 
 
+const Home = lazy(() => import('./application/Home/Home'));
 const Dashboard = lazy(() => import('./application/Dashboard/Dashboard'));
 const Login = lazy(() => import('./application/Login/Login'));
 const Signup = lazy(() => import('./application/Signup/Signup'));
@@ -55,7 +56,7 @@ class App extends Component {
                 <Suspense fallback={<div className={styles.Loader}> Loading...</div>}>
                     <TimezoneContext.Provider value={this.state.timezone}>
                         <Switch>
-                            {/* <Route exact path="/" component={Home} /> */}
+                            <Route exact path="/" component={Home}/>
                             <Route path="/login" component={Login}/>
                             <Route path="/signup" component={Signup}/>
                             <Route path="/forget_password" component={ForgetPassword}/>
@@ -65,7 +66,7 @@ class App extends Component {
                             <Route path="/appointment_status/" component={AppointmentStatus}/>
                             <Route path="/chatbot_direct_link/" component={ChatbotDirectLink}/>
                             <PrivateRoute path="/dashboard" component={Dashboard}/>
-                            <Redirect to={{ pathname: '/dashboard' }}/>
+                            <Redirect to={{pathname: '/dashboard'}}/>
                         </Switch>
                     </TimezoneContext.Provider>
                 </Suspense>
@@ -75,7 +76,7 @@ class App extends Component {
 }
 
 const mapStateToProps = (state) => {
-    const { alert } = state;
+    const {alert} = state;
     return {
         alert
     };

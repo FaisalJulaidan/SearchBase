@@ -1,0 +1,239 @@
+.section {
+    /*overflow: hidden;*/
+}
+
+.section1 {
+    padding-top: 80px;
+    padding-bottom: 40px;
+}
+
+.section1 .image_wrapper1 {
+    position: relative;
+    width: 100%;
+    height: 0;
+    padding-top: 166.966%;
+}
+
+.section1 .image1 {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+}
+
+.section1 .image_wrapper2 {
+    position: relative;
+    width: 100%;
+    height: 0;
+    padding-top: 84.73%;
+}
+
+.section1 .image2 {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+}
+
+.section2 {
+    padding-top: 120px;
+    padding-bottom: 80px;
+}
+
+.section2 .image_wrapper1 {
+    position: relative;
+    width: 100%;
+    height: 0;
+    padding-top: 82.88%;
+    margin-top: -40px;
+    margin-left: -40px;
+}
+
+.section2 .image1 {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+}
+
+.section2 .image_wrapper2 {
+    position: relative;
+    width: 100%;
+    height: 0;
+    padding-top: 117.5%;
+    margin-top: 20px;
+}
+
+.section2 .image2 {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+}
+
+.section3 {
+    padding: 80px 0;
+}
+
+.section3 .image_wrapper1 {
+    position: relative;
+    width: 100%;
+    height: 0;
+    padding-top: 67.65%;
+    margin-top: -100px;
+}
+
+.section3 .image1 {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+}
+
+.section4 {
+    padding: 80px 0;
+}
+
+.section4 .image_wrapper1 {
+    position: relative;
+    width: 100%;
+    height: 0;
+    padding-top: 81.01%;
+    margin-top: -40px;
+}
+
+.section4 .image1 {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+}
+
+.arrow0 {
+    position: absolute;
+    width: 45%;
+    height: 42%;
+    right: -60%;
+    top: -56%;
+    border-width: 3px 0 0 3px;
+    border-style: dashed;
+    border-color: #694EB9;
+    border-top-left-radius: 100%;
+    z-index: 1;
+}
+
+.arrow0::after {
+    content: '';
+    position: absolute;
+    bottom: -16%;
+    left: -17%;
+    border-width: 15px 12px 0;
+    border-style: solid;
+    border-color: #694EB9 transparent transparent;
+    animation: dance-arrow1 500ms infinite alternate;
+}
+
+.arrow1 {
+    position: absolute;
+    width: 30%;
+    height: 72%;
+    left: 25%;
+    bottom: -30%;
+    border-width: 3px 3px 0 0;
+    border-style: dashed;
+    border-color: transparent #694EB9;
+    border-top-right-radius: 100%;
+    z-index: 1;
+
+}
+
+.arrow1::after {
+    content: '';
+    position: absolute;
+    bottom: -10%;
+    right: -10%;
+    border-width: 15px 12px 0;
+    border-style: solid;
+    border-color: #694EB9 transparent transparent;
+    animation: dance-arrow1 500ms infinite alternate;
+}
+
+@keyframes dance-arrow1 {
+    0% {
+        transform: translateY(0%);
+    }
+    100% {
+        transform: translateY(50%);
+    }
+}
+
+.arrow2 {
+    position: absolute;
+    width: 10%;
+    height: 68%;
+    right: 34%;
+    bottom: -42%;
+    border-width: 3px 3px 0 0;
+    border-style: dashed;
+    border-color: transparent #694EB9;
+    border-top-right-radius: 80%;
+    z-index: 1;
+}
+
+.arrow2::after {
+    content: '';
+    position: absolute;
+    bottom: -12%;
+    right: -30%;
+    border-width: 15px 12px 0;
+    border-style: solid;
+    border-color: #694EB9 transparent transparent;
+    animation: dance-arrow2 500ms infinite alternate;
+
+}
+
+@keyframes dance-arrow2 {
+    0% {
+        transform: translateY(0%);
+    }
+    100% {
+        transform: translateY(50%);
+    }
+}
+
+.arrow3 {
+    position: absolute;
+    width: 70%;
+    height: 70%;
+    left: -64%;
+    bottom: -52%;
+    border-width: 0 3px 3px 0;
+    border-style: dashed;
+    border-color: #694EB9;
+    transform: rotate(-5deg);
+    border-bottom-right-radius: 100%;
+    z-index: 1;
+}
+
+.arrow3::after {
+    content: '';
+    position: absolute;
+    bottom: -4.5%;
+    left: -8%;
+    border-width: 15px 12px 0;
+    border-style: solid;
+    border-color: #694EB9 transparent transparent;
+    transform: rotate(90deg);
+    -webkit-transform: rotate(90deg);
+    animation: dance-arrow3 500ms infinite alternate;
+}
+
+@keyframes dance-arrow3 {
+    0% {
+        transform: translateX(0%) rotate(90deg);
+    }
+    100% {
+        transform: translateX(-25%) rotate(90deg);
+    }
+}
+

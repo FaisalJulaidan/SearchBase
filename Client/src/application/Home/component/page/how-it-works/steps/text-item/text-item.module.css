@@ -1,0 +1,35 @@
+.wrapper{
+    color: #444444;
+}
+
+.div_num{
+    display: flex;
+    flex-flow: row nowrap;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.div_num span{
+    font-weight: bold;
+    font-size: 1.2em;
+    display: inline;
+    color: #694EB9;
+}
+
+.div_num hr{
+    margin: 0 .5em;
+    display: inline;
+    background: #694EB9;
+    height: 3px;
+    width: 48px;
+}
+
+.title{
+    margin-bottom: 25px;
+    font-size: 1.8em;
+    letter-spacing: .5px;
+}
+
+.text{
+    font-size: 1.2em;
+}

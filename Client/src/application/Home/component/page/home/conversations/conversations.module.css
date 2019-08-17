@@ -1,0 +1,49 @@
+.bg_gradient {
+    color: #694EB9;
+    /*background: linear-gradient(to left, #7873ed, #a865e1);*/
+}
+
+.center {
+    align-items: center;
+}
+
+.col_text{
+    display: flex;
+    align-items: center;
+    flex-flow: column;
+}
+.div_number {
+    margin-top: 10px;
+    border-top: 5px solid #694EB9;
+    border-bottom: 5px solid #694EB9;
+    color: #694EB9;
+}
+
+.div_text {
+    color: #444444;
+}
+
+.div_text .icon {
+    display: inline-block;
+    animation: dance 2.2s infinite normal;
+}
+
+@keyframes dance {
+    0% {
+        transform: translateY(0);
+    }
+    50%{
+        transform: translateY(-10px);
+    }
+    100% {
+        transform: translateY(0);
+    }
+}
+
+.div_text .text {
+    margin: 0 10px;
+    display: inline-block;
+    text-align: center;
+    font-size: 1.5em;
+    font-weight: bold;
+}

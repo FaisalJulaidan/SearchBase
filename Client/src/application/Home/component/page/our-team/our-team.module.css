@@ -1,0 +1,27 @@
+.container {
+    margin-top: 2em;
+    margin-bottom: 2em;
+}
+
+.row {
+    justify-content: center;
+    font-size: 2em;
+    text-align: center;
+    color: #444444;
+    margin-bottom: 40px;
+}
+
+.row h1{
+    font-weight: bold;
+}
+
+.row hr{
+    background-color: #694EB9;
+    max-width: 100px;
+    height: 3px;
+}
+
+.card_col {
+    padding-top: 15px;
+    padding-bottom: 15px;
+}

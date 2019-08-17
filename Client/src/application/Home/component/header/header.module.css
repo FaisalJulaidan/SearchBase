@@ -1,0 +1,133 @@
+.header {
+    width: 100%;
+    background-color: white;
+    position: sticky;
+    position: -webkit-sticky;
+    position: sticky;
+    top: -1px;
+    z-index: 30;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.10), 0 1px 2px rgba(0, 0, 0, 0.18);
+}
+
+/**** Logo ****/
+.logo {
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    -webkit-transition: color 0.4s ease 0s;
+    -moz-transition: color 0.4s ease 0s;
+    -o-transition: color 0.4s ease 0s;
+    transition: color 0.4s ease 0s;
+    color: #694EB9;
+    text-decoration: none;
+}
+
+.logo h1 {
+    margin: 0 0 0 10px;
+    font-weight: bold;
+}
+
+.logo:hover {
+    color: #9C7DED;
+}
+
+
+/**** Navigation Buttons ****/
+.nav_buttons {
+    width: 100% !important;
+    padding-right: 2em;
+    padding-left: 2em;
+    justify-content: space-around;
+    display: flex;
+}
+
+.nav_buttons .link {
+    text-decoration: none;
+    transition: color 0.4s ease 0s;
+    font-size: .96em;
+    cursor: pointer;
+    color: #929292 !important;
+}
+
+.nav_buttons .link_dropdown a {
+    text-decoration: none;
+    transition: color 0.4s ease 0s;
+    font-size: .96em;
+    cursor: pointer;
+    color: #929292 !important;
+}
+
+.nav_buttons .link_dropdown a:after {
+    display: none;
+}
+
+.nav_buttons .link_dropdown a:active {
+    color: #929292;
+    background-color: #f8f9fa;
+}
+
+.nav_buttons .link_dropdown a:hover {
+    color: #727272 !important;
+}
+
+.nav_buttons .link:hover {
+    color: #D9D9D9 !important;
+}
+
+.button_wrapper {
+    align-items: center;
+    display: flex;
+}
+
+/**** Primary Button ****/
+.button {
+    text-decoration: none;
+    min-width: 9em;
+    color: white !important;
+    border: solid transparent 0;
+    padding: 8px 20px;
+    background-color: #694EBA;
+    transition: border-color 0.4s ease 0s, background-color 0.4s ease 0s;
+}
+
+.button:hover {
+    background-color: #9C7DED;
+    transition: border-color 0.4s ease 0s, background-color 0.4s ease 0s;
+}
+
+.button:not(:disabled):not(.disabled):active {
+    background-color: #9C7DED;
+    transition: border-color 0.4s ease 0s, background-color 0.4s ease 0s;
+}
+
+.button:focus {
+    box-shadow: 0 0 0 0.2rem rgba(138, 107, 219, .5);
+}
+
+.button:not(:disabled):not(.disabled):active:focus {
+    box-shadow: 0 0 0 0.2rem rgba(138, 107, 219, .5);
+}
+
+@media (max-width: 767.98px) {
+    .button_wrapper {
+        margin-bottom: 1em;
+        flex-direction: column;
+    }
+
+    .nav_buttons {
+        align-items: center;
+        margin-top: 1em;
+        margin-bottom: 1em;
+        padding: 0;
+    }
+
+    .nav_buttons .link {
+        font-size: 1em;
+    }
+
+    .nav_buttons .link_dropdown a {
+        font-size: 1em;
+    }
+}
+

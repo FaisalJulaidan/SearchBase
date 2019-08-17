@@ -1,0 +1,63 @@
+.video_frame {
+    position: relative;
+    height: 0;
+    padding-top: 135%;
+}
+
+.image {
+    position: absolute;
+    pointer-events: none;
+    top: -1.5%;
+    z-index: 3;
+    height: auto;
+    left: 15%;
+    width: 70%;
+}
+
+.background {
+    background: #FBFAFC;
+    position: absolute;
+    top: 1%;
+    height: 98%;
+    left: 20%;
+    width: 61%;
+    z-index: 1;
+}
+
+.background2 {
+    position: absolute;
+    top: 15%;
+    left: -20%;
+    width: 140%;
+}
+
+.video {
+    position: absolute;
+    top: 1%;
+    height: 98%;
+    left: 20%;
+    width: 61%;
+    z-index: 2;
+}
+
+
+/*@media (max-width: 991.98px) {*/
+/*    .video_frame .frame {*/
+/*        padding-top: 135%;*/
+/*    }*/
+
+/*    .background {*/
+/*        top: 1%;*/
+/*        height: 98%;*/
+/*        left: 20%;*/
+/*        width: 61%;*/
+/*    }*/
+
+/*    .video {*/
+/*        top: 1%;*/
+/*        height: 98%;*/
+/*        left: 20%;*/
+/*        width: 61%;*/
+/*    }*/
+
+/*}*/

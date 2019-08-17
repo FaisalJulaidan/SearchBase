@@ -1,0 +1,35 @@
+.col .title {
+    text-align: center;
+    color: #444444;
+    font-size: 2em;
+    font-weight: bold;
+}
+
+.col hr {
+    background-color: #694EB9;
+    max-width: 100px;
+    height: 3px;
+    margin-bottom: 80px;
+}
+
+.center {
+    display: flex;
+    align-items: center;
+    flex-flow: column;
+}
+
+.image {
+    height: 64px;
+    width: 64px;
+    object-fit: contain;
+}
+
+@media (max-width: 991.98px) {
+    .col hr {
+        margin-bottom: 60px;
+    }
+    .image {
+        height: 64px;
+        width: 64px;
+    }
+}

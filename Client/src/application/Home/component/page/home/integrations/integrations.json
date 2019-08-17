@@ -1,0 +1,30 @@
+[
+  {
+    "title": "Bullhorn",
+    "image": "/assets/img/integrations/bullhorn.png"
+  },
+  {
+    "title": "Erecruit",
+    "image": "/assets/img/integrations/adapt.png"
+  },
+  {
+    "title": "Salesforce",
+    "image": "/assets/img/integrations/eploy.png"
+  },
+  {
+    "title": "Microsoft Dynamics 365",
+    "image": "/assets/img/integrations/rdb.png"
+  },
+  {
+    "title": "Outlook",
+    "image": "/assets/img/integrations/greenhouse.png"
+  },
+  {
+    "title": "Gmail",
+    "image": "/assets/img/integrations/jobdiva.png"
+  },
+  {
+    "title": "LinkedIn",
+    "image": "/assets/img/integrations/jobdiva.png"
+  }
+]

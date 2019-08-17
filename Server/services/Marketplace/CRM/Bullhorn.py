@@ -468,7 +468,10 @@ def searchPerfectCandidates(auth, companyID, data, fields=None) -> Callback:
 
                 records = list(dict.fromkeys(records))
 
-                query = ",".join(query.split(",")[:-1])
+                query = "and".join(query.split("and")[:-1])
+
+                if not query:
+                    break
 
         result = []
         # TODO educations uses ids - need to retrieve them

@@ -13,7 +13,7 @@ const { confirm } = Modal;
 class Development extends React.Component {
 
     state = {
-        activeID: this.props.webhooks[0] ? this.props.webhooks[0].ID : null,
+        activeID: null,
         showModal: false,
         createModal: false
     };
@@ -59,7 +59,6 @@ class Development extends React.Component {
     }
 
     render() {
-        console.log(this.props)
         const webhookOptions = this.props.options.webhooks;
         const columns = [
             {

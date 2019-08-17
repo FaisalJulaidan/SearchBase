@@ -452,6 +452,8 @@ def searchPerfectCandidates(auth, companyID, data, fields=None) -> Callback:
 
             return_body = json.loads(sendQuery_callback.Data.text)
 
+            records = return_body["data"]
+
         else:
             records = []
 

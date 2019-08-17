@@ -1,7 +1,7 @@
 import React from 'react';
 
 import { connect } from 'react-redux';
-import { developmentActions } from 'store/actions/development.actions';
+import { developmentActions } from 'store/actions';
 
 import { Table, Button, Divider, Modal } from 'antd';
 
@@ -59,6 +59,7 @@ class Development extends React.Component {
     }
 
     render() {
+        console.log(this.props)
         const webhookOptions = this.props.options.webhooks;
         const columns = [
             {
@@ -121,6 +122,7 @@ class Development extends React.Component {
 
 
 function mapStateToProps(state) {
+    console.log(state)
     return {
         webhooks: state.development.webhooks,
         options: state.options.options,

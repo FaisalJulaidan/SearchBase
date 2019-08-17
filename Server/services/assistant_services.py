@@ -68,7 +68,6 @@ def getByID(id: int, companyID: int) -> Callback:
         # Get result and check if None then raise exception
         result: Assistant = db.session.query(Assistant)\
             .filter(and_(Assistant.ID == id, Assistant.CompanyID == companyID)).first()
-        print(result.StoredFile)
         if not result: raise Exception
         return Callback(True, "Got assistant successfully.", result)
 

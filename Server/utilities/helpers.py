@@ -196,7 +196,7 @@ def convertSalaryPeriod(salary, fromPeriod: Period, toPeriod: Period):
 
 # -------- SQLAlchemy Converters -------- #
 """Convert a SQLAlchemy object to a single dict """
-def getDictFromSQLAlchemyObj(obj) -> dict:
+def getDictFromSQLAlchemyObj(obj, convertDeep: bool = False) -> dict:
     dict = {}  # Results
     if not obj: return dict
 
@@ -221,13 +221,19 @@ def getDictFromSQLAlchemyObj(obj) -> dict:
                 flow_services.parseFlow(dict[key])  # pass by reference
 
     for attr in obj.__dict__.keys():
+        if convertDeep:
+            if isinstance(getattr(obj, attr), List):
+                if all(hasattr(sub, '_sa_instance_state') for sub in getattr(obj, attr)):
+                    dict[attr] = getListFromSQLAlchemyList(getattr(obj, attr), True)
+            elif hasattr(getattr(obj, attr), '_sa_instance_state'):
+                dict[attr] = getDictFromSQLAlchemyObj(getattr(obj, attr), True)
         if attr.startswith("__"):
             dict[attr[2:]] = getattr(obj, attr)
     return dict
 
 """Convert a SQLAlchemy list of objects to a list of dicts"""
-def getListFromSQLAlchemyList(SQLAlchemyList):
-    return list(map(getDictFromSQLAlchemyObj, SQLAlchemyList))
+def getListFromSQLAlchemyList(SQLAlchemyList, convertDeep: bool = False):
+    return [getDictFromSQLAlchemyObj(item, convertDeep) for item in SQLAlchemyList]
 
 """Used when you want to only gather specific data from a table (columns)"""
 """Provide a list of keys (e.g ['id', 'name']) and the list of tuples"""

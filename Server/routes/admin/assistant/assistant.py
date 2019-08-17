@@ -57,7 +57,7 @@ def assistant(assistantID):
             return helpers.jsonResponse(False, 404, "Can't fetch assistant")
         return helpers.jsonResponse(True, 200,
                                     "Assistant fetched successfully",
-                                    helpers.getDictFromSQLAlchemyObj(callback.Data))
+                                    helpers.getDictFromSQLAlchemyObj(callback.Data, True))
     # Update assistant
     if request.method == "PUT":
         data = request.json

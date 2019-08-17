@@ -55,8 +55,15 @@ def processConversation(assistantHashID, data: dict) -> Callback:
                                     Score=round(data['score'], 2),
                                     ApplicationStatus=Status.Pending,
                                     Assistant=assistant)
+        webhookData = {
+            **conversationData,
+            'name': data['name'],
+            'email': data['email'],
+            'phoneNumber': data['phone'],
+            'userType': UserType[data['userType']].value
+        }
 
-        webhook_services.fireRequests(helpers.getDictFromSQLAlchemyObj(conversation), callback.Data.CompanyID, Webhooks.Conversations)
+        webhook_services.fireRequests(webhookData, callback.Data.CompanyID, Webhooks.Conversations)
 
         # AutoPilot Operations
         if assistant.AutoPilot and conversation.Completed:

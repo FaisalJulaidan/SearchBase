@@ -42,7 +42,7 @@ def webhook(ID: int, companyID: int) -> Callback:
 
     except Exception as e:
         helpers.logError("webhook_serivces.webhook(): " + str(e))
-        return Callback(False, str(e), None)
+        return Callback(False, "Failed to get webhooks", None)
 
 
 def createWebhook(req, companyID: int) -> Callback:

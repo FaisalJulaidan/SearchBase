@@ -30,7 +30,7 @@ class OurFocus extends React.Component {
     state = {
         items: this.items.map((item, i) => {
             return (
-                <Col key={i} className={styles.col_item}>
+                <Col key={i} xs={12} sm={{span:8,offset:2}} md={{span:4,offset:0}} className={styles.col_item}>
                     <Flip fraction={1} bottom>
                         <FontAwesomeIcon className={styles.icon} size='6x' icon={item.icon}/>
                     </Flip>

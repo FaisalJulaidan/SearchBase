@@ -9,7 +9,7 @@ import {faAngellist, faLinkedinIn} from '@fortawesome/free-brands-svg-icons'
 import {Link} from "react-router-dom";
 import {animateScroll as scroll} from "react-scroll";
 import EmailShare from "react-email-share-link";
-import {CURRENT_YEAR} from '../../config';
+import {CURRENT_YEAR} from '../../../../constants/config';
 import {ReactComponent as Wave} from './wave.svg';
 import PropTypes from "prop-types";
 
@@ -24,12 +24,10 @@ const Footer = (props) => {
                     <Row className={styles.row}>
                         <Col xs="auto" sm={4} md={6} lg={{span: 6, offset: 1}}
                              xl={{span: 7, offset: 1}}>
-                            <div className={styles.logo} onClick={() => scroll.scrollToTop()}>
+                            <Link className={styles.logo} to="/">
                                 <FontAwesomeIcon size="6x" icon={faCloud}/>
-                                <h1>
-                                    SearchBase
-                                </h1>
-                            </div>
+                                <h1>SearchBase</h1>
+                            </Link>
                         </Col>
                         <Col xs="auto" className={styles.nav}>
                             <ul>
@@ -37,7 +35,7 @@ const Footer = (props) => {
                                 <li><Link to={"/how-it-works#chatbot"}>Chatbots</Link></li>
                                 <li><Link to={"/how-it-works#sms"}>SMS</Link></li>
                                 <li><Link to={"/how-it-works"}>How it works?</Link></li>
-                                 <li><Link to={"/release-notes"}>Release Note</Link></li>
+                                {/* <li><Link to={"/release-notes"}>Release Note</Link></li> */}
                             </ul>
                         </Col>
                         <Col xs="auto" className={styles.nav}>

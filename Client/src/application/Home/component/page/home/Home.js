@@ -6,7 +6,7 @@ import VideoIntro from "./video-intro/VideoIntro";
 import CaptureCandidates from "./capture-candidates/CaptureCandidates";
 import OurFocus from "./our-focus/OurFocus";
 import WhyWait from "./why-wait/WhyWait";
-import {WEBSITE_TITLE} from "../../../config";
+import {WEBSITE_TITLE} from '../../../../../constants/config';
 import Layout from "../../../hoc/layout/Layout";
 import Integrations from "./integrations/Integrations";
 import KeyFeatures from "./key-features/KeyFeatures";

@@ -5,7 +5,7 @@ import {Fade} from "react-reveal";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faCloud} from "@fortawesome/free-solid-svg-icons";
 import {Link} from "react-router-dom";
-import {WEBSITE_TITLE} from "../../../config";
+import {WEBSITE_TITLE} from '../../../../../constants/config';
 
 const Login = () => {
 

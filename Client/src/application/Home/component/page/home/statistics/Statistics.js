@@ -14,7 +14,7 @@ const Statistics = (props) => {
         //     span = {span: 5, offset: 0};
         // }
         return (
-            <Col key={i} xs={6}>
+            <Col key={i} xs={{span: 10, offset: 1}} sm={{span: 6, offset: 0}}>
                 <div className={styles.text_section}>
                     <Fade left big>
                         <h1 className={styles.intro}>{item.title}</h1>

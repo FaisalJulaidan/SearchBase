@@ -5,7 +5,7 @@ import HeroLayout from "../../../hoc/hero-layout/HeroLayout";
 import teamJson from './team.json';
 import MemberCard from "./memeber-card/MemberCard";
 import Layout from "../../../hoc/layout/Layout";
-import {WEBSITE_TITLE} from "../../../config";
+import {WEBSITE_TITLE} from '../../../../../constants/config';
 
 const OurTeam = () => {
 

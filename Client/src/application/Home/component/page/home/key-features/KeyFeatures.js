@@ -7,8 +7,9 @@ const KeyFeatures = (props) => {
     return (
         <Container id={props.id}>
             <Row className={styles.center}>
-                <Col xs={{span:8,offset:2,order:2}} md={{span:5,offset:0,order:0}}>
+                <Col className={styles.col_text} xs={{span:12,order:2}} sm={{span:10,offset:1,order:2}} md={{span:5,offset:0,order:0}}>
                     <h1 className={styles.title}>Key Features</h1>
+                    <hr/>
                     <h1 className={styles.subtitle}>SearchBase works within your current ecosystem,
                         and is easy to
                         plug-and-play.</h1>
@@ -23,7 +24,7 @@ const KeyFeatures = (props) => {
                     </ul>
 
                 </Col>
-                <Col xs={{span:8,offset:2,order:1}} md={{span:7,offset:0,order:0}}>
+                <Col xs={{span:12,offset:0,order:1}} md={{span:7,offset:0,order:0}}>
                     <div className={styles.image_wrapper}>
                         <Image className={styles.image} src="assets/img/home/os.svg"/>
                     </div>

@@ -5,6 +5,7 @@ import {Link} from "react-router-dom";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faCloud} from "@fortawesome/free-solid-svg-icons";
 import Tada from 'react-reveal/Tada';
+import {animateScroll as scroll} from "react-scroll";
 
 const WhyWait = (props) => {
     return (
@@ -12,7 +13,13 @@ const WhyWait = (props) => {
             <Row>
                 <Col md={{span: 10, offset: 1}} lg={{span: 10, offset: 1}}>
                     <div className={styles.wrapper}>
-                        <FontAwesomeIcon className={styles.logo} size="5x" color="#694EB9" icon={faCloud}/>
+                        <div className={styles.logo_wrapper}>
+                            <FontAwesomeIcon className={styles.logo}
+                                             size="5x"
+                                             color="#694EB9"
+                                             icon={faCloud}
+                                             onClick={() => scroll.scrollToTop()}/>
+                        </div>
                         <div className={styles.text}>
                             <h1>Power up your recruitment business</h1>
                             <h1>with</h1>

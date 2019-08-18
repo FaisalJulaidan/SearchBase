@@ -5,26 +5,26 @@
   },
   {
     "title": "Erecruit",
-    "image": "/assets/img/integrations/adapt.png"
+    "image": "/assets/img/integrations/erecruit.png"
   },
   {
     "title": "Salesforce",
-    "image": "/assets/img/integrations/eploy.png"
+    "image": "/assets/img/integrations/salesforce.png"
   },
   {
-    "title": "Microsoft Dynamics 365",
-    "image": "/assets/img/integrations/rdb.png"
+    "title": "Dynamics 365",
+    "image": "/assets/img/integrations/dynamic-365.png"
   },
   {
     "title": "Outlook",
-    "image": "/assets/img/integrations/greenhouse.png"
+    "image": "/assets/img/integrations/outlook.png"
   },
   {
     "title": "Gmail",
-    "image": "/assets/img/integrations/jobdiva.png"
+    "image": "/assets/img/integrations/gmail.png"
   },
   {
     "title": "LinkedIn",
-    "image": "/assets/img/integrations/jobdiva.png"
+    "image": "/assets/img/integrations/linkedin.png"
   }
 ]

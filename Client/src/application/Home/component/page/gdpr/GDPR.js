@@ -1,5 +1,5 @@
 import React from 'react';
-import {WEBSITE_TITLE} from "../../../config";
+import {WEBSITE_TITLE} from '../../../../../constants/config';
 import DescriptiveLayout from "../../../hoc/descriptive-layout/DescriptiveLayout";
 import gdprJson from "./gdpr.json"
 

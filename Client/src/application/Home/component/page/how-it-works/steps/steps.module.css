@@ -1,7 +1,3 @@
-.section {
-    /*overflow: hidden;*/
-}
-
 .section1 {
     padding-top: 80px;
     padding-bottom: 40px;
@@ -46,7 +42,7 @@
     height: 0;
     padding-top: 82.88%;
     margin-top: -40px;
-    margin-left: -40px;
+    margin-left: -20px;
 }
 
 .section2 .image1 {
@@ -130,15 +126,24 @@
     border-width: 15px 12px 0;
     border-style: solid;
     border-color: #694EB9 transparent transparent;
-    animation: dance-arrow1 500ms infinite alternate;
+    animation: dance-arrow0 500ms infinite alternate;
+}
+
+@keyframes dance-arrow0 {
+    0% {
+        transform: translateY(0%);
+    }
+    100% {
+        transform: translateY(50%);
+    }
 }
 
 .arrow1 {
     position: absolute;
     width: 30%;
     height: 72%;
-    left: 25%;
-    bottom: -30%;
+    left: 16%;
+    bottom: -35%;
     border-width: 3px 3px 0 0;
     border-style: dashed;
     border-color: transparent #694EB9;
@@ -237,3 +242,169 @@
     }
 }
 
+
+@media (max-width: 1199.98px) {
+    .arrow0 {
+        width: 30%;
+        height: 50%;
+        right: -45%;
+        top: -68%;
+    }
+
+    .arrow0::after {
+        bottom: -16%;
+        left: -28%;
+    }
+
+    .arrow1 {
+        width: 30%;
+        height: 70%;
+        left: 17%;
+        bottom: -45%;
+    }
+
+    .arrow1::after {
+        bottom: -12%;
+        right: -12%;
+    }
+
+    .arrow2 {
+        width: 150%;
+        height: 112%;
+        right: 32.5%;
+        bottom: -60%;
+        border-top-right-radius: 100%;
+    }
+
+    .arrow2::after {
+        bottom: -10%;
+        right: -2%;
+    }
+
+    .arrow3 {
+        width: 70%;
+        height: 70%;
+        left: -64%;
+        bottom: -75%;
+    }
+
+    .arrow3::after {
+        bottom: -6.5%;
+        left: -9%;
+    }
+
+    .section2 .image_wrapper1 {
+        margin-left: 0;
+    }
+
+    .section2 .image_wrapper2 {
+        width: 140%;
+    }
+
+}
+
+@media (max-width: 991.98px) {
+    .arrow0 {
+        width: 40%;
+        height: 45%;
+        right: -60%;
+        top: -60%;
+        border-color: transparent #694EB9;
+        border-top-left-radius: 100%;
+    }
+
+    .arrow0::after {
+        bottom: -18%;
+        left: -28%;
+    }
+
+    .arrow1 {
+        width: 30%;
+        height: 54%;
+        left: 19%;
+        bottom: -48%;
+    }
+
+    .arrow1::after {
+        bottom: -14%;
+        right: -15%;
+    }
+
+    .arrow2 {
+        width: 80%;
+        height: 70%;
+        right: 32.5%;
+        bottom: -55%;
+        border-color: transparent #694EB9;
+        border-top-right-radius: 100%;
+    }
+
+    .arrow2::after {
+        bottom: -14%;
+        right: -5.5%;
+    }
+
+    .arrow3 {
+        width: 80%;
+        height: 70%;
+        left: -64%;
+        bottom: -60%;
+        border-bottom-right-radius: 100%;
+        border-color: #694EB9 transparent;
+        -webkit-transform: rotate(-18deg);
+    }
+
+    .arrow3::after {
+        bottom: -7%;
+        left: -10%;
+    }
+
+
+    .section2 .image_wrapper1 {
+        margin-top: 0;
+        margin-left: -20px;
+        width: 110%;
+    }
+
+    .section2 .image_wrapper2 {
+        width: 150%;
+    }
+
+    .section3 .image_wrapper1 {
+        right: 40px;
+        width: 120%;
+    }
+}
+
+@media (max-width: 771.98px) {
+    .arrow0,.arrow1,.arrow2,.arrow3{
+        display: none;
+    }
+    .section1,.section2,.section3,.section4{
+        padding: 25px 0;
+    }
+    .section4{
+        margin-bottom: 40px;
+    }
+    .section1 .image_wrapper1 {
+       left: -15px;
+    }
+    .section1 .image_wrapper2 {
+        display: none;
+    }
+    .section2 .image_wrapper1 {
+        margin: 0;
+        width: 100%;
+    }
+    .section2 .image_wrapper2 {
+        display: none;
+    }
+    .section3 .image_wrapper1 {
+        margin-top: 0;
+        right: 0;
+        width: 100%;
+    }
+    .section4 .image_wrapper1 {
+        margin: 0;
+    }
+}

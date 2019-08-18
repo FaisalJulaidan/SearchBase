@@ -1,11 +1,11 @@
-.wrapper{
+.wrapper {
     text-align: center;
     display: flex;
     align-items: center;
     flex-flow: column;
 }
 
-.text{
+.text {
     font-size: 3em;
     color: #494949;
     font-weight: bold;
@@ -13,9 +13,21 @@
     text-align: center;
 }
 
-.logo{
-    display:block;
+.logo_wrapper {
+    perspective: 1000px;
 }
+
+.logo{
+    position: relative;
+    transition: transform 1s;
+    transform-style: preserve-3d;
+    cursor: pointer;
+}
+
+.logo_wrapper:hover .logo {
+    transform: rotateY(180deg);
+}
+
 
 .button {
     color: white !important;

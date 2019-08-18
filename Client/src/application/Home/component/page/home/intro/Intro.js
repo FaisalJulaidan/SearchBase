@@ -44,7 +44,7 @@ class Intro extends React.Component {
                     </Col>
                     <Col xs={12} md={7} lg={7}>
                         <div className={styles.image_wrapper}>
-                            <Image className={styles.image} src="assets/img/home/destinations.svg"/>
+                            <Image className={styles.image} src="assets/img/home/data-trends.png"/>
                         </div>
                     </Col>
                 </Row>

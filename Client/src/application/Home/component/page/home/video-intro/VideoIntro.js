@@ -4,7 +4,7 @@ import styles from "./video-intro.module.css";
 import ReactPlayer from "react-player";
 import VideoWrapper from "./video-wrapper/VideoWrapper";
 import {Fade} from "react-reveal";
-import {faArrowRight} from "@fortawesome/free-solid-svg-icons";
+import {faArrowCircleRight} from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {Link} from "react-router-dom";
 
@@ -23,7 +23,7 @@ class VideoIntro extends React.Component {
 
     render() {
         let fadeAnim = {};
-        if (window.innerWidth > 767.98) fadeAnim["left"] = true; else fadeAnim["top"] = true;
+        if (window.innerWidth > 767.98) fadeAnim["left"] = true; else fadeAnim["bottom"] = true;
         return (
             <Container id={this.props.id}>
                 <Row className={styles.center}>
@@ -32,14 +32,14 @@ class VideoIntro extends React.Component {
                         <ReactPlayer playing pip loop wrapper={VideoWrapper}
                                      url="assets/vid/sb-video.mp4"/>
                     </Col>
-                    <Col xs={{span: 10, order: 2, offset: 1}} md={{span: 6, offset: 0}} lg={{span: 6, offset: 1}}>
+                    <Col xs={{span: 12, order: 2}} sm={{span: 10, order: 2, offset: 1}} md={{span: 6, offset: 0}} lg={{span: 6, offset: 1}}>
                         <div className={styles.text_section}>
                             <Fade {...fadeAnim} big>
                                 <h1 className={styles.intro}>{this.state.text.intro}</h1>
                                 <h3 className={styles.title}>{this.state.text.title}</h3>
                                 <h6 className={styles.text}>{this.state.text.text}</h6>
                                 <Link to="/how-it-works" className={styles.button}>
-                                    Read How it works <FontAwesomeIcon className={styles.icon} icon={faArrowRight}/>
+                                    Read How it works <FontAwesomeIcon className={styles.icon} icon={faArrowCircleRight}/>
                                 </Link>
                             </Fade>
                         </div>

@@ -46,8 +46,8 @@
 
 @media (max-width: 767.98px) {
     .col_item {
-        margin-top: 0.5em;
-        margin-bottom: 0.5em;
+        margin-top: 1.5em;
+        margin-bottom: 1.5em;
     }
 
     .col_item:first-child {

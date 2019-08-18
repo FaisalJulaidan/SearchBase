@@ -4,7 +4,7 @@
     flex-direction: row;
 }
 
-.text_section{
+.text_section {
     overflow: hidden;
     border-left: 8px solid #694EB9;
     padding-left: 2em;
@@ -13,7 +13,7 @@
 }
 
 
-.intro{
+.intro {
     font-size: 1.2em;
     color: #444444;
     border-bottom: 2px #444444 solid;
@@ -21,18 +21,18 @@
     display: inline-block;
 }
 
-.title{
+.title {
     margin-top: .2em;
     margin-bottom: 1em;
     font-size: 2em;
     color: #694EB9;
 }
 
-.text{
+.text {
     color: #726a84;
 }
 
-.button{
+.button {
     display: inline-block;
     text-decoration: none;
     margin-top: 1em;
@@ -43,19 +43,21 @@
     transition: color 0.4s ease 0s;
 }
 
-.button .icon{
+.button .icon {
     margin-left: 5px;
 }
 
-.button:hover{
+.button:hover {
     text-decoration: none;
     color: #9C7DED;
 }
 
 @media (max-width: 767.98px) {
-    .text_section{
+    .text_section {
+        text-align: center;
         margin: 60px 0 0;
         border-left: unset;
         border-top: 8px solid #694EB9;
+        padding: 2em 1em 0 1em;
     }
 }

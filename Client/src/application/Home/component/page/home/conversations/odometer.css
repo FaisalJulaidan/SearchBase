@@ -4,10 +4,22 @@
     line-height: 1 !important;
 }
 
-.odometer-digit{
+.odometer-digit {
     vertical-align: unset !important;
 }
 
 .odometer-inside {
     font-size: 10em;
+}
+
+@media (max-width: 1199.98px) {
+    .odometer-inside {
+        font-size: 9em;
+    }
+}
+
+@media (max-width: 991.98px) {
+    .odometer-inside {
+        font-size: 7em;
+    }
 }

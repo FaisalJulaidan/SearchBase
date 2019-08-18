@@ -4,7 +4,7 @@ import changelog from './changelog';
 import ReleaseNoteItem from "./release-note-item/ReleaseNoteItem";
 import {Col, Container, Row} from "react-bootstrap";
 import Layout from "../../../hoc/layout/Layout";
-import {WEBSITE_TITLE} from "../../../config";
+import {WEBSITE_TITLE} from '../../../../../constants/config';
 
 const ReleaseNote = () => {
 

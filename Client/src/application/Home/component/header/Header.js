@@ -19,7 +19,7 @@ const Header = (props) => {
                     <Navbar.Toggle aria-controls="basic-navbar-nav"/>
                     <Navbar.Collapse>
                         <Nav className={styles.nav_buttons}>
-                            <NavDropdown className={styles.link_dropdown} title="Products">
+                            <NavDropdown id="products" className={styles.link_dropdown} title="Products">
                                 <NavDropdown.Item className={styles.link} as={Link}
                                                   to={{pathname: "/how-it-works", hash: "#chatbot",}}>Chatbot
                                 </NavDropdown.Item>

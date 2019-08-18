@@ -20,7 +20,7 @@ class Conversations extends React.Component {
             const rand = 1 + Math.random() * (10 - 1);
             let conversationsNum = this.state.conversationsNum + rand;
             this.setState({conversationsNum: conversationsNum});
-        }, 3000);
+        }, 4000);
     }
 
     componentWillUnmount() {
@@ -31,17 +31,21 @@ class Conversations extends React.Component {
         return (
             <div className={styles.bg_gradient}>
                 <Container>
+                    <Row>
+                        <Col className={styles.col_text}>
+                            <h1>ChatBot on going conversations</h1>
+                        </Col>
+                    </Row>
                     <Row className={styles.center}>
-                        <Col className={styles.col_text} xs={{span: 7}}>
-                            <div className={styles.div_text}>
-                                <h1 className={styles.text}>ChatBot on going conversations</h1>
-                            </div>
+                        <Col className={styles.col_num} xs={12} md={8} xl={7}>
                             <div className={styles.div_number}>
                                 <Odometer duration={1000} value={this.state.conversationsNum} format="dd"/>
                             </div>
                         </Col>
-                        <Col xs={{span:5}}>
-                            <Image className={styles.image} fluid src="assets/img/home/message.svg"/>
+                        <Col xs={{span: 8, offset: 2}} md={{span: 4, offset: 0}} xl={5}>
+                            <div className={styles.image_wrapper}>
+                                <Image className={styles.image} fluid src="assets/img/home/message.svg"/>
+                            </div>
                         </Col>
                     </Row>
                 </Container>

@@ -51,14 +51,14 @@ DescriptiveLayout.propTypes = {
         items: PropTypes.arrayOf(PropTypes.string),
         texts: PropTypes.arrayOf(PropTypes.string),
         _table: PropTypes.shape({
-            head: PropTypes.arrayOf(PropTypes.shape({
+            head: PropTypes.arrayOf(PropTypes.arrayOf(PropTypes.shape({
                 text: PropTypes.string,
                 items: PropTypes.arrayOf(PropTypes.string)
-            })),
-            body: PropTypes.arrayOf(PropTypes.shape({
+            }))),
+            body: PropTypes.arrayOf(PropTypes.arrayOf(PropTypes.shape({
                 text: PropTypes.string,
                 items: PropTypes.arrayOf(PropTypes.string)
-            }))
+            })))
         }),
     })).isRequired
 };

@@ -1,6 +1,6 @@
 import React from 'react';
 import styles from './not-found-404.module.css';
-import {WEBSITE_TITLE} from "../../../config";
+import {WEBSITE_TITLE} from '../../../../../constants/config';
 import {Button, Col, Container, Row} from "react-bootstrap";
 import {Link} from "react-router-dom";
 import Layout from "../../../hoc/layout/Layout";

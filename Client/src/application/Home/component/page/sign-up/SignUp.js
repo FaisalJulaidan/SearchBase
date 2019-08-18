@@ -3,7 +3,7 @@ import styles from "./sign-up.module.css";
 import {Button, Card, Col, Container, Form, Row} from "react-bootstrap";
 import {Fade} from "react-reveal";
 import {Link} from "react-router-dom";
-import {WEBSITE_TITLE} from "../../../config";
+import {WEBSITE_TITLE} from '../../../../../constants/config';
 
 const SignUp = () => {
 

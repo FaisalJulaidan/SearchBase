@@ -31,4 +31,7 @@
     .section {
         padding: 40px 0;
     }
+    .col_intro h1{
+        font-size: 1.8em;
+    }
 }

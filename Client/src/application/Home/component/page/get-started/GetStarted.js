@@ -1,5 +1,5 @@
 import React from 'react';
-import {WEBSITE_TITLE} from "../../../config";
+import {WEBSITE_TITLE} from '../../../../../constants/config';
 import styles from "./get-started.module.css";
 import {Button, Card, Col, Container, Form, Row} from "react-bootstrap";
 import Layout from "../../../hoc/layout/Layout";
@@ -9,7 +9,7 @@ const GetStarted = () => {
     document.title = "Get Started | " + WEBSITE_TITLE;
 
     return (
-        <Layout background="#FBFAFF">
+        <Layout background={"#FEFEFE"}>
             <div className={styles.wrapper}>
                 <Container>
                     <Row>

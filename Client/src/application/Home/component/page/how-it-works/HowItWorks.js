@@ -3,7 +3,7 @@ import styles from './how-it-works.module.css';
 // import featuresJson from './features.json';
 import descriptiveSectionsJSON from './descriptive-sections.json';
 // import FeatureItem from "./feature-item/FeatureItem";
-import {WEBSITE_TITLE} from '../../../config';
+import {WEBSITE_TITLE} from '../../../../../constants/config';
 import Layout from "../../../hoc/layout/Layout";
 import Steps from "./steps/Steps";
 import Slider from "./slider/Slider";
@@ -53,7 +53,7 @@ class HowItWorks extends React.Component {
                         </Container>
                     </div>
                     <Steps/>
-                    <Slider/>
+                    {/*<Slider/>*/}
                     {descriptiveSections}
                 </div>
             </Layout>

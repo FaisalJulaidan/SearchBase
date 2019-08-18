@@ -42,7 +42,7 @@ def webhook(ID: int, companyID: int) -> Callback:
 
     except Exception as e:
         helpers.logError("webhook_serivces.webhook(): " + str(e))
-        return Callback(False, str(e), None)
+        return Callback(False, "Failed to get webhooks", None)
 
 
 def createWebhook(req, companyID: int) -> Callback:
@@ -184,7 +184,13 @@ def fireRequests(data, companyID: int, event: enums.Webhooks):
             if event.value in webhook.Subscriptions.split(","):
                 requestList.append(webhook.URL)
                 webhook.LastSent = datetime.datetime.utcnow()
-        rs = (grequests.post(u, json=data) for u in requestList)
+
+        formattedData = {
+            "event": event.value,
+            "data": data
+        }
+
+        rs = (grequests.post(u, json=formattedData) for u in requestList)
         grequests.map(rs, exception_handler=handleExceptions)
     except Exception as e:
         helpers.logError("webhook_services.fireRequests(): " + str(e))

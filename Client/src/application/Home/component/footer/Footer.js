@@ -1,19 +1,14 @@
 import React from 'react';
 import styles from './footer.module.css'
 import {Container, Row, Col} from 'react-bootstrap';
-import {library} from '@fortawesome/fontawesome-svg-core'
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
-import {fab} from "@fortawesome/free-brands-svg-icons";
 import {faCloud} from '@fortawesome/free-solid-svg-icons'
 import {faAngellist, faLinkedinIn} from '@fortawesome/free-brands-svg-icons'
 import {Link} from "react-router-dom";
-import {animateScroll as scroll} from "react-scroll";
 import EmailShare from "react-email-share-link";
 import {CURRENT_YEAR} from '../../../../constants/config';
 import {ReactComponent as Wave} from './wave.svg';
 import PropTypes from "prop-types";
-
-library.add(fab);
 
 const Footer = (props) => {
     return (

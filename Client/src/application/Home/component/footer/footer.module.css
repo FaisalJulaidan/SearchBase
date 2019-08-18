@@ -43,6 +43,7 @@
 }
 
 .footer .row .logo h1 {
+    color: white;
     text-indent: .8em;
     font-weight: bold;
 }
@@ -75,6 +76,7 @@
 }
 
 .copyright h4{
+    color: white;
     line-height: 1.5em;
 }
 

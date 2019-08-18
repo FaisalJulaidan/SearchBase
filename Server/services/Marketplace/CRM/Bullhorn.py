@@ -464,14 +464,19 @@ def searchPerfectCandidates(auth, companyID, data, fields=None) -> Callback:
                 if not sendQuery_callback.Success:
                     raise Exception(sendQuery_callback.Message)
 
+                # get query result
                 return_body = json.loads(sendQuery_callback.Data.text)
 
+                # add the candidates to the records
                 records.append(list(return_body["data"]))
 
+                # remove duplicate records
                 records = list(dict.fromkeys(records))
 
+                # remove the last (least important filter)
                 query = "and".join(query.split("and")[:-1])
 
+                # if no filters left - stop
                 if not query:
                     break
 

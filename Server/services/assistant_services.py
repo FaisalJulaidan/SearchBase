@@ -1,5 +1,5 @@
 from sqlalchemy import and_
-
+from sqlalchemy.orm import joinedload
 from models import db, Assistant, Callback, AutoPilot
 from services import auto_pilot_services, flow_services
 from services.Marketplace.CRM import crm_services
@@ -67,7 +67,7 @@ def getByID(id: int, companyID: int) -> Callback:
     try:
         # Get result and check if None then raise exception
         result: Assistant = db.session.query(Assistant)\
-            .filter(and_(Assistant.ID == id, Assistant.CompanyID == companyID)).first()
+            .filter(and_(Assistant.ID == id, Assistant.CompanyID == companyID)).options(joinedload('StoredFile').joinedload('StoredFileInfo')).first()
         if not result: raise Exception
         return Callback(True, "Got assistant successfully.", result)
 

@@ -16,6 +16,9 @@ class Company(db.Model):
     StripeID = db.Column(db.String(68), unique=True, nullable=False)
     SubID = db.Column(db.String(68), unique=True, default=None)
 
+    StoredFileID = db.Column(db.Integer, db.ForeignKey('stored_file.ID'), nullable=True)
+    StoredFile = db.relationship('StoredFile', order_by="desc(StoredFile.ID)")
+
     TrackingData = db.Column(db.Boolean, nullable=False, default=False)
     TechnicalSupport = db.Column(db.Boolean, nullable=False, default=True)
     AccountSpecialist = db.Column(db.Boolean, nullable=False, default=False)

@@ -1,6 +1,8 @@
 from datetime import datetime, timedelta
 from typing import List
 
+# import joi from sqlalchemy_utils
+
 from jsonschema import validate
 from sqlalchemy.sql import and_
 from sqlalchemy.sql import desc
@@ -108,7 +110,8 @@ def getAllByAssistantID(assistantID):
             .order_by(desc(Conversation.DateTime)).all()
         for conversation in conversations:
             if(conversation.StoredFile != None):
-                conversation.__Files = helpers.getListFromSQLAlchemyList(conversation.StoredFile.StoredFileInfo)
+                print(conversation.StoredFile.StoredFileInfo)
+                # conversation.__Files = helpers.getListFromSQLAlchemyList()
         return Callback(True, "Conversations retrieved successfully.", conversations)
     except Exception as exc:
         helpers.logError("conversation_services.getAllByAssistantID(): " + str(exc))
@@ -123,9 +126,9 @@ def getByID(conversationID, assistantID):
         if not conversation:
             return Callback(False, "Conversation does not exist")
 
-        storedFile_callback: Callback = stored_file_services.getByConversation(conversation)
-        if storedFile_callback.Success:
-            conversation.__Files = storedFile_callback.Data.StoredFileInfo
+        # storedFile_callback: Callback = stored_file_services.getByConversation(conversation)
+        # if storedFile_callback.Success:
+        #     conversation.__Files = storedFile_callback.Data.StoredFileInfo
 
         return Callback(True, "ChatbotConversation retrieved successfully.", conversation)
 

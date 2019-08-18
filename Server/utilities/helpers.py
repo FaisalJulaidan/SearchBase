@@ -8,7 +8,7 @@ import traceback
 from datetime import time
 from enum import Enum
 from io import BytesIO
-from typing import List
+from typing import List, Dict
 
 import geoip2.webservice
 import stripe
@@ -196,10 +196,9 @@ def convertSalaryPeriod(salary, fromPeriod: Period, toPeriod: Period):
 
 # -------- SQLAlchemy Converters -------- #
 """Convert a SQLAlchemy object to a single dict """
-def getDictFromSQLAlchemyObj(obj, convertDeep: bool = False) -> dict:
+def getDictFromSQLAlchemyObj(obj, eager: bool = False) -> dict:
     dict = {}  # Results
     if not obj: return dict
-
     # A nested for loop for joining two tables
     for attr in obj.__table__.columns:
         key = attr.name
@@ -221,7 +220,7 @@ def getDictFromSQLAlchemyObj(obj, convertDeep: bool = False) -> dict:
                 flow_services.parseFlow(dict[key])  # pass by reference
 
     for attr in obj.__dict__.keys():
-        if convertDeep:
+        if eager:
             if isinstance(getattr(obj, attr), List):
                 if all(hasattr(sub, '_sa_instance_state') for sub in getattr(obj, attr)):
                     dict[attr] = getListFromSQLAlchemyList(getattr(obj, attr), True)
@@ -232,8 +231,8 @@ def getDictFromSQLAlchemyObj(obj, convertDeep: bool = False) -> dict:
     return dict
 
 """Convert a SQLAlchemy list of objects to a list of dicts"""
-def getListFromSQLAlchemyList(SQLAlchemyList, convertDeep: bool = False):
-    return [getDictFromSQLAlchemyObj(item, convertDeep) for item in SQLAlchemyList]
+def getListFromSQLAlchemyList(SQLAlchemyList, eager: bool = False):
+    return [getDictFromSQLAlchemyObj(item, eager) for item in SQLAlchemyList]
 
 """Used when you want to only gather specific data from a table (columns)"""
 """Provide a list of keys (e.g ['id', 'name']) and the list of tuples"""

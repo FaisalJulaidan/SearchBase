@@ -10,6 +10,8 @@ function* getAccountDetails() {
         const account = yield res.data?.data;
 
         // Update username in localStorage
+        let file = account.company.StoredFile?.StoredFileInfo?.find(item => item.Key === "Logo")
+        account.company.LogoPath = file.FilePath
         yield updateUsername(account.user.Firstname, account.user.Surname);
         yield updateTimezone(account.user.TimeZone)
 

@@ -111,6 +111,14 @@ def uploadFile(file, filename, path, public=False):
         except ClientError as e:
             raise Exception("DigitalOcean Error")
 
+        sf = StoredFile()
+        db.session.add(sf)
+        db.session.flush()
+
+        files = [StoredFileInfo(Key="Logo", FilePath=UPLOAD_FOLDER + path + '/' + filename, StoredFileID=sf.ID)]
+
+        db.session.add_all(files)
+        db.session.commit()
 
         return Callback(True, "File uploaded successfully")
 

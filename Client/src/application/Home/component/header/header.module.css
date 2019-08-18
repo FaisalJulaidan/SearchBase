@@ -24,11 +24,12 @@
 }
 
 .logo h1 {
+    color: #694EB9;
     margin: 0 0 0 10px;
     font-weight: bold;
 }
 
-.logo:hover {
+.logo:hover,.logo:hover h1 {
     color: #9C7DED;
 }
 

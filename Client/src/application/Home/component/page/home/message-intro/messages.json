@@ -1,0 +1,14 @@
+[
+  {
+    "mine": false,
+    "text": "How can I help?"
+  },
+  {
+    "mine": true,
+    "text": "Show my python jobs"
+  },
+  {
+    "mine": false,
+    "text": "Here is what i've found"
+  }
+]

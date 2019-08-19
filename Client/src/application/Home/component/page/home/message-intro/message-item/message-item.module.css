@@ -1,0 +1,109 @@
+.message {
+    display: block;
+    width: 98%;
+    padding: 0.5%;
+}
+
+.my_message:before {
+    content: "";
+    position: absolute;
+    z-index: 1;
+    bottom: -2px;
+    right: -8px;
+    height: 19px;
+    border-right: 20px solid #00e34d;
+    border-bottom-left-radius: 16px 14px;
+    -webkit-transform: translate(0, -2px);
+    transform: translate(0, -2px);
+}
+
+.my_message {
+    max-width: 90%;
+    font-size: 12px;
+    background: #00e34d;
+    color: white;
+    float: right;
+    clear: both;
+    position: relative;
+    padding: 10px 16px;
+    border-radius: 10px;
+    word-wrap: break-word;
+    margin-bottom: 10px;
+    transition: all .5s;
+    box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+}
+
+.my_message:after {
+    content: "";
+    position: absolute;
+    z-index: 1;
+    bottom: -2px;
+    right: -42px;
+    width: 12px;
+    height: 20px;
+    background: #FBFAFC;
+    border-bottom-left-radius: 10px;
+    -webkit-transform: translate(-30px, -2px);
+    transform: translate(-30px, -2px);
+}
+
+.your_message:before {
+    content: "";
+    position: absolute;
+    z-index: 2;
+    bottom: -2px;
+    left: -7px;
+    height: 19px;
+    border-left: 20px solid #ebebeb;
+    border-bottom-right-radius: 16px 14px;
+    -webkit-transform: translate(0, -2px);
+    transform: translate(0, -2px);
+}
+
+.your_message {
+    max-width: 90%;
+    font-size: 12px;
+    background: #ebebeb;
+    color: #444444;
+    float: left;
+    clear: both;
+    word-wrap: break-word;
+    margin-bottom: 10px;
+    transition: all .5s;
+    box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    position: relative;
+    padding: 10px 16px;
+    border-radius: 10px;
+}
+
+.your_message:after {
+    content: "";
+    position: absolute;
+    z-index: 3;
+    bottom: -2px;
+    left: 4px;
+    width: 26px;
+    height: 20px;
+    background: #FBFAFC;
+    border-bottom-right-radius: 10px;
+    -webkit-transform: translate(-30px, -2px);
+    transform: translate(-30px, -2px);
+}
+
+.text {
+    margin: 0;
+}
+
+@media (max-width: 1199.98px) {
+    .my_message, .your_message {
+        padding: 8px 12px;
+    }
+}
+
+@media (max-width: 450px) {
+    .my_message, .your_message {
+        font-size: 10px;
+    }
+}

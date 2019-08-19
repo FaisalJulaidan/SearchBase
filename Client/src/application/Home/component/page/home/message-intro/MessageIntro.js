@@ -5,7 +5,11 @@ import MobileFrame from "./mobile-frame/MobileFrame";
 import {Fade} from "react-reveal";
 import {faArrowCircleRight} from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
+import messagesJSON from './messages.json'
 import {Link} from "react-router-dom";
+import MessageItem from "./message-item/MessageItem";
+import JobOfferItem from "./job-offer-item/JobOfferItem";
+
 
 class MessageIntro extends React.Component {
 
@@ -17,10 +21,15 @@ class MessageIntro extends React.Component {
                 'you are working at times of Convenience for the Candidates, in a Confidential\n' +
                 'Environment. With direct interaction between you and candidates, your business can\n' +
                 'make Connections and build Highly Descriptive Candidate Profiles in Seconds.',
-        }
+        },
     };
 
     render() {
+
+        let messages = messagesJSON.map((message, i) => {
+            return <MessageItem key={i} mine={message.mine} text={message.text}/>
+        });
+
         let fadeAnim = {};
         if (window.innerWidth > 767.98) fadeAnim["left"] = true; else fadeAnim["bottom"] = true;
         return (
@@ -29,9 +38,8 @@ class MessageIntro extends React.Component {
                     <Col xs={{span: 8, offset: 2, order: 1}} md={{span: 6, offset: 0, order: 1}}
                          lg={{span: 4, offset: 1, order: 1}}>
                         <MobileFrame>
-                            <div>
-                                test
-                            </div>
+                            {messages}
+                            <JobOfferItem/>
                         </MobileFrame>
                     </Col>
                     <Col xs={{span: 12, order: 2}} sm={{span: 10, order: 2, offset: 1}} md={{span: 6, offset: 0}}

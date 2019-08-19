@@ -13,6 +13,11 @@
     text-align: center;
 }
 
+.text h1{
+    font-weight: bold;
+    color: #494949;
+}
+
 .logo_wrapper {
     perspective: 1000px;
 }

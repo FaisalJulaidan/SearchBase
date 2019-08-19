@@ -7,6 +7,7 @@ import {Fade} from "react-reveal";
 import {faArrowCircleRight} from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {Link} from "react-router-dom";
+import {getLink} from "helpers";
 
 class VideoIntro extends React.Component {
 
@@ -30,16 +31,18 @@ class VideoIntro extends React.Component {
                     <Col xs={{span: 8, offset: 2, order: 1}} md={{span: 6, offset: 0, order: 1}}
                          lg={{span: 4, offset: 1, order: 1}}>
                         <ReactPlayer playing pip loop wrapper={VideoWrapper}
-                                     url="assets/vid/sb-video.mp4"/>
+                                     url={getLink("/static/images/sb-video.mp4")}/>
                     </Col>
-                    <Col xs={{span: 12, order: 2}} sm={{span: 10, order: 2, offset: 1}} md={{span: 6, offset: 0}} lg={{span: 6, offset: 1}}>
+                    <Col xs={{span: 12, order: 2}} sm={{span: 10, order: 2, offset: 1}} md={{span: 6, offset: 0}}
+                         lg={{span: 6, offset: 1}}>
                         <div className={styles.text_section}>
                             <Fade {...fadeAnim} big>
                                 <h1 className={styles.intro}>{this.state.text.intro}</h1>
                                 <h3 className={styles.title}>{this.state.text.title}</h3>
                                 <h6 className={styles.text}>{this.state.text.text}</h6>
                                 <Link to="/how-it-works" className={styles.button}>
-                                    Read How it works <FontAwesomeIcon className={styles.icon} icon={faArrowCircleRight}/>
+                                    Read How it works <FontAwesomeIcon className={styles.icon}
+                                                                       icon={faArrowCircleRight}/>
                                 </Link>
                             </Fade>
                         </div>

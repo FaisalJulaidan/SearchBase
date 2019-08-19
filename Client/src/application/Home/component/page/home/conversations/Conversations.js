@@ -4,6 +4,7 @@ import styles from './conversations.module.css';
 import odometerStyle from './odometer.css';
 import Odometer from 'react-odometerjs';
 import 'odometer/themes/odometer-theme-default.css';
+import {getLink} from "helpers";
 
 class Conversations extends React.Component {
 
@@ -44,7 +45,8 @@ class Conversations extends React.Component {
                         </Col>
                         <Col xs={{span: 8, offset: 2}} md={{span: 4, offset: 0}} xl={5}>
                             <div className={styles.image_wrapper}>
-                                <Image className={styles.image} fluid src="assets/img/home/message.svg"/>
+                                <Image className={styles.image} fluid
+                                       src={getLink("/static/images/home/home/message.svg")}/>
                             </div>
                         </Col>
                     </Row>

@@ -4,6 +4,7 @@ import styles from "./intro.module.css";
 import {Bounce} from "react-reveal";
 import {Link} from "react-router-dom";
 import TextTransition from "react-text-transition";
+import {getLink} from "helpers";
 
 class Intro extends React.Component {
 
@@ -44,7 +45,8 @@ class Intro extends React.Component {
                     </Col>
                     <Col xs={12} md={7} lg={7}>
                         <div className={styles.image_wrapper}>
-                            <Image className={styles.image} src="assets/img/home/data-trends.png"/>
+                            <Image className={styles.image}
+                                   src={getLink("/static/images/home/home/data-trends.png")}/>
                         </div>
                     </Col>
                 </Row>

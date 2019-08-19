@@ -2,6 +2,7 @@ import React from 'react';
 import styles from './key-features.module.css'
 import {Col, Container, Image, Row} from "react-bootstrap";
 import {Slide} from "react-reveal";
+import {getLink} from "helpers";
 
 const KeyFeatures = (props) => {
     return (
@@ -26,7 +27,8 @@ const KeyFeatures = (props) => {
                 </Col>
                 <Col xs={{span:12,offset:0,order:1}} md={{span:7,offset:0,order:0}}>
                     <div className={styles.image_wrapper}>
-                        <Image className={styles.image} src="assets/img/home/os.svg"/>
+                        <Image className={styles.image}
+                               src={getLink("/static/images/home/home/os.svg")}/>
                     </div>
                 </Col>
             </Row>

@@ -2,14 +2,16 @@ import React from 'react';
 import styles from './integrations.module.css'
 import integrations from './integrations.json'
 import "react-alice-carousel/lib/alice-carousel.css";
-import {Col, Container, Image, Row} from "react-bootstrap";
+import {Container, Col, Image, Row} from "react-bootstrap";
+import {getLink} from "helpers";
 
 class Integrations extends React.Component {
 
     items = integrations.map((item, i) => {
         return (
             <Col key={i} className={styles.col_item}>
-                <Image className={styles.image} src={item.image}/>
+                <Image className={styles.image}
+                       src={getLink(item.image)}/>
                 <h1 id="title" className={styles.title}>{item.title}</h1>
             </Col>
         );

@@ -2,6 +2,7 @@ import React, {Component} from 'react';
 import styles from './descriptive-section.module.css'
 import PropTypes from 'prop-types';
 import {Col, Container, Image, Row} from "react-bootstrap";
+import {getLink} from "helpers";
 
 class DescriptiveSection extends Component {
 
@@ -32,7 +33,7 @@ class DescriptiveSection extends Component {
                         </Col>
                         <Col md={6}>
                             <div className={styles.image_wrapper}>
-                                <Image className={styles.image} fluid src={this.props.image}/>
+                                <Image className={styles.image} fluid src={getLink(this.props.image)}/>
                             </div>
                         </Col>
                     </Row>

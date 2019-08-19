@@ -5,12 +5,13 @@ import styles from "./member-card.module.css";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faFacebook, faGithub, faLinkedin} from "@fortawesome/free-brands-svg-icons";
 import {faTwitter} from "@fortawesome/free-brands-svg-icons/faTwitter";
+import {getLink} from "helpers";
 
 const MemberCard = (props) => {
     return (
         <Card className={styles.card}>
             <div className={styles.img_container}>
-                <Card.Img className={styles.img} variant="top" src={props.img}/>
+                <Card.Img className={styles.img} variant="top" src={getLink(props.img)}/>
             </div>
             <Card.Body>
                 <h4 className={styles.name}>{props.name}</h4>

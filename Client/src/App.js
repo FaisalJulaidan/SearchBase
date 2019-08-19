@@ -56,7 +56,6 @@ class App extends Component {
                 <Suspense fallback={<div className={styles.Loader}> Loading...</div>}>
                     <TimezoneContext.Provider value={this.state.timezone}>
                         <Switch>
-                            <Route exact path="/" component={Home}/>
                             <Route path="/login" component={Login}/>
                             <Route path="/signup" component={Signup}/>
                             <Route path="/forget_password" component={ForgetPassword}/>
@@ -66,7 +65,8 @@ class App extends Component {
                             <Route path="/appointment_status/" component={AppointmentStatus}/>
                             <Route path="/chatbot_direct_link/" component={ChatbotDirectLink}/>
                             <PrivateRoute path="/dashboard" component={Dashboard}/>
-                            <Redirect to={{pathname: '/dashboard'}}/>
+                            <Route path="/" component={Home}/>
+                            {/*<Redirect to={{pathname: '/'}}/>*/}
                         </Switch>
                     </TimezoneContext.Provider>
                 </Suspense>

@@ -1,13 +1,11 @@
 import React from 'react';
 import {Col, Container, Row} from "react-bootstrap";
 import styles from "./message-intro.module.css";
-import ReactPlayer from "react-player";
 import MobileFrame from "./mobile-frame/MobileFrame";
 import {Fade} from "react-reveal";
 import {faArrowCircleRight} from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {Link} from "react-router-dom";
-import {getLink} from "helpers";
 
 class MessageIntro extends React.Component {
 
@@ -30,8 +28,11 @@ class MessageIntro extends React.Component {
                 <Row className={styles.center}>
                     <Col xs={{span: 8, offset: 2, order: 1}} md={{span: 6, offset: 0, order: 1}}
                          lg={{span: 4, offset: 1, order: 1}}>
-                        <ReactPlayer playing pip loop wrapper={MobileFrame}
-                                     url={getLink("/static/images/sb-video.mp4")}/>
+                        <MobileFrame>
+                            <div>
+                                test
+                            </div>
+                        </MobileFrame>
                     </Col>
                     <Col xs={{span: 12, order: 2}} sm={{span: 10, order: 2, offset: 1}} md={{span: 6, offset: 0}}
                          lg={{span: 6, offset: 1}}>
@@ -49,8 +50,7 @@ class MessageIntro extends React.Component {
                     </Col>
                 </Row>
             </Container>
-        )
-            ;
+        );
     }
 }
 

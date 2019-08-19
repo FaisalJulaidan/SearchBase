@@ -2,7 +2,7 @@ import React from 'react';
 import styles from './home.module.css'
 import Intro from "./intro/Intro";
 import DividerButton from "./divider-button/DividerButton";
-import MessageIntro from "./video-intro/MessageIntro";
+import MessageIntro from "./message-intro/MessageIntro";
 import CaptureCandidates from "./capture-candidates/CaptureCandidates";
 import OurFocus from "./our-focus/OurFocus";
 import WhyWait from "./why-wait/WhyWait";

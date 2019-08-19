@@ -1,9 +1,9 @@
 import React, {Component} from 'react';
-import styles from './video-wrapper.module.css';
+import styles from './mobile-frame.module.css';
 import {Image} from "react-bootstrap";
 import {getLink} from "helpers";
 
-class VideoWrapper extends Component {
+class MobileFrame extends Component {
     render() {
         return (
             <div className={styles.video_frame}>
@@ -20,4 +20,4 @@ class VideoWrapper extends Component {
     }
 }
 
-export default VideoWrapper;
+export default MobileFrame;

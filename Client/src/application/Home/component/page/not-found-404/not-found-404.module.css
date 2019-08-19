@@ -4,7 +4,7 @@
 }
 
 .emoji {
-    color: #694EB9;
+    color: #9254de;
     font-size: 5em;
     font-weight: bold;
 }
@@ -22,19 +22,19 @@
 
 .button {
     margin-top: 1em;
-    color: #694EB9;
-    border-color: #694EB9;
+    color: #9254de;
+    border-color: #9254de;
 }
 
 .button:hover {
-    color: #694EB9;
+    color: #9254de;
     background: #F8EBFF;
     border-color: white;
     transition: border-color 0.4s ease 0s, background-color 0.4s ease 0s;
 }
 
 .button:hover {
-    color: #694EB9;
+    color: #9254de;
     background: #F8EBFF;
     border-color: white;
     transition: border-color 0.4s ease 0s, background-color 0.4s ease 0s;
@@ -47,7 +47,7 @@
 
 
 .button:not(:disabled):not(.disabled):active {
-    color: #694EB9;
+    color: #9254de;
     background: #F8EBFF;
     border-color: white;
     transition: border-color 0.4s ease 0s, background-color 0.4s ease 0s;

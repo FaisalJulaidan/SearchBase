@@ -16,7 +16,7 @@
 
 .title {
     margin-top: 1em;
-    color: #694EB9;
+    color: #9254de;
     font-weight: bold;
     font-size: 1.8em;
 }
@@ -38,7 +38,7 @@
 
 .input:focus {
     box-shadow: none;
-    border-color: #694EB9;
+    border-color: #9254de;
 }
 
 .checkbox {
@@ -48,8 +48,8 @@
 }
 
 .checkbox input:checked ~ label:before {
-    background-color: #694EB9 !important;
-    border-color: #694EB9 !important;
+    background-color: #9254de !important;
+    border-color: #9254de !important;
 }
 
 
@@ -58,7 +58,7 @@
     border: solid transparent 0;
     border-radius: 7px;
     padding: 8px 20px;
-    background-color: #694EBA;
+    background-color: #9254de;
     transition: border-color 0.4s ease 0s, background-color 0.4s ease 0s;
 }
 

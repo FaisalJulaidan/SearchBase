@@ -26,7 +26,7 @@
 .title {
     margin-bottom: 1em;
     font-size: 2em;
-    color: #694EB9;
+    color: #9254de;
 }
 
 .text {
@@ -38,7 +38,7 @@
 .button {
     display: inline-block;
     text-decoration: none;
-    color: #694EB9;
+    color: #9254de;
     font-size: 1.1em;
     -webkit-transition: color 0.4s ease 0s;
     -moz-transition: color 0.4s ease 0s;

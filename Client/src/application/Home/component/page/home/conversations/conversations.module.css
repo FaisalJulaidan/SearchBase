@@ -1,5 +1,5 @@
 .bg_gradient {
-    color: #694EB9;
+    color: #9254de;
     /*background: linear-gradient(to left, #7873ed, #a865e1);*/
 }
 
@@ -15,9 +15,9 @@
 
 .div_number {
     margin-top: 10px;
-    border-top: 5px solid #694EB9;
-    border-bottom: 5px solid #694EB9;
-    color: #694EB9;
+    border-top: 5px solid #9254de;
+    border-bottom: 5px solid #9254de;
+    color: #9254de;
 }
 
 .col_text h1 {

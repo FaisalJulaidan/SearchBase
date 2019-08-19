@@ -30,7 +30,7 @@
 }
 
 .col_text hr{
-    background-color: #694EB9;
+    background-color: #9254de;
     height: 3px;
     margin: 0;
     width: 60px;
@@ -42,7 +42,7 @@
 }
 
 .col_text .list {
-    color: #694EB9;
+    color: #9254de;
     list-style-type: square;
     list-style-position: inside;
     font-size: 1.2em;

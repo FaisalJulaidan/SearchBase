@@ -39,7 +39,7 @@
     line-height: normal;
     font-weight: bold;
     margin-bottom: 4em;
-    color: #694EB9;
+    color: #9254de;
 }
 
 .logo .brand_title {
@@ -56,11 +56,11 @@
 
 .input:focus {
     box-shadow: none;
-    border-color: #694EB9;
+    border-color: #9254de;
 }
 
 .has_val {
-    border-color: #694EB9;
+    border-color: #9254de;
 }
 
 .submit {
@@ -68,7 +68,7 @@
     border: solid transparent 0;
     border-radius: 7px;
     padding: 8px 20px;
-    background-color: #694EBA;
+    background-color: #9254de;
     transition: border-color 0.4s ease 0s, background-color 0.4s ease 0s;
 }
 
@@ -101,7 +101,7 @@
     font-size: .96em;
     margin: 0 .2em;
     text-decoration: none;
-    color: #694EB9;
+    color: #9254de;
 }
 
 .navigation {

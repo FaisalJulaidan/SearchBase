@@ -19,12 +19,12 @@
     -moz-transition: color 0.4s ease 0s;
     -o-transition: color 0.4s ease 0s;
     transition: color 0.4s ease 0s;
-    color: #694EB9;
+    color: #9254de;
     text-decoration: none;
 }
 
 .logo h1 {
-    color: #694EB9;
+    color: #9254de;
     margin: 0 0 0 10px;
     font-weight: bold;
 }
@@ -88,7 +88,7 @@
     color: white !important;
     border: solid transparent 0;
     padding: 8px 20px;
-    background-color: #694EBA;
+    background-color: #9254de;
     transition: border-color 0.4s ease 0s, background-color 0.4s ease 0s;
 }
 

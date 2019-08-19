@@ -16,14 +16,14 @@ const WhyWait = (props) => {
                         <div className={styles.logo_wrapper}>
                             <FontAwesomeIcon className={styles.logo}
                                              size="5x"
-                                             color="#694EB9"
+                                             color="#9254de"
                                              icon={faCloud}
                                              onClick={() => scroll.scrollToTop()}/>
                         </div>
                         <div className={styles.text}>
                             <h1>Power up your recruitment business</h1>
                             <h1>with</h1>
-                            <h1 style={{color: '#694EB9'}}><b>SearchBase</b></h1>
+                            <h1 style={{color: '#9254de'}}><b>SearchBase</b></h1>
                         </div>
                         <Tada fraction={1}>
                             <Link to="/get-started">

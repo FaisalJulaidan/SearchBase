@@ -26,14 +26,15 @@ export const QuestionFormItem = ({FormItem, layout, getFieldDecorator, block, pl
     )
 };
 
-export const DataTypeFormItem = ({FormItem, layout, getFieldDecorator, options, block}) => {
+export const DataTypeFormItem = ({FormItem, layout, getFieldDecorator, options, block, blockType}) => {
     // This will create the Cascader content and will put every userType's associated dataType in a category
-    const dataTypes = [];
+    const dataTypesMenu = [];
+    const dataTypesFiltered = options.flow.dataTypes.filter(dt => dt.blockTypes.includes(blockType));
     options.flow.dataTypeSections.forEach((dts, i) => {
-        dataTypes[i] = {
+        dataTypesMenu[i] = {
             value: dts,
             label: dts,
-            children: options.flow.dataTypes
+            children: dataTypesFiltered
                 .filter(dt => dt.dataTypeSection === dts && dt.dataTypeSection !== 'No Type')
                 .map(dt => {
                 return {value: dt.name, label: dt.name}
@@ -55,7 +56,7 @@ export const DataTypeFormItem = ({FormItem, layout, getFieldDecorator, options, 
                     initialValue: initialValue,
                     rules: [{ type: 'array', required: true, message: 'Please specify the data type!' }]
                 })(
-                    <Cascader options={dataTypes} />
+                    <Cascader options={dataTypesMenu.filter(item => item.children.length > 0 || item.value === "No Type")} />
                 )
             }
         </FormItem>

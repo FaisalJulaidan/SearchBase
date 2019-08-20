@@ -114,7 +114,8 @@ class UserInput extends Component {
                     <DataTypeFormItem FormItem={FormItem} block={block}
                                       getFieldDecorator={getFieldDecorator}
                                       options={this.props.options}
-                                      layout={layout}/>
+                                      layout={layout}
+                                      blockType={"User Input"}/>
 
                     <FormItem label="Scoring Keywords" {...layout}
                               extra="Every matched keyword from user input will add up to the score">

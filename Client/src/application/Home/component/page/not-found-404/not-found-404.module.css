@@ -1,0 +1,62 @@
+.container {
+    margin-top: 6em;
+    margin-bottom: 6em;
+}
+
+.emoji {
+    color: #9254de;
+    font-size: 5em;
+    font-weight: bold;
+}
+
+.title {
+    margin: .1em 0;
+    color: #494949;
+    font-size: 2.5em;
+    font-weight: bold;
+}
+
+.desc {
+    color: #726a84;
+}
+
+.button {
+    margin-top: 1em;
+    color: #9254de;
+    border-color: #9254de;
+}
+
+.button:hover {
+    color: #9254de;
+    background: #F8EBFF;
+    border-color: white;
+    transition: border-color 0.4s ease 0s, background-color 0.4s ease 0s;
+}
+
+.button:hover {
+    color: #9254de;
+    background: #F8EBFF;
+    border-color: white;
+    transition: border-color 0.4s ease 0s, background-color 0.4s ease 0s;
+}
+
+
+.button:focus {
+    box-shadow: none;
+}
+
+
+.button:not(:disabled):not(.disabled):active {
+    color: #9254de;
+    background: #F8EBFF;
+    border-color: white;
+    transition: border-color 0.4s ease 0s, background-color 0.4s ease 0s;
+}
+
+.button:not(:disabled):not(.disabled):active:focus {
+    box-shadow: none;
+}
+
+.button a{
+    color:inherit;
+}

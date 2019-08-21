@@ -1,0 +1,63 @@
+.row {
+    line-height: normal;
+    flex-direction: column;
+}
+
+.image_wrapper {
+    position: relative;
+    width: 100%;
+    height: 0;
+    padding-top: 85.58%;
+}
+
+
+.image_wrapper .image {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+}
+
+.text_col {
+    align-self: center;
+    text-align: center;
+}
+
+.title {
+    margin-bottom: 1em;
+    font-size: 2em;
+    color: #9254de;
+}
+
+.text {
+    margin: 1.5em 0;
+    line-height: 1.5em;
+    color: #726a84;
+}
+
+.button {
+    display: inline-block;
+    text-decoration: none;
+    color: #9254de;
+    font-size: 1.1em;
+    -webkit-transition: color 0.4s ease 0s;
+    -moz-transition: color 0.4s ease 0s;
+    -o-transition: color 0.4s ease 0s;
+    transition: color 0.4s ease 0s;
+}
+
+.button .icon {
+    margin-left: 5px;
+}
+
+.button:hover {
+    text-decoration: none;
+    color: #9C7DED;
+}
+
+
+@media (max-width: 575.98px) {
+    .text_col .text {
+        font-size: .9em;
+    }
+}

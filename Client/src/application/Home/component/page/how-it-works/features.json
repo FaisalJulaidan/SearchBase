@@ -1,0 +1,68 @@
+[
+  {
+    "title": "A new way of interacting with users",
+    "subtitle": "Reduce Bounce Rates, Boost leads.",
+    "text": "The average bounce rate on websites is 48.6%. Users with our chat bots have seen their bounce rates decrease to 17%. The platform offers businesses the ability to interact with users at any time during the day, with pre-built questions and answers that don't require effort from users.",
+    "img": "/assets/img/features/1-search.png"
+  },
+  {
+    "title": "Complete CRM Integration",
+    "subtitle": "Fitting us into, your world",
+    "text": "We have implemented our software with some of the world's leading CRM companies and continue to partner with more add more companies. Talk to us to find if your CRM can be integrated for the ultimate level of automation.",
+    "img": "/assets/img/features/2-crm.png"
+  },
+  {
+    "title": "Process Candidates, in Seconds",
+    "subtitle": "Deep and Meaningful conversations",
+    "text": "The average bounce rate for candidates whilst talking to recruiters is 57%! Using chatbot technology, you can ask your clients smart and meaningful questions at a time that's convenient for everyone. The data collected is then directly processed and added to your CRM for you to grow.",
+    "img": "/assets/img/features/3-businessman.png"
+  },
+  {
+    "title": "Candidate Profile",
+    "subtitle": "Understanding Candidates, with dimension.",
+    "text": "Recruitment is all about thinking outside of the box. Take advantage of the ability to effectively use your time when communicating with candidates or clients. Take immediate action with the data as soon as it is collected. All the data is also encrypted and fully GDPR compliant.",
+    "img": "/assets/img/features/4-man.png"
+  },
+  {
+    "title": "Scanning Data for Users",
+    "subtitle": "Super Intelligent and Fast",
+    "text": "Our Chatbots will connect to your CRM, collect all of your job data and share them with candidates it thinks will find them interesting. The assistant will then walk the candidate through the entire process and send the data back to your CRM - Saving you hours every week!",
+    "img": "/assets/img/features/5-cycle.png"
+  },
+  {
+    "title": "Advancement in Technology",
+    "subtitle": "AI to your advantage",
+    "text": "Statistics show that 63% of questions companies get asked are all repeats. Using AI and Machine learning, you can train your bot with pre-set answers for these questions which can help save your team hours in time every week. The assistant can deal with clients and Candidates.",
+    "img": "/assets/img/features/6-cpu.png"
+  },
+  {
+    "title": "Machine Learning",
+    "subtitle": "Save Time, using AI",
+    "text": "Recruiters spend on average 3 Hours a week looking at CVs, only to find out that a candidate is not right for the job. So we have solved this by processing CVs before passing them to the recruiter. We apply machine learning to understand keywords and build a deep profile for every candidate.",
+    "img": "/assets/img/features/7-approved.png"
+  },
+  {
+    "title": "Natural Language Processing",
+    "subtitle": "First understand, then respond",
+    "text": "We use highly accurate Natural Language Processing to determine what a candidate is really trying to say. From processing raw text, we build a deep emotional profile of what past experiences candidates have had and what will be best for them.",
+    "img": "/assets/img/features/nlp.png"
+  },
+  {
+    "title": "Build from Data",
+    "subtitle": "Build CVs for Candidates",
+    "text": "For some recruiters, building CVs is a real challenge. We solve this by directly communicating with candidates and collecting as much information as we can. We then process the information and build a CV for the candidate.",
+    "img": "/assets/img/features/8-cv.png"
+  },
+  {
+    "title": "Long Term Talent Pool",
+    "subtitle": "Talk to candidates, after positioning them.",
+    "text": "In most cases once a recruiter has placed a candidate, the process stops. Not for us! We have built technology which communicates with candidates after they have been placed to see if candidates actually like their new role. In the contract sector, this has proven to build sustainable and long term relationships between recruiter and candidate.",
+    "img": "/assets/img/features/chat.svg"
+  },
+  {
+    "title": "Learning From The Process",
+    "subtitle": "Satisfaction Ratings",
+    "text": "Our numbers have shown that recruiters who took feedback from the candidates, saw a 36% increase in future success. This was because we helped them identify where they needed to change and more importantly how to improve their process.",
+    "img": "/assets/img/features/debate.svg"
+  }
+]

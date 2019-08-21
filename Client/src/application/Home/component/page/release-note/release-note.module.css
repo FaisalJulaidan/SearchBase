@@ -1,0 +1,27 @@
+.background {
+    /*background: rgba(45, 30, 75, 0.95);*/
+    background: linear-gradient(to top, #a865e1, #9d69e5, #916ce8, #8570eb, #7773ed);
+}
+
+.wave {
+    transform: translateY(5px);
+    display: block;
+}
+
+.background .text_wrapper {
+    padding-top: 3em;
+    padding-bottom: 3em;
+    color: white;
+
+}
+
+.background .text_wrapper .title {
+    font-size: 4em;
+    line-height: 1em;
+}
+
+.content {
+    line-height: normal;
+    color: #726a84;
+}
+

@@ -1,0 +1,23 @@
+.text_section{
+    overflow: hidden;
+    border-left: 10px solid #9254de;
+    padding-left: 1em;
+    margin: 1em 0;
+}
+
+.intro{
+    font-size: 4em;
+    font-weight: bold;
+    color: #9254de;
+    display: inline-block;
+}
+
+.title{
+    font-weight: bold;
+    color: #9254de;
+}
+
+.text{
+    margin-top: .2em;
+    color: #726a84;
+}

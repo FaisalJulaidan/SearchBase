@@ -60,6 +60,29 @@ function* signup({signupDetails}) {
     }
 }
 
+// Demo Request
+function* demoRequest({name, email, companyName, phone, crm, subscribe}) {
+    try {
+        loadingMessage('Arranging a demo', 0);
+        const res = yield axios.post(`/mail/arrange_demo`, {name, email, companyName, phone, crm, subscribe}, {
+            headers: {'Content-Type': 'application/json'},
+        });
+        yield put(authActions.demoSuccess());
+        successMessage('Demo request submitted');
+
+
+        // Redirect to login ans ask user to verify account
+        yield history.push('/');
+        warningMessage('Your Demo request submitted successfully.', 0);
+
+    } catch (error) {
+        console.log(error);
+        const msg = error.response?.data?.msg || "Couldn't request demo";
+        yield put(authActions.demoFailure(error.response.data));
+        errorMessage(msg, 0);
+    }
+}
+
 // Reset Password
 function* forgetPassword({data}) {
     try {
@@ -101,7 +124,7 @@ function* newResetPassword({data}) {
 function* logout() {
     // Clear local storage from user, token...
     yield localStorage.clear();
-    yield history.push('/login');
+    yield history.push('/');
     successMessage('You have been logged out');
 }
 
@@ -133,6 +156,10 @@ function* watchSignup() {
     yield takeLatest(actionTypes.SIGNUP_REQUEST, signup)
 }
 
+function* watchDemoRequest() {
+    yield takeLatest(actionTypes.DEMO_REQUEST, demoRequest)
+}
+
 function* watchForgetPassword() {
     yield takeLatest(actionTypes.RESET_PASSWORD_REQUEST, forgetPassword)
 }
@@ -150,6 +177,7 @@ export function* authSaga() {
     yield all([
         watchLogin(),
         watchSignup(),
+        watchDemoRequest(),
         watchForgetPassword(),
         watchLogout(),
         watchNewResetPassword(),

@@ -1,0 +1,147 @@
+.wrapper {
+    padding: 1em 1em;
+    min-height: 100vh;
+    height: 100%;
+    background-image: linear-gradient(to right top, #a865e1, #9d69e5, #916ce8, #8570eb, #7773ed);
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    color: #726a84;
+}
+
+.container {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-items: center;
+    place-items: center;
+}
+
+.col_desc {
+    align-self: center;
+    color: white;
+}
+
+.col_desc .text1 {
+    text-align: left;
+    color: white;
+    font-weight: bold;
+    padding: 0 0 .5em 0;
+    font-size: 2em;
+}
+
+.col_desc .text2 {
+    text-align: left;
+    color: white;
+    font-size: 1em;
+}
+
+
+.card {
+    border-radius: 10px;
+    box-shadow: 0 5px 10px 0 rgba(0, 0, 0, 0.1);
+}
+
+.title {
+    color: #494949;
+    font-size: 2.5em;
+    font-weight: bold;
+    text-align: center;
+    padding-bottom: 2em;
+}
+
+.input {
+    border: none;
+    border-radius: 0;
+    border-bottom: 2px solid #adadad;
+}
+
+.input:focus {
+    box-shadow: none;
+    border-color: #9254de;
+}
+
+.has_val {
+    border-color: #9254de;
+}
+
+.submit {
+    margin-top: 3em;
+    border: solid transparent 0;
+    border-radius: 7px;
+    padding: 8px 20px;
+    background-color: #9254de;
+    transition: border-color 0.4s ease 0s, background-color 0.4s ease 0s;
+}
+
+.submit:hover {
+    background-color: #9C7DED;
+    transition: border-color 0.4s ease 0s, background-color 0.4s ease 0s;
+}
+
+.submit:not(:disabled):not(.disabled):active {
+    background-color: #9C7DED;
+    transition: border-color 0.4s ease 0s, background-color 0.4s ease 0s;
+}
+
+.submit:focus {
+    box-shadow: 0 0 0 0.2rem rgba(138, 107, 219, .5);
+}
+
+.submit:not(:disabled):not(.disabled):active:focus {
+    box-shadow: 0 0 0 0.2rem rgba(138, 107, 219, .5);
+}
+
+.sign_up {
+    margin-top: 4em;
+    font-size: .85em;
+    text-align: center;
+    color: #726a84;
+}
+
+.sign_up a {
+    font-size: .96em;
+    margin: 0 .2em;
+    text-decoration: none;
+    color: #9254de;
+}
+
+.navigation {
+    margin-top: 1em;
+    color: white;
+    align-self: center;
+    text-align: center;
+}
+
+.navigation ul {
+    font-size: 0.8em;
+    justify-content: space-around;
+    display: flex;
+    flex-flow: row;
+    align-self: center;
+}
+
+.navigation ul li {
+    padding: 0 1em;
+}
+
+.navigation a {
+    text-decoration: none;
+    color: white;
+}
+
+
+@media (max-width: 575.98px) {
+    .col_desc{
+        margin-top: 1em;
+        margin-bottom: 1em;
+    }
+    .col_desc .text1 {
+        text-align: center;
+        font-size: 1.5em;
+    }
+
+    .col_desc .text2 {
+        text-align: center;
+    }
+}

@@ -122,7 +122,7 @@ function* newResetPassword({data}) {
 function* logout() {
     // Clear local storage from user, token...
     yield localStorage.clear();
-    yield history.push('/login');
+    yield history.push('/');
     successMessage('You have been logged out');
 }
 

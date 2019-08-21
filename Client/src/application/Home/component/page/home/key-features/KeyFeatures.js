@@ -15,12 +15,14 @@ const KeyFeatures = (props) => {
                         and is easy to
                         plug-and-play.</h1>
                     <ul className={styles.list}>
-                        <Slide bottom big>
+                        <Slide bottom big cascade>
+                            <div>
                             <li>ATS/CRM</li>
                             <li>Calendars</li>
                             <li>Messaging Apps</li>
                             <li>Job Boards</li>
                             <li>Learning & Development</li>
+                            </div>
                         </Slide>
                     </ul>
 

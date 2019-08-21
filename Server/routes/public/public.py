@@ -36,11 +36,6 @@ def chatbot_direct_link123(assistantIDAsHash):
 
 # ======== Static Pages =========== #
 
-@public_router.route("/", methods=['GET'])
-def index_page():
-    if request.method == "GET":
-        return render_template("index.html")
-
 
 @public_router.route("/mail/arrange_demo", methods=['POST'])
 def register_interest():

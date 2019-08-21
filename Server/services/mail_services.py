@@ -13,8 +13,8 @@ tsbEmail = "info@thesearchbase.com"
 
 def sendDemoRequest(data) -> Callback:
     try:
-        if not data["name"] or data["company"] or (data["phone"] or data["email"]):
-            return Callback(False, "Required information is missing")
+        # if not data["name"] or data["company"] or (data["phone"] or data["email"]):
+        #     return Callback(False, "Required information is missing")
 
         callback: Callback = __sendEmail(tsbEmail, 'Demo Request', '/emails/arrange_demo.html', data=data)
 

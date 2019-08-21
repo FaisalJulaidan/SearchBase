@@ -263,6 +263,7 @@ class DataType(Enum):
         [UserType.Candidate],
         [BlockType.UserInput, BlockType.Question])
 
+    # TODO DELETE MIGRATE FIND_USAGES => NO NEED, USE (JobTitle)
     CandidateJobTitle = dataTypeCreator(
         'Candidate Job Title',
         'CandidateJobTitle',

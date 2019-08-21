@@ -1,6 +1,9 @@
 #/usr/bin/python3.5
-import os
 
+from gevent import monkey
+monkey.patch_all()
+
+import os
 from flask import Flask, render_template, request
 from flask_api import status
 from flask_babel import Babel
@@ -13,12 +16,12 @@ from models import db
 # Import all routers to register them as blueprints
 from routes.admin.routers import account_router, analytics_router, sub_router, \
     conversation_router, users_router, flow_router, assistant_router, \
-    database_router, options_router, marketplace_router, auto_pilot_router, appointment_router
+    database_router, options_router, marketplace_router, auto_pilot_router, appointment_router, webhook_router
 from routes.public.routers import public_router, reset_password_router, chatbot_router, auth_router
+from routes.staff.routers import staff_router
 from services import scheduler_services
 from services.auth_services import jwt
 from services.mail_services import mail
-from services import auto_pilot_services
 from utilities import helpers, tasks, dummy_data
 
 app = Flask(__name__, static_folder='static')
@@ -40,6 +43,8 @@ app.register_blueprint(database_router, url_prefix='/api')
 app.register_blueprint(auto_pilot_router, url_prefix='/api')
 app.register_blueprint(options_router, url_prefix='/api')
 app.register_blueprint(appointment_router, url_prefix='/api')
+app.register_blueprint(webhook_router, url_prefix='/api')
+app.register_blueprint(staff_router, url_prefix='/api/staff')
 
 @app.after_request
 def apply_caching(response):
@@ -126,6 +131,7 @@ elif os.environ['FLASK_ENV'] == 'development':
         os.environ["scheduler_lock"] = "True"
 
     print('Development mode running...')
+
 
 else:
     raise Exception("Please set FLASK_ENV first to either 'production', 'development', or 'staging' in .env file")

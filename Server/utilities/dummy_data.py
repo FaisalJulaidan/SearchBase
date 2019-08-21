@@ -3,7 +3,7 @@ from datetime import datetime, timedelta
 from sqlalchemy_utils import Currency
 
 from models import db, Role, Company, Assistant, Conversation, Database, Candidate, CRM, Appointment, Job, Messenger
-from services import user_services, flow_services, auto_pilot_services
+from services import user_services, flow_services, auto_pilot_services, appointment_services
 from utilities import helpers, enums
 
 
@@ -130,22 +130,22 @@ def generate():
     user_sabic = Role.query.filter(Role.Company == sabic).filter(Role.Name == "User").first()
 
     user_services.create(firstname='Sylvester', surname='Stallone', email='aa@aa.com', password='123', phone='43444236456',
-                         companyID=aramco.ID, roleID=ownerRole.ID, verified=True)
+                         companyID=aramco.ID, roleID=ownerRole.ID, verified=True, timeZone="Europe/London")
     user_services.create(firstname='Evg', surname='Test', email='evgeniy67@abv.bg', password='123', phone='43444236456',
-                         companyID=aramco.ID, roleID=admin_aramco.ID, verified=True)
+                         companyID=aramco.ID, roleID=admin_aramco.ID, verified=True, timeZone="Europe/London")
     user_services.create(firstname='firstname', surname='lastname', email='e2@e.com', password='123', phone='43444236456',
-                         companyID=aramco.ID, roleID=admin_aramco.ID, verified=True)
+                         companyID=aramco.ID, roleID=admin_aramco.ID, verified=True, timeZone="Europe/London")
     user_services.create(firstname='firstname', surname='lastname', email='e3@e.com', password='123', phone='43444236456',
-                         companyID=aramco.ID, roleID=user_aramco.ID, verified=True)
+                         companyID=aramco.ID, roleID=user_aramco.ID, verified=True, timeZone="Europe/London")
 
     user_services.create(firstname='Ali', surname='Khalid', email='bb@bb.com', password='123', phone='43444236456',
-                         companyID=sabic.ID, roleID=ownerRole.ID, verified=True)
+                         companyID=sabic.ID, roleID=ownerRole.ID, verified=True, timeZone="Europe/London")
     user_services.create(firstname='firstname', surname='lastname', email='e5@e.com', password='123', phone='43444236456',
-                         companyID=sabic.ID, roleID=admin_sabic.ID, verified=True)
+                         companyID=sabic.ID, roleID=admin_sabic.ID, verified=True, timeZone="Europe/London")
 
 
 
-    # Chatbot Sessions
+    # Chatbot Conversations
     data = {
         "collectedData": [
             {
@@ -250,11 +250,14 @@ def generate():
     }))
 
 
-# Create an AutoPilot for a Company
+    # Create an AutoPilot for a Company
     reader_a.AutoPilot = auto_pilot_services.create('First Pilot',
                                "First pilot to automate the acceptance and rejection of candidates application",
                                aramco.ID).Data
     auto_pilot_services.create('Second Pilot', '', aramco.ID)
+
+
+    appointment_services.dummyCreateAppointmentAllocationTime("Test Times", aramco.ID)
 
     # Add Appointment
     a = Appointment(DateTime=datetime.now() + timedelta(days=5), Conversation=conversation1)

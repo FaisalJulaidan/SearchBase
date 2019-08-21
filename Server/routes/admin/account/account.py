@@ -36,6 +36,7 @@ def profile():
                                                       data.get("phoneNumber"),
                                                       data.get("chatbotNotifications"),
                                                       data.get("newsletters"),
+                                                      data.get("timeZone"),
                                                       user.get("id", 0))
         if not callback.Success:
             return helpers.jsonResponse(False, 400, "Could not update profile details.", None)

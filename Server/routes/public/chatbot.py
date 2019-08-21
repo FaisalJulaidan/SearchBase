@@ -4,7 +4,7 @@ from flask import Blueprint, request, send_from_directory
 from flask_cors import CORS
 from werkzeug.utils import secure_filename
 
-from models import Callback, db, Conversation, Assistant
+from models import Callback, db, Conversation, Assistant, StoredFile, StoredFileInfo
 from services import conversation_services, flow_services, databases_services, stored_file_services, mail_services
 from services.Marketplace.CRM import crm_services
 from utilities import helpers
@@ -98,6 +98,7 @@ def getSolutions_forChatbot(assistantHashID):
 
 @chatbot_router.route("/assistant/<string:assistantIDAsHash>/chatbot/<int:sessionID>/file", methods=['POST'])
 def chatbot_upload_files(assistantIDAsHash, sessionID):
+    print('call')
     callback: Callback = conversation_services.getByID(sessionID, helpers.decodeID(assistantIDAsHash)[0])
     if not callback.Success:
         return helpers.jsonResponseFlask(False, 404, "Session not found.", None)
@@ -113,6 +114,10 @@ def chatbot_upload_files(assistantIDAsHash, sessionID):
 
             files = request.files.getlist('file')
             filenames = ''
+            sf : StoredFile = StoredFile()
+
+            db.session.add(sf)
+            db.session.flush()
 
             for file in files:
 
@@ -126,18 +131,17 @@ def chatbot_upload_files(assistantIDAsHash, sessionID):
                 upload_callback: Callback = stored_file_services.uploadFile(file, filename,
                                                                             stored_file_services.USER_FILES_PATH,
                                                                             True)
+                file.realFileName = filename
+                # if not upload_callback.Success:
+                #     filename = 'fileCorrupted'
 
-                if not upload_callback.Success:
-                    filename = 'fileCorrupted'
 
                 # if there is multiple files, split there name by commas to store a ref of the uploaded files in DB
-                if filenames == '':
-                    filenames = filename
-                else:
-                    filenames += ',' + filename
+                # file.realFileName = filename
+
 
             # Store filePaths in the DB as reference
-            dbRef_callback: Callback = stored_file_services.createRef(filenames, conversation)
+            dbRef_callback: Callback = stored_file_services.createRef(files, conversation, sf.ID)
             if not dbRef_callback.Success:
                 logError("Couldn't Save Stored Files Reference For: " + str(filenames))
                 raise Exception(dbRef_callback.Message)

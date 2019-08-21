@@ -77,7 +77,7 @@ export const dataHandler = (() => {
             source = CancelToken.source();
             let cancelled;
             const result = processMessages(completed); // loop messages
-            if ((!completed && result.collectedData.length < 3) || sessionID) return {cancelled};
+            if ((!completed && result.collectedData.length < 1) || sessionID) return {cancelled};
 
             const cancel = {
                 cancelToken: source.token

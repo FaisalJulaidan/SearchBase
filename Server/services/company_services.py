@@ -1,4 +1,4 @@
-from models import db, Callback, Company, User
+from models import db, Callback, Company, User, AppointmentAllocationTime, AppointmentAllocationTimeInfo
 from services import stored_file_services
 from utilities import helpers
 from werkzeug.utils import secure_filename
@@ -28,6 +28,7 @@ def create(name, url, ownerEmail) -> Company or None:
         helpers.logError("company_service.create(): " + str(exc))
         db.session.rollback()
         return Callback(False, "Couldn't create a company entity.")
+
 
 
 
@@ -184,3 +185,18 @@ def deleteLogo(companyID):
         helpers.logError("company_service.deleteLogo(): " + str(exc))
         db.session.rollback()
         return Callback(False, 'Error in deleting logo.')
+
+def activateCompany(companyID):
+    try:
+        # Get company and check if None then raise exception
+        company: Company = db.session.query(Company).get(companyID)
+        if not company: raise Exception
+
+        company.Active = True
+        db.session.commit()
+        return Callback(True, 'Company activated successfully')
+
+    except Exception as exc:
+        print(exc)
+        db.session.rollback()
+        return Callback(False, 'Company activation failed')

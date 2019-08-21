@@ -4,7 +4,7 @@ from .Conversation import Conversation
 class Assistant(db.Model):
 
     @property
-    def appointments(self):
+    def Appointments(self):
         q = Appointment.query.join(Conversation).filter(Conversation.Assistant == self)
         return q.all()
 

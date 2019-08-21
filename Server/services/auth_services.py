@@ -10,7 +10,7 @@ jwt = JWTManager()
 
 @jwt.invalid_token_loader
 def my_expired_token_callback(error):
-    return helpers.jsonResponse(False, 401, "Session has expired!")
+    return helpers.jsonResponse(False, 401, "Session has expired")
 
 
 def signup(details) -> Callback:
@@ -20,12 +20,12 @@ def signup(details) -> Callback:
         
         # Validate Email
         if not helpers.isValidEmail(email):
-            return Callback(False, 'Invalid Email.')
+            return Callback(False, 'Invalid Email')
         
 
         # Check if user exists
         if user_services.getByEmail(email).Data:
-            return Callback(False, 'User already exists.')
+            return Callback(False, 'Email already exists')
 
         # Company
         # Create a company plus the Stripe customer and link it with the company
@@ -41,7 +41,7 @@ def signup(details) -> Callback:
         adminRole: Callback = role_services.create('Admin', True, True, True, True, False, company.ID)
         userRole: Callback = role_services.create('User', True, False, False, False, False, company.ID)
         if not (adminRole.Success or userRole.Success):
-            return Callback(False, 'Could not create roles for the new user.')
+            return Callback(False, 'Could not create roles for the new user')
 
         # User
         # Create a new user with its associated company and owner role
@@ -51,7 +51,8 @@ def signup(details) -> Callback:
                                              details['password'],
                                              details['telephone'],
                                              company.ID,
-                                             2) # RoleID = 2 -> Owner
+                                             2,
+                                             details['timeZone']) # RoleID = 2 -> Owner
 
 
         # Subscribe to basic plan with 14 trial days
@@ -63,10 +64,11 @@ def signup(details) -> Callback:
             .sendVerificationEmail(details['firstName'], details['lastName'], email, company.Name, company.ID)
 
         # Send us mail that someone has registered
-        notify_us_callback: Callback = mail_services.sendNewUserHasRegistered(details['firstName'] + details['lastName'],
-                                                                              email,
-                                                                              company.Name,
-                                                                              details['telephone'])
+        notify_us_callback: Callback = mail_services.sendNewCompanyHasRegistered(details['firstName'] + details['lastName'],
+                                                                                 email,
+                                                                                 company.Name,
+                                                                                 company.ID,
+                                                                                 details['telephone'])
 
         # If subscription failed, remove the new created company and user
         if not (user_callback.Success or verify_callback.Success or notify_us_callback.Success):
@@ -80,12 +82,12 @@ def signup(details) -> Callback:
         # ###############
 
         # Return a callback with a message
-        return Callback(True, 'Signed up successfully!')
+        return Callback(True, "Signed up successfully")
 
     except Exception as exc:
         helpers.logError("auth_services.signup(): " + str(exc))
         db.session.rollback()
-        return Callback(False, "Failed to signup!", None)
+        return Callback(False, "Failed to signup", None)
 
 
 def authenticate(email: str, password_to_check: str) -> Callback:
@@ -107,12 +109,16 @@ def authenticate(email: str, password_to_check: str) -> Callback:
         if not user.Verified:
             return Callback(False, "Account is not verified.")
 
+        if not user.Company.Active:
+            return Callback(False, "Please, wait for SearchBase team to activate your account")
+
         # If all the tests are valid then do login process
         data = {'user': {
                          "email": user.Email,
                          "username": user.Firstname + ' ' + user.Surname,
                          "lastAccess": user.LastAccess,
                          "phoneNumber": user.PhoneNumber,
+                         "timezone": user.TimeZone
                          # "plan": helpers.getPlanNickname(user.Company.SubID),
                          },
                 'role': helpers.getDictFromSQLAlchemyObj(user.Role),

@@ -47,7 +47,7 @@ def login(auth):
             "grant_type": "authorization_code",
             "client_id": CLIENT_ID,
             "client_secret": CLIENT_SECRET,
-            "redirect_uri": helpers.getDomain() + "/dashboard/marketplace/Mercury",
+            "redirect_uri": helpers.getDomain(3000) + "/dashboard/marketplace/Mercury",
             "code": auth.get("code"),
             "resource": "https://" + auth.get("state") + ".dynamics.com"
         }
@@ -83,7 +83,7 @@ def retrieveAccessToken(auth, companyID):
             "grant_type": "refresh_token",
             "client_id": CLIENT_ID,
             "client_secret": CLIENT_SECRET,
-            "redirect_uri": helpers.getDomain() + "/dashboard/marketplace/Mercury",
+            "redirect_uri": helpers.getDomain(3000) + "/dashboard/marketplace/Mercury",
             "refresh_token": auth.get("refresh_token")
         }
 

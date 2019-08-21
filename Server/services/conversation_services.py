@@ -5,9 +5,9 @@ from jsonschema import validate
 from sqlalchemy.sql import and_
 from sqlalchemy.sql import desc
 
-from utilities.enums import UserType, Status
+from utilities.enums import UserType, Status, Webhooks
 from models import db, Callback, Conversation, Assistant
-from services import assistant_services, stored_file_services, auto_pilot_services, mail_services
+from services import assistant_services, stored_file_services, auto_pilot_services, mail_services, webhook_services
 from services.Marketplace.CRM import crm_services
 from utilities import json_schemas, helpers
 
@@ -55,6 +55,15 @@ def processConversation(assistantHashID, data: dict) -> Callback:
                                     Score=round(data['score'], 2),
                                     ApplicationStatus=Status.Pending,
                                     Assistant=assistant)
+        webhookData = {
+            **conversationData,
+            'name': data['name'],
+            'email': data['email'],
+            'phoneNumber': data['phone'],
+            'userType': UserType[data['userType']].value
+        }
+
+        webhook_services.fireRequests(webhookData, callback.Data.CompanyID, Webhooks.Conversations)
 
         # AutoPilot Operations
         if assistant.AutoPilot and conversation.Completed:
@@ -104,15 +113,10 @@ def getAllByAssistantID(assistantID):
         conversations: List[Conversation] = db.session.query(Conversation) \
             .filter(Conversation.AssistantID == assistantID) \
             .order_by(desc(Conversation.DateTime)).all()
-
         for conversation in conversations:
-            filePaths = ""
-            storedFile_callback: Callback = stored_file_services.getByConversation(conversation)
-            if storedFile_callback.Success:
-                filePaths = storedFile_callback.Data.FilePath
-            conversation.FilePath = filePaths
+            if(conversation.StoredFile != None):
+                conversation.__Files = helpers.getListFromSQLAlchemyList(conversation.StoredFile.StoredFileInfo)
         return Callback(True, "Conversations retrieved successfully.", conversations)
-
     except Exception as exc:
         helpers.logError("conversation_services.getAllByAssistantID(): " + str(exc))
         db.session.rollback()
@@ -128,7 +132,7 @@ def getByID(conversationID, assistantID):
 
         storedFile_callback: Callback = stored_file_services.getByConversation(conversation)
         if storedFile_callback.Success:
-            conversation.FilePath = storedFile_callback.Data.FilePath
+            conversation.__Files = storedFile_callback.Data.StoredFileInfo
 
         return Callback(True, "ChatbotConversation retrieved successfully.", conversation)
 

@@ -29,20 +29,26 @@ import * as messageTypes from '../../constants/MessageType';
 import ChatButton from './ChatButton';
 import Header from './Header';
 import Flow from './Flow';
+import Settings from './Settings';
 import Input from './Input';
 import Signature from './Signature';
 import 'antd/dist/antd.css';
+import { Tooltip } from 'antd';
 
 export const Chatbot = ({
                             isDirectLink, btnColor, assistantID,
                             addBotMessage, setChatbotStatus, chatbot, initChatbot,
                             resetChatbot, resetMessage, setChatbotAnimation, messageList,
-                            loadByDefault
+                            loadByDefault, root
                         }) => {
     const { assistant, status, animation } = chatbot;
     const { loading, thinking, open, disabled, active, started, curAction, finished } = status;
     const { open: animationOpen } = animation;
+
+
     let timer = useRef(null);
+    let messageTimer = useRef(null);
+    let chatbotRef = useRef(null);
     let stopTimer = useRef(null);
 
     window.addEventListener('beforeunload', () => {
@@ -77,18 +83,17 @@ export const Chatbot = ({
         setChatbotAnimation({ open: true });
     };
 
-    // useEffect(() => {
-    //   let chat = localStorage.getItem('tsb_chatbot_draft')
-    //   if(chat){
-    //     alert('Hello again, you left last time without finishing the chatbot, would you like to continue where you left off?')
-    //   }
-    // }, [])
-
-    // On boot first time animation
-
-
     useEffect(() => {
-        if (assistant)
+        const hasBeenUsed = () => {
+            let used = localStorage.getItem('TSB_CHATBOT_USED');
+            if (used === null) {
+                localStorage.setItem('TSB_CHATBOT_USED', true);
+                return false;
+            } else {
+                return true;
+            }
+        };
+        if (assistant && !hasBeenUsed())
             if (isDirectLink) {
                 setChatbotAnimation({ open: true });
                 setChatbotStatus({ open: true });
@@ -103,6 +108,7 @@ export const Chatbot = ({
 
     // When the chatbot animation has been set to true
     useEffect(() => {
+
         let startupTimeout;
         if (animationOpen) {
             startupTimeout = setTimeout(() => {
@@ -118,11 +124,12 @@ export const Chatbot = ({
         dataHandler.incrementTimeElapsed(200);
     }, open === true ? 200 : null);
 
+
     // Every time the chatbot changes, call to flowHandler
     useEffect(() => {
         // if(disabled) return;
         const setChatbotWaiting = (block) => {
-            if(!block.Content   ) return
+            if (!block.Content) return;
             setChatbotStatus({
                 curAction: null,
                 waitingForUser: false,
@@ -134,23 +141,28 @@ export const Chatbot = ({
         };
 
         const botRespond = (block, chatbot) => {
-            if(!block.Content) return
+            if (!block.Content) return;
             stopTimer.current = optionalDelayExecution(() => {
-                setChatbotStatus({ thinking: false, waitingForUser: true });
                 addBotMessage(block.Content.text, block.Type, block);
-                    if (block.selfContinue) {
+                setChatbotStatus({ thinking: false, waitingForUser: true });
+                if (block.selfContinue) {
                     setChatbotStatus({
+                        thinking: false,
                         curBlockID: block.selfContinue,
                         curAction: block.selfContinue === 'End Chat' ? 'End Chat' : 'Go To Next Block'
                     });
+                    return;
                 }
                 if (block[flowAttributes.TYPE] === messageTypes.RAW_TEXT) {
                     setChatbotStatus({
+                        thinking: false,
                         curBlockID: block[flowAttributes.CONTENT][flowAttributes.BLOCKTOGOID],
                         curAction: block[flowAttributes.CONTENT][flowAttributes.SUPER_ACTION]
-                    })
+                    });
+                    return;
                 }
-            }, !block.extra.needsToFetch, block.delay);
+                // messageTimer.current = { timer: setInterval(() => console.log('lol'), 100), count: messageList.length }
+            }, block.extra.needsToFetch !== false, block.delay);
         };
 
         const fetch = async (block) => {
@@ -166,9 +178,9 @@ export const Chatbot = ({
                     afterMessage: 'Sorry, I could not find what you want!',
                     curBlockID: block[flowAttributes.CONTENT][flowAttributes.BLOCKTOGOID]
                 });
-                return {};
+                return ['Failed to fetch data', null];
             }
-            return fetchedData;
+            return [null, fetchedData];
         };
 
 
@@ -184,10 +196,17 @@ export const Chatbot = ({
 
             if (!nextBlock) return;
 
+            if (messageTimer.current) {
+                clearInterval(messageTimer.current.timer);
+                messageTimer.current = null;
+            }
             setChatbotWaiting(nextBlock);
-            let fetchedData = {};
+            let fetchedData, err;
             if (nextBlock.extra.needsToFetch) {
-                fetchedData = await fetch(nextBlock);
+                [err, fetchedData] = await fetch(nextBlock);
+            }
+            if (err) {
+                return;
             }
             if (nextBlock.extra.end) {
                 setChatbotStatus({ finished: true });
@@ -202,6 +221,8 @@ export const Chatbot = ({
 
     // initialize chatbot
     useEffect(() => {
+
+
         const fetchChatbot = async () => {
             const { data, error } = await promiseWrapper(axios.get(`${getServerDomain()}/api/assistant/${assistantID}/chatbot`));
             if (error) {
@@ -214,8 +235,6 @@ export const Chatbot = ({
             if (isDisabled)
                 return setChatbotStatus({ disabled: isDisabled, active: assistant.Active, loading: false });
 
-
-            console.log()
             dataHandler.setAssistantID(assistantID);
 
             initChatbot(
@@ -225,14 +244,14 @@ export const Chatbot = ({
 
 
         };
-        if (!assistant && (loadByDefault === "true" || !loadByDefault)) {
-            fetchChatbot()
+        if (!assistant && (loadByDefault === 'true' || !loadByDefault)) {
+            fetchChatbot();
         }
-        if (!window.__TSB_CHATBOT){
-            window.__TSB_CHATBOT = {}
-            window.__TSB_CHATBOT.ready = true
-            window.__TSB_CHATBOT.load = () => fetchChatbot()
-            window.__TSB_CHATBOT.open = () => openWindow()
+        if (!window.__TSB_CHATBOT) {
+            window.__TSB_CHATBOT = {};
+            window.__TSB_CHATBOT.ready = true;
+            window.__TSB_CHATBOT.load = () => fetchChatbot();
+            window.__TSB_CHATBOT.open = () => openWindow();
             window.__TSB_CHATBOT.close = () => closeWindow();
         }
     }, [initChatbot, setChatbotStatus]);
@@ -242,7 +261,8 @@ export const Chatbot = ({
             {active ?
                 <>
                     {open && !loading ?
-                        <div style={{ position: isDirectLink ? 'relative' : '' }}
+                        <div ref={chatbotRef}
+                             style={{ position: isDirectLink ? 'relative' : '' }}
                              className={[
                                  animation.open ? 'ZoomIn' : 'ZoomOut',
                                  isDirectLink ? 'Chatbot_DirectLink' : 'Chatbot'
@@ -260,13 +280,14 @@ export const Chatbot = ({
                                    hideSignature={assistant.HideSignature}
                                    visible={animation.inputOpen}/>
                             {assistant.HideSignature ? null : <Signature isDirectLink={isDirectLink}/>}
+                            <Settings/>
                         </div>
                         :
-                        <ChatButton btnColor={btnColor}
-                                    disabled={disabled}
-                                    active={active}
-                                    loading={loading}
-                                    openWindow={openWindow}/>
+                            <ChatButton btnColor={btnColor}
+                                        disabled={disabled}
+                                        active={active}
+                                        loading={loading}
+                                        openWindow={openWindow}/>
                     }
                 </>
                 : null}

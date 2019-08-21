@@ -1,6 +1,8 @@
 import 'react-app-polyfill/ie11';
 import 'react-app-polyfill/stable';
 import smoothscroll from 'smoothscroll-polyfill';
+// import 'babel-polyfill';
+
 
 import React from 'react';
 import ReactDOM from 'react-dom';
@@ -35,7 +37,8 @@ else
 
 ReactDOM.render(
     <Provider store={Store}>
-        <Chatbot isDirectLink={isDirectLink} btnColor={btnColor}
+        <Chatbot root={root}
+                 isDirectLink={isDirectLink} btnColor={btnColor}
                  loadByDefault={loadByDefault}
                  assistantID={assistantID}/>
     </Provider>, root

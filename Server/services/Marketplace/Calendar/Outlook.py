@@ -51,7 +51,7 @@ def login(auth):
             "grant_type": "authorization_code",
             "client_id": CLIENT_ID,
             "client_secret": CLIENT_SECRET,
-            "redirect_uri": helpers.getDomain() + "/dashboard/marketplace/Outlook",
+            "redirect_uri": helpers.getDomain(3000) + "/dashboard/marketplace/Outlook",
             "code": auth.get("code")
         }
 
@@ -85,7 +85,7 @@ def retrieveAccessToken(auth, companyID):
             "grant_type": "refresh_token",
             "client_id": CLIENT_ID,
             "client_secret": CLIENT_SECRET,
-            "redirect_uri": helpers.getDomain() + "/dashboard/marketplace/Outlook",
+            "redirect_uri": helpers.getDomain(3000) + "/dashboard/marketplace/Outlook",
             "refresh_token": auth.get("refresh_token")
         }
 

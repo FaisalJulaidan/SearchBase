@@ -93,6 +93,7 @@ def auto_pilot_configs(autoPilotID):
                            data.get('sendRejectionSMS'),
                            data.get('rejectionSMSBody'),
                            data.get('sendCandidatesAppointments'),
+                           data.get('appointmentAllocationTimes'),
                            user['companyID'])
         if not callback.Success:
             return helpers.jsonResponse(False, 400, callback.Message, None)

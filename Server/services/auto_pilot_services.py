@@ -1,6 +1,6 @@
-from datetime import datetime, time
+from datetime import datetime
 
-from models import db, Callback, AutoPilot, OpenTimes, Conversation, Assistant, Messenger
+from models import db, Callback, Conversation, AutoPilot, Assistant, Messenger
 from services import mail_services, stored_file_services as sfs
 from services.Marketplace.Messenger import mesenger_services
 from sqlalchemy import and_
@@ -89,7 +89,7 @@ def processConversation(conversation: Conversation, autoPilot: AutoPilot, assist
             def __processSendingSMS(phone, status: Status, autoPilot: AutoPilot):
 
                 messenger: Messenger = assistant.Messenger
-                userName = conversation.Name or 'Anonymous'
+                userName = conversation.Name or '[Candidate.Name]'
                 # companyName = autoPilot.Company.Name
 
                 # ======================
@@ -99,7 +99,7 @@ def processConversation(conversation: Conversation, autoPilot: AutoPilot, assist
 
                     SMSBody = autoPilot.AcceptanceSMSBody \
                         .replace("${candidateName}$", userName) \
-                        .replace("${candidateEmail}$", email or " ") \
+                        .replace("${candidateEmail}$", email or "[Candidate.Email]") \
                         .replace("&nbsp;", "\n")
 
                     acceptance_SMS_callback: Callback = \
@@ -114,7 +114,8 @@ def processConversation(conversation: Conversation, autoPilot: AutoPilot, assist
 
                     SMSBody = autoPilot.RejectionSMSBody \
                         .replace("${candidateName}$", userName) \
-                        .replace("${candidateEmail}$", email)
+                        .replace("${candidateEmail}$", email or "[Candidate.Email]") \
+                        .replace("&nbsp;", "\n")
 
                     rejection_SMS_callback: Callback = \
                         mesenger_services.sendMessage(messenger.Type, phone, SMSBody, messenger.Auth)
@@ -171,7 +172,6 @@ def getByID(id: int, companyID: int) -> Callback:
         result: AutoPilot = db.session.query(AutoPilot) \
             .filter(and_(AutoPilot.ID == id, AutoPilot.CompanyID == companyID)).first()
         if not result: raise Exception
-
         return Callback(True, "Got AutoPilot successfully.", result)
 
     except Exception as exc:
@@ -195,7 +195,7 @@ def fetchAll(companyID) -> Callback:
 def parseAutoPilot(autoPilot: AutoPilot) -> dict:
     return {
         **helpers.getDictFromSQLAlchemyObj(autoPilot),
-        "OpenTimes": helpers.getListFromSQLAlchemyList(autoPilot.OpenTimes)
+        "AppointmentAllocationTime": helpers.getDictFromSQLAlchemyObj(autoPilot.AppointmentAllocationTime)
     }
 
 
@@ -226,8 +226,9 @@ def updateConfigs(id, name, desc, active, acceptApplications, acceptanceScore, s
                   acceptanceEmailTitle,
                   acceptanceEmailBody, sendAcceptanceSMS, acceptanceSMSBody, rejectApplications, rejectionScore,
                   sendRejectionEmail, rejectionEmailTitle, rejectionEmailBody, sendRejectionSMS, rejectionSMSBody,
-                  sendCandidatesAppointments, companyID: int) -> Callback:
+                  sendCandidatesAppointments, appointmentAllocationTimes, companyID: int) -> Callback:
     try:
+
         # Get AutoPilot
         autoPilot_callback: Callback = getByID(id, companyID)
         if not autoPilot_callback.Success: return autoPilot_callback
@@ -246,6 +247,8 @@ def updateConfigs(id, name, desc, active, acceptApplications, acceptanceScore, s
         autoPilot.SendAcceptanceSMS = sendAcceptanceSMS
         autoPilot.AcceptanceSMSBody = acceptanceSMSBody
 
+        autoPilot.AppointmentAllocationTimeID = appointmentAllocationTimes
+
         autoPilot.RejectApplications = rejectApplications
         autoPilot.RejectionScore = rejectionScore
         autoPilot.SendRejectionEmail = sendRejectionEmail
@@ -257,6 +260,7 @@ def updateConfigs(id, name, desc, active, acceptApplications, acceptanceScore, s
         autoPilot.SendCandidatesAppointments = sendCandidatesAppointments
 
         # Save all changes
+
         db.session.commit()
         return Callback(True, "Updated the AutoPilot successfully.", autoPilot)
 

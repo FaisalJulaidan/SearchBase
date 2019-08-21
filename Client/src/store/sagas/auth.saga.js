@@ -15,8 +15,10 @@ function* login({email, password, prevPath}) {
         });
 
         const {user, role, company, token, refresh, expiresIn} = yield res.data.data;
+        const {timezone} = user;
         yield localStorage.setItem("user", JSON.stringify(user));
         yield localStorage.setItem("role", JSON.stringify(role));
+        yield localStorage.setItem("timezone", timezone);
         yield localStorage.setItem("company", JSON.stringify(company));
         yield localStorage.setItem("token", token);
         yield localStorage.setItem("refresh", refresh);
@@ -24,7 +26,7 @@ function* login({email, password, prevPath}) {
 
         // Dispatch actions
         // yield put(profileActions.getProfile());
-        yield put(authActions.loginSuccess(user, role));
+        yield put(authActions.loginSuccess(user, role, timezone));
 
         // Redirect to dashboard page
         yield history.push(prevPath || '/dashboard');

@@ -1,6 +1,7 @@
 import React, {Component, lazy, Suspense} from 'react';
 
 import {Avatar, Dropdown, Icon, Layout, Menu} from 'antd';
+import momenttz from 'moment-timezone'
 import "./Dashboard.less"
 import styles from "./Dashboard.module.less"
 
@@ -14,8 +15,7 @@ import {CSSTransition, TransitionGroup} from "react-transition-group";
 
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
 import {faCloud} from '@fortawesome/free-solid-svg-icons'
-
-
+import {TimezoneContext} from "../../contexts/timezone";
 
 const Home = lazy(() => import('./Home/Home'));
 const Assistants = lazy(() => import('./Assistants/Assistants'));
@@ -26,11 +26,14 @@ const Account = lazy(() => import('./ControlPanel/Account/Account'));
 const Billing = lazy(() => import('./ControlPanel/Billing/Billing'));
 const UsersManagement = lazy(() => import('./ControlPanel/UsersManagement/UsersManagement'));
 const Documentation = lazy(() => import('./Documentation/Documentation'));
-const Calendar = lazy(() => import('./Calendar/Calendar'));
+const Campaign = lazy(() => import('./Campaign/Campaign'));
 const AutoPilots = lazy(() => import('./AutoPilots/AutoPilots'));
 const AutoPilot = lazy(() => import('./AutoPilots/AutoPilot/AutoPilot'));
+const Appointment = lazy(() => import('./Appointment/Appointment'));
 const Marketplace = lazy(() => import('./Marketplace/Marketplace'));
 const Item = lazy(() => import('./Marketplace/Item/Item'));
+// const AppointmentRoutes = lazy(() => import('./Appointment/AppointmentRoutes'));
+
 
 
 const {SubMenu} = Menu;
@@ -46,6 +49,7 @@ class Dashboard extends Component {
     componentWillMount() {
         this.props.dispatch(optionsActions.getOptions())
     }
+
 
 
     toggle = () => {
@@ -71,8 +75,9 @@ class Dashboard extends Component {
     };
 
     render() {
-
         const {match, location} = this.props;
+        const timezone = getTimezone()
+        const validTimezone = timezone ? timezone : momenttz.tz.guess()
         const user = getUser();
         const company = getCompany();
 
@@ -116,11 +121,12 @@ class Dashboard extends Component {
         const newLayoutRoutes = [
             "/dashboard/assistants",
             "/dashboard/marketplace",
-            "/dashboard/calendar",
+            "/dashboard/appointments",
             "/dashboard/auto_pilot",
             "/dashboard/databases",
             "/dashboard/account",
             "/dashboard/users_management",
+            "/dashboard/campaign"
         ];
         const isNewLayout = newLayoutRoutes.some(a => this.props.location.pathname.indexOf(a) > -1);
         return (
@@ -173,15 +179,16 @@ class Dashboard extends Component {
                             <span>Assistants</span>
                         </Menu.Item>
 
+                        <Menu.Item key="campaign">
+                            <Icon type="rocket"/>
+                            <span>Campaign</span>
+                        </Menu.Item>
+
                         <Menu.Item disabled={!company.AccessAutoPilot} key="auto_pilots">
                             <Icon type="clock-circle"/>
                             <span>Auto Pilot</span>
                         </Menu.Item>
 
-                        <Menu.Item key="marketplace">
-                            <Icon type="interation"/>
-                            <span>Marketplace</span>
-                        </Menu.Item>
 
                         <Menu.Item disabled={!company.AccessDatabases} key="databases">
                             <Icon type="database"/>
@@ -190,7 +197,12 @@ class Dashboard extends Component {
 
                         <Menu.Item disabled key="calendar">
                             <Icon type="calendar"/>
-                            <span>Calendar (soon)</span>
+                            <span>Appointments (beta)</span>
+                        </Menu.Item>
+
+                        <Menu.Item key="marketplace">
+                            <Icon type="interation"/>
+                            <span>Marketplace</span>
                         </Menu.Item>
 
                         <Divider/>
@@ -250,39 +262,43 @@ class Dashboard extends Component {
                             :
                             {margin: 16, marginTop: 10, marginBottom: 0, height: '100%'}
                     }>
-                        <Route render={() =>
-                            <TransitionGroup style={{height: '100%'}}>
-                                <CSSTransition key={location.key} classNames="fade" timeout={550}>
-                                    <Suspense fallback={<div> Loading...</div>}>
-                                        <Switch location={location} style={{height: '100%'}}>
 
-                                            <Route path={`${match.path}/assistants`} component={Assistants} exact/>
-                                            <Route path={`${match.path}/assistants/:id`} component={Assistant} exact/>
+                        <TimezoneContext.Provider value={validTimezone}>
+                            <Route render={() =>
+                                <TransitionGroup style={{height: '100%'}}>
+                                    <CSSTransition key={location.key} classNames="fade" timeout={550}>
+                                        <Suspense fallback={<div> Loading...</div>}>
+                                            <Switch location={location} style={{height: '100%'}}>
 
-                                            <Route path={`${match.path}/marketplace`} component={Marketplace} exact/>
-                                            <Route path={`${match.path}/marketplace/:type`} component={Item} exact/>
+                                                <Route path={`${match.path}/assistants`} component={Assistants} exact/>
+                                                <Route path={`${match.path}/assistants/:id`} component={Assistant} exact/>
 
-                                            <Route path={`${match.path}/databases`} component={Databases} exact/>
-                                            <Route path={`${match.path}/databases/:id`} component={Database} exact/>
+                                                <Route path={`${match.path}/marketplace`} component={Marketplace} exact/>
+                                                <Route path={`${match.path}/marketplace/:type`} component={Item} exact/>
 
-                                            <Route path={`${match.path}/account`} component={Account} exact/>
-                                            <Route path={`${match.path}/billing`} component={Billing} exact/>
+                                                <Route path={`${match.path}/databases`} component={Databases} exact/>
+                                                <Route path={`${match.path}/databases/:id`} component={Database} exact/>
 
-                                            <Route path={`${match.path}/auto_pilots`} component={AutoPilots} exact/>
-                                            <Route path={`${match.path}/auto_pilots/:id`} component={AutoPilot} exact/>
+                                                <Route path={`${match.path}/account`} component={Account} exact/>
+                                                <Route path={`${match.path}/billing`} component={Billing} exact/>
 
-                                            <Route path={`${match.path}/users_management`} component={UsersManagement}
-                                                   exact/>
-                                            <Route path={`${match.path}/documentation`} component={Documentation}
-                                                   exact/>
-                                            {/*<Route path={`${match.path}/calendar`} component={Calendar} exact/>*/}
+                                                <Route path={`${match.path}/auto_pilots`} component={AutoPilots} exact/>
+                                                <Route path={`${match.path}/auto_pilots/:id`} component={AutoPilot} exact/>
 
-                                            <Route path="/dashboard" component={Home}/>
-                                        </Switch>
-                                    </Suspense>
-                                </CSSTransition>
-                            </TransitionGroup>
-                        }/>
+                                                <Route path={`${match.path}/users_management`} component={UsersManagement}
+                                                       exact/>
+                                                <Route path={`${match.path}/documentation`} component={Documentation}
+                                                       exact/>}
+                                                <Route path={`${match.path}/appointments`} component={Appointment} exact/>
+                                                       exact/>
+                                                <Route path={`${match.path}/campaign`} component={Campaign} exact/>
+                                                <Route path="/dashboard" component={Home}/>
+                                            </Switch>
+                                        </Suspense>
+                                    </CSSTransition>
+                                </TransitionGroup>
+                            }/>
+                        </TimezoneContext.Provider>
                     </Content>
 
                     <Footer style={{textAlign: 'center', padding: 10, zIndex: 1}}>
@@ -296,7 +312,7 @@ class Dashboard extends Component {
 
 function mapStateToProps(state) {
     return {
-        account: state.account.account
+        account: state.account.account.t
     };
 }
 

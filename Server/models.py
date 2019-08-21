@@ -86,14 +86,23 @@ Newsletter: Newsletter = Newsletter
 from schemas.Messenger import Messenger
 Messenger: Messenger = Messenger
 
-from schemas.OpenTimes import OpenTimes
-OpenTimes: OpenTimes = OpenTimes
+from schemas.AppointmentAllocationTime import AppointmentAllocationTime
+AppointmentAllocationTime: AppointmentAllocationTime = AppointmentAllocationTime
+
+from schemas.AppointmentAllocationTimeInfo import AppointmentAllocationTimeInfo
+AppointmentAllocationTimeInfo: AppointmentAllocationTimeInfo = AppointmentAllocationTimeInfo
 
 from schemas.Role import Role
 Role: Role = Role
 
 from schemas.StoredFile import StoredFile
 StoredFile: StoredFile = StoredFile
+
+from schemas.StoredFileInfo import StoredFileInfo
+StoredFileInfo: StoredFileInfo = StoredFileInfo
+
+from schemas.Webhook import Webhook
+Webhook: Webhook = Webhook
 
 from schemas.User import User
 User: User = User

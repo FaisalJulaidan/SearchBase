@@ -15,12 +15,13 @@ import {
     Row,
     Spin,
     Switch,
-    Typography
+    Typography,
+    Select
 } from 'antd';
 import 'types/TimeSlots_Types';
 import './AutoPilot.less'
 import {history} from 'helpers';
-import {autoPilotActions} from 'store/actions';
+import {autoPilotActions, appointmentAllocationTimeActions} from 'store/actions';
 import CKEditor from '@ckeditor/ckeditor5-react';
 import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
 
@@ -74,6 +75,7 @@ class AutoPilot extends React.Component {
     };
 
     componentDidMount() {
+        this.props.dispatch(appointmentAllocationTimeActions.fetchAAT())
         this.props.dispatch(autoPilotActions.fetchAutoPilot(this.props.match.params.id))
             .then(() => {
                 const {autoPilot} = this.props;
@@ -107,7 +109,6 @@ class AutoPilot extends React.Component {
             title: `Delete auto pilot confirmation`,
             content: `If you click OK, this auto pilot will be deleted and disconnected from all assistants that are connected to it`,
             onOk: () => {
-                console.log(this.props);
                 this.props.dispatch(autoPilotActions.deleteAutoPilot(this.props.autoPilot.ID))
                     .then(() => history.push('/dashboard/auto_pilots'));
             }
@@ -115,11 +116,11 @@ class AutoPilot extends React.Component {
     };
 
     onSubmit = () => this.props.form.validateFields((err, values) => {
-
+        console.log(err)
         if (!err) {
             const /**@type AutoPilot*/ autoPilot = this.props.autoPilot || {};
-            const {state} = this;
-            console.log(state.acceptanceSMSBody);
+            const {state, TimeSlotsRef} = this;
+            // const timeSlots = TimeSlotsRef.current.state.weekDays;
             let payload = {
                 active: autoPilot.Active,
                 name: values.name,
@@ -145,9 +146,9 @@ class AutoPilot extends React.Component {
                 sendRejectionSMS: state.sendRejectionSMS,
                 rejectionSMSBody: state.rejectionSMSBody.replace(/<\/p>/g, '\n').replace(/<p>/g, '').replace(/&nbsp;/g, ''),
 
+                appointmentAllocationTimes: values.AppointmentAllocationTimes,
                 sendCandidatesAppointments: state.sendCandidatesAppointments,
             };
-
             if (payload.sendAcceptanceEmail) {
                 if (!payload.acceptanceEmailTitle || !payload.acceptanceEmailBody)
                     return this.setState({sendAcceptanceEmailErrors: true});
@@ -180,12 +181,14 @@ class AutoPilot extends React.Component {
             } else
                 this.setState({sendRejectionSMSErrors: false});
 
+            payload.appointmentAllocationTimes = payload.appointmentAllocationTimes === "You have no timetables, please create one!" ? null : payload.appointmentAllocationTimes
             console.log(payload)
-
             this.props.dispatch(autoPilotActions.updateAutoPilotConfigs(autoPilot.ID, payload));
         }
 
     });
+
+
 
     render() {
         const /**@type AutoPilot*/ autoPilot = this.props.autoPilot;
@@ -193,6 +196,7 @@ class AutoPilot extends React.Component {
             labelCol: {span: 4},
             wrapperCol: {span: 18}
         };
+        const allocTime =  this.props.autoPilot?.AppointmentAllocationTimeID
         const {getFieldDecorator} = this.props.form;
         return (
             <>
@@ -219,7 +223,7 @@ class AutoPilot extends React.Component {
                     </div>
 
                     <div className={styles.Body}>
-                        {!autoPilot ? <Spin/> :
+                        {!autoPilot || this.props.aatLoading ? <Spin/> :
                             <Form layout='vertical' wrapperCol={{span: 15}} style={{width: '100%'}}
                                   id={'AutoPilotForm'}>
                                 <FormItem label="Name">
@@ -583,7 +587,23 @@ class AutoPilot extends React.Component {
                                         </div>
                                     )}
                                 </FormItem>
+                                <Form.Item label="Choose a timetable from the list to allocate when you would like to have your appointments (Coming Soon)"
+                                           help="Select from the dropdown list">
+                                    {getFieldDecorator('AppointmentAllocationTimes', {
+                                        // initialValue: allocTime ? allocTime : this.props.appointmentAllocationTime[0] ?
+                                        //     this.props.appointmentAllocationTime[0].ID : null,
+                                        initialValue: null,
+                                        rules: [],
+                                    })(
+                                        <Select disabled={true}>
+                                            <Select.Option value={null}>None selected</Select.Option>
+                                            {this.props.appointmentAllocationTime.map(time => {
+                                                return (<Select.Option value={time.ID}>{time.Name}</Select.Option>)
+                                            })}
+                                        </Select>
+                                    )}
 
+                                </Form.Item>
                             </Form>
                         }
 
@@ -618,6 +638,8 @@ function mapStateToProps(state) {
         autoPilot: state.autoPilot.autoPilot,
         autoPilotsList: state.autoPilot.autoPilotsList,
         isLoading: state.autoPilot.isLoading,
+        appointmentAllocationTime: state.appointmentAllocationTime.allocationTimes,
+        aatLoading: state.appointmentAllocationTime.isLoading,
         assistantList: state.assistant.assistantList
     };
 }

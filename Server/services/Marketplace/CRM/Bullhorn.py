@@ -60,7 +60,7 @@ def login(auth):
 
         access_token_url = "https://auth9.bullhornstaffing.com/oauth/token?" + \
                            "&grant_type=authorization_code" + \
-                           "&redirect_uri=" + helpers.getDomain() + "/dashboard/marketplace/Bullhorn" + \
+                           "&redirect_uri=" + helpers.getDomain(3000) + "/dashboard/marketplace/Bullhorn" + \
                            "&client_id=" + CLIENT_ID + \
                            "&client_secret=" + CLIENT_SECRET + \
                            "&code=" + authCopy.get("code")
@@ -106,21 +106,26 @@ def retrieveRestToken(auth, companyID):
               authCopy.get("refresh_token") + \
               "&client_id=" + CLIENT_ID + \
               "&client_secret=" + CLIENT_SECRET
+        helpers.logError("--------------------------------------------------------------------------------------------")
+        helpers.logError("--------------------------------------------------------------------------------------------")
+        helpers.logError("TESTING BUG " + str(companyID) + " REQUEST: " + url)
         get_access_token = requests.post(url, headers=headers)
-
+        helpers.logError("TESTING BUG " + str(companyID) + " TEXT: " + get_access_token.text)
+        helpers.logError("--------------------------------------------------------------------------------------------")
+        helpers.logError("--------------------------------------------------------------------------------------------")
         if get_access_token.ok:
             result_body = json.loads(get_access_token.text)
-            access_token = result_body.get("access_token")
-            authCopy["refresh_token"] = result_body.get("refresh_token")
+            access_token = result_body["access_token"]
+            authCopy["refresh_token"] = result_body["refresh_token"]
         else:
-            raise Exception("CRM not set up properly")
+            raise Exception(get_access_token.text)
 
         url = "https://rest.bullhornstaffing.com/rest-services/login?version=*&" + \
               "access_token=" + access_token
 
         get_rest_token = requests.put(url, headers=headers)
         if not get_rest_token.ok:
-            raise Exception("Failure in generating rest_token")
+            raise Exception(get_rest_token.text)
         result_body = json.loads(get_rest_token.text)
 
         authCopy["rest_token"] = result_body.get("BhRestToken")
@@ -139,7 +144,7 @@ def retrieveRestToken(auth, companyID):
     except Exception as exc:
         db.session.rollback()
         helpers.logError("Marketplace.CRM.Bullhorn.retrieveRestToken() ERROR: " + str(exc))
-        return Callback(False, str(exc))
+        return Callback(False, "Failed to retrieve CRM tokens. Please check login information")
 
 
 # create query url and also tests the BhRestToken to see if it still valid, if not it generates a new one and new url
@@ -401,7 +406,92 @@ def searchCandidates(auth, companyID, data, fields=None) -> Callback:
                                                                   skills=record.get("primarySkills", {}).get("data"),
                                                                   linkdinURL=None,
                                                                   availability=record.get("status"),
-                                                                  jobTitle=None,#
+                                                                  jobTitle=None,  #
+                                                                  education=None,
+                                                                  yearsExperience=0,
+                                                                  desiredSalary=record.get("salary") or
+                                                                                record.get("dayRate", 0),
+                                                                  currency=Currency("GBP"),
+                                                                  source="Bullhorn"))
+
+        return Callback(True, sendQuery_callback.Message, result)
+
+    except Exception as exc:
+        helpers.logError("Marketplace.CRM.Bullhorn.searchCandidates() ERROR: " + str(exc))
+        return Callback(False, str(exc))
+
+
+def searchPerfectCandidates(auth, companyID, data, fields=None) -> Callback:
+    try:
+        query = "query="
+        if not fields:
+            fields = "fields=id,name,email,mobile,address,primarySkills,status,educations,dayRate,salary"
+
+        # populate filter
+        query += populateFilter(data.get("preferredJotTitle"), "occupation")
+        query += populateFilter(data.get("location"), "address.city")
+        query += populateFilter(data.get("jobCategory"), "employmentPreference")
+        # query += populateFilter(data.get("skills"), "primarySkills")
+        query += populateFilter(data.get("yearsExperience"), "experience")
+        # query += populateFilter(data.get("education"), "educationDegree")
+
+        # if keywords[DT.CandidateSkills.value["name"]]:
+        #     query += "primarySkills.data:" + keywords[DT.CandidateSkills.name] + " or"
+
+        query = query[:-3]
+
+        # check if no conditions submitted
+        if len(query) < 6:
+            query = "query=*:*"
+
+            # send query
+            sendQuery_callback: Callback = sendQuery(auth, "search/Candidate", "get", {}, companyID,
+                                                     [fields, query, "count=500"])
+            if not sendQuery_callback.Success:
+                raise Exception(sendQuery_callback.Message)
+
+            return_body = json.loads(sendQuery_callback.Data.text)
+
+            records = return_body["data"]
+
+        else:
+            records = []
+
+            while len(records) < 200:
+                # send query
+                sendQuery_callback: Callback = sendQuery(auth, "search/Candidate", "get", {}, companyID,
+                                                         [fields, query, "count=500"])
+                if not sendQuery_callback.Success:
+                    raise Exception(sendQuery_callback.Message)
+
+                # get query result
+                return_body = json.loads(sendQuery_callback.Data.text)
+
+                # add the candidates to the records
+                records.append(list(return_body["data"]))
+
+                # remove duplicate records
+                records = list(dict.fromkeys(records))
+
+                # remove the last (least important filter)
+                query = "and".join(query.split("and")[:-1])
+
+                # if no filters left - stop
+                if not query:
+                    break
+
+        result = []
+        # TODO educations uses ids - need to retrieve them
+        for record in records:
+            result.append(databases_services.createPandaCandidate(id=record.get("id", ""),
+                                                                  name=record.get("name"),
+                                                                  email=record.get("email"),
+                                                                  mobile=record.get("mobile"),
+                                                                  location=record.get("address", {}).get("city") or "",
+                                                                  skills=record.get("primarySkills", {}).get("data"),
+                                                                  linkdinURL=None,
+                                                                  availability=record.get("status"),
+                                                                  jobTitle=None,  #
                                                                   education=None,
                                                                   yearsExperience=0,
                                                                   desiredSalary=record.get("salary") or

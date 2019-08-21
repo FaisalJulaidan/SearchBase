@@ -4,14 +4,22 @@ from services import mail_services, company_services, newsletter_services
 from utilities import helpers
 from sqlalchemy import and_
 
+def getTimezone(id) -> Callback:
+    try:
+        user: User = db.session.query(User).filter(User.ID == id).first()
 
-def create(firstname, surname, email, password, phone, companyID: int, roleID: int, verified=False) -> Callback:
+        return Callback(True, "Gathered timezone information", user.TimeZone)
+    except Exception as exc:
+        return Callback(False, "Failed to gather timezone information")
+
+
+def create(firstname, surname, email, password, phone, companyID: int, roleID: int, timeZone: str, verified=False, ) -> Callback:
     try:
 
         # Create a new user with its associated company and role
         newUser: User = User(Firstname=firstname, Surname=surname, Email=email.lower(), Verified=verified,
                              Password=password, PhoneNumber=phone, CompanyID=companyID, RoleID=roleID,
-                             ChatbotNotifications=True)
+                             ChatbotNotifications=True, TimeZone=timeZone)
         db.session.add(newUser)
         db.session.commit()
         return Callback(True, 'User has been created successfully!', newUser)
@@ -182,7 +190,7 @@ def updateStripeID(email, cusID: str):
         return Callback(False, 'Could not update subID for ' + email)
 
 
-def updateUser(firstname, surname, phoneNumber, chatbotNotifications: bool, newsletters: bool, userID):
+def updateUser(firstname, surname, phoneNumber, chatbotNotifications: bool,  newsletters: bool, timeZone: str, userID):
     try:
 
         if not (firstname
@@ -200,6 +208,8 @@ def updateUser(firstname, surname, phoneNumber, chatbotNotifications: bool, news
         user.Surname = surname
         user.PhoneNumber = phoneNumber
         user.ChatbotNotifications = chatbotNotifications
+        user.TimeZone = timeZone
+
 
         if newsletters:
             newsletters_callback: Callback = newsletter_services.add(user.Email)

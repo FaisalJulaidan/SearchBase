@@ -11,6 +11,9 @@ import {analytics} from './analytics.reducer'
 import {autoPilot} from "./autoPilot.reducer";
 import {appointmentsPicker} from "./appointmentsPicker.reducer";
 import {appointment} from "./appointment.reducer";
+import {appointmentAllocationTime} from "./appointmentAllocationTime.reducer";
+import {development} from "./development.reducer";
+
 import * as actionTypes from '../actions/actionTypes';
 import storage from 'redux-persist/lib/storage'
 
@@ -27,7 +30,9 @@ const appReducer = combineReducers({
     options,
     analytics,
     appointmentsPicker,
-    appointment
+    appointment,
+    appointmentAllocationTime,
+    development
 });
 
 const rootReducer = (state, action) => {

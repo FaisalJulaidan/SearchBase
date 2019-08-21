@@ -54,6 +54,7 @@ const Input = ({setChatbotStatus, hideSignature, addUserMessage, lastMessage, ad
         const component = getInput(lastMessage);
         if (visible === false && component) {
             setChatbotAnimation({ inputOpen: true });
+
         } else if (!component && visible === true) {
             setChatbotAnimation({ inputOpen: false });
         }

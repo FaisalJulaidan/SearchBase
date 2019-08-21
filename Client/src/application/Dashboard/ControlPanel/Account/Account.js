@@ -7,6 +7,7 @@ import styles from "./Account.module.less"
 
 import ProfileDetails from "./ProfileDetails/ProfileDetails";
 import CompanyDetails from "./CompanyDetails/CompanyDetails";
+import Development from './Development/Development'
 
 import {accountActions} from "store/actions/account.actions";
 import NoHeaderPanel from 'components/NoHeaderPanel/NoHeaderPanel'
@@ -38,6 +39,7 @@ class Account extends React.Component {
 
     componentWillMount() {
         this.props.dispatch(accountActions.getAccount());
+        // this.props.dispatch(developmentActions.fetch)
     }
 
     render() {
@@ -70,6 +72,9 @@ class Account extends React.Component {
                                                     uploadLogo={this.uploadLogo}
                                                     deleteLogo={this.deleteLogo}/>
                                 </TabPane>
+                                <TabPane tab={"Development"} key={"3"}>
+                                    <Development/>
+                                </TabPane>
                             </Tabs>
                         }
                     </div>
@@ -81,7 +86,7 @@ class Account extends React.Component {
 
 function mapStateToProps(state) {
     return {
-        account: state.account.account
+        account: state.account.account,
     };
 }
 

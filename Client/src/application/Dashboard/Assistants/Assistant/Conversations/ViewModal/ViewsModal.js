@@ -21,6 +21,7 @@ class ViewsModal extends Component {
     constructor(props) {
         super(props);
         this.handleKeyPress = this.handleKeyPress.bind(this);
+        console.log(this.props.conversation.Files)
     }
 
     componentDidMount() {
@@ -44,8 +45,7 @@ class ViewsModal extends Component {
 
     downloadFileHandler = (filenameIndex) => {
         // Get file name by index
-        let fileName = this.props.conversation?.FilePath?.split(',')[filenameIndex];
-
+        let fileName = this.props.conversation?.Files[filenameIndex].FilePath;
         if (!fileName){
             errorMessage("File doesn't exist!");
             return;

@@ -1,7 +1,7 @@
 import {all, put, takeEvery, takeLatest} from 'redux-saga/effects'
 import * as actionTypes from '../actions/actionTypes';
 import {accountActions} from "../actions";
-import {errorMessage, http, loadingMessage, successMessage, updateUsername} from "helpers";
+import {errorMessage, http, loadingMessage, successMessage, updateUsername, updateTimezone} from "helpers";
 
 
 function* getAccountDetails() {
@@ -11,6 +11,7 @@ function* getAccountDetails() {
 
         // Update username in localStorage
         yield updateUsername(account.user.Firstname, account.user.Surname);
+        yield updateTimezone(account.user.TimeZone)
 
         yield put(accountActions.getAccountSuccess(account))
 

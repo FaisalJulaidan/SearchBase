@@ -21,6 +21,8 @@ class Company(db.Model):
     AccountSpecialist = db.Column(db.Boolean, nullable=False, default=False)
 
     HideSignature = db.Column(db.Boolean, nullable=False, default=False)
+    Active = db.Column(db.Boolean, nullable=False, default=False)
+
 
     AccessAssistants = db.Column(db.Boolean(), nullable=False, default=False)
     AccessCampaigns = db.Column(db.Boolean(), nullable=False, default=False)
@@ -37,6 +39,8 @@ class Company(db.Model):
     Calendars = db.relationship('Calendar', back_populates='Company')
     Messengers = db.relationship('Messenger', back_populates='Company')
     AutoPilots = db.relationship('AutoPilot', back_populates='Company')
+    AppointmentAllocationTimes = db.relationship('AppointmentAllocationTime', back_populates='Company')
+    Webhooks = db.relationship('Webhook', back_populates='Company')
 
     def __repr__(self):
         return '<Company {}>'.format(self.Name)

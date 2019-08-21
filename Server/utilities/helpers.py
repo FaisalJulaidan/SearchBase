@@ -16,13 +16,14 @@ from cryptography.fernet import Fernet
 from flask import json, after_this_request, request, Response
 from flask_jwt_extended import get_jwt_identity
 from forex_python.converter import CurrencyRates
+from flask_jwt_extended import get_jwt_identity
 from hashids import Hashids
 from itsdangerous import URLSafeTimedSerializer
 from sqlalchemy_utils import Currency
 
 from config import BaseConfig
 from models import db, Assistant, Job, Callback, Role
-from services import flow_services, assistant_services
+from services import flow_services, assistant_services, appointment_services
 from utilities.enums import Period
 
 # ======== Global Variables ======== #
@@ -48,9 +49,9 @@ currencyConverter = CurrencyRates()
 # ======== Helper Functions ======== #
 
 # Get domain based on current environment
-def getDomain():
+def getDomain(port=5000):
     if os.environ['FLASK_ENV'] == 'development':
-        return 'http://localhost:3000'
+        return 'http://localhost:'+str(port)
     elif os.environ['FLASK_ENV'] == 'staging':
         return 'https://staging.thesearchbase.com'
     elif os.environ['FLASK_ENV'] == 'production':
@@ -65,8 +66,6 @@ def cleanDict(target):
         return {k: v for k, v in target.items() if v}
     elif isinstance(target, type({}.items())):
         return {k: v for k, v in target if v}
-    print(target)
-
     return target
 
 
@@ -204,7 +203,7 @@ def getDictFromSQLAlchemyObj(obj) -> dict:
     # A nested for loop for joining two tables
     for attr in obj.__table__.columns:
         key = attr.name
-        if key not in ['Password', 'Auth']:
+        if key not in ['Password', 'Auth', 'Secret']:
             dict[key] = getattr(obj, key)
             if isinstance(dict[key], Enum):  # Convert Enums
                 dict[key] = dict[key].value
@@ -221,8 +220,9 @@ def getDictFromSQLAlchemyObj(obj) -> dict:
             if key == Assistant.Flow.name and dict[key]:  # Parse Flow !!
                 flow_services.parseFlow(dict[key])  # pass by reference
 
-    if hasattr(obj, "FilePath"):
-        dict["FilePath"] = obj.FilePath
+    for attr in obj.__dict__.keys():
+        if attr.startswith("__"):
+            dict[attr[2:]] = getattr(obj, attr)
     return dict
 
 """Convert a SQLAlchemy list of objects to a list of dicts"""
@@ -295,6 +295,69 @@ def validAssistant(func):
 
     wrapper.__name__ = func.__name__
     return wrapper
+
+class requestException(Exception):
+    pass
+
+
+def validateRequest(req, check: dict, throwIfNotValid: bool = True):
+    returnDict = {}
+    returnDict["missing"] = []
+    returnDict["errors"] = []
+    returnDict["inputs"] = {}
+    returnDict["valid"] = True
+    response = ""
+    if req is None:
+        raise requestException("No arguments supplied")
+    for item in check:
+        if check[item]['required']:
+            if item not in req and check[item]['required']:
+                returnDict["missing"].append(item)
+            elif check[item]['type']:
+                if not isinstance(req[item], check[item]['type']):
+                    returnDict["errors"].append("Parameter {} is not of required type {}".format(item, str(check[item]['type'].__name__)))
+        returnDict["inputs"][item] = req[item] if item in req and item is not None else None
+    if len(returnDict["missing"]) != 0:
+        returnDict["valid"] = False
+        response += "Missing parameters {} in request".format(returnDict["missing"])
+    if len(returnDict["errors"]) != 0:
+        returnDict["valid"] = False
+        response += ", " if response != "" else ""
+        response += "Errors in supplied parameters: {}".format(returnDict["errors"])
+    if throwIfNotValid and response != "":
+        raise requestException(response)
+    else:
+        return returnDict
+
+class owns(object):
+    def getOwner(self, type, jwt, *args):
+        method_name = "owns_" + str(type)
+        method = getattr(self, method_name, lambda: "Invalid Function type")
+        return method(jwt, *args)
+    def owns_Appointment(self, jwt, key):
+        id = request.get_json()[key]
+        callback: Callback = appointment_services.hasAppointment(jwt['companyID'], id)
+        if not callback.Success:
+            return jsonResponse(False, 401, "You do not own this appointment", None)
+        return True
+
+
+def validOwner(type, *args):
+    def wrap(func):
+        def wrapper():
+            jwt = get_jwt_identity()['user']
+            Owns = owns()
+            valid = Owns.getOwner(type, jwt, *args)
+            if valid != True:
+                return valid
+            return func()
+        wrapper.__name__ = func.__name__
+        return wrapper
+    wrap.__name__ = type #needs to change
+    return wrap
+
+
+
 
 
 def findIndexOfKeyInArray(key, value, array):

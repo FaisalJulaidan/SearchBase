@@ -3,7 +3,7 @@ import os
 import boto3
 from botocore.exceptions import ClientError
 
-from models import db, Callback, StoredFile, Conversation
+from models import db, Callback, StoredFile, Conversation, StoredFileInfo
 from utilities import helpers
 
 PUBLIC_URL = "https://tsb.ams3.digitaloceanspaces.com/"
@@ -13,11 +13,13 @@ USER_FILES_PATH = '/user_files'
 BUCKET= 'tsb'
 
 
+# NEEDS TO BE CONVERTED
 def getByID(id) -> StoredFile or None:
     try:
         if id:
             # Get result and check if None then raise exception
-            result = db.session.query(StoredFile).get(id)
+            result : StoredFile = db.session.query(StoredFile).get(id)
+            print(result.StoredFileInfo)
             if not result: raise Exception
 
             return Callback(True,
@@ -34,8 +36,7 @@ def getByID(id) -> StoredFile or None:
 
 def getByConversation(conversation: Conversation) -> StoredFile or None:
     try:
-        # Get result and check if None then raise exception
-        result = db.session.query(StoredFile).filter(StoredFile.Conversation == conversation).first()
+        result = db.session.query(StoredFile).filter(conversation.StoredFileID == StoredFile.ID).first()
         if not result: return Callback(False, '')
         return Callback(True, 'StoredFile was successfully retrieved', result)
 
@@ -56,13 +57,18 @@ def getAll():
         return Callback(False, 'StoredFiles could not be retrieved/empty')
 
 
-def createRef(filePath, conversation) -> StoredFile or None:
+def createRef(files, conversation, storedFileID) -> StoredFile or None:
     try:
-        if not filePath: raise Exception;
-        newStoredFile = StoredFile(FilePath=filePath, Conversation=conversation)
-        db.session.add(newStoredFile)
+        if not files: raise Exception;
+        conversation : Conversation = db.session.query(Conversation).filter(Conversation.ID == conversation.ID).first()
+        newFiles = []
+        for file in files:
+            newFiles.append(StoredFileInfo(StoredFileID=storedFileID, Key=None, FilePath=file.realFileName))
+        print(conversation)
+        conversation.StoredFileID = storedFileID
+        db.session.add_all(newFiles)
         db.session.commit()
-        return Callback(True, "Stored files reference was created successfully.", newStoredFile)
+        return Callback(True, "Stored files reference was created successfully.", helpers.getListFromSQLAlchemyList(newFiles))
 
     except Exception as exc:
         helpers.logError("stored_file_services.create(): " + str(exc))
@@ -154,6 +160,7 @@ def genPresigendURL(filename, path, expireIn=None):
                                                     'Key': UPLOAD_FOLDER + path + '/' + filename
                                                  })
         except ClientError as e:
+            print('error')
             raise Exception("---> DigitalOcean Error" + str(e))
 
         return Callback(True, "File downloaded successfully", url)

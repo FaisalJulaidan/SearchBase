@@ -1,6 +1,7 @@
 import React from 'react';
 import {connect} from 'react-redux';
 
+import momenttz from 'moment-timezone'
 import {authActions} from '../../store/actions/index';
 import styles from './Signup.module.less';
 import {Link} from 'react-router-dom';
@@ -28,6 +29,7 @@ class Signup extends React.Component {
         e.preventDefault();
         this.props.form.validateFields((err, values) => {
             if (!err) {
+                values.timeZone = momenttz.tz.guess()
                 console.log('Received values of form: ', values);
                 this.props.dispatch(authActions.signup(values));
             }
@@ -42,7 +44,7 @@ class Signup extends React.Component {
     compareToFirstPassword = (rule, value, callback) => {
         const form = this.props.form;
         if (value && value !== form.getFieldValue('password')) {
-            callback('The two passwords that you entered are inconsistent!');
+            callback('The two passwords are inconsistent!');
         } else {
             callback();
         }
@@ -90,7 +92,7 @@ class Signup extends React.Component {
                                     <FormItem className={styles.SignupFormItem}>
                                         {getFieldDecorator('websiteURL', {
                                             rules: [{required: true, message: 'Please input company website URL!'},
-                                                {pattern: /[-a-zA-Z0-9@:%_\+.~#?&//=]{2,256}\.[a-z]{2,4}\b(\/[-a-zA-Z0-9@:%_\+.~#?&//=]*)?/,
+                                                {pattern: /[-a-zA-Z0-9@:%_\+.~#?&//=]{2,256}\.[a-z]{2,16}\b(\/[-a-zA-Z0-9@:%_\+.~#?&//=]*)?/,
                                                     message: 'Please, enter a valid URL'}],
                                         })(
                                             <Input prefix={<Icon type="global" style={{color: 'rgba(0,0,0,.25)'}}/>}
@@ -133,7 +135,7 @@ class Signup extends React.Component {
                                         {getFieldDecorator('email', {
                                             rules: [
                                                 {required: true, message: 'Please input your email!'},
-                                                {pattern: /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/,
+                                                {pattern: /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,16})+$/,
                                                     message: 'Sorry, use a valid email'}
                                             ],
                                         })(

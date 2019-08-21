@@ -179,7 +179,7 @@ class Dashboard extends Component {
                             <span>Assistants</span>
                         </Menu.Item>
 
-                        <Menu.Item key="campaign">
+                        <Menu.Item disabled={!company.AccessCampaigns} key="campaign">
                             <Icon type="rocket"/>
                             <span>Campaign</span>
                         </Menu.Item>
@@ -188,7 +188,6 @@ class Dashboard extends Component {
                             <Icon type="clock-circle"/>
                             <span>Auto Pilot</span>
                         </Menu.Item>
-
 
                         <Menu.Item disabled={!company.AccessDatabases} key="databases">
                             <Icon type="database"/>

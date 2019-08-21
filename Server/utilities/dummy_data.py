@@ -11,12 +11,11 @@ from utilities import helpers, enums
 def generate():
 
     # Companies creation
-
-    # Add 'plan' columns
     db.session.add(Company(Name='Aramco', URL='ff.com', StripeID='cus_00000000000000', SubID='sub_00000000000000',
-                           AccessAssistants=True, AccessCampaigns=True, AccessAutoPilot=True, AccessAppointments=True))
+                           Active=True, AccessAssistants=True, AccessCampaigns=True, AccessAutoPilot=True,
+                           AccessDatabases=True, AccessAppointments=True))
 
-    db.session.add(Company(Name='Sabic', URL='ff.com', StripeID='cus_DbgKupMRLNYXly'))
+    db.session.add(Company(Name='Sabic', URL='ff.com', StripeID='cus_DbgKupMRLNYXly', Active=True))
 
     # Get Companies
     aramco: Company = Company.query.filter(Company.Name == "Aramco").first()

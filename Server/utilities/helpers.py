@@ -415,7 +415,7 @@ def AccessAssistantsRequired(func):
     return wrapper
 
 
-# Check if the plan allows Assistant access
+# Check if the plan allows Assistant access (not used anywhere yet)
 def AccessCampaignsRequired(func):
     def wrapper():
         print('Access Campaigns decorator executed')

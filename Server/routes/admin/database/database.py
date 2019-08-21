@@ -5,7 +5,6 @@ from services import databases_services
 from flask_jwt_extended import jwt_required, get_jwt_identity
 
 
-
 database_router: Blueprint = Blueprint('database_router', __name__, template_folder="../../templates")
 
 # Get databases list, and create a new database

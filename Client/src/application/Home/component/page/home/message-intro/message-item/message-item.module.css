@@ -11,7 +11,7 @@
     bottom: -2px;
     right: -8px;
     height: 19px;
-    border-right: 20px solid #00e34d;
+    border-right: 20px solid #0589ff;
     border-bottom-left-radius: 16px 14px;
     -webkit-transform: translate(0, -2px);
     transform: translate(0, -2px);
@@ -20,7 +20,7 @@
 .my_message {
     max-width: 90%;
     font-size: 12px;
-    background: #00e34d;
+    background: #0589ff;
     color: white;
     float: right;
     clear: both;

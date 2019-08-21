@@ -42,6 +42,7 @@
 }
 
 .col_text .list {
+    font-family: 'Noto Sans TC', sans-serif;
     color: #9254de;
     list-style-type: square;
     list-style-position: inside;
@@ -50,7 +51,10 @@
 }
 
 .col_text .list li {
+    font-weight: 500;
     margin-top: 1em;
+    list-style: none;
+    margin-left: 20px;
 }
 
 @media (max-width: 767.98px) {

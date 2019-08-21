@@ -289,8 +289,11 @@ class Dashboard extends Component {
                                             <Route path={`${match.path}/documentation`} component={Documentation}
                                                    exact/>
                                             {/*<Route path={`${match.path}/calendar`} component={Calendar} exact/>*/}
-
-                                            <Route path="/dashboard" component={Home}/>
+                                            <Route path={`${match.path}/appointments`} component={Appointment} exact/>
+                                                       exact/>
+                                                <Route path={`${match.path}/campaign`} component={Campaign} exact/>
+                                                <Route path="/dashboard" component={Home}/>
+                                                <Route path="/dashboard" component={Home}/>
                                         </Switch>
                                     </Suspense>
                                 </CSSTransition>

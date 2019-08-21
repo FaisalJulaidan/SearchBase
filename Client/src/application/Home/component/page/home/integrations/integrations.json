@@ -8,6 +8,10 @@
     "image": "/static/images/home/integrations/erecruit.png"
   },
   {
+    "title": "Access Group",
+    "image": "/static/images/home/integrations/accessgroup.png"
+  },
+  {
     "title": "Salesforce",
     "image": "/static/images/home/integrations/salesforce.png"
   },

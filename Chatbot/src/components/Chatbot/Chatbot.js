@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { connect } from 'react-redux';
 import axios from 'axios';
 // Actions
@@ -33,7 +33,6 @@ import Settings from './Settings';
 import Input from './Input';
 import Signature from './Signature';
 import 'antd/dist/antd.css';
-import { Tooltip } from 'antd';
 
 export const Chatbot = ({
                             isDirectLink, btnColor, assistantID,
@@ -93,17 +92,20 @@ export const Chatbot = ({
                 return true;
             }
         };
-        if (assistant && !hasBeenUsed())
-            if (isDirectLink) {
+
+        if (isDirectLink) {
+            setChatbotAnimation({ open: true });
+            setChatbotStatus({ open: true });
+        }
+
+        if (assistant && !hasBeenUsed()) {
+            const { SecondsUntilPopup } = assistant;
+            if (SecondsUntilPopup === 0) return;
+            setTimeout(() => {
                 setChatbotAnimation({ open: true });
-                setChatbotStatus({ open: true });
-            } else {
-                const { SecondsUntilPopup } = assistant;
-                if (SecondsUntilPopup === 0) return;
-                setTimeout(() => {
-                    setChatbotAnimation({ open: true });
-                }, SecondsUntilPopup * 1000);
-            }
+            }, SecondsUntilPopup * 1000);
+        }
+
     }, [setChatbotAnimation, assistant]);
 
     // When the chatbot animation has been set to true

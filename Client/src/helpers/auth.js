@@ -26,7 +26,6 @@ export const getTimezone = () => {
 export const getRole = () => {
     // return role from local storage
     let role = JSON.parse(localStorage.getItem('role'));
-    console.log('ROLE IS: ' + role);
     if(!role){return null;}
     return role;
 };

@@ -10,6 +10,7 @@ flow_router: Blueprint = Blueprint('flow_router', __name__, template_folder="../
 
 @flow_router.route("/assistant/<int:assistantID>/flow", methods=['PUT'])
 @jwt_required
+@helpers.AccessAssistantsRequired
 def flow(assistantID):
 
     # Authenticate

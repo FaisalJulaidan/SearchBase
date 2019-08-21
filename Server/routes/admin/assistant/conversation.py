@@ -12,6 +12,7 @@ conversation_router: Blueprint = Blueprint('conversation_router', __name__ , tem
 # Get all assistant's user inputs
 @conversation_router.route("/assistant/<int:assistantID>/conversations", methods=["GET", "DELETE"])
 @jwt_required
+@helpers.AccessAssistantsRequired
 def conversation(assistantID):
 
     # Authenticate
@@ -43,6 +44,7 @@ def conversation(assistantID):
 # Download files
 @conversation_router.route("/assistant/<int:assistantID>/conversation/<filename>", methods=['GET'])
 @jwt_required
+@helpers.AccessAssistantsRequired
 @helpers.gzipped
 def conversation_file_uploads(assistantID, filename):
 
@@ -85,6 +87,7 @@ def conversation_file_uploads(assistantID, filename):
 
 @conversation_router.route("/assistant/<assistantID>/conversation/<conversationID>", methods=["DELETE"])
 @jwt_required
+@helpers.AccessAssistantsRequired
 def conversation_delete_record(assistantID, conversationID):
 
     # Authenticate
@@ -103,6 +106,7 @@ def conversation_delete_record(assistantID, conversationID):
 
 @conversation_router.route("/assistant/<assistantID>/conversation/<conversationID>/status", methods=["PUT"])
 @jwt_required
+@helpers.AccessAssistantsRequired
 def conversation_status(assistantID, conversationID):
 
     # Authenticate

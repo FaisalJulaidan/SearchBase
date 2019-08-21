@@ -11,6 +11,7 @@ auto_pilot_router: Blueprint = Blueprint('auto_pilot_router', __name__, template
 # Get all AutoPilots & create new AutoPilot
 @auto_pilot_router.route("/auto_pilots", methods=['GET', 'POST'])
 @jwt_required
+@helpers.AccessAutoPilotRequired
 def auto_pilots():
     # Authenticate
     user = get_jwt_identity()['user']
@@ -33,6 +34,7 @@ def auto_pilots():
 # Update & Delete auto pilots
 @auto_pilot_router.route("/auto_pilot/<int:autoPilotID>", methods=['GET', 'DELETE', 'PUT'])
 @jwt_required
+@helpers.AccessAutoPilotRequired
 def auto_pilot(autoPilotID):
     # Authenticate
     user = get_jwt_identity()['user']
@@ -66,6 +68,7 @@ def auto_pilot(autoPilotID):
 
 @auto_pilot_router.route("/auto_pilot/<int:autoPilotID>/configs", methods=['PUT'])
 @jwt_required
+@helpers.AccessAutoPilotRequired
 def auto_pilot_configs(autoPilotID):
     # Authenticate
     user = get_jwt_identity()['user']
@@ -102,6 +105,7 @@ def auto_pilot_configs(autoPilotID):
 
 @auto_pilot_router.route("/auto_pilot/<int:autoPilotID>/status", methods=['PUT'])
 @jwt_required
+@helpers.AccessAutoPilotRequired
 def auto_pilot_status(autoPilotID):
     # Authenticate
     user = get_jwt_identity()['user']

@@ -9,6 +9,7 @@ analytics_router: Blueprint = Blueprint('analytics_router', __name__, template_f
 @analytics_router.route("/assistant/<assistantID>/analytics", methods=['GET'])
 @jwt_required
 @helpers.validAssistant
+@helpers.AccessAssistantsRequired
 def admin_analytics_data(assistant):
     if request.method == "GET":
         callback: Callback = analytics_services.getAnalytics(assistant)

@@ -74,10 +74,7 @@ class Dashboard extends Component {
 
         const {match, location} = this.props;
         const user = getUser();
-
-        // Test fetching company (for plan retrieval):
         const company = getCompany();
-        console.log(company)
 
         let userInfo = null;
         // User Information at the top
@@ -171,12 +168,12 @@ class Dashboard extends Component {
                             <span>Home</span>
                         </Menu.Item>
 
-                        <Menu.Item key="assistants">
+                        <Menu.Item disabled={!company.AccessAssistants} key="assistants">
                             <Icon type="robot"/>
                             <span>Assistants</span>
                         </Menu.Item>
 
-                        <Menu.Item key="auto_pilots">
+                        <Menu.Item disabled={!company.AccessAutoPilot} key="auto_pilots">
                             <Icon type="clock-circle"/>
                             <span>Auto Pilot</span>
                         </Menu.Item>
@@ -186,12 +183,12 @@ class Dashboard extends Component {
                             <span>Marketplace</span>
                         </Menu.Item>
 
-                        <Menu.Item key="databases">
+                        <Menu.Item disabled={!company.AccessDatabases} key="databases">
                             <Icon type="database"/>
                             <span>Database</span>
                         </Menu.Item>
 
-                        <Menu.Item disabled={true} key="calendar">
+                        <Menu.Item disabled key="calendar">
                             <Icon type="calendar"/>
                             <span>Calendar (soon)</span>
                         </Menu.Item>

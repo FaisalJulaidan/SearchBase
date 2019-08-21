@@ -60,7 +60,7 @@ class MessageIntro extends React.Component {
             }
 
             return (
-                <Bounce delay={((i+1) * 750)} when={animWhen} onReveal={this.onReveal}>
+                <Bounce wait={1000} when={animWhen} onReveal={this.onReveal}>
                     <MessageItem key={i} mine={message.mine} text={message.text}/>
                 </Bounce>
             )
@@ -76,7 +76,7 @@ class MessageIntro extends React.Component {
                          lg={{span: 4, offset: 1, order: 1}}>
                         <MobileFrame>
                             {messages}
-                            <Bounce delay={3000} when={this.state.animWhen.offerReveal}>
+                            <Bounce when={this.state.animWhen.offerReveal}>
                                 <JobOfferItem/>
                             </Bounce>
                         </MobileFrame>

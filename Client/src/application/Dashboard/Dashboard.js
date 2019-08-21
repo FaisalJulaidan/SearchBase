@@ -5,7 +5,7 @@ import momenttz from 'moment-timezone'
 import "./Dashboard.less"
 import styles from "./Dashboard.module.less"
 
-import {getUser, history, getCompany} from "helpers";
+import {getUser, history, getCompany, getTimezone} from "helpers";
 import {Route, Switch, withRouter} from 'react-router-dom';
 import {authActions, optionsActions} from "store/actions";
 import {store} from "store/store";
@@ -276,28 +276,27 @@ class Dashboard extends Component {
                                                 <Route path={`${match.path}/marketplace`} component={Marketplace} exact/>
                                                 <Route path={`${match.path}/marketplace/:type`} component={Item} exact/>
 
-                                                <Route path={`${match.path}/databases`} component={Databases} exact/>
-                                                <Route path={`${match.path}/databases/:id`} component={Database} exact/>
+                                            <Route path={`${match.path}/databases`} component={Databases} exact/>
+                                            <Route path={`${match.path}/databases/:id`} component={Database} exact/>
 
-                                                <Route path={`${match.path}/account`} component={Account} exact/>
-                                                <Route path={`${match.path}/billing`} component={Billing} exact/>
+                                            <Route path={`${match.path}/account`} component={Account} exact/>
+                                            <Route path={`${match.path}/billing`} component={Billing} exact/>
 
-                                                <Route path={`${match.path}/auto_pilots`} component={AutoPilots} exact/>
-                                                <Route path={`${match.path}/auto_pilots/:id`} component={AutoPilot} exact/>
+                                            <Route path={`${match.path}/auto_pilots`} component={AutoPilots} exact/>
+                                            <Route path={`${match.path}/auto_pilots/:id`} component={AutoPilot} exact/>
 
-                                                <Route path={`${match.path}/users_management`} component={UsersManagement}
-                                                       exact/>
-                                                <Route path={`${match.path}/documentation`} component={Documentation}
-                                                       exact/>}
-                                                <Route path={`${match.path}/appointments`} component={Appointment} exact/>
-                                                       exact/>
-                                                <Route path={`${match.path}/campaign`} component={Campaign} exact/>
-                                                <Route path="/dashboard" component={Home}/>
-                                            </Switch>
-                                        </Suspense>
-                                    </CSSTransition>
-                                </TransitionGroup>
-                            }/>
+                                            <Route path={`${match.path}/users_management`} component={UsersManagement}
+                                                   exact/>
+                                            <Route path={`${match.path}/documentation`} component={Documentation}
+                                                   exact/>
+                                            {/*<Route path={`${match.path}/calendar`} component={Calendar} exact/>*/}
+
+                                            <Route path="/dashboard" component={Home}/>
+                                        </Switch>
+                                    </Suspense>
+                                </CSSTransition>
+                            </TransitionGroup>
+                        }/>
                         </TimezoneContext.Provider>
                     </Content>
 
@@ -312,7 +311,7 @@ class Dashboard extends Component {
 
 function mapStateToProps(state) {
     return {
-        account: state.account.account.t
+        account: state.account.account
     };
 }
 

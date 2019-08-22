@@ -84,9 +84,9 @@ export const Chatbot = ({
 
     useEffect(() => {
         const hasBeenUsed = () => {
-            let used = localStorage.getItem('TSB_CHATBOT_USED');
+            let used = sessionStorage.getItem('TSB_CHATBOT_USED');
             if (used === null) {
-                localStorage.setItem('TSB_CHATBOT_USED', true);
+                sessionStorage.setItem('TSB_CHATBOT_USED', 'true');
                 return false;
             } else {
                 return true;

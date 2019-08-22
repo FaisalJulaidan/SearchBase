@@ -1,0 +1,32 @@
+[
+  {
+    "title": "Automate",
+    "intro": "Set it and forget it.",
+    "text": "Your team knows what ideal candidate engagement looks like, but probably struggles to make it happen.\n\nCreate the perfect cadence of welcomes, reminders, and check-ins for each stage of the contractor lifecycle with Sense’s journey builder. Then leave the “how” to us.",
+    "image": "https://s3-us-west-2.amazonaws.com/madeby.com/hashed/static/client/images/marketing/home/how-it-works/b305adc69c59269a5f38e76da89bfd3a.svg"
+  },
+  {
+    "title": "Engage",
+    "intro": "Right Time, Right Place.",
+    "text": "Smart workflows use existing data in your ATS to trigger and personalize messages.\n\nTexts and emails come from your team and arrive at just the right moments to keep talent feeling connected.",
+    "image": "https://s3-us-west-2.amazonaws.com/madeby.com/hashed/static/client/images/marketing/home/how-it-works/b41359332759e514fc4874f16958ff2f.svg"
+  },
+  {
+    "title": "Personalise",
+    "intro": "Keep it personal.",
+    "text": "Go beyond automation and connect when it matters most.\n\nSense monitors contractor feedback and engagement and gives your team early warnings so they can troubleshoot.",
+    "image": "https://s3-us-west-2.amazonaws.com/madeby.com/hashed/static/client/images/marketing/home/how-it-works/95f7711533b086e516c350a9fc9665ac.svg"
+  },
+  {
+    "title": "Refer",
+    "intro": "Ask and you will receive.",
+    "text": "Your talent sees new opportunities and already knows the right people to refer.\n\nSense finds the right time ask your happiest contractors for referrals and online reviews.",
+    "image": "https://s3-us-west-2.amazonaws.com/madeby.com/hashed/static/client/images/marketing/home/how-it-works/f497ed5fc979b69c22d54bdbcea2cc6d.svg"
+  },
+  {
+    "title": "Measure",
+    "intro": "Act on the cues you’ve been missing.",
+    "text": "Sense synthesizes valuable insights on your business by combining contractor engagement data and feedback with data in your ATS.\n\nKeep a pulse on NPS and other key trends. Uncover hidden obstacles to contractor and client satisfaction that you can fix.",
+    "image": "https://s3-us-west-2.amazonaws.com/madeby.com/hashed/static/client/images/marketing/home/how-it-works/45692ee071c04a4df5e2cd73b0ea76c3.svg"
+  }
+]

@@ -1,0 +1,35 @@
+.item_wrapper {
+    color: #726a84;
+}
+
+.headline {
+    margin: 0.5em 0;
+    font-size: 1.4em;
+    font-weight: bold;
+    color: #494949;
+}
+
+.title {
+    margin: 0 0 0.2em 0;
+    font-size: 1.1em;
+    font-weight: bold;
+    color: #9254de;
+}
+
+.items li{
+    margin: 0.5em 10px;
+    list-style-type: disc;
+    list-style-position: inside;
+}
+
+.items:last-child {
+    margin-bottom: 0;
+}
+
+.text {
+    margin: 0.5em 0 1em;
+}
+
+.text:last-child {
+    margin-bottom: 0;
+}

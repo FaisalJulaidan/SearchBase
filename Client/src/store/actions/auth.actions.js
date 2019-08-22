@@ -84,6 +84,20 @@ const verifyAccountFailure = (error) => ({
     error
 });
 
+const demoRequest = (name, email, companyName, phone, crm, subscribe) => ({
+    type: actionTypes.DEMO_REQUEST,
+    name, email, companyName, phone, crm, subscribe
+});
+
+const demoSuccess = () => ({
+    type: actionTypes.DEMO_SUCCESS,
+});
+
+const demoFailure = (error) => ({
+    type: actionTypes.DEMO_FAILURE,
+    error
+});
+
 
 export const authActions = {
     login,
@@ -93,6 +107,10 @@ export const authActions = {
     signup,
     signupSuccess,
     signupFailure,
+
+    demoRequest,
+    demoSuccess,
+    demoFailure,
 
     resetPassword,
     resetPasswordSuccess,

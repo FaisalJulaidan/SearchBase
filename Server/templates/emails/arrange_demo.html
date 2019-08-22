@@ -251,7 +251,11 @@
                                 <h1 style="margin: 0 0 10px; font-size: 25px; line-height: 30px; color: #333333; font-weight: normal;">Demo Requested.</h1>
                                 <p style="margin: 0 0 10px;">A new user has requested a demo of our software.</p>
                                 <ul style="padding: 0; margin: 0; list-style-type: disc;">
-									<li style="margin:0 0 10px 20px;" class="list-item-first">{{ email }}</li>
+									<li style="margin:0 0 10px 20px;" class="list-item-first">Name: {{ data["name"] }}</li>
+									<li style="margin:0 0 10px 20px;" class="list-item-first">Email: {{ data["email"] }}</li>
+									<li style="margin:0 0 10px 20px;" class="list-item-first">Company: {{ data["companyName"] }}</li>
+									<li style="margin:0 0 10px 20px;" class="list-item-first">Phone: {{ data["phone"] }}</li>
+									<li style="margin:0 0 10px 20px;" class="list-item-first">CRM: {{ data["crm"] }}</li>
 								</ul>
                             </td>
                         </tr>

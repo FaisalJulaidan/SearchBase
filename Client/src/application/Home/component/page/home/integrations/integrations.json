@@ -1,0 +1,34 @@
+[
+  {
+    "title": "Bullhorn",
+    "image": "/static/images/home/integrations/bullhorn.png"
+  },
+  {
+    "title": "Erecruit",
+    "image": "/static/images/home/integrations/erecruit.png"
+  },
+  {
+    "title": "Access Group",
+    "image": "/static/images/home/integrations/accessgroup.png"
+  },
+  {
+    "title": "Salesforce",
+    "image": "/static/images/home/integrations/salesforce.png"
+  },
+  {
+    "title": "Dynamics 365",
+    "image": "/static/images/home/integrations/dynamic-365.png"
+  },
+  {
+    "title": "Outlook",
+    "image": "/static/images/home/integrations/outlook.png"
+  },
+  {
+    "title": "Gmail",
+    "image": "/static/images/home/integrations/gmail.png"
+  },
+  {
+    "title": "LinkedIn",
+    "image": "/static/images/home/integrations/link-logo.png"
+  }
+]

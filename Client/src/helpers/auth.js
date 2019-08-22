@@ -24,10 +24,17 @@ export const getTimezone = () => {
 };
 
 export const getRole = () => {
-    // return user from local storage
+    // return role from local storage
     let role = JSON.parse(localStorage.getItem('role'));
     if(!role){return null;}
     return role;
+};
+
+export const getCompany = () => {
+    // return plan from local storage
+    let company = JSON.parse(localStorage.getItem('company'));
+    if(!company){return null;}
+    return company;
 };
 
 // Update username in localStorage

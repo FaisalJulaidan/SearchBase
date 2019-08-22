@@ -1,68 +1,66 @@
-import React, {Component, lazy, Suspense} from 'react';
+import React, { Component, lazy, Suspense } from 'react';
 
-import {Avatar, Dropdown, Icon, Layout, Menu} from 'antd';
-import momenttz from 'moment-timezone'
-import "./Dashboard.less"
-import styles from "./Dashboard.module.less"
+import { Avatar, Dropdown, Icon, Layout, Menu } from 'antd';
+import momenttz from 'moment-timezone';
+import './Dashboard.less';
+import styles from './Dashboard.module.less';
 
-import {getUser, history, getTimezone} from "helpers";
-import {Route, Switch, withRouter} from 'react-router-dom';
-import {authActions, optionsActions} from "store/actions";
-import {store} from "store/store";
-import {connect} from 'react-redux';
+import { getUser, history, getTimezone } from 'helpers';
+import { Route, Switch, withRouter } from 'react-router-dom';
+import { authActions, optionsActions } from 'store/actions';
+import { store } from 'store/store';
+import { connect } from 'react-redux';
 
-import {CSSTransition, TransitionGroup} from "react-transition-group";
+import { CSSTransition, TransitionGroup } from 'react-transition-group';
 
-import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
-import {faCloud} from '@fortawesome/free-solid-svg-icons'
-import {TimezoneContext} from "../../contexts/timezone";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faCloud } from '@fortawesome/free-solid-svg-icons';
+import { TimezoneContext } from '../../contexts/timezone';
 
-const Home = lazy(() => import('./Home/Home'));
-const Assistants = lazy(() => import('./Assistants/Assistants'));
-const Assistant = lazy(() => import('./Assistants/Assistant/Assistant'));
-const Databases = lazy(() => import('./Databases/Databases'));
-const Database = lazy(() => import('./Databases/Database/Database'));
-const Account = lazy(() => import('./ControlPanel/Account/Account'));
-const Billing = lazy(() => import('./ControlPanel/Billing/Billing'));
-const UsersManagement = lazy(() => import('./ControlPanel/UsersManagement/UsersManagement'));
-const Documentation = lazy(() => import('./Documentation/Documentation'));
-const Campaign = lazy(() => import('./Campaign/Campaign'));
-const AutoPilots = lazy(() => import('./AutoPilots/AutoPilots'));
-const AutoPilot = lazy(() => import('./AutoPilots/AutoPilot/AutoPilot'));
-const Appointment = lazy(() => import('./Appointment/Appointment'));
-const Marketplace = lazy(() => import('./Marketplace/Marketplace'));
-const Item = lazy(() => import('./Marketplace/Item/Item'));
+import Home from  './Home/Home';
+import Assistants from './Assistants/Assistants';
+import Assistant from './Assistants/Assistant/Assistant';
+import Databases from './Databases/Databases';
+import Database from './Databases/Database/Database';
+import Account from './ControlPanel/Account/Account';
+import Billing from './ControlPanel/Billing/Billing';
+import UsersManagement from './ControlPanel/UsersManagement/UsersManagement';
+import Documentation from './Documentation/Documentation';
+import Campaign from './Campaign/Campaign';
+import AutoPilots from './AutoPilots/AutoPilots';
+import AutoPilot from './AutoPilots/AutoPilot/AutoPilot';
+import Appointment from './Appointment/Appointment';
+import Marketplace from './Marketplace/Marketplace';
+import Item from './Marketplace/Item/Item';
 // const AppointmentRoutes = lazy(() => import('./Appointment/AppointmentRoutes'));
 
 
-
-const {SubMenu} = Menu;
-const {Divider} = Menu;
-const {Header, Content, Footer, Sider} = Layout;
+const { SubMenu } = Menu;
+const { Divider } = Menu;
+const { Header, Content, Footer, Sider } = Layout;
 
 
 class Dashboard extends Component {
     state = {
-        collapsed: false,
+        collapsed: false
     };
 
     componentWillMount() {
-        this.props.dispatch(optionsActions.getOptions())
+        this.props.dispatch(optionsActions.getOptions());
     }
-
 
 
     toggle = () => {
         this.setState({
-            collapsed: !this.state.collapsed,
-        }, () => this.setState({marginLeft: this.state.collapsed ? 81 : 200}));
+            collapsed: !this.state.collapsed
+        }, () => this.setState({ marginLeft: this.state.collapsed ? 81 : 200 }));
     };
 
     handleMenuClick = (e) => {
         if (e.key === 'logout') {
-            return this.logout()
+            return this.logout();
         }
-        e.key === 'dashboard' ? history.push(`/dashboard`) : history.push(`/dashboard/${e.key}`)
+        e.key === 'dashboard' ? history.push(`/dashboard`) : history.push(`/dashboard/${e.key}`);
     };
 
     logout = () => {
@@ -75,10 +73,11 @@ class Dashboard extends Component {
     };
 
     render() {
-        const {match, location} = this.props;
-        const timezone = getTimezone()
-        const validTimezone = timezone ? timezone : momenttz.tz.guess()
+        const { match, location } = this.props;
+        const timezone = getTimezone();
+        const validTimezone = timezone ? timezone : momenttz.tz.guess();
         const user = getUser();
+
         let userInfo = null;
         // User Information at the top
         if (!user) {
@@ -86,16 +85,16 @@ class Dashboard extends Component {
         } else {
 
             let avatar = (
-                <Avatar size="large" style={{backgroundColor: '#9254de', verticalAlign: 'middle'}}>
+                <Avatar size="large" style={{ backgroundColor: '#9254de', verticalAlign: 'middle' }}>
                     {this.getInitials(user.username || '')}
                 </Avatar>
             );
             let userInfoMenu = (
                 <Menu onClick={this.handleMenuClick}>
                     <Menu.Item key="account">
-                        <div style={{display: 'flex', marginTop: '10px'}}>
+                        <div style={{ display: 'flex', marginTop: '10px' }}>
                             {avatar}
-                            <div style={{marginLeft: '10px'}}>
+                            <div style={{ marginLeft: '10px' }}>
                                 <h3>{user.username}</h3>
                                 <p>{user.email}</p>
                             </div>
@@ -109,7 +108,7 @@ class Dashboard extends Component {
                 </Menu>
             );
             userInfo = (
-                <Dropdown overlay={userInfoMenu} overlayStyle={{width: '255px'}}>
+                <Dropdown overlay={userInfoMenu} overlayStyle={{ width: '255px' }}>
                     {avatar}
                 </Dropdown>
             );
@@ -117,18 +116,18 @@ class Dashboard extends Component {
         // End of User Information
 
         const newLayoutRoutes = [
-            "/dashboard/assistants",
-            "/dashboard/marketplace",
-            "/dashboard/appointments",
-            "/dashboard/auto_pilot",
-            "/dashboard/databases",
-            "/dashboard/account",
-            "/dashboard/users_management",
-            "/dashboard/campaign"
+            '/dashboard/assistants',
+            '/dashboard/marketplace',
+            '/dashboard/appointments',
+            '/dashboard/auto_pilot',
+            '/dashboard/databases',
+            '/dashboard/account',
+            '/dashboard/users_management',
+            '/dashboard/campaign'
         ];
         const isNewLayout = newLayoutRoutes.some(a => this.props.location.pathname.indexOf(a) > -1);
         return (
-            <Layout style={{height: '100%'}}>
+            <Layout style={{ height: '100%' }}>
                 <Sider
                     trigger={null}
                     collapsible
@@ -142,18 +141,18 @@ class Dashboard extends Component {
                     <div className={styles.Logo}>
                         {
                             this.state.collapsed ?
-                                <div style={{display: 'flex'}}>
+                                <div style={{ display: 'flex' }}>
                                     <FontAwesomeIcon size="2x" icon={faCloud}
-                                                     style={{color: '#9254de', marginLeft: 7}}/>
+                                                     style={{ color: '#9254de', marginLeft: 7 }}/>
                                 </div>
                                 :
-                                <div style={{display: 'flex'}}>
-                                    <FontAwesomeIcon size="2x" icon={faCloud} style={{color: '#9254de'}}/>
+                                <div style={{ display: 'flex' }}>
+                                    <FontAwesomeIcon size="2x" icon={faCloud} style={{ color: '#9254de' }}/>
                                     <div style={{
                                         lineHeight: '32px',
                                         marginLeft: 18,
                                         // color: isNewLayout ? 'white' : '#9254de'
-                                        color: "#9254de"
+                                        color: '#9254de'
                                     }}>TheSearchBase
                                     </div>
                                 </div>
@@ -163,7 +162,7 @@ class Dashboard extends Component {
 
                     <Menu
                         // theme={isNewLayout ? "dark" : "light"}
-                        theme={"light"}
+                        theme={'light'}
                         defaultSelectedKeys={this.state.selectedMenuKey}
                         selectedKeys={location.pathname.split('/')[2] ? [location.pathname.split('/')[2]] : [location.pathname.split('/')[1]]}
                         mode="inline" onClick={this.handleMenuClick}>
@@ -187,13 +186,12 @@ class Dashboard extends Component {
                             <span>Auto Pilot</span>
                         </Menu.Item>
 
-
                         <Menu.Item key="databases">
                             <Icon type="database"/>
                             <span>Database</span>
                         </Menu.Item>
 
-                        <Menu.Item disabled={false} key="appointments">
+                        <Menu.Item key="appointments">
                             <Icon type="calendar"/>
                             <span>Appointments (beta)</span>
                         </Menu.Item>
@@ -230,14 +228,14 @@ class Dashboard extends Component {
                 </Sider>
 
                 <Layout style={
-                    {marginLeft: this.state.collapsed ? 81 : 200, height: '100%'}}>
+                    { marginLeft: this.state.collapsed ? 81 : 200, height: '100%' }}>
 
                     <Header className={styles.Header}
                             style={
                                 isNewLayout ?
                                     {
                                         position: 'fixed',
-                                        width: `calc(100% - ${this.state.collapsed ? 80 : 200}px)`,
+                                        width: `calc(100% - ${this.state.collapsed ? 80 : 200}px)`
                                     }
                                     :
                                     {}
@@ -256,17 +254,17 @@ class Dashboard extends Component {
 
                     <Content style={
                         isNewLayout ?
-                            {minHeight: 'auto', marginTop: 64}
+                            { minHeight: 'auto', marginTop: 64 }
                             :
-                            {margin: 16, marginTop: 10, marginBottom: 0, height: '100%'}
+                            { margin: 16, marginTop: 10, marginBottom: 0, height: '100%' }
                     }>
 
                         <TimezoneContext.Provider value={validTimezone}>
                             <Route render={() =>
-                                <TransitionGroup style={{height: '100%'}}>
+                                <TransitionGroup style={{ height: '100%' }}>
                                     <CSSTransition key={location.key} classNames="fade" timeout={550}>
                                         <Suspense fallback={<div> Loading...</div>}>
-                                            <Switch location={location} style={{height: '100%'}}>
+                                            <Switch location={location} style={{ height: '100%' }}>
 
                                                 <Route path={`${match.path}/assistants`} component={Assistants} exact/>
                                                 <Route path={`${match.path}/assistants/:id`} component={Assistant} exact/>
@@ -283,12 +281,9 @@ class Dashboard extends Component {
                                                 <Route path={`${match.path}/auto_pilots`} component={AutoPilots} exact/>
                                                 <Route path={`${match.path}/auto_pilots/:id`} component={AutoPilot} exact/>
 
-                                                <Route path={`${match.path}/users_management`} component={UsersManagement}
-                                                       exact/>
-                                                <Route path={`${match.path}/documentation`} component={Documentation}
-                                                       exact/>}
+                                                <Route path={`${match.path}/users_management`} component={UsersManagement} exact/>
+                                                <Route path={`${match.path}/documentation`} component={Documentation} exact/>
                                                 <Route path={`${match.path}/appointments`} component={Appointment} exact/>
-                                                       exact/>
                                                 <Route path={`${match.path}/campaign`} component={Campaign} exact/>
                                                 <Route path="/dashboard" component={Home}/>
                                             </Switch>
@@ -299,7 +294,7 @@ class Dashboard extends Component {
                         </TimezoneContext.Provider>
                     </Content>
 
-                    <Footer style={{textAlign: 'center', padding: 10, zIndex: 1}}>
+                    <Footer style={{ textAlign: 'center', padding: 10, zIndex: 1 }}>
                         Copyright TheSearchBase Limited 2019. All rights reserved.
                     </Footer>
                 </Layout>
@@ -310,7 +305,7 @@ class Dashboard extends Component {
 
 function mapStateToProps(state) {
     return {
-        account: state.account.account.t
+        account: state.account.account
     };
 }
 

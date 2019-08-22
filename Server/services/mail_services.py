@@ -11,9 +11,12 @@ mail = Mail()
 tsbEmail = "info@thesearchbase.com"
 
 
-def sendDemoRequest(email) -> Callback:
+def sendDemoRequest(data) -> Callback:
     try:
-        callback: Callback = __sendEmail(tsbEmail, 'Demo Request', '/emails/arrange_demo.html', email=email)
+        if not (data["name"] or data["companyName"] or (data["phone"] or data["email"])):
+            return Callback(False, "Required information is missing")
+
+        callback: Callback = __sendEmail(tsbEmail, 'Demo Request', '/emails/arrange_demo.html', data=data)
 
         if not callback.Success:
             raise Exception(callback.Message)

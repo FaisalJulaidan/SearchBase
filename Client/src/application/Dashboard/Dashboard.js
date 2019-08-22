@@ -5,7 +5,7 @@ import momenttz from 'moment-timezone';
 import './Dashboard.less';
 import styles from './Dashboard.module.less';
 
-import { getUser, history, getCompany, getTimezone } from 'helpers';
+import { getUser, history, getTimezone } from 'helpers';
 import { Route, Switch, withRouter } from 'react-router-dom';
 import { authActions, optionsActions } from 'store/actions';
 import { store } from 'store/store';
@@ -77,7 +77,6 @@ class Dashboard extends Component {
         const timezone = getTimezone();
         const validTimezone = timezone ? timezone : momenttz.tz.guess();
         const user = getUser();
-        const company = getCompany();
 
         let userInfo = null;
         // User Information at the top
@@ -172,27 +171,27 @@ class Dashboard extends Component {
                             <span>Home</span>
                         </Menu.Item>
 
-                        <Menu.Item disabled={!company.AccessAssistants} key="assistants">
+                        <Menu.Item key="assistants">
                             <Icon type="robot"/>
                             <span>Assistants</span>
                         </Menu.Item>
 
-                        <Menu.Item disabled={!company.AccessCampaigns} key="campaign">
+                        <Menu.Item key="campaign">
                             <Icon type="rocket"/>
                             <span>Campaign</span>
                         </Menu.Item>
 
-                        <Menu.Item disabled={!company.AccessAutoPilot} key="auto_pilots">
+                        <Menu.Item key="auto_pilots">
                             <Icon type="clock-circle"/>
                             <span>Auto Pilot</span>
                         </Menu.Item>
 
-                        <Menu.Item disabled={!company.AccessDatabases} key="databases">
+                        <Menu.Item key="databases">
                             <Icon type="database"/>
                             <span>Database</span>
                         </Menu.Item>
 
-                        <Menu.Item disabled={!company.AccessAppointments} key="appointments">
+                        <Menu.Item key="appointments">
                             <Icon type="calendar"/>
                             <span>Appointments (beta)</span>
                         </Menu.Item>

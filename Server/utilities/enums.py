@@ -182,6 +182,14 @@ class DataType(Enum):
         [UserType.Unknown],
         [BlockType.UserInput, BlockType.Question, BlockType.FileUpload])
 
+    UserType = dataTypeCreator(
+        'User Type',
+        'UserType',
+        ValidationType.String,
+        DataTypeSection.NoType,
+        [UserType.Unknown],
+        [BlockType.UserType])
+
     # Candidate
     CandidateName = dataTypeCreator(
         'Candidate Name',
@@ -296,6 +304,14 @@ class DataType(Enum):
         DataTypeSection.Candidate,
         [UserType.Candidate],
         [BlockType.SalaryPicker])
+
+    CandidatePreferredJobType = dataTypeCreator(
+        'Candidate Preferred Job Type',
+        'CandidatePreferredJobType',
+        ValidationType.String,
+        DataTypeSection.Candidate,
+        [UserType.Candidate],
+        [BlockType.JobType])
 
     # TODO DELETE MIGRATE
     # CandidateDailyDesiredSalary = dataTypeCreator(

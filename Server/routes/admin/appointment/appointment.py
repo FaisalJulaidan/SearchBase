@@ -11,6 +11,7 @@ appointment_router: Blueprint = Blueprint('appointment_router', __name__, templa
 # Get all appointments for a company
 @appointment_router.route("/appointments", methods=['GET'])
 @jwt_required
+@wrappers.AccessAppointmentsRequired
 def appointments():
     user = get_jwt_identity()['user']
     callback = appointment_services.getAppointments(user['companyID'])
@@ -32,6 +33,7 @@ POST REQUEST EXAMPLE:
 @appointment_router.route("/appointments/set_status", methods=['POST'])
 @jwt_required
 @wrappers.validOwner('Appointment', 'appointmentID')
+@wrappers.AccessAppointmentsRequired
 def set_appointment_status():
     data = request.get_json()
     callback = appointment_services.setAppointmentStatus(data['appointmentID'], data['status'])
@@ -42,6 +44,7 @@ def set_appointment_status():
         return helpers.jsonResponse(False, 401, callback.Message)
 
 @appointment_router.route("/appointments/set_status_public", methods=['POST'])
+@wrappers.AccessAppointmentsRequired
 def set_appointment_status_public():
     data = request.get_json()
     callback = appointment_services.setAppointmentStatusPublic(data['token'], data['appointmentID'], data['status'])
@@ -52,6 +55,7 @@ def set_appointment_status_public():
         return helpers.jsonResponse(False, 401, callback.Message)
 
 @appointment_router.route("/appointments/verify/<token>", methods=['GET'])
+@wrappers.AccessAppointmentsRequired
 def verify_get_appointment(token):
     callback = appointment_services.verifyRequest(token)
 

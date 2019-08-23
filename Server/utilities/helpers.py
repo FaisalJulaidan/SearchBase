@@ -1,5 +1,3 @@
-import functools
-import gzip
 import inspect
 import logging
 import os
@@ -7,7 +5,6 @@ import re
 import traceback
 from datetime import time
 from enum import Enum
-from io import BytesIO
 from typing import List
 
 import geoip2.webservice
@@ -141,38 +138,6 @@ def jsonResponseFlask(success: bool, http_code: int, msg: str, data=None):
         mimetype='application/json'
     )
 
-def gzipped(f):
-    @functools.wraps(f)
-    def view_func(*args, **kwargs):
-        @after_this_request
-        def zipper(response):
-            accept_encoding = request.headers.get('Accept-Encoding', '')
-
-            if 'gzip' not in accept_encoding.lower():
-                return response
-
-            response.direct_passthrough = False
-
-            if (response.status_code < 200 or
-                    response.status_code >= 300 or
-                    'Content-Encoding' in response.headers):
-                return response
-            gzip_buffer = BytesIO()
-            gzip_file = gzip.GzipFile(mode='wb',
-                                      fileobj=gzip_buffer)
-            gzip_file.write(response.data)
-            gzip_file.close()
-
-            response.data = gzip_buffer.getvalue()
-            response.headers['Content-Encoding'] = 'gzip'
-            response.headers['Vary'] = 'Accept-Encoding'
-            response.headers['Content-Length'] = len(response.data)
-
-            return response
-
-        return f(*args, **kwargs)
-
-    return view_func
 
 
 # Note: Hourly is not supported because it varies and number of working hours is required

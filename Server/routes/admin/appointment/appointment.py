@@ -82,11 +82,11 @@ def allocation_time(payload):
         if not times_callback.Success:
             return helpers.jsonResponse(False, 404, "Couldn't load available time slots")
 
-        logoPath = helpers.keyFromStoredFile(assistant.Company.StoredFile, 'Logo')
+        logo = helpers.keyFromStoredFile(assistant.Company.StoredFile, 'Logo')
 
         data = {
             "companyName": assistant.Company.Name,
-            "companyLogoURL": logoPath,
+            "companyLogoURL": logo.FilePath,
             "appointmentAllocationTime": helpers.getListFromSQLAlchemyList(times_callback.Data.Info or []),
             "takenTimeSlots": helpers.getListFromSQLAlchemyList(assistant.Appointments),
             "userName": data['userName']

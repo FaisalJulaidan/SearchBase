@@ -120,7 +120,7 @@ def uploadFile(file, filename, path, public=False):
         db.session.add_all(files)
         db.session.commit()
 
-        return Callback(True, "File uploaded successfully")
+        return Callback(True, "File uploaded successfully", sf.ID)
 
     except Exception as exc:
         helpers.logError("stored_file_services.uploadFile(): " + str(exc))
@@ -178,6 +178,10 @@ def genPresigendURL(filename, path, expireIn=None):
         helpers.logError("stored_file_services.uploadFile(): " + str(exc))
         return Callback(False, "File is corrupted", None)
 
+def genURL(path):
+    logo = PUBLIC_URL + UPLOAD_FOLDER + COMPANY_LOGOS_PATH + "/" + (
+        path or "")
+    return logo if path else None
 
 def deleteFile(filename, path):
     try:

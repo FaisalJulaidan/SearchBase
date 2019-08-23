@@ -28,7 +28,7 @@ def processConversation(conversation: Conversation, autoPilot: AutoPilot, assist
             def __processSendingEmails(email, status: Status, autoPilot: AutoPilot):
 
                 userName = conversation.Name or 'Anonymous'
-                logoPath
+                logoPath = ""
                 logo = helpers.keyFromStoredFile(autoPilot.Company.StoredFile, 'Logo')
 
                 if logo:

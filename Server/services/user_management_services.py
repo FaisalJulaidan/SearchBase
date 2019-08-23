@@ -92,7 +92,7 @@ def addUser(firstname, surname, email, phoneNumber,  givenRoleID, editorUserID, 
             return Callback(False, 'Email is already on use maybe under your or another company')
 
         # Get company
-        callback: Callback = company_services.getByID(editorCompanyID)
+        callback: Callback = company_services.getByID(editorCompanyID, True)
         if not callback.Success:
             return Callback(False, 'Your company does not exist')
         company: Company = callback.Data

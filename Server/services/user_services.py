@@ -88,11 +88,16 @@ def getAllByCompanyID(companyID) -> Callback:
         return Callback(False, 'Users could not be retrieved.')
 
 
-def getAllByCompanyIDWithEnabledNotifications(companyID) -> Callback:
+def getAllByCompanyIDWithEnabledNotifications(companyID, eager: bool = False) -> Callback:
     try:
         # Get result and check if None then raise exception
-        result = db.session.query(User) \
-            .filter(and_(User.CompanyID == companyID, User.ChatbotNotifications, User.Verified)).all()
+        query = db.session.query(User) \
+            .filter(and_(User.CompanyID == companyID, User.ChatbotNotifications, User.Verified))
+        if eager:
+            query.options(joinedload("Company").joinedload("StoredFile").joinedload("StoredFileInfo"))
+
+
+        result = query.all()
 
         return Callback(True, 'Users were successfully retrieved.', result)
     except Exception as exc:
@@ -121,7 +126,8 @@ def getProfile(userID):
         result: User = db.session.query(User).filter(User.ID == userID).options(joinedload('Company').joinedload('StoredFile').joinedload('StoredFileInfo')).first()
         if not result:
             raise Exception
-
+        print('lol')
+        print(helpers.getDictFromSQLAlchemyObj(result.Company, True))
         profile = {
             'user': helpers.getDictFromSQLAlchemyObj(result),
             'company': helpers.getDictFromSQLAlchemyObj(result.Company, True),

@@ -23,7 +23,7 @@ def getChatbot(assistantHashID) -> Callback:
                                                 Company.Name.label("CompanyName"), Company.LogoPath.label("LogoPath")) \
             .join(Company)\
             .filter(Assistant.ID == assistantID[0]).first()
-        test: Assistant = db.session.query(Assistant).options(joinedload("Company"), joinedload("StoredFile"), joinedload("StoredFileInfo"))\
+        test: Assistant = db.session.query(Assistant).options(joinedload("Company").joinedload("StoredFile").joinedload("StoredFileInfo"))\
                                      .filter(Assistant.ID == assistantID[0]).first()
         print(test)
 

@@ -121,8 +121,9 @@ def getPlanNickname(SubID=None):
     except stripe.error.StripeError as e:
         return None
 
-def keyFromStoredFile(fileList: StoredFile, key: str) -> StoredFileInfo:
-    for file in fileList:
+def keyFromStoredFile(storedFile: StoredFile, key: str) -> StoredFileInfo:
+    for file in storedFile.StoredFileInfo:
+        print(file)
         if file.Key == key:
             return file
     return None

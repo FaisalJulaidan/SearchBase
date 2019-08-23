@@ -9,15 +9,17 @@ function* getAccountDetails() {
         const res = yield http.get(`/account`);
         const account = yield res.data?.data;
 
+        console.log(account)
         // Update username in localStorage
         let file = account.company.StoredFile?.StoredFileInfo?.find(item => item.Key === "Logo")
-        account.company.LogoPath = file.FilePath
+        account.company.LogoPath = file?.FilePath
         yield updateUsername(account.user.Firstname, account.user.Surname);
         yield updateTimezone(account.user.TimeZone)
 
         yield put(accountActions.getAccountSuccess(account))
 
     } catch (error) {
+        console.log(error)
         const msg = error.response?.data?.msg || "Couldn't load account details";
         yield put(accountActions.getAccountFailure(msg));
         errorMessage(msg);

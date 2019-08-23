@@ -229,7 +229,7 @@ def sendSolutionAlert(record, solutions):
 def notifyNewConversation(assistant: Assistant, conversation: Conversation):
     try:
 
-        users_callback: Callback = user_services.getAllByCompanyIDWithEnabledNotifications(assistant.CompanyID)
+        users_callback: Callback = user_services.getAllByCompanyIDWithEnabledNotifications(assistant.CompanyID, True)
         if not users_callback.Success:
             return Callback(False, "Users not found!")
 
@@ -259,6 +259,9 @@ def notifyNewConversation(assistant: Assistant, conversation: Conversation):
 
         }]
 
+        logo = helpers.keyFromStoredFile(company.StoredFile, 'Logo')
+        print(logo.FilePath)
+
         # send emails, jobs applied for
         for user in users_callback.Data:
             email_callback: Callback = __sendEmail(to=user.Email,
@@ -269,7 +272,7 @@ def notifyNewConversation(assistant: Assistant, conversation: Conversation):
                                                    assistantName = assistant.Name,
                                                    assistantID = assistant.ID,
                                                    conversations = conversations,
-                                                   logoPath=company.logo,
+                                                   logoPath=logo.FilePath,
                                                    companyName=company.Name,
                                                    companyURL=company.URL,
                                                    )
@@ -284,10 +287,10 @@ def notifyNewConversation(assistant: Assistant, conversation: Conversation):
 
 
 # Notify company about a new conversation
-def notifyNewConversations(assistant: dict, conversations, lastNotificationDate):
+def notifyNewConversations(assistant: Assistant, conversations, lastNotificationDate):
     try:
 
-        users_callback: Callback = user_services.getAllByCompanyIDWithEnabledNotifications(assistant["CompanyID"])
+        users_callback: Callback = user_services.getAllByCompanyIDWithEnabledNotifications(assistant.CompanyID)
         if not users_callback.Success:
             return Callback(False, "Users not found!")
 
@@ -311,13 +314,13 @@ def notifyNewConversations(assistant: dict, conversations, lastNotificationDate)
                 'completed': "Yes" if conversation.Completed else "No",
                 'dateTime': conversation.DateTime.strftime("%Y-%m-%d %H:%M"),
                 'link': helpers.getDomain() + "/dashboard/assistants/" +
-                        str(assistant["ID"]) + "?tab=Conversations&conversation_id=" + str(conversation.ID)
+                        str(assistant.ID) + "?tab=Conversations&conversation_id=" + str(conversation.ID)
             })
 
         if not len(conversationsList) > 0:
             return Callback(True, "No new conversation to send")
 
-        logo = assistant["LogoPath"]
+        logo = helpers.keyFromStoredFile(Assistant.Company.StoredFile, 'Logo')
 
         # send emails, jobs applied for
         for user in users_callback.Data:
@@ -329,7 +332,7 @@ def notifyNewConversations(assistant: dict, conversations, lastNotificationDate)
                                                    assistantID = assistant["ID"],
                                                    conversations = conversationsList,
                                                    logoPath = sfs.PUBLIC_URL + sfs.UPLOAD_FOLDER + sfs.COMPANY_LOGOS_PATH + "/" + (
-                                                           logo or "") if logo else None,
+                                                           logo.FilePath or "") if logo else None,
                                                    companyName = assistant["CompanyName"],
                                                    companyURL=assistant["CompanyURL"],
                                                    )

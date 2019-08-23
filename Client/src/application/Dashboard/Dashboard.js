@@ -5,7 +5,7 @@ import momenttz from 'moment-timezone';
 import './Dashboard.less';
 import styles from './Dashboard.module.less';
 
-import { getUser, history, getCompany, getTimezone } from 'helpers';
+import { getUser, history, getTimezone } from 'helpers';
 import { Route, Switch, withRouter } from 'react-router-dom';
 import { authActions, optionsActions } from 'store/actions';
 import { store } from 'store/store';
@@ -18,21 +18,21 @@ import { faCloud } from '@fortawesome/free-solid-svg-icons';
 import { TimezoneContext } from '../../contexts/timezone';
 import {AuthorisedRoute} from "../../hoc/AuthorisedRoute";
 
-const Home = lazy(() => import('./Home/Home'));
-const Assistants = lazy(() => import('./Assistants/Assistants'));
-const Assistant = lazy(() => import('./Assistants/Assistant/Assistant'));
-const Databases = lazy(() => import('./Databases/Databases'));
-const Database = lazy(() => import('./Databases/Database/Database'));
-const Account = lazy(() => import('./ControlPanel/Account/Account'));
-const Billing = lazy(() => import('./ControlPanel/Billing/Billing'));
-const UsersManagement = lazy(() => import('./ControlPanel/UsersManagement/UsersManagement'));
-const Documentation = lazy(() => import('./Documentation/Documentation'));
-const Campaign = lazy(() => import('./Campaign/Campaign'));
-const AutoPilots = lazy(() => import('./AutoPilots/AutoPilots'));
-const AutoPilot = lazy(() => import('./AutoPilots/AutoPilot/AutoPilot'));
-const Appointment = lazy(() => import('./Appointment/Appointment'));
-const Marketplace = lazy(() => import('./Marketplace/Marketplace'));
-const Item = lazy(() => import('./Marketplace/Item/Item'));
+import Home from  './Home/Home';
+import Assistants from './Assistants/Assistants';
+import Assistant from './Assistants/Assistant/Assistant';
+import Databases from './Databases/Databases';
+import Database from './Databases/Database/Database';
+import Account from './ControlPanel/Account/Account';
+import Billing from './ControlPanel/Billing/Billing';
+import UsersManagement from './ControlPanel/UsersManagement/UsersManagement';
+import Documentation from './Documentation/Documentation';
+import Campaign from './Campaign/Campaign';
+import AutoPilots from './AutoPilots/AutoPilots';
+import AutoPilot from './AutoPilots/AutoPilot/AutoPilot';
+import Appointment from './Appointment/Appointment';
+import Marketplace from './Marketplace/Marketplace';
+import Item from './Marketplace/Item/Item';
 // const AppointmentRoutes = lazy(() => import('./Appointment/AppointmentRoutes'));
 
 
@@ -78,7 +78,6 @@ class Dashboard extends Component {
         const timezone = getTimezone();
         const validTimezone = timezone ? timezone : momenttz.tz.guess();
         const user = getUser();
-        const company = getCompany();
 
         let userInfo = null;
         // User Information at the top
@@ -173,27 +172,27 @@ class Dashboard extends Component {
                             <span>Home</span>
                         </Menu.Item>
 
-                        <Menu.Item disabled={!company.AccessAssistants} key="assistants">
+                        <Menu.Item key="assistants">
                             <Icon type="robot"/>
                             <span>Assistants</span>
                         </Menu.Item>
 
-                        <Menu.Item disabled={!company.AccessCampaigns} key="campaign">
+                        <Menu.Item key="campaign">
                             <Icon type="rocket"/>
                             <span>Campaign</span>
                         </Menu.Item>
 
-                        <Menu.Item disabled={!company.AccessAutoPilot} key="auto_pilots">
+                        <Menu.Item key="auto_pilots">
                             <Icon type="clock-circle"/>
                             <span>Auto Pilot</span>
                         </Menu.Item>
 
-                        <Menu.Item disabled={!company.AccessDatabases} key="databases">
+                        <Menu.Item key="databases">
                             <Icon type="database"/>
                             <span>Database</span>
                         </Menu.Item>
 
-                        <Menu.Item disabled={!company.AccessAppointments} key="appointments">
+                        <Menu.Item key="appointments">
                             <Icon type="calendar"/>
                             <span>Appointments (beta)</span>
                         </Menu.Item>

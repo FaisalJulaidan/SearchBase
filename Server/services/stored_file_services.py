@@ -20,7 +20,6 @@ def getByID(id) -> StoredFile or None:
         if id:
             # Get result and check if None then raise exception
             result : StoredFile = db.session.query(StoredFile).get(id)
-            print(result.StoredFileInfo)
             if not result: raise Exception
 
             return Callback(True,

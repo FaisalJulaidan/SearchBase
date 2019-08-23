@@ -45,7 +45,7 @@ def conversation(assistantID):
 @conversation_router.route("/assistant/<int:assistantID>/conversation/<filename>", methods=['GET'])
 @jwt_required
 @wrappers.AccessAssistantsRequired
-@helpers.gzipped
+@wrappers.gzipped
 def conversation_file_uploads(assistantID, filename):
 
     # Authenticate

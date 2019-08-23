@@ -28,11 +28,13 @@ def processConversation(conversation: Conversation, autoPilot: AutoPilot, assist
             def __processSendingEmails(email, status: Status, autoPilot: AutoPilot):
 
                 userName = conversation.Name or 'Anonymous'
-                logoPath = autoPilot.Company.LogoPath
-                if logoPath:
+                logoPath
+                logo = helpers.keyFromStoredFile(autoPilot.Company.StoredFile, 'Logo')
+
+                if logo:
                     logoPath = sfs.PUBLIC_URL \
                                + sfs.UPLOAD_FOLDER + sfs.COMPANY_LOGOS_PATH \
-                               + "/" + logoPath
+                               + "/" + logo.FilePath
 
                 companyName = autoPilot.Company.Name
                 # ======================

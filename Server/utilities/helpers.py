@@ -22,7 +22,7 @@ from itsdangerous import URLSafeTimedSerializer
 from sqlalchemy_utils import Currency
 
 from config import BaseConfig
-from models import db, Assistant, Job, Callback, Role
+from models import db, Assistant, Job, Callback, Role, StoredFileInfo, StoredFile
 from services import flow_services, assistant_services, appointment_services
 from utilities.enums import Period
 
@@ -120,6 +120,12 @@ def getPlanNickname(SubID=None):
 
     except stripe.error.StripeError as e:
         return None
+
+def keyFromStoredFile(fileList: StoredFile, key: str) -> StoredFileInfo:
+    for file in fileList:
+        if file.Key == key:
+            return file
+    return None
 
 
 def isValidEmail(email: str) -> bool:

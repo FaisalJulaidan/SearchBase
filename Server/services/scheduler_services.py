@@ -39,9 +39,9 @@ def sendConversationsNotifications(assistantID=None):
     try:
         from app import app
         with app.app_context():
-
+            #NEEDS STORED FILEREIMPLEMENTED
             now = datetime.now()
-            assistantsQuery = db.session.query(Assistant.ID, Assistant.CompanyID, Company.Name, Company.LogoPath,
+            assistantsQuery = db.session.query(Assistant.ID, Assistant.CompanyID, Company.Name,
                                                Company.URL, Assistant.NotifyEvery, Assistant.Name,
                                                Assistant.LastNotificationDate) \
                 .join(Company)\
@@ -50,7 +50,7 @@ def sendConversationsNotifications(assistantID=None):
             if assistantID != None:
                 assistantsQuery.filter(Assistant.ID == assistantID)
 
-            assistants = helpers.getListFromLimitedQuery(["ID", "CompanyID", "CompanyName", "LogoPath", "CompanyURL",
+            assistants = helpers.getListFromLimitedQuery(["ID", "CompanyID", "CompanyName" , "CompanyURL",
                                                           "NotifyEvery", "Name", "LastNotificationDate"],
                                                          assistantsQuery.all())
 

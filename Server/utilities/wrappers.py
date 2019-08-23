@@ -74,14 +74,14 @@ def validOwner(type, *args):
 # Check if the plan allows Assistant access
 def AccessAssistantsRequired(func):
     def wrapper():
-        print('Access Assistants decorator executed')
+
         user = get_jwt_identity()['user']
         callback: Callback = company_services.getByID(user['companyID'])
         if not callback.Success:
             return helpers.jsonResponse(False, 404, "Not found.", None)
 
         company: Company = callback.Data
-        print('Access Assistants: ', company.AccessAssistants)
+
         if company.AccessAssistants:
             return func()
         else:
@@ -94,14 +94,14 @@ def AccessAssistantsRequired(func):
 # Check if the plan allows Assistant access (not used anywhere yet)
 def AccessCampaignsRequired(func):
     def wrapper():
-        print('Access Campaigns decorator executed')
+
         user = get_jwt_identity()['user']
         callback: Callback = company_services.getByID(user['companyID'])
         if not callback.Success:
             return helpers.jsonResponse(False, 404, "Not found.", None)
 
         company: Company = callback.Data
-        print('Access Campaigns: ', company.AccessCampaigns)
+
         if company.AccessAssistants:
             return func()
         else:
@@ -114,14 +114,14 @@ def AccessCampaignsRequired(func):
 # Check if the plan allows appointment access
 def AccessAppointmentsRequired(func):
     def wrapper():
-        print('Access appointments decorator executed')
+
         user = get_jwt_identity()['user']
         callback: Callback = company_services.getByID(user['companyID'])
         if not callback.Success:
             return helpers.jsonResponse(False, 404, "Not found.", None)
 
         company: Company = callback.Data
-        print('Access Appointments: ', company.AccessAppointments)
+
         if company.AccessAppointments:
             return func()
         else:
@@ -134,14 +134,14 @@ def AccessAppointmentsRequired(func):
 # Check if the plan allows autopilot access
 def AccessAutoPilotRequired(func):
     def wrapper():
-        print('Access autopilot decorator executed')
+
         user = get_jwt_identity()['user']
         callback: Callback = company_services.getByID(user['companyID'])
         if not callback.Success:
             return helpers.jsonResponse(False, 404, "Not found.", None)
 
         company: Company = callback.Data
-        print('Access Autopilot: ', company.AccessAutoPilot)
+
         if company.AccessAutoPilot:
             return func()
         else:
@@ -154,14 +154,14 @@ def AccessAutoPilotRequired(func):
 # Check if the plan allows database access
 def AccessDatabasesRequired(func):
     def wrapper():
-        print('Access database decorator executed')
+
         user = get_jwt_identity()['user']
         callback: Callback = company_services.getByID(user['companyID'])
         if not callback.Success:
             return helpers.jsonResponse(False, 404, "Not found.", None)
 
         company: Company = callback.Data
-        print('Access Databases: ', company.AccessDatabases)
+
         if company.AccessDatabases:
             return func()
         else:

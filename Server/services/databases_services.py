@@ -321,8 +321,6 @@ def scanCandidates(session, dbIDs, extraCandidates=None):
         __wordsCounter(DT.CandidateSkills, Candidate.CandidateSkills, keywords, df, 2)
         __wordsCounter(DT.JobEssentialSkills, Candidate.CandidateSkills, keywords, df, 2)
 
-        # Availability
-        __wordsCounter(DT.CandidateAvailability, Candidate.CandidateAvailability, keywords, df, 1)
 
         topResults = json.loads(df[df['Score'] > 0].nlargest(session.get('showTop', 2), 'Score')
                                 .to_json(orient='records'))

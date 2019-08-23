@@ -160,3 +160,74 @@ RawText = {
     "additionalProperties": False
 }
 
+
+SalaryPicker = {
+    "type": "object",
+    "properties": {
+        "text": {"type": "string"},
+        "min": {"type": "integer", "minimum": 0},
+        "max": {"type": "integer", "minimum": 1},
+        "period": {"enum": ["Annually", "Daily"]},
+        "defaultCurrency": {"enum": ['GBP', 'USD', 'EUR', 'CAD']},
+        "blockToGoID": {"type": ["string", "null"]},
+        "action": {"enum": [e.value for e in enums.BlockAction]},
+        "afterMessage": {"type": "string"},
+    },
+    "required": ["text", "min", "max", "period", "defaultCurrency", "action", "afterMessage", "blockToGoID"],
+    "additionalProperties": False
+}
+
+UserType = {
+    "type": "object",
+    "properties": {
+        "text": {"type": "string"},
+        "types": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "text": {"type": "string"},
+                    "value": {"enum": [ut.value for ut in enums.UserType]},
+                },
+                "required": ["text", "value"],
+                "additionalProperties": False
+            }
+        }
+    },
+    "required": ["text", "types"],
+    "additionalProperties": False
+}
+
+JobType = {
+    "type": "object",
+    "properties": {
+        "text": {"type": "string"},
+        "types": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "text": {"type": "string"},
+                    "value": {"enum": [jt.value for jt in enums.JobType]},
+                },
+                "required": ["text", "value"],
+                "additionalProperties": False
+            }
+        }
+    },
+    "required": ["text", "types"],
+    "additionalProperties": False
+}
+
+DatePicker = {
+    "type": "object",
+    "properties": {
+        "text": {"type": "string"},
+        "type": {"enum": ["Range", "Specific"]},
+        "blockToGoID": {"type": ["string", "null"]},
+        "action": {"enum": [e.value for e in enums.BlockAction]},
+        "afterMessage": {"type": "string"},
+    },
+    "required": ["text", "action", "afterMessage", "blockToGoID"],
+    "additionalProperties": False
+}

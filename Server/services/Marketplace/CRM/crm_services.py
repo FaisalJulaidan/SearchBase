@@ -48,7 +48,7 @@ def insertCandidate(assistant: Assistant, conversation: Conversation):
         "educations": ", ".join(conversation.Data.get('keywordsByDataType').get(DT.CandidateEducation.value['name'],
                                                                                 [])) or None,
         "availability": ", ".join(
-            conversation.Data.get('keywordsByDataType').get(DT.CandidateAvailability.value['name'], [])) or None,
+            conversation.Data.get('keywordsByDataType').get(DT.UserAvailabilityDate.value['name'], [])) or None,
 
         "annualSalary": getSalary(conversation, DT.CandidateAnnualDesiredSalary, "Min") or
                         getSalary(conversation, DT.JobAnnualSalary, "Min"),
@@ -85,7 +85,7 @@ def insertClient(assistant: Assistant, conversation: Conversation):
         "email": emails[0],
         "emails": emails,
         "availability": " ".join(
-            conversation.Data.get('keywordsByDataType').get(DT.ClientAvailability.value['name'], [])),
+            conversation.Data.get('keywordsByDataType').get(DT.UserAvailabilityDate.value['name'], [])),
 
         "companyName": " ".join(
             conversation.Data.get('keywordsByDataType').get(DT.CompanyName.value['name'],

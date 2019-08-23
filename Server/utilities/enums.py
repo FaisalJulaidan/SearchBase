@@ -63,7 +63,7 @@ class Period(Enum):
 
 
 @unique
-class EmploymentType(Enum):
+class JobType(Enum):
     Permanent = 'Permanent'
     Temporary = 'Temporary'
     Contract = 'Contract'
@@ -182,6 +182,15 @@ class DataType(Enum):
         [UserType.Unknown],
         [BlockType.UserInput, BlockType.Question, BlockType.FileUpload, BlockType.UserType])
 
+
+    UserAvailabilityDate =  dataTypeCreator(
+        'UserAvailabilityDate',
+        'User Availability Date',
+        ValidationType.DateTime,
+        DataTypeSection.NoType,
+        [UserType.Candidate, UserType.Client],
+        [BlockType.DatePicker])
+
     # Candidate
     CandidateName = dataTypeCreator(
         'Candidate Name',
@@ -222,30 +231,6 @@ class DataType(Enum):
         DataTypeSection.Candidate,
         [UserType.Candidate],
         [BlockType.FileUpload])
-
-    CandidateAvailability = dataTypeCreator(
-        'Candidate Availability',
-        'CandidateAvailability',
-        ValidationType.DateTime,
-        DataTypeSection.Candidate,
-        [UserType.Candidate],
-        [BlockType.DatePicker])
-
-    CandidateAvailableFrom = dataTypeCreator(
-        'Candidate Available From',
-        'CandidateAvailableFrom',
-        ValidationType.DateTime,
-        DataTypeSection.Candidate,
-        [UserType.Candidate],
-        [BlockType.DatePicker])
-
-    CandidateAvailableTo = dataTypeCreator(
-        'Candidate Available To',
-        'CandidateAvailableTo',
-        ValidationType.DateTime,
-        DataTypeSection.Candidate,
-        [UserType.Candidate],
-        [BlockType.DatePicker])
 
     CandidateLocation = dataTypeCreator(
         'Candidate Location',
@@ -296,14 +281,6 @@ class DataType(Enum):
         DataTypeSection.Candidate,
         [UserType.Candidate],
         [BlockType.SalaryPicker])
-
-    CandidatePreferredJobType = dataTypeCreator(
-        'Candidate Preferred Job Type',
-        'CandidatePreferredJobType',
-        ValidationType.String,
-        DataTypeSection.Candidate,
-        [UserType.Candidate],
-        [BlockType.JobType])
 
     # TODO DELETE MIGRATE
     # CandidateDailyDesiredSalary = dataTypeCreator(
@@ -448,30 +425,6 @@ class DataType(Enum):
         [UserType.Client] * 6,
         [BlockType.UserInput])
 
-    ClientAvailability = dataTypeCreator(
-        'Client Availability',
-        'ClientAvailability',
-        ValidationType.DateTime,
-        DataTypeSection.Client,
-        [UserType.Client] * 6,
-        [BlockType.DatePicker])
-
-    ClientAvailableFrom = dataTypeCreator(
-        'Client Available From',
-        'ClientAvailableFrom',
-        ValidationType.DateTime,
-        DataTypeSection.Client,
-        [UserType.Client],
-        [BlockType.DatePicker])
-
-    ClientAvailableTo = dataTypeCreator(
-        'Client Available To',
-        'ClientAvailableTo',
-        ValidationType.DateTime,
-        DataTypeSection.Client,
-        [UserType.Client],
-        [BlockType.DatePicker])
-
     # ======================================================================
     # Job
 
@@ -497,7 +450,7 @@ class DataType(Enum):
         ValidationType.String,
         DataTypeSection.Job,
         [UserType.Candidate, UserType.Client],
-        [BlockType.NoType])
+        [BlockType.JobType])
 
     JobSalary = dataTypeCreator(
         'Job Salary',

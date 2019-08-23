@@ -3,7 +3,7 @@ from flask_jwt_extended import jwt_required, get_jwt_identity
 
 from models import Callback, Assistant, Conversation, Appointment
 from services import assistant_services, conversation_services, appointment_services, company_services
-from utilities import helpers
+from utilities import helpers, wrappers
 
 appointment_router: Blueprint = Blueprint('appointment_router', __name__, template_folder="../../templates")
 
@@ -31,7 +31,7 @@ POST REQUEST EXAMPLE:
 
 @appointment_router.route("/appointments/set_status", methods=['POST'])
 @jwt_required
-@helpers.validOwner('Appointment', 'appointmentID')
+@wrappers.validOwner('Appointment', 'appointmentID')
 def set_appointment_status():
     data = request.get_json()
     callback = appointment_services.setAppointmentStatus(data['appointmentID'], data['status'])

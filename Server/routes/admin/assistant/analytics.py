@@ -1,15 +1,16 @@
 from flask import Blueprint, request, session
 from services import analytics_services, assistant_services
 from models import Callback, Assistant
-from utilities import helpers
+from utilities import helpers, wrappers
 from flask_jwt_extended import jwt_required, get_jwt_identity
 
 analytics_router: Blueprint = Blueprint('analytics_router', __name__, template_folder="../../templates")
 
+
 @analytics_router.route("/assistant/<assistantID>/analytics", methods=['GET'])
 @jwt_required
-@helpers.validAssistant
-@helpers.AccessAssistantsRequired
+@wrappers.validAssistant
+@wrappers.AccessAssistantsRequired
 def admin_analytics_data(assistant):
     if request.method == "GET":
         callback: Callback = analytics_services.getAnalytics(assistant)

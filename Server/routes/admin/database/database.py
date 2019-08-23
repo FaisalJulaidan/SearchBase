@@ -1,6 +1,6 @@
 from flask import Blueprint, request
 from models import Callback
-from utilities import helpers
+from utilities import helpers, wrappers
 from services import databases_services
 from flask_jwt_extended import jwt_required, get_jwt_identity
 
@@ -10,7 +10,7 @@ database_router: Blueprint = Blueprint('database_router', __name__, template_fol
 # Get databases list, and create a new database
 @database_router.route("/databases", methods=['GET', 'POST'])
 @jwt_required
-@helpers.AccessDatabasesRequired
+@wrappers.AccessDatabasesRequired
 def get_databasesList():
 
     # Authenticate
@@ -35,7 +35,7 @@ def get_databasesList():
 
 @database_router.route("/databases/<int:databaseID>/page/<int:pageNumber>", methods=['GET'])
 @jwt_required
-@helpers.AccessDatabasesRequired
+@wrappers.AccessDatabasesRequired
 def get_database(databaseID, pageNumber):
 
     # Authenticate
@@ -54,7 +54,7 @@ def get_database(databaseID, pageNumber):
 
 @database_router.route("/databases/<int:databaseID>", methods=['DELETE', 'PUT'])
 @jwt_required
-@helpers.AccessDatabasesRequired
+@wrappers.AccessDatabasesRequired
 def delete_update_database(databaseID):
 
     # Authenticate

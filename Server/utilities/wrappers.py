@@ -73,7 +73,7 @@ def validOwner(type, *args):
 
 # Check if the plan allows Assistant access
 def AccessAssistantsRequired(func):
-    def wrapper():
+    def wrapper(*args, **kwargs):
 
         user = get_jwt_identity()['user']
         callback: Callback = company_services.getByID(user['companyID'])
@@ -83,7 +83,7 @@ def AccessAssistantsRequired(func):
         company: Company = callback.Data
 
         if company.AccessAssistants:
-            return func()
+            return func(*args, **kwargs)
         else:
             return helpers.jsonResponse(False, 401, "Assistants not included in plan", None)
 
@@ -93,7 +93,7 @@ def AccessAssistantsRequired(func):
 
 # Check if the plan allows Assistant access (not used anywhere yet)
 def AccessCampaignsRequired(func):
-    def wrapper():
+    def wrapper(*args, **kwargs):
 
         user = get_jwt_identity()['user']
         callback: Callback = company_services.getByID(user['companyID'])
@@ -103,7 +103,7 @@ def AccessCampaignsRequired(func):
         company: Company = callback.Data
 
         if company.AccessAssistants:
-            return func()
+            return func(*args, **kwargs)
         else:
             return helpers.jsonResponse(False, 401, "Campaigns not included in plan", None)
 
@@ -113,7 +113,7 @@ def AccessCampaignsRequired(func):
 
 # Check if the plan allows appointment access
 def AccessAppointmentsRequired(func):
-    def wrapper():
+    def wrapper(*args, **kwargs):
 
         user = get_jwt_identity()['user']
         callback: Callback = company_services.getByID(user['companyID'])
@@ -123,7 +123,7 @@ def AccessAppointmentsRequired(func):
         company: Company = callback.Data
 
         if company.AccessAppointments:
-            return func()
+            return func(*args, **kwargs)
         else:
             return helpers.jsonResponse(False, 401, "Appointments not included in plan", None)
 
@@ -133,7 +133,7 @@ def AccessAppointmentsRequired(func):
 
 # Check if the plan allows autopilot access
 def AccessAutoPilotRequired(func):
-    def wrapper():
+    def wrapper(*args, **kwargs):
 
         user = get_jwt_identity()['user']
         callback: Callback = company_services.getByID(user['companyID'])
@@ -143,7 +143,7 @@ def AccessAutoPilotRequired(func):
         company: Company = callback.Data
 
         if company.AccessAutoPilot:
-            return func()
+            return func(*args, **kwargs)
         else:
             return helpers.jsonResponse(False, 401, "Autopilot not included in plan", None)
 
@@ -153,7 +153,7 @@ def AccessAutoPilotRequired(func):
 
 # Check if the plan allows database access
 def AccessDatabasesRequired(func):
-    def wrapper():
+    def wrapper(*args, **kwargs):
 
         user = get_jwt_identity()['user']
         callback: Callback = company_services.getByID(user['companyID'])
@@ -163,7 +163,7 @@ def AccessDatabasesRequired(func):
         company: Company = callback.Data
 
         if company.AccessDatabases:
-            return func()
+            return func(*args,**kwargs)
         else:
             return helpers.jsonResponse(False, 401, "Databases not included in plan", None)
 

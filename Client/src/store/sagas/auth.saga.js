@@ -68,11 +68,9 @@ function* demoRequest({name, email, companyName, phone, crm, subscribe}) {
             headers: {'Content-Type': 'application/json'},
         });
         yield put(authActions.demoSuccess());
-        successMessage('Demo request submitted');
 
-
-        yield history.push('/test');
-        warningMessage('Your demo request submitted successfully.', 0);
+        yield history.push('/');
+        successMessage('Your demo request submitted successfully.', 0);
 
     } catch (error) {
         console.log(error);

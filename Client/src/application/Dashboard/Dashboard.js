@@ -16,6 +16,7 @@ import { CSSTransition, TransitionGroup } from 'react-transition-group';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCloud } from '@fortawesome/free-solid-svg-icons';
 import { TimezoneContext } from '../../contexts/timezone';
+import {AuthorisedRoute} from "../../hoc/AuthorisedRoute";
 
 const Home = lazy(() => import('./Home/Home'));
 const Assistants = lazy(() => import('./Assistants/Assistants'));
@@ -267,25 +268,25 @@ class Dashboard extends Component {
                                         <Suspense fallback={<div> Loading...</div>}>
                                             <Switch location={location} style={{ height: '100%' }}>
 
-                                                <Route path={`${match.path}/assistants`} component={Assistants} exact/>
-                                                <Route path={`${match.path}/assistants/:id`} component={Assistant} exact/>
+                                                <AuthorisedRoute path={`${match.path}/assistants`} permission={company.AccessAssistants} component={Assistants} exact/>
+                                                <AuthorisedRoute path={`${match.path}/assistants/:id`} permission={company.AccessAssistants} component={Assistant} exact/>
 
                                                 <Route path={`${match.path}/marketplace`} component={Marketplace} exact/>
                                                 <Route path={`${match.path}/marketplace/:type`} component={Item} exact/>
 
-                                                <Route path={`${match.path}/databases`} component={Databases} exact/>
-                                                <Route path={`${match.path}/databases/:id`} component={Database} exact/>
+                                                <AuthorisedRoute path={`${match.path}/databases`} permission={company.AccessDatabases} component={Databases} exact/>
+                                                <AuthorisedRoute path={`${match.path}/databases/:id`} permission={company.AccessDatabases} component={Database} exact/>
 
                                                 <Route path={`${match.path}/account`} component={Account} exact/>
                                                 <Route path={`${match.path}/billing`} component={Billing} exact/>
 
-                                                <Route path={`${match.path}/auto_pilots`} component={AutoPilots} exact/>
-                                                <Route path={`${match.path}/auto_pilots/:id`} component={AutoPilot} exact/>
+                                                <AuthorisedRoute path={`${match.path}/auto_pilots`} permission={company.AccessAutoPilot} component={AutoPilots} exact/>
+                                                <AuthorisedRoute path={`${match.path}/auto_pilots/:id`} permission={company.AccessAutoPilot} component={AutoPilot} exact/>
 
                                                 <Route path={`${match.path}/users_management`} component={UsersManagement} exact/>
                                                 <Route path={`${match.path}/documentation`} component={Documentation} exact/>
-                                                <Route path={`${match.path}/appointments`} component={Appointment} exact/>
-                                                <Route path={`${match.path}/campaign`} component={Campaign} exact/>
+                                                <AuthorisedRoute path={`${match.path}/appointments`} permission={company.AccessAppointments} component={Appointment} exact/>
+                                                <AuthorisedRoute path={`${match.path}/campaign`} permission={company.AccessCampaigns} component={Campaign} exact/>
                                                 <Route path="/dashboard" component={Home}/>
                                             </Switch>
                                         </Suspense>

@@ -180,15 +180,7 @@ class DataType(Enum):
         ValidationType.Ignore,
         DataTypeSection.NoType,
         [UserType.Unknown],
-        [BlockType.UserInput, BlockType.Question, BlockType.FileUpload])
-
-    UserType = dataTypeCreator(
-        'User Type',
-        'UserType',
-        ValidationType.String,
-        DataTypeSection.NoType,
-        [UserType.Unknown],
-        [BlockType.UserType])
+        [BlockType.UserInput, BlockType.Question, BlockType.FileUpload, BlockType.UserType])
 
     # Candidate
     CandidateName = dataTypeCreator(

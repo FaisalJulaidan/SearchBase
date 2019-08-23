@@ -159,3 +159,4 @@ RawText = {
     "required": ["text", "action", "blockToGoID"],
     "additionalProperties": False
 }
+

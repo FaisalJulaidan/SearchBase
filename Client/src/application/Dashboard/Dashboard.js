@@ -5,7 +5,7 @@ import momenttz from 'moment-timezone';
 import './Dashboard.less';
 import styles from './Dashboard.module.less';
 
-import { getUser, history, getCompany, getTimezone } from 'helpers';
+import { getUser, history, getTimezone } from 'helpers';
 import { Route, Switch, withRouter } from 'react-router-dom';
 import { authActions, optionsActions } from 'store/actions';
 import { store } from 'store/store';
@@ -16,23 +16,22 @@ import { CSSTransition, TransitionGroup } from 'react-transition-group';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCloud } from '@fortawesome/free-solid-svg-icons';
 import { TimezoneContext } from '../../contexts/timezone';
-import {AuthorisedRoute} from "../../hoc/AuthorisedRoute";
 
-const Home = lazy(() => import('./Home/Home'));
-const Assistants = lazy(() => import('./Assistants/Assistants'));
-const Assistant = lazy(() => import('./Assistants/Assistant/Assistant'));
-const Databases = lazy(() => import('./Databases/Databases'));
-const Database = lazy(() => import('./Databases/Database/Database'));
-const Account = lazy(() => import('./ControlPanel/Account/Account'));
-const Billing = lazy(() => import('./ControlPanel/Billing/Billing'));
-const UsersManagement = lazy(() => import('./ControlPanel/UsersManagement/UsersManagement'));
-const Documentation = lazy(() => import('./Documentation/Documentation'));
-const Campaign = lazy(() => import('./Campaign/Campaign'));
-const AutoPilots = lazy(() => import('./AutoPilots/AutoPilots'));
-const AutoPilot = lazy(() => import('./AutoPilots/AutoPilot/AutoPilot'));
-const Appointment = lazy(() => import('./Appointment/Appointment'));
-const Marketplace = lazy(() => import('./Marketplace/Marketplace'));
-const Item = lazy(() => import('./Marketplace/Item/Item'));
+import Home from  './Home/Home';
+import Assistants from './Assistants/Assistants';
+import Assistant from './Assistants/Assistant/Assistant';
+import Databases from './Databases/Databases';
+import Database from './Databases/Database/Database';
+import Account from './ControlPanel/Account/Account';
+import Billing from './ControlPanel/Billing/Billing';
+import UsersManagement from './ControlPanel/UsersManagement/UsersManagement';
+import Documentation from './Documentation/Documentation';
+import Campaign from './Campaign/Campaign';
+import AutoPilots from './AutoPilots/AutoPilots';
+import AutoPilot from './AutoPilots/AutoPilot/AutoPilot';
+import Appointment from './Appointment/Appointment';
+import Marketplace from './Marketplace/Marketplace';
+import Item from './Marketplace/Item/Item';
 // const AppointmentRoutes = lazy(() => import('./Appointment/AppointmentRoutes'));
 
 
@@ -78,7 +77,6 @@ class Dashboard extends Component {
         const timezone = getTimezone();
         const validTimezone = timezone ? timezone : momenttz.tz.guess();
         const user = getUser();
-        const company = getCompany();
 
         let userInfo = null;
         // User Information at the top
@@ -173,27 +171,27 @@ class Dashboard extends Component {
                             <span>Home</span>
                         </Menu.Item>
 
-                        <Menu.Item disabled={!company.AccessAssistants} key="assistants">
+                        <Menu.Item key="assistants">
                             <Icon type="robot"/>
                             <span>Assistants</span>
                         </Menu.Item>
 
-                        <Menu.Item disabled={!company.AccessCampaigns} key="campaign">
+                        <Menu.Item key="campaign">
                             <Icon type="rocket"/>
                             <span>Campaign</span>
                         </Menu.Item>
 
-                        <Menu.Item disabled={!company.AccessAutoPilot} key="auto_pilots">
+                        <Menu.Item key="auto_pilots">
                             <Icon type="clock-circle"/>
                             <span>Auto Pilot</span>
                         </Menu.Item>
 
-                        <Menu.Item disabled={!company.AccessDatabases} key="databases">
+                        <Menu.Item key="databases">
                             <Icon type="database"/>
                             <span>Database</span>
                         </Menu.Item>
 
-                        <Menu.Item disabled={!company.AccessAppointments} key="appointments">
+                        <Menu.Item key="appointments">
                             <Icon type="calendar"/>
                             <span>Appointments (beta)</span>
                         </Menu.Item>
@@ -268,25 +266,25 @@ class Dashboard extends Component {
                                         <Suspense fallback={<div> Loading...</div>}>
                                             <Switch location={location} style={{ height: '100%' }}>
 
-                                                <AuthorisedRoute path={`${match.path}/assistants`} permission={company.AccessAssistants} component={Assistants} exact/>
-                                                <AuthorisedRoute path={`${match.path}/assistants/:id`} permission={company.AccessAssistants} component={Assistant} exact/>
+                                                <Route path={`${match.path}/assistants`} component={Assistants} exact/>
+                                                <Route path={`${match.path}/assistants/:id`} component={Assistant} exact/>
 
                                                 <Route path={`${match.path}/marketplace`} component={Marketplace} exact/>
                                                 <Route path={`${match.path}/marketplace/:type`} component={Item} exact/>
 
-                                                <AuthorisedRoute path={`${match.path}/databases`} permission={company.AccessDatabases} component={Databases} exact/>
-                                                <AuthorisedRoute path={`${match.path}/databases/:id`} permission={company.AccessDatabases} component={Database} exact/>
+                                                <Route path={`${match.path}/databases`} component={Databases} exact/>
+                                                <Route path={`${match.path}/databases/:id`} component={Database} exact/>
 
                                                 <Route path={`${match.path}/account`} component={Account} exact/>
                                                 <Route path={`${match.path}/billing`} component={Billing} exact/>
 
-                                                <AuthorisedRoute path={`${match.path}/auto_pilots`} permission={company.AccessAutoPilot} component={AutoPilots} exact/>
-                                                <AuthorisedRoute path={`${match.path}/auto_pilots/:id`} permission={company.AccessAutoPilot} component={AutoPilot} exact/>
+                                                <Route path={`${match.path}/auto_pilots`} component={AutoPilots} exact/>
+                                                <Route path={`${match.path}/auto_pilots/:id`} component={AutoPilot} exact/>
 
                                                 <Route path={`${match.path}/users_management`} component={UsersManagement} exact/>
                                                 <Route path={`${match.path}/documentation`} component={Documentation} exact/>
-                                                <AuthorisedRoute path={`${match.path}/appointments`} permission={company.AccessAppointments} component={Appointment} exact/>
-                                                <AuthorisedRoute path={`${match.path}/campaign`} permission={company.AccessCampaigns} component={Campaign} exact/>
+                                                <Route path={`${match.path}/appointments`} component={Appointment} exact/>
+                                                <Route path={`${match.path}/campaign`} component={Campaign} exact/>
                                                 <Route path="/dashboard" component={Home}/>
                                             </Switch>
                                         </Suspense>

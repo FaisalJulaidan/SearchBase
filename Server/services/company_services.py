@@ -1,4 +1,4 @@
-from models import db, Callback, Company, User, AppointmentAllocationTime, AppointmentAllocationTimeInfo
+from models import db, Callback, Company, User, AppointmentAllocationTime, AppointmentAllocationTimeInfo, StoredFile, StoredFileInfo
 from services import stored_file_services
 from utilities import helpers
 from sqlalchemy.orm import joinedload
@@ -157,13 +157,17 @@ def uploadLogo(file, companyID):
         upload_callback : Callback = stored_file_services.uploadFile(file,
                                                                      filename,
                                                                      public=True)
+
+        sf = StoredFile()
+        db.session.add(sf)
+
         db.session.flush()
+        db.session.add(StoredFileInfo(StoredFileID=sf.ID, Key='Logo', FilePath=filename))
 
         if not upload_callback.Success:
             raise Exception(upload_callback.Message)
 
-        company.LogoPath = filename
-        company.StoredFileID = upload_callback.Data
+        company.StoredFileID = sf.ID
 
         db.session.commit()
 

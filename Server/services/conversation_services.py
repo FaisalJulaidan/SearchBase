@@ -56,7 +56,6 @@ def processConversation(assistantHashID, data: dict) -> Callback:
                                     QuestionsAnswered=len(collectedData),
                                     UserType=UserType[data['userType']],
                                     Score=round(data['score'], 2),
-                                    # StoredFile=
                                     ApplicationStatus=Status.Pending,
                                     Assistant=assistant)
 

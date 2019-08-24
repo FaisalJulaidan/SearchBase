@@ -5,6 +5,7 @@ from datetime import datetime
 from typing import List
 
 import pandas
+import swifter
 
 from services.Marketplace.marketplace_helpers import convertSkillsToString
 from utilities.enums import DatabaseType, DataType as DT
@@ -527,7 +528,8 @@ def __salary(row, dbSalaryColumn, dbCurrencyColumn, salaryInput: str, plus=4, fo
 
     # Convert db salary currency if did not match with user's entered currency
     dbSalary = row[dbSalaryColumn.name] or 0
-    if (not row[dbCurrencyColumn.name] == userSalary[1]) and dbSalary > 0:
+    if (row[dbCurrencyColumn.name] != userSalary[1]) and dbSalary > 0:
+        print("Convert")
         dbSalary = helpers.currencyConverter.convert(row[dbCurrencyColumn.name], userSalary[1], dbSalary)
         row[dbSalaryColumn.name] = dbSalary
 

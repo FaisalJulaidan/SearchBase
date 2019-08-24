@@ -123,7 +123,6 @@ def getPlanNickname(SubID=None):
 
 def keyFromStoredFile(storedFile: StoredFile, key: str) -> StoredFileInfo:
     for file in storedFile.StoredFileInfo:
-        print(file)
         if file.Key == key:
             return file
     return None

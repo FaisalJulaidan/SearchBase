@@ -113,7 +113,6 @@ def chatbot_upload_files(assistantIDAsHash, sessionID):
                 return helpers.jsonResponseFlask(False, 404, "No file part")
 
             files = request.files.getlist('file')
-            filenames = ''
             sf : StoredFile = StoredFile()
 
             db.session.add(sf)
@@ -122,26 +121,21 @@ def chatbot_upload_files(assistantIDAsHash, sessionID):
             set_file_id: Callback = conversation_services.setFileByID(sessionID, sf.ID)
             for idx, file in enumerate(files):
                 if file.filename == '':
+                    db.session.rollback()
                     return helpers.jsonResponseFlask(False, 404, "No selected file")
                 # Generate unique name: hash_sessionIDEncrypted.extension
                 filename = str(uuid.uuid4()) + '_' + helpers.encodeID(sessionID) + '.' + \
                            secure_filename(file.filename).rsplit('.', 1)[1].lower()
 
+
                 # Upload file to DigitalOcean Space
                 upload_callback: Callback = stored_file_services.uploadFile(file, filename, True)
                 file.realFileName = filename
-                # if not upload_callback.Success:
-                #     filename = 'fileCorrupted'
-
-
-                # if there is multiple files, split there name by commas to store a ref of the uploaded files in DB
-                # file.realFileName = filename
-
 
             # Store filePaths in the DB as reference
             dbRef_callback: Callback = stored_file_services.createRef(files, conversation, sf.ID, keys)
             if not dbRef_callback.Success:
-                logError("Couldn't Save Stored Files Reference For: " + str(filenames))
+                logError("Couldn't Save Stored Files Reference")
                 raise Exception(dbRef_callback.Message)
 
             # Save changes
@@ -155,11 +149,9 @@ def chatbot_upload_files(assistantIDAsHash, sessionID):
                 # Send through CRM
                 sendCRMFile_callback: Callback = crm_services.uploadFile(assistant, dbRef_callback.Data)
                 if not sendCRMFile_callback:
-                    # TODO we should not raise expcetion just becuase CRM fail beucase this mean the chatbot will fail too
-                    # TODO but instead we should log this in the db and notify
                     raise Exception("Could not submit file to CRM")
 
         except Exception as exc:
             print(exc)
-            return helpers.jsonResponseFlask(False, 404, "I am having difficulties saving your uploaded the files :(")
-        return helpers.jsonResponseFlask(True, 200, "File uploaded successfully!!")
+            return helpers.jsonResponseFlask(False, 404, "I am having difficulties saving your uploaded files :(")
+        return helpers.jsonResponseFlask(True, 200, "File uploaded successfully")

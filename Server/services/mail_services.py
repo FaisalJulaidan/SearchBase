@@ -1,5 +1,5 @@
 from threading import Thread
-
+import os
 from flask import render_template, current_app
 from flask_mail import Mail, Message
 
@@ -259,7 +259,7 @@ def notifyNewConversation(assistant: Assistant, conversation: Conversation):
 
         }]
 
-        logo = helpers.keyFromStoredFile(company.StoredFile, 'Logo').FilePath
+        logoPath = helpers.keyFromStoredFile(company.StoredFile, 'Logo').AbsFilePath
         # send emails, jobs applied for
         for user in users_callback.Data:
             email_callback: Callback = __sendEmail(to=user.Email,
@@ -270,7 +270,7 @@ def notifyNewConversation(assistant: Assistant, conversation: Conversation):
                                                    assistantName = assistant.Name,
                                                    assistantID = assistant.ID,
                                                    conversations = conversations,
-                                                   logoPath=sfs.PUBLIC_URL + logo,
+                                                   logoPath= logoPath,
                                                    companyName=company.Name,
                                                    companyURL=company.URL,
                                                    )
@@ -314,13 +314,12 @@ def notifyNewConversations(assistant: Assistant, conversations, lastNotification
                 'link': helpers.getDomain() + "/dashboard/assistants/" +
                         str(assistant.ID) + "?tab=Conversations&conversation_id=" + str(conversation.ID)
             })
-        print('lol')
 
         if not len(conversationsList) > 0:
             return Callback(True, "No new conversation to send")
 
         logo = helpers.keyFromStoredFile(Assistant.Company.StoredFile, 'Logo')
-        print(logo.FilePath)
+
         # send emails, jobs applied for
         for user in users_callback.Data:
             email_callback: Callback = __sendEmail(to=user.Email,
@@ -330,7 +329,7 @@ def notifyNewConversations(assistant: Assistant, conversations, lastNotification
                                                    assistantName = assistant["Name"],
                                                    assistantID = assistant["ID"],
                                                    conversations = conversationsList,
-                                                   logoPath = logo.FilePath or "" if logo else None,
+                                                   logoPath = logo.AbsFilePath or "" if logo else None,
                                                    companyName = assistant["CompanyName"],
                                                    companyURL=assistant["CompanyURL"],
                                                    )

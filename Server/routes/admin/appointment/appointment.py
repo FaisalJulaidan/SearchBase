@@ -86,7 +86,7 @@ def allocation_time(payload):
 
         data = {
             "companyName": assistant.Company.Name,
-            "companyLogoURL": logo.FilePath,
+            "companyLogoURL": logo.AbsFilePath,
             "appointmentAllocationTime": helpers.getListFromSQLAlchemyList(times_callback.Data.Info or []),
             "takenTimeSlots": helpers.getListFromSQLAlchemyList(assistant.Appointments),
             "userName": data['userName']

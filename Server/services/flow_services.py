@@ -17,12 +17,6 @@ def getChatbot(assistantHashID) -> Callback:
         if not assistantID:
             return Callback(False, "Assistant not found!", None)
 
-        # assistant: Assistant = db.session.query(Assistant.Name, Assistant.Flow, Assistant.Message, Assistant.TopBarText,
-        #                                         Assistant.SecondsUntilPopup, Assistant.Active, Assistant.Config,
-        #                                         Company.HideSignature,
-        #                                         Company.Name.label("CompanyName"), Company.LogoPath.label("LogoPath")) \
-        #     .join(Company)\
-        #     .filter(Assistant.ID == assistantID[0]).first()
         assistant: Assistant = db.session.query(Assistant).options(joinedload("Company").joinedload("StoredFile").joinedload("StoredFileInfo"))\
                                      .filter(Assistant.ID == assistantID[0]).first()
 
@@ -46,7 +40,7 @@ def getChatbot(assistantHashID) -> Callback:
             pass
 
         assistantDict = helpers.getDictFromSQLAlchemyObj(assistant)
-        assistantDict['LogoPath'] = helpers.keyFromStoredFile(assistant.Company.StoredFile, 'Logo').FilePath
+        assistantDict['LogoPath'] = helpers.keyFromStoredFile(assistant.Company.StoredFile, 'Logo').AbsFilePath
 
         data = {
             "assistant": assistantDict,

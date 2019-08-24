@@ -32,7 +32,7 @@ def processConversation(conversation: Conversation, autoPilot: AutoPilot, assist
                 logo = helpers.keyFromStoredFile(autoPilot.Company.StoredFile, 'Logo')
 
                 if logo:
-                    logoPath = logo.FilePath
+                    logoPath = logo.AbsFilePath
 
                 companyName = autoPilot.Company.Name
                 # ======================

@@ -179,8 +179,6 @@ def setFileByID(conversationID: int, fileID: int) -> Callback:
         result: Conversation = db.session.query(Conversation).filter(Conversation.ID == conversationID).first()
         result.StoredFileID = fileID
 
-        db.session.commit()
-
         if not result:
             raise Exception("Conversation files set")
 

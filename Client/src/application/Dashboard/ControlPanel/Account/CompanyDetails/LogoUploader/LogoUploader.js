@@ -95,13 +95,13 @@ class LogoUploader extends Component {
                     </Dragger>
 
                     {
-                        account?.company?.LogoPath ?
+                        account?.company?.StoredFile ?
                             <div>
                                 <h3>The current logo</h3>
                                 <Card hoverable
                                       style={{width: 300, textAlign: 'center'}}
                                       cover={<img alt="example"
-                                                  src={`${process.env.REACT_APP_ASSETS_PUBLIC_URL}${account?.company.LogoPath}?timestamp=${this.state.timeStamp}`}/>}
+                                                  src={`${account?.company.StoredFile.StoredFileInfo[0]}?timestamp=${this.state.timeStamp}`}/>}
                                 >
                                     <Button type={'danger'} onClick={() => this.deleteLogo()}>Delete</Button>
                                 </Card>

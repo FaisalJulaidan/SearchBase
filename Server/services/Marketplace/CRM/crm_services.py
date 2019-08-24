@@ -18,7 +18,7 @@ def processConversation(assistant: Assistant, conversation: Conversation) -> Cal
                         " whether user is a Candidate or Client ")
 
 
-def insertCandidate(assistant: Assistant, conversation: Conversation, update=False, update_id=None):
+def insertCandidate(assistant: Assistant, conversation: Conversation, update_id=None):
     name = (conversation.Name or " ").split(" ")
     data = {
         "name": conversation.Name or " ",
@@ -58,7 +58,7 @@ def insertCandidate(assistant: Assistant, conversation: Conversation, update=Fal
         "selectedSolutions": conversation.Data.get("selectedSolutions")
     }
 
-    if update and update_id and assistant.CRM.Type is CRM.Bullhorn:
+    if update_id and assistant.CRM.Type is CRM.Bullhorn:
         func = "update"
     else:
         func = "insert"

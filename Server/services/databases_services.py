@@ -405,10 +405,10 @@ def scanJobs(session, dbIDs, extraJobs=None):
                             keywords.get(DT.CandidateAnnualDesiredSalary.value['name'],
                                 keywords.get(DT.CandidateDailyDesiredSalary.value[ 'name']))))
 
-        if salaryInputs and len(salaryInputs):
-            df[['Score', Job.JobSalary.name, Job.Currency.name]] = \
-                df.apply(lambda row: __salary(row, Job.JobSalary, Job.Currency, salaryInputs[-1], 8),
-                         axis=1, result_type='expand')
+        # if salaryInputs and len(salaryInputs):
+        #     df[['Score', Job.JobSalary.name, Job.Currency.name]] = \
+        #         df.apply(lambda row: __salary(row, Job.JobSalary, Job.Currency, salaryInputs[-1], 8),
+        #                  axis=1, result_type='expand')
 
         # Job Year Required
         __numCounter(Job.JobYearsRequired, '<', DT.JobYearsRequired, keywords, df, plus=5, addInputToScore=True)

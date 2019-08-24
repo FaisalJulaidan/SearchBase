@@ -5,7 +5,6 @@ from datetime import datetime
 from typing import List
 
 import pandas
-import swifter
 
 from services.Marketplace.marketplace_helpers import convertSkillsToString
 from utilities.enums import DatabaseType, DataType as DT

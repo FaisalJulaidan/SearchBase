@@ -25,8 +25,8 @@ class Routes extends Component {
                 <Route path="/privacy" exact component={Policies}/>
                 <Route path="/gdpr" exact component={GDPR}/>
                 <Route path="/release-notes" exact component={ReleaseNote}/>
-                <Route path="/login" exact component={Login}/>
-                <Route path="/sign-up" exact component={SignUp}/>
+                {/*<Route path="/login" exact component={Login}/>*/}
+                {/*<Route path="/signup" exact component={SignUp}/>*/}
                 <Route path="/get-started" exact component={GetStarted}/>
                 <Route path="" exact component={NotFound404}/>
             </Switch>

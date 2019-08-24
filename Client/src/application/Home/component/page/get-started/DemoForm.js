@@ -100,4 +100,4 @@ function mapStateToProps(state) {
     };
 }
 
-export default connect(mapStateToProps)(Form.create({name: 'demo'})(DemoForm));
+export default connect(mapStateToProps)(Form.create()(DemoForm));

@@ -1,11 +1,12 @@
 import React from 'react';
 import styles from './login.module.css';
-import {Card, Container, Row, Form, Button, Col} from "react-bootstrap";
+import {Card, Container, Row, Col} from "react-bootstrap";
 import {Fade} from "react-reveal";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faCloud} from "@fortawesome/free-solid-svg-icons";
 import {Link} from "react-router-dom";
 import {WEBSITE_TITLE} from '../../../../../constants/config';
+import LoginForm from "./LoginForm";
 
 const Login = () => {
 
@@ -24,31 +25,14 @@ const Login = () => {
                                     <Card.Body>
                                         <h1 className={styles.title}>Login</h1>
                                         <div className={styles.logo}>
-                                            <FontAwesomeIcon size="6x" icon={faCloud}/>
+                                            <FontAwesomeIcon size="5x" icon={faCloud}/>
                                             <h1 className={styles.brand_title}>
                                                 SearchBase
                                             </h1>
                                         </div>
-                                        <Form>
-                                            <Form.Group controlId="formEmail">
-                                                <Form.Control className={styles.input} type="email"
-                                                              placeholder="E-mail"/>
-                                            </Form.Group>
-
-                                            <Form.Group controlId="formBPassword">
-                                                <Form.Control className={styles.input} type="password"
-                                                              placeholder="Password"/>
-                                            </Form.Group>
-
-                                            <Form.Group >
-                                                <Button className={styles.submit} block variant="primary" type="submit">
-                                                    Submit
-                                                </Button>
-                                            </Form.Group>
-
-                                        </Form>
+                                        <LoginForm/>
                                         <h6 className={styles.sign_up}>Don’t have an account?
-                                            <Link to="/sign-up">Sign Up</Link>
+                                            <Link to="/signup">Sign Up</Link>
                                         </h6>
                                     </Card.Body>
                                 </Card>

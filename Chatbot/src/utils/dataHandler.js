@@ -104,7 +104,8 @@ export const dataHandler = (() => {
             if (sessionID && files.length && !cancelled) {
                 const formData = new FormData();
                 const config = {headers: {'content-type': 'multipart/form-data'}};
-                files.forEach(file => formData.append('file', file, file.name));
+                files.forEach(file => formData.append('file', file.file, file.file.name));
+                formData.append('keys', files.map(file => file.key).join(","))
                 const {data, error} = await promiseWrapper(axios.post(`${getServerDomain()}/api/assistant/${assistantID}/chatbot/${sessionID}/file`, formData, config));
 
                 if (error) {
@@ -247,7 +248,6 @@ export const dataHandler = (() => {
             const __processFileUpload = (message) => {
                 const {blockRef, content, text} = message;
                 const input = !content.skipped ? '&FILE_UPLOAD&' : text;
-
                 __collectData(
                     blockRef[flowAttributes.ID],
                     blockRef[flowAttributes.CONTENT][flowAttributes.CONTENT_TEXT],
@@ -257,7 +257,7 @@ export const dataHandler = (() => {
                     content.skipped);
 
                 if (!content.skipped)
-                    submittedFiles = submittedFiles.concat(content.file);
+                    submittedFiles = submittedFiles.concat({file: content.file, key: blockRef.DataType.name});
             };
 
             const __processSolutions = (message) => {

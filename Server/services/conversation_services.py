@@ -6,6 +6,7 @@ from typing import List
 from jsonschema import validate
 from sqlalchemy.sql import and_
 from sqlalchemy.sql import desc
+from sqlalchemy.orm import joinedload
 
 from utilities.enums import UserType, Status, Webhooks
 from models import db, Callback, Conversation, Assistant
@@ -55,6 +56,7 @@ def processConversation(assistantHashID, data: dict) -> Callback:
                                     QuestionsAnswered=len(collectedData),
                                     UserType=UserType[data['userType']],
                                     Score=round(data['score'], 2),
+                                    # StoredFile=
                                     ApplicationStatus=Status.Pending,
                                     Assistant=assistant)
 
@@ -106,6 +108,7 @@ def processConversation(assistantHashID, data: dict) -> Callback:
 def getAllByAssistantID(assistantID):
     try:
         conversations: List[Conversation] = db.session.query(Conversation) \
+            .options(joinedload('StoredFile').joinedload("StoredFileInfo"))\
             .filter(Conversation.AssistantID == assistantID) \
             .order_by(desc(Conversation.DateTime)).all()
         for conversation in conversations:
@@ -172,6 +175,21 @@ def getAllRecordsByAssistantIDInTheLast(hours, assistantID):
         return Callback(False, "Error in returning records for the last " + str(hours) +
                         " hours for assistant with ID: " + str(assistantID))
 
+def setFileByID(conversationID: int, fileID: int) -> Callback:
+    try:
+        result: Conversation = db.session.query(Conversation).filter(Conversation.ID == conversationID).first()
+        result.StoredFileID = fileID
+
+        db.session.commit()
+
+        if not result:
+            raise Exception("Conversation files set")
+
+        return Callback(True, "Conversations found", result)
+    except Exception as exc:
+        helpers.logError("conversation_services.setFileByID(): " + str(exc))
+        db.session.rollback()
+        return Callback(False, "Could not set file by ID")
 
 # ----- Deletions ----- #
 def deleteByID(conversationID):

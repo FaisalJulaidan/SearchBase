@@ -32,9 +32,7 @@ def processConversation(conversation: Conversation, autoPilot: AutoPilot, assist
                 logo = helpers.keyFromStoredFile(autoPilot.Company.StoredFile, 'Logo')
 
                 if logo:
-                    logoPath = sfs.PUBLIC_URL \
-                               + sfs.UPLOAD_FOLDER + sfs.COMPANY_LOGOS_PATH \
-                               + "/" + logo.FilePath
+                    logoPath = logo.FilePath
 
                 companyName = autoPilot.Company.Name
                 # ======================

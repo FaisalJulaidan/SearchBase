@@ -244,7 +244,7 @@ def notifyNewConversation(assistant: Assistant, conversation: Conversation):
         if conversation.StoredFile:
             if conversation.StoredFile.StoredFileInfo:
                 for file in conversation.StoredFile.StoredFileInfo:
-                    fileURLsSinged.append(sfs.genPresigendURL(file.FilePath, sfs.USER_FILES_PATH, 2592000).Data) # Expires in a month
+                    fileURLsSinged.append(sfs.genPresigendURL(file.FilePath, 2592000).Data) # Expires in a month
 
 
         conversations = [{
@@ -259,7 +259,7 @@ def notifyNewConversation(assistant: Assistant, conversation: Conversation):
 
         }]
 
-        logo = helpers.keyFromStoredFile(company.StoredFile, 'Logo')
+        logo = helpers.keyFromStoredFile(company.StoredFile, 'Logo').FilePath
         # send emails, jobs applied for
         for user in users_callback.Data:
             email_callback: Callback = __sendEmail(to=user.Email,
@@ -270,7 +270,7 @@ def notifyNewConversation(assistant: Assistant, conversation: Conversation):
                                                    assistantName = assistant.Name,
                                                    assistantID = assistant.ID,
                                                    conversations = conversations,
-                                                   logoPath=(sfs.PUBLIC_URL + logo.FilePath),
+                                                   logoPath=sfs.PUBLIC_URL + logo,
                                                    companyName=company.Name,
                                                    companyURL=company.URL,
                                                    )
@@ -302,7 +302,7 @@ def notifyNewConversations(assistant: Assistant, conversations, lastNotification
             if conversation.StoredFile:
                 if conversation.StoredFile.StoredFileInfo:
                     for file in conversation.StoredFile.StoredFileInfo:
-                        fileURLsSinged.append(sfs.genPresigendURL(file.FilePath, sfs.USER_FILES_PATH, 2592000).Data) # Expires in a month
+                        fileURLsSinged.append(sfs.genPresigendURL(file.FilePath, 2592000).Data) # Expires in a month
 
             conversationsList.append({
                 'userType': conversation.UserType.name,
@@ -330,8 +330,7 @@ def notifyNewConversations(assistant: Assistant, conversations, lastNotification
                                                    assistantName = assistant["Name"],
                                                    assistantID = assistant["ID"],
                                                    conversations = conversationsList,
-                                                   logoPath = sfs.PUBLIC_URL + sfs.UPLOAD_FOLDER + sfs.COMPANY_LOGOS_PATH + "/" + (
-                                                           logo.FilePath or "") if logo else None,
+                                                   logoPath = logo.FilePath or "" if logo else None,
                                                    companyName = assistant["CompanyName"],
                                                    companyURL=assistant["CompanyURL"],
                                                    )

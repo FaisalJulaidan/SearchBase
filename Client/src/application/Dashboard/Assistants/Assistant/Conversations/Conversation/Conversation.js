@@ -22,12 +22,11 @@ class Conversation extends Component {
         title: 'Input',
         key: 'input',
         render: (text, record, index) => {
-
             if (record.input === '&FILE_UPLOAD&') {
                 this.counter+=1;
                 return (<Button
                     disabled={this.props.isDownloadingFile}
-                    hreftype="primary" file-path-index={this.counter} icon="download" size="small"
+                    hreftype="primary" file-path-index={record.dataType} icon="download" size="small"
                     onClick={(e) => {this.props.downloadFile(e.target.getAttribute('file-path-index'))}}>
                     Download File
                 </Button>);

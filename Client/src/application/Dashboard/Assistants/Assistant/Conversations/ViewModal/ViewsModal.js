@@ -43,9 +43,9 @@ class ViewsModal extends Component {
             this.props.deleteConversation(this.props.conversation)
     };
 
-    downloadFileHandler = (filenameIndex) => {
+    downloadFileHandler = (fileKey) => {
         // Get file name by index
-        let fileName = this.props.conversation?.Files[filenameIndex].FilePath;
+        let fileName = this.props.conversation.StoredFile.StoredFileInfo.find(sf => sf.Key === fileKey).FilePath
         if (!fileName){
             errorMessage("File doesn't exist!");
             return;

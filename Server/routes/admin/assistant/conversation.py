@@ -75,7 +75,7 @@ def conversation_file_uploads(assistantID, filename):
 
 
     if request.method == "GET":
-        callback: Callback = stored_file_services.genPresigendURL(filename, stored_file_services.USER_FILES_PATH)
+        callback: Callback = stored_file_services.genPresigendURL(filename)
         if not callback.Success:
             return helpers.jsonResponse(False, 404, "File not found.")
 

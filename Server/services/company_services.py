@@ -156,7 +156,6 @@ def uploadLogo(file, companyID):
         # Upload file to cloud Space
         upload_callback : Callback = stored_file_services.uploadFile(file,
                                                                      filename,
-                                                                     stored_file_services.COMPANY_LOGOS_PATH,
                                                                      public=True)
         db.session.flush()
 
@@ -165,7 +164,7 @@ def uploadLogo(file, companyID):
 
         company.LogoPath = filename
         company.StoredFileID = upload_callback.Data
-        print(upload_callback.Data)
+
         db.session.commit()
 
         return Callback(True, 'Logo uploaded successfully.', filename)
@@ -187,10 +186,9 @@ def deleteLogo(companyID):
         if not logo: return Callback(False, 'No logo to delete')
 
         # Delete file from cloud Space and reference from database
-        path = helpers.keyFromStoredFile(logo, 'Logo')
+        path = helpers.keyFromStoredFile(logo, 'Logo').FilePath
         company.StoredFile = None
-        delete_callback : Callback = stored_file_services.deleteFile(path,
-                                                                     stored_file_services.COMPANY_LOGOS_PATH)
+        delete_callback : Callback = stored_file_services.deleteFile(path)
         if not delete_callback.Success:
             raise Exception(delete_callback.Message)
 

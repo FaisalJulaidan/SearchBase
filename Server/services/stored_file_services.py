@@ -2,6 +2,7 @@ import os
 
 import boto3
 from botocore.exceptions import ClientError
+from sqlalchemy.orm import joinedload
 
 from typing import List
 from models import db, Callback, StoredFile, Conversation, StoredFileInfo
@@ -19,7 +20,7 @@ def getByID(id) -> StoredFile or None:
     try:
         if id:
             # Get result and check if None then raise exception
-            result : StoredFile = db.session.query(StoredFile).get(id)
+            result : StoredFile = db.session.query(StoredFile).options(joinedload("StoredFileInfo")).get(id)
             if not result: raise Exception
 
             return Callback(True,
@@ -57,14 +58,15 @@ def getAll():
         return Callback(False, 'StoredFiles could not be retrieved/empty')
 
 
-def createRef(files, conversation, storedFileID) -> StoredFile or None:
+def createRef(files, conversation, storedFileID, keys: List=None) -> StoredFile or None:
     try:
         if not files: raise Exception;
         conversation : Conversation = db.session.query(Conversation).filter(Conversation.ID == conversation.ID).first()
         newFiles = []
-        for file in files:
-            newFiles.append(StoredFileInfo(StoredFileID=storedFileID, Key=None, FilePath=file.realFileName))
-        print(conversation)
+        for idx, file in enumerate(files):
+            key =  keys[idx] + idx if keys.count(keys[idx]) > 1 else keys[idx] if keys else None
+            newFiles.append(StoredFileInfo(StoredFileID=storedFileID, Key=key, FilePath=file.realFileName))
+
         conversation.StoredFileID = storedFileID
         db.session.add_all(newFiles)
         db.session.commit()
@@ -88,7 +90,7 @@ def removeByID(id):
         return Callback(False, "StoredFile cold not be deleted")
 
 
-def uploadFile(file, filename, path, public=False):
+def uploadFile(file, filename, public=False):
     try:
         # Set config arguments
         ExtraArgs = {}
@@ -104,22 +106,16 @@ def uploadFile(file, filename, path, public=False):
                                 aws_secret_access_key=os.environ['SPACES_SECRET_KEY'])
 
             # Upload file
-            s3.upload_fileobj(file, BUCKET, UPLOAD_FOLDER + path + '/' + filename,
+            print(filename)
+            s3.upload_fileobj(file, BUCKET, filename,
                               ExtraArgs=ExtraArgs)
 
         except ClientError as e:
             raise Exception("DigitalOcean Error")
 
-        sf = StoredFile()
-        db.session.add(sf)
-        db.session.flush()
 
-        files = [StoredFileInfo(Key="Logo", FilePath=UPLOAD_FOLDER + path + '/' + filename, StoredFileID=sf.ID)]
 
-        db.session.add_all(files)
-        db.session.commit()
-
-        return Callback(True, "File uploaded successfully", sf.ID)
+        return Callback(True, "File uploaded successfully")
 
     except Exception as exc:
         helpers.logError("stored_file_services.uploadFile(): " + str(exc))
@@ -127,7 +123,7 @@ def uploadFile(file, filename, path, public=False):
 
 
 
-def downloadFile(filename, path):
+def downloadFile(filename):
     try:
         # Connect to DigitalOcean Space
         session = boto3.session.Session()
@@ -136,7 +132,7 @@ def downloadFile(filename, path):
                               endpoint_url=os.environ['SPACES_SERVER_URI'],
                               aws_access_key_id=os.environ['SPACES_PUBLIC_KEY'],
                               aws_secret_access_key=os.environ['SPACES_SECRET_KEY'])
-        file = s3.Object(BUCKET, UPLOAD_FOLDER  + path + '/' + filename)
+        file = s3.Object(BUCKET, filename)
 
         # Check if file exists
         try:
@@ -151,9 +147,10 @@ def downloadFile(filename, path):
         return Callback(False, "Couldn't upload file")
 
 
-def genPresigendURL(filename, path, expireIn=None):
+def genPresigendURL(filename, expireIn=None):
     try:
         # Connect to DigitalOcean Space
+        print(filename)
         session = boto3.session.Session()
         s3 = session.client('s3',
                             region_name='ams3',
@@ -165,7 +162,7 @@ def genPresigendURL(filename, path, expireIn=None):
             url = s3.generate_presigned_url('get_object',
                                                  Params={
                                                     'Bucket': BUCKET,
-                                                    'Key': UPLOAD_FOLDER + path + '/' + filename
+                                                    'Key': filename
                                                  })
         except ClientError as e:
             print('error')
@@ -182,7 +179,7 @@ def genURL(path):
         path or "")
     return logo if path else None
 
-def deleteFile(filename, path):
+def deleteFile(filename):
     try:
         # Connect to DigitalOcean Space
         try:
@@ -193,14 +190,14 @@ def deleteFile(filename, path):
                                   aws_access_key_id=os.environ['SPACES_PUBLIC_KEY'],
                                   aws_secret_access_key=os.environ['SPACES_SECRET_KEY'])
             # Delete file
-            s3.Object(BUCKET, UPLOAD_FOLDER + path + '/' + filename).delete()
+            s3.Object(BUCKET, filename).delete()
         except ClientError as e:
             raise Exception("DigitalOcean Error")
 
         return Callback(True, "File deleted successfully")
 
     except Exception as exc:
-        helpers.logError("stored_file_services.deleteFile(): " + str(exc) + " >>> File Name: " + path + '/' + filename)
+        helpers.logError("stored_file_services.deleteFile(): " + str(exc) + " >>> File Name:" + filename)
         return Callback(False, "Couldn't delete file")
 
 def getUnusedFiles():

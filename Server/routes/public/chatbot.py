@@ -98,7 +98,6 @@ def getSolutions_forChatbot(assistantHashID):
 
 @chatbot_router.route("/assistant/<string:assistantIDAsHash>/chatbot/<int:sessionID>/file", methods=['POST'])
 def chatbot_upload_files(assistantIDAsHash, sessionID):
-    print('call')
     callback: Callback = conversation_services.getByID(sessionID, helpers.decodeID(assistantIDAsHash)[0])
     if not callback.Success:
         return helpers.jsonResponseFlask(False, 404, "Session not found.", None)
@@ -109,6 +108,7 @@ def chatbot_upload_files(assistantIDAsHash, sessionID):
         try:
             assistant: Assistant = conversation.Assistant
             # Check if the post request has the file part
+            keys = request.form.get('keys').split(",")
             if 'file' not in request.files:
                 return helpers.jsonResponseFlask(False, 404, "No file part")
 
@@ -119,8 +119,8 @@ def chatbot_upload_files(assistantIDAsHash, sessionID):
             db.session.add(sf)
             db.session.flush()
 
-            for file in files:
-
+            set_file_id: Callback = conversation_services.setFileByID(sessionID, sf.ID)
+            for idx, file in enumerate(files):
                 if file.filename == '':
                     return helpers.jsonResponseFlask(False, 404, "No selected file")
                 # Generate unique name: hash_sessionIDEncrypted.extension
@@ -128,9 +128,7 @@ def chatbot_upload_files(assistantIDAsHash, sessionID):
                            secure_filename(file.filename).rsplit('.', 1)[1].lower()
 
                 # Upload file to DigitalOcean Space
-                upload_callback: Callback = stored_file_services.uploadFile(file, filename,
-                                                                            stored_file_services.USER_FILES_PATH,
-                                                                            True)
+                upload_callback: Callback = stored_file_services.uploadFile(file, filename, True)
                 file.realFileName = filename
                 # if not upload_callback.Success:
                 #     filename = 'fileCorrupted'
@@ -141,7 +139,7 @@ def chatbot_upload_files(assistantIDAsHash, sessionID):
 
 
             # Store filePaths in the DB as reference
-            dbRef_callback: Callback = stored_file_services.createRef(files, conversation, sf.ID)
+            dbRef_callback: Callback = stored_file_services.createRef(files, conversation, sf.ID, keys)
             if not dbRef_callback.Success:
                 logError("Couldn't Save Stored Files Reference For: " + str(filenames))
                 raise Exception(dbRef_callback.Message)
@@ -162,5 +160,6 @@ def chatbot_upload_files(assistantIDAsHash, sessionID):
                     raise Exception("Could not submit file to CRM")
 
         except Exception as exc:
+            print(exc)
             return helpers.jsonResponseFlask(False, 404, "I am having difficulties saving your uploaded the files :(")
         return helpers.jsonResponseFlask(True, 200, "File uploaded successfully!!")

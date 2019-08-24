@@ -4,7 +4,7 @@ import json
 import requests
 from sqlalchemy_utils import Currency
 
-from models import Callback, StoredFile
+from models import Callback, StoredFileInfo
 from services import databases_services, stored_file_services
 from utilities import helpers
 
@@ -135,14 +135,14 @@ def sendRequest(url, method, headers, data=None):
 #         return Callback(False, str(exc))
 
 
-def uploadFile(auth, storedFile: StoredFile):
+def uploadFile(auth, storedFileInfo: StoredFileInfo):
     try:
-        conversation = storedFile.Conversation
+        conversation = storedFileInfo.Conversation
 
         if not conversation.CRMResponse:
             raise Exception("Can't upload file for record with no CRM Response")
-
-        file_callback = stored_file_services.downloadFile(storedFile.FilePath, stored_file_services.USER_FILES_PATH)
+        # storedFile.
+        file_callback = stored_file_services.downloadFile(storedFileInfo.FilePath)
         if not file_callback.Success:
             raise Exception(file_callback.Message)
         file = file_callback.Data
@@ -150,7 +150,7 @@ def uploadFile(auth, storedFile: StoredFile):
         file_content = base64.b64encode(file_content).decode('ascii')
 
         body = {
-            "filename": storedFile.FilePath,
+            "filename": storedFileInfo.FilePath,
             "type": "resume",
             "content": file_content
         }

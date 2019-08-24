@@ -366,6 +366,66 @@ def insertCompany(auth, data, companyID) -> Callback:
         return Callback(False, str(exc))
 
 
+def updateCandidate(auth, data, companyID) -> Callback:
+    try:
+        # availability, yearsExperience
+        body = {
+            "id": data.get("id"),
+            "name": data.get("name"),
+            "firstName": data.get("firstName"),
+            "lastName": data.get("lastName"),
+            "mobile": data.get("mobile"),
+            "address": {
+                "city": data.get("city"),
+            },
+            "email": data.get("email"),
+
+            # "primarySkills": data.get("skills"),
+            "experience": data.get("yearsExperience"),
+
+            "secondaryAddress": {
+                "city": data.get("preferredWorkCity"),
+            },
+
+            "educationDegree": data.get("educations"),
+            "dateAvailable": data.get("availability"),  # TODO CHECK
+
+            "salary": data.get("annualSalary"),
+            "dayRate": data.get("dayRate"),
+
+            "comments": crm_services.additionalCandidateNotesBuilder(
+                {
+                    "preferredJobTitle": data.get("preferredJobTitle"),
+                    "preferredJobType": data.get("preferredJobType"),
+                    "yearsExperience": data.get("yearsExperience"),
+                    "skills": data.get("skills")
+                }, data.get("selectedSolutions")
+            )
+        }
+
+        # Add additional emails to email2 and email3
+        emails = data.get("emails")
+        for email in emails:
+            index = emails.index(email)
+            if index != 0:
+                body["email" + str(index + 1)] = email
+
+        if body.get("dayRate") == 0:
+            body["dayRate"] = None
+
+        # send query
+        sendQuery_callback: Callback = sendQuery(auth, "entity/Candidate", "post", body, companyID)
+
+        if not sendQuery_callback.Success:
+            raise Exception(sendQuery_callback.Message)
+
+        return Callback(True, sendQuery_callback.Data.text)
+
+    except Exception as exc:
+        helpers.logError("Marketplace.CRM.Bullhorn.insertCandidate() ERROR: " + str(exc))
+        return Callback(False, str(exc))
+
+
 def searchCandidates(auth, companyID, data, fields=None) -> Callback:
     try:
         query = "query="

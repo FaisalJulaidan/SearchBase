@@ -8,7 +8,7 @@ import {
     RawTextFormItem,
     ShowGoToBlockFormItem,
     ShowGoToGroupFormItem,
-} from './CardTypesFormItems'
+} from './FormItems'
 
 const FormItem = Form.Item;
 

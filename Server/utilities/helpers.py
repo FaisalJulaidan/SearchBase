@@ -241,8 +241,7 @@ def getDictFromSQLAlchemyObj(obj, eager: bool = False) -> dict:
                     dict[attr] = getListFromSQLAlchemyList(getattr(obj, attr), True)
             elif hasattr(getattr(obj, attr), '_sa_instance_state'):
                 dict[attr] = getDictFromSQLAlchemyObj(getattr(obj, attr), True)
-        if attr in serialize:
-            print(attr)
+        if attr in serialize and attr not in protected:
             dict[attr] = getattr(obj, attr)
 
     return dict

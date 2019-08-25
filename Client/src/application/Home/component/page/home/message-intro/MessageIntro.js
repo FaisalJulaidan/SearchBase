@@ -60,8 +60,8 @@ class MessageIntro extends React.Component {
             }
 
             return (
-                <Bounce wait={1000} when={animWhen} onReveal={this.onReveal}>
-                    <MessageItem key={i} mine={message.mine} text={message.text}/>
+                <Bounce key={i} wait={1000} when={animWhen} onReveal={this.onReveal}>
+                    <MessageItem mine={message.mine} text={message.text}/>
                 </Bounce>
             )
 

@@ -77,6 +77,7 @@ class LogoUploader extends Component {
             accept: 'image/png',
             showUploadList: false
         };
+        console.log(props)
 
         const {account} = this.props;
         return (
@@ -101,7 +102,7 @@ class LogoUploader extends Component {
                                 <Card hoverable
                                       style={{width: 300, textAlign: 'center'}}
                                       cover={<img alt="example"
-                                                  src={`${account?.company.StoredFile.StoredFileInfo[0]}?timestamp=${this.state.timeStamp}`}/>}
+                                                  src={`${account?.company.StoredFile.StoredFileInfo[0].AbsFilePath}?timestamp=${this.state.timeStamp}`}/>}
                                 >
                                     <Button type={'danger'} onClick={() => this.deleteLogo()}>Delete</Button>
                                 </Card>

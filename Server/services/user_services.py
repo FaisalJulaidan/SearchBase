@@ -126,8 +126,7 @@ def getProfile(userID):
         result: User = db.session.query(User).filter(User.ID == userID).options(joinedload('Company').joinedload('StoredFile').joinedload('StoredFileInfo')).first()
         if not result:
             raise Exception
-        print('lol')
-        print(helpers.getDictFromSQLAlchemyObj(result.Company, True))
+        print(result.Company.StoredFile.StoredFileInfo[0].all_attributes)
         profile = {
             'user': helpers.getDictFromSQLAlchemyObj(result),
             'company': helpers.getDictFromSQLAlchemyObj(result.Company, True),

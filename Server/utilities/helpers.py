@@ -204,9 +204,13 @@ def convertSalaryPeriod(salary, fromPeriod: Period, toPeriod: Period):
 """Convert a SQLAlchemy object to a single dict """
 def getDictFromSQLAlchemyObj(obj, eager: bool = False) -> dict:
     dict = {}  # Results
+    protected = getattr(obj, "__protected__") if hasattr(obj, "__protected__") else []
+    serialize = getattr(obj, "__serialize__") if hasattr(obj, "__serialize__") else []
     if not obj: return dict
     # A nested for loop for joining two tables
     for attr in obj.__table__.columns:
+        if attr in protected:
+            continue
         key = attr.name
         if key not in ['Password', 'Auth', 'Secret']:
             dict[key] = getattr(obj, key)
@@ -225,15 +229,22 @@ def getDictFromSQLAlchemyObj(obj, eager: bool = False) -> dict:
             if key == Assistant.Flow.name and dict[key]:  # Parse Flow !!
                 flow_services.parseFlow(dict[key])  # pass by reference
 
-    for attr in obj.__dict__.keys():
+    keys = obj.__dict__.keys()
+
+    if hasattr(obj, 'all_attributes'):
+        keys = getattr(obj, 'all_attributes')
+
+    for attr in keys:
         if eager:
             if isinstance(getattr(obj, attr), List):
                 if all(hasattr(sub, '_sa_instance_state') for sub in getattr(obj, attr)):
                     dict[attr] = getListFromSQLAlchemyList(getattr(obj, attr), True)
             elif hasattr(getattr(obj, attr), '_sa_instance_state'):
                 dict[attr] = getDictFromSQLAlchemyObj(getattr(obj, attr), True)
-        if attr.startswith("__"):
-            dict[attr[2:]] = getattr(obj, attr)
+        if attr in serialize:
+            print(attr)
+            dict[attr] = getattr(obj, attr)
+
     return dict
 
 """Convert a SQLAlchemy list of objects to a list of dicts"""

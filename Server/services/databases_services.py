@@ -279,8 +279,13 @@ def scanCandidates(session, dbIDs, extraCandidates=None):
         keywords = session['keywordsByDataType']
         df['Score'] = 0  # Add column for tracking score
         df['Source'] = "Internal Database"  # Source of solution e.g. Bullhorn, Adapt...
+
         if extraCandidates:
-            df = df.append(extraCandidates, ignore_index=True)  # TODO
+            df = df.append(extraCandidates, ignore_index=True)
+
+        # Check if there are no Candidates.
+        if not len(df):
+            return Callback(True, '', [])
 
         # Fill None values with 0 for numeric columns and with empty string for string columns
         df = df.fillna({Candidate.CandidateDesiredSalary.name: 0, Candidate.CandidateYearsExperience.name: 0}).fillna('')
@@ -395,6 +400,11 @@ def scanJobs(session, dbIDs, extraJobs=None):
         if extraJobs:
             df = df.append(extraJobs, ignore_index=True)
 
+        # Check if there are no Jobs.
+        if not len(df):
+            return Callback(True, '', [])
+
+
         # Fill None values with 0 for numeric columns and with empty string for string columns
         df = df.fillna({Job.JobSalary.name: 0, Job.JobYearsRequired.name: 0}).fillna('')
 
@@ -430,8 +440,8 @@ def scanJobs(session, dbIDs, extraJobs=None):
         __wordsCounter(DT.CandidateLocation, Job.JobLocation, keywords, df, 3)
 
         # Skills
-        # __wordsCounter(DT.JobEssentialSkills, Job.JobEssentialSkills, keywords, df, 3)
-        # __wordsCounter(DT.CandidateSkills, Job.JobEssentialSkills, keywords, df, 3)
+        __wordsCounter(DT.JobEssentialSkills, Job.JobEssentialSkills, keywords, df, 3)
+        __wordsCounter(DT.CandidateSkills, Job.JobEssentialSkills, keywords, df, 3)
 
         # Results
         topResults = json.loads(df[df['Score'] > 0].nlargest(session.get('showTop', 0), 'Score')

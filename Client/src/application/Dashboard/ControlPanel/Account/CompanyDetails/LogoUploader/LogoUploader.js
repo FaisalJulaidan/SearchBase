@@ -77,13 +77,11 @@ class LogoUploader extends Component {
             accept: 'image/png',
             showUploadList: false
         };
-        console.log(props)
-
         const {account} = this.props;
+        const logo  = account?.company?.StoredFile?.StoredFileInfo.find(sf => sf.Key === "Logo")?.AbsFilePath
         return (
             <div>
                 <div style={{width: 300}}>
-
                     <Dragger {...props}>
                         <p className="ant-upload-drag-icon">
                             <Icon type="inbox"/>
@@ -96,13 +94,13 @@ class LogoUploader extends Component {
                     </Dragger>
 
                     {
-                        account?.company?.StoredFile ?
+                        logo ?
                             <div>
                                 <h3>The current logo</h3>
                                 <Card hoverable
                                       style={{width: 300, textAlign: 'center'}}
                                       cover={<img alt="example"
-                                                  src={`${account?.company.StoredFile.StoredFileInfo[0].AbsFilePath}?timestamp=${this.state.timeStamp}`}/>}
+                                                  src={`${logo}?timestamp=${this.state.timeStamp}`}/>}
                                 >
                                     <Button type={'danger'} onClick={() => this.deleteLogo()}>Delete</Button>
                                 </Card>

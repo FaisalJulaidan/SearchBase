@@ -118,6 +118,7 @@ def chatbot_upload_files(assistantIDAsHash, sessionID):
             db.session.add(sf)
             db.session.flush()
 
+            files = []
             set_file_id: Callback = conversation_services.setFileByID(sessionID, sf.ID)
             for idx, file in enumerate(files):
                 if file.filename == '':
@@ -127,17 +128,15 @@ def chatbot_upload_files(assistantIDAsHash, sessionID):
                 filename = str(uuid.uuid4()) + '_' + helpers.encodeID(sessionID) + '.' + \
                            secure_filename(file.filename).rsplit('.', 1)[1].lower()
 
-
-                # Upload file to DigitalOcean Space
-                upload_callback: Callback = stored_file_services.uploadFile(file, filename, True)
                 file.realFileName = filename
 
-            # Store filePaths in the DB as reference
-            dbRef_callback: Callback = stored_file_services.createRef(files, conversation, sf.ID, keys)
-            if not dbRef_callback.Success:
-                logError("Couldn't Save Stored Files Reference")
-                raise Exception(dbRef_callback.Message)
+                upload_callback: Callback = stored_file_services.uploadFile(file, filename, True, model=Conversation,
+                                                                                                identifier="ID",
+                                                                                                identifier_value=conversation.ID,
+                                                                                                stored_file_id=sf.ID,
+                                                                                                key=keys[idx] if keys[idx] is not None else None)
 
+                files.append(upload_callback.Data)
             # Save changes
             db.session.commit()
 
@@ -145,11 +144,11 @@ def chatbot_upload_files(assistantIDAsHash, sessionID):
             if assistant.NotifyEvery == 0:
                 mail_services.notifyNewConversation(assistant, conversation)
 
-            if assistant.CRM:
+            # if assistant.CRM:
                 # Send through CRM
-                sendCRMFile_callback: Callback = crm_services.uploadFile(assistant, dbRef_callback.Data)
-                if not sendCRMFile_callback:
-                    raise Exception("Could not submit file to CRM")
+                # sendCRMFile_callback: Callback = crm_services.uploadFile(assistant, files)
+                # if not sendCRMFile_callback:
+                #     raise Exception("Could not submit file to CRM")
 
         except Exception as exc:
             print(exc)

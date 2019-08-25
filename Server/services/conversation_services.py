@@ -110,9 +110,8 @@ def getAllByAssistantID(assistantID):
             .options(joinedload('StoredFile').joinedload("StoredFileInfo"))\
             .filter(Conversation.AssistantID == assistantID) \
             .order_by(desc(Conversation.DateTime)).all()
-        for conversation in conversations:
-            if(conversation.StoredFile != None):
-                print(conversation.StoredFile.StoredFileInfo)
+        # for conversation in conversations:
+            # if(conversation.StoredFile != None):
                 # conversation.__Files = helpers.getListFromSQLAlchemyList()
         return Callback(True, "Conversations retrieved successfully.", conversations)
     except Exception as exc:

@@ -58,20 +58,29 @@ def getAll():
         return Callback(False, 'StoredFiles could not be retrieved/empty')
 
 
-def createRef(files, conversation, storedFileID, keys: List = None) -> StoredFile or None:
+def createRef(file, model, identifier, value, storedFileID, key: str = None) -> StoredFile or None:
     try:
-        if not files: raise Exception;
-        conversation: Conversation = db.session.query(Conversation).filter(Conversation.ID == conversation.ID).first()
-        newFiles = []
-        for idx, file in enumerate(files):
-            key = keys[idx] + idx if keys.count(keys[idx]) > 1 else keys[idx] if keys else None
-            newFiles.append(StoredFileInfo(StoredFileID=storedFileID, Key=key, FilePath=file.realFileName))
+        if not file: raise Exception;
+        print(model)
+        obj = db.session.query(model).filter(getattr(model, identifier) == value).first()
+        print(obj)
+        if obj is None:
+            return Callback(False, 'Model not found')
+        elif not hasattr(obj, 'StoredFileID'):
+            return Callback(False,'Provided model does not have StoredFileID Attribute')
+        # for idx, file in enumerate(files):\
 
-        conversation.StoredFileID = storedFileID
-        db.session.add_all(newFiles)
+        # key = keys[idx] + idx if keys.count(keys[idx]) > 1 else keys[idx] if keys else None
+        file : StoredFileInfo = StoredFileInfo(StoredFileID=storedFileID, Key=key, FilePath=file.realFileName)
+
+        # conversation.StoredFileID = storedFileID
+        obj.StoredFileID = storedFileID
+
+        db.session.add(file)
         db.session.commit()
+
         return Callback(True, "Stored files reference was created successfully.",
-                        helpers.getListFromSQLAlchemyList(newFiles))
+                        helpers.getDictFromSQLAlchemyObj(file))
 
     except Exception as exc:
         helpers.logError("stored_file_services.create(): " + str(exc))
@@ -91,7 +100,7 @@ def removeByID(id):
         return Callback(False, "StoredFile cold not be deleted")
 
 
-def uploadFile(file, filename, public=False):
+def uploadFile(file, filename, public=False, **kwargs):
     try:
         # Set config arguments
         ExtraArgs = {}
@@ -113,7 +122,15 @@ def uploadFile(file, filename, public=False):
         except ClientError as e:
             raise Exception("DigitalOcean Error")
 
-        return Callback(True, "File uploaded successfully")
+        if 'model' in kwargs:
+            #files, model, identifier, value, storedFileID, keys: List = None
+            dbRef_callback: Callback = createRef(file, kwargs['model'], kwargs['identifier'], kwargs['identifier_value'], kwargs['stored_file_id'] , kwargs['key'])
+
+            if not dbRef_callback.Success:
+                helpers.logError("Couldn't Save Stored Files Reference")
+                raise Exception(dbRef_callback.Message)
+
+        return Callback(True, "File uploaded successfully", dbRef_callback.Data if 'model' in kwargs else None)
 
     except Exception as exc:
         helpers.logError("stored_file_services.uploadFile(): " + str(exc))

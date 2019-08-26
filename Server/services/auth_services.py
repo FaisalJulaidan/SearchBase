@@ -163,7 +163,8 @@ def refreshToken() -> Callback:
         #     raise Exception("Your account was logged in somewhere else")
 
         data = {'token': create_access_token(identity=current_user),
-                'expiresIn': datetime.now() + BaseConfig.JWT_ACCESS_TOKEN_EXPIRES}
+                'expiresIn': datetime.now() + BaseConfig.JWT_ACCESS_TOKEN_EXPIRES,
+                'company': helpers.getDictFromSQLAlchemyObj(user_callback.Data.Company)} # with new permissions maybe
         return Callback(True, "Authorised!", data)
     except Exception as exc:
         helpers.logError("auth_services.refreshToken(): " + str(exc))

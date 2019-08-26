@@ -27,6 +27,9 @@ marketplace_router: Blueprint = marketplace_router
 from .account.users import users_router
 users_router: Blueprint = users_router
 
+from .campaign.campaign import campaign_router
+campaign_router: Blueprint = campaign_router
+
 from .database.database import database_router
 database_router: Blueprint = database_router
 

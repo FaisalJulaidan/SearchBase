@@ -527,11 +527,22 @@ def searchPerfectCandidates(auth, companyID, data, fields=None) -> Callback:
                 # get query result
                 return_body = json.loads(sendQuery_callback.Data.text)
 
-                # add the candidates to the records
-                records.append(list(return_body["data"]))
+                if return_body["data"]:
+                    # add the candidates to the records
+                    records = records + list(return_body["data"])
 
-                # remove duplicate records
-                records = list(dict.fromkeys(records))
+                    # remove duplicate records
+                    seen = set()
+                    new_l = []
+                    for d in records:
+                        t = tuple(d.items())
+                        if str(t) not in seen:
+                            seen.add(str(t))
+                            new_l.append(d)
+
+                    records = []
+                    for l in new_l:
+                        records.append(dict(l))
 
                 # remove the last (least important filter)
                 query = "and".join(query.split("and")[:-1])
@@ -551,7 +562,7 @@ def searchPerfectCandidates(auth, companyID, data, fields=None) -> Callback:
                                                                   skills=record.get("primarySkills", {}).get("data"),
                                                                   linkdinURL=None,
                                                                   availability=record.get("status"),
-                                                                  jobTitle=None,  #
+                                                                  jobTitle=None,
                                                                   education=None,
                                                                   yearsExperience=0,
                                                                   desiredSalary=record.get("salary") or
@@ -559,7 +570,7 @@ def searchPerfectCandidates(auth, companyID, data, fields=None) -> Callback:
                                                                   currency=Currency("GBP"),
                                                                   source="Bullhorn"))
 
-        return Callback(True, sendQuery_callback.Message, result)
+        return Callback(True, "Search has been successful", result)
 
     except Exception as exc:
         helpers.logError("Marketplace.CRM.Bullhorn.searchCandidates() ERROR: " + str(exc))
@@ -587,7 +598,7 @@ def searchJobs(auth, companyID, data, fields=None) -> Callback:
 
         # query += populateFilter(data.get("yearsRequired"), "yearsRequired")
 
-        query = query[:-3]
+        query = query[:-4]
 
         # check if no conditions submitted
         if len(query) < 4:
@@ -626,7 +637,7 @@ def searchJobs(auth, companyID, data, fields=None) -> Callback:
 
 def populateFilter(value, string):
     if value:
-        return string + ":" + value + " and"
+        return string + ":" + value + " and "
     return ""
 
 

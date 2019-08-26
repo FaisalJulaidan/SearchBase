@@ -144,6 +144,36 @@ def searchCandidates(assistant: Assistant, session):
         return Callback(False, "CRM type did not match with those on the system")
 
 
+def searchCandidatesCustom(assistant, candidate_data, perfect=False):
+    data = {
+        "location": candidate_data.get("location"),
+        "preferredJotTitle": candidate_data.get("jobTitle"),
+        "skills": candidate_data.get("skills"),
+        # "yearsExperience": checkFilter(session['keywordsByDataType'], DT.CandidateYearsExperience),
+        # "jobCategory": checkFilter(session['keywordsByDataType'], DT.CandidateJobCategory),
+        # "education": checkFilter(session['keywordsByDataType'], DT.CandidateEducation)
+    }
+
+    crm_type = assistant.CRM.Type.value
+
+    if perfect:
+        searchFunc = "searchPerfectCandidates"
+    else:
+        searchFunc = "searchCandidates"
+
+    if CRM.has_value(crm_type):
+        if assistant.CRM.Type is CRM.Adapt:
+            return Callback(True, "CRM does not support candidate search at this time")
+        if assistant.CRM.Type is CRM.Greenhouse:
+            return eval(crm_type + "." + searchFunc + "(assistant.CRM.Auth)")
+        if assistant.CRM.Type is CRM.Jobscience:
+            return eval(crm_type + "." + searchFunc + "(assistant.CRM.Auth, data)")
+
+        return eval(crm_type + "." + searchFunc + "(assistant.CRM.Auth, assistant.CompanyID, data)")
+    else:
+        return Callback(False, "CRM type did not match with those on the system")
+
+
 def searchJobs(assistant: Assistant, session):
     data = {
         "jobTitle": checkFilter(session['keywordsByDataType'], DT.JobTitle) or

@@ -18,7 +18,7 @@ def processConversation(assistant: Assistant, conversation: Conversation) -> Cal
                         " whether user is a Candidate or Client ")
 
 
-def insertCandidate(assistant: Assistant, conversation: Conversation):
+def insertCandidate(assistant: Assistant, conversation: Conversation, update_id=None):
     name = (conversation.Name or " ").split(" ")
     data = {
         "name": conversation.Name or " ",
@@ -58,14 +58,19 @@ def insertCandidate(assistant: Assistant, conversation: Conversation):
         "selectedSolutions": conversation.Data.get("selectedSolutions")
     }
 
+    if update_id and assistant.CRM.Type is CRM.Bullhorn:
+        func = "update"
+    else:
+        func = "insert"
+
     crm_type = assistant.CRM.Type.value
     if CRM.has_value(crm_type):
         if assistant.CRM.Type is CRM.Greenhouse:
             return Callback(True, "Greenhouse does not accept candidates at this stage")
         if assistant.CRM.Type is CRM.Adapt or assistant.CRM.Type is CRM.Jobscience:
-            return eval(crm_type + ".insertCandidate(assistant.CRM.Auth, data)")
+            return eval(crm_type + "." + func + "Candidate(assistant.CRM.Auth, data)")
 
-        return eval(crm_type + ".insertCandidate(assistant.CRM.Auth, data, assistant.CompanyID)")
+        return eval(crm_type + "." + func + "Candidate(assistant.CRM.Auth, data, assistant.CompanyID)")
     else:
         return Callback(False, "CRM type did not match with those on the system")
 

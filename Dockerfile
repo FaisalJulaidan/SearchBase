@@ -69,4 +69,4 @@ RUN chmod +x /wait-for-it.sh
 # Run the production server
 CMD ["/wait-for-it.sh", "mysql:3306", "--", \
      "gunicorn", "--bind", "0.0.0.0:5000", \
-     "--no-sendfile", "thesearchbase:app"]
+     "--no-sendfile", "--timeout", "90", "thesearchbase:app"]

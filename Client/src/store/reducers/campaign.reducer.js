@@ -19,5 +19,7 @@ export const campaign = (state = initialState, action) => {
                 isLaunching: false,
                 errorMsg: action.error
             });
+        default:
+            return state;
     }
 };

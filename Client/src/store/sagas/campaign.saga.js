@@ -1,4 +1,4 @@
-import {all, put, takeLatest} from 'redux-saga/effects'
+import {all, put} from 'redux-saga/effects'
 import {authActions} from "../actions";
 import {successMessage} from "helpers";
 import {errorMessage, loadingMessage} from "helpers/alert";

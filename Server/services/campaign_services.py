@@ -49,13 +49,10 @@ def sendCampaign(campaign_details, companyID):
             raise Exception(candidates_callback.Message)
 
         for candidate in candidates_callback.Data:
-            if campaign_details.get("use_crm"):
-                if crm.Type is CRM.Bullhorn:
-                    candidate_phone = candidate.get("CandidateMobile")
-                else:
-                    raise Exception("CRM is not supported for this operation")
-            else:
+            if campaign_details.get("use_crm") or crm.Type is CRM.Bullhorn:
                 candidate_phone = candidate.get("CandidateMobile")
+            else:
+                raise Exception("CRM is not supported for this operation")
 
             if not candidate_phone:
                 continue

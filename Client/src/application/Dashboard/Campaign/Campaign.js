@@ -62,7 +62,7 @@ class Campaign extends React.Component {
     setLocations = (err, response) => {
         if (!err) {
             // GB Filter (in the future to remove replace with let resp = response.json.results.filter(address => address.address_components)
-            let resp = response.json.results.filter(address => address.address_components.find(loc => loc.types.includes("country")).short_name === "GB")
+            let resp = response.json.results.filter(address => address.address_components.find(loc => loc.types.includes("country")).short_name === "GB");
             this.setState({locations: resp.map(item => item.formatted_address)})
         }
     };
@@ -192,5 +192,10 @@ class Campaign extends React.Component {
 
 }
 
+function mapStateToProps(state) {
+    return {
+        isLoading: state.campaign.isLoading
+    };
+}
 
 export default Form.create()(Campaign)

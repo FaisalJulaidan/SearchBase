@@ -20,8 +20,6 @@ const google = googleMaps.createClient({
     key: 'AIzaSyDExVDw_47y0U4kukU1A0UscjXE7qDTRhk'
 });
 
-let skills = ["Software engineer", "Sales"];
-
 class Campaign extends React.Component {
 
 
@@ -32,8 +30,7 @@ class Campaign extends React.Component {
             use_crm: true,
             locations: [],
             skills: [],
-            skillInput: "",
-            textMessage: ""
+            skillInput: ""
         };
         this.setLocations = this.setLocations.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
@@ -63,7 +60,8 @@ class Campaign extends React.Component {
     //TODO:: Skill should be validated before submission | Empty String can be accepted
     submit = (e) => {
         if (e.key === "Enter") {
-            this.setState({skills: this.state.skills.concat([e.target.value]), skillInput: ""})
+            this.setState({skills: this.state.skills.concat([e.target.value])});
+            this.props.form.setFieldsValue({skill: ""});
         }
     };
 
@@ -71,9 +69,17 @@ class Campaign extends React.Component {
         event.preventDefault();
         this.props.form.validateFields((err, values) => {
             if (!err) {
-                // this.props.dispatch(campaignActions.launchCampaign(
-                //     values.crmType, values.jobTitle, this.state.skills, this.state.location
-                // ));
+                this.props.dispatch(campaignActions.launchCampaign(
+                    values.assistant_id,
+                    this.state.use_crm,
+                    values.crm_id,
+                    values.database_id,
+                    values.messenger_id,
+                    values.location,
+                    values.jobTitle,
+                    this.state.skills,
+                    values.text
+                ));
             }
         });
     };
@@ -171,7 +177,7 @@ class Campaign extends React.Component {
                                     defaultChecked={this.state.use_crm}/>
                         </FormItem>
                         <FormItem label={"Messaging Service"}>
-                            {getFieldDecorator("message_id", {
+                            {getFieldDecorator("messenger_id", {
                                 rules: [{
                                     required: true,
                                     message: "Please select the messaging service"
@@ -202,12 +208,14 @@ class Campaign extends React.Component {
                             )}
                         </FormItem>
                         <FormItem label={"Skills"}>
-                            <Input id={"skills"}
-                                   placeholder="Type in a skill and press enter to add to the list of skills"
-                                   type="text"
-                                   onKeyDown={this.submit}
-                                   onChange={e => this.setState({skillInput: e.target.value})}
-                                   value={this.state.skillInput}/>
+                            {getFieldDecorator("skill", {
+                                setFieldsValue:this.state.skillInput
+                            })(
+                                <Input placeholder="Type in a skill and press enter to add to the list of skills"
+                                       type="text"
+                                       onKeyDown={this.submit}
+                                       onChange={e => this.setState({skillInput: e.target.value})}/>
+                            )}
                         </FormItem>
                         <div>
                             {this.state.skills.map((skill, i) => {
@@ -215,17 +223,18 @@ class Campaign extends React.Component {
                             })}
                         </div>
                         <FormItem label={"Location"}>
-                            <AutoComplete id={"location"}
-                                          placeholder="Type in your location"
-                                          type="text"
-                                          dataSource={this.state.locations}
-                                          onChange={value => this.findLocation(value)}/>
-
+                            {getFieldDecorator("location")(
+                                <AutoComplete placeholder="Type in your location"
+                                              type="text"
+                                              dataSource={this.state.locations}
+                                              onChange={value => this.findLocation(value)}/>
+                            )}
                         </FormItem>
                         <FormItem label={"Message"}>
-                            <TextArea id={"text"} placeholder="Type in the message you'd like to send"
-                                      onChange={e => this.setState({textMessage: e.target.value})}/>
-
+                            {getFieldDecorator("text")(
+                                <TextArea placeholder="Type in the message you'd like to send"
+                                          onChange={e => this.setState({textMessage: e.target.value})}/>
+                            )}
                         </FormItem>
                         <Button type="primary" icon="rocket" htmlType="submit" size={"large"}>
                             Launch

@@ -7,7 +7,7 @@ from werkzeug.utils import secure_filename
 from models import Callback, db, Conversation, Assistant, StoredFile, StoredFileInfo
 from services import conversation_services, flow_services, databases_services, stored_file_services, mail_services
 from services.Marketplace.CRM import crm_services
-from utilities import helpers
+from utilities import helpers, wrappers
 from utilities.helpers import logError
 
 chatbot_router = Blueprint('chatbot_router', __name__, template_folder="../templates")
@@ -32,7 +32,7 @@ def add_header(r):
 
 # To give an access to the static/widgets/chatbot folder
 @chatbot_router.route("/static/widgets/chatbot/<path:path>", methods=['GET'])
-@helpers.gzipped
+@wrappers.gzipped
 def get_chatbot_static(path):
     if request.method == "GET":
         return send_from_directory('static/widgets/chatbot/', path)
@@ -40,7 +40,7 @@ def get_chatbot_static(path):
 
 # To load the loadChatbo
 @chatbot_router.route("/widgets/chatbot", methods=['GET'])
-@helpers.gzipped
+@wrappers.gzipped
 def get_widget():
     if request.method == "GET":
         return send_from_directory('static/js',
@@ -51,7 +51,7 @@ def get_widget():
 # TO BE REMOVED
 # To load the loadChatbot
 @chatbot_router.route("/widgets/chatbot.js", methods=['GET'])
-@helpers.gzipped
+@wrappers.gzipped
 def get_widget_legacy():
     if request.method == "GET":
         return send_from_directory('static/js',

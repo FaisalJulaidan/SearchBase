@@ -1,5 +1,3 @@
-import functools
-import gzip
 import inspect
 import logging
 import os
@@ -7,7 +5,6 @@ import re
 import traceback
 from datetime import time
 from enum import Enum
-from io import BytesIO
 from typing import List
 
 import geoip2.webservice
@@ -22,8 +19,8 @@ from itsdangerous import URLSafeTimedSerializer
 from sqlalchemy_utils import Currency
 
 from config import BaseConfig
-from models import db, Assistant, Job, Callback, Role
-from services import flow_services, assistant_services, appointment_services
+from models import db, Assistant, Job, Callback, Role, Company
+from services import flow_services, assistant_services, appointment_services, company_services
 from utilities.enums import Period
 
 # ======== Global Variables ======== #
@@ -141,38 +138,6 @@ def jsonResponseFlask(success: bool, http_code: int, msg: str, data=None):
         mimetype='application/json'
     )
 
-def gzipped(f):
-    @functools.wraps(f)
-    def view_func(*args, **kwargs):
-        @after_this_request
-        def zipper(response):
-            accept_encoding = request.headers.get('Accept-Encoding', '')
-
-            if 'gzip' not in accept_encoding.lower():
-                return response
-
-            response.direct_passthrough = False
-
-            if (response.status_code < 200 or
-                    response.status_code >= 300 or
-                    'Content-Encoding' in response.headers):
-                return response
-            gzip_buffer = BytesIO()
-            gzip_file = gzip.GzipFile(mode='wb',
-                                      fileobj=gzip_buffer)
-            gzip_file.write(response.data)
-            gzip_file.close()
-
-            response.data = gzip_buffer.getvalue()
-            response.headers['Content-Encoding'] = 'gzip'
-            response.headers['Vary'] = 'Accept-Encoding'
-            response.headers['Content-Length'] = len(response.data)
-
-            return response
-
-        return f(*args, **kwargs)
-
-    return view_func
 
 
 # Note: Hourly is not supported because it varies and number of working hours is required
@@ -283,19 +248,6 @@ def getDictFromLimitedQuery(columnsList, tuple) -> dict:
     return dict
 
 
-# Check if the logged in user owns the accessed assistant for security
-def validAssistant(func):
-    def wrapper(assistantID):
-        user = get_jwt_identity()['user']
-        callback: Callback = assistant_services.getByID(assistantID, user['companyID'])
-        if not callback.Success:
-            return jsonResponse(False, 404, "Assistant not found.", None)
-        assistant: Assistant = callback.Data
-        return func(assistant)
-
-    wrapper.__name__ = func.__name__
-    return wrapper
-
 class requestException(Exception):
     pass
 
@@ -329,6 +281,7 @@ def validateRequest(req, check: dict, throwIfNotValid: bool = True):
     else:
         return returnDict
 
+
 class owns(object):
     def getOwner(self, type, jwt, *args):
         method_name = "owns_" + str(type)
@@ -340,24 +293,6 @@ class owns(object):
         if not callback.Success:
             return jsonResponse(False, 401, "You do not own this appointment", None)
         return True
-
-
-def validOwner(type, *args):
-    def wrap(func):
-        def wrapper():
-            jwt = get_jwt_identity()['user']
-            Owns = owns()
-            valid = Owns.getOwner(type, jwt, *args)
-            if valid != True:
-                return valid
-            return func()
-        wrapper.__name__ = func.__name__
-        return wrapper
-    wrap.__name__ = type #needs to change
-    return wrap
-
-
-
 
 
 def findIndexOfKeyInArray(key, value, array):

@@ -71,8 +71,9 @@ function* demoRequest({name, email, companyName, phone, crm, subscribe}) {
         successMessage('Demo request submitted');
 
 
-        yield history.push('/test');
-        warningMessage('Your demo request submitted successfully.', 0);
+        // Redirect to login ans ask user to verify account
+        yield history.push('/');
+        warningMessage('Your Demo request submitted successfully.', 0);
 
     } catch (error) {
         console.log(error);

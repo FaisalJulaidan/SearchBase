@@ -6,7 +6,7 @@ from services.Marketplace import marketplace_helpers
 from services.Marketplace.CRM import crm_services
 from services.Marketplace.Messenger import mesenger_services
 from services.Marketplace.Calendar import Google, calendar_services
-from utilities import helpers
+from utilities import helpers, wrappers
 
 marketplace_router: Blueprint = Blueprint('marketplace_router', __name__, template_folder="../../templates")
 
@@ -91,7 +91,7 @@ def recruiter_value_report():
 
 @marketplace_router.route("/calendar/<assistantID>/Google/authorize", methods=['GET', 'POST'])
 @jwt_required
-@helpers.validAssistant
+@wrappers.validAssistant
 def calendar_auth(assistantID):
     params = request.get_json()
     callback: Callback = Google.authorizeUser(params['code'])

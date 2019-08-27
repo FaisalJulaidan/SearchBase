@@ -10,9 +10,24 @@ import {store} from "../../store/store";
 import {history} from "../../helpers";
 
 const Home = () => {
+
+    const injectGA = () => {
+        if (typeof window == 'undefined') {
+            return;
+        }
+        window.dataLayer = window.dataLayer || [];
+        function gtag() {
+            window.dataLayer.push(arguments);
+        }
+        gtag('js', new Date());
+        gtag('config', 'UA-70419779-2');
+    };
+
     return (
         <Provider store={store}>
             <Router history={history}>
+                <script async src="https://www.googletagmanager.com/gtag/js?id=UA-70419779-2"/>
+                <script>{injectGA()}</script>
                 <ScrollToTop>
                     <Routes/>
                 </ScrollToTop>

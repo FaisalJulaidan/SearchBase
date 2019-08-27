@@ -1,7 +1,7 @@
 from flask import Blueprint, request, send_file
 from services import conversation_services, assistant_services, stored_file_services
 from models import Callback, Conversation, Assistant
-from utilities import helpers
+from utilities import helpers, wrappers
 from config import BaseConfig
 from utilities.enums import UserType, DataType
 from flask_jwt_extended import jwt_required, get_jwt_identity
@@ -12,6 +12,7 @@ conversation_router: Blueprint = Blueprint('conversation_router', __name__ , tem
 # Get all assistant's user inputs
 @conversation_router.route("/assistant/<int:assistantID>/conversations", methods=["GET", "DELETE"])
 @jwt_required
+@wrappers.AccessAssistantsRequired
 def conversation(assistantID):
 
     # Authenticate
@@ -43,7 +44,8 @@ def conversation(assistantID):
 # Download files
 @conversation_router.route("/assistant/<int:assistantID>/conversation/<filename>", methods=['GET'])
 @jwt_required
-@helpers.gzipped
+@wrappers.AccessAssistantsRequired
+@wrappers.gzipped
 def conversation_file_uploads(assistantID, filename):
 
     # Authenticate
@@ -85,6 +87,7 @@ def conversation_file_uploads(assistantID, filename):
 
 @conversation_router.route("/assistant/<assistantID>/conversation/<conversationID>", methods=["DELETE"])
 @jwt_required
+@wrappers.AccessAssistantsRequired
 def conversation_delete_record(assistantID, conversationID):
 
     # Authenticate
@@ -103,6 +106,7 @@ def conversation_delete_record(assistantID, conversationID):
 
 @conversation_router.route("/assistant/<assistantID>/conversation/<conversationID>/status", methods=["PUT"])
 @jwt_required
+@wrappers.AccessAssistantsRequired
 def conversation_status(assistantID, conversationID):
 
     # Authenticate

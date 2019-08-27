@@ -3,6 +3,8 @@ from flask_jwt_extended import jwt_required, get_jwt_identity
 
 from models import Callback
 from services import campaign_services, assistant_services, databases_services
+from services.Marketplace.CRM import crm_services
+from services.Marketplace.Messenger import messenger_servicess
 from utilities import helpers, wrappers
 
 campaign_router: Blueprint = Blueprint('campaign_router', __name__, template_folder="../../templates")
@@ -16,29 +18,38 @@ def fill_assistants():
     user = get_jwt_identity()['user']
 
     if request.method == "GET":
-        # Get all assistants
-        callback: Callback = assistant_services.getAllFull(user['companyID'])
-        if not callback.Success:
+        # fetch Assistants
+        assistants_callback: Callback = assistant_services.getAll(user['companyID'])
+        if not assistants_callback.Success:
             return helpers.jsonResponse(False, 404, "Cannot fetch Assistants")
 
-        # fetch assistants, their crms and messengers
-        assistants = []
-        records = callback.Data
-        for i in range(0, len(records)):
-            assistants.append({"assistant": helpers.getDictFromSQLAlchemyObj(records[i]),
-                           "crm": helpers.getDictFromSQLAlchemyObj(records[i].CRM),
-                           "messaging_service": helpers.getDictFromSQLAlchemyObj(records[i].Messenger)})
+        # fetch CRMs
+        crms_callback: Callback = crm_services.getAll(user['companyID'])
+        if not crms_callback.Success:
+            return helpers.jsonResponse(False, 404, "Cannot fetch Assistants")
 
-        # fetch databases
-        callback: Callback = databases_services.getDatabasesList(user['companyID'])
-        # Return response
-        if not callback.Success:
-            return helpers.jsonResponse(False, 400, callback.Message, callback.Data)
+        # fetch Messengers
+        messengers_callback: Callback = messenger_servicess.getAll(user['companyID'])
+        if not messengers_callback.Success:
+            return helpers.jsonResponse(False, 404, "Cannot fetch Assistants")
+
+        # fetch Databases
+        databases_callback: Callback = databases_services.getDatabasesList(user['companyID'])
+        if not databases_callback.Success:
+            return helpers.jsonResponse(False, 400, "Cannot fetch Databases")
 
         return helpers.jsonResponse(True, 200, "Data Returned!",
                                     {
-                                        "assistants": assistants,
-                                        "databases": helpers.getListFromSQLAlchemyList(callback.Data)
+                                        "assistants": helpers.getListFromLimitedQuery(['ID',
+                                                                                       'Name',
+                                                                                       'Description',
+                                                                                       'Message',
+                                                                                       'TopBarText',
+                                                                                       'Active'],
+                                                                                      assistants_callback.Data),
+                                        "crms": helpers.getListFromSQLAlchemyList(crms_callback.Data),
+                                        "messengers": helpers.getListFromSQLAlchemyList(messengers_callback.Data),
+                                        "databases": helpers.getListFromSQLAlchemyList(databases_callback.Data)
                                     })
 
 

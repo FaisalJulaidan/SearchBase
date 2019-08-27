@@ -4,7 +4,7 @@ from models import db, Assistant, Callback, AutoPilot
 from services import auto_pilot_services, flow_services
 from services.Marketplace.CRM import crm_services
 from services.Marketplace.Calendar import calendar_services
-from services.Marketplace.Messenger import mesenger_services
+from services.Marketplace.Messenger import messenger_servicess
 from utilities import helpers, json_schemas
 from os.path import join
 from config import BaseConfig
@@ -324,7 +324,7 @@ def disconnectFromCalendar(assistantID, companyID):
 def connectToMessenger(assistantID, messengerID, companyID):
     try:
 
-        messenger_callback: Callback = mesenger_services.getMessengerByID(messengerID, companyID)
+        messenger_callback: Callback = messenger_servicess.getMessengerByID(messengerID, companyID)
         if not messenger_callback.Success:
             raise Exception(messenger_callback.Message)
 

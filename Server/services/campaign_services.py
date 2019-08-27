@@ -1,7 +1,7 @@
 from models import Callback
 from services import assistant_services
 from services.Marketplace.CRM.crm_services import searchCandidatesCustom
-from services.Marketplace.Messenger.mesenger_services import sendMessage
+from services.Marketplace.Messenger.messenger_servicess import sendMessage
 from utilities import helpers
 from utilities.enums import CRM
 
@@ -21,11 +21,17 @@ def sendCampaign(campaign_details, companyID):
         if not text:
             raise Exception("Message text is missing")
 
-        candidates_callback: Callback = searchCandidatesCustom(assistant, campaign_details, True)
-        if not candidates_callback.Success:
-            raise Exception(candidates_callback.Message)
+        if campaign_details.get("use_crm"):
+            candidates_callback: Callback = searchCandidatesCustom(assistant, campaign_details, True)
+            if not candidates_callback.Success:
+                raise Exception(candidates_callback.Message)
 
-        for candidate in candidates_callback.Data:
+            candidates = candidates_callback.Data
+        else:
+
+            candidates = []
+
+        for candidate in candidates:
             if crm_type is CRM.Bullhorn:
                 candidate_phone = candidate.get("CandidateMobile")
             else:

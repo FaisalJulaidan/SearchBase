@@ -117,26 +117,55 @@ class Campaign extends React.Component {
                             )}
 
                         </FormItem>
-                        <FormItem label={"CRM Type"}>
-                            {getFieldDecorator("crm_id", {
-                                rules: [{
-                                    required: true,
-                                    message: "Please select your desired CRM"
-                                }],
-                            })(
-                                <Select placeholder={"Please select your desired CRM"}>
-                                    {(() => {
-                                        return this.props.crms.map((item, key) => {
-                                            return (
-                                                <Select.Option key={key} value={item.ID}>
-                                                    {trimText.capitalize(trimText.trimDash(item.Type))}
-                                                </Select.Option>
-                                            );
-                                        });
-                                    })()}
-                                </Select>
-                            )}
-                        </FormItem>
+                        {(() => {
+                            if (this.state.use_crm) {
+                                return (
+                                    <FormItem label={"CRM Type"}>
+                                        {getFieldDecorator("crm_id", {
+                                            rules: [{
+                                                required: true,
+                                                message: "Please select your desired CRM"
+                                            }],
+                                        })(
+                                            <Select placeholder={"Please select your desired CRM"}>
+                                                {(() => {
+                                                    return this.props.crms.map((item, key) => {
+                                                        return (
+                                                            <Select.Option key={key} value={item.ID}>
+                                                                {trimText.capitalize(trimText.trimDash(item.Type))}
+                                                            </Select.Option>
+                                                        );
+                                                    });
+                                                })()}
+                                            </Select>
+                                        )}
+                                    </FormItem>
+                                );
+                            } else {
+                                return (
+                                    <FormItem label={"DataBase"}>
+                                        {getFieldDecorator("database_id", {
+                                            rules: [{
+                                                required: true,
+                                                message: "Please select the database"
+                                            }],
+                                        })(
+                                            <Select placeholder={"Please select the database"}>
+                                                {(() => {
+                                                    return this.props.databases.map((item, key) => {
+                                                        return (
+                                                            <Select.Option key={key} value={item.ID}>
+                                                                {trimText.capitalize(trimText.trimDash(item.Name))}
+                                                            </Select.Option>
+                                                        );
+                                                    });
+                                                })()}
+                                            </Select>
+                                        )}
+                                    </FormItem>
+                                );
+                            }
+                        })()}
                         <FormItem label={"Use CRM"} labelCol={{xs: {span: 5, offset: 0}}}>
                             <Switch onChange={(checked) => this.setState({use_crm: checked})}
                                     defaultChecked={this.state.use_crm}/>

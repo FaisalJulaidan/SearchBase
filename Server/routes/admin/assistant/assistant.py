@@ -43,6 +43,30 @@ def assistants():
         return helpers.jsonResponse(True, 200, callback.Message, helpers.getDictFromSQLAlchemyObj(callback.Data))
 
 
+@assistant_router.route("/full_assistants", methods=['GET', 'POST'])
+@jwt_required
+@wrappers.AccessAssistantsRequired
+def fill_assistants():
+    # Authenticate
+    user = get_jwt_identity()['user']
+
+    if request.method == "GET":
+        # Get all assistants
+        callback: Callback = assistant_services.getAllFull(user['companyID'])
+        if not callback.Success:
+            return helpers.jsonResponse(False, 404, "Cannot fetch Assistants")
+
+        result = []
+        records = callback.Data
+
+        for i in range(0, len(records)):
+            result.append({"assistant": helpers.getDictFromSQLAlchemyObj(records[i]),
+                           "crm": helpers.getDictFromSQLAlchemyObj(records[i].CRM),
+                           "messaging_service": helpers.getDictFromSQLAlchemyObj(records[i].Messenger)})
+
+        return helpers.jsonResponse(True, 200, "Assistants Returned!", result)
+
+
 @assistant_router.route("/assistant/<int:assistantID>", methods=['GET', 'PUT', 'DELETE'])
 @jwt_required
 @wrappers.AccessAssistantsRequired

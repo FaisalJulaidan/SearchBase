@@ -23,11 +23,11 @@ function* fetchCampaignData() {
 }
 
 //Launch Campaign
-function* launchCampaign({assistant_id, use_crm, database_id, location, jobTitle, skills, text}) {
+function* launchCampaign({assistant_id, use_crm, crm_id, database_id, messenger_id, location, jobTitle, skills, text}) {
     try {
         loadingMessage('Launching the campaign...', 0);
-        const res = yield axios.post(`/send_campaign`,
-            {assistant_id, use_crm, database_id, location, jobTitle, skills, text}, {
+        const res = yield http.post('/send_campaign',
+            {assistant_id, use_crm, crm_id, database_id, messenger_id, location, jobTitle, skills, text}, {
                 headers: {'Content-Type': 'application/json'},
             });
         yield put(campaignActions.launchCampaignSuccess());

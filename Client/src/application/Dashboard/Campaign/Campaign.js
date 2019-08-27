@@ -66,6 +66,9 @@ class Campaign extends React.Component {
     };
 
     handleSubmit = (event) => {
+        if (event.key === "Enter") {
+            return
+        }
         event.preventDefault();
         this.props.form.validateFields((err, values) => {
             if (!err) {

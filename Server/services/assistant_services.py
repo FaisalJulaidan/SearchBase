@@ -252,7 +252,7 @@ def removeByID(id, companyID) -> Callback:
 def connectToCRM(assistantID, CRMID, companyID):
     try:
 
-        crm_callback: Callback = crm_services.getCRMByID(CRMID, companyID)
+        crm_callback: Callback = crm_services.getByID(CRMID, companyID)
         if not crm_callback.Success:
             raise Exception(crm_callback.Message)
 
@@ -324,7 +324,7 @@ def disconnectFromCalendar(assistantID, companyID):
 def connectToMessenger(assistantID, messengerID, companyID):
     try:
 
-        messenger_callback: Callback = messenger_servicess.getMessengerByID(messengerID, companyID)
+        messenger_callback: Callback = messenger_servicess.getByID(messengerID, companyID)
         if not messenger_callback.Success:
             raise Exception(messenger_callback.Message)
 

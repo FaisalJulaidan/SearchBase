@@ -228,7 +228,7 @@ def deleteDatabase(databaseID, companyID) -> Callback:
 
 
 # ----- Scanners (Pandas) ----- #
-def scan(session, assistantHashID):
+def scan(session, assistantHashID, useCRM=True):
     try:
 
         callback: Callback = assistant_services.getByHashID(assistantHashID)
@@ -241,8 +241,11 @@ def scan(session, assistantHashID):
             .filter(and_(Database.CompanyID == assistant.CompanyID,
                          Database.Type == databaseType)).all()
 
-        # get CRM Data
-        extraRecords = getCRMData(assistant, databaseType.name, session)
+        if useCRM:
+            # get CRM Data
+            extraRecords = getCRMData(assistant, databaseType.name, session)
+        else:
+            extraRecords = []
 
         # Scan database for solutions based on database type
         if databaseType == DatabaseType.Candidates:

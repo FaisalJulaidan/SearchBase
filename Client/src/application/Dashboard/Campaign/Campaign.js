@@ -165,11 +165,11 @@ class Campaign extends React.Component {
                                           onChange={value => this.findLocation(value)}/>
 
                         </FormItem>
-                        <FormItem label="Hotlists" help={"Any Hotlists made in your CRM will be shown here"}>
-                            <Select>
-                                <Select.Option key={1}/>
-                            </Select>
-                        </FormItem>
+                        {/*<FormItem label="Hotlists" help={"Any Hotlists made in your CRM will be shown here"}>*/}
+                        {/*    <Select>*/}
+                        {/*        <Select.Option key={1}/>*/}
+                        {/*    </Select>*/}
+                        {/*</FormItem>*/}
                         <FormItem label={"Message"}>
                             <TextArea id={"message"} placeholder="Type in the message you'd like to send"
                                       onChange={e => this.setState({textMessage: e.target.value})}/>

@@ -286,7 +286,7 @@ def disconnectByType(crm_type, companyID) -> Callback:
 
 def disconnectByID(crmID, companyID) -> Callback:
     try:
-        crm_callback: Callback = getCRMByID(crmID, companyID)
+        crm_callback: Callback = getByID(crmID, companyID)
         if not crm_callback:
             return Callback(False, "Could not find CRM.")
 
@@ -315,7 +315,7 @@ def logoutOfCRM(auth, crm_type, companyID) -> Callback:
         return Callback(False, "CRM logout failed.")
 
 
-def getCRMByID(crmID, companyID):
+def getByID(crmID, companyID):
     try:
         crm = db.session.query(CRM_Model) \
             .filter(and_(CRM_Model.CompanyID == companyID, CRM_Model.ID == crmID)).first()

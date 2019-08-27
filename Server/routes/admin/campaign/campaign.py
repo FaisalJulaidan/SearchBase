@@ -10,7 +10,7 @@ from utilities import helpers, wrappers
 campaign_router: Blueprint = Blueprint('campaign_router', __name__, template_folder="../../templates")
 
 
-@campaign_router.route("/campaign_data", methods=['GET', 'POST'])
+@campaign_router.route("/campaign_data", methods=['GET'])
 @jwt_required
 @wrappers.AccessAssistantsRequired
 def fill_assistants():

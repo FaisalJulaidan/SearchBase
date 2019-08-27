@@ -144,7 +144,7 @@ def searchCandidates(assistant: Assistant, session):
         return Callback(False, "CRM type did not match with those on the system")
 
 
-def searchCandidatesCustom(assistant, candidate_data, perfect=False):
+def searchCandidatesCustom(crm, companyID, candidate_data, perfect=False):
     data = {
         "location": candidate_data.get("location"),
         "preferredJotTitle": candidate_data.get("jobTitle"),
@@ -154,7 +154,7 @@ def searchCandidatesCustom(assistant, candidate_data, perfect=False):
         # "education": checkFilter(session['keywordsByDataType'], DT.CandidateEducation)
     }
 
-    crm_type = assistant.CRM.Type.value
+    crm_type = crm.Type.value
 
     if perfect:
         searchFunc = "searchPerfectCandidates"
@@ -162,14 +162,14 @@ def searchCandidatesCustom(assistant, candidate_data, perfect=False):
         searchFunc = "searchCandidates"
 
     if CRM.has_value(crm_type):
-        if assistant.CRM.Type is CRM.Adapt:
+        if crm.Type is CRM.Adapt:
             return Callback(True, "CRM does not support candidate search at this time")
-        if assistant.CRM.Type is CRM.Greenhouse:
-            return eval(crm_type + "." + searchFunc + "(assistant.CRM.Auth)")
-        if assistant.CRM.Type is CRM.Jobscience:
-            return eval(crm_type + "." + searchFunc + "(assistant.CRM.Auth, data)")
+        if crm.Type is CRM.Greenhouse:
+            return eval(crm_type + "." + searchFunc + "(crm.Auth)")
+        if crm.Type is CRM.Jobscience:
+            return eval(crm_type + "." + searchFunc + "(crm.Auth, data)")
 
-        return eval(crm_type + "." + searchFunc + "(assistant.CRM.Auth, assistant.CompanyID, data)")
+        return eval(crm_type + "." + searchFunc + "(crm.Auth, companyID, data)")
     else:
         return Callback(False, "CRM type did not match with those on the system")
 

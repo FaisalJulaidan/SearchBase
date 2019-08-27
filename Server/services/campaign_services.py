@@ -32,7 +32,7 @@ def sendCampaign(campaign_details, companyID):
             raise Exception("Message text is missing")
 
         if campaign_details.get("use_crm"):
-            candidates_callback: Callback = searchCandidatesCustom(assistant, campaign_details, True)
+            candidates_callback: Callback = searchCandidatesCustom(crm, companyID, campaign_details, True)
         else:
             session = {
                 "showTop": 200,

@@ -1,28 +1,29 @@
 import {all, put} from 'redux-saga/effects'
 import {campaignActions} from "../actions";
-import {http,errorMessage, loadingMessage,successMessage} from "helpers";
+import {http, errorMessage, loadingMessage, successMessage} from "helpers";
 import axios from 'axios';
 
 
 //Fetch Assistant data
-function* fetchFullAssistants() {
+function* fetchCampaignData() {
     try {
-        const res = yield http.get(`/full_assistants`);
-        yield put(campaignActions.fetchFullAssistantsSuccess(res.data?.data));
+        const res = yield http.get(`/campaign_data`);
+        yield put(campaignActions.fetchCampaignDataSuccess(res.data?.data.assistants, res.data?.data.databases));
     } catch (error) {
         const msg = error.response?.data?.msg || "Couldn't load full assistants data";
         errorMessage(msg);
-        yield put(campaignActions.fetchFullAssistantsFailure(msg));
+        yield put(campaignActions.fetchCampaignDataFailure(msg));
     }
 }
 
 //Launch Campaign
-function* launchCampaign({assistant_id, location, jobTitle, skills,text}) {
+function* launchCampaign({assistant_id, use_crm, database_id, location, jobTitle, skills, text}) {
     try {
         loadingMessage('Launching the campaign...', 0);
-        const res = yield axios.post(`/send_campaign`, {assistant_id, location, jobTitle, skills,text}, {
-            headers: {'Content-Type': 'application/json'},
-        });
+        const res = yield axios.post(`/send_campaign`,
+            {assistant_id, use_crm, database_id, location, jobTitle, skills, text}, {
+                headers: {'Content-Type': 'application/json'},
+            });
         yield put(campaignActions.launchCampaignSuccess());
         successMessage('Campaign has been launched successfully.');
 
@@ -37,7 +38,7 @@ function* launchCampaign({assistant_id, location, jobTitle, skills,text}) {
 
 export function* campaignSaga() {
     yield all([
-        fetchFullAssistants,
+        fetchCampaignData,
         launchCampaign
     ])
 }

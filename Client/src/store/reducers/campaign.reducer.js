@@ -1,27 +1,27 @@
 import * as actionTypes from '../actions/actionTypes';
 import {updateObject} from '../utility';
 
-const initialState = {fullAssistantList: [], isLoading: false, isLaunching: true, errorMsg: null};
+const initialState = {campaignData: null, isLoading: false, isLaunching: true, errorMsg: null};
 
 export const campaign = (state = initialState, action) => {
     switch (action.type) {
 
         //FETCH ASSISTANTS DATA
-        case actionTypes.FETCH_FULL_ASSISTANTS_REQUEST:
+        case actionTypes.FETCH_CAMPAIGN_DATA_REQUEST:
             return updateObject(state, {
-                fullAssistantList: [],
+                campaignData: null,
                 isLoading: true,
                 errorMsg: null,
             });
-        case actionTypes.FETCH_FULL_ASSISTANTS_SUCCESS:
+        case actionTypes.FETCH_CAMPAIGN_DATA_SUCCESS:
             return updateObject(state, {
-                fullAssistantList: action.fullAssistantList,
+                campaignData: action.campaignData,
                 isLoading: false,
                 errorMsg: null,
             });
-        case actionTypes.FETCH_FULL_ASSISTANTS_FAILURE:
+        case actionTypes.FETCH_CAMPAIGN_DATA_FAILURE:
             return updateObject(state, {
-                fullAssistantList: [],
+                campaignData: null,
                 isLoading: false,
                 errorMsg: action.error
             });

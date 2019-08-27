@@ -10,8 +10,6 @@ import googleMaps from '@google/maps'
 
 import Phone from "../../../components/Phone/Phone";
 import styles from "./Campaign.module.less";
-import BullhornItems from "./FormItem/BullhornItems";
-import MercuryItems from "./FormItem/MercuryItems";
 import {campaignActions} from "../../../store/actions";
 
 const FormItem = Form.Item;
@@ -44,6 +42,10 @@ class Campaign extends React.Component {
         this.onCRMSelect = this.onCRMSelect.bind(this);
         this.setLocations = this.setLocations.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
+    }
+
+    componentWillMount() {
+        this.props.dispatch(campaignActions.fetchCampaignData());
     }
 
     onCRMSelect = (value) => {
@@ -194,8 +196,10 @@ class Campaign extends React.Component {
 
 function mapStateToProps(state) {
     return {
-        isLoading: state.campaign.isLoading
+        campaignData: state.campaign.campaignData,
+        isLoading: state.campaign.isLoading,
+        isLaunching: state.campaign.isLaunching
     };
 }
 
-export default Form.create()(Campaign)
+export default connect(mapStateToProps)(Form.create()(Campaign))

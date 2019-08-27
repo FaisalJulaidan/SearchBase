@@ -1,23 +1,26 @@
 import * as actionTypes from './actionTypes';
 
-const fetchFullAssistants = () => ({
-    type: actionTypes.FETCH_FULL_ASSISTANTS_REQUEST
+const fetchCampaignData = () => ({
+    type: actionTypes.FETCH_CAMPAIGN_DATA_REQUEST
 });
 
-const fetchFullAssistantsSuccess = (fullAssistantList) => ({
-    type: actionTypes.FETCH_FULL_ASSISTANTS_SUCCESS,
-    fullAssistantList
+const fetchCampaignDataSuccess = (assistants, database) => ({
+    type: actionTypes.FETCH_CAMPAIGN_DATA_SUCCESS,
+    assistants,
+    database
 });
 
-const fetchFullAssistantsFailure = (error) => ({
-    type: actionTypes.FETCH_FULL_ASSISTANTS_FAILURE,
+const fetchCampaignDataFailure = (error) => ({
+    type: actionTypes.FETCH_CAMPAIGN_DATA_FAILURE,
     error
 });
 
 
-const launchCampaign = (assistant_id, location, jobTitle, skills,text) => ({
+const launchCampaign = (assistant_id, use_crm, database_id, location, jobTitle, skills, text) => ({
     type: actionTypes.LAUNCH_CAMPAIGN_REQUEST,
     assistant_id,
+    use_crm,
+    database_id,
     location,
     jobTitle,
     skills,
@@ -34,9 +37,9 @@ const launchCampaignFailure = (errorMsg) => ({
 });
 
 export const campaignActions = {
-    fetchFullAssistants,
-    fetchFullAssistantsSuccess,
-    fetchFullAssistantsFailure,
+    fetchCampaignData,
+    fetchCampaignDataSuccess,
+    fetchCampaignDataFailure,
     launchCampaign,
     launchCampaignSuccess,
     launchCampaignFailure

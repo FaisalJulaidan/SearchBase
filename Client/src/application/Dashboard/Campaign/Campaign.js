@@ -10,8 +10,6 @@ import googleMaps from '@google/maps'
 
 import Phone from "../../../components/Phone/Phone";
 import styles from "./Campaign.module.less";
-import BullhornItems from "./FormItem/BullhornItems";
-import MercuryItems from "./FormItem/MercuryItems";
 import {campaignActions} from "../../../store/actions";
 
 const FormItem = Form.Item;
@@ -46,6 +44,10 @@ class Campaign extends React.Component {
         this.handleSubmit = this.handleSubmit.bind(this);
     }
 
+    componentWillMount() {
+        this.props.dispatch(campaignActions.fetchCampaignData());
+    }
+
     onCRMSelect = (value) => {
         this.setState({selectedCRM: value});
     };
@@ -62,7 +64,7 @@ class Campaign extends React.Component {
     setLocations = (err, response) => {
         if (!err) {
             // GB Filter (in the future to remove replace with let resp = response.json.results.filter(address => address.address_components)
-            let resp = response.json.results.filter(address => address.address_components.find(loc => loc.types.includes("country")).short_name === "GB")
+            let resp = response.json.results.filter(address => address.address_components.find(loc => loc.types.includes("country")).short_name === "GB");
             this.setState({locations: resp.map(item => item.formatted_address)})
         }
     };
@@ -165,11 +167,11 @@ class Campaign extends React.Component {
                                           onChange={value => this.findLocation(value)}/>
 
                         </FormItem>
-                        <FormItem label="Hotlists" help={"Any Hotlists made in your CRM will be shown here"}>
-                            <Select>
-                                <Select.Option key={1}/>
-                            </Select>
-                        </FormItem>
+                        {/*<FormItem label="Hotlists" help={"Any Hotlists made in your CRM will be shown here"}>*/}
+                        {/*    <Select>*/}
+                        {/*        <Select.Option key={1}/>*/}
+                        {/*    </Select>*/}
+                        {/*</FormItem>*/}
                         <FormItem label={"Message"}>
                             <TextArea id={"message"} placeholder="Type in the message you'd like to send"
                                       onChange={e => this.setState({textMessage: e.target.value})}/>
@@ -192,5 +194,12 @@ class Campaign extends React.Component {
 
 }
 
+function mapStateToProps(state) {
+    return {
+        campaignData: state.campaign.campaignData,
+        isLoading: state.campaign.isLoading,
+        isLaunching: state.campaign.isLaunching
+    };
+}
 
-export default Form.create()(Campaign)
+export default connect(mapStateToProps)(Form.create()(Campaign))

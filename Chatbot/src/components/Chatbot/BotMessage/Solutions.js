@@ -1,5 +1,5 @@
-import React, {useState} from 'react';
-import {Badge, Button, Card, Carousel, Tag} from 'antd';
+import React, { useState } from 'react';
+import { Badge, Button, Card, Carousel, Tag } from 'antd';
 // Constants
 import * as solutionAttributes from '../../../constants/SolutionAttributes';
 // Styles
@@ -102,7 +102,7 @@ const Solution = ({solution, index, selected, responded, toggleSelect}) => {
 
     return (
         <Card hoverable className={'Card'}
-              cover={<img alt="example" height="100px" style={{objectFit: 'cover'}}
+              cover={<img alt="example" style={{ objectFit: 'cover', height: '100%' }}
                           src="https://42f2671d685f51e10fc6-b9fcecea3e50b3b59bdc28dead054ebc.ssl.cf5.rackcdn.com/illustrations/voice_control_ofo1.svg"/>}
         >
             <div className={'Card_Text'}>

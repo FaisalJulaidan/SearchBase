@@ -1,14 +1,20 @@
-import {all, put} from 'redux-saga/effects'
+import {all, takeEvery, put} from 'redux-saga/effects'
+import * as actionTypes from "../actions/actionTypes";
 import {campaignActions} from "../actions";
 import {http, errorMessage, loadingMessage, successMessage} from "helpers";
 import axios from 'axios';
 
 
-//Fetch Assistant data
+//Fetch Campaign data
 function* fetchCampaignData() {
     try {
         const res = yield http.get(`/campaign_data`);
-        yield put(campaignActions.fetchCampaignDataSuccess(res.data?.data.assistants, res.data?.data.databases));
+        yield put(campaignActions.fetchCampaignDataSuccess(
+            res.data?.data.assistants,
+            res.data?.data.crms,
+            res.data?.data.databases,
+            res.data?.data.messengers)
+        );
     } catch (error) {
         const msg = error.response?.data?.msg || "Couldn't load full assistants data";
         errorMessage(msg);
@@ -35,10 +41,17 @@ function* launchCampaign({assistant_id, use_crm, database_id, location, jobTitle
     }
 }
 
+function* watchFetchCampaignData() {
+    yield takeEvery(actionTypes.FETCH_CAMPAIGN_DATA_REQUEST, fetchCampaignData)
+}
+
+function* watchLaunchCampaign() {
+    yield takeEvery(actionTypes.LAUNCH_CAMPAIGN_REQUEST, launchCampaign)
+}
 
 export function* campaignSaga() {
     yield all([
-        fetchCampaignData,
-        launchCampaign
+        watchFetchCampaignData(),
+        watchLaunchCampaign()
     ])
 }

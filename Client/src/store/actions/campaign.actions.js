@@ -4,10 +4,12 @@ const fetchCampaignData = () => ({
     type: actionTypes.FETCH_CAMPAIGN_DATA_REQUEST
 });
 
-const fetchCampaignDataSuccess = (assistants, database) => ({
+const fetchCampaignDataSuccess = (assistants,crms, databases,messengers) => ({
     type: actionTypes.FETCH_CAMPAIGN_DATA_SUCCESS,
     assistants,
-    database
+    crms,
+    databases,
+    messengers
 });
 
 const fetchCampaignDataFailure = (error) => ({
@@ -16,11 +18,13 @@ const fetchCampaignDataFailure = (error) => ({
 });
 
 
-const launchCampaign = (assistant_id, use_crm, database_id, location, jobTitle, skills, text) => ({
+const launchCampaign = (assistant_id, use_crm, crm_id, database_id, messenger_id, location, jobTitle, skills, text) => ({
     type: actionTypes.LAUNCH_CAMPAIGN_REQUEST,
     assistant_id,
     use_crm,
+    crm_id,
     database_id,
+    messenger_id,
     location,
     jobTitle,
     skills,
@@ -40,6 +44,7 @@ export const campaignActions = {
     fetchCampaignData,
     fetchCampaignDataSuccess,
     fetchCampaignDataFailure,
+
     launchCampaign,
     launchCampaignSuccess,
     launchCampaignFailure

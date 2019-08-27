@@ -7,7 +7,7 @@ const capitalize = (s) => {
     if (typeof s !== 'string') return '';
     let words = s.split(" ");
     let capitalised = "";
-    words.map((word, i) => {
+    words.forEach((word, i) => {
         if (i === 0)
             capitalised = capitalizeWord(word);
         else

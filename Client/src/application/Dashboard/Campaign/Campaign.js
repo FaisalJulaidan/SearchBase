@@ -1,8 +1,7 @@
 import React from 'react';
 import {connect} from 'react-redux';
-import moment from 'moment';
 import NoHeaderPanel from 'components/NoHeaderPanel/NoHeaderPanel'
-import {Typography, Form, Input, Icon, Button, Tag, AutoComplete, Select} from 'antd';
+import {Typography, Form, Input, Icon, Button, Tag, AutoComplete, Select, Switch} from 'antd';
 
 import {trimText} from "../../../helpers";
 
@@ -10,7 +9,7 @@ import googleMaps from '@google/maps'
 
 import Phone from "../../../components/Phone/Phone";
 import styles from "./Campaign.module.less";
-import {campaignActions} from "../../../store/actions";
+import {campaignActions} from "store/actions";
 
 const FormItem = Form.Item;
 
@@ -23,8 +22,6 @@ const google = googleMaps.createClient({
 
 let skills = ["Software engineer", "Sales"];
 
-let CRMs = ["bullhorn", "mercury", "rdp-pro"];
-
 class Campaign extends React.Component {
 
 
@@ -32,14 +29,12 @@ class Campaign extends React.Component {
         super(props);
         this.timer = React.createRef();
         this.state = {
-            selectedCRM: CRMs[0],
+            use_crm: true,
+            locations: [],
             skills: [],
             skillInput: "",
-            location: "",
-            locations: [],
             textMessage: ""
         };
-        this.onCRMSelect = this.onCRMSelect.bind(this);
         this.setLocations = this.setLocations.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
     }
@@ -47,10 +42,6 @@ class Campaign extends React.Component {
     componentWillMount() {
         this.props.dispatch(campaignActions.fetchCampaignData());
     }
-
-    onCRMSelect = (value) => {
-        this.setState({selectedCRM: value});
-    };
 
     findLocation = (value) => {
         clearTimeout(this.timer.current);
@@ -80,9 +71,9 @@ class Campaign extends React.Component {
         event.preventDefault();
         this.props.form.validateFields((err, values) => {
             if (!err) {
-                this.props.dispatch(campaignActions.launchCampaign(
-                    values.crmType, values.jobTitle, this.state.skills, this.state.location
-                ));
+                // this.props.dispatch(campaignActions.launchCampaign(
+                //     values.crmType, values.jobTitle, this.state.skills, this.state.location
+                // ));
             }
         });
     };
@@ -105,35 +96,71 @@ class Campaign extends React.Component {
             <div className={styles.mainContainer}>
                 <div className={styles.formContainer}>
                     <Form layout='vertical' onSubmit={this.handleSubmit}>
-                        <FormItem label={"CRM"}>
-                            {getFieldDecorator("crmType", {
-                                initialValue: CRMs[0],
+                        <FormItem label={"Assistant"}>
+                            {getFieldDecorator("assistant_id", {
+                                rules: [{
+                                    required: true,
+                                    message: "Please select the assistant"
+                                }],
+                            })(
+                                <Select placeholder={"Please select the assistant"}>
+                                    {(() => {
+                                        return this.props.assistants.map((item, key) => {
+                                            return (
+                                                <Select.Option key={key} value={item.ID}>
+                                                    {trimText.capitalize(trimText.trimDash(item.Name))}
+                                                </Select.Option>
+                                            );
+                                        });
+                                    })()}
+                                </Select>
+                            )}
+
+                        </FormItem>
+                        <FormItem label={"CRM Type"}>
+                            {getFieldDecorator("crm_id", {
                                 rules: [{
                                     required: true,
                                     message: "Please select your desired CRM"
                                 }],
                             })(
-                                <Select onChange={this.onCRMSelect}>
+                                <Select placeholder={"Please select your desired CRM"}>
                                     {(() => {
-                                        return CRMs.map((crm, key) => {
-                                            return <Select.Option key={key} value={crm}>
-                                                {trimText.capitalize(trimText.trimDash(crm))}
-                                            </Select.Option>
+                                        return this.props.crms.map((item, key) => {
+                                            return (
+                                                <Select.Option key={key} value={item.ID}>
+                                                    {trimText.capitalize(trimText.trimDash(item.Type))}
+                                                </Select.Option>
+                                            );
                                         });
                                     })()}
                                 </Select>
                             )}
                         </FormItem>
-                        {/*(() => {  //Uncomment, if you want to see how extended forms works
-                            switch (this.state.selectedCRM) {
-                                case"bullhorn":
-                                    return <BullhornItems form={this.props.form}/>;
-                                case"mercury":
-                                    return <MercuryItems form={this.props.form}/>;
-                                default:
-                                    break;
-                            }
-                        })()*/}
+                        <FormItem label={"Use CRM"} labelCol={{xs: {span: 5, offset: 0}}}>
+                            <Switch onChange={(checked) => this.setState({use_crm: checked})}
+                                    defaultChecked={this.state.use_crm}/>
+                        </FormItem>
+                        <FormItem label={"Messaging Service"}>
+                            {getFieldDecorator("message_id", {
+                                rules: [{
+                                    required: true,
+                                    message: "Please select the messaging service"
+                                }],
+                            })(
+                                <Select placeholder={"Please select the messaging service"}>
+                                    {(() => {
+                                        return this.props.messengers.map((item, key) => {
+                                            return (
+                                                <Select.Option key={key} value={item.ID}>
+                                                    {trimText.capitalize(trimText.trimDash(item.Type))}
+                                                </Select.Option>
+                                            );
+                                        });
+                                    })()}
+                                </Select>
+                            )}
+                        </FormItem>
                         <FormItem label={"Job Title"}>
                             {getFieldDecorator("jobTitle", {
                                 rules: [{
@@ -152,7 +179,6 @@ class Campaign extends React.Component {
                                    onKeyDown={this.submit}
                                    onChange={e => this.setState({skillInput: e.target.value})}
                                    value={this.state.skillInput}/>
-
                         </FormItem>
                         <div>
                             {this.state.skills.map((skill, i) => {
@@ -167,17 +193,11 @@ class Campaign extends React.Component {
                                           onChange={value => this.findLocation(value)}/>
 
                         </FormItem>
-                        {/*<FormItem label="Hotlists" help={"Any Hotlists made in your CRM will be shown here"}>*/}
-                        {/*    <Select>*/}
-                        {/*        <Select.Option key={1}/>*/}
-                        {/*    </Select>*/}
-                        {/*</FormItem>*/}
                         <FormItem label={"Message"}>
-                            <TextArea id={"message"} placeholder="Type in the message you'd like to send"
+                            <TextArea id={"text"} placeholder="Type in the message you'd like to send"
                                       onChange={e => this.setState({textMessage: e.target.value})}/>
 
                         </FormItem>
-
                         <Button type="primary" icon="rocket" htmlType="submit" size={"large"}>
                             Launch
                         </Button>
@@ -196,10 +216,13 @@ class Campaign extends React.Component {
 
 function mapStateToProps(state) {
     return {
-        campaignData: state.campaign.campaignData,
+        assistants: state.campaign.assistants,
+        crms: state.campaign.crms,
+        databases: state.campaign.databases,
+        messengers: state.campaign.messengers,
         isLoading: state.campaign.isLoading,
         isLaunching: state.campaign.isLaunching
     };
 }
 
-export default connect(mapStateToProps)(Form.create()(Campaign))
+export default connect(mapStateToProps)(Form.create()(Campaign));

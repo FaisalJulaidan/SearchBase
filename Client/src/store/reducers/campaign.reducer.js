@@ -1,27 +1,44 @@
 import * as actionTypes from '../actions/actionTypes';
 import {updateObject} from '../utility';
 
-const initialState = {campaignData: null, isLoading: false, isLaunching: true, errorMsg: null};
+const initialState = {
+    assistants: [],
+    crms: [],
+    databases: [],
+    messengers: [],
+    isLoading: false,
+    isLaunching: true,
+    errorMsg: null
+};
 
 export const campaign = (state = initialState, action) => {
     switch (action.type) {
 
-        //FETCH ASSISTANTS DATA
+        //Fetch campaign data
         case actionTypes.FETCH_CAMPAIGN_DATA_REQUEST:
             return updateObject(state, {
-                campaignData: null,
+                assistants: [],
+                crms: [],
+                databases: [],
+                messengers: [],
                 isLoading: true,
                 errorMsg: null,
             });
         case actionTypes.FETCH_CAMPAIGN_DATA_SUCCESS:
             return updateObject(state, {
-                campaignData: action.campaignData,
+                assistants: action.assistants,
+                crms: action.crms,
+                databases: action.databases,
+                messengers: action.messengers,
                 isLoading: false,
                 errorMsg: null,
             });
         case actionTypes.FETCH_CAMPAIGN_DATA_FAILURE:
             return updateObject(state, {
-                campaignData: null,
+                assistants: [],
+                crms: [],
+                databases: [],
+                messengers: [],
                 isLoading: false,
                 errorMsg: action.error
             });

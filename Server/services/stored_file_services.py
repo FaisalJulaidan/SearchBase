@@ -60,6 +60,7 @@ def getAll():
 
 def createRef(file, model, identifier, value, storedFileID, key: str = None) -> StoredFile or None:
     try:
+        print('ccreating ref')
         if not file: raise Exception;
         print(model)
         obj = db.session.query(model).filter(getattr(model, identifier) == value).first()
@@ -122,6 +123,7 @@ def uploadFile(file, filename, public=False, **kwargs):
         except ClientError as e:
             raise Exception("DigitalOcean Error")
 
+        print(kwargs)
         if 'model' in kwargs:
             #files, model, identifier, value, storedFileID, keys: List = None
             dbRef_callback: Callback = createRef(file, kwargs['model'], kwargs['identifier'], kwargs['identifier_value'], kwargs['stored_file_id'] , kwargs['key'])

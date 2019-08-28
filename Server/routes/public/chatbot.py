@@ -118,9 +118,12 @@ def chatbot_upload_files(assistantIDAsHash, sessionID):
             db.session.add(sf)
             db.session.flush()
 
-            files = []
+            returnValue = []
             set_file_id: Callback = conversation_services.setFileByID(sessionID, sf.ID)
             for idx, file in enumerate(files):
+                print('--')
+                print(file)
+                print('--')
                 if file.filename == '':
                     db.session.rollback()
                     return helpers.jsonResponseFlask(False, 404, "No selected file")
@@ -136,7 +139,7 @@ def chatbot_upload_files(assistantIDAsHash, sessionID):
                                                                                                 stored_file_id=sf.ID,
                                                                                                 key=keys[idx] if keys[idx] is not None else None)
 
-                files.append(upload_callback.Data)
+                returnValue.append(upload_callback.Data)
             # Save changes
             db.session.commit()
 

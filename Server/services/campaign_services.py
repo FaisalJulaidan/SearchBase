@@ -28,6 +28,8 @@ def sendCampaign(campaign_details, companyID):
         messenger = messenger_callback.Data
         text = campaign_details.get("text")
 
+        campaign_details["location"] = campaign_details.get("location").split(",")[0]
+
         if not text:
             raise Exception("Message text is missing")
 

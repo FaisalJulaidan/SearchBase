@@ -1,0 +1,29 @@
+.icon {
+    color: rgba(0, 0, 0, .25);
+}
+
+.form_item {
+    transition: all .5s;
+    font-weight: bold;
+    margin-bottom: 1em;
+}
+
+.form_item div {
+    line-height: 2.5em;
+}
+
+.form_item:last-child {
+    margin-top: 2em;
+}
+
+.forgot_pass{
+    font-size: .9em;
+    text-align: right;
+    padding: 0 0 10px 0;
+    color: #726a84;
+}
+
+.forgot_pass a{
+    color: #9254de;
+    text-decoration: none;
+}

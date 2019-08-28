@@ -1,0 +1,92 @@
+.image_wrapper {
+    position: relative;
+    width: 100%;
+    height: 0;
+    padding-top: 75.44%;
+}
+
+.image_wrapper .image {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+}
+
+.text_col {
+    line-height: normal;
+    align-self: center;
+}
+
+.text_col .title_transient{
+    color: #9254de;
+    font-size: 2.3em;
+    font-weight: bold;
+}
+
+.text_col .title{
+    color: #9254de;
+    margin-bottom: 1em;
+    font-size: 2.3em;
+    font-weight: lighter;
+}
+
+.text_col .subtitle{
+    color: #726a84;
+    margin-bottom: .5em;
+}
+
+.text_col .button {
+    color: #9254de;
+    border-color: #9254de;
+}
+
+.text_col .button:hover {
+    color: #9254de;
+    background: #F8EBFF;
+    border-color: white;
+    transition: border-color 0.4s ease 0s, background-color 0.4s ease 0s;
+}
+
+.text_col .button:not(:disabled):not(.disabled):active {
+    background-color: #F8EBFF;
+    transition: border-color 0.4s ease 0s, background-color 0.4s ease 0s;
+}
+
+.text_col .button:focus {
+    box-shadow: 0 0 0 0.2rem rgba(138,107,219,.5);
+}
+
+.text_col .button a {
+    text-decoration: none;
+    color: #9254de;
+}
+
+
+@media (max-width: 991.98px) {
+
+    .text_col .title_transient{
+        font-size: 1.8em;
+    }
+
+    .text_col .title{
+        margin-bottom: 1.1em;
+        font-size: 1.8em;
+    }
+
+    .text_col .button{
+        font-size: .9em;
+    }
+}
+
+@media (max-width: 767.98px) {
+    .text_col {
+        margin-bottom: 3em;
+        text-align: center;
+    }
+
+    .text_col .title_transient div{
+        display: flex;
+        align-items: center;
+        flex-flow: column;
+    }
+}

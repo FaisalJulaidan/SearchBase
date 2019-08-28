@@ -77,7 +77,7 @@ def disconnectByType(type, companyID) -> Callback:
 
 def disconnectByID(messengerID, companyID) -> Callback:
     try:
-        messenger_callback: Callback = getMessengerByID(messengerID, companyID)
+        messenger_callback: Callback = getByID(messengerID, companyID)
         if not messenger_callback:
             return Callback(False, "Could not find Messenger.")
 
@@ -91,7 +91,7 @@ def disconnectByID(messengerID, companyID) -> Callback:
         return Callback(False, "Messenger disconnection failed.")
 
 
-def getMessengerByID(messengerID, companyID):
+def getByID(messengerID, companyID):
     try:
         messenger = db.session.query(Messenger_Model) \
             .filter(and_(Messenger_Model.CompanyID == companyID, Messenger_Model.ID == messengerID)).first()

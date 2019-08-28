@@ -1,6 +1,7 @@
-#/usr/bin/python3.5
+# /usr/bin/python3.5
 
 from gevent import monkey
+
 monkey.patch_all()
 
 import os
@@ -17,7 +18,8 @@ from models import db
 from routes.admin.routers import account_router, analytics_router, sub_router, \
     conversation_router, users_router, flow_router, assistant_router, \
     database_router, options_router, marketplace_router, auto_pilot_router, appointment_router, \
-    files_router, database_router, options_router, marketplace_router, auto_pilot_router, appointment_router, webhook_router
+    files_router, database_router, options_router, marketplace_router, auto_pilot_router, appointment_router, webhook_router, \
+    campaign_router
 from routes.public.routers import public_router, reset_password_router, chatbot_router, auth_router
 from routes.staff.routers import staff_router
 from services import scheduler_services
@@ -40,6 +42,7 @@ app.register_blueprint(conversation_router, url_prefix='/api')
 app.register_blueprint(users_router, url_prefix='/api')
 app.register_blueprint(chatbot_router, url_prefix='/api')
 app.register_blueprint(auth_router, url_prefix='/api')
+app.register_blueprint(campaign_router, url_prefix='/api')
 app.register_blueprint(database_router, url_prefix='/api')
 app.register_blueprint(auto_pilot_router, url_prefix='/api')
 app.register_blueprint(options_router, url_prefix='/api')
@@ -47,6 +50,7 @@ app.register_blueprint(appointment_router, url_prefix='/api')
 app.register_blueprint(files_router, url_prefix='/api')
 app.register_blueprint(webhook_router, url_prefix='/api')
 app.register_blueprint(staff_router, url_prefix='/api/staff')
+
 
 @app.after_request
 def apply_caching(response):
@@ -59,7 +63,7 @@ def apply_caching(response):
 def page_not_found(e):
     try:
         print("Error Handler:" + e.description)
-        return render_template('errors/404.html', error= e.description), status.HTTP_404_NOT_FOUND
+        return render_template('errors/404.html', error=e.description), status.HTTP_404_NOT_FOUND
     except:
         print("Error without description")
         return render_template('errors/404.html'), status.HTTP_404_NOT_FOUND
@@ -77,7 +81,8 @@ manager = Manager(app)
 babel = Babel(app)
 # scheduler = APScheduler()
 manager.add_command('db', MigrateCommand)
-app.jinja_env.add_extension('jinja2.ext.do') # Add 'do' extension to Jinja engine
+app.jinja_env.add_extension('jinja2.ext.do')  # Add 'do' extension to Jinja engine
+
 
 # will be used for migration purposes
 @manager.command

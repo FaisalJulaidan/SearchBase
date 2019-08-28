@@ -21,6 +21,12 @@ class Company(db.Model):
     Active = db.Column(db.Boolean, nullable=False, default=False)
 
 
+    AccessAssistants = db.Column(db.Boolean(), nullable=False, default=False)
+    AccessCampaigns = db.Column(db.Boolean(), nullable=False, default=False)
+    AccessAutoPilot = db.Column(db.Boolean(), nullable=False, default=False)
+    AccessDatabases = db.Column(db.Boolean(), nullable=False, default=False)
+    AccessAppointments = db.Column(db.Boolean(), nullable=False, default=False)
+
     # Relationships:
     Users = db.relationship('User', back_populates='Company')
     Assistants = db.relationship('Assistant', back_populates='Company')

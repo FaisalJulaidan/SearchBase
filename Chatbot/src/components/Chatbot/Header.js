@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 // Styles
 // import styles from './styles/Header.module.css';
 import './styles/Header.css';
@@ -12,22 +12,51 @@ const Header = ({ title, logoPath, isDirectLink, resetChatbot, closeWindow }) =>
     const privacyPolicy = () => {
         let win = window.open("https://www.thesearchbase.com/privacy", '_blank');
         win.focus();
+    };
+
+    const isMobile = useWindowSize().width <= 420;
+
+    // Hook
+    function useWindowSize() {
+        const isClient = typeof window === 'object';
+
+        function getSize() {
+            return {
+                width: isClient ? window.innerWidth : undefined,
+                height: isClient ? window.innerHeight : undefined
+            };
+        }
+
+        const [windowSize, setWindowSize] = useState(getSize);
+
+        useEffect(() => {
+            if (!isClient) {
+                return false;
+            }
+
+            function handleResize() {
+                setWindowSize(getSize());
+            }
+
+            window.addEventListener('resize', handleResize);
+            return () => window.removeEventListener('resize', handleResize);
+        }, []); // Empty array ensures that effect is only run on mount and unmount
+
+        return windowSize;
     }
-
-
     return (
         <div className={'Header'} id={'Chatbot_Header'}>
             <Row>
                 {
                     !isDirectLink ?
-                        <Col span={3}>
-                            {
-                                logoPath ?
-                                    <img alt="header" width={30}
-                                         src={`${logoPath}`}/> :
-                                    <FontAwesomeIcon size="2x" icon={faCloud} style={{ color: '#673AB7' }}/>
-                            }
-                        </Col>
+                    <Col span={3}>
+                        {
+                            logoPath ?
+                                <img alt="header" width={30}
+                                        src={`${logoPath}`}/> :
+                                <FontAwesomeIcon size="2x" icon={faCloud} style={{ color: '#673AB7' }}/>
+                        }
+                    </Col>
                         : <Col span={3}/>
                 }
 

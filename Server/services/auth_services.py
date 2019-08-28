@@ -121,9 +121,11 @@ def authenticate(email: str, password_to_check: str) -> Callback:
                          "timezone": user.TimeZone
                          # "plan": helpers.getPlanNickname(user.Company.SubID),
                          },
-                'role': helpers.getDictFromSQLAlchemyObj(user.Role)
-                }
-
+                'role': helpers.getDictFromSQLAlchemyObj(user.Role),
+                'company': helpers.getDictFromSQLAlchemyObj(user.Company)  # BUG: Stored as list currently
+        }
+        # print("here")
+        # print(helpers.getListFromSQLAlchemyList(user.Company.Plan))
         time_now = datetime.now()
         # for security, hide them in the token
         tokenData = {'user': {"id": user.ID, "companyID": user.CompanyID, "email": user.Email, "roleID": user.RoleID}}
@@ -161,7 +163,8 @@ def refreshToken() -> Callback:
         #     raise Exception("Your account was logged in somewhere else")
 
         data = {'token': create_access_token(identity=current_user),
-                'expiresIn': datetime.now() + BaseConfig.JWT_ACCESS_TOKEN_EXPIRES}
+                'expiresIn': datetime.now() + BaseConfig.JWT_ACCESS_TOKEN_EXPIRES,
+                'company': helpers.getDictFromSQLAlchemyObj(user_callback.Data.Company)} # with new permissions maybe
         return Callback(True, "Authorised!", data)
     except Exception as exc:
         helpers.logError("auth_services.refreshToken(): " + str(exc))

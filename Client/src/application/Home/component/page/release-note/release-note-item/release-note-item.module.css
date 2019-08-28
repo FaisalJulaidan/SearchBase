@@ -1,0 +1,54 @@
+.item_wrapper .container {
+    padding-top: 3em;
+    padding-bottom: 3em;
+    border-bottom: 1px solid #D5CABD;
+}
+
+.item_wrapper:last-child .container {
+    border-bottom: none;
+}
+
+.version {
+    color: #494949;
+    display: inline-block;
+    font-size: 3em;
+}
+
+.tag{
+    margin: .2em;
+    font-size: 1.1em;
+    color: #494949;
+    display: inline-block;
+}
+
+.latest {
+    color: #9254de;
+    font-size: 1em;
+    margin: 0 0.2em;
+}
+
+.date {
+    font-size: 1.2em;
+    margin: 0 0.2em;
+}
+
+.notes {
+    margin-bottom: 2em;
+}
+
+.notes:last-child {
+    margin-bottom: 0;
+}
+
+.notes .title {
+    margin: 0.2em 0;
+    font-size: 1.1em;
+    font-weight: bold;
+    color: #9254de;
+}
+
+.notes .items {
+    margin: 10px 10px;
+    list-style-type: disc;
+    list-style-position: inside;
+}

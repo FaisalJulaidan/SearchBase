@@ -228,9 +228,8 @@ def deleteDatabase(databaseID, companyID) -> Callback:
 
 
 # ----- Scanners (Pandas) ----- #
-def scan(session, assistantHashID):
+def scan(session, assistantHashID, campaign=False):
     try:
-
         callback: Callback = assistant_services.getByHashID(assistantHashID)
         if not callback.Success:
             return Callback(False, "Assistant not found!")
@@ -241,12 +240,15 @@ def scan(session, assistantHashID):
             .filter(and_(Database.CompanyID == assistant.CompanyID,
                          Database.Type == databaseType)).all()
 
-        # get CRM Data
-        extraRecords = getCRMData(assistant, databaseType.name, session)
+        if not campaign:
+            # get CRM Data
+            extraRecords = getCRMData(assistant, databaseType.name, session)
+        else:
+            extraRecords = []
 
         # Scan database for solutions based on database type
         if databaseType == DatabaseType.Candidates:
-            return scanCandidates(session, [d[0] for d in databases], extraRecords)
+            return scanCandidates(session, [d[0] for d in databases], extraRecords, campaign)
         elif databaseType == DatabaseType.Jobs:
             return scanJobs(session, [d[0] for d in databases], extraRecords)
         else:
@@ -268,7 +270,7 @@ def getCRMData(assistant, databaseType, session):
 
 
 # Data analysis using Pandas library
-def scanCandidates(session, dbIDs, extraCandidates=None):
+def scanCandidates(session, dbIDs, extraCandidates=None, campaign=False):
     try:
 
         df = pandas.read_sql(db.session.query(Candidate).filter(Candidate.DatabaseID.in_(dbIDs)).statement,
@@ -279,8 +281,13 @@ def scanCandidates(session, dbIDs, extraCandidates=None):
         keywords = session['keywordsByDataType']
         df['Score'] = 0  # Add column for tracking score
         df['Source'] = "Internal Database"  # Source of solution e.g. Bullhorn, Adapt...
+
         if extraCandidates:
-            df = df.append(extraCandidates, ignore_index=True)  # TODO
+            df = df.append(extraCandidates, ignore_index=True)
+
+        # Check if there are no Candidates.
+        if not len(df):
+            return Callback(True, '', [])
 
         # Fill None values with 0 for numeric columns and with empty string for string columns
         df = df.fillna({Candidate.CandidateDesiredSalary.name: 0, Candidate.CandidateYearsExperience.name: 0}).fillna('')
@@ -326,6 +333,9 @@ def scanCandidates(session, dbIDs, extraCandidates=None):
 
         topResults = json.loads(df[df['Score'] > 0].nlargest(session.get('showTop', 2), 'Score')
                                 .to_json(orient='records'))
+
+        if campaign:
+            return Callback(True, '', topResults)
 
         data = []  # List of candidates
         location = ["Candidate's preferred location of work is [location].",
@@ -395,6 +405,11 @@ def scanJobs(session, dbIDs, extraJobs=None):
         if extraJobs:
             df = df.append(extraJobs, ignore_index=True)
 
+        # Check if there are no Jobs.
+        if not len(df):
+            return Callback(True, '', [])
+
+
         # Fill None values with 0 for numeric columns and with empty string for string columns
         df = df.fillna({Job.JobSalary.name: 0, Job.JobYearsRequired.name: 0}).fillna('')
 
@@ -403,9 +418,9 @@ def scanJobs(session, dbIDs, extraJobs=None):
             keywords.get(DT.JobAnnualSalary.value['name'],
                          keywords.get(DT.JobDayRate.value['name'],
                             keywords.get(DT.CandidateAnnualDesiredSalary.value['name'],
-                                keywords.get(DT.CandidateDailyDesiredSalary.value[ 'name']))))
+                                keywords.get(DT.CandidateDailyDesiredSalary.value['name']))))
 
-        if salaryInputs and len(salaryInputs):
+        if salaryInputs:
             df[['Score', Job.JobSalary.name, Job.Currency.name]] = \
                 df.apply(lambda row: __salary(row, Job.JobSalary, Job.Currency, salaryInputs[-1], 8),
                          axis=1, result_type='expand')
@@ -430,8 +445,8 @@ def scanJobs(session, dbIDs, extraJobs=None):
         __wordsCounter(DT.CandidateLocation, Job.JobLocation, keywords, df, 3)
 
         # Skills
-        # __wordsCounter(DT.JobEssentialSkills, Job.JobEssentialSkills, keywords, df, 3)
-        # __wordsCounter(DT.CandidateSkills, Job.JobEssentialSkills, keywords, df, 3)
+        __wordsCounter(DT.JobEssentialSkills, Job.JobEssentialSkills, keywords, df, 3)
+        __wordsCounter(DT.CandidateSkills, Job.JobEssentialSkills, keywords, df, 3)
 
         # Results
         topResults = json.loads(df[df['Score'] > 0].nlargest(session.get('showTop', 0), 'Score')
@@ -527,7 +542,8 @@ def __salary(row, dbSalaryColumn, dbCurrencyColumn, salaryInput: str, plus=4, fo
 
     # Convert db salary currency if did not match with user's entered currency
     dbSalary = row[dbSalaryColumn.name] or 0
-    if (not row[dbCurrencyColumn.name] == userSalary[1]) and dbSalary > 0:
+    if (row[dbCurrencyColumn.name] != userSalary[1]) and dbSalary > 0:
+        print("Convert")
         dbSalary = helpers.currencyConverter.convert(row[dbCurrencyColumn.name], userSalary[1], dbSalary)
         row[dbSalaryColumn.name] = dbSalary
 

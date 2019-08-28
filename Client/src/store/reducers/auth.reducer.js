@@ -3,9 +3,23 @@ import {updateObject} from '../utility';
 
 let user = JSON.parse(localStorage.getItem('user'));
 const initialState = user ?
-    {isAuthenticated: true, user,  isSigningUp: false, isLoggingIn: false, errorMsg: null}
+    {
+        isAuthenticated: true,
+        user,
+        isRequestingDemo: false,
+        isSigningUp: false,
+        isLoggingIn: false,
+        errorMsg: null
+    }
     :
-    {isAuthenticated: false, user: null,  isSigningUp: false, isLoggingIn: false, errorMsg: null};
+    {
+        isAuthenticated: false,
+        user: null,
+        isRequestingDemo: false,
+        isSigningUp: false,
+        isLoggingIn: false,
+        errorMsg: null
+    };
 
 export const auth = (state = initialState, action) => {
     switch (action.type) {
@@ -46,13 +60,26 @@ export const auth = (state = initialState, action) => {
                 errorMsg: action.error
             });
 
+        case actionTypes.DEMO_REQUEST:
+            return updateObject(state, {
+                isRequestingDemo: true,
+                errorMsg: null,
+            });
+        case actionTypes.DEMO_SUCCESS:
+            return updateObject(state, {
+                isRequestingDemo: false,
+            });
+        case actionTypes.DEMO_FAILURE:
+            return updateObject(state, {
+                isRequestingDemo: false,
+                errorMsg: action.error
+            });
+
 
         case actionTypes.RESET_PASSWORD_REQUEST:
-            return updateObject(state, {
-            });
+            return updateObject(state, {});
         case actionTypes.RESET_PASSWORD_SUCCESS:
-            return updateObject(state, {
-            });
+            return updateObject(state, {});
         case actionTypes.RESET_PASSWORD_FAILURE:
             return updateObject(state, {
                 errorMsg: action.error
@@ -60,11 +87,9 @@ export const auth = (state = initialState, action) => {
 
 
         case actionTypes.NEW_RESET_PASSWORD_REQUEST:
-            return updateObject(state, {
-            });
+            return updateObject(state, {});
         case actionTypes.NEW_RESET_PASSWORD_SUCCESS:
-            return updateObject(state, {
-            });
+            return updateObject(state, {});
         case actionTypes.NEW_RESET_PASSWORD_FAILURE:
             return updateObject(state, {
                 errorMsg: action.error
@@ -83,8 +108,7 @@ export const auth = (state = initialState, action) => {
                 errorMsg: null,
             });
         case actionTypes.VERIFY_ACCOUNT_SUCCESS:
-            return updateObject(state, {
-            });
+            return updateObject(state, {});
         case actionTypes.VERIFY_ACCOUNT_FAILURE:
             return updateObject(state, {
                 errorMsg: action.error

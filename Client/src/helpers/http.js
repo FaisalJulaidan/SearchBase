@@ -47,6 +47,7 @@ http.interceptors.response.use(
 
                     // Set new access token
                     localStorage.setItem("token", res.data.data.token);
+                    localStorage.setItem("company", JSON.stringify(res.data.data.company));
 
                     // Make sure to remove the /api because it is by in http instance by default
                     error.config.baseURL = "";

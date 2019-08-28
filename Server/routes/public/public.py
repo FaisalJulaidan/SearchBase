@@ -7,6 +7,7 @@ from flask_mail import Message
 from models import Callback
 from services import mail_services
 from services.mail_services import mail
+from utilities import helpers
 
 public_router = Blueprint('public_router', __name__, template_folder="../templates", static_folder='static')
 CORS(public_router)
@@ -35,22 +36,17 @@ def chatbot_direct_link123(assistantIDAsHash):
 
 # ======== Static Pages =========== #
 
-@public_router.route("/", methods=['GET'])
-def index_page():
-    if request.method == "GET":
-        return render_template("index.html")
-
 
 @public_router.route("/mail/arrange_demo", methods=['POST'])
 def register_interest():
     if request.method == "POST":
-        email = request.form.get("user_email", default=None)
 
-        if not email:
-            return "Could not retrieve some of your inputs"
+        callback: Callback = mail_services.sendDemoRequest(request.json)
 
-        requestDemo_callback: Callback = mail_services.sendDemoRequest(email)
-        return requestDemo_callback.Message
+        if not callback.Success:
+            return helpers.jsonResponse(False, 400, callback.Message)
+
+        return helpers.jsonResponse(True, 200, callback.Message)
 
 
 @public_router.route("/mail/contact_us", methods=['POST'])

@@ -1,0 +1,59 @@
+.wrapper {
+    text-align: center;
+    display: flex;
+    align-items: center;
+    flex-flow: column;
+}
+
+.text {
+    font-size: 2.8em;
+    margin: .3em 0 .5em 0;
+    text-align: center;
+}
+
+.text h1{
+    font-weight: bold;
+    color: #444444;
+}
+
+.logo_wrapper {
+    perspective: 1000px;
+}
+
+.logo{
+    position: relative;
+    transition: transform 1s;
+    transform-style: preserve-3d;
+    cursor: pointer;
+}
+
+.logo_wrapper:hover .logo {
+    transform: rotateY(180deg);
+}
+
+
+.button {
+    color: white !important;
+    border: solid transparent 0;
+    padding: 10px 20px;
+    background-color: #9254de;
+    transition: border-color 0.4s ease 0s, background-color 0.4s ease 0s;
+}
+
+.button:hover {
+    background-color: #9C7DED;
+    transition: border-color 0.4s ease 0s, background-color 0.4s ease 0s;
+}
+
+.button:not(:disabled):not(.disabled):active {
+    background-color: #9C7DED;
+    transition: border-color 0.4s ease 0s, background-color 0.4s ease 0s;
+}
+
+.button:focus {
+    box-shadow: 0 0 0 0.2rem rgba(138, 107, 219, .5);
+}
+
+.button:not(:disabled):not(.disabled):active:focus {
+    box-shadow: 0 0 0 0.2rem rgba(138, 107, 219, .5);
+}

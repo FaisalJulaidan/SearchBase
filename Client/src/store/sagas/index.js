@@ -12,3 +12,4 @@ export * from './appointmentsPicker.saga';
 export * from './appointment.saga';
 export * from './appointmentAllocationTime.saga';
 export * from './development.saga';
+export * from './campaign.saga';

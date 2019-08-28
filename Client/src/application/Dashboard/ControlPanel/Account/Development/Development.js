@@ -1,7 +1,7 @@
 import React from 'react';
 
 import { connect } from 'react-redux';
-import { developmentActions } from 'store/actions/development.actions';
+import { developmentActions } from 'store/actions';
 
 import { Table, Button, Divider, Modal } from 'antd';
 
@@ -13,7 +13,7 @@ const { confirm } = Modal;
 class Development extends React.Component {
 
     state = {
-        activeID: this.props.webhooks[0] ? this.props.webhooks[0].ID : null,
+        activeID: null,
         showModal: false,
         createModal: false
     };
@@ -121,6 +121,7 @@ class Development extends React.Component {
 
 
 function mapStateToProps(state) {
+    console.log(state)
     return {
         webhooks: state.development.webhooks,
         options: state.options.options,

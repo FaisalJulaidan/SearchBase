@@ -3,7 +3,7 @@ from flask_jwt_extended import jwt_required, get_jwt_identity
 
 from models import Callback
 from services import assistant_services
-from utilities import helpers
+from utilities import helpers, wrappers
 
 
 import json
@@ -14,6 +14,7 @@ assistant_router: Blueprint = Blueprint('assistant_router', __name__, template_f
 # Get all assistants & Add new assistant
 @assistant_router.route("/assistants", methods=['GET', 'POST'])
 @jwt_required
+@wrappers.AccessAssistantsRequired
 def assistants():
     # Authenticate
     user = get_jwt_identity()['user']
@@ -47,6 +48,7 @@ def assistants():
 
 @assistant_router.route("/assistant/<int:assistantID>", methods=['GET', 'PUT', 'DELETE'])
 @jwt_required
+@wrappers.AccessAssistantsRequired
 def assistant(assistantID):
     # Authenticate
     user = get_jwt_identity()['user']
@@ -86,6 +88,7 @@ def assistant(assistantID):
 
 @assistant_router.route("/assistant/<int:assistantID>/configs", methods=['PUT'])
 @jwt_required
+@wrappers.AccessAssistantsRequired
 def assistant_configs(assistantID):
     # Authenticate
     user = get_jwt_identity()['user']
@@ -112,6 +115,7 @@ def assistant_configs(assistantID):
 # Activate or deactivate assistant
 @assistant_router.route("/assistant/<int:assistantID>/status", methods=['PUT'])
 @jwt_required
+@wrappers.AccessAssistantsRequired
 def assistant_status(assistantID):
     # Authenticate
     user = get_jwt_identity()['user']
@@ -129,6 +133,7 @@ def assistant_status(assistantID):
 # Connect assistant to CRM
 @assistant_router.route("/assistant/<int:assistantID>/crm", methods=['POST', 'DELETE'])
 @jwt_required
+@wrappers.AccessAssistantsRequired
 def assistant_crm_connect(assistantID):
     # Authenticate
     user = get_jwt_identity()['user']
@@ -148,6 +153,7 @@ def assistant_crm_connect(assistantID):
 # Connect assistant to Calendar
 @assistant_router.route("/assistant/<int:assistantID>/calendar", methods=['POST', 'DELETE'])
 @jwt_required
+@wrappers.AccessAssistantsRequired
 def assistant_calendar_connect(assistantID):
     # Authenticate
     user = get_jwt_identity()['user']
@@ -168,6 +174,7 @@ def assistant_calendar_connect(assistantID):
 # Connect assistant to Messenger
 @assistant_router.route("/assistant/<int:assistantID>/messenger", methods=['POST', 'DELETE'])
 @jwt_required
+@wrappers.AccessAssistantsRequired
 def assistant_messenger_connect(assistantID):
     # Authenticate
     user = get_jwt_identity()['user']
@@ -187,6 +194,7 @@ def assistant_messenger_connect(assistantID):
 # Connect assistant to AutoPilot
 @assistant_router.route("/assistant/<int:assistantID>/auto_pilot", methods=['POST', 'DELETE'])
 @jwt_required
+@wrappers.AccessAssistantsRequired
 def assistant_auto_pilot_connect(assistantID):
     # Authenticate
     user = get_jwt_identity()['user']

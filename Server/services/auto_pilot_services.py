@@ -2,7 +2,7 @@ from datetime import datetime
 
 from models import db, Callback, Conversation, AutoPilot, Assistant, Messenger
 from services import mail_services, stored_file_services as sfs
-from services.Marketplace.Messenger import mesenger_services
+from services.Marketplace.Messenger import messenger_servicess
 from sqlalchemy import and_
 from utilities import helpers
 from utilities.enums import UserType, Status
@@ -103,7 +103,7 @@ def processConversation(conversation: Conversation, autoPilot: AutoPilot, assist
                         .replace("&nbsp;", "\n")
 
                     acceptance_SMS_callback: Callback = \
-                        mesenger_services.sendMessage(messenger.Type, phone, SMSBody, messenger.Auth)
+                        messenger_servicess.sendMessage(messenger.Type, phone, SMSBody, messenger.Auth)
 
                     if acceptance_SMS_callback.Success:
                         result['acceptanceSMSSentAt'] = datetime.now()
@@ -118,7 +118,7 @@ def processConversation(conversation: Conversation, autoPilot: AutoPilot, assist
                         .replace("&nbsp;", "\n")
 
                     rejection_SMS_callback: Callback = \
-                        mesenger_services.sendMessage(messenger.Type, phone, SMSBody, messenger.Auth)
+                        messenger_servicess.sendMessage(messenger.Type, phone, SMSBody, messenger.Auth)
 
                     if rejection_SMS_callback.Success:
                         result['rejectionSMSSentAt'] = datetime.now()

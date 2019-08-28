@@ -1,0 +1,69 @@
+[
+  {
+    "subtitle": "This website is operated by SearchBase Limited (we may refer to ourselves as \"we\", \"our\", or \"us\")"
+  },
+  {
+    "title": "Personal information",
+    "subtitle": "Please read these Terms and Conditions carefully before you start using our software as a service as they will apply to your use of it. By using our platform, you confirm that you accept these Terms and agree to comply with them at all times when using our website. If you are using registered for a free trial for our services, the Terms and Conditions in this agreement will also govern that free trial. If you do not accept these Terms, you may not use the Service. If we change these Terms we will notify you indefinitely. We may leave a note on the home page or send you an email. We will ensure you know of any changes that are taking place."
+  },
+  {
+    "title": "About Us",
+    "subtitle": "You can contact us at any time by emailing: info@SearchBase.com"
+  },
+  {
+    "title": "The Service We Provide",
+    "subtitle": "This software is licensed, not sold. You may use this software as described in this agreement. SearchBase Limited provides a platform for companies to create a virtual assistant for their website or business for multiple purposes. The platform can be used across all industries and sectors without any limitations. More accurately the service will allow you to:",
+    "items": [
+      "Create an assistant that can then be deployed to your website",
+      "Build your own questions and answers that will be used during the use of the assistant",
+      "Add products, services or what your business intends to provide visitors",
+      "Track how many visitors have used your deployed assistant and what they searched for."
+    ]
+  },
+  {
+    "title": "Mandatory Emails",
+    "subtitle": "We hold the right to send you updates about our platform that are Critical. This excludes newsletters."
+  },
+  {
+    "title": "Access to our platform",
+    "subtitle": "If for any reason the Site is unavailable at any time or for any period. From time to time, we may restrict access to all or some parts of the Site to users who have registered with us."
+  },
+  {
+    "title": "User information",
+    "subtitle": "In order to make your assistant work, we will require certain pieces of information to make the assistant work. We will never ask for more information than what is necessary. To deploy your assistant we will need:",
+    "items": [
+      "Your website domain",
+      "and for you to add some code to any part of your website."
+    ]
+  },
+  {
+    "title": "Accounts & Users",
+    "subtitle": "We may refer to a user as a 'consultant', 'recruiter' or 'individual'.",
+    "texts": ["The login credentials for one user that has registered or added to the platform by their company may only be used by that unique individual. We are allowed to run audits & scripts to check how many active users from a single company are accessing the platform. it is forbidden to physically use a shared computer amongst your team or company to prevent the purchase of more licenses. If more than one individual uses the software with the same credentials (email & password) then we hold the right to file an invoice with the correct number of users."]
+  },
+  {
+    "title": "Informing users about data collection",
+    "subtitle": "With new European regulations(GDPR) surrounding data collection and data storage about users, we must inform the company/individual using our technology for data collection from the user, to inform the user that their data is being collected. This can be done in a few ways.",
+    "items": [
+      "Explicitly informing the user in your chat, that data is being collected.",
+      "Extending your use policy and adding that any data entered to the chat bot will be collected and used.."
+    ],
+    "texts": ["We take every precaution to ensure all of the data that is being for you, meets the new data policy regulations."]
+  },
+  {
+    "title": "Data Ownership",
+    "subtitle": "Our platform enables you as a user to store information. It is your responsibility to understand what data you are collecting and for what purposes since you are the owner of the data. We do all we can do help prevent data being leaked and are working to comply with new European Regulations (GDPR)."
+  },
+  {
+    "title": "",
+    "subtitle": "To help our users, we are working on new technologies to",
+    "items": [
+      "Encrypting any data that you are storing.",
+      "Legally making sure that the user is informed when data is collected."
+    ]
+  },
+  {
+    "title": "Restrictions",
+    "subtitle": "You may not reduce the software we provide to human readable form, reverse engineer, disassemble, merge, adapt or modify the software."
+  }
+]

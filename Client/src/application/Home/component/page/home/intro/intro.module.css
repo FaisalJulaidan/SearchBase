@@ -14,7 +14,6 @@
 
 .text_col {
     line-height: normal;
-    color: #726a84;
     align-self: center;
 }
 
@@ -32,6 +31,7 @@
 }
 
 .text_col .subtitle{
+    color: #726a84;
     margin-bottom: .5em;
 }
 

@@ -26,8 +26,8 @@
 }
 
 .title {
-    color: #494949;
-    font-size: 2.5em;
+    color: #444444;
+    font-size: 3em;
     font-weight: bold;
     text-align: center;
     padding-bottom: 1em;
@@ -43,51 +43,10 @@
 }
 
 .logo .brand_title {
+    color: #9254de;
     line-height: 0.5em;
-    font-size: .95em;
+    font-size: .9em;
     font-weight: bold;
-}
-
-.input {
-    border: none;
-    border-radius: 0;
-    border-bottom: 2px solid #adadad;
-}
-
-.input:focus {
-    box-shadow: none;
-    border-color: #9254de;
-}
-
-.has_val {
-    border-color: #9254de;
-}
-
-.submit {
-    margin-top: 3em;
-    border: solid transparent 0;
-    border-radius: 7px;
-    padding: 8px 20px;
-    background-color: #9254de;
-    transition: border-color 0.4s ease 0s, background-color 0.4s ease 0s;
-}
-
-.submit:hover{
-    background-color: #9C7DED;
-    transition: border-color 0.4s ease 0s, background-color 0.4s ease 0s;
-}
-
-.submit:not(:disabled):not(.disabled):active {
-    background-color: #9C7DED;
-    transition: border-color 0.4s ease 0s, background-color 0.4s ease 0s;
-}
-
-.submit:focus {
-    box-shadow: 0 0 0 0.2rem rgba(138, 107, 219, .5);
-}
-
-.submit:not(:disabled):not(.disabled):active:focus {
-    box-shadow: 0 0 0 0.2rem rgba(138, 107, 219, .5);
 }
 
 .sign_up {

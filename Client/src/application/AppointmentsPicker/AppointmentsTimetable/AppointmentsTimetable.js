@@ -1,10 +1,10 @@
-import moment from "moment";
-import React from 'react'
-import styles from "../AppointmentsPicker.module.less";
+import moment from 'moment';
+import React from 'react';
+import styles from '../AppointmentsPicker.module.less';
 
-import {Button, Popconfirm, Typography} from 'antd'
+import { Button, Popconfirm, Typography } from 'antd';
 
-const {Title, Paragraph} = Typography;
+const { Title, Paragraph } = Typography;
 
 class AppointmentsTimetable extends React.Component {
 
@@ -39,14 +39,17 @@ class AppointmentsTimetable extends React.Component {
     }
 
     componentWillReceiveProps(nextProps) {
-        this.createTimeTable(nextProps)
+        this.createTimeTable(nextProps);
     }
 
     updateWindowDimensions() {
-        this.setState({width: window.innerWidth, height: window.innerHeight});
+        this.setState({ width: window.innerWidth, height: window.innerHeight });
     }
 
     createTimeTable = (props = this.props, state = this.state) => {
+
+
+
         const getTimeSlots = (From, To, duration) => {
             const hours = moment.duration(To.diff(From)).hours(); // 3
             const minutes = moment.duration(To.diff(From)).minutes();// 30
@@ -58,7 +61,7 @@ class AppointmentsTimetable extends React.Component {
                 else
                     totalHalfHours = Math.ceil(totalHalfHours / 2);
 
-            return totalHalfHours
+            return totalHalfHours;
         };
 
         const range = state.width < 700 ? 3 : 7;
@@ -70,18 +73,21 @@ class AppointmentsTimetable extends React.Component {
             3: 'Thu',
             4: 'Fri',
             5: 'Sat',
-            6: 'Sun',
+            6: 'Sun'
         };
 
         let weekDays = [];
         let sv_appointment = props.appointment;
 
-        for (const i in sv_appointment.openTimes) {
-            sv_appointment.openTimes[i].From = moment(sv_appointment.openTimes[i].From, 'HH:mm');
-            sv_appointment.openTimes[i].To = moment(sv_appointment.openTimes[i].To, 'HH:mm')
+        if (!sv_appointment?.appointmentAllocationTime.length)
+            return this.setState({ stWeekDays: [] });
+
+        for (const i in sv_appointment.appointmentAllocationTime) {
+            sv_appointment.appointmentAllocationTime[i].From = moment(sv_appointment.appointmentAllocationTime[i].From, 'HH:mm');
+            sv_appointment.appointmentAllocationTime[i].To = moment(sv_appointment.appointmentAllocationTime[i].To, 'HH:mm');
         }
 
-        if (sv_appointment.openTimes) {
+        if (sv_appointment.appointmentAllocationTime) {
 
             for (let i = 0; i < range; i++) {
                 const date = state.firstDate.clone().add(i, 'days');
@@ -96,7 +102,7 @@ class AppointmentsTimetable extends React.Component {
                     slots: []
                 };
 
-                const svWeekDay = sv_appointment.openTimes.find(ot => weekDaysKey[ot.Day] === weekDay.dayText);
+                const svWeekDay = sv_appointment.appointmentAllocationTime.find(ot => weekDaysKey[ot.Day] === weekDay.dayText);
 
                 const totalSlots = getTimeSlots(
                     svWeekDay.From,
@@ -127,7 +133,7 @@ class AppointmentsTimetable extends React.Component {
                             });
                     }
 
-                weekDays.push(weekDay)
+                weekDays.push(weekDay);
             }
 
 
@@ -151,9 +157,9 @@ class AppointmentsTimetable extends React.Component {
                                     // deactivate it
                                     slot.active = false;
                                 }
-                            })
+                            });
                         }
-                    })
+                    });
                 });
             }
 
@@ -177,12 +183,12 @@ class AppointmentsTimetable extends React.Component {
 
                             if (moment(slot.time, 'HH:mm').isBefore(moment().add(6, 'hours')))
                                 slot.active = false;
-                        })
+                        });
                     }
                 }
             );
 
-            this.setState({stWeekDays: weekDays})
+            this.setState({ stWeekDays: weekDays });
         }
     };
 
@@ -205,7 +211,7 @@ class AppointmentsTimetable extends React.Component {
      * */
     lastWeek = range => this.setState(state => {
         const lastWeek = state.firstDate.clone().add(-range, 'days');
-        if (!lastWeek.isBefore(moment().subtract(1, "days")))
+        if (!lastWeek.isBefore(moment().subtract(1, 'days')))
             return state.firstDate = lastWeek;
     }, () => this.createTimeTable());
 
@@ -226,95 +232,100 @@ class AppointmentsTimetable extends React.Component {
         // store the selected day and slot
         state.selectedTimeSlot = `${currentSlot.dateMoment.format('YYYY-MM-DD')} ${currentSlot.timeMoment.format('HH:mm')}`;
         // Server expect something like this: 2019-06-23 16:00
-        return state
+        return state;
     });
 
 
     render() {
         const range = this.state.width < 700 ? 3 : 7;
-
+        console.log(this.state.stWeekDays.length);
         return (
             <>
                 <div className={styles.Title}>
                     <Typography>
                         <Title>Hi {this.props.appointment.userName} </Title>
                         <Paragraph>
-                            In the process of internal desktop applications development, many different
-                            design specs
-                            and
-                            implementations would be involved, which might cause designers and developers
-                            difficulties and
-                            duplication and reduce the efficiency of development.
+
                         </Paragraph>
                     </Typography>
                 </div>
+                {!this.state.stWeekDays.length ?
 
-                <div className={styles.Container}>
-                    <div className={styles.Table}>
-                        <div className={styles.TableContent}>
-                            <Button className={styles.NavigateButtons}
-                                    onClick={() => this.lastWeek(range)}
-                                    icon={'left'} size={'large'}></Button>
-
-                            <div className={styles.Columns}>
-                                {
-                                    this.state.stWeekDays.map((weekDay, i) =>
-                                        <div key={i}>
-                                            <div className={styles.Header}>
-                                                <h3>{weekDay.dayText}</h3>
-                                                {weekDay.monthText} {weekDay.day}
-                                            </div>
-                                            {
-                                                <div className={styles.Body}>
-                                                    {
-                                                        weekDay.slots.map(
-                                                            (slot, j) =>
-                                                                <Button key={j} block
-                                                                        onClick={() => this.selectTimeSlot(i, j)}
-                                                                        type={slot.selected ? 'primary' : ''}
-                                                                        disabled={!slot.active}>{slot.time}</Button>
-                                                        )
-                                                    }
-                                                </div>
-                                            }
-                                        </div>
-                                    )
-                                }
-                            </div>
-
-                            <Button className={styles.NavigateButtons}
-                                    onClick={() => this.nextWeek(range)}
-                                    icon={'right'} size={'large'}></Button>
-                        </div>
+                    <div className={styles.Container}>
+                        <h2>No free appointments available :( </h2>
                     </div>
 
+                    :
 
-                    <div style={{width: '100%'}}>
-                        {
-                            !this.state.selectedTimeSlot ?
-                                <Button type={'primary'}
-                                        disabled={!this.state.selectedTimeSlot}
-                                        style={{marginTop: 10, float: 'right'}}
-                                        size={'large'}>Submit</Button>
-                                :
-                                <Popconfirm
-                                    title="Are you sure to select this date?"
-                                    onConfirm={() => this.props.onSubmit(this.state.selectedTimeSlot)}
-                                    okText="Yes"
-                                    cancelText="No"
-                                >
+                    <div className={styles.Container}>
+                        <div className={styles.Table}>
+                            <div className={styles.TableContent}>
+                                <Button className={styles.NavigateButtons}
+                                        onClick={() => this.lastWeek(range)}
+                                        icon={'left'} size={'large'}></Button>
+
+                                <div className={styles.Columns}>
+                                    {
+                                        this.state.stWeekDays.map((weekDay, i) =>
+                                            <div key={i}>
+                                                <div className={styles.Header}>
+                                                    <h3>{weekDay.dayText}</h3>
+                                                    {weekDay.monthText} {weekDay.day}
+                                                </div>
+                                                {
+                                                    <div className={styles.Body}>
+                                                        {
+                                                            weekDay.slots.map(
+                                                                (slot, j) =>
+                                                                    <Button key={j} block
+                                                                            onClick={() => this.selectTimeSlot(i, j)}
+                                                                            type={slot.selected ? 'primary' : ''}
+                                                                            disabled={!slot.active}>{slot.time}</Button>
+                                                            )
+                                                        }
+                                                    </div>
+                                                }
+                                            </div>
+                                        )
+                                    }
+                                </div>
+
+                                <Button className={styles.NavigateButtons}
+                                        onClick={() => this.nextWeek(range)}
+                                        icon={'right'} size={'large'}></Button>
+                            </div>
+                        </div>
+
+
+                        <div style={{ width: '100%' }}>
+                            {
+                                !this.state.selectedTimeSlot ?
                                     <Button type={'primary'}
                                             disabled={!this.state.selectedTimeSlot}
-                                            style={{marginTop: 10, float: 'right'}}
+                                            style={{ marginTop: 10, float: 'right' }}
                                             size={'large'}>Submit</Button>
-                                </Popconfirm>
-                        }
+                                    :
+                                    <Popconfirm
+                                        title="Are you sure to select this date?"
+                                        onConfirm={() => this.props.onSubmit(this.state.selectedTimeSlot)}
+                                        okText="Yes"
+                                        cancelText="No"
+                                    >
+                                        <Button type={'primary'}
+                                                disabled={!this.state.selectedTimeSlot}
+                                                style={{ marginTop: 10, float: 'right' }}
+                                                size={'large'}>Submit</Button>
+                                    </Popconfirm>
+                            }
+                        </div>
+
                     </div>
 
-                </div>
+                }
+
             </>
-        )
+        );
     }
 }
 
-export default AppointmentsTimetable
+export default AppointmentsTimetable;

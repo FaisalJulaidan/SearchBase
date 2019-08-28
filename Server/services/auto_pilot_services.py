@@ -37,21 +37,22 @@ def processConversation(conversation: Conversation, autoPilot: AutoPilot, assist
                 companyName = autoPilot.Company.Name
                 # ======================
                 # Send Acceptance Letters
-                if status is Status.Accepted and autoPilot.SendAcceptanceEmail:
+                if status is Status.Accepted:
 
-                    # Process candidates Acceptance email
-                    emailTitle = autoPilot.AcceptanceEmailTitle \
-                        .replace("${candidateName}$", userName) \
-                        .replace("${candidateEmail}$", email)
-                    emailBody = autoPilot.AcceptanceEmailBody \
-                        .replace("${candidateName}$", userName) \
-                        .replace("${candidateEmail}$", email)
+                    if autoPilot.SendAcceptanceEmail:
+                        # Process candidates Acceptance email
+                        emailTitle = autoPilot.AcceptanceEmailTitle \
+                            .replace("${candidateName}$", userName) \
+                            .replace("${candidateEmail}$", email)
+                        emailBody = autoPilot.AcceptanceEmailBody \
+                            .replace("${candidateName}$", userName) \
+                            .replace("${candidateEmail}$", email)
 
-                    acceptance_email_callback: Callback = \
-                        mail_services.sendAcceptanceEmail(emailTitle, emailBody, userName, email, logoPath, companyName)
+                        acceptance_email_callback: Callback = \
+                            mail_services.sendAcceptanceEmail(emailTitle, emailBody, userName, email, logoPath, companyName)
 
-                    if acceptance_email_callback.Success:
-                        result['acceptanceEmailSentAt'] = datetime.now()
+                        if acceptance_email_callback.Success:
+                            result['acceptanceEmailSentAt'] = datetime.now()
 
                     # Process candidates Appointment email only if score is accepted
                     if autoPilot.SendCandidatesAppointments:

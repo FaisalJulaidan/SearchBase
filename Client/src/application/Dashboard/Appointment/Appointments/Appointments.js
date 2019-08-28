@@ -68,7 +68,7 @@ class Appointments extends React.Component {
         const realList = this.props.appointments.map(item => ({
             key: item.ID,
             time: moment.utc(item.DateTime).tz(this.props.tz).format('MMMM Do YYYY, h:mm:ss a'),
-            email: item.Conversation.keywordsByDataType.Email[0],
+            email: item.Conversation.Email,
             status: item.Status,
             approve: item,
             reject: item

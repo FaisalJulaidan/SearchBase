@@ -1,105 +1,109 @@
-import React from 'react'
-import {connect} from 'react-redux'
-import { Modal, Tooltip, Button, message, Tabs, Icon, Spin} from 'antd'
-import 'types/TimeSlots_Types'
-import 'types/AutoPilot_Types'
-import {appointmentAllocationTimeActions} from "store/actions";
-import TimeSlot from "./TimeSlot";
-import LoadingSpinner from "components/LoadingSpinner/LoadingSpinner";
+import React from 'react';
+import { connect } from 'react-redux';
+import { Modal, Tooltip, Button, message, Tabs, Icon, Spin } from 'antd';
+import 'types/TimeSlots_Types';
+import 'types/AutoPilot_Types';
+import { appointmentAllocationTimeActions } from 'store/actions';
+import TimeSlot from './TimeSlot';
+import LoadingSpinner from 'components/LoadingSpinner/LoadingSpinner';
 
-import styles from './Timeslots.module.less'
+import styles from './Timeslots.module.less';
 
-const { TabPane } = Tabs
+const { TabPane } = Tabs;
 
 const dupeData = (day) => ({
     Day: day,
     Duration: 30,
     Active: false,
-    From: "08:30:00",
-    To: "12:00:00",
-})
+    From: '08:30:00',
+    To: '12:00:00'
+});
 
 
-const emptyAAT = (id) =>  ({
+const emptyAAT = (id) => ({
     ID: 'new',
-    Name: "New Timetable",
+    Name: 'New Timetable',
     Info: new Array(7).fill(0).map((index, i) => dupeData(i))
 });
 
-const antIcon = <Icon className={styles.spinner} type="loading" style={{ fontSize: 18 }} spin />
+const antIcon = <Icon className={styles.spinner} type="loading" style={{ fontSize: 18 }} spin/>;
 
 
 class TimeSlots extends React.Component {
-    constructor(props){
-        super(props)
+    constructor(props) {
+        super(props);
         this.state = {
             creating: false,
             activeKey: null,
             initPopup: false
-        }
-        this.checkNameAllowed = this.checkNameAllowed.bind(this)
+        };
+        this.checkNameAllowed = this.checkNameAllowed.bind(this);
     }
 
     checkNameAllowed(name, selfName) {
-        return this.props.appointmentAllocationTime.filter(aat => aat.Name === name).length === 0 || name === selfName
+        return this.props.appointmentAllocationTime.filter(aat => aat.Name === name).length === 0 || name === selfName;
     }
 
 
     componentDidMount() {
-        this.timer = React.createRef()
+        this.timer = React.createRef();
         this.props.dispatch(appointmentAllocationTimeActions.fetchAAT());
-        setTimeout(() =>{
-            this.setState({initPopup: true})
-        }, 1200)
-        this.timer.current = setTimeout(() =>{
-            this.clearPopup()
-        }, 5500)
+        setTimeout(() => {
+            this.setState({ initPopup: true });
+        }, 1200);
+        this.timer.current = setTimeout(() => {
+            this.clearPopup();
+        }, 5500);
     }
 
     clearPopup = () => {
-        this.setState({initPopup: false})
-    }
+        this.setState({ initPopup: false });
+    };
 
 
     saveTimeSlot = (id, newSettings) => {
-        if(id === "new"){
-            this.props.dispatch(appointmentAllocationTimeActions.createAAT(newSettings))
+        if (id === 'new') {
+            this.props.dispatch(appointmentAllocationTimeActions.createAAT(newSettings));
         } else {
-            this.props.dispatch(appointmentAllocationTimeActions.saveAAT({...newSettings, ID: id}))
+            this.props.dispatch(appointmentAllocationTimeActions.saveAAT({ ...newSettings, ID: id }));
         }
-    }
+    };
 
-    componentDidUpdate(prevProps){
-        if(this.state.creating && prevProps.appointmentAllocationTime.length < this.props.appointmentAllocationTime.length){
-            this.setState({activeKey: this.props.appointmentAllocationTime[this.props.appointmentAllocationTime.length-1].ID, creating: false})
+    componentDidUpdate(prevProps) {
+        if (this.state.creating && prevProps.appointmentAllocationTime.length < this.props.appointmentAllocationTime.length) {
+            this.setState({
+                activeKey: this.props.appointmentAllocationTime[this.props.appointmentAllocationTime.length - 1].ID,
+                creating: false
+            });
         }
-        if(this.props.appointmentAllocationTime.length !== 0 && !this.state.activeKey){
-            this.setState({activeKey: this.props.appointmentAllocationTime[0].ID})
+        if (this.props.appointmentAllocationTime.length !== 0 && !this.state.activeKey) {
+            this.setState({ activeKey: this.props.appointmentAllocationTime[0].ID });
         }
-        if(!this.props.isLoading && this.props.appointmentAllocationTime.length === 0 && !this.state.creating){
-            this.setState({creating: true, activeKey: "new"})
+        if (!this.props.isLoading && this.props.appointmentAllocationTime.length === 0 && !this.state.creating) {
+            this.setState({ creating: true, activeKey: 'new' });
         }
-        if(this.props.openTab === false && this.state.initPopup){
-            clearTimeout(this.timer.current)
-            this.clearPopup()
+        if (!this.props.openTab && this.state.initPopup) {
+            clearTimeout(this.timer.current);
+            this.clearPopup();
         }
     }
 
     componentWillUnmount() {
-        clearTimeout(this.timer.current)
+        clearTimeout(this.timer.current);
+        this.clearPopup()
     }
 
     onChange = (key, action) => {
-        this.setState({activeKey: key})
-    }
+        this.setState({ activeKey: key });
+    };
 
     add = () => {
-        if(!this.state.creating) {
-            this.setState({creating: true, activeKey: `new`})
+        if (!this.state.creating) {
+            this.setState({ creating: true, activeKey: `new` });
         } else {
-            message.warn("Please finish working on your new timetable before you create another one!")
+            message.warn('Please finish working on your new timetable before you create another one!');
         }
-    }
+    };
 
     remove = (key) => {
         return Modal.confirm({
@@ -108,52 +112,50 @@ class TimeSlots extends React.Component {
             okText: 'Yes',
             cancelText: 'No',
             onOk: (e) => {
-                console.log(e)
-                this.props.dispatch(appointmentAllocationTimeActions.deleteAATRequest(key))
-                e()
+                this.props.dispatch(appointmentAllocationTimeActions.deleteAATRequest(key));
+                e();
             },
             maskClosable: true
         });
-    }
+    };
 
     onEdit = (key, action) => {
-        this[action](key)
-    }
+        this[action](key);
+    };
 
     render() {
-        console.log(this.props.tz)
-        const tab = (name, loading) => (<>{name} {loading ? <Spin indicator={antIcon}/> : null}</>)
+        const tab = (name, loading) => (<>{name} {loading ? <Spin indicator={antIcon}/> : null}</>);
 
         const button = (<>
-                <Tooltip title={"Click here to create a new timeslot!"} visible={this.state.initPopup} placement={"left"}>
-                    <Button style={{fontSize: "11px"}} onClick={this.add} icon={"plus"}/>
-                </Tooltip></>);
-        let tabList = this.props.appointmentAllocationTime.concat(this.state.creating ? [emptyAAT()] : [])
-         return (
-             <>
-                 {this.props.isLoading ? <LoadingSpinner/> :
-                     <Tabs tabBarExtraContent={button}
-                           onChange={this.onChange}
-                           type="editable-card"
-                           hideAdd
-                           activeKey={`${this.state.activeKey}`}
-                           onEdit={this.onEdit}>
-                         {tabList.map((timeSlot, i) => {
-                             return (<TabPane tab={tab(timeSlot.Name, timeSlot.isLoading)} key={`${timeSlot.ID}`}
-                                              closable={timeSlot.ID === "new" ? false : true}>
-                                 <TimeSlot
-                                     tz={this.props.tz}
-                                     info={timeSlot.Info}
-                                     id={timeSlot.ID}
-                                     name={timeSlot.Name}
-                                     checkNameAllowed={this.checkNameAllowed}
-                                     save={newSettings => this.saveTimeSlot(timeSlot.ID, newSettings)}/>
-                             </TabPane>)
-                         })}
-                     </Tabs>
-                 }
-             </>
-        )
+            <Tooltip title={'Click here to create a new timeslot!'} visible={false} placement={'left'}>
+                <Button style={{ fontSize: '11px' }} onClick={this.add} icon={'plus'}/>
+            </Tooltip></>);
+        let tabList = this.props.appointmentAllocationTime.concat(this.state.creating ? [emptyAAT()] : []);
+        return (
+            <>
+                {this.props.isLoading ? <LoadingSpinner/> :
+                    <Tabs tabBarExtraContent={button}
+                          onChange={this.onChange}
+                          type="editable-card"
+                          hideAdd
+                          activeKey={`${this.state.activeKey}`}
+                          onEdit={this.onEdit}>
+                        {tabList.map((timeSlot, i) => {
+                            return (<TabPane tab={tab(timeSlot.Name, timeSlot.isLoading)} key={`${timeSlot.ID}`}
+                                             closable={timeSlot.ID === 'new' ? false : true}>
+                                <TimeSlot
+                                    tz={this.props.tz}
+                                    info={timeSlot.Info}
+                                    id={timeSlot.ID}
+                                    name={timeSlot.Name}
+                                    checkNameAllowed={this.checkNameAllowed}
+                                    save={newSettings => this.saveTimeSlot(timeSlot.ID, newSettings)}/>
+                            </TabPane>);
+                        })}
+                    </Tabs>
+                }
+            </>
+        );
 
     }
 }
@@ -162,6 +164,6 @@ const mapStateToProps = (state) => ({
     appointmentAllocationTime: state.appointmentAllocationTime.allocationTimes,
     isLoading: state.appointmentAllocationTime.isLoading,
     active: state.appointmentAllocationTime.aat
-})
+});
 
-export default connect(mapStateToProps, null)(TimeSlots)
+export default connect(mapStateToProps, null)(TimeSlots);

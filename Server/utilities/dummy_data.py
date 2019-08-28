@@ -12,7 +12,7 @@ def generate():
 
     # Companies creation
     db.session.add(Company(Name='Aramco', URL='ff.com', StripeID='cus_00000000000000', SubID='sub_00000000000000',
-                           Active=True, AccessAssistants=True, AccessCampaigns=True, AccessAutoPilot=False,
+                           Active=True, AccessAssistants=True, AccessCampaigns=True, AccessAutoPilot=True,
                            AccessDatabases=True, AccessAppointments=True))
 
     db.session.add(Company(Name='Sabic', URL='ff.com', StripeID='cus_DbgKupMRLNYXly', Active=True,

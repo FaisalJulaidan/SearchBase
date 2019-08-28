@@ -1,6 +1,6 @@
 from sqlalchemy import and_
 
-from models import db, Assistant, Callback, AutoPilot
+from models import db, Assistant, Callback, AutoPilot, AppointmentAllocationTime
 from services import auto_pilot_services, flow_services
 from services.Marketplace.CRM import crm_services
 from services.Marketplace.Calendar import calendar_services
@@ -138,13 +138,17 @@ def getAppointmentAllocationTime(assistantID) -> Callback:
         if not assistant: raise Exception
 
         connectedAutoPilot: AutoPilot = assistant.AutoPilot
-
         # If the assistant is not connected to an autoPilot then return an empty array which means no open times
         if not connectedAutoPilot:
-            return Callback(True,"There are no open time slots")
+            return Callback(True, "There are no available time slots")
+
+        appointmentAllocationTime: AppointmentAllocationTime = connectedAutoPilot.AppointmentAllocationTime
+        # Check if the auto pilot is not linked with an AppointmentAllocationTime table
+        if not connectedAutoPilot:
+            return Callback(True, "There are no available time slots")
 
         # OpenTimes is an array of all open slots per day
-        return Callback(True, "Got open time slots successfully.", connectedAutoPilot.AppointmentAllocationTime)
+        return Callback(True, "Got open time slots successfully.", appointmentAllocationTime)
 
     except Exception as exc:
         helpers.logError("assistant_services.getOpenTimes(): " + str(exc))

@@ -1,4 +1,5 @@
 from models import db
+from schemas import Assistant, Conversation
 
 class Company(db.Model):
 
@@ -8,6 +9,11 @@ class Company(db.Model):
         logo = sfs.PUBLIC_URL + sfs.UPLOAD_FOLDER + sfs.COMPANY_LOGOS_PATH + "/" + (
                 self.LogoPath or "")
         return logo if self.LogoPath else None
+
+    # @property
+    # def Conversations(self):
+    #     c = db.session.query(Conversation).join(Assistant).filter(Assistant. == self)
+    #     return c.all()
 
     ID = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
     Name = db.Column(db.String(80), nullable=False)

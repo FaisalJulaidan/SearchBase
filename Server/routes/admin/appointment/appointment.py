@@ -1,7 +1,7 @@
 from flask import Blueprint, request
 from flask_jwt_extended import jwt_required, get_jwt_identity
 
-from models import Callback, Assistant, Conversation, Appointment
+from models import Callback, Assistant, Conversation, Appointment, AppointmentAllocationTime, AppointmentAllocationTimeInfo
 from services import assistant_services, conversation_services, appointment_services, company_services
 from utilities import helpers, wrappers
 
@@ -86,10 +86,12 @@ def allocation_time(payload):
         if not times_callback.Success:
             return helpers.jsonResponse(False, 404, "Couldn't load available time slots")
 
+        times: AppointmentAllocationTime = times_callback.Data
+
         data = {
             "companyName": assistant.Company.Name,
             "companyLogoURL": assistant.Company.LogoPath,
-            "appointmentAllocationTime": helpers.getListFromSQLAlchemyList(times_callback.Data.Info or []),
+            "appointmentAllocationTime": helpers.getListFromSQLAlchemyList(times.Info if times else []),
             "takenTimeSlots": helpers.getListFromSQLAlchemyList(assistant.Appointments),
             "userName": data['userName']
         }

@@ -177,13 +177,17 @@ def setAppointmentStatus(appointmentID, status):
 
 def getAppointments(companyID):
     try:
+
         assistants = db.session.query(Assistant).filter(Assistant.CompanyID == companyID).all()
         appointments = []
+
         for assistant in assistants:
             for idx, appointment in enumerate(helpers.getListFromSQLAlchemyList(assistant.Appointments)):
-                appointment['Conversation'] = assistant.Appointments[idx].Conversation.Data
+                appointment['Conversation'] = helpers.getDictFromSQLAlchemyObj(assistant.Appointments[idx].Conversation)
                 appointments.append(appointment)
+
         return Callback(True, 'Successfully gathered appointments.', appointments)
+
     except Exception as exc:
         helpers.logError("appointment_services.getAppointments(): " + str(exc))
         return Callback(False, 'Could not get appointments.')

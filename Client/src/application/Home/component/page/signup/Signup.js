@@ -1,13 +1,14 @@
 import React from 'react';
-import styles from "./sign-up.module.css";
-import {Button, Card, Col, Container, Form, Row} from "react-bootstrap";
+import styles from "./signup.module.css";
+import {Card, Col, Container, Row} from "react-bootstrap";
 import {Fade} from "react-reveal";
 import {Link} from "react-router-dom";
 import {WEBSITE_TITLE} from '../../../../../constants/config';
+import SignupForm from "./SignupForm";
 
-const SignUp = () => {
+const Signup = () => {
 
-    document.title = "SignUp | " + WEBSITE_TITLE;
+    document.title = "Signup | " + WEBSITE_TITLE;
 
     return (
         <div className={styles.wrapper}>
@@ -24,32 +25,7 @@ const SignUp = () => {
                         <Card className={styles.card}>
                             <Card.Body>
                                 <h1 className={styles.title}>Sign up</h1>
-                                <Form>
-                                    <Form.Group controlId="formEmail">
-                                        <Form.Control className={styles.input} type="email"
-                                                      placeholder="E-mail"/>
-                                    </Form.Group>
-
-                                    <Form.Group controlId="formEmailConfirm">
-                                        <Form.Control className={styles.input} type="email"
-                                                      placeholder="Confirm E-mail"/>
-                                    </Form.Group>
-
-                                    <Form.Group controlId="formPassword">
-                                        <Form.Control className={styles.input} type="password"
-                                                      placeholder="Password"/>
-                                    </Form.Group>
-
-                                    <Form.Group controlId="formPasswordConfirm">
-                                        <Form.Control className={styles.input} type="password"
-                                                      placeholder="Confirm Password"/>
-                                    </Form.Group>
-
-                                    <Button className={styles.submit} block variant="primary" type="submit">
-                                        Submit
-                                    </Button>
-
-                                </Form>
+                                <SignupForm/>
                                 <h6 className={styles.sign_up}>Or log into an
                                     <Link to="/login">existing account!</Link>
                                 </h6>
@@ -69,4 +45,4 @@ const SignUp = () => {
     );
 };
 
-export default SignUp;
+export default Signup;

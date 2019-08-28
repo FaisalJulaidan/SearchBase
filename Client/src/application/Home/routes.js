@@ -9,7 +9,7 @@ import NotFound404 from "./component/page/not-found-404/NotFound404";
 import OurTeam from "./component/page/our-team/OurTeam";
 import ReleaseNote from "./component/page/release-note/ReleaseNote";
 import Login from "./component/page/login/Login";
-import SignUp from "./component/page/sign-up/SignUp";
+import Signup from "./component/page/signup/Signup";
 import GDPR from "./component/page/gdpr/GDPR";
 import GetStarted from "./component/page/get-started/GetStarted";
 
@@ -26,7 +26,7 @@ class Routes extends Component {
                 <Route path="/gdpr" exact component={GDPR}/>
                 <Route path="/release-notes" exact component={ReleaseNote}/>
                 <Route path="/login" exact component={Login}/>
-                <Route path="/signup" exact component={SignUp}/>
+                <Route path="/signup" exact component={Signup}/>
                 <Route path="/get-started" exact component={GetStarted}/>
                 <Route path='/dashboard' exact component={(() => <>{(()=>{window.location.reload()})()}</>)}/>
                 <Route path="" exact component={NotFound404}/>

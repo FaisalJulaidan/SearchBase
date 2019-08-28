@@ -6,7 +6,7 @@ from sqlalchemy.orm import joinedload
 
 from typing import List
 from models import db, Callback, StoredFile, Conversation, StoredFileInfo
-from utilities import helpers
+from utilities import helpers, enums
 
 PUBLIC_URL = "https://tsb.ams3.digitaloceanspaces.com/"
 UPLOAD_FOLDER = os.environ['FLASK_ENV']
@@ -58,21 +58,21 @@ def getAll():
         return Callback(False, 'StoredFiles could not be retrieved/empty')
 
 
-def createRef(file, model, identifier, value, storedFileID, key: str = None) -> StoredFile or None:
+def createRef(file, model, identifier, value, storedFileID, key: enums.StoredFileKeys = None, realFileName: str = None) -> StoredFile or None:
     try:
-        print('ccreating ref')
         if not file: raise Exception;
-        print(model)
         obj = db.session.query(model).filter(getattr(model, identifier) == value).first()
-        print(obj)
         if obj is None:
             return Callback(False, 'Model not found')
         elif not hasattr(obj, 'StoredFileID'):
             return Callback(False,'Provided model does not have StoredFileID Attribute')
-        # for idx, file in enumerate(files):\
 
-        # key = keys[idx] + idx if keys.count(keys[idx]) > 1 else keys[idx] if keys else None
-        file : StoredFileInfo = StoredFileInfo(StoredFileID=storedFileID, Key=key, FilePath=file.realFileName)
+
+        key = key.value if key is not None else None
+
+        filename = realFileName if realFileName is not None else file.filename
+
+        file : StoredFileInfo = StoredFileInfo(StoredFileID=storedFileID, Key=key, FilePath=filename)
 
         # conversation.StoredFileID = storedFileID
         obj.StoredFileID = storedFileID
@@ -84,7 +84,7 @@ def createRef(file, model, identifier, value, storedFileID, key: str = None) -> 
                         helpers.getDictFromSQLAlchemyObj(file))
 
     except Exception as exc:
-        helpers.logError("stored_file_services.create(): " + str(exc))
+        helpers.logError("stored_file_services.createRef(): " + str(exc))
         db.session.rollback()
         return Callback(False, "Couldn't create a storedFile entity.")
 
@@ -123,10 +123,9 @@ def uploadFile(file, filename, public=False, **kwargs):
         except ClientError as e:
             raise Exception("DigitalOcean Error")
 
-        print(kwargs)
         if 'model' in kwargs:
             #files, model, identifier, value, storedFileID, keys: List = None
-            dbRef_callback: Callback = createRef(file, kwargs['model'], kwargs['identifier'], kwargs['identifier_value'], kwargs['stored_file_id'] , kwargs['key'])
+            dbRef_callback: Callback = createRef(file, kwargs['model'], kwargs['identifier'], kwargs['identifier_value'], kwargs['stored_file_id'] , kwargs['key'], realFileName=filename)
 
             if not dbRef_callback.Success:
                 helpers.logError("Couldn't Save Stored Files Reference")

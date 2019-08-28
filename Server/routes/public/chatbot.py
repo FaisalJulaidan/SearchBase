@@ -7,7 +7,7 @@ from werkzeug.utils import secure_filename
 from models import Callback, db, Conversation, Assistant, StoredFile, StoredFileInfo
 from services import conversation_services, flow_services, databases_services, stored_file_services, mail_services
 from services.Marketplace.CRM import crm_services
-from utilities import helpers
+from utilities import helpers, enums
 from utilities.helpers import logError
 
 chatbot_router = Blueprint('chatbot_router', __name__, template_folder="../templates")
@@ -121,9 +121,6 @@ def chatbot_upload_files(assistantIDAsHash, sessionID):
             returnValue = []
             set_file_id: Callback = conversation_services.setFileByID(sessionID, sf.ID)
             for idx, file in enumerate(files):
-                print('--')
-                print(file)
-                print('--')
                 if file.filename == '':
                     db.session.rollback()
                     return helpers.jsonResponseFlask(False, 404, "No selected file")
@@ -131,13 +128,13 @@ def chatbot_upload_files(assistantIDAsHash, sessionID):
                 filename = str(uuid.uuid4()) + '_' + helpers.encodeID(sessionID) + '.' + \
                            secure_filename(file.filename).rsplit('.', 1)[1].lower()
 
-                file.realFileName = filename
-
+                key = keys[idx] if keys[idx] is not None else None
+                key = enums.StoredFileKeys(keys[idx]) if enums.StoredFileKeys.has_value(keys[idx]) else None
                 upload_callback: Callback = stored_file_services.uploadFile(file, filename, True, model=Conversation,
                                                                                                 identifier="ID",
                                                                                                 identifier_value=conversation.ID,
                                                                                                 stored_file_id=sf.ID,
-                                                                                                key=keys[idx] if keys[idx] is not None else None)
+                                                                                                key=key)
 
                 returnValue.append(upload_callback.Data)
             # Save changes
@@ -152,8 +149,10 @@ def chatbot_upload_files(assistantIDAsHash, sessionID):
                 # sendCRMFile_callback: Callback = crm_services.uploadFile(assistant, files)
                 # if not sendCRMFile_callback:
                 #     raise Exception("Could not submit file to CRM")
-
+    
         except Exception as exc:
-            print(exc)
+            print('wtf exc {}'.format(exc))
+            print(str(exc))
+            print('le what')
             return helpers.jsonResponseFlask(False, 404, "I am having difficulties saving your uploaded files :(")
         return helpers.jsonResponseFlask(True, 200, "File uploaded successfully")

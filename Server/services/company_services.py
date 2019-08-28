@@ -1,6 +1,6 @@
 from models import db, Callback, Company, User, AppointmentAllocationTime, AppointmentAllocationTimeInfo, StoredFile, StoredFileInfo
 from services import stored_file_services
-from utilities import helpers
+from utilities import helpers, enums
 from sqlalchemy.orm import joinedload
 from werkzeug.utils import secure_filename
 import logging , stripe
@@ -153,23 +153,21 @@ def uploadLogo(file, companyID):
 
 
 
-        # Upload file to cloud Space
-        upload_callback : Callback = stored_file_services.uploadFile(file,
-                                                                     filename,
-                                                                     public=True)
+        # # Upload file to cloud Space
+        # upload_callback : Callback = stored_file_services.uploadFile(file,
+        #                                                              filename,
+        #                                                              public=True)
 
         sf = StoredFile()
         db.session.add(sf)
 
         db.session.flush()
-        db.session.add(StoredFileInfo(StoredFileID=sf.ID, Key='Logo', FilePath=filename))
 
-        if not upload_callback.Success:
-            raise Exception(upload_callback.Message)
-
-        company.StoredFileID = sf.ID
-
-        db.session.commit()
+        upload_callback: Callback = stored_file_services.uploadFile(file, filename, True, model=Company,
+                                identifier="ID",
+                                identifier_value=company.ID,
+                                stored_file_id=sf.ID,
+                                key=enums.StoredFileKeys.Logo)
 
         return Callback(True, 'Logo uploaded successfully.', filename)
 

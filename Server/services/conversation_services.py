@@ -179,7 +179,7 @@ def setFileByID(conversationID: int, fileID: int) -> Callback:
         result.StoredFileID = fileID
 
         if not result:
-            raise Exception("Conversation files set")
+            raise Exception("Conversation files failed to be set")
 
         return Callback(True, "Conversations found", result)
     except Exception as exc:

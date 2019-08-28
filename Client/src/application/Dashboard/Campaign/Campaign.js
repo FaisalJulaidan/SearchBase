@@ -59,7 +59,6 @@ class Campaign extends React.Component {
 
     //TODO:: Skill should be validated before submission | Empty String can be accepted
     submit = (e) => {
-        console.log(e);
         if (e.key === "Enter") {
             this.setState({skills: this.state.skills.concat([e.target.value])});
             this.props.form.setFieldsValue({skill: ""});
@@ -67,9 +66,6 @@ class Campaign extends React.Component {
     };
 
     handleSubmit = (event) => {
-        if (event.key === "Enter") {
-            return
-        }
         event.preventDefault();
         this.props.form.validateFields((err, values) => {
             if (!err) {
@@ -242,7 +238,7 @@ class Campaign extends React.Component {
                                           onChange={e => this.setState({textMessage: e.target.value})}/>
                             )}
                         </FormItem>
-                        <Button type="primary" icon="rocket" htmlType="submit" size={"large"}>
+                        <Button type="primary" icon="rocket" onClick={this.handleSubmit} size={"large"}>
                             Launch
                         </Button>
                     </Form>

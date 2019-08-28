@@ -1,4 +1,6 @@
 from models import db
+from utilities import enums
+from sqlalchemy import Enum
 
 # Stored files
 class StoredFileInfo(db.Model):
@@ -10,7 +12,7 @@ class StoredFileInfo(db.Model):
         return logo if self.FilePath else None
 
     ID = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
-    Key = db.Column(db.String(250), nullable=True)
+    Key = db.Column(Enum(enums.StoredFileKeys), nullable=True)
     FilePath = db.Column(db.String(250), nullable=True, default=None)
 
     StoredFileID = db.Column(db.Integer, db.ForeignKey('stored_file.ID', ondelete='cascade'), nullable=False)

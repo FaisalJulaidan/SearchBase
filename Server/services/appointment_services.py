@@ -1,9 +1,10 @@
 from datetime import datetime, time
 
 from models import db, Callback, Appointment, Conversation, Assistant,\
-    AppointmentAllocationTime, AppointmentAllocationTimeInfo
+    AppointmentAllocationTime, AppointmentAllocationTimeInfo, Company
 from sqlalchemy import and_
 from utilities import helpers, enums
+from services import mail_services, company_services
 
 def dummyCreateAppointmentAllocationTime(name, companyID: int):
     try:
@@ -162,18 +163,28 @@ def setAppointmentStatusPublic(token, appointmentID, status):
         helpers.logError("appointment_services.setAppointmentStatusPublic(): " + str(exc))
         return Callback(False, 'Could not set appointment status.')
 
-def setAppointmentStatus(appointmentID, status):
+
+def setAppointmentStatus(appointmentID, name, email, phone, status, companyID):
     try:
+        company: Company = company_services.getByID(companyID).Data
+        if not company: raise Exception("Company does not exist")
+
         appointment = db.session.query(Appointment).filter(Appointment.ID == appointmentID).first()
         if appointment.Status != enums.Status.Pending:
           return Callback(False, "Appointment status is {} and cannot be modified.".format(appointment.Status.value))
+
         appointment.Status = status
+
+        if status == enums.Status.Accepted.name:
+            mail_services.sendAppointmentConfirmationEmail(name, email, appointment.DateTime, company.Name, company.LogoPath)
+
         db.session.commit()
         return Callback(True, "Appointment status has been set to {}.".format(appointment.Status.value))
 
     except Exception as exc:
         helpers.logError("appointment_services.setAppointmentStatus(): " + str(exc))
         return Callback(False, 'Could not set appointment status.')
+
 
 def getAppointments(companyID):
     try:

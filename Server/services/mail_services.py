@@ -66,6 +66,26 @@ def sendVerificationEmail(firstName, lastName, email, companyName, companyID) ->
         helpers.logError("mail_service.sendVerificationEmail(): " + str(exc))
         return Callback(False, 'Could not send a verification email to ' + email)
 
+def sendAppointmentConfirmationEmail(name, email, datetime, companyName, logoPath):
+    try:
+        callback: Callback = __sendEmail(
+            email,
+            'Appointment Confirmation',
+            '/emails/appointment_confirmation.html',
+            companyName=companyName,
+            userName=name,
+            dateTime=datetime.strftime("%Y/%m/%d %H:%M"),
+            logoPath=logoPath)
+
+        if not callback.Success:
+            raise Exception(callback.Message)
+
+        return Callback(True, 'Appointment confirmation email is on its way to ' + email)
+
+    except Exception as exc:
+        helpers.logError("mail_service.sendAppointmentConfirmationEmail(): " + str(exc))
+        return Callback(False, 'Could not send the confirmation email to ' + email)
+
 
 def sendAcceptanceEmail(title, body, userName, email, logoPath, companyName):
     try:
@@ -256,7 +276,7 @@ def notifyNewConversation(assistant: Assistant, conversation: Conversation):
             'status': conversation.ApplicationStatus.name,
             'fileURLsSinged': fileURLsSinged,
             'completed': "Yes" if conversation.Completed else "No",
-            'dateTime': conversation.DateTime.strftime("%Y-%m-%d %H:%M"),
+            'dateTime': conversation.DateTime.strftime("%Y/%m/%d %H:%M"),
             'link': helpers.getDomain() + "/dashboard/assistants/" +
                                str(assistant.ID) + "?tab=Conversations&conversation_id=" + str(conversation.ID)
 
@@ -312,7 +332,7 @@ def notifyNewConversations(assistant: dict, conversations, lastNotificationDate)
                 'status': conversation.ApplicationStatus.name,
                 'fileURLsSinged': fileURLsSinged,
                 'completed': "Yes" if conversation.Completed else "No",
-                'dateTime': conversation.DateTime.strftime("%Y-%m-%d %H:%M"),
+                'dateTime': conversation.DateTime.strftime("%Y/%m/%d %H:%M"),
                 'link': helpers.getDomain() + "/dashboard/assistants/" +
                         str(assistant["ID"]) + "?tab=Conversations&conversation_id=" + str(conversation.ID)
             })

@@ -16,10 +16,10 @@ function* fetchAppointments() {
     }
 }
 
-function* setAppointmentStatus({appointmentID, status}) {
+function* setAppointmentStatus({appointmentID, name, email, phone, status}) {
     try {
-        const res = yield http.post('/appointments/set_status', {appointmentID, status});
-        yield put(appointmentActions.setAppointmentStatusSuccess(appointmentID, status))
+        const res = yield http.post('/appointments/set_status', {appointmentID, name, email, phone, status});
+        yield put(appointmentActions.setAppointmentStatusSuccess(appointmentID, status));
         successMessage(`Appointment ${status}`);
     } catch (error) {
         const msg = error.response?.data?.msg || "Couldn't set appointment status";

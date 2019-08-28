@@ -79,7 +79,7 @@ class AppointmentsTimetable extends React.Component {
         let weekDays = [];
         let sv_appointment = props.appointment;
 
-        if (!sv_appointment?.appointmentAllocationTime.length)
+        if (!sv_appointment?.appointmentAllocationTime?.length)
             return this.setState({ stWeekDays: [] });
 
         for (const i in sv_appointment.appointmentAllocationTime) {
@@ -252,7 +252,7 @@ class AppointmentsTimetable extends React.Component {
                 {!this.state.stWeekDays.length ?
 
                     <div className={styles.Container}>
-                        <h2>No free appointments available :( </h2>
+                        <h2>Sorry, there are no available appointments :( </h2>
                     </div>
 
                     :

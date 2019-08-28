@@ -144,7 +144,7 @@ def getAppointmentAllocationTime(assistantID) -> Callback:
 
         appointmentAllocationTime: AppointmentAllocationTime = connectedAutoPilot.AppointmentAllocationTime
         # Check if the auto pilot is not linked with an AppointmentAllocationTime table
-        if not connectedAutoPilot:
+        if not (appointmentAllocationTime and connectedAutoPilot.SendCandidatesAppointments):
             return Callback(True, "There are no available time slots")
 
         # OpenTimes is an array of all open slots per day

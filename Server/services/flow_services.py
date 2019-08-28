@@ -40,8 +40,8 @@ def getChatbot(assistantHashID) -> Callback:
             pass
 
         assistantDict = helpers.getDictFromSQLAlchemyObj(assistant)
-        print(assistant.Company.StoredFile)
-        assistantDict['LogoPath'] = helpers.keyFromStoredFile(assistant.Company.StoredFile, enums.StoredFileKeys.Logo).AbsFilePath if assistant.Company.StoredFile is not None else None
+        logo = helpers.keyFromStoredFile(assistant.Company.StoredFile, enums.StoredFileKeys.Logo)
+        assistantDict['LogoPath'] = logo.AbsFilePath if logo is not None else None
 
         data = {
             "assistant": assistantDict,

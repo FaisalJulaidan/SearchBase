@@ -228,9 +228,8 @@ def deleteDatabase(databaseID, companyID) -> Callback:
 
 
 # ----- Scanners (Pandas) ----- #
-def scan(session, assistantHashID, useCRM=True):
+def scan(session, assistantHashID, campaign=False):
     try:
-
         callback: Callback = assistant_services.getByHashID(assistantHashID)
         if not callback.Success:
             return Callback(False, "Assistant not found!")
@@ -241,7 +240,7 @@ def scan(session, assistantHashID, useCRM=True):
             .filter(and_(Database.CompanyID == assistant.CompanyID,
                          Database.Type == databaseType)).all()
 
-        if useCRM:
+        if not campaign:
             # get CRM Data
             extraRecords = getCRMData(assistant, databaseType.name, session)
         else:
@@ -249,7 +248,7 @@ def scan(session, assistantHashID, useCRM=True):
 
         # Scan database for solutions based on database type
         if databaseType == DatabaseType.Candidates:
-            return scanCandidates(session, [d[0] for d in databases], extraRecords)
+            return scanCandidates(session, [d[0] for d in databases], extraRecords, campaign)
         elif databaseType == DatabaseType.Jobs:
             return scanJobs(session, [d[0] for d in databases], extraRecords)
         else:
@@ -271,7 +270,7 @@ def getCRMData(assistant, databaseType, session):
 
 
 # Data analysis using Pandas library
-def scanCandidates(session, dbIDs, extraCandidates=None):
+def scanCandidates(session, dbIDs, extraCandidates=None, campaign=False):
     try:
 
         df = pandas.read_sql(db.session.query(Candidate).filter(Candidate.DatabaseID.in_(dbIDs)).statement,
@@ -334,6 +333,9 @@ def scanCandidates(session, dbIDs, extraCandidates=None):
 
         topResults = json.loads(df[df['Score'] > 0].nlargest(session.get('showTop', 2), 'Score')
                                 .to_json(orient='records'))
+
+        if campaign:
+            return Callback(True, '', topResults)
 
         data = []  # List of candidates
         location = ["Candidate's preferred location of work is [location].",

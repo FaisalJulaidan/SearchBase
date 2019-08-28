@@ -59,6 +59,7 @@ class Campaign extends React.Component {
 
     //TODO:: Skill should be validated before submission | Empty String can be accepted
     submit = (e) => {
+        console.log(e);
         if (e.key === "Enter") {
             this.setState({skills: this.state.skills.concat([e.target.value])});
             this.props.form.setFieldsValue({skill: ""});
@@ -156,7 +157,7 @@ class Campaign extends React.Component {
                                 );
                             } else {
                                 return (
-                                    <FormItem label={"DataBase"}>
+                                    <FormItem label={"Database"}>
                                         {getFieldDecorator("database_id", {
                                             rules: [{
                                                 required: true,
@@ -166,6 +167,8 @@ class Campaign extends React.Component {
                                             <Select placeholder={"Please select the database"}>
                                                 {(() => {
                                                     return this.props.databases.map((item, key) => {
+                                                        if (item.Type?.name !== "Candidates")
+                                                            return;
                                                         return (
                                                             <Select.Option key={key} value={item.ID}>
                                                                 {trimText.capitalize(trimText.trimDash(item.Name))}
@@ -212,7 +215,7 @@ class Campaign extends React.Component {
                         </FormItem>
                         <FormItem label={"Skills"}>
                             {getFieldDecorator("skill", {
-                                setFieldsValue:this.state.skillInput
+                                setFieldsValue: this.state.skillInput
                             })(
                                 <Input placeholder="Type in a skill and press enter to add to the list of skills"
                                        type="text"

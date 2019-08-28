@@ -1,5 +1,5 @@
 import React, {Component} from 'react'
-import {Route, Switch} from 'react-router-dom'
+import {Route, Switch, Redirect} from 'react-router-dom'
 
 import Home from './component/page/home/Home'
 import Terms from "./component/page/terms/Terms";
@@ -25,13 +25,14 @@ class Routes extends Component {
                 <Route path="/privacy" exact component={Policies}/>
                 <Route path="/gdpr" exact component={GDPR}/>
                 <Route path="/release-notes" exact component={ReleaseNote}/>
-                {/*<Route path="/login" exact component={Login}/>*/}
-                {/*<Route path="/signup" exact component={SignUp}/>*/}
+                <Route path="/login" exact component={Login}/>
+                <Route path="/signup" exact component={SignUp}/>
                 <Route path="/get-started" exact component={GetStarted}/>
+                <Route path='/dashboard' exact component={(() => <>{(()=>{window.location.reload()})()}</>)}/>
                 <Route path="" exact component={NotFound404}/>
             </Switch>
         )
     }
 }
 
-export default Routes
+export default Routes;

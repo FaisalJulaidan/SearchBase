@@ -12,8 +12,6 @@ const Login = () => {
 
     document.title = "Login | " + WEBSITE_TITLE;
 
-
-    //TODO: Fix inputs bottom border when they have value - They should stay purple with inputs
     return (
         <div className={styles.wrapper}>
             <Container className={styles.container}>
@@ -25,7 +23,7 @@ const Login = () => {
                                     <Card.Body>
                                         <h1 className={styles.title}>Login</h1>
                                         <div className={styles.logo}>
-                                            <FontAwesomeIcon size="5x" icon={faCloud}/>
+                                            <FontAwesomeIcon size="6x" icon={faCloud}/>
                                             <h1 className={styles.brand_title}>
                                                 SearchBase
                                             </h1>

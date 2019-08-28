@@ -126,6 +126,10 @@ class Campaign extends React.Component {
                             )}
 
                         </FormItem>
+                        <FormItem label={"Use CRM"} labelCol={{xs: {span: 5, offset: 0}}}>
+                            <Switch onChange={(checked) => this.setState({use_crm: checked})}
+                                    defaultChecked={this.state.use_crm}/>
+                        </FormItem>
                         {(() => {
                             if (this.state.use_crm) {
                                 return (
@@ -175,10 +179,6 @@ class Campaign extends React.Component {
                                 );
                             }
                         })()}
-                        <FormItem label={"Use CRM"} labelCol={{xs: {span: 5, offset: 0}}}>
-                            <Switch onChange={(checked) => this.setState({use_crm: checked})}
-                                    defaultChecked={this.state.use_crm}/>
-                        </FormItem>
                         <FormItem label={"Messaging Service"}>
                             {getFieldDecorator("messenger_id", {
                                 rules: [{

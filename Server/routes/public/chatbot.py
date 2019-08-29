@@ -130,6 +130,7 @@ def chatbot_upload_files(assistantIDAsHash, sessionID):
 
                 key = keys[idx] if keys[idx] is not None else None
                 key = enums.FileAssetType(keys[idx]) if enums.FileAssetType.has_value(keys[idx]) else None
+                print(keys[idx])
                 upload_callback: Callback = stored_file_services.uploadFile(file, filename, True, model=Conversation,
                                                                                                 identifier="ID",
                                                                                                 identifier_value=conversation.ID,

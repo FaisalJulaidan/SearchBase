@@ -277,7 +277,7 @@ export const dataHandler = (() => {
                     content.skipped);
 
                 if (!content.skipped)
-                    submittedFiles = submittedFiles.concat({file: content.file, key: blockRef.DataType.name});
+                    submittedFiles = submittedFiles.concat({file: content.file, key: blockRef.DataType.enumName});
             };
 
             const __processSolutions = (message) => {

@@ -103,6 +103,14 @@ def removeByID(id):
 
 def uploadFile(file, filename, public=False, **kwargs):
     try:
+        if 'model' in kwargs:
+            #files, model, identifier, value, storedFileID, keys: List = None
+            dbRef_callback: Callback = createRef(file, kwargs['model'], kwargs['identifier'], kwargs['identifier_value'], kwargs['stored_file_id'] , kwargs['key'], realFileName=filename)
+
+            if not dbRef_callback.Success:
+                helpers.logError("Couldn't Save Stored Files Reference")
+                raise Exception(dbRef_callback.Message)
+
         # Set config arguments
         ExtraArgs = {}
         if public: ExtraArgs['ACL'] = 'public-read'
@@ -123,13 +131,6 @@ def uploadFile(file, filename, public=False, **kwargs):
         except ClientError as e:
             raise Exception("DigitalOcean Error")
 
-        if 'model' in kwargs:
-            #files, model, identifier, value, storedFileID, keys: List = None
-            dbRef_callback: Callback = createRef(file, kwargs['model'], kwargs['identifier'], kwargs['identifier_value'], kwargs['stored_file_id'] , kwargs['key'], realFileName=filename)
-
-            if not dbRef_callback.Success:
-                helpers.logError("Couldn't Save Stored Files Reference")
-                raise Exception(dbRef_callback.Message)
 
         return Callback(True, "File uploaded successfully",  PUBLIC_URL + UPLOAD_FOLDER + '/' + filename)
 

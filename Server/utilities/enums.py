@@ -35,7 +35,7 @@ class Calendar(Enum):
 
 @unique
 class FileAssetType(Enum):
-    CandidateCV = 'Candidate CV'
+    CandidateCV = 'CandidateCV'
     Passport = 'Passport'
     DrivingLicense = 'Driving License'
     DrugTest = 'Drug Test'

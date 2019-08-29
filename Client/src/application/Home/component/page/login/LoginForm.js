@@ -1,5 +1,6 @@
 import React from 'react';
 import {connect} from 'react-redux';
+import {withRouter} from "react-router-dom";
 import styles from './login-form.module.css'
 import {Form, Icon, Input, Button} from 'antd';
 
@@ -11,13 +12,16 @@ class LoginForm extends React.Component {
         if (e) e.preventDefault();
         this.props.form.validateFields((err, values) => {
             if (!err) {
-                // let from = this.props.history.location.state?.from || "";
-                // let prevPath = from?.pathname || "";
-                // if (prevPath) prevPath += from.search;
-                // // prevPath has to have /dashboard keyword if not make it null
-                // if (prevPath?.indexOf('/dashboard') < -1)
-                //     prevPath = null;
-                this.props.dispatch(authActions.login(values.email, values.password, null));
+                console.log(this.props.history);
+                let from = this.props.history.location.state?.from || "";
+                let prevPath = from?.pathname || "";
+                if (prevPath) prevPath += from.search;
+
+                // prevPath has to have /dashboard keyword if not make it null
+                if (prevPath?.indexOf('/dashboard') < -1)
+                    prevPath = null;
+
+                this.props.dispatch(authActions.login(values.email, values.password, prevPath));
             }
         });
     };
@@ -54,4 +58,4 @@ function mapStateToProps(state) {
     };
 }
 
-export default connect(mapStateToProps)(Form.create()(LoginForm));
+export default connect(mapStateToProps)(withRouter(Form.create()(LoginForm)));

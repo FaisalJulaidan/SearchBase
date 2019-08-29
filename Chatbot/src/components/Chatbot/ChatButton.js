@@ -14,7 +14,8 @@ const Header = ({ loading, disabled, openWindow, btnColor }) => {
         height: '50px',
         boxShadow: '0px 2px 20px -4.5px #666',
         backgroundColor: btnColor,
-        borderColor: btnColor
+        borderColor: btnColor,
+        padding: '0 !important'
     };
 
     return (

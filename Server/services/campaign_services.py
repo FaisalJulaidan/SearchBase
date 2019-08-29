@@ -16,7 +16,10 @@ def sendCampaign(campaign_details, companyID):
         hashedAssistantID = helpers.encodeID(campaign_details.get("assistant_id"))
         messenger = messenger_callback.Data
         crm = None
-        text = campaign_details.get("text") + "\n\n" + helpers.getDomain() + "/chatbot_direct_link/" + hashedAssistantID
+        source = "crm" if campaign_details.get("use_crm") else "database"
+        text = campaign_details.get("text") + "\n\n" + helpers.getDomain() + "/chatbot_direct_link/" + \
+               hashedAssistantID + "?source=" + source + "&source_id=" + \
+               str(campaign_details.get("crm_id", campaign_details.get("database_id")))
 
         campaign_details["location"] = campaign_details.get("location").split(",")[0]
 
@@ -41,7 +44,8 @@ def sendCampaign(campaign_details, companyID):
                 },
                 "databaseType": "Candidates"
             }
-            candidates_callback: Callback = databases_services.scan(session, hashedAssistantID, True)
+            candidates_callback: Callback = databases_services.scan(session, hashedAssistantID, True,
+                                                                    campaign_details.get("database_id"))
 
         if not candidates_callback.Success:
             raise Exception(candidates_callback.Message)
@@ -57,7 +61,9 @@ def sendCampaign(campaign_details, companyID):
 
             if not candidate_phone:
                 continue
-
+            text = text.split("&id")[0]
+            text += "&id=" + str(candidate.get("ID"))
+            print("TEXT: ", text)
             sendMessage(messenger.Type, candidate_phone, text, messenger.Auth)
 
         return Callback(True, '')

@@ -174,7 +174,6 @@ def setAppointmentStatus(appointmentID, name, email, phone, status, companyID):
           return Callback(False, "Appointment status is {} and cannot be modified.".format(appointment.Status.value))
 
         appointment.Status = status
-
         if status == enums.Status.Accepted.name:
             mail_services.sendAppointmentConfirmationEmail(name, email, appointment.DateTime, company.Name, company.LogoPath)
 

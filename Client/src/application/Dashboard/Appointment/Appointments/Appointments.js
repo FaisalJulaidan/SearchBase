@@ -33,7 +33,7 @@ class Appointments extends React.Component {
     reject = (id, name, email, phone) => {
         confirm({
             title: `Reject appointment confirmation`,
-            content: `If you click Reject, this user will receive a rejection email about this appointment and you cannot undo that`,
+            content: `If you click Reject you won't be able to undo that`,
             onOk: () => {this.props.dispatch(appointmentActions.setAppointmentStatusRequest(id, name, email, phone, 'Rejected'))},
             okText: "Reject",
         });

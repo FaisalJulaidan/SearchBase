@@ -9,19 +9,14 @@ from utilities.enums import CRM
 
 def sendCampaign(campaign_details, companyID):
     try:
-
-        assistant_callback: Callback = assistant_services.getByID(campaign_details.get("assistant_id"), companyID)
-        if not assistant_callback.Success:
-            raise Exception("Assistant not found.")
-
         messenger_callback: Callback = messenger_servicess.getByID(campaign_details.get("messenger_id"), companyID)
         if not messenger_callback.Success:
             raise Exception("Messenger not found.")
 
-        assistant = assistant_callback.Data
+        hashedAssistantID = helpers.encodeID(campaign_details.get("assistant_id"))
         messenger = messenger_callback.Data
         crm = None
-        text = campaign_details.get("text")
+        text = campaign_details.get("text") + "\n\n" + helpers.getDomain() + "/chatbot_direct_link/" + hashedAssistantID
 
         campaign_details["location"] = campaign_details.get("location").split(",")[0]
 
@@ -46,7 +41,7 @@ def sendCampaign(campaign_details, companyID):
                 },
                 "databaseType": "Candidates"
             }
-            candidates_callback: Callback = databases_services.scan(session, helpers.encodeID(assistant.ID), True)
+            candidates_callback: Callback = databases_services.scan(session, hashedAssistantID, True)
 
         if not candidates_callback.Success:
             raise Exception(candidates_callback.Message)

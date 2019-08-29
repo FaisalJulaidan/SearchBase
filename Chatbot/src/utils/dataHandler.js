@@ -1,4 +1,5 @@
 import axios from 'axios';
+import queryString from 'query-string';
 // Constants
 import * as messageTypes from '../constants/MessageType';
 import * as flowAttributes from '../constants/FlowAttributes';
@@ -85,6 +86,25 @@ export const dataHandler = (() => {
             console.log('============>>>>>');
             console.log(result);
             console.log('sending data...');
+
+            // CHECK IF UPDATING CANDIDATE
+
+
+            if(window.location.href.indexOf("directLink") !== -1){
+                let allowedKeys = ['source', 'source_id', 'id']
+                let params = queryString.parse(window.location.search)
+                let crmInformation = {}
+                for(let key in params){
+                    if(allowedKeys.includes(key)){
+                        crmInformation[key] = params[key]
+                    }
+                }
+                if(Object.keys(crmInformation).length !== 0 ){
+                    result['crmInformation'] = crmInformation
+                }
+            }
+
+
             // send data to server
             const {data, error} = await promiseWrapper(axios.post(`${getServerDomain()}/api/assistant/${assistantID}/chatbot`, result, cancel));
             sessionID = data ? data.data.data.sessionID : null; // :) // lol faisal 🔫

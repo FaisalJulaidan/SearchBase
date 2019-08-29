@@ -28,9 +28,9 @@ const Login = () => {
                                         </h1>
                                     </div>
                                     <LoginForm/>
-                                    <h6 className={styles.sign_up}>Don’t have an account?
-                                        <Link to="/signup">Sign Up</Link>
-                                    </h6>
+                                    {/*<h6 className={styles.sign_up}>Don’t have an account?*/}
+                                    {/*    <Link to="/signup">Sign Up</Link>*/}
+                                    {/*</h6>*/}
                                 </Card.Body>
                             </Card>
                         </Fade>

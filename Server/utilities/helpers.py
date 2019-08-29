@@ -118,7 +118,8 @@ def getPlanNickname(SubID=None):
     except stripe.error.StripeError as e:
         return None
 
-def keyFromStoredFile(storedFile: StoredFile, key: FileAssetType) -> StoredFileInfo:
+def keyFromStoredFile(storedFile: StoredFile, key: FileAssetType) -> StoredFileInfo or None:
+    if not storedFile: return None
     for file in storedFile.StoredFileInfo:
         if file.Key.value == key.value:
             return file

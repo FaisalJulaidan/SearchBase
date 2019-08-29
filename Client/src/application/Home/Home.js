@@ -4,9 +4,6 @@ import React from 'react'
 import Routes from './routes'
 import ScrollToTop from "./hoc/scroll-to-top/ScrollToTop";
 const Home = () => {
-
-    console.log('wtf')
-
     const injectGA = () => {
         if (typeof window == 'undefined') {
             return;

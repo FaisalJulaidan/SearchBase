@@ -21,7 +21,7 @@ from sqlalchemy_utils import Currency
 from config import BaseConfig
 from models import db, Assistant, Job, Callback, Role, Company, StoredFile, StoredFileInfo
 from services import flow_services, assistant_services, appointment_services, company_services
-from utilities.enums import Period
+from utilities.enums import Period, FileAssetType
 
 # ======== Global Variables ======== #
 
@@ -118,9 +118,9 @@ def getPlanNickname(SubID=None):
     except stripe.error.StripeError as e:
         return None
 
-def keyFromStoredFile(storedFile: StoredFile, key: str) -> StoredFileInfo:
+def keyFromStoredFile(storedFile: StoredFile, key: FileAssetType) -> StoredFileInfo:
     for file in storedFile.StoredFileInfo:
-        if file.Key == key:
+        if file.Key.value == key.value:
             return file
     return None
 

@@ -34,7 +34,7 @@ class Calendar(Enum):
         return any(value == item.value for item in cls)
 
 @unique
-class StoredFileKeys(Enum):
+class FileAssetType(Enum):
     CandidateCV = 'Candidate CV'
     Passport = 'Passport'
     DrivingLicense = 'Driving License'

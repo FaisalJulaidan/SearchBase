@@ -167,9 +167,9 @@ def uploadLogo(file, companyID):
                                 identifier="ID",
                                 identifier_value=company.ID,
                                 stored_file_id=sf.ID,
-                                key=enums.StoredFileKeys.Logo)
-
-        return Callback(True, 'Logo uploaded successfully.', filename)
+                                key=enums.FileAssetType.Logo)
+        
+        return Callback(True, 'Logo uploaded successfully.', upload_callback.Data)
 
     except Exception as exc:
         helpers.logError("company_service.uploadLogo(): " + str(exc))
@@ -188,7 +188,7 @@ def deleteLogo(companyID):
         if not logo: return Callback(False, 'No logo to delete')
 
         # Delete file from cloud Space and reference from database
-        path = helpers.keyFromStoredFile(logo, 'Logo').FilePath
+        path = helpers.keyFromStoredFile(logo, enums.FileAssetType.Logo).FilePath
         company.StoredFile = None
         delete_callback : Callback = stored_file_services.deleteFile(path)
         if not delete_callback.Success:

@@ -3,7 +3,7 @@ from flask_jwt_extended import jwt_required, get_jwt_identity
 
 from models import Callback, Assistant, Conversation, Appointment
 from services import assistant_services, conversation_services, appointment_services, company_services
-from utilities import helpers, wrappers
+from utilities import helpers, wrappers, enums
 
 appointment_router: Blueprint = Blueprint('appointment_router', __name__, template_folder="../../templates")
 
@@ -86,7 +86,7 @@ def allocation_time(payload):
         if not times_callback.Success:
             return helpers.jsonResponse(False, 404, "Couldn't load available time slots")
 
-        logo = helpers.keyFromStoredFile(assistant.Company.StoredFile, 'Logo')
+        logo = helpers.keyFromStoredFile(assistant.Company.StoredFile, enums.FileAssetType.Logo)
 
         data = {
             "companyName": assistant.Company.Name,

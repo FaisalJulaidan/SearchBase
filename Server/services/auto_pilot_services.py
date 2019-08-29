@@ -4,7 +4,7 @@ from models import db, Callback, Conversation, AutoPilot, Assistant, Messenger
 from services import mail_services, stored_file_services as sfs
 from services.Marketplace.Messenger import messenger_servicess
 from sqlalchemy import and_
-from utilities import helpers
+from utilities import helpers, enums
 from utilities.enums import UserType, Status
 
 
@@ -29,7 +29,7 @@ def processConversation(conversation: Conversation, autoPilot: AutoPilot, assist
 
                 userName = conversation.Name or 'Anonymous'
                 logoPath = ""
-                logo = helpers.keyFromStoredFile(autoPilot.Company.StoredFile, 'Logo')
+                logo = helpers.keyFromStoredFile(autoPilot.Company.StoredFile, enums.FileAssetType.Logo)
 
                 if logo:
                     logoPath = logo.AbsFilePath

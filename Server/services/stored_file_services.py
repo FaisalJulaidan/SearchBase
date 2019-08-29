@@ -58,7 +58,7 @@ def getAll():
         return Callback(False, 'StoredFiles could not be retrieved/empty')
 
 
-def createRef(file, model, identifier, value, storedFileID, key: enums.StoredFileKeys = None, realFileName: str = None) -> StoredFile or None:
+def createRef(file, model, identifier, value, storedFileID, key: enums.FileAssetType = None, realFileName: str = None) -> StoredFile or None:
     try:
         if not file: raise Exception;
         obj = db.session.query(model).filter(getattr(model, identifier) == value).first()
@@ -70,7 +70,7 @@ def createRef(file, model, identifier, value, storedFileID, key: enums.StoredFil
 
         key = key.value if key is not None else None
 
-        filename = realFileName if realFileName is not None else file.filename
+        filename = realFileName or file.filename
 
         file : StoredFileInfo = StoredFileInfo(StoredFileID=storedFileID, Key=key, FilePath=filename)
 
@@ -131,7 +131,7 @@ def uploadFile(file, filename, public=False, **kwargs):
                 helpers.logError("Couldn't Save Stored Files Reference")
                 raise Exception(dbRef_callback.Message)
 
-        return Callback(True, "File uploaded successfully", dbRef_callback.Data if 'model' in kwargs else None)
+        return Callback(True, "File uploaded successfully",  PUBLIC_URL + UPLOAD_FOLDER + '/' + filename)
 
     except Exception as exc:
         helpers.logError("stored_file_services.uploadFile(): " + str(exc))
@@ -147,7 +147,7 @@ def downloadFile(filename):
                               endpoint_url=os.environ['SPACES_SERVER_URI'],
                               aws_access_key_id=os.environ['SPACES_PUBLIC_KEY'],
                               aws_secret_access_key=os.environ['SPACES_SECRET_KEY'])
-        file = s3.Object(BUCKET, filename)
+        file = s3.Object(BUCKET, UPLOAD_FOLDER + "/" + filename)
 
         # Check if file exists
         try:

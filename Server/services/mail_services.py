@@ -5,7 +5,7 @@ from flask_mail import Mail, Message
 
 from models import Callback, Assistant, Conversation, Company, StoredFileInfo
 from services import user_services, stored_file_services as sfs
-from utilities import helpers
+from utilities import helpers,enums
 
 mail = Mail()
 tsbEmail = "info@thesearchbase.com"
@@ -262,7 +262,7 @@ def notifyNewConversation(assistant: Assistant, conversation: Conversation):
 
         }]
 
-        logoPath = helpers.keyFromStoredFile(company.StoredFile, 'Logo').AbsFilePath
+        logoPath = helpers.keyFromStoredFile(company.StoredFile, enums.FileAssetType.Logo).AbsFilePath
         # send emails, jobs applied for
         for user in users_callback.Data:
             email_callback: Callback = __sendEmail(to=user.Email,
@@ -321,7 +321,7 @@ def notifyNewConversations(assistant: Assistant, conversations, lastNotification
         if not len(conversationsList) > 0:
             return Callback(True, "No new conversation to send")
 
-        logo = helpers.keyFromStoredFile(Assistant.Company.StoredFile, 'Logo')
+        logo = helpers.keyFromStoredFile(Assistant.Company.StoredFile, enums.FileAssetType.Logo)
 
         # send emails, jobs applied for
         for user in users_callback.Data:

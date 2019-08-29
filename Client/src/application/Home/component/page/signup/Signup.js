@@ -21,23 +21,27 @@ const Signup = () => {
                                 card required).</h1>
                         </Fade>
                     </Col>
-                    <Col sm={{span: 6}} md="auto">
-                        <Card className={styles.card}>
-                            <Card.Body>
-                                <h1 className={styles.title}>Sign up</h1>
-                                <SignupForm/>
-                                <h6 className={styles.sign_up}>Or log into an
-                                    <Link to="/login">existing account!</Link>
-                                </h6>
-                            </Card.Body>
-                        </Card>
-                        <div className={styles.navigation}>
-                            <ul>
-                                <li><Link to={"/"}>Home</Link></li>
-                                <li><Link to={"/terms"}>Terms & Conditions</Link></li>
-                                <li><Link to={"/privacy"}>Privacy Policy</Link></li>
-                            </ul>
-                        </div>
+                    <Col sm={6} md xl={4}>
+                        <Fade right>
+                            <div className={styles.form_wrapper}>
+                                <Card className={styles.card}>
+                                    <Card.Body>
+                                        <h1 className={styles.title}>Sign up</h1>
+                                        <SignupForm/>
+                                        <h6 className={styles.sign_up}>Or log into an
+                                            <Link to="/login">existing account!</Link>
+                                        </h6>
+                                    </Card.Body>
+                                </Card>
+                                <div className={styles.navigation}>
+                                    <ul>
+                                        <li><Link to={"/"}>Home</Link></li>
+                                        <li><Link to={"/terms"}>Terms & Conditions</Link></li>
+                                        <li><Link to={"/privacy"}>Privacy Policy</Link></li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </Fade>
                     </Col>
                 </Row>
             </Container>

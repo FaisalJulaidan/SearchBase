@@ -35,7 +35,6 @@
     font-size: 1em;
 }
 
-
 .card {
     border-radius: 10px;
     box-shadow: 0 5px 10px 0 rgba(0, 0, 0, 0.1);
@@ -129,6 +128,18 @@
     color: white;
 }
 
+
+@media (max-width: 1200px) {
+    .form_wrapper {
+        margin: 0 3%;
+    }
+}
+
+@media (max-width: 992px) {
+    .form_wrapper {
+        margin: 0;
+    }
+}
 
 @media (max-width: 575.98px) {
     .col_desc{

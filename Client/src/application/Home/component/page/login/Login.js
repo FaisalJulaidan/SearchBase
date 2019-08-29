@@ -14,28 +14,26 @@ const Login = () => {
 
     return (
         <div className={styles.wrapper}>
-            <Container className={styles.container}>
-                <Row>
-                    <Col md={3.5}>
-                        <div>
-                            <Fade top>
-                                <Card className={styles.card}>
-                                    <Card.Body>
-                                        <h1 className={styles.title}>Login</h1>
-                                        <div className={styles.logo}>
-                                            <FontAwesomeIcon size="6x" icon={faCloud}/>
-                                            <h1 className={styles.brand_title}>
-                                                SearchBase
-                                            </h1>
-                                        </div>
-                                        <LoginForm/>
-                                        <h6 className={styles.sign_up}>Don’t have an account?
-                                            <Link to="/signup">Sign Up</Link>
-                                        </h6>
-                                    </Card.Body>
-                                </Card>
-                            </Fade>
-                        </div>
+            <Container>
+                <Row className={styles.row}>
+                    <Col  sm={8} md={6} lg={5} xl={4}>
+                        <Fade top>
+                            <Card className={styles.card}>
+                                <Card.Body>
+                                    <h1 className={styles.title}>Login</h1>
+                                    <div className={styles.logo}>
+                                        <FontAwesomeIcon size="6x" icon={faCloud}/>
+                                        <h1 className={styles.brand_title}>
+                                            SearchBase
+                                        </h1>
+                                    </div>
+                                    <LoginForm/>
+                                    <h6 className={styles.sign_up}>Don’t have an account?
+                                        <Link to="/signup">Sign Up</Link>
+                                    </h6>
+                                </Card.Body>
+                            </Card>
+                        </Fade>
                         <div className={styles.navigation}>
                             <ul>
                                 <li><Link to={"/"}>Home</Link></li>

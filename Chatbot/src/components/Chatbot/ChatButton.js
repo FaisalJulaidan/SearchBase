@@ -14,8 +14,7 @@ const Header = ({ loading, disabled, openWindow, btnColor }) => {
         height: '50px',
         boxShadow: '0px 2px 20px -4.5px #666',
         backgroundColor: btnColor,
-        borderColor: btnColor,
-        padding: '0 !important'
+        borderColor: btnColor
     };
 
     return (
@@ -28,8 +27,7 @@ const Header = ({ loading, disabled, openWindow, btnColor }) => {
                 ghost={disabled}
                 disabled={disabled}
                 loading={loading}
-                style={styling}
-            >
+                style={styling}>
                 {!loading && <Icon type="message" theme="outlined" style={{ fontSize: '25px', margin: '11px 2px' }}/>}
             </Button>
         </div>

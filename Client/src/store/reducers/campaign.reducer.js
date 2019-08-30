@@ -6,6 +6,7 @@ const initialState = {
     crms: [],
     databases: [],
     messengers: [],
+    candidates_list: [],
     isLoading: false,
     isLaunching: true,
     errorMsg: null
@@ -42,6 +43,28 @@ export const campaign = (state = initialState, action) => {
                 isLoading: false,
                 errorMsg: action.error
             });
+
+
+        //Fetch Candidate Data
+        case actionTypes.FETCH_CAMPAIGN_CANDIDATES_DATA_REQUEST:
+            return updateObject(state, {
+                candidates_list: [],
+                isLoading: true,
+                errorMsg: null,
+            });
+        case actionTypes.FETCH_CAMPAIGN_CANDIDATES_DATA_SUCCESS:
+            return updateObject(state, {
+                candidates_list: action.candidates_list,
+                isLoading: false,
+                errorMsg: null,
+            });
+        case actionTypes.FETCH_CAMPAIGN_CANDIDATES_DATA_FAILURE:
+            return updateObject(state, {
+                candidates_list: [],
+                isLoading: false,
+                errorMsg: action.error
+            });
+
 
         //Launch Campaign
         case actionTypes.LAUNCH_CAMPAIGN_REQUEST:

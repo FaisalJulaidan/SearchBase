@@ -4,7 +4,7 @@ const fetchCampaignData = () => ({
     type: actionTypes.FETCH_CAMPAIGN_DATA_REQUEST
 });
 
-const fetchCampaignDataSuccess = (assistants,crms, databases,messengers) => ({
+const fetchCampaignDataSuccess = (assistants, crms, databases, messengers) => ({
     type: actionTypes.FETCH_CAMPAIGN_DATA_SUCCESS,
     assistants,
     crms,
@@ -14,6 +14,24 @@ const fetchCampaignDataSuccess = (assistants,crms, databases,messengers) => ({
 
 const fetchCampaignDataFailure = (error) => ({
     type: actionTypes.FETCH_CAMPAIGN_DATA_FAILURE,
+    error
+});
+
+const fetchCampaignCandidatesData = () => ({
+    type: actionTypes.FETCH_CAMPAIGN_CANDIDATES_DATA_REQUEST
+});
+
+const fetchCampaignCandidatesDataSuccess = (assistants, crms, databases, messengers, candidates_list) => ({
+    type: actionTypes.FETCH_CAMPAIGN_CANDIDATES_DATA_SUCCESS,
+    assistants,
+    crms,
+    databases,
+    messengers,
+    candidates_list
+});
+
+const fetchCampaignCandidatesDataFailure = (error) => ({
+    type: actionTypes.FETCH_CAMPAIGN_CANDIDATES_DATA_FAILURE,
     error
 });
 
@@ -44,6 +62,10 @@ export const campaignActions = {
     fetchCampaignData,
     fetchCampaignDataSuccess,
     fetchCampaignDataFailure,
+
+    fetchCampaignCandidatesData,
+    fetchCampaignCandidatesDataSuccess,
+    fetchCampaignCandidatesDataFailure,
 
     launchCampaign,
     launchCampaignSuccess,

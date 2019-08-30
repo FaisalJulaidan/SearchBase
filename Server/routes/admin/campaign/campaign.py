@@ -10,7 +10,7 @@ from utilities import helpers, wrappers
 campaign_router: Blueprint = Blueprint('campaign_router', __name__, template_folder="../../templates")
 
 
-@campaign_router.route("/campaign_data", methods=['GET'])
+@campaign_router.route("/campaign_data", methods=['GET', 'POST'])
 @jwt_required
 @wrappers.AccessAssistantsRequired
 def fill_assistants():
@@ -52,9 +52,17 @@ def fill_assistants():
                                         "databases": helpers.getListFromSQLAlchemyList(databases_callback.Data)
                                     })
 
+    if request.method == "POST":
+        callback: Callback = campaign_services.prepareCampaign(request.json, user['companyID'])
+        if not callback.Success:
+            return helpers.jsonResponse(False, 400, callback.Message)
+
+        return helpers.jsonResponse(True, 200, "Campaign has been prepared!", callback.Data)
+
 
 @campaign_router.route("/send_campaign", methods=['POST'])
 @jwt_required
+@wrappers.AccessAssistantsRequired
 def send_campaign():
     user = get_jwt_identity()['user']
 

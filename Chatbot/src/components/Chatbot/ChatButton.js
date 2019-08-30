@@ -27,8 +27,7 @@ const Header = ({ loading, disabled, openWindow, btnColor }) => {
                 ghost={disabled}
                 disabled={disabled}
                 loading={loading}
-                style={styling}
-            >
+                style={styling}>
                 {!loading && <Icon type="message" theme="outlined" style={{ fontSize: '25px', margin: '11px 2px' }}/>}
             </Button>
         </div>

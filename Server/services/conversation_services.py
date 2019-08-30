@@ -8,11 +8,12 @@ from sqlalchemy.sql import and_
 from sqlalchemy.sql import desc
 from sqlalchemy.orm import joinedload
 
-from utilities.enums import UserType, Status, Webhooks
-from models import db, Callback, Conversation, Assistant
+from utilities.enums import UserType, Status, Webhooks, FileAssetType
+from models import db, Callback, Conversation, Assistant, StoredFile
 from services import assistant_services, stored_file_services, auto_pilot_services, mail_services, webhook_services
 from services.Marketplace.CRM import crm_services
 from utilities import json_schemas, helpers
+import json
 
 
 # Process chatbot conversation data
@@ -108,6 +109,35 @@ def processConversation(assistantHashID, data: dict) -> Callback:
         helpers.logError("conversation_services.processConversation(): " + str(exc))
         db.session.rollback()
         return Callback(False, "An error occurred while processing chatbot data.")
+
+def uploadFiles(files, conversation, keys):
+    try:
+        data = json.loads(conversation.collectedData)
+        sf : StoredFile = StoredFile()
+
+        db.session.add(sf)
+        db.session.flush()
+
+        uploadedFiles = []
+
+        for item in data.collectedData:
+            if item.input == "&FILE_UPLOAD&": # enum for this?
+                key = FileAssetType(item.dataType) or None
+                for file in files:
+                    if file.filename == item.filename:
+                        upload_callback: Callback = stored_file_services.uploadFile(file, item.fileName, True, model=Conversation,
+                                                                                                        identifier="ID",
+                                                                                                        identifier_value=conversation.ID,
+                                                                                                        stored_file_id=sf.ID,
+                                                                                                        key=key)
+                        uploadedFiles.append(upload_callback.Data)
+        
+        db.session.commit()
+
+    except Exception as exc:
+        helpers.logError("conversation_services.uploadFiles(): " + str(exc))
+        db.session.rollback()
+        return Callback(False, "An error occurred while uploading files.")
 
 
 # ----- Getters ----- #

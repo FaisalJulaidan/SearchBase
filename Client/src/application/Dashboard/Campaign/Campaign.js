@@ -1,7 +1,7 @@
 import React from 'react';
 import {connect} from 'react-redux';
 import NoHeaderPanel from 'components/NoHeaderPanel/NoHeaderPanel'
-import {Typography, Form, Input, Icon, Button, Tag, AutoComplete, Select, Switch} from 'antd';
+import {Typography, Form, Input, Icon, Button, Tag, AutoComplete, Select, Switch, Row, Col} from 'antd';
 
 import {trimText} from "../../../helpers";
 
@@ -30,10 +30,12 @@ class Campaign extends React.Component {
             use_crm: true,
             locations: [],
             skills: [],
-            skillInput: ""
+            skillInput: "",
+            textMessage:""
         };
         this.setLocations = this.setLocations.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
+        this.addCandidateName = this.addCandidateName.bind(this);
     }
 
     componentWillMount() {
@@ -57,6 +59,12 @@ class Campaign extends React.Component {
         }
     };
 
+    addCandidateName = () => {
+        let textMessage = this.state.textMessage+" {candidate.name} ";
+        this.props.form.setFieldsValue({text: textMessage}); //Update Message Input
+        this.setState({textMessage:textMessage}); //Update TextMessage State for Phone.JS
+    };
+
     //TODO:: Skill should be validated before submission | Empty String can be accepted
     submit = (e) => {
         if (e.key === "Enter") {
@@ -78,7 +86,7 @@ class Campaign extends React.Component {
                     values.location,
                     values.jobTitle,
                     this.state.skills,
-                    values.text
+                    this.state.textMessage,
                 ));
             }
         });
@@ -233,10 +241,21 @@ class Campaign extends React.Component {
                             )}
                         </FormItem>
                         <FormItem label={"Message"}>
-                            {getFieldDecorator("text")(
-                                <TextArea placeholder="Type in the message you'd like to send"
-                                          onChange={e => this.setState({textMessage: e.target.value})}/>
-                            )}
+                            <Row gutter={16} type="flex" justify="end">
+                                <Col span={24}>
+                                    {getFieldDecorator("text")(
+                                        <TextArea placeholder="Type in the message you'd like to send"
+                                                  onChange={e => this.setState({textMessage: e.target.value})}
+                                        />
+                                    )}
+                                </Col>
+                                <Col span={7}>
+                                    <Button type="default" shape="round" size="small"
+                                            onClick={this.addCandidateName}>
+                                        Candidate Name
+                                    </Button>
+                                </Col>
+                            </Row>
                         </FormItem>
                         <Button type="primary" icon="rocket" onClick={this.handleSubmit} size={"large"}>
                             Launch

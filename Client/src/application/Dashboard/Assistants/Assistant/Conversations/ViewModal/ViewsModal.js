@@ -21,7 +21,7 @@ class ViewsModal extends Component {
     constructor(props) {
         super(props);
         this.handleKeyPress = this.handleKeyPress.bind(this);
-        console.log(this.props.conversation.Files)
+        console.log(this.props.conversation)
     }
 
     componentDidMount() {
@@ -45,17 +45,17 @@ class ViewsModal extends Component {
 
     downloadFileHandler = (fileKey) => {
         // Get file name by index
-        let fileName = this.props.conversation.StoredFile.StoredFileInfo.find(sf => sf.FilePath === fileKey).FilePath;
-        if (!fileName){
+        let file = this.props.conversation.StoredFile.StoredFileInfo.find(sf => sf.FilePath === fileKey);
+        if (!file){
             errorMessage("File doesn't exist!");
             return;
         }
 
         loadingMessage("Downloading file...", 0);
         this.setState({isDownloadingFile: true});
-
+        const conversationID = this.props.conversation.ID
         // Get the pre singed generated url to download from DigitalOcean
-        http.get(`/assistant/${this.props.assistant.ID}/conversation/${fileName}`)
+        http.get(`/assistant/${this.props.assistant.ID}/conversation/${conversationID}/${file.FilePath}`)
             .then((response) => {
                 window.open(response.data.data.url);
                 this.setState({isDownloadingFile: false});

@@ -9,7 +9,7 @@ from sqlalchemy.sql import desc
 from sqlalchemy.orm import joinedload
 
 from utilities.enums import UserType, Status, Webhooks, FileAssetType
-from models import db, Callback, Conversation, Assistant, StoredFile
+from models import db, Callback, Conversation, Assistant, StoredFile, StoredFileInfo
 from services import assistant_services, stored_file_services, auto_pilot_services, mail_services, webhook_services
 from services.Marketplace.CRM import crm_services
 from utilities import json_schemas, helpers, enums
@@ -109,6 +109,24 @@ def processConversation(assistantHashID, data: dict) -> Callback:
         helpers.logError("conversation_services.processConversation(): " + str(exc))
         db.session.rollback()
         return Callback(False, "An error occurred while processing chatbot data.")
+
+def getFileByConversationID(assistantID, conversationID, filePath):
+    try:
+        file: StoredFileInfo = db.session.query(StoredFileInfo)\
+            .filter(Assistant.ID == assistantID)\
+            .filter(Conversation.ID == conversationID)\
+            .filter(StoredFileInfo.FilePath == filePath)\
+            .first()
+        if not file:
+            return Callback(False, "Could not gather file.")
+
+
+        return Callback(False, "Gathered storedfile.", file)
+    except Exception as exc:
+        helpers.logError("conversation_services.getFileByConversationID(): " + str(exc))
+        db.session.rollback()
+        return Callback(False, "Could not gather file.")
+
 
 def uploadFiles(files, conversation, data, keys):
     try:

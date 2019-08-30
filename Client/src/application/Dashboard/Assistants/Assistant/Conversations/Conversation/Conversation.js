@@ -26,7 +26,7 @@ class Conversation extends Component {
                 this.counter+=1;
                 return (<Button
                     disabled={this.props.isDownloadingFile}
-                    hreftype="primary" file-path-index={record.dataType} icon="download" size="small"
+                    hreftype="primary" file-path-index={record.fileName} icon="download" size="small"
                     onClick={(e) => {this.props.downloadFile(e.target.getAttribute('file-path-index'))}}>
                     Download File
                 </Button>);

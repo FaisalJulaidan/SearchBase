@@ -61,6 +61,11 @@ def sendCampaign(campaign_details, companyID):
 
             if not candidate_phone:
                 continue
+
+            # insert candidate details in text
+            text = text.replace("{candidate.name}", candidate.get("CandidateName"))
+
+            # insert chatbot link
             text = text.split("&id")[0]
             text += "&id=" + str(candidate.get("ID"))
             print("TEXT: ", text)

@@ -19,7 +19,8 @@ import {
     isReady,
     optionalDelayExecution,
     promiseWrapper,
-    useInterval
+    useInterval,
+    genUniqueFileName,
 } from '../../utils';
 import { fetchData, getCurBlock } from '../../utils/flowHandler';
 // Constants
@@ -257,6 +258,7 @@ export const Chatbot = ({
             window.__TSB_CHATBOT.close = () => closeWindow();
         }
     }, [initChatbot, setChatbotStatus]);
+
 
     return (
         <>

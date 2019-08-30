@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 // Utils
-import { validate } from '../../../utils';
+import { validate, genUniqueFileName } from '../../../utils';
 
 // Constants
 import * as messageTypes from '../../../constants/MessageType';
@@ -63,7 +63,13 @@ const FileUpload = ({ message, submitMessage }) => {
                 curBlockID: message.block[flowAttributes.CONTENT][flowAttributes.USER_INPUT_BLOCKTOGOID],
                 waitingForUser: false
             };
-            submitMessage(text, type, newState, afterMessage, block, { skipped: false, file });
+            submitMessage(
+                text,
+                type,
+                newState,
+                afterMessage,
+                block,
+                { skipped: false, file, fileName: genUniqueFileName(file) });
         }
 
     }, [upload, message, setUpload, file, submitMessage]);

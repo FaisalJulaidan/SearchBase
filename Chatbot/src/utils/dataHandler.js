@@ -155,7 +155,7 @@ export const dataHandler = (() => {
                 ClientTelephone: null
             };
 
-            const __collectData = (blockID, questionText, input, dataType, keywords, skipped) => {
+            const __collectData = (blockID, questionText, input, dataType, keywords, skipped, extras={}) => {
                 const {name, enumName} = dataType;
                 if (!skipped) {
                     const kdt = {...keywordsByDataType};
@@ -177,7 +177,8 @@ export const dataHandler = (() => {
                     questionText,
                     input: input.trim(),
                     dataType: name,
-                    keywords
+                    keywords,
+                    ...extras
                 });
             };
 
@@ -274,10 +275,14 @@ export const dataHandler = (() => {
                     input,
                     blockRef[flowAttributes.DATA_TYPE],
                     input.trim().split(' ').filter(n => n),
-                    content.skipped);
+                    content.skipped,
+                    {fileName: content.fileName});
 
                 if (!content.skipped)
-                    submittedFiles = submittedFiles.concat({file: content.file, key: blockRef.DataType.enumName});
+                    submittedFiles = submittedFiles.concat({
+                        file: content.file,
+                        fileName: content.fileName,
+                        key: blockRef.DataType.enumName});
             };
 
             const __processSolutions = (message) => {

@@ -68,7 +68,7 @@ def sendCampaign(campaign_details, companyID):
             # insert chatbot link
             text = text.split("&id")[0]
             text += "&id=" + str(candidate.get("ID"))
-            print("TEXT: ", text)
+
             sendMessage(messenger.Type, candidate_phone, text, messenger.Auth)
 
         return Callback(True, '')

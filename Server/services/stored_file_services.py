@@ -104,6 +104,7 @@ def removeByID(id):
 def uploadFile(file, filename, public=False, **kwargs):
     try:
         if 'model' in kwargs:
+            print(file)
             #files, model, identifier, value, storedFileID, keys: List = None
             dbRef_callback: Callback = createRef(file, kwargs['model'], kwargs['identifier'], kwargs['identifier_value'], kwargs['stored_file_id'] , kwargs['key'], realFileName=filename)
 

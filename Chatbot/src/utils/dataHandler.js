@@ -83,10 +83,6 @@ export const dataHandler = (() => {
             const cancel = {
                 cancelToken: source.token
             };
-            console.log('============>>>>>');
-            console.log(result);
-            console.log('sending data...');
-
             // CHECK IF UPDATING CANDIDATE
 
 
@@ -104,35 +100,29 @@ export const dataHandler = (() => {
                 }
             }
 
+            const files = result.submittedFiles;
 
+            const formData = new FormData();
+            const config = {headers: {'content-type': 'multipart/form-data'}, ...cancel};
+            files.forEach(file => formData.append('file', file.file, file.file.name));
+            formData.append('keys', files.map(file => file.key).join(","));
+            formData.append('conversation', JSON.stringify(result));
             // send data to server
-            const {data, error} = await promiseWrapper(axios.post(`${getServerDomain()}/api/assistant/${assistantID}/chatbot`, result, cancel));
-            sessionID = data ? data.data.data.sessionID : null; // :) // lol faisal 🔫
-            setSessionID(sessionID);
+            const {data, error} = await promiseWrapper(axios.post(`${getServerDomain()}/api/assistant/${assistantID}/chatbot`, formData, config));
+
             if (axios.isCancel(error)) {
                 console.log('cancelled');
                 cancelled = true;
             }
             if (error) {
                 console.log('SendData: ', error);
+                // filesSentFailed = true;
             }
 
             console.log('sending files...');
             // send files to server
-            const files = result.submittedFiles;
             let filesSentFailed = false;
-            if (sessionID && files.length && !cancelled) {
-                const formData = new FormData();
-                const config = {headers: {'content-type': 'multipart/form-data'}};
-                files.forEach(file => formData.append('file', file.file, file.file.name));
-                formData.append('keys', files.map(file => file.key).join(","))
-                const {data, error} = await promiseWrapper(axios.post(`${getServerDomain()}/api/assistant/${assistantID}/chatbot/${sessionID}/file`, formData, config));
 
-                if (error) {
-                    console.error('file sending failed');
-                    filesSentFailed = true;
-                }
-            }
 
             return {dataSent: !!sessionID, filesSent: !filesSentFailed, cancelled};
         };
@@ -281,6 +271,7 @@ export const dataHandler = (() => {
                 if (!content.skipped)
                     submittedFiles = submittedFiles.concat({
                         file: content.file,
+                        uploadedFileName: content.file.name,
                         fileName: content.fileName,
                         key: blockRef.DataType.enumName});
             };

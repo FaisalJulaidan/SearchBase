@@ -12,7 +12,7 @@ from utilities.enums import UserType, Status, Webhooks, FileAssetType
 from models import db, Callback, Conversation, Assistant, StoredFile
 from services import assistant_services, stored_file_services, auto_pilot_services, mail_services, webhook_services
 from services.Marketplace.CRM import crm_services
-from utilities import json_schemas, helpers
+from utilities import json_schemas, helpers, enums
 import json
 
 
@@ -103,34 +103,36 @@ def processConversation(assistantHashID, data: dict) -> Callback:
         db.session.commit()
 
 
-        return Callback(True, 'Chatbot data has been processed successfully!', conversation)
+        return Callback(True, 'Chatbot data has been processed successfully!', (conversation, data,))
 
     except Exception as exc:
         helpers.logError("conversation_services.processConversation(): " + str(exc))
         db.session.rollback()
         return Callback(False, "An error occurred while processing chatbot data.")
 
-def uploadFiles(files, conversation, keys):
+def uploadFiles(files, conversation, data, keys):
     try:
-        data = json.loads(conversation.collectedData)
         sf : StoredFile = StoredFile()
 
         db.session.add(sf)
         db.session.flush()
+        
 
         uploadedFiles = []
 
-        for item in data.collectedData:
-            if item.input == "&FILE_UPLOAD&": # enum for this?
-                key = FileAssetType(item.dataType) or None
+        for item in data['collectedData']:
+            if item['input'] == "&FILE_UPLOAD&": # enum for this?
                 for file in files:
-                    if file.filename == item.filename:
-                        upload_callback: Callback = stored_file_services.uploadFile(file, item.fileName, True, model=Conversation,
-                                                                                                        identifier="ID",
-                                                                                                        identifier_value=conversation.ID,
-                                                                                                        stored_file_id=sf.ID,
-                                                                                                        key=key)
-                        uploadedFiles.append(upload_callback.Data)
+                    print(item)
+                    for submittedFile in data['submittedFiles']:
+                        if file.filename == submittedFile['uploadedFileName']:
+                            key = enums.FileAssetType(submittedFile['key']) or None
+                            upload_callback: Callback = stored_file_services.uploadFile(file, item['fileName'], True, model=Conversation,
+                                                                                                            identifier="ID",
+                                                                                                            identifier_value=conversation.ID,
+                                                                                                            stored_file_id=sf.ID,
+                                                                                                            key=key)
+                            uploadedFiles.append(upload_callback.Data)
         
         db.session.commit()
 

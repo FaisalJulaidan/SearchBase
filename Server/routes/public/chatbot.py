@@ -9,6 +9,7 @@ from services import conversation_services, flow_services, databases_services, s
 from services.Marketplace.CRM import crm_services
 from utilities import helpers, enums, wrappers
 from utilities.helpers import logError
+import json
 
 chatbot_router = Blueprint('chatbot_router', __name__, template_folder="../templates")
 CORS(chatbot_router)
@@ -86,79 +87,13 @@ def chatbot(assistantIDAsHash):
     if request.method == "POST":
 
         # Chatbot collected information
-        data = request.json
+        data = json.loads(request.form.get('conversation'))
         callback: Callback = conversation_services.processConversation(assistantIDAsHash, data)
-        if request.form.get('file'):
-            file_callback: Callback = conversation_services.uploadFiles(request.form.get('file'), callback.Data, request.form.get('keys'))
+        if request.files:
+            file_callback: Callback = conversation_services.uploadFiles(request.files.getlist('file'), callback.Data[0], callback.Data[1], request.form.get('keys'))
         
-      
-
-                #ends here
-
         if not callback.Success:
             return helpers.jsonResponseFlask(False, 400, callback.Message, callback.Data)
 
         return helpers.jsonResponseFlask(True, 200,
-                                    "Collected data is successfully processed",
-                                    {'sessionID': callback.Data.ID})
-
-
-# @chatbot_router.route("/assistant/<string:assistantIDAsHash>/chatbot/<int:sessionID>/file", methods=['POST'])
-# def chatbot_upload_files(assistantIDAsHash, sessionID):
-#     callback: Callback = conversation_services.getByID(sessionID, helpers.decodeID(assistantIDAsHash)[0])
-#     if not callback.Success:
-#         return helpers.jsonResponseFlask(False, 404, "Session not found.", None)
-#     conversation: Conversation = callback.Data
-
-#     if request.method == 'POST':
-
-#         try:
-#             assistant: Assistant = conversation.Assistant
-#             # Check if the post request has the file part
-#             keys = request.form.get('keys').split(",")
-#             if 'file' not in request.files:
-#                 return helpers.jsonResponseFlask(False, 404, "No file part")
-
-#             files = request.files.getlist('file')
-#             sf : StoredFile = StoredFile()
-
-#             db.session.add(sf)
-#             db.session.flush()
-
-#             returnValue = []
-#             set_file_id: Callback = conversation_services.setFileByID(sessionID, sf.ID)
-#             for idx, file in enumerate(files):
-#                 if file.filename == '':
-#                     db.session.rollback()
-#                     return helpers.jsonResponseFlask(False, 404, "No selected file")
-#                 # Generate unique name: hash_sessionIDEncrypted.extension
-#                 filename = str(uuid.uuid4()) + '_' + helpers.encodeID(sessionID) + '.' + \
-#                            secure_filename(file.filename).rsplit('.', 1)[1].lower()
-
-#                 key = keys[idx] if keys[idx] is not None else None
-#                 key = enums.FileAssetType(keys[idx]) if enums.FileAssetType.has_value(keys[idx]) else None
-#                 print(keys[idx])    
-#                 upload_callback: Callback = stored_file_services.uploadFile(file, filename, True, model=Conversation,
-#                                                                                                 identifier="ID",
-#                                                                                                 identifier_value=conversation.ID,
-#                                                                                                 stored_file_id=sf.ID,
-#                                                                                                 key=key)
-
-#                 returnValue.append(upload_callback.Data)
-#             # Save changes
-#             db.session.commit()
-
-#             # Notify company of new conversation
-#             if assistant.NotifyEvery == 0:
-#                 mail_services.notifyNewConversation(assistant, conversation)
-
-#             # if assistant.CRM:
-#                 # Send through CRM
-#                 # sendCRMFile_callback: Callback = crm_services.uploadFile(assistant, files)
-#                 # if not sendCRMFile_callback:
-#                 #     raise Exception("Could not submit file to CRM")
-    
-#         except Exception as exc:
-#             print(str(exc))
-#             return helpers.jsonResponseFlask(False, 404, "I am having difficulties saving your uploaded files :(")
-#         return helpers.jsonResponseFlask(True, 200, "File uploaded successfully")
+                                    "Collected data is successfully processed")

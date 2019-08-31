@@ -62,60 +62,61 @@ def contact_us():
         contactUs_callback: Callback = mail_services.contactUsIndex(name, email, message)
         return contactUs_callback.Message
 
-
-@public_router.route("/features", methods=['GET'])
-def features():
-    if request.method == "GET":
-        return render_template("features.html")
-
-
-@public_router.route("/dataRetrieval", methods=['GET'])
-def data_retrieval():
-    if request.method == "GET":
-        return render_template("retrieval.html")
-
-
-@public_router.route("/dataCollection", methods=['GET'])
-def data_collection():
-    if request.method == "GET":
-        return render_template("collection.html")
-
-
-@public_router.route("/CvParsing", methods=['GET'])
-def cv_parsing():
-    if request.method == "GET":
-        return render_template("CvParsing.html")
-
-
-@public_router.route("/FeedbackCollector", methods=['GET'])
-def feedback_collector():
-    if request.method == "GET":
-        return render_template("Feedback.html")
-
-
-@public_router.route("/about", methods=['GET'])
-def about():
-    if request.method == "GET":
-        return render_template("about.html")
-
-
-@public_router.route("/contact", methods=['GET'])
-def contactpage():
-    if request.method == "GET":
-        return render_template("contact.html")
-
-
-# Terms and conditions page route
-@public_router.route("/termsandconditions", methods=['GET'])
-def terms_and_conditions():
-    if request.method == "GET":
-        return render_template("terms.html")
-
-
-@public_router.route("/privacy", methods=['GET'])
-def privacy():
-    if request.method == "GET":
-        return render_template("privacy-policy.html")
+# Old website routes, To be deleted.
+#
+# @public_router.route("/features", methods=['GET'])
+# def features():
+#     if request.method == "GET":
+#         return render_template("features.html")
+#
+#
+# @public_router.route("/dataRetrieval", methods=['GET'])
+# def data_retrieval():
+#     if request.method == "GET":
+#         return render_template("retrieval.html")
+#
+#
+# @public_router.route("/dataCollection", methods=['GET'])
+# def data_collection():
+#     if request.method == "GET":
+#         return render_template("collection.html")
+#
+#
+# @public_router.route("/CvParsing", methods=['GET'])
+# def cv_parsing():
+#     if request.method == "GET":
+#         return render_template("CvParsing.html")
+#
+#
+# @public_router.route("/FeedbackCollector", methods=['GET'])
+# def feedback_collector():
+#     if request.method == "GET":
+#         return render_template("Feedback.html")
+#
+#
+# @public_router.route("/about", methods=['GET'])
+# def about():
+#     if request.method == "GET":
+#         return render_template("about.html")
+#
+#
+# @public_router.route("/contact", methods=['GET'])
+# def contactpage():
+#     if request.method == "GET":
+#         return render_template("contact.html")
+#
+#
+# # Terms and conditions page route
+# @public_router.route("/termsandconditions", methods=['GET'])
+# def terms_and_conditions():
+#     if request.method == "GET":
+#         return render_template("terms.html")
+#
+#
+# @public_router.route("/privacy", methods=['GET'])
+# def privacy():
+#     if request.method == "GET":
+#         return render_template("privacy-policy.html")
 
 
 

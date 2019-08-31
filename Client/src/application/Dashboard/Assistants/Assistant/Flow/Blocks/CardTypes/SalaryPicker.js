@@ -30,41 +30,44 @@ class SalaryPicker extends Component {
         showSkip: false
     };
 
-    onSubmit = () => this.props.form.validateFields((err, values) => {
-        if (!err) {
-            const flowOptions = this.props.options.flow;
-            let options = {
-                Type: 'Salary Picker',
-                StoreInDB: false,
+    onSubmit = async () => {
+        const isFilled = await this.minMaxSalaryFormItem.checkFields();
+        this.props.form.validateFields((err, values) => {
+            if (!err && isFilled) {
+                const flowOptions = this.props.options.flow;
+                let options = {
+                    Type: 'Salary Picker',
+                    StoreInDB: false,
 
-                Skippable: values.isSkippable || false,
-                SkipText: values.SkipText || 'Skip!',
-                SkipAction: values.SkipAction || 'End Chat',
-                SkipBlockToGoID: values.skipBlockToGoID || values.skipBlockToGoIDGroup || null,
+                    Skippable: values.isSkippable || false,
+                    SkipText: values.SkipText || 'Skip!',
+                    SkipAction: values.SkipAction || 'End Chat',
+                    SkipBlockToGoID: values.skipBlockToGoID || values.skipBlockToGoIDGroup || null,
 
-                DataType: flowOptions.dataTypes.find((dataType) => dataType.name === 'No Type'),
-                Content: {
-                    text: values.text,
-                    min: +values.minSalary,
-                    max: +values.maxSalary,
-                    period: values.payPeriod,
-                    defaultCurrency: values.defualtCurrency,
-                    action: values.action,
-                    afterMessage: values.afterMessage,
-                    blockToGoID: values.blockToGoID || values.blockToGoIDGroup || null
+                    DataType: flowOptions.dataTypes.find((dataType) => dataType.name === 'No Type'),
+                    Content: {
+                        text: values.text,
+                        min: +values.minSalary,
+                        max: +values.maxSalary,
+                        period: values.payPeriod,
+                        defaultCurrency: values.defualtCurrency,
+                        action: values.action,
+                        afterMessage: values.afterMessage || '',
+                        blockToGoID: values.blockToGoID || values.blockToGoIDGroup || null
+                    }
+                };
+                console.log(options);
+
+                if (this.props.handleNewBlock)
+                    this.props.handleNewBlock(options);
+                else {
+                    // Edit Block
+                    options.ID = this.props.modalState.block.ID;
+                    this.props.handleEditBlock(options);
                 }
-            };
-            console.log(options);
-
-            if (this.props.handleNewBlock)
-                this.props.handleNewBlock(options);
-            else {
-                // Edit Block
-                options.ID = this.props.modalState.block.ID;
-                this.props.handleEditBlock(options);
             }
-        }
-    });
+        });
+    };
 
     componentWillMount() {
         const { modalState, options } = this.props;
@@ -87,7 +90,6 @@ class SalaryPicker extends Component {
 
         const buttons = ButtonsForm(handleNewBlock, handleEditBlock, handleDeleteBlock, this.onSubmit, block);
 
-
         return (
             <Card style={{ width: '100%' }} actions={buttons}>
                 <Form layout='horizontal'>
@@ -103,11 +105,14 @@ class SalaryPicker extends Component {
                                       layout={layout}
                                       blockType={'Salary Picker'}/>
 
-                    <MinMaxSalaryFormItem FormItem={FormItem} layout={layout}
+                    <MinMaxSalaryFormItem onRef={ref => (this.minMaxSalaryFormItem = ref)}
+                                          FormItem={FormItem} layout={layout}
+                                          block={block}
                                           getFieldDecorator={getFieldDecorator}
                                           form={this.props.form} options={this.props.options}/>
 
                     <DefualtCurrencyFormItem FormItem={FormItem} layout={layout}
+                                             block={block}
                                              currencyCodes={options.databases.currencyCodes}
                                              getFieldDecorator={getFieldDecorator}/>
 

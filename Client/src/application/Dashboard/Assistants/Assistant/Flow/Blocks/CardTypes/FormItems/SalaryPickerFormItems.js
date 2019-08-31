@@ -9,9 +9,10 @@ export const DefualtCurrencyFormItem = ({ FormItem, layout, getFieldDecorator, c
         {
             currencyCodes && currencyCodes[0] ?
                 getFieldDecorator('defualtCurrency', {
+                    initialValue: block.Content.defaultCurrency,
                     rules: [{
                         required: true,
-                        message: 'Please select an action'
+                        message: 'Please select default currency'
                     }]
                 })(
                     <Select placeholder="Select the defualt currency">
@@ -26,9 +27,15 @@ export const DefualtCurrencyFormItem = ({ FormItem, layout, getFieldDecorator, c
     </FormItem>
 );
 
-export const PayPeriodFormItem = ({ FormItem, layout, getFieldDecorator }) => (
+export const PayPeriodFormItem = ({ FormItem, layout, getFieldDecorator,block }) => (
     <FormItem label="Pay Period" {...layout}>
-        {getFieldDecorator('payPeriod')(
+        {getFieldDecorator('payPeriod', {
+            initialValue: block.Content.period,
+            rules: [{
+                required: true,
+                message: 'Please select pay period'
+            }]
+        })(
             <Radio.Group>
                 <Radio value="Annually">Annually</Radio>
                 <Radio value="Daily">Daily</Radio>

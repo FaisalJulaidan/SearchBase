@@ -58,7 +58,7 @@ def login(auth):
 
         headers = {'Content-Type': 'application/json'}
 
-        access_token_url = "https://auth9.bullhornstaffing.com/oauth/token?" + \
+        access_token_url = "https://auth-emea.bullhornstaffing.com/oauth/token?" + \
                            "&grant_type=authorization_code" + \
                            "&redirect_uri=" + helpers.getDomain(3000) + "/dashboard/marketplace/Bullhorn" + \
                            "&client_id=" + CLIENT_ID + \
@@ -102,7 +102,7 @@ def retrieveRestToken(auth, companyID):
         headers = {'Content-Type': 'application/json'}
 
         # use refresh_token to generate access_token and refresh_token
-        url = "https://auth.bullhornstaffing.com/oauth/token?grant_type=refresh_token&refresh_token=" + \
+        url = "https://auth-emea.bullhornstaffing.com/oauth/token?grant_type=refresh_token&refresh_token=" + \
               authCopy.get("refresh_token") + \
               "&client_id=" + CLIENT_ID + \
               "&client_secret=" + CLIENT_SECRET
@@ -120,7 +120,7 @@ def retrieveRestToken(auth, companyID):
         else:
             raise Exception(get_access_token.text)
 
-        url = "https://rest.bullhornstaffing.com/rest-services/login?version=*&" + \
+        url = "https://rest91.bullhornstaffing.com/rest-services/login?version=*&" + \
               "access_token=" + access_token
 
         get_rest_token = requests.put(url, headers=headers)

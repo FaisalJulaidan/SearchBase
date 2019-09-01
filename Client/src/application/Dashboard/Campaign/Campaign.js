@@ -37,8 +37,10 @@ class Campaign extends React.Component {
         this.handleSkillSubmit = this.handleSkillSubmit.bind(this);
         this.onSkillTagClose = this.onSkillTagClose.bind(this);
         this.onCandidateSelected = this.onCandidateSelected.bind(this);
+        this.isCandidateSelected = this.isCandidateSelected.bind(this);
         this.showModal = this.showModal.bind(this);
         this.handleModalOk = this.handleModalOk.bind(this);
+        this.handleModalSelectAll = this.handleModalSelectAll.bind(this);
         this.handleModalCancel = this.handleModalCancel.bind(this);
         this.afterModalClose = this.afterModalClose.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
@@ -57,11 +59,8 @@ class Campaign extends React.Component {
     };
 
     showModal = (visibility) => {
-        if (this.state.modalVisibility !== visibility) {
-            this.setState({
-                modalVisibility: visibility,
-            });
-        }
+        if (this.state.modalVisibility !== visibility)
+            this.setState({modalVisibility: visibility,});
     };
 
     findLocation = (value) => {
@@ -120,27 +119,35 @@ class Campaign extends React.Component {
         });
     };
 
+    handleModalSelectAll = () => {
+        this.setState({candidate_list: this.props.candidate_list})
+    };
+
     handleModalCancel = () => {
-        this.setState({
-            modalVisibility: false
-        });
+        this.setState({modalVisibility: false});
     };
 
     afterModalClose = () => {
-        this.setState({
-            candidate_list: []
-        });
+        this.setState({candidate_list: []});
     };
 
     onCandidateSelected = (e, candidate) => {
         if (e.target.checked)
             this.state.candidate_list.push(candidate);
         else {
-            this.state.candidate_list = this.state.candidate_list.filter(function (temp_candidate) {
-                if (temp_candidate.ID !== candidate.ID)
-                    return temp_candidate
+            this.state.candidate_list = this.state.candidate_list.filter(function (tempCandidate) {
+                if (tempCandidate.ID !== candidate.ID)
+                    return tempCandidate
             });
         }
+        this.setState({candidate_list: this.state.candidate_list});
+    };
+
+    isCandidateSelected = (candidate) => {
+        return this.state.candidate_list.some((tempCandidate) => {
+            if (tempCandidate.ID === candidate.ID)
+                return true;
+        });
     };
 
     handleSubmit = (event) => {
@@ -165,6 +172,7 @@ class Campaign extends React.Component {
     render() {
         const {form} = this.props;
         const {getFieldDecorator} = form;
+        console.log(this.state.candidate_list);
 
         return (<NoHeaderPanel>
             <div className={styles.Header}>
@@ -186,6 +194,15 @@ class Campaign extends React.Component {
                     onOk={this.handleModalOk}
                     confirmLoading={this.props.isLaunchingCampaign}
                     okButtonProps={{icon: "rocket"}}
+                    footer={<div>
+                        <Button onClick={this.handleModalCancel}>Cancel</Button>
+                        <Button onClick={this.handleModalSelectAll}
+                                disabled={this.props.candidate_list.length === 0}>Select All</Button>
+                        <Button onClick={this.handleModalOk}
+                                type="primary"
+                                loading={this.props.isLaunchingCampaign}
+                                icon="rocket">Launch</Button>
+                    </div>}
                     onCancel={this.handleModalCancel}
                     afterClose={this.afterModalClose}
                     destroyOnClose
@@ -195,13 +212,12 @@ class Campaign extends React.Component {
                         loading={this.props.isCandidatesLoading}
                         itemLayout="horizontal"
                         dataSource={this.props.candidate_list}
-                        renderItem={item => (
-                            <List.Item
-                                actions={[<Checkbox onChange={(e) => this.onCandidateSelected(e, item)}/>]}>
+                        renderItem={(item) => (
+                            <List.Item actions={[<Checkbox checked={this.isCandidateSelected(item)}
+                                                           onChange={(e) => this.onCandidateSelected(e, item)}/>]}>
                                 <List.Item.Meta
                                     title={item.CandidateName}
-                                    description={item.CandidateLocation + ' - ' + item.CandidateSkills}
-                                />
+                                    description={item.CandidateLocation + ' - ' + item.CandidateSkills}/>
                             </List.Item>
                         )}
                     />

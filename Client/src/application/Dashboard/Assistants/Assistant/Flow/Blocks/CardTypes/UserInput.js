@@ -15,7 +15,7 @@ import {
     SkippableFormItem,
     SkipTextFormItem,
     StoreInDBFormItem
-} from './CardTypesFormItems'
+} from './FormItems'
 
 const FormItem = Form.Item;
 

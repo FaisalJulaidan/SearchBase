@@ -1,56 +1,60 @@
-import React, {Component} from 'react';
-import {Card, Divider, Form} from "antd";
+import React, { Component } from 'react';
+import { Card, Divider, Form } from 'antd';
 
-import {getInitialVariables, initActionType, initActionTypeSkip} from './CardTypesHelpers'
+import { getInitialVariables, initActionType, initActionTypeSkip } from './CardTypesHelpers';
 import {
     ActionFormItem,
     AfterMessageFormItem,
     ButtonsForm,
     DataTypeFormItem,
-    FileTypesFormItem,
+    DefualtCurrencyFormItem,
+    MinMaxSalaryFormItem,
+    PayPeriodFormItem,
     QuestionFormItem,
-    ShowGoToBlockFormItem, ShowGoToBlockSkipFormItem,
-    ShowGoToGroupFormItem, ShowGoToGroupSkipFormItem, SkipFormItem,
-    SkippableFormItem, SkipTextFormItem
-} from './FormItems'
+    ShowGoToBlockFormItem,
+    ShowGoToBlockSkipFormItem,
+    ShowGoToGroupFormItem,
+    ShowGoToGroupSkipFormItem,
+    SkipFormItem,
+    SkippableFormItem,
+    SkipTextFormItem
+} from './FormItems';
 
 const FormItem = Form.Item;
 
-class FileUpload extends Component {
+class SalaryPicker extends Component {
 
     state = {
         showGoToBlock: false,
         showGoToGroup: false,
-
-        showGoToBlockSkip: false,
-        showGoToGroupSkip: false,
-
-        fileTypes: [],
+        showSkip: false
     };
 
     onSubmit = () => this.props.form.validateFields((err, values) => {
         if (!err) {
             const flowOptions = this.props.options.flow;
-            console.log(values);
             let options = {
-                Type: 'File Upload',
-                StoreInDB: true,
+                Type: 'Salary Picker',
+                StoreInDB: false,
 
                 Skippable: values.isSkippable || false,
-                SkipText: values.SkipText || "Skip!",
-                SkipAction: values.SkipAction || "End Chat",
+                SkipText: values.SkipText || 'Skip!',
+                SkipAction: values.SkipAction || 'End Chat',
                 SkipBlockToGoID: values.skipBlockToGoID || values.skipBlockToGoIDGroup || null,
 
-                DataType: flowOptions.dataTypes
-                    .find((dataType) => dataType.name === values.dataType[values.dataType.length-1]),
+                DataType: flowOptions.dataTypes.find((dataType) => dataType.name === 'No Type'),
                 Content: {
                     text: values.text,
+                    min: +values.minSalary,
+                    max: +values.maxSalary,
+                    period: values.payPeriod,
+                    defaultCurrency: values.defualtCurrency,
                     action: values.action,
-                    fileTypes: values.fileTypes,
-                    blockToGoID: values.blockToGoID || values.blockToGoIDGroup || null,
-                    afterMessage: values.afterMessage || ""
+                    afterMessage: values.afterMessage,
+                    blockToGoID: values.blockToGoID || values.blockToGoIDGroup || null
                 }
             };
+            console.log(options);
 
             if (this.props.handleNewBlock)
                 this.props.handleNewBlock(options);
@@ -63,8 +67,8 @@ class FileUpload extends Component {
     });
 
     componentWillMount() {
-        const {modalState, options} = this.props;
-        const {block} = getInitialVariables(options.flow, modalState);
+        const { modalState, options } = this.props;
+        const { block } = getInitialVariables(options.flow, modalState);
         this.setState({
             ...initActionType(block, this.props.modalState.allGroups),
             ...initActionTypeSkip(block, this.props.modalState.allGroups),
@@ -72,34 +76,47 @@ class FileUpload extends Component {
         });
     }
 
-
     render() {
-        const {modalState, options, form, handleNewBlock, handleEditBlock, handleDeleteBlock} = this.props;
-        const {blockOptions, block} = getInitialVariables(options.flow , modalState, 'File Upload');
-        const {allGroups, allBlocks, currentGroup, layout} = modalState;
-        const {getFieldDecorator} = form;
-        const {typesAllowed} = blockOptions;
-        const {showSkip} = this.state;
+        const { modalState, options, form, handleNewBlock, handleEditBlock, handleDeleteBlock } = this.props;
+        // TODO: Important make this from the server
+        const { blockOptions, block } = getInitialVariables(options.flow, modalState, 'Raw Text');
+        const { allGroups, allBlocks, currentGroup, layout } = modalState;
+        const { getFieldDecorator } = form;
+
+        const { showSkip } = this.state;
 
         const buttons = ButtonsForm(handleNewBlock, handleEditBlock, handleDeleteBlock, this.onSubmit, block);
 
+
         return (
-            <Card style={{width: '100%'}} actions={buttons}>
+            <Card style={{ width: '100%' }} actions={buttons}>
                 <Form layout='horizontal'>
+
                     <QuestionFormItem FormItem={FormItem} block={block}
                                       getFieldDecorator={getFieldDecorator}
                                       layout={layout}
-                                      placeholder="Ex: Please upload your CV"/>
+                                      placeholder="Ex: What is your email?"/>
 
                     <DataTypeFormItem FormItem={FormItem} block={block}
                                       getFieldDecorator={getFieldDecorator}
                                       options={this.props.options}
                                       layout={layout}
-                                      blockType={"File Upload"}/>
+                                      blockType={'Salary Picker'}/>
 
-                    <FileTypesFormItem FormItem={FormItem} typesAllowed={typesAllowed} block={block}
-                                       getFieldDecorator={getFieldDecorator}
-                                       layout={layout}/>
+                    <MinMaxSalaryFormItem FormItem={FormItem} layout={layout}
+                                          getFieldDecorator={getFieldDecorator}
+                                          form={this.props.form} options={this.props.options}/>
+
+                    <DefualtCurrencyFormItem FormItem={FormItem} layout={layout}
+                                             currencyCodes={options.databases.currencyCodes}
+                                             getFieldDecorator={getFieldDecorator}/>
+
+                    <PayPeriodFormItem FormItem={FormItem} block={block}
+                                       getFieldDecorator={getFieldDecorator} layout={layout}/>
+
+                    <AfterMessageFormItem FormItem={FormItem} block={block}
+                                          getFieldDecorator={getFieldDecorator}
+                                          layout={layout}/>
 
                     <ActionFormItem FormItem={FormItem} blockOptions={blockOptions} block={block}
                                     setStateHandler={(state) => this.setState(state)}
@@ -119,26 +136,24 @@ class FileUpload extends Component {
                                            getFieldDecorator={getFieldDecorator}
                                            layout={layout}/>
 
-                    <AfterMessageFormItem FormItem={FormItem} block={block}
-                                          getFieldDecorator={getFieldDecorator}
-                                          layout={layout}/>
-
                     <SkippableFormItem FormItem={FormItem} block={block}
-                                       setStateHandler={(state) => this.setState(state)}
                                        getFieldDecorator={getFieldDecorator}
+                                       setStateHandler={(state) => this.setState(state)}
                                        layout={layout}/>
 
                     {
                         showSkip &&
                         <>
-                            <Divider dashed={true} style={{fontWeight: 'normal', fontSize: '14px'}}>
+                            <Divider dashed={true} style={{ fontWeight: 'normal', fontSize: '14px' }}>
                                 Skip Button
                             </Divider>
+
 
                             <SkipTextFormItem FormItem={FormItem}
                                               layout={layout}
                                               getFieldDecorator={getFieldDecorator}
                                               block={block}/>
+
 
                             <SkipFormItem FormItem={FormItem}
                                           blockOptions={blockOptions}
@@ -166,5 +181,5 @@ class FileUpload extends Component {
     }
 }
 
-export default Form.create()(FileUpload);
+export default Form.create()(SalaryPicker);
 

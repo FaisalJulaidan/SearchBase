@@ -17,7 +17,7 @@ import {
     SkippableFormItem,
     SkipTextFormItem,
     StoreInDBFormItem
-} from './CardTypesFormItems'
+} from './FormItems'
 import shortid from 'shortid';
 import './CardTypes.less'
 
@@ -137,7 +137,6 @@ class Question extends Component {
             answers: block.Content.answers || [],
             showSkip: block.Skippable || false
         });
-
     }
 
     render() {

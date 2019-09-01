@@ -1,13 +1,14 @@
-import React, {Component} from 'react';
+import React, { Component } from 'react';
 
 
-import {Icon, Modal, Tabs} from 'antd';
+import { Icon, Modal, Tabs } from 'antd';
 
-import UserInput from "../CardTypes/UserInput";
-import Question from "../CardTypes/Question";
-import FileUpload from "../CardTypes/FileUpload";
-import Solutions from "../CardTypes/Solutions";
-import RawText from "../CardTypes/RawText";
+import UserInput from '../CardTypes/UserInput';
+import Question from '../CardTypes/Question';
+import FileUpload from '../CardTypes/FileUpload';
+import Solutions from '../CardTypes/Solutions';
+import RawText from '../CardTypes/RawText';
+import SalaryPicker from '../CardTypes/SalaryPicker';
 
 const TabPane = Tabs.TabPane;
 const MyModal = Modal;
@@ -50,13 +51,22 @@ class NewBlockModal extends Component {
                          destroyOnClose={true}
                          footer={null}>
 
-                    <Tabs type="card" onChange={this.onChangeTab}>
+                    <Tabs type="card"
+                          defaultActiveKey={'SalaryPicker'}
+                          onChange={this.onChangeTab}>
 
                         <TabPane tab={<span><Icon type="question-circle"/>Pre-Selected Answers</span>}
                                  key="Question">
                             <Question modalState={this.state}
                                       handleNewBlock={this.handleNewBlock}
                                       options={this.props.options}/>
+                        </TabPane>
+
+                        <TabPane tab={<span><Icon type="dollar"/>Salary Picker</span>}
+                                 key="SalaryPicker">
+                            <SalaryPicker modalState={this.state}
+                                          handleNewBlock={this.handleNewBlock}
+                                          options={this.props.options}/>
                         </TabPane>
 
                         <TabPane tab={<span><Icon type="form"/>Open Answer</span>}

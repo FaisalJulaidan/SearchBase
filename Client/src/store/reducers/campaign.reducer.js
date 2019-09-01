@@ -6,9 +6,10 @@ const initialState = {
     crms: [],
     databases: [],
     messengers: [],
-    candidates_list: [],
+    candidate_list: [],
     isLoading: false,
-    isLaunching: true,
+    isCandidatesLoading: false,
+    isLaunchingCampaign: false,
     errorMsg: null
 };
 
@@ -48,20 +49,20 @@ export const campaign = (state = initialState, action) => {
         //Fetch Candidate Data
         case actionTypes.FETCH_CAMPAIGN_CANDIDATES_DATA_REQUEST:
             return updateObject(state, {
-                candidates_list: [],
-                isLoading: true,
+                candidate_list: [],
+                isCandidatesLoading: true,
                 errorMsg: null,
             });
         case actionTypes.FETCH_CAMPAIGN_CANDIDATES_DATA_SUCCESS:
             return updateObject(state, {
-                candidates_list: action.candidates_list,
-                isLoading: false,
+                candidate_list: action.candidate_list || [],
+                isCandidatesLoading: false,
                 errorMsg: null,
             });
         case actionTypes.FETCH_CAMPAIGN_CANDIDATES_DATA_FAILURE:
             return updateObject(state, {
-                candidates_list: [],
-                isLoading: false,
+                candidate_list: [],
+                isCandidatesLoading: false,
                 errorMsg: action.error
             });
 
@@ -69,16 +70,17 @@ export const campaign = (state = initialState, action) => {
         //Launch Campaign
         case actionTypes.LAUNCH_CAMPAIGN_REQUEST:
             return updateObject(state, {
-                isLaunching: true,
+                isLaunchingCampaign: true,
                 errorMsg: null,
             });
         case actionTypes.LAUNCH_CAMPAIGN_SUCCESS:
             return updateObject(state, {
-                isLaunching: false,
+                isLaunchingCampaign: false,
+                errorMsg: null,
             });
         case actionTypes.LAUNCH_CAMPAIGN_FAILURE:
             return updateObject(state, {
-                isLaunching: false,
+                isLaunchingCampaign: false,
                 errorMsg: action.error
             });
         default:

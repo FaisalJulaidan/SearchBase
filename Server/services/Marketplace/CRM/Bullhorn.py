@@ -37,7 +37,7 @@ CLIENT_SECRET = os.environ['BULLHORN_CLIENT_SECRET']
 
 def testConnection(auth, companyID):
     try:
-        if auth9.get("refresh_token"):
+        if auth.get("refresh_token"):
             callback: Callback = retrieveRestToken(auth, companyID)
         else:
             callback: Callback = login(auth)

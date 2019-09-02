@@ -121,7 +121,7 @@ def allocation_time(token):
         # Add new appointment
         appointment_callback: Callback = appointment_services.addNewAppointment(data['conversationID'],
                                                                                 request.json.get('pickedTimeSlot'),
-                                                                                "Europe/London")
+                                                                                request.json.get('userTimeZone'))
 
         if not appointment_callback.Success:
             return helpers.jsonResponse(False, 400, "Sorry, we couldn't add your appointment")

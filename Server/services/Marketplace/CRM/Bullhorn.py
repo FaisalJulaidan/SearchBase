@@ -120,7 +120,7 @@ def retrieveRestToken(auth, companyID):
         else:
             raise Exception(get_access_token.text)
 
-        url = "https://rest91.bullhornstaffing.com/rest-services/login?version=*&" + \
+        url = "https://rest.bullhornstaffing.com/rest-services/login?version=*&" + \
               "access_token=" + access_token
 
         get_rest_token = requests.put(url, headers=headers)
@@ -180,7 +180,7 @@ def sendQuery(auth, query, method, body, companyID, optionalParams=None):
 
 def buildUrl(rest_data, query, optionalParams=None):
     # set up initial url
-    url = rest_data.get("rest_url", "https://rest91.bullhornstaffing.com/rest-services/5i3n9d/") + query + \
+    url = rest_data.get("rest_url", "https://rest.bullhornstaffing.com/rest-services/5i3n9d/") + query + \
           "?BhRestToken=" + rest_data.get("rest_token", "none")
     # add additional params
     if optionalParams:

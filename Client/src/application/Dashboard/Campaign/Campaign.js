@@ -1,7 +1,7 @@
 import React from 'react';
 import {connect} from 'react-redux';
 import NoHeaderPanel from 'components/NoHeaderPanel/NoHeaderPanel'
-import {Typography, Form, Input, Icon, Button, Tag, AutoComplete, Select, Switch, Modal, List, Checkbox} from 'antd';
+import {Typography, Form, Input, Icon, Button, Tag, AutoComplete, Select, Switch, Modal, List, Checkbox, Row, Col} from 'antd';
 
 import {trimText} from "../../../helpers";
 
@@ -30,6 +30,8 @@ class Campaign extends React.Component {
             use_crm: true,
             locations: [],
             skills: [],
+            skillInput: "",
+            textMessage:"",
             candidate_list: [],
             modalVisibility: false
         };
@@ -44,6 +46,7 @@ class Campaign extends React.Component {
         this.handleModalCancel = this.handleModalCancel.bind(this);
         this.afterModalClose = this.afterModalClose.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
+        this.addCandidateName = this.addCandidateName.bind(this);
     }
 
     componentWillMount() {
@@ -82,6 +85,12 @@ class Campaign extends React.Component {
             let resp = response.json.results.filter(address => address.address_components.find(loc => loc.types.includes("country")).short_name === "GB");
             this.setState({locations: resp.map(item => item.formatted_address)})
         }
+    };
+
+    addCandidateName = () => {
+        let textMessage = this.state.textMessage+" {candidate.name} ";
+        this.props.form.setFieldsValue({text: textMessage}); //Update Message Input
+        this.setState({textMessage:textMessage}); //Update TextMessage State for Phone.JS
     };
 
     //TODO:: Skill should be validated before submission | Empty String can be accepted
@@ -163,7 +172,7 @@ class Campaign extends React.Component {
                     values.location,
                     values.jobTitle,
                     this.state.skills,
-                    values.text
+                    this.state.textMessage,
                 ));
             }
         });
@@ -363,15 +372,26 @@ class Campaign extends React.Component {
                             )}
                         </FormItem>
                         <FormItem label={"Message"}>
-                            {getFieldDecorator("text", {
+                            <Row gutter={16} type="flex" justify="end">
+                                <Col span={24}>
+                                    {getFieldDecorator("text", {
                                 rules: [{
                                     required: true,
                                     message: "Please enter the message"
                                 }],
                             })(
-                                <TextArea placeholder="Type in the message you'd like to send"
-                                          onChange={e => this.setState({textMessage: e.target.value})}/>
-                            )}
+                                        <TextArea placeholder="Type in the message you'd like to send"
+                                                  onChange={e => this.setState({textMessage: e.target.value})}
+                                        />
+                                    )}
+                                </Col>
+                                <Col span={7}>
+                                    <Button type="default" shape="round" size="small"
+                                            onClick={this.addCandidateName}>
+                                        Candidate Name
+                                    </Button>
+                                </Col>
+                            </Row>
                         </FormItem>
                         <Button loading={this.props.isCandidatesLoading} type="primary" onClick={this.handleSubmit}
                                 size={"large"}>

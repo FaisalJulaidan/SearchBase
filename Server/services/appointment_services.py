@@ -1,4 +1,5 @@
 from datetime import datetime, time
+from pytz import timezone, utc
 
 from models import db, Callback, Appointment, Conversation, Assistant,\
     AppointmentAllocationTime, AppointmentAllocationTimeInfo, Company
@@ -92,24 +93,28 @@ def createAppointmentAllocationTime(companyID, name, times, duration):
         db.session.add_all(toAdd)
         db.session.commit()
         db.session.flush()
-        return Callback(True, "Timetable saved succesfully.", appointmentAllocationTime)
+        return Callback(True, "Timetable saved successfully.", appointmentAllocationTime)
 
     except Exception as exc:
         helpers.logError("appointment_services.createAppointmentAllocationTime(): " + str(exc))
         db.session.rollback()
         return Callback(False, 'Could not create a new Appointment Allocation Time.')
 
-def addNewAppointment(conversationID, dateTime):
+# Add new appointment selected through the appointment picker page
+def addNewAppointment(conversationID, dateTime, userTimezone: str):
     try:
-        if not datetime: raise Exception('Time slot (datetime) is required')
+        if not (datetime and userTimezone): raise Exception('Time picked and user timezone are required')
+
+        userTime = timezone(userTimezone).localize(datetime.strptime(dateTime, "%Y-%m-%d %H:%M"))
 
         if not Conversation.query.get(conversationID): raise Exception("Conversation does not exist anymore")
 
         db.session.add(
             Appointment(
-                DateTime=datetime.strptime(dateTime, "%Y-%m-%d %H:%M"),  # 2019-06-23 16:04
+                DateTime=userTime.astimezone(utc),  # 2019-06-23 16:04
+                UserTimeZone = userTimezone,
                 ConversationID=conversationID,
-                Status= enums.Status.Pending
+                Status= enums.Status.Pending,
             )
         )
 

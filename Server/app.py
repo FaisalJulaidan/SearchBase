@@ -23,6 +23,15 @@ from services import scheduler_services
 from services.auth_services import jwt
 from services.mail_services import mail
 from utilities import helpers, tasks, dummy_data
+from datetime import datetime
+from pytz import timezone, utc
+
+utc_now = utc.localize(datetime.utcnow())
+print(utc_now)
+pst_now = utc_now.astimezone(timezone("Europe/London"))
+print(pst_now)
+
+
 
 app = Flask(__name__, static_folder='static')
 

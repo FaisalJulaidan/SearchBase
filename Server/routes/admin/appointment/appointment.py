@@ -69,11 +69,11 @@ def verify_get_appointment(token):
     else:
         return helpers.jsonResponse(False, 401, callback.Message)
 
-@appointment_router.route("/allocation_times/<payload>", methods=['GET', 'POST'])
-def allocation_time(payload):
+@appointment_router.route("/allocation_times/<token>", methods=['GET', 'POST'])
+def allocation_time(token):
     try:
         # Token expires in 5 days
-        data = helpers.verificationSigner.loads(payload, salt='appointment-key', max_age=432000)
+        data = helpers.verificationSigner.loads(token, salt='appointment-key', max_age=432000)
 
     except Exception as exc:
         return helpers.jsonResponse(False, 400, "Invalid token")
@@ -120,7 +120,8 @@ def allocation_time(payload):
 
         # Add new appointment
         appointment_callback: Callback = appointment_services.addNewAppointment(data['conversationID'],
-                                                                                request.json.get('pickedTimeSlot'))
+                                                                                request.json.get('pickedTimeSlot'),
+                                                                                "Europe/London")
 
         if not appointment_callback.Success:
             return helpers.jsonResponse(False, 400, "Sorry, we couldn't add your appointment")

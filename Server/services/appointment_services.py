@@ -181,6 +181,7 @@ def setAppointmentStatus(appointmentID, name, email, phone, status, companyID) -
 
         appointment.Status = status
 
+        # When appointment is accepted
         if status == enums.Status.Accepted.name:
             email_callback: Callback = mail_services.sendAppointmentConfirmationEmail(
                 name,
@@ -195,6 +196,7 @@ def setAppointmentStatus(appointmentID, name, email, phone, status, companyID) -
             db.session.commit()
             return Callback(True, "Appointment status has been set to {}.".format(appointment.Status.value))
 
+        # When appointment is rejected
         if status == enums.Status.Rejected.name:
             db.session.delete(appointment)
             db.session.commit()

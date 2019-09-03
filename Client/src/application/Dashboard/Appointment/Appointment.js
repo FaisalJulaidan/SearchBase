@@ -47,7 +47,7 @@ class Appointment extends React.Component {
                     <Tabs.TabPane tab="Appointments" key="Appointments">
                         <Appointments tz={tz}/>
                     </Tabs.TabPane>
-                    <Tabs.TabPane tab="Calendar" key="Calendar">
+                    <Tabs.TabPane disabled={true} tab="Calendar (coming soon)" key="Calendar">
                         <Calendar tz={tz}/>
                     </Tabs.TabPane>
                     <Tabs.TabPane tab="Time Slots" key="TimeSlots">

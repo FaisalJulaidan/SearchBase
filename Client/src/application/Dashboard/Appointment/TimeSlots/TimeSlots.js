@@ -133,7 +133,7 @@ class TimeSlots extends React.Component {
         let tabList = this.props.appointmentAllocationTime.concat(this.state.creating ? [emptyAAT()] : []);
         return (
             <>
-                {this.props.isLoading ? <LoadingSpinner/> :
+                {this.props.isLoading ? <Spin size="large"/> :
                     <Tabs tabBarExtraContent={button}
                           onChange={this.onChange}
                           type="editable-card"

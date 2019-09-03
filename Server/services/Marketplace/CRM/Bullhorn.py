@@ -58,7 +58,7 @@ def login(auth):
 
         headers = {'Content-Type': 'application/json'}
 
-        access_token_url = "https://auth9.bullhornstaffing.com/oauth/token?" + \
+        access_token_url = "https://auth-emea.bullhornstaffing.com/oauth/token?" + \
                            "&grant_type=authorization_code" + \
                            "&redirect_uri=" + helpers.getDomain(3000) + "/dashboard/marketplace/Bullhorn" + \
                            "&client_id=" + CLIENT_ID + \
@@ -102,7 +102,7 @@ def retrieveRestToken(auth, companyID):
         headers = {'Content-Type': 'application/json'}
 
         # use refresh_token to generate access_token and refresh_token
-        url = "https://auth.bullhornstaffing.com/oauth/token?grant_type=refresh_token&refresh_token=" + \
+        url = "https://auth-emea.bullhornstaffing.com/oauth/token?grant_type=refresh_token&refresh_token=" + \
               authCopy.get("refresh_token") + \
               "&client_id=" + CLIENT_ID + \
               "&client_secret=" + CLIENT_SECRET
@@ -180,7 +180,7 @@ def sendQuery(auth, query, method, body, companyID, optionalParams=None):
 
 def buildUrl(rest_data, query, optionalParams=None):
     # set up initial url
-    url = rest_data.get("rest_url", "https://rest91.bullhornstaffing.com/rest-services/5i3n9d/") + query + \
+    url = rest_data.get("rest_url", "https://rest.bullhornstaffing.com/rest-services/5i3n9d/") + query + \
           "?BhRestToken=" + rest_data.get("rest_token", "none")
     # add additional params
     if optionalParams:

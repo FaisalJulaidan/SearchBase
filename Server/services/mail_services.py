@@ -74,7 +74,7 @@ def sendAppointmentConfirmationEmail(name, email, dateTime, userTimeZone, compan
             '/emails/appointment_confirmation.html',
             companyName=companyName,
             userName=name,
-            dateTime=dateTime.strftime("%Y/%m/%d %H:%M"),
+            dateTime=dateTime.strftime("%d/%m/%Y %H:%M"),
             userTimeZone=userTimeZone,
             logoPath=logoPath)
 

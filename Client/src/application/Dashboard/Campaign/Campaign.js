@@ -246,8 +246,8 @@ class Campaign extends React.Component {
                             <List.Item actions={[<Checkbox defaultChecked checked={this.isCandidateSelected(item)}
                                                            onChange={(e) => this.onCandidateSelected(e, item)}/>]}>
                                 <List.Item.Meta
-                                    title={item.CandidateName}
-                                    description={item.CandidateLocation + ' - ' + item.CandidateSkills}/>
+                                    title={<span style={{color:'#444444',fontWeight:'bold',fontSize:'1.2em'}}>{item.CandidateName}</span>}
+                                    description={<span style={{fontSize:'1.1em'}}>{item.CandidateLocation + ' - ' + item.CandidateSkills}</span>}/>
                             </List.Item>
                         )}
                     />

@@ -1,7 +1,22 @@
 import React from 'react';
 import {connect} from 'react-redux';
 import NoHeaderPanel from 'components/NoHeaderPanel/NoHeaderPanel'
-import {Typography, Form, Input, Icon, Button, Tag, AutoComplete, Select, Switch, Modal, List, Checkbox, Row, Col} from 'antd';
+import {
+    Typography,
+    Form,
+    Input,
+    Icon,
+    Button,
+    Tag,
+    AutoComplete,
+    Select,
+    Switch,
+    Modal,
+    List,
+    Checkbox,
+    Row,
+    Col
+} from 'antd';
 
 import {trimText} from "../../../helpers";
 
@@ -30,10 +45,10 @@ class Campaign extends React.Component {
             use_crm: true,
             locations: [],
             skills: [],
-            skillInput: "",
-            textMessage:"",
             candidate_list: [],
-            modalVisibility: false
+            modalVisibility: false,
+            skillInput: "",
+            textMessage: ""
         };
         this.setLocations = this.setLocations.bind(this);
         this.handleSkillSubmit = this.handleSkillSubmit.bind(this);
@@ -55,6 +70,7 @@ class Campaign extends React.Component {
 
     componentDidUpdate(prevProps, prevState, snapshot) {
         if (prevProps.isCandidatesLoading && (this.props.errorMsg === null)) {
+            this.state.candidate_list = this.props.candidate_list;
             this.showModal(true);
         } else if (prevProps.isLaunchingCampaign && (this.props.errorMsg === null)) {
             this.showModal(false);
@@ -88,9 +104,9 @@ class Campaign extends React.Component {
     };
 
     addCandidateName = () => {
-        let textMessage = this.state.textMessage+" {candidate.name} ";
+        let textMessage = this.state.textMessage + " {candidate.name} ";
         this.props.form.setFieldsValue({text: textMessage}); //Update Message Input
-        this.setState({textMessage:textMessage}); //Update TextMessage State for Phone.JS
+        this.setState({textMessage: textMessage}); //Update TextMessage State for Phone.JS
     };
 
     //TODO:: Skill should be validated before submission | Empty String can be accepted
@@ -129,7 +145,10 @@ class Campaign extends React.Component {
     };
 
     handleModalSelectAll = () => {
-        this.setState({candidate_list: this.props.candidate_list})
+        if (this.props?.candidate_list?.length === this.state.candidate_list.length)
+            this.setState({candidate_list: []});
+        else
+            this.setState({candidate_list: this.props.candidate_list})
     };
 
     handleModalCancel = () => {
@@ -206,7 +225,9 @@ class Campaign extends React.Component {
                     footer={<div>
                         <Button onClick={this.handleModalCancel}>Cancel</Button>
                         <Button onClick={this.handleModalSelectAll}
-                                disabled={this.props.candidate_list.length === 0}>Select All</Button>
+                                disabled={this.props?.candidate_list?.length === 0}>
+                            {this.props?.candidate_list?.length === this.state.candidate_list.length ? 'Deselect all' : 'Select All'}
+                        </Button>
                         <Button onClick={this.handleModalOk}
                                 type="primary"
                                 loading={this.props.isLaunchingCampaign}
@@ -222,7 +243,7 @@ class Campaign extends React.Component {
                         itemLayout="horizontal"
                         dataSource={this.props.candidate_list}
                         renderItem={(item) => (
-                            <List.Item actions={[<Checkbox checked={this.isCandidateSelected(item)}
+                            <List.Item actions={[<Checkbox defaultChecked checked={this.isCandidateSelected(item)}
                                                            onChange={(e) => this.onCandidateSelected(e, item)}/>]}>
                                 <List.Item.Meta
                                     title={item.CandidateName}
@@ -255,7 +276,7 @@ class Campaign extends React.Component {
                             )}
 
                         </FormItem>
-                        <FormItem label={"Use CRM"} labelCol={{xs: {span: 5, offset: 0}}}>
+                        <FormItem label={"Use CRM"} labelCol={{xs: {span: 4, offset: 0}}}>
                             <Switch onChange={(checked) => this.setState({use_crm: checked})}
                                     defaultChecked={this.state.use_crm}/>
                         </FormItem>
@@ -337,7 +358,6 @@ class Campaign extends React.Component {
                             {getFieldDecorator("jobTitle", {
                                 rules: [{
                                     whitespace: true,
-                                    required: true,
                                     message: "Please enter your job title"
                                 }],
                             })(
@@ -361,7 +381,7 @@ class Campaign extends React.Component {
                         <FormItem label={"Location"}>
                             {getFieldDecorator("location", {
                                 rules: [{
-                                    required: true,
+                                    whitespace: true,
                                     message: "Please enter the location"
                                 }],
                             })(
@@ -371,27 +391,22 @@ class Campaign extends React.Component {
                                               onChange={value => this.findLocation(value)}/>
                             )}
                         </FormItem>
-                        <FormItem label={"Message"}>
-                            <Row gutter={16} type="flex" justify="end">
-                                <Col span={24}>
-                                    {getFieldDecorator("text", {
+                        <FormItem
+                            label={<span>Message
+                                <Button type="default" size="small" shape="round"
+                                        style={{margin: '0 5px', fontSize: '.9em'}}
+                                        onClick={this.addCandidateName}>Candidate Name</Button>
+                            </span>}>
+                            {getFieldDecorator("text", {
                                 rules: [{
                                     required: true,
                                     message: "Please enter the message"
                                 }],
                             })(
-                                        <TextArea placeholder="Type in the message you'd like to send"
-                                                  onChange={e => this.setState({textMessage: e.target.value})}
-                                        />
-                                    )}
-                                </Col>
-                                <Col span={7}>
-                                    <Button type="default" shape="round" size="small"
-                                            onClick={this.addCandidateName}>
-                                        Candidate Name
-                                    </Button>
-                                </Col>
-                            </Row>
+                                <TextArea placeholder="Type in the message you'd like to send"
+                                          onChange={e => this.setState({textMessage: e.target.value})}
+                                />
+                            )}
                         </FormItem>
                         <Button loading={this.props.isCandidatesLoading} type="primary" onClick={this.handleSubmit}
                                 size={"large"}>

@@ -197,7 +197,7 @@ class Campaign extends React.Component {
                     footer={<div>
                         <Button onClick={this.handleModalCancel}>Cancel</Button>
                         <Button onClick={this.handleModalSelectAll}
-                                disabled={this.props.candidate_list.length === 0}>Select All</Button>
+                                disabled={this.props?.candidate_list?.length === 0}>Select All</Button>
                         <Button onClick={this.handleModalOk}
                                 type="primary"
                                 loading={this.props.isLaunchingCampaign}

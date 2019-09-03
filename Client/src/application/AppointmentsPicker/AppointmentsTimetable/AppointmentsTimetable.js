@@ -154,11 +154,13 @@ class AppointmentsTimetable extends React.Component {
              */
             for (let i = 0; i < range; i++) {
                 sv_appointment.takenTimeSlots.forEach((timeSlot) => {
-                    const takenTimeSlot = moment(timeSlot.DateTime, 'ddd, DD MMM YYYY HH:mm:ss');
+                    // convert takenTimeSlots to user's timezone before comparing
+                    const takenTimeSlot = momentTZ.utc(timeSlot.DateTime, 'ddd, DD MMM YYYY HH:mm:ss')?.tz(this.currentTimeZone);
+
                     // finding the day
                     weekDays.find(weekDay => {
                         // founded the day
-                        if (weekDay.day === takenTimeSlot.date() && weekDay.month === takenTimeSlot.month()) {
+                        if (takenTimeSlot && weekDay.day === takenTimeSlot.date() && weekDay.month === takenTimeSlot.month()) {
                             // finding the slot
                             weekDay.slots.find(slot => {
                                 // founded the slot

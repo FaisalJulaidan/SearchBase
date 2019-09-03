@@ -14,14 +14,15 @@ def dummyCreateAppointmentAllocationTime(name, companyID: int):
 
         # Create the AppointmentAllocationTime with default times info
         default = {"From": time(8,30), "To": time(12,0), "Duration": 30, "AppointmentAllocationTime": allocationTime, "Active": False}
-        times = [AppointmentAllocationTimeInfo(Day=0, **default),  # Sunday
-                     AppointmentAllocationTimeInfo(Day=1, **default),
-                     AppointmentAllocationTimeInfo(Day=2, **default),
-                     AppointmentAllocationTimeInfo(Day=3, **default),
-                     AppointmentAllocationTimeInfo(Day=4, **default),
-                     AppointmentAllocationTimeInfo(Day=5, **default),
-                     AppointmentAllocationTimeInfo(Day=6, **default),  # Saturday
-                     ]
+        times = [
+            AppointmentAllocationTimeInfo(Day=0, **default),  # Sunday
+            AppointmentAllocationTimeInfo(Day=1, **default),
+            AppointmentAllocationTimeInfo(Day=2, **default),
+            AppointmentAllocationTimeInfo(Day=3, **default),
+            AppointmentAllocationTimeInfo(Day=4, **default),
+            AppointmentAllocationTimeInfo(Day=5, **default),
+            AppointmentAllocationTimeInfo(Day=6, **default),  # Saturday
+        ]
         db.session.add_all(times)
         db.session.commit()
         return Callback(True, "Created successfully.", allocationTime)
@@ -175,23 +176,29 @@ def setAppointmentStatus(appointmentID, name, email, phone, status, companyID) -
 
         appointment = db.session.query(Appointment).filter(Appointment.ID == appointmentID).first()
         if appointment.Status != enums.Status.Pending:
-          return Callback(False, "Appointment status is {} and cannot be modified.".format(appointment.Status.value))
+            return Callback(False, "Appointment status is {} and cannot be modified.".format(appointment.Status.value))
 
 
         appointment.Status = status
 
         if status == enums.Status.Accepted.name:
-            email_callback: Callback = mail_services.sendAppointmentConfirmationEmail(name,
-                                                           email,
-                                                           utc.localize(appointment.DateTime).astimezone(timezone(appointment.UserTimeZone)),
-                                                           appointment.UserTimeZone,
-                                                           company.Name,
-                                                           company.LogoPath)
+            email_callback: Callback = mail_services.sendAppointmentConfirmationEmail(
+                name,
+                email,
+                utc.localize(appointment.DateTime).astimezone(timezone(appointment.UserTimeZone)),
+                appointment.UserTimeZone,
+                company.Name,
+                company.LogoPath
+            )
             if not email_callback.Success:
                 return email_callback
+            db.session.commit()
+            return Callback(True, "Appointment status has been set to {}.".format(appointment.Status.value))
 
-        db.session.commit()
-        return Callback(True, "Appointment status has been set to {}.".format(appointment.Status.value))
+        if status == enums.Status.Rejected.name:
+            db.session.delete(appointment)
+            db.session.commit()
+            return Callback(True, "Appointment status has been set to rejected.")
 
     except Exception as exc:
         helpers.logError("appointment_services.setAppointmentStatus(): " + str(exc))

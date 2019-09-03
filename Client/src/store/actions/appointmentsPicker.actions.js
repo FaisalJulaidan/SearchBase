@@ -16,10 +16,11 @@ const fetchAppointmentFailure = (error) => ({
 });
 
 
-const selectAppointmentTime = (token, pickedTimeSlot) => ({
+const selectAppointmentTime = (token, pickedTimeSlot, userTimeZone) => ({
     type: actionTypes.SELECT_APPOINTMENT_TIME_REQUEST,
     token,
-    pickedTimeSlot
+    pickedTimeSlot,
+    userTimeZone
 });
 
 const selectAppointmentTimeSuccess = (isSuccess) => ({

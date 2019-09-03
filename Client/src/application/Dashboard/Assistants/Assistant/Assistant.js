@@ -36,8 +36,7 @@ class Assistant extends Component {
 
     componentWillMount() {
         this.props.dispatch(assistantActions.fetchAssistant(this.props.match.params.id))
-            .then(() => {
-            }).catch(() => history.push(`/dashboard/assistants`));
+            .then(() => {}).catch(() => history.push(`/dashboard/assistants`));
 
         // Set tab from url search params
         let params = queryString.parse(this.props.location.search);

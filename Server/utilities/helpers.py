@@ -287,6 +287,7 @@ class owns(object):
         method_name = "owns_" + str(type)
         method = getattr(self, method_name, lambda: "Invalid Function type")
         return method(jwt, *args)
+
     def owns_Appointment(self, jwt, key):
         id = request.get_json()[key]
         callback: Callback = appointment_services.hasAppointment(jwt['companyID'], id)

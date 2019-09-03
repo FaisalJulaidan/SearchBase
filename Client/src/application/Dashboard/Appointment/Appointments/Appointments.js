@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { Table, Button, Spin, Icon } from 'antd';
+import { Table, Button, Spin, Icon, Modal, Popconfirm } from 'antd';
 import { appointmentActions } from 'store/actions';
 import moment from 'moment-timezone';
 
@@ -10,6 +10,8 @@ import styles from './Appointments.module.less';
 
 import { connect } from 'react-redux';
 
+const confirm = Modal.confirm;
+
 const antIcon = <Icon type="loading" style={{ fontSize: 24 }} spin/>;
 
 class Appointments extends React.Component {
@@ -18,12 +20,23 @@ class Appointments extends React.Component {
         this.props.dispatch(appointmentActions.fetchAppointments());
     }
 
-    approve = (id) => {
-        this.props.dispatch(appointmentActions.setAppointmentStatusRequest(id, 'Accepted'));
+    approve = (id, name, email, phone) => {
+        confirm({
+            title: `Accept appointment confirmation`,
+            content: `If you click Approve, this user will receive a confirmation email about this appointment and you cannot undo that`,
+            onOk: () => {this.props.dispatch(appointmentActions.setAppointmentStatusRequest(id, name, email, phone, 'Accepted'))},
+            okText: "Approve",
+        });
+
     };
 
-    reject = (id) => {
-        this.props.dispatch(appointmentActions.setAppointmentStatusRequest(id, 'Rejected'));
+    reject = (id, name, email, phone) => {
+        confirm({
+            title: `Reject appointment confirmation`,
+            content: `If you click Reject you won't be able to undo that`,
+            onOk: () => {this.props.dispatch(appointmentActions.setAppointmentStatusRequest(id, name, email, phone, 'Rejected'))},
+            okText: "Reject",
+        });
     };
 
 
@@ -53,14 +66,15 @@ class Appointments extends React.Component {
             dataIndex: 'approve',
             key: 'approve',
             render: item => item.isLoading ? <Spin indicator={antIcon}/> : item.Status === 'Pending' ?
-                <Button onClick={() => this.approve(item.ID)}>Approve</Button> : 'Status has already been set'
+                <Button onClick={() => this.approve(item.ID, item.Conversation.Name, item.Conversation.Email, item.Conversation.PhoneNumber)}>Approve</Button> : 'Status has already been set'
         },
         {
             title: 'Reject',
             dataIndex: 'reject',
             key: 'reject',
+            okType: 'danger',
             render: item => item.isLoading ? <Spin indicator={antIcon}/> : item.Status === 'Pending' ?
-                <Button onClick={() => this.reject(item.ID)}>Reject</Button> : 'Status has already been set'
+                <Button onClick={() => this.reject(item.ID, item.Conversation.Name, item.Conversation.Email, item.Conversation.PhoneNumber)}>Reject</Button> : 'Status has already been set'
         }
     ];
 
@@ -68,7 +82,7 @@ class Appointments extends React.Component {
         const realList = this.props.appointments.map(item => ({
             key: item.ID,
             time: moment.utc(item.DateTime).tz(this.props.tz).format('MMMM Do YYYY, h:mm:ss a'),
-            email: item.Conversation.keywordsByDataType.Email[0],
+            email: item.Conversation.Email,
             status: item.Status,
             approve: item,
             reject: item

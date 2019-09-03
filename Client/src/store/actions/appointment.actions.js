@@ -21,10 +21,13 @@ const fetchAppointmentsFailure = (error) => {
     };
 };
 
-const setAppointmentStatusRequest = (appointmentID, status) => {
+const setAppointmentStatusRequest = (appointmentID, name, email, phone, status) => {
     return {
         type: actionTypes.SET_APPOINTMENT_STATUS_REQUEST,
         appointmentID,
+        name,
+        email,
+        phone,
         status
     };
 };

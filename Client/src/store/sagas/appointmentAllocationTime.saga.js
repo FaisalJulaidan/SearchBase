@@ -18,7 +18,7 @@ function* fetchAppointmentAllocationTime() {
 
 function* saveAppointmentAllocationTime({newSettings}) {
     try {
-        const res = yield http.post(`/allocation_times/save`, newSettings,
+        const res = yield http.put(`/allocation_times`, newSettings,
             {headers: {'Content-Type': 'application/json'}});
         yield put(appointmentAllocationTimeActions.saveAATSuccess(newSettings));
         successMessage("Successfully saved Appointment Allocation Timetable")
@@ -32,7 +32,7 @@ function* saveAppointmentAllocationTime({newSettings}) {
 function* createAppointmentAllocationTime({aat}) {
     try {
         console.log(aat)
-        const res = yield http.post(`/allocation_times/create`, aat,
+        const res = yield http.post(`/allocation_times`, aat,
             {headers: {'Content-Type': 'application/json'}});
         yield put(appointmentAllocationTimeActions.createAATSuccess(res.data.data[0]));
         successMessage("Successfully created Appointment Allocation Timetable")
@@ -46,7 +46,7 @@ function* createAppointmentAllocationTime({aat}) {
 
 function* deleteAppointmentAllocationTime({id}) {
     try {
-        yield http.get(`/allocation_times/${id}/delete`,
+        yield http.delete(`/allocation_times/${id}`,
             {headers: {'Content-Type': 'application/json'}});
         yield put(appointmentAllocationTimeActions.deleteAATSuccess(id));
         successMessage("Successfully delete Appointment Allocation Timetable")

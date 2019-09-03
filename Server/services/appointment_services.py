@@ -1,9 +1,11 @@
 from datetime import datetime, time
+from pytz import timezone, utc
 
 from models import db, Callback, Appointment, Conversation, Assistant,\
-    AppointmentAllocationTime, AppointmentAllocationTimeInfo
+    AppointmentAllocationTime, AppointmentAllocationTimeInfo, Company
 from sqlalchemy import and_
 from utilities import helpers, enums
+from services import mail_services, company_services
 
 def dummyCreateAppointmentAllocationTime(name, companyID: int):
     try:
@@ -12,14 +14,15 @@ def dummyCreateAppointmentAllocationTime(name, companyID: int):
 
         # Create the AppointmentAllocationTime with default times info
         default = {"From": time(8,30), "To": time(12,0), "Duration": 30, "AppointmentAllocationTime": allocationTime, "Active": False}
-        times = [AppointmentAllocationTimeInfo(Day=0, **default),  # Sunday
-                     AppointmentAllocationTimeInfo(Day=1, **default),
-                     AppointmentAllocationTimeInfo(Day=2, **default),
-                     AppointmentAllocationTimeInfo(Day=3, **default),
-                     AppointmentAllocationTimeInfo(Day=4, **default),
-                     AppointmentAllocationTimeInfo(Day=5, **default),
-                     AppointmentAllocationTimeInfo(Day=6, **default),  # Saturday
-                     ]
+        times = [
+            AppointmentAllocationTimeInfo(Day=0, **default),  # Sunday
+            AppointmentAllocationTimeInfo(Day=1, **default),
+            AppointmentAllocationTimeInfo(Day=2, **default),
+            AppointmentAllocationTimeInfo(Day=3, **default),
+            AppointmentAllocationTimeInfo(Day=4, **default),
+            AppointmentAllocationTimeInfo(Day=5, **default),
+            AppointmentAllocationTimeInfo(Day=6, **default),  # Saturday
+        ]
         db.session.add_all(times)
         db.session.commit()
         return Callback(True, "Created successfully.", allocationTime)
@@ -91,24 +94,25 @@ def createAppointmentAllocationTime(companyID, name, times, duration):
         db.session.add_all(toAdd)
         db.session.commit()
         db.session.flush()
-        return Callback(True, "Timetable saved succesfully.", appointmentAllocationTime)
+        return Callback(True, "Timetable saved successfully.", appointmentAllocationTime)
 
     except Exception as exc:
         helpers.logError("appointment_services.createAppointmentAllocationTime(): " + str(exc))
         db.session.rollback()
         return Callback(False, 'Could not create a new Appointment Allocation Time.')
 
-def addNewAppointment(conversationID, dateTime):
+# Add new appointment selected through the appointment picker page
+def addNewAppointment(conversationID, dateTime, userTimezone: str):
     try:
-        if not datetime: raise Exception('Time slot (datetime) is required')
-
+        if not (datetime and userTimezone): raise Exception('Time picked and user timezone are required')
         if not Conversation.query.get(conversationID): raise Exception("Conversation does not exist anymore")
 
         db.session.add(
             Appointment(
-                DateTime=datetime.strptime(dateTime, "%Y-%m-%d %H:%M"),  # 2019-06-23 16:04
+                DateTime=datetime.strptime(dateTime, "%Y-%m-%d %H:%M"),
+                UserTimeZone = userTimezone,
                 ConversationID=conversationID,
-                Status= enums.Status.Pending
+                Status= enums.Status.Pending,
             )
         )
 
@@ -158,32 +162,62 @@ def setAppointmentStatusPublic(token, appointmentID, status):
         db.session.commit()
         return Callback(True, "Appointment status has been set to {}.".format(appointment.Status.value))
 
+        # TODO send confirmation email when appointment Accepted
+
     except Exception as exc:
         helpers.logError("appointment_services.setAppointmentStatusPublic(): " + str(exc))
         return Callback(False, 'Could not set appointment status.')
 
-def setAppointmentStatus(appointmentID, status):
+
+def setAppointmentStatus(appointmentID, name, email, phone, status, companyID) -> Callback:
     try:
+        company: Company = company_services.getByID(companyID).Data
+        if not company: raise Exception("Company does not exist")
+
         appointment = db.session.query(Appointment).filter(Appointment.ID == appointmentID).first()
         if appointment.Status != enums.Status.Pending:
-          return Callback(False, "Appointment status is {} and cannot be modified.".format(appointment.Status.value))
+            return Callback(False, "Appointment status is {} and cannot be modified.".format(appointment.Status.value))
+
+
         appointment.Status = status
-        db.session.commit()
-        return Callback(True, "Appointment status has been set to {}.".format(appointment.Status.value))
+
+        if status == enums.Status.Accepted.name:
+            email_callback: Callback = mail_services.sendAppointmentConfirmationEmail(
+                name,
+                email,
+                utc.localize(appointment.DateTime).astimezone(timezone(appointment.UserTimeZone)),
+                appointment.UserTimeZone,
+                company.Name,
+                company.LogoPath
+            )
+            if not email_callback.Success:
+                return email_callback
+            db.session.commit()
+            return Callback(True, "Appointment status has been set to {}.".format(appointment.Status.value))
+
+        if status == enums.Status.Rejected.name:
+            db.session.delete(appointment)
+            db.session.commit()
+            return Callback(True, "Appointment status has been set to rejected.")
 
     except Exception as exc:
         helpers.logError("appointment_services.setAppointmentStatus(): " + str(exc))
         return Callback(False, 'Could not set appointment status.')
 
+
 def getAppointments(companyID):
     try:
+
         assistants = db.session.query(Assistant).filter(Assistant.CompanyID == companyID).all()
         appointments = []
+
         for assistant in assistants:
             for idx, appointment in enumerate(helpers.getListFromSQLAlchemyList(assistant.Appointments)):
-                appointment['Conversation'] = assistant.Appointments[idx].Conversation.Data
+                appointment['Conversation'] = helpers.getDictFromSQLAlchemyObj(assistant.Appointments[idx].Conversation)
                 appointments.append(appointment)
+
         return Callback(True, 'Successfully gathered appointments.', appointments)
+
     except Exception as exc:
         helpers.logError("appointment_services.getAppointments(): " + str(exc))
         return Callback(False, 'Could not get appointments.')

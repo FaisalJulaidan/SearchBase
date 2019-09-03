@@ -164,12 +164,14 @@ def setAppointmentStatusPublic(token, appointmentID, status):
         db.session.commit()
         return Callback(True, "Appointment status has been set to {}.".format(appointment.Status.value))
 
+        # TODO send confirmation email when appointment Accepted
+
     except Exception as exc:
         helpers.logError("appointment_services.setAppointmentStatusPublic(): " + str(exc))
         return Callback(False, 'Could not set appointment status.')
 
 
-def setAppointmentStatus(appointmentID, name, email, phone, status, companyID):
+def setAppointmentStatus(appointmentID, name, email, phone, status, companyID) -> Callback:
     try:
         company: Company = company_services.getByID(companyID).Data
         if not company: raise Exception("Company does not exist")
@@ -178,9 +180,18 @@ def setAppointmentStatus(appointmentID, name, email, phone, status, companyID):
         if appointment.Status != enums.Status.Pending:
           return Callback(False, "Appointment status is {} and cannot be modified.".format(appointment.Status.value))
 
+
         appointment.Status = status
+
         if status == enums.Status.Accepted.name:
-            mail_services.sendAppointmentConfirmationEmail(name, email, appointment.DateTime, company.Name, company.LogoPath)
+            email_callback: Callback = mail_services.sendAppointmentConfirmationEmail(name,
+                                                           email,
+                                                           utc.localize(appointment.DateTime).astimezone(timezone(appointment.UserTimeZone)),
+                                                           appointment.UserTimeZone,
+                                                           company.Name,
+                                                           company.LogoPath)
+            if not email_callback.Success:
+                return email_callback
 
         db.session.commit()
         return Callback(True, "Appointment status has been set to {}.".format(appointment.Status.value))

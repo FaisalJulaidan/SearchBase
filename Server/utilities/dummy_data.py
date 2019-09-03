@@ -261,7 +261,7 @@ def generate():
     appointment_services.dummyCreateAppointmentAllocationTime("Test Times", aramco.ID)
 
     # Add Appointment
-    a = Appointment(DateTime=datetime.now() + timedelta(days=5), Conversation=conversation1)
+    a = Appointment(DateTime=datetime.now() + timedelta(days=5), Conversation=conversation1, UserTimeZone="Europe/London")
 
     db.session.add(a)
     db.session.commit()

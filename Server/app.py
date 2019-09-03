@@ -10,7 +10,7 @@ from flask_babel import Babel
 from flask_migrate import Migrate, MigrateCommand
 from flask_script import Manager
 from sqlalchemy_utils import create_database, database_exists
-
+import time
 import config
 from models import db
 # Import all routers to register them as blueprints
@@ -19,19 +19,10 @@ from routes.admin.routers import account_router, analytics_router, sub_router, \
     database_router, options_router, marketplace_router, auto_pilot_router, appointment_router, webhook_router
 from routes.public.routers import public_router, reset_password_router, chatbot_router, auth_router
 from routes.staff.routers import staff_router
-from services import scheduler_services
+from services import scheduler_services, appointment_services
 from services.auth_services import jwt
 from services.mail_services import mail
 from utilities import helpers, tasks, dummy_data
-from datetime import datetime
-from pytz import timezone, utc
-
-utc_now = utc.localize(datetime.utcnow())
-print(utc_now)
-pst_now = utc_now.astimezone(timezone("Europe/London"))
-print(pst_now)
-
-
 
 app = Flask(__name__, static_folder='static')
 
@@ -140,6 +131,7 @@ elif os.environ['FLASK_ENV'] == 'development':
         os.environ["scheduler_lock"] = "True"
 
     print('Development mode running...')
+    # appointment_services.setAppointmentStatus(1, "Faisal", "julaidan.faisal@gmail.com", "3202343", "Accepted", 1)
 
 
 else:

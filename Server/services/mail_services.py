@@ -66,7 +66,7 @@ def sendVerificationEmail(firstName, lastName, email, companyName, companyID) ->
         helpers.logError("mail_service.sendVerificationEmail(): " + str(exc))
         return Callback(False, 'Could not send a verification email to ' + email)
 
-def sendAppointmentConfirmationEmail(name, email, datetime, companyName, logoPath):
+def sendAppointmentConfirmationEmail(name, email, dateTime, userTimeZone, companyName, logoPath):
     try:
         callback: Callback = __sendEmail(
             email,
@@ -74,7 +74,8 @@ def sendAppointmentConfirmationEmail(name, email, datetime, companyName, logoPat
             '/emails/appointment_confirmation.html',
             companyName=companyName,
             userName=name,
-            dateTime=datetime.strftime("%Y/%m/%d %H:%M"),
+            dateTime=dateTime.strftime("%Y/%m/%d %H:%M"),
+            userTimeZone=userTimeZone,
             logoPath=logoPath)
 
         if not callback.Success:

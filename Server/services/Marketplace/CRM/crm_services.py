@@ -166,7 +166,7 @@ def customInsertCandidate(details, conversation, companyID):
         # if crm_type is CRM.Adapt or crm_type is CRM.Jobscience:
         #     return eval(crm_type.value + "." + func + "Candidate(assistant.CRM.Auth, data)")
 
-        return eval(crm_type.value + "." + func + "Candidate(assistant.CRM.Auth, data, assistant.CompanyID)")
+        return eval(crm_type.value + "." + func + "Candidate(crm_callback.Data.Auth, data, companyID)")
     else:
         return Callback(False, "CRM type did not match with those on the system")
 

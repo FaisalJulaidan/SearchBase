@@ -157,6 +157,9 @@ def sendQuery(auth, query, method, body, companyID, optionalParams=None):
         headers = {'Content-Type': 'application/json'}
         # test the BhRestToken (rest_token)
         r = marketplace_helpers.sendRequest(url, method, headers, json.dumps(body))
+        # print(url)
+        # print(r.status_code)
+        # print(r.text)
         if r.status_code == 401:  # wrong rest token
             callback: Callback = retrieveRestToken(auth, companyID)
             if not callback.Success:
@@ -169,7 +172,7 @@ def sendQuery(auth, query, method, body, companyID, optionalParams=None):
                 raise Exception(r.text + ". Query could not be sent")
 
         elif not r.ok:
-            raise Exception("Rest url for query is incorrect")
+            raise Exception("send query failed: ", r.text)
 
         return Callback(True, "Query was successful", r)
 

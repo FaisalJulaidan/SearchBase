@@ -52,6 +52,7 @@ class Campaign extends React.Component {
 
     componentDidUpdate(prevProps, prevState, snapshot) {
         if (prevProps.isCandidatesLoading && (this.props.errorMsg === null)) {
+            this.state.candidate_list = this.props.candidate_list;
             this.showModal(true);
         } else if (prevProps.isLaunchingCampaign && (this.props.errorMsg === null)) {
             this.showModal(false);
@@ -120,7 +121,10 @@ class Campaign extends React.Component {
     };
 
     handleModalSelectAll = () => {
-        this.setState({candidate_list: this.props.candidate_list})
+        if (this.props?.candidate_list?.length === this.state.candidate_list.length)
+            this.setState({candidate_list: []});
+        else
+            this.setState({candidate_list: this.props.candidate_list})
     };
 
     handleModalCancel = () => {
@@ -197,7 +201,9 @@ class Campaign extends React.Component {
                     footer={<div>
                         <Button onClick={this.handleModalCancel}>Cancel</Button>
                         <Button onClick={this.handleModalSelectAll}
-                                disabled={this.props?.candidate_list?.length === 0}>Select All</Button>
+                                disabled={this.props?.candidate_list?.length === 0}>
+                            {this.props?.candidate_list?.length === this.state.candidate_list.length ? 'Deselect all' : 'Select All'}
+                        </Button>
                         <Button onClick={this.handleModalOk}
                                 type="primary"
                                 loading={this.props.isLaunchingCampaign}
@@ -213,7 +219,7 @@ class Campaign extends React.Component {
                         itemLayout="horizontal"
                         dataSource={this.props.candidate_list}
                         renderItem={(item) => (
-                            <List.Item actions={[<Checkbox checked={this.isCandidateSelected(item)}
+                            <List.Item actions={[<Checkbox defaultChecked checked={this.isCandidateSelected(item)}
                                                            onChange={(e) => this.onCandidateSelected(e, item)}/>]}>
                                 <List.Item.Meta
                                     title={item.CandidateName}
@@ -328,7 +334,6 @@ class Campaign extends React.Component {
                             {getFieldDecorator("jobTitle", {
                                 rules: [{
                                     whitespace: true,
-                                    required: true,
                                     message: "Please enter your job title"
                                 }],
                             })(
@@ -352,7 +357,7 @@ class Campaign extends React.Component {
                         <FormItem label={"Location"}>
                             {getFieldDecorator("location", {
                                 rules: [{
-                                    required: true,
+                                    whitespace: true,
                                     message: "Please enter the location"
                                 }],
                             })(

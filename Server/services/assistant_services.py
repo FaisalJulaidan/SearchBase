@@ -4,7 +4,7 @@ from models import db, Assistant, Callback, AutoPilot, AppointmentAllocationTime
 from services import auto_pilot_services, flow_services
 from services.Marketplace.CRM import crm_services
 from services.Marketplace.Calendar import calendar_services
-from services.Marketplace.Messenger import mesenger_services
+from services.Marketplace.Messenger import messenger_servicess
 from utilities import helpers, json_schemas
 from os.path import join
 from config import BaseConfig
@@ -100,6 +100,24 @@ def getAll(companyID) -> Callback:
                                   Assistant.Message,
                                   Assistant.TopBarText,
                                   Assistant.Active)\
+            .filter(Assistant.CompanyID == companyID).all()
+
+        if len(result) == 0:
+            return Callback(True, "No assistants  to be retrieved.", [])
+
+        return Callback(True, "Got all assistants  successfully.", result)
+
+    except Exception as exc:
+        db.session.rollback()
+        helpers.logError("assistant_services.getAll(): " + str(exc))
+        return Callback(False, 'Could not get all assistants.')
+
+
+def getAllFull(companyID) -> Callback:
+    try:
+        if not companyID: raise Exception
+        # Get result and check if None then raise exception
+        result = db.session.query(Assistant)\
             .filter(Assistant.CompanyID == companyID).all()
 
         if len(result) == 0:
@@ -238,7 +256,7 @@ def removeByID(id, companyID) -> Callback:
 def connectToCRM(assistantID, CRMID, companyID):
     try:
 
-        crm_callback: Callback = crm_services.getCRMByID(CRMID, companyID)
+        crm_callback: Callback = crm_services.getByID(CRMID, companyID)
         if not crm_callback.Success:
             raise Exception(crm_callback.Message)
 
@@ -310,7 +328,7 @@ def disconnectFromCalendar(assistantID, companyID):
 def connectToMessenger(assistantID, messengerID, companyID):
     try:
 
-        messenger_callback: Callback = mesenger_services.getMessengerByID(messengerID, companyID)
+        messenger_callback: Callback = messenger_servicess.getByID(messengerID, companyID)
         if not messenger_callback.Success:
             raise Exception(messenger_callback.Message)
 

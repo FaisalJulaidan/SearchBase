@@ -13,6 +13,7 @@ import {appointmentsPicker} from "./appointmentsPicker.reducer";
 import {appointment} from "./appointment.reducer";
 import {appointmentAllocationTime} from "./appointmentAllocationTime.reducer";
 import {development} from "./development.reducer";
+import {campaign} from "./campaign.reducer";
 
 import * as actionTypes from '../actions/actionTypes';
 import storage from 'redux-persist/lib/storage'
@@ -32,7 +33,8 @@ const appReducer = combineReducers({
     appointmentsPicker,
     appointment,
     appointmentAllocationTime,
-    development
+    development,
+    campaign
 });
 
 const rootReducer = (state, action) => {

@@ -35,6 +35,9 @@ def prepareCampaign(campaign_details, companyID):
 
         if not candidates_callback.Success:
             raise Exception(candidates_callback.Message)
+        for candidate in candidates_callback.Data:
+            if candidate.get("Currency"):
+                candidate["Currency"] = ""
         print(candidates_callback.Data)
         campaign_details["candidate_list"] = candidates_callback.Data
 

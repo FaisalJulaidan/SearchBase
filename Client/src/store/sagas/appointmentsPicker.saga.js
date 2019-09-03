@@ -1,7 +1,7 @@
-import {all, put, takeEvery} from 'redux-saga/effects'
+import { all, put, takeEvery } from 'redux-saga/effects';
 import * as actionTypes from '../actions/actionTypes';
-import {appointmentsPickerActions} from "../actions";
-import {errorMessage, http, successMessage} from "helpers";
+import { appointmentsPickerActions } from '../actions';
+import { errorMessage, successMessage } from 'helpers';
 import axios from 'axios';
 
 
@@ -18,9 +18,10 @@ function* fetchAppointment({token}) {
     }
 }
 
-function* selectAppointmentTime({token, pickedTimeSlot}) {
+function* selectAppointmentTime({ token, pickedTimeSlot, userTimeZone }) {
     try {
-        const res = yield axios.post(`/api/allocation_times/${token}`, {pickedTimeSlot},
+        const res = yield axios.post(`/api/allocation_times/${token}`,
+            { pickedTimeSlot, userTimeZone },
             {headers: {'Content-Type': 'application/json'}});
         successMessage(res.data?.msg || 'Appointment selected successfully');
         yield put(appointmentsPickerActions.selectAppointmentTimeSuccess());

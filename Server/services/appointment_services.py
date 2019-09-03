@@ -105,13 +105,13 @@ def addNewAppointment(conversationID, dateTime, userTimezone: str):
     try:
         if not (datetime and userTimezone): raise Exception('Time picked and user timezone are required')
 
-        userTime = timezone(userTimezone).localize(datetime.strptime(dateTime, "%Y-%m-%d %H:%M"))
-
+        # userTime = timezone(userTimezone).localize(datetime.strptime(dateTime, "%Y-%m-%d %H:%M"))
+        # DateTime=userTime.astimezone(utc),  # 2019-06-23 16:04
         if not Conversation.query.get(conversationID): raise Exception("Conversation does not exist anymore")
 
         db.session.add(
             Appointment(
-                DateTime=userTime.astimezone(utc),  # 2019-06-23 16:04
+                DateTime=datetime.strptime(dateTime, "%Y-%m-%d %H:%M"),
                 UserTimeZone = userTimezone,
                 ConversationID=conversationID,
                 Status= enums.Status.Pending,

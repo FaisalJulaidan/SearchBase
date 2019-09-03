@@ -3,6 +3,8 @@ import React from 'react';
 import styles from '../AppointmentsPicker.module.less';
 
 import { Button, Popconfirm, Typography } from 'antd';
+import { TimezoneContext } from 'contexts/timezone';
+import momentTZ from 'moment-timezone';
 
 const { Title, Paragraph } = Typography;
 
@@ -23,6 +25,7 @@ class AppointmentsTimetable extends React.Component {
 
     firstDateAfter4weeks = moment().add(28, 'day');
 
+    currentTimeZone;
 
     componentDidMount() {
         this.updateWindowDimensions();
@@ -34,6 +37,8 @@ class AppointmentsTimetable extends React.Component {
     }
 
     componentDidUpdate(prevProps, prevState) {
+        this.currentTimeZone = this.context ? this.context : momentTZ.tz.guess();
+
         if (prevState.width !== this.state.width)
             this.createTimeTable();
     }
@@ -46,22 +51,24 @@ class AppointmentsTimetable extends React.Component {
         this.setState({ width: window.innerWidth, height: window.innerHeight });
     }
 
+    static contextType = TimezoneContext;
+
     createTimeTable = (props = this.props, state = this.state) => {
 
-
-
         const getTimeSlots = (From, To, duration) => {
-            const hours = moment.duration(To.diff(From)).hours(); // 3
-            const minutes = moment.duration(To.diff(From)).minutes();// 30
-            let totalHalfHours = (minutes / 30) + (hours * 2); // 1 + 6 = 7
+            if (From && To && duration) {
+                const hours = moment.duration(To.diff(From)).hours(); // 3
+                const minutes = moment.duration(To.diff(From)).minutes();// 30
+                let totalHalfHours = (minutes / 30) + (hours * 2); // 1 + 6 = 7
 
-            if (duration === 60)
-                if (totalHalfHours < 2)
-                    totalHalfHours = 0;
-                else
-                    totalHalfHours = Math.ceil(totalHalfHours / 2);
-
-            return totalHalfHours;
+                if (duration === 60)
+                    if (totalHalfHours < 2)
+                        totalHalfHours = 0;
+                    else
+                        totalHalfHours = Math.ceil(totalHalfHours / 2);
+                return totalHalfHours;
+            } else
+                return undefined;
         };
 
         const range = state.width < 700 ? 3 : 7;
@@ -82,10 +89,12 @@ class AppointmentsTimetable extends React.Component {
         if (!sv_appointment?.appointmentAllocationTime?.length)
             return this.setState({ stWeekDays: [] });
 
-        for (const i in sv_appointment.appointmentAllocationTime) {
-            sv_appointment.appointmentAllocationTime[i].From = moment(sv_appointment.appointmentAllocationTime[i].From, 'HH:mm');
-            sv_appointment.appointmentAllocationTime[i].To = moment(sv_appointment.appointmentAllocationTime[i].To, 'HH:mm');
-        }
+        for (const i in sv_appointment.appointmentAllocationTime)
+            sv_appointment.appointmentAllocationTime[i] = {
+                ...sv_appointment.appointmentAllocationTime[i],
+                From: momentTZ.utc(sv_appointment.appointmentAllocationTime[i].From, 'HH:mm').tz(this.currentTimeZone),
+                To: momentTZ.utc(sv_appointment.appointmentAllocationTime[i].To, 'HH:mm').tz(this.currentTimeZone)
+            };
 
         if (sv_appointment.appointmentAllocationTime) {
 
@@ -238,18 +247,23 @@ class AppointmentsTimetable extends React.Component {
 
     render() {
         const range = this.state.width < 700 ? 3 : 7;
-        console.log(this.state.stWeekDays.length);
+
         return (
             <>
                 <div className={styles.Title}>
                     <Typography>
                         <Title>Hi {this.props.appointment.userName} </Title>
-                        <Paragraph>
-
-                        </Paragraph>
+                        {
+                            !!this.state.stWeekDays.length &&
+                            <Paragraph>
+                                The time slots below is shown based on your current
+                                timezone: <b>{this.currentTimeZone}</b>
+                            </Paragraph>
+                        }
                     </Typography>
                 </div>
-                {!this.state.stWeekDays.length ?
+                {
+                    !this.state.stWeekDays.length ?
 
                     <div className={styles.Container}>
                         <h2>Sorry, there are no available appointments :( </h2>
@@ -307,7 +321,10 @@ class AppointmentsTimetable extends React.Component {
                                     :
                                     <Popconfirm
                                         title="Are you sure to select this date?"
-                                        onConfirm={() => this.props.onSubmit(this.state.selectedTimeSlot)}
+                                        onConfirm={() => this.props.onSubmit({
+                                            selectedTimeSlot: this.state.selectedTimeSlot,
+                                            userTimeZone: this.currentTimeZone
+                                        })}
                                         okText="Yes"
                                         cancelText="No"
                                     >

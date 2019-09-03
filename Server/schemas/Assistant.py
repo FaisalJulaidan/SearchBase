@@ -38,7 +38,7 @@ class Assistant(db.Model):
     AutoPilotID = db.Column(db.Integer, db.ForeignKey('auto_pilot.ID', ondelete='SET NULL'))
     AutoPilot = db.relationship("AutoPilot", back_populates="Assistants", foreign_keys=[AutoPilotID])
 
-    StoredFileID = db.Column(db.Integer, db.ForeignKey('stored_file.ID', ondelete='SET NULL'))
+    StoredFileID = db.Column(db.Integer, db.ForeignKey('stored_file.ID', ondelete='cascade'))
     StoredFile = db.relationship('StoredFile', order_by="desc(StoredFile.ID)")
     #  - Many to one
     Conversations = db.relationship('Conversation', back_populates='Assistant')

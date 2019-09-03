@@ -103,9 +103,9 @@ class Campaign extends React.Component {
     };
 
     addCandidateName = () => {
-        let textMessage = this.state.textMessage+" {candidate.name} ";
+        let textMessage = this.state.textMessage + " {candidate.name} ";
         this.props.form.setFieldsValue({text: textMessage}); //Update Message Input
-        this.setState({textMessage:textMessage}); //Update TextMessage State for Phone.JS
+        this.setState({textMessage: textMessage}); //Update TextMessage State for Phone.JS
     };
 
     //TODO:: Skill should be validated before submission | Empty String can be accepted
@@ -275,7 +275,7 @@ class Campaign extends React.Component {
                             )}
 
                         </FormItem>
-                        <FormItem label={"Use CRM"} labelCol={{xs: {span: 5, offset: 0}}}>
+                        <FormItem label={"Use CRM"} labelCol={{xs: {span: 4, offset: 0}}}>
                             <Switch onChange={(checked) => this.setState({use_crm: checked})}
                                     defaultChecked={this.state.use_crm}/>
                         </FormItem>
@@ -390,27 +390,22 @@ class Campaign extends React.Component {
                                               onChange={value => this.findLocation(value)}/>
                             )}
                         </FormItem>
-                        <FormItem label={"Message"}>
-                            <Row gutter={16} type="flex" justify="end">
-                                <Col span={24}>
-                                    {getFieldDecorator("text", {
-                                        rules: [{
+                        <FormItem
+                            label={<span>Message
+                                <Button type="default" size="small" shape="round"
+                                        style={{margin: '0 5px', fontSize: '.9em'}}
+                                        onClick={this.addCandidateName}>Candidate Name</Button>
+                            </span>}>
+                            {getFieldDecorator("text", {
+                                rules: [{
                                     required: true,
                                     message: "Please enter the message"
                                 }],
                             })(
                                 <TextArea placeholder="Type in the message you'd like to send"
                                           onChange={e => this.setState({textMessage: e.target.value})}
-                                        />
-                                    )}
-                                </Col>
-                                <Col span={7}>
-                                    <Button type="default" shape="round" size="small"
-                                            onClick={this.addCandidateName}>
-                                        Candidate Name
-                                    </Button>
-                                </Col>
-                            </Row>
+                                />
+                            )}
                         </FormItem>
                         <Button loading={this.props.isCandidatesLoading} type="primary" onClick={this.handleSubmit}
                                 size={"large"}>

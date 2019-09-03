@@ -109,12 +109,51 @@ def insertClient(assistant: Assistant, conversation: Conversation):
         return Callback(False, "CRM type did not match with those on the system")
 
 
-def customInsertCandidate(details, companyID):
+def customInsertCandidate(details, conversation, companyID):
     crm_callback: Callback = getByID(details["source_id"], companyID)
     if not crm_callback.Success:
         return crm_callback
 
     crm_type = crm_callback.Data.Type
+
+    name = (conversation.Name or " ").split(" ")
+    data = {
+        "name": conversation.Name or " ",
+        "firstName": helpers.getListValue(name, 0, " "),
+        "lastName": helpers.getListValue(name, 1, " "),
+        "mobile": conversation.PhoneNumber or " ",
+        "city": ", ".join(
+            conversation.Data.get('keywordsByDataType').get(DT.CandidateLocation.value['name']) or
+            conversation.Data.get('keywordsByDataType').get(DT.JobLocation.value['name'], [])),
+        "email": conversation.Email or " ",
+        "emails": conversation.Data.get('keywordsByDataType').get(DT.CandidateEmail.value['name'], []),
+
+        "skills": ", ".join(
+            conversation.Data.get('keywordsByDataType').get(DT.CandidateSkills.value['name'], ) or
+            conversation.Data.get('keywordsByDataType').get(DT.JobEssentialSkills.value['name'], [])) or None,
+        "yearsExperience": ", ".join(
+            conversation.Data.get('keywordsByDataType').get(DT.CandidateYearsExperience.value['name']) or
+            conversation.Data.get('keywordsByDataType').get(DT.JobYearsRequired.value['name'], [])) or None,
+
+        "preferredWorkCity": ", ".join(
+            conversation.Data.get('keywordsByDataType').get(DT.JobLocation.value['name'], [])) or None,
+        "preferredJobTitle": ", ".join(
+            conversation.Data.get('keywordsByDataType').get(DT.JobTitle.value['name'], [])) or None,
+        "preferredJobType": ", ".join(
+            conversation.Data.get('keywordsByDataType').get(DT.JobType.value['name'], [])) or None, # cant be used until predefined values
+
+        "educations": ", ".join(conversation.Data.get('keywordsByDataType').get(DT.CandidateEducation.value['name'],
+                                                                                [])) or None,
+        "availability": ", ".join(
+            conversation.Data.get('keywordsByDataType').get(DT.CandidateAvailability.value['name'], [])) or None,
+
+        "annualSalary": getSalary(conversation, DT.CandidateAnnualDesiredSalary, "Min") or
+                        getSalary(conversation, DT.JobAnnualSalary, "Min"),
+        "dayRate": getSalary(conversation, DT.CandidateDailyDesiredSalary, "Min") or
+                   getSalary(conversation, DT.JobDayRate, "Min"),
+
+        "selectedSolutions": conversation.Data.get("selectedSolutions")
+    }
 
     if details["id"] and crm_type is CRM.Bullhorn:
         func = "update"

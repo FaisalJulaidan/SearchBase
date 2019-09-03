@@ -88,7 +88,7 @@ def processConversation(assistantHashID, data: dict) -> Callback:
         else:
             crmInformation = data["crmInformation"]
             if crmInformation.get("source") == "crm":
-                crm_callback: Callback = crm_services.customInsertCandidate(crmInformation, assistant.CompanyID)
+                crm_callback: Callback = crm_services.customInsertCandidate(crmInformation, conversation, assistant.CompanyID)
                 if crm_callback.Success:
                     conversation.CRMSynced = True
                 conversation.CRMResponse = crm_callback.Message

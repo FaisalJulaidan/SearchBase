@@ -109,15 +109,19 @@ def insertClient(assistant: Assistant, conversation: Conversation):
         return Callback(False, "CRM type did not match with those on the system")
 
 
-def customInsertCandidate(details, conversation, companyID):
+def updateCandidate(details, conversation, companyID):
     crm_callback: Callback = getByID(details["source_id"], companyID)
     if not crm_callback.Success:
         return crm_callback
 
     crm_type = crm_callback.Data.Type
 
+    if crm_type is not CRM.Bullhorn:
+        return Callback(False, "CRM " + crm_type.value + " is not allowed for updating")
+
     name = (conversation.Name or " ").split(" ")
     data = {
+        "id": details["id"],
         "name": conversation.Name or " ",
         "firstName": helpers.getListValue(name, 0, " "),
         "lastName": helpers.getListValue(name, 1, " "),
@@ -155,18 +159,13 @@ def customInsertCandidate(details, conversation, companyID):
         "selectedSolutions": conversation.Data.get("selectedSolutions")
     }
 
-    if details["id"] and crm_type is CRM.Bullhorn:
-        func = "update"
-    else:
-        func = "insert"
-
     if CRM.has_value(crm_type.value):
         # if crm_type is CRM.Greenhouse:
         #     return Callback(True, "Greenhouse does not accept clients")
         # if crm_type is CRM.Adapt or crm_type is CRM.Jobscience:
         #     return eval(crm_type.value + "." + func + "Candidate(assistant.CRM.Auth, data)")
 
-        return eval(crm_type.value + "." + func + "Candidate(crm_callback.Data.Auth, data, companyID)")
+        return eval(crm_type.value + ".updateCandidate(crm_callback.Data.Auth, data, companyID)")
     else:
         return Callback(False, "CRM type did not match with those on the system")
 

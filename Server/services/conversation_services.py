@@ -64,7 +64,7 @@ def processConversation(assistantHashID, data: dict) -> Callback:
         }
 
         webhook_services.fireRequests(webhookData, callback.Data.CompanyID, Webhooks.Conversations)
-
+        print("crmInformation: ", data.get("crmInformation"))
         if not data.get("crmInformation"):
             # AutoPilot Operations
             if assistant.AutoPilot and conversation.Completed:
@@ -86,9 +86,11 @@ def processConversation(assistantHashID, data: dict) -> Callback:
                     conversation.CRMSynced = True
                 conversation.CRMResponse = crm_callback.Message
         else:
+            print("STARTING")
             crmInformation = data["crmInformation"]
+            print(crmInformation.get("source"))
             if crmInformation.get("source") == "crm":
-                crm_callback: Callback = crm_services.customInsertCandidate(crmInformation, conversation, assistant.CompanyID)
+                crm_callback: Callback = crm_services.updateCandidate(crmInformation, conversation, assistant.CompanyID)
                 if crm_callback.Success:
                     conversation.CRMSynced = True
                 conversation.CRMResponse = crm_callback.Message
@@ -100,7 +102,6 @@ def processConversation(assistantHashID, data: dict) -> Callback:
                 callback_mail: Callback = mail_services.notifyNewConversation(assistant, conversation)
                 if callback_mail.Success:
                     assistant.LastNotificationDate = datetime.now()
-
 
         # Save conversation data
         db.session.add(conversation)

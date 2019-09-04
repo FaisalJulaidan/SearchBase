@@ -157,9 +157,9 @@ def sendQuery(auth, query, method, body, companyID, optionalParams=None):
         headers = {'Content-Type': 'application/json'}
         # test the BhRestToken (rest_token)
         r = marketplace_helpers.sendRequest(url, method, headers, json.dumps(body))
-        # print(url)
-        # print(r.status_code)
-        # print(r.text)
+        print(url)
+        print(r.status_code)
+        print(r.text)
         if r.status_code == 401:  # wrong rest token
             callback: Callback = retrieveRestToken(auth, companyID)
             if not callback.Success:
@@ -417,7 +417,7 @@ def updateCandidate(auth, data, companyID) -> Callback:
             body["dayRate"] = None
 
         # send query
-        sendQuery_callback: Callback = sendQuery(auth, "entity/Candidate", "post", body, companyID)
+        sendQuery_callback: Callback = sendQuery(auth, "entity/Candidate/" + str(data["id"]), "post", body, companyID)
 
         if not sendQuery_callback.Success:
             raise Exception(sendQuery_callback.Message)

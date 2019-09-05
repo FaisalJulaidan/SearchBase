@@ -38,7 +38,7 @@ def prepareCampaign(campaign_details, companyID):
         for candidate in candidates_callback.Data:
             if candidate.get("Currency"):
                 candidate["Currency"] = ""
-        print(candidates_callback.Data)
+
         campaign_details["candidate_list"] = candidates_callback.Data
 
         return Callback(True, 'Campaign Ready', campaign_details)

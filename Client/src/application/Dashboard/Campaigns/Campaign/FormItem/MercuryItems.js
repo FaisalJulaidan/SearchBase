@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 import PropTypes from 'prop-types';
 import {Form, Input} from 'antd';
-import Item from "../../Marketplace/Item/Item";
+import Item from "../../../Marketplace/Item/Item";
 
 class MercuryItems extends Component {
     render() {

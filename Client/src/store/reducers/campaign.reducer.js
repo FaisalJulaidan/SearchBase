@@ -2,6 +2,7 @@ import * as actionTypes from '../actions/actionTypes';
 import {updateObject} from '../utility';
 
 const initialState = {
+    campaignsList:[],
     assistants: [],
     crms: [],
     databases: [],
@@ -16,8 +17,28 @@ const initialState = {
 export const campaign = (state = initialState, action) => {
     switch (action.type) {
 
-        //Fetch campaign data
-        case actionTypes.FETCH_CAMPAIGN_DATA_REQUEST:
+        //Fetch All
+        case actionTypes.FETCH_CAMPAIGNS_REQUEST:
+            return updateObject(state, {
+                campaignsList: [],
+                isLoading: true,
+                errorMsg: null,
+            });
+        case actionTypes.FETCH_CAMPAIGNS_SUCCESS:
+            return updateObject(state, {
+                campaignsList: action.campaignsList,
+                isLoading: false,
+                errorMsg: null,
+            });
+        case actionTypes.FETCH_CAMPAIGNS_FAILURE:
+            return updateObject(state, {
+                campaignsList: [],
+                isLoading: false,
+                errorMsg: action.error
+            });
+
+        //Fetch campaign
+        case actionTypes.FETCH_CAMPAIGN_REQUEST:
             return updateObject(state, {
                 assistants: [],
                 crms: [],
@@ -26,7 +47,7 @@ export const campaign = (state = initialState, action) => {
                 isLoading: true,
                 errorMsg: null,
             });
-        case actionTypes.FETCH_CAMPAIGN_DATA_SUCCESS:
+        case actionTypes.FETCH_CAMPAIGN_SUCCESS:
             return updateObject(state, {
                 assistants: action.assistants,
                 crms: action.crms,
@@ -35,7 +56,7 @@ export const campaign = (state = initialState, action) => {
                 isLoading: false,
                 errorMsg: null,
             });
-        case actionTypes.FETCH_CAMPAIGN_DATA_FAILURE:
+        case actionTypes.FETCH_CAMPAIGN_FAILURE:
             return updateObject(state, {
                 assistants: [],
                 crms: [],

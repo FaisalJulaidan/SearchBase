@@ -1,19 +1,36 @@
 import * as actionTypes from './actionTypes';
 
-const fetchCampaignData = () => ({
-    type: actionTypes.FETCH_CAMPAIGN_DATA_REQUEST
+
+// Fetch All
+const fetchCampaigns = () => ({
+    type: actionTypes.FETCH_CAMPAIGNS_REQUEST
 });
 
-const fetchCampaignDataSuccess = (assistants, crms, databases, messengers) => ({
-    type: actionTypes.FETCH_CAMPAIGN_DATA_SUCCESS,
+const fetchCampaignsSuccess = (campaignsList) => ({
+    type: actionTypes.FETCH_CAMPAIGNS_SUCCESS,
+    campaignsList
+});
+
+const fetchCampaignsFailure = (errorMsg) => ({
+    type: actionTypes.FETCH_CAMPAIGNS_FAILURE,
+    errorMsg
+});
+
+
+const fetchCampaign = () => ({
+    type: actionTypes.FETCH_CAMPAIGN_REQUEST
+});
+
+const fetchCampaignSuccess = (assistants, crms, databases, messengers) => ({
+    type: actionTypes.FETCH_CAMPAIGN_SUCCESS,
     assistants,
     crms,
     databases,
     messengers
 });
 
-const fetchCampaignDataFailure = (error) => ({
-    type: actionTypes.FETCH_CAMPAIGN_DATA_FAILURE,
+const fetchCampaignFailure = (error) => ({
+    type: actionTypes.FETCH_CAMPAIGN_FAILURE,
     error
 });
 
@@ -65,9 +82,13 @@ const launchCampaignFailure = (errorMsg) => ({
 });
 
 export const campaignActions = {
-    fetchCampaignData,
-    fetchCampaignDataSuccess,
-    fetchCampaignDataFailure,
+    fetchCampaigns,
+    fetchCampaignsSuccess,
+    fetchCampaignsFailure,
+
+    fetchCampaign,
+    fetchCampaignSuccess,
+    fetchCampaignFailure,
 
     fetchCampaignCandidatesData,
     fetchCampaignCandidatesDataSuccess,

@@ -27,7 +27,7 @@ import Account from './ControlPanel/Account/Account';
 import Billing from './ControlPanel/Billing/Billing';
 import UsersManagement from './ControlPanel/UsersManagement/UsersManagement';
 import Documentation from './Documentation/Documentation';
-import Campaign from './Campaign/Campaign';
+import Campaign from './Campaigns/Campaigns';
 import AutoPilots from './AutoPilots/AutoPilots';
 import AutoPilot from './AutoPilots/AutoPilot/AutoPilot';
 import Appointment from './Appointment/Appointment';

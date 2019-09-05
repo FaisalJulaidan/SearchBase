@@ -18,11 +18,11 @@ import {
     Col
 } from 'antd';
 
-import {trimText} from "../../../helpers";
+import {trimText} from "../../../../helpers";
 
 import googleMaps from '@google/maps'
 
-import Phone from "../../../components/Phone/Phone";
+import Phone from "../../../../components/Phone/Phone";
 import styles from "./Campaign.module.less";
 import {campaignActions} from "store/actions";
 
@@ -65,7 +65,7 @@ class Campaign extends React.Component {
     }
 
     componentWillMount() {
-        this.props.dispatch(campaignActions.fetchCampaignData());
+        this.props.dispatch(campaignActions.fetchCampaign());
     }
 
     componentDidUpdate(prevProps, prevState, snapshot) {

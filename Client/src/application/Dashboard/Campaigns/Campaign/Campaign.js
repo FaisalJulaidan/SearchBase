@@ -12,6 +12,7 @@ import googleMaps from '@google/maps'
 
 import Phone from "../../../../components/Phone/Phone";
 import styles from "./Campaign.module.less";
+import {history} from 'helpers';
 import {campaignActions} from "store/actions";
 
 const FormItem = Form.Item;
@@ -196,6 +197,23 @@ class Campaign extends React.Component {
                     this.state.skills,
                     this.state.textMessage,
                 ));
+            }
+        });
+    };
+
+    handleSave = () => {
+        //TODO:: Dispatch Save Action
+        history.push('/dashboard/campaigns/1')
+    };
+
+    handleDelete = () => {
+        Modal.confirm({
+            title: `Delete campaign confirmation`,
+            content: `If you click OK, this campaign data will be deleted.`,
+            onOk: () => {
+                // this.props.dispatch(campaignActions.deleteCampaign(this.props.campaign.ID))
+                //     .then(() => history.push('/dashboard/campaigns'));
+                history.push('/dashboard/campaigns')
             }
         });
     };
@@ -423,10 +441,11 @@ class Campaign extends React.Component {
 
                         <Divider/>
 
-                        <Button type="danger" icon="delete" style={{display: this.state.isSaved ? 'unset' : 'none'}}>
+                        <Button type="danger" icon="delete" onClick={this.handleDelete}
+                                style={{display: this.state.isSaved ? 'unset' : 'none'}}>
                             Delete Campaign
                         </Button>
-                        <Button type="default" icon="save">
+                        <Button type="default" icon="save" onClick={this.handleSave}>
                             {this.state.isSaved ? 'Save Changes' : 'Save Campaign'}
                         </Button>
                     </Form>

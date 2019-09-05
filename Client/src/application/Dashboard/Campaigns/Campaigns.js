@@ -18,21 +18,33 @@ class Campaigns extends Component {
         this.props.dispatch(campaignActions.fetchCampaigns())
     }
 
+    deleteCampaign = (campaignID) => {
+        Modal.confirm({
+            title: `Delete campaign confirmation`,
+            content: `If you click OK, this campaign will be deleted.`,
+            onOk: () => {
+                console.log(this.props);
+                //TODO::
+                // this.props.dispatch(campaignActions.deleteCampaign(campaignID))
+            }
+        });
+    };
+
     optionsMenuClickHandler = (e, campaign) => {
         if (e.key === 'edit')
-            history.push(`/dashboard/campaigns/${campaign.ID}`)
-        // if (e.key === 'delete')
-            // TODO:: this.deleteAutoPilot(autoPilot.ID)
+            history.push(`/dashboard/campaigns/${campaign.ID}`);
+        if (e.key === 'delete')
+            this.deleteCampaign(campaign.ID)
     };
 
     // it must be an array of Menu.Item. ViewBox expect that in its options Menu
     optionsMenuItems = [
-        <Menu.Item style={{padding:10, paddingRight: 30}} key="edit">
+        <Menu.Item style={{padding: 10, paddingRight: 30}} key="edit">
             <Icon type="edit" theme="twoTone" twoToneColor="#595959" style={{marginRight: 5}}/>
             Edit
         </Menu.Item>,
-        <Menu.Item style={{padding:10, paddingRight: 30}} key="delete">
-            <Icon type="delete" theme="twoTone" twoToneColor="#f50808" />
+        <Menu.Item style={{padding: 10, paddingRight: 30}} key="delete">
+            <Icon type="delete" theme="twoTone" twoToneColor="#f50808"/>
             Delete
         </Menu.Item>
     ];
@@ -53,7 +65,9 @@ class Campaigns extends Component {
 
                     <div className={styles.Body}>
                         <CreateNewBox text={'Add Campaign'}
-                            onClick={()=>{history.push(`/dashboard/campaigns/new`)}}
+                                      onClick={() => {
+                                          history.push(`/dashboard/campaigns/new`)
+                                      }}
                         />
 
                         {

@@ -271,6 +271,9 @@ class Dashboard extends Component {
                                                 <AuthorisedRoute path={`${match.path}/assistants`} permission={company.AccessAssistants} component={Assistants} exact/>
                                                 <AuthorisedRoute path={`${match.path}/assistants/:id`} permission={company.AccessAssistants} component={Assistant} exact/>
 
+                                                <AuthorisedRoute path={`${match.path}/campaigns`} permission={company.AccessCampaigns} component={Campaign} exact/>
+                                                <AuthorisedRoute path={`${match.path}/campaigns/:id`} permission={company.AccessCampaigns} component={Campaign} exact/>
+
                                                 <Route path={`${match.path}/marketplace`} component={Marketplace} exact/>
                                                 <Route path={`${match.path}/marketplace/:type`} component={Item} exact/>
 
@@ -286,7 +289,6 @@ class Dashboard extends Component {
                                                 <Route path={`${match.path}/users_management`} component={UsersManagement} exact/>
                                                 <Route path={`${match.path}/documentation`} component={Documentation} exact/>
                                                 <AuthorisedRoute path={`${match.path}/appointments`} permission={company.AccessAppointments} component={Appointment} exact/>
-                                                <AuthorisedRoute path={`${match.path}/campaigns`} permission={company.AccessCampaigns} component={Campaign} exact/>
                                                 <Route path="/dashboard" component={Home}/>
                                             </Switch>
                                         </Suspense>

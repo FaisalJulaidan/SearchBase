@@ -178,9 +178,9 @@ class Dashboard extends Component {
                             <span>Assistants</span>
                         </Menu.Item>
 
-                        <Menu.Item disabled={!company.AccessCampaigns} key="campaign">
+                        <Menu.Item disabled={!company.AccessCampaigns} key="campaigns">
                             <Icon type="rocket"/>
-                            <span>Campaign</span>
+                            <span>Campaigns</span>
                         </Menu.Item>
 
                         <Menu.Item disabled={!company.AccessAutoPilot} key="auto_pilots">
@@ -286,7 +286,7 @@ class Dashboard extends Component {
                                                 <Route path={`${match.path}/users_management`} component={UsersManagement} exact/>
                                                 <Route path={`${match.path}/documentation`} component={Documentation} exact/>
                                                 <AuthorisedRoute path={`${match.path}/appointments`} permission={company.AccessAppointments} component={Appointment} exact/>
-                                                <AuthorisedRoute path={`${match.path}/campaign`} permission={company.AccessCampaigns} component={Campaign} exact/>
+                                                <AuthorisedRoute path={`${match.path}/campaigns`} permission={company.AccessCampaigns} component={Campaign} exact/>
                                                 <Route path="/dashboard" component={Home}/>
                                             </Switch>
                                         </Suspense>

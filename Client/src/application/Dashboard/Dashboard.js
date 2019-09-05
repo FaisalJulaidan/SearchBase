@@ -27,7 +27,8 @@ import Account from './ControlPanel/Account/Account';
 import Billing from './ControlPanel/Billing/Billing';
 import UsersManagement from './ControlPanel/UsersManagement/UsersManagement';
 import Documentation from './Documentation/Documentation';
-import Campaign from './Campaigns/Campaigns';
+import Campaigns from './Campaigns/Campaigns';
+import Campaign from "./Campaigns/Campaign/Campaign";
 import AutoPilots from './AutoPilots/AutoPilots';
 import AutoPilot from './AutoPilots/AutoPilot/AutoPilot';
 import Appointment from './Appointment/Appointment';
@@ -121,11 +122,11 @@ class Dashboard extends Component {
             '/dashboard/assistants',
             '/dashboard/marketplace',
             '/dashboard/appointments',
-            '/dashboard/auto_pilot',
+            '/dashboard/auto_pilots',
             '/dashboard/databases',
             '/dashboard/account',
             '/dashboard/users_management',
-            '/dashboard/campaign'
+            '/dashboard/campaigns'
         ];
         const isNewLayout = newLayoutRoutes.some(a => this.props.location.pathname.indexOf(a) > -1);
         return (
@@ -271,7 +272,7 @@ class Dashboard extends Component {
                                                 <AuthorisedRoute path={`${match.path}/assistants`} permission={company.AccessAssistants} component={Assistants} exact/>
                                                 <AuthorisedRoute path={`${match.path}/assistants/:id`} permission={company.AccessAssistants} component={Assistant} exact/>
 
-                                                <AuthorisedRoute path={`${match.path}/campaigns`} permission={company.AccessCampaigns} component={Campaign} exact/>
+                                                <AuthorisedRoute path={`${match.path}/campaigns`} permission={company.AccessCampaigns} component={Campaigns} exact/>
                                                 <AuthorisedRoute path={`${match.path}/campaigns/:id`} permission={company.AccessCampaigns} component={Campaign} exact/>
 
                                                 <Route path={`${match.path}/marketplace`} component={Marketplace} exact/>

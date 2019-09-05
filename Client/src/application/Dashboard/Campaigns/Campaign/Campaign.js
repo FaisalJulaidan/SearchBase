@@ -1,21 +1,9 @@
 import React from 'react';
 import {connect} from 'react-redux';
+import {withRouter} from "react-router-dom";
 import NoHeaderPanel from 'components/NoHeaderPanel/NoHeaderPanel'
 import {
-    Typography,
-    Form,
-    Input,
-    Icon,
-    Button,
-    Tag,
-    AutoComplete,
-    Select,
-    Switch,
-    Modal,
-    List,
-    Checkbox,
-    Row,
-    Col
+    Typography, Form, Input, Icon, Divider, Button, Tag, AutoComplete, Select, Switch, Modal, List, Checkbox
 } from 'antd';
 
 import {trimText} from "../../../../helpers";
@@ -48,7 +36,8 @@ class Campaign extends React.Component {
             candidate_list: [],
             modalVisibility: false,
             skillInput: "",
-            textMessage: ""
+            textMessage: "",
+            isSaved: true //If the campaign is saved or not
         };
         this.setLocations = this.setLocations.bind(this);
         this.handleSkillSubmit = this.handleSkillSubmit.bind(this);
@@ -65,6 +54,9 @@ class Campaign extends React.Component {
     }
 
     componentWillMount() {
+        if (this.props.match.params.id === 'new') {
+            this.setState({isSaved: false})
+        }
         this.props.dispatch(campaignActions.fetchCampaign());
     }
 
@@ -76,6 +68,20 @@ class Campaign extends React.Component {
             this.showModal(false);
         }
     };
+
+    componentWillUnmount() {
+        clearTimeout(this.timer.current)
+    }
+
+    routerWillLeave(nextLocation) {
+        // return false to prevent a transition w/o prompting the user,
+        // or return a string to allow the user to decide:
+        // return `null` or nothing to let other hooks to be executed
+        //
+        // NOTE: if you return true, other hooks will not be executed!
+        if (!this.state.isSaved)
+            return 'Your work is not saved! Are you sure you want to leave?'
+    }
 
     showModal = (visibility) => {
         if (this.state.modalVisibility !== visibility)
@@ -91,9 +97,6 @@ class Campaign extends React.Component {
         }, 300)
     };
 
-    componentWillUnmount() {
-        clearTimeout(this.timer.current)
-    }
 
     setLocations = (err, response) => {
         if (!err) {
@@ -200,7 +203,6 @@ class Campaign extends React.Component {
     render() {
         const {form} = this.props;
         const {getFieldDecorator} = form;
-        console.log(this.state.candidate_list);
 
         return (<NoHeaderPanel>
             <div className={styles.Header}>
@@ -246,8 +248,13 @@ class Campaign extends React.Component {
                             <List.Item actions={[<Checkbox defaultChecked checked={this.isCandidateSelected(item)}
                                                            onChange={(e) => this.onCandidateSelected(e, item)}/>]}>
                                 <List.Item.Meta
-                                    title={<span style={{color:'#444444',fontWeight:'bold',fontSize:'1.2em'}}>{item.CandidateName}</span>}
-                                    description={<span style={{fontSize:'1.1em'}}>{item.CandidateLocation + ' - ' + item.CandidateSkills}</span>}/>
+                                    title={<span style={{
+                                        color: '#444444',
+                                        fontWeight: 'bold',
+                                        fontSize: '1.2em'
+                                    }}>{item.CandidateName}</span>}
+                                    description={<span
+                                        style={{fontSize: '1.1em'}}>{item.CandidateLocation + ' - ' + item.CandidateSkills}</span>}/>
                             </List.Item>
                         )}
                     />
@@ -408,9 +415,19 @@ class Campaign extends React.Component {
                                 />
                             )}
                         </FormItem>
-                        <Button loading={this.props.isCandidatesLoading} type="primary" onClick={this.handleSubmit}
+                        <Button loading={this.props.isCandidatesLoading} icon="rocket" type="primary"
+                                onClick={this.handleSubmit}
                                 size={"large"}>
-                            Submit
+                            Launch
+                        </Button>
+
+                        <Divider/>
+
+                        <Button type="danger" icon="delete" style={{display: this.state.isSaved ? 'unset' : 'none'}}>
+                            Delete Campaign
+                        </Button>
+                        <Button type="default" icon="save">
+                            {this.state.isSaved ? 'Save Changes' : 'Save Campaign'}
                         </Button>
                     </Form>
                 </div>
@@ -439,4 +456,4 @@ function mapStateToProps(state) {
     };
 }
 
-export default connect(mapStateToProps)(Form.create()(Campaign));
+export default connect(mapStateToProps)(withRouter(Form.create()(Campaign)));

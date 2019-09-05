@@ -18,22 +18,42 @@ class Campaigns extends Component {
         this.props.dispatch(campaignActions.fetchCampaigns())
     }
 
+    optionsMenuClickHandler = (e, campaign) => {
+        if (e.key === 'edit')
+            history.push(`/dashboard/campaigns/${campaign.ID}`)
+        // if (e.key === 'delete')
+            // TODO:: this.deleteAutoPilot(autoPilot.ID)
+    };
+
+    // it must be an array of Menu.Item. ViewBox expect that in its options Menu
+    optionsMenuItems = [
+        <Menu.Item style={{padding:10, paddingRight: 30}} key="edit">
+            <Icon type="edit" theme="twoTone" twoToneColor="#595959" style={{marginRight: 5}}/>
+            Edit
+        </Menu.Item>,
+        <Menu.Item style={{padding:10, paddingRight: 30}} key="delete">
+            <Icon type="delete" theme="twoTone" twoToneColor="#f50808" />
+            Delete
+        </Menu.Item>
+    ];
+
     render() {
         return (
             <>
                 <NoHeaderPanel>
                     <div className={styles.Header}>
                         <Title className={styles.Title}>
-                            <Icon type="interation"/> Campaign
+                            <Icon type="rocket"/> Campaign
                         </Title>
                         <Paragraph type="secondary">
-                            Here you can use our Outreach engine to Engage with the candidates inside your CRM via SMS and Email
+                            Here you can use our Outreach engine to Engage with the candidates inside your CRM via SMS
+                            and Email
                         </Paragraph>
                     </div>
 
                     <div className={styles.Body}>
                         <CreateNewBox text={'Add Campaign'}
-                                      // onClick={this.showNewAutoPilotModal}
+                            onClick={()=>{history.push(`/dashboard/campaigns/new`)}}
                         />
 
                         {
@@ -44,11 +64,11 @@ class Campaigns extends Component {
                                         <ViewBox
                                             onClick={() => history.push(`/dashboard/campaigns/${campaign.ID}`)}
                                             optionsMenuItems={this.optionsMenuItems}
-                                            optionsMenuClickHandler={(e)=>this.optionsMenuClickHandler(e, campaign)}
+                                            optionsMenuClickHandler={(e) => this.optionsMenuClickHandler(e, campaign)}
                                             key={i}
                                             title={campaign.Name}
                                             text={campaign.Description}
-                                            icon={<AutoPilotIcon/>}
+                                            icon={<Icon type="rocket" style={{fontSize: '2em'}}/>}
                                             iconTop={175}
                                             iconRight={15}
                                         />

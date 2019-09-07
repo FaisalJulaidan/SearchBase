@@ -71,8 +71,14 @@ const FileUpload = ({ message, submitMessage }) => {
                 block,
                 { skipped: false, file, fileName: genUniqueFileName(file) });
         }
-
     }, [upload, message, setUpload, file, submitMessage]);
+
+    useEffect(() => {
+        if(upload.progress === 0 && upload.uploading === true){
+            setUpload(upload => ({...upload, uploading: false}))
+            setFile(null)
+        }
+    }, [upload])
 
     useEffect(() => {
         return () => clearInterval(uploadTimer.current);

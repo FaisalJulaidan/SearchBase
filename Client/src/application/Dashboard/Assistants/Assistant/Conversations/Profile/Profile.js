@@ -26,12 +26,13 @@ class Profile extends Component {
             let values = this.props.conversation.Data.keywordsByDataType[dataType.name];
 
             let inputs = [];
+            let idx = 0;
             if(values){
                 values.forEach(input => {
                     if (input === '&FILE_UPLOAD&'){
-                        inputs.push(this.createDownloadFileBtn(dataType.files[0])) // #TODO: Make this so it takes the appropriate file (dropdown or smth in the future)
+                        inputs.push(this.createDownloadFileBtn(dataType.files[idx++])); // #TODO: Make this so it takes the appropriate file (dropdown or smth in the future)
                     } else {
-                        inputs.push(input + " ")
+                        inputs.push(input + " ");
                     }
                 });
             }

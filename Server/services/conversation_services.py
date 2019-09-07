@@ -134,16 +134,18 @@ def uploadFiles(files, conversation, data, keys):
 
         db.session.add(sf)
         db.session.flush()
-
+        uploadedFiles = []
         uploadedFilesCallbacks = []
         for item in data['collectedData']:
             if item['input'] == "&FILE_UPLOAD&": # enum for this?
                 for file in files:
-                    print(item)
+                    if file.filename in uploadedFiles:
+                        continue
                     for submittedFile in data['submittedFiles']:
                         if file.filename == submittedFile['uploadedFileName']:
+                            uploadedFiles.append(file.filename)
                             key = enums.FileAssetType.NoType # TODO once BlockType-Upgrade is done
-                            upload_callback: Callback = stored_file_services.uploadFile(file, item['fileName'], True, model=Conversation,
+                            upload_callback: Callback = stored_file_services.uploadFile(file, submittedFile['fileName'], True, model=Conversation,
                                                                                                             identifier="ID",
                                                                                                             identifier_value=conversation.ID,
                                                                                                             stored_file_id=sf.ID,

@@ -1,5 +1,5 @@
 import React from 'react';
-import {connect} from 'react-redux';
+import { connect } from 'react-redux';
 import styles from './AutoPilot.module.less';
 import NoHeaderPanel from 'components/NoHeaderPanel/NoHeaderPanel';
 import {
@@ -16,21 +16,22 @@ import {
     Spin,
     Switch,
     Typography,
-    Select
+    Select,
+    Icon,
 } from 'antd';
 import 'types/TimeSlots_Types';
-import './AutoPilot.less'
-import {history} from 'helpers';
-import {autoPilotActions, appointmentAllocationTimeActions} from 'store/actions';
+import './AutoPilot.less';
+import { history } from 'helpers';
+import { autoPilotActions, appointmentAllocationTimeActions } from 'store/actions';
 import CKEditor from '@ckeditor/ckeditor5-react';
 import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
 
-const {Panel} = Collapse;
+const { Panel } = Collapse;
 const ButtonGroup = Button.Group;
 const FormItem = Form.Item;
 const confirm = Modal.confirm;
 
-const {Title, Paragraph} = Typography;
+const { Title, Paragraph } = Typography;
 const toolbar = [
     'heading',
     'bold',
@@ -39,14 +40,14 @@ const toolbar = [
     'bulletedList',
     'numberedList',
     'undo',
-    'redo',
+    'redo'
 ];
 
 const customPanelStyle = {
     borderRadius: 4,
     marginBottom: 24,
     border: 0,
-    overflow: 'hidden',
+    overflow: 'hidden'
 };
 
 class AutoPilot extends React.Component {
@@ -60,25 +61,25 @@ class AutoPilot extends React.Component {
         sendRejectionSMS: false,
         sendCandidatesAppointments: false,
         acceptanceScore: null,
-        acceptanceEmailBody: "<p>Congrats you got accepted.</p>",
-        acceptanceSMSBody: "Congrats you got accepted.",
+        acceptanceEmailBody: '<p>Congrats you got accepted.</p>',
+        acceptanceSMSBody: 'Congrats you got accepted.',
 
         rejectionScore: null,
-        rejectionEmailBody: "<p>Sorry you are not accepted.</p>",
-        rejectionSMSBody: "Sorry you are not accepted.",
+        rejectionEmailBody: '<p>Sorry you are not accepted.</p>',
+        rejectionSMSBody: 'Sorry you are not accepted.',
 
         sendAcceptanceEmailErrors: false,
         sendAcceptanceSMSErrors: false,
         sendRejectionEmailErrors: false,
-        sendRejectionSMSErrors: false,
+        sendRejectionSMSErrors: false
 
     };
 
     componentDidMount() {
-        this.props.dispatch(appointmentAllocationTimeActions.fetchAAT())
+        this.props.dispatch(appointmentAllocationTimeActions.fetchAAT());
         this.props.dispatch(autoPilotActions.fetchAutoPilot(this.props.match.params.id))
             .then(() => {
-                const {autoPilot} = this.props;
+                const { autoPilot } = this.props;
                 this.setState({
                     rejectApplications: autoPilot.RejectApplications,
                     acceptApplications: autoPilot.AcceptApplications,
@@ -89,20 +90,28 @@ class AutoPilot extends React.Component {
                     sendCandidatesAppointments: autoPilot.SendCandidatesAppointments,
                     acceptanceScore: autoPilot.AcceptanceScore * 100,
                     acceptanceEmailBody: autoPilot.AcceptanceEmailBody,
-                    acceptanceSMSBody: autoPilot.AcceptanceSMSBody.split('\n').map(x=>`<p>${x?x:'&nbsp;'}</p>`).join(' '),
+                    acceptanceSMSBody: autoPilot.AcceptanceSMSBody.split('\n').map(x => `<p>${x ? x : '&nbsp;'}</p>`).join(' '),
                     rejectionScore: autoPilot.RejectionScore * 100,
                     rejectionEmailBody: autoPilot.RejectionEmailBody,
-                    rejectionSMSBody: autoPilot.RejectionSMSBody.split('\n').map(x=>`<p>${x?x:'&nbsp;'}</p>`).join(' ')
+                    rejectionSMSBody: autoPilot.RejectionSMSBody.split('\n').map(x => `<p>${x ? x : '&nbsp;'}</p>`).join(' ')
                 });
             }).catch(() => history.push(`/dashboard/auto_pilots`));
     }
 
-    onRejectChange = (checked) => this.setState({rejectApplications: checked, sendRejectionEmail: checked ? this.state.sendRejectionEmail : false, sendRejectionSMS: checked ? this.state.sendRejectionSMS : false});
-    onAcceptChange = (checked) => this.setState({acceptApplications: checked, sendAcceptanceEmail: checked ? this.state.sendAcceptanceEmail : false, sendAcceptanceSMS: checked ? this.state.sendAcceptanceSMS : false});
-    onSendAcceptanceEmailChange = (checked) => this.setState({sendAcceptanceEmail: checked});
-    onSendRejectionEmailChange = (checked) => this.setState({sendRejectionEmail: checked});
-    onSendAcceptanceSMSChange = (checked) => this.setState({sendAcceptanceSMS: checked});
-    onSendRejectionSMSChange = (checked) => this.setState({sendRejectionSMS: checked});
+    onRejectChange = (checked) => this.setState({
+        rejectApplications: checked,
+        sendRejectionEmail: checked ? this.state.sendRejectionEmail : false,
+        sendRejectionSMS: checked ? this.state.sendRejectionSMS : false
+    });
+    onAcceptChange = (checked) => this.setState({
+        acceptApplications: checked,
+        sendAcceptanceEmail: checked ? this.state.sendAcceptanceEmail : false,
+        sendAcceptanceSMS: checked ? this.state.sendAcceptanceSMS : false
+    });
+    onSendAcceptanceEmailChange = (checked) => this.setState({ sendAcceptanceEmail: checked });
+    onSendRejectionEmailChange = (checked) => this.setState({ sendRejectionEmail: checked });
+    onSendAcceptanceSMSChange = (checked) => this.setState({ sendAcceptanceSMS: checked });
+    onSendRejectionSMSChange = (checked) => this.setState({ sendRejectionSMS: checked });
 
     handleDelete = () => {
         confirm({
@@ -116,10 +125,10 @@ class AutoPilot extends React.Component {
     };
 
     onSubmit = () => this.props.form.validateFields((err, values) => {
-        console.log(err)
+        console.log(err);
         if (!err) {
             const /**@type AutoPilot*/ autoPilot = this.props.autoPilot || {};
-            const {state, TimeSlotsRef} = this;
+            const { state, TimeSlotsRef } = this;
             // const timeSlots = TimeSlotsRef.current.state.weekDays;
             let payload = {
                 active: autoPilot.Active,
@@ -147,62 +156,61 @@ class AutoPilot extends React.Component {
                 rejectionSMSBody: state.rejectionSMSBody.replace(/<\/p>/g, '\n').replace(/<p>/g, '').replace(/&nbsp;/g, ''),
 
                 appointmentAllocationTimes: values.AppointmentAllocationTimes,
-                sendCandidatesAppointments: state.sendCandidatesAppointments,
+                sendCandidatesAppointments: state.sendCandidatesAppointments
             };
             if (payload.sendAcceptanceEmail) {
                 if (!payload.acceptanceEmailTitle || !payload.acceptanceEmailBody)
-                    return this.setState({sendAcceptanceEmailErrors: true});
+                    return this.setState({ sendAcceptanceEmailErrors: true });
                 else
-                    this.setState({sendAcceptanceEmailErrors: false})
+                    this.setState({ sendAcceptanceEmailErrors: false });
             } else
-                this.setState({sendAcceptanceEmailErrors: false});
+                this.setState({ sendAcceptanceEmailErrors: false });
 
             if (payload.sendAcceptanceSMS) {
                 if (!payload.acceptanceSMSBody)
-                    return this.setState({sendAcceptanceSMSErrors: true});
+                    return this.setState({ sendAcceptanceSMSErrors: true });
                 else
-                    this.setState({sendAcceptanceSMSErrors: false})
+                    this.setState({ sendAcceptanceSMSErrors: false });
             } else
-                this.setState({sendAcceptanceSMSErrors: false});
+                this.setState({ sendAcceptanceSMSErrors: false });
 
             if (payload.sendRejectionEmail) {
                 if (!payload.rejectionEmailTitle || !payload.rejectionEmailBody)
-                    return this.setState({sendRejectionEmailErrors: true});
+                    return this.setState({ sendRejectionEmailErrors: true });
                 else
-                    this.setState({sendRejectionEmailErrors: false})
+                    this.setState({ sendRejectionEmailErrors: false });
             } else
-                this.setState({sendRejectionEmailErrors: false});
+                this.setState({ sendRejectionEmailErrors: false });
 
             if (payload.sendRejectionSMS) {
                 if (!payload.rejectionSMSBody)
-                    return this.setState({sendRejectionSMSErrors: true});
+                    return this.setState({ sendRejectionSMSErrors: true });
                 else
-                    this.setState({sendRejectionSMSErrors: false})
+                    this.setState({ sendRejectionSMSErrors: false });
             } else
-                this.setState({sendRejectionSMSErrors: false});
+                this.setState({ sendRejectionSMSErrors: false });
 
-            payload.appointmentAllocationTimes = payload.appointmentAllocationTimes === "You have no timetables, please create one!" ? null : payload.appointmentAllocationTimes
-            console.log(payload)
+            payload.appointmentAllocationTimes = payload.appointmentAllocationTimes === 'You have no timetables, please create one!' ? null : payload.appointmentAllocationTimes;
+            console.log(payload);
             this.props.dispatch(autoPilotActions.updateAutoPilotConfigs(autoPilot.ID, payload));
         }
 
     });
 
 
-
     render() {
         const /**@type AutoPilot*/ autoPilot = this.props.autoPilot;
         const layout = {
-            labelCol: {span: 4},
-            wrapperCol: {span: 18}
+            labelCol: { span: 4 },
+            wrapperCol: { span: 18 }
         };
-        const allocTime =  this.props.autoPilot?.AppointmentAllocationTimeID
-        const {getFieldDecorator} = this.props.form;
+        const { getFieldDecorator } = this.props.form;
+
         return (
             <>
                 <NoHeaderPanel>
                     <div className={styles.Header}>
-                        <div style={{marginBottom: 20}}>
+                        <div style={{ marginBottom: 20 }}>
                             <Breadcrumb>
                                 <Breadcrumb.Item>
                                     <a href={'javascript:void(0);'}
@@ -224,7 +232,7 @@ class AutoPilot extends React.Component {
 
                     <div className={styles.Body}>
                         {!autoPilot || this.props.aatLoading ? <Spin/> :
-                            <Form layout='vertical' wrapperCol={{span: 15}} style={{width: '100%'}}
+                            <Form layout='vertical' wrapperCol={{ span: 15 }} style={{ width: '100%' }}
                                   id={'AutoPilotForm'}>
                                 <FormItem label="Name">
                                     {getFieldDecorator('name', {
@@ -274,16 +282,16 @@ class AutoPilot extends React.Component {
                                             })(
                                                 <>
                                                     <Switch onChange={this.onAcceptChange}
-                                                            style={{marginRight: 15}}
+                                                            style={{ marginRight: 15 }}
                                                             checked={this.state.acceptApplications}
                                                     />
                                                     A score greater than
                                                     <InputNumber min={0} max={100}
-                                                                 onChange={value => this.setState({acceptanceScore: value})}
+                                                                 onChange={value => this.setState({ acceptanceScore: value })}
                                                                  value={this.state.acceptanceScore}
                                                                  key={autoPilot?.AcceptanceScore ? 'notLoadedYet' : 'loaded'}
                                                                  formatter={value => `${value}%`}
-                                                                 style={{marginLeft: 15}}
+                                                                 style={{ marginLeft: 15 }}
                                                                  disabled={!this.state.acceptApplications}/>
                                                 </>
                                             )}
@@ -296,7 +304,7 @@ class AutoPilot extends React.Component {
                                                 initialValue: autoPilot?.SendAcceptanceEmail,
                                                 rules: []
                                             })(
-                                                <div style={{marginLeft: 3}}>
+                                                <div style={{ marginLeft: 3 }}>
                                                     <Switch onChange={this.onSendAcceptanceEmailChange}
                                                             checked={this.state.sendAcceptanceEmail}
                                                             disabled={!this.state.acceptApplications}
@@ -311,7 +319,7 @@ class AutoPilot extends React.Component {
                                             <FormItem label="Acceptance Email Title" vi>
                                                 {getFieldDecorator('acceptanceEmailTitle', {
                                                     initialValue: autoPilot?.AcceptanceEmailTitle,
-                                                    rules: [{required: true,}]
+                                                    rules: [{ required: true }]
                                                 })(
                                                     <Input placeholder="Congrats you got accepted"/>
                                                 )}
@@ -325,10 +333,10 @@ class AutoPilot extends React.Component {
 
                                                 {
                                                     this.state.sendAcceptanceEmailErrors &&
-                                                    <p style={{color: 'red'}}> * Title and Body field are requierd</p>
+                                                    <p style={{ color: 'red' }}> * Title and Body field are requierd</p>
                                                 }
 
-                                                <ButtonGroup style={{margin: '5px 0'}}>
+                                                <ButtonGroup style={{ margin: '5px 0' }}>
                                                     <Button
                                                         onClick={() =>
                                                             this.setState({
@@ -351,7 +359,7 @@ class AutoPilot extends React.Component {
                                                     <Col span={15}>
                                                         <CKEditor
                                                             editor={ClassicEditor}
-                                                            config={{toolbar: toolbar}}
+                                                            config={{ toolbar: toolbar }}
                                                             data={this.state.acceptanceEmailBody}
                                                             onChange={(event, editor) => this.setState(state => state.acceptanceEmailBody = editor?.getData())}
                                                             onInit={editor => this.setState(state => state.acceptanceEmailBody = editor?.getData())}
@@ -367,7 +375,7 @@ class AutoPilot extends React.Component {
                                                 initialValue: autoPilot?.SendAcceptanceSMS,
                                                 rules: []
                                             })(
-                                                <div style={{marginLeft: 3}}>
+                                                <div style={{ marginLeft: 3 }}>
                                                     <Switch onChange={this.onSendAcceptanceSMSChange}
                                                             checked={this.state.sendAcceptanceSMS}
                                                             disabled={!this.state.acceptApplications}/>
@@ -382,9 +390,9 @@ class AutoPilot extends React.Component {
                                                 <h4>Acceptance message</h4>
                                                 {
                                                     this.state.sendAcceptanceSMSErrors &&
-                                                    <p style={{color: 'red'}}> * Body field is required</p>
+                                                    <p style={{ color: 'red' }}> * Body field is required</p>
                                                 }
-                                                <ButtonGroup style={{margin: '5px 0'}}>
+                                                <ButtonGroup style={{ margin: '5px 0' }}>
                                                     <Button
                                                         onClick={() =>
                                                             this.setState({
@@ -407,7 +415,7 @@ class AutoPilot extends React.Component {
                                                     <Col span={15}>
                                                         <CKEditor
                                                             editor={ClassicEditor}
-                                                            config={{toolbar: ['undo', 'redo']}}
+                                                            config={{ toolbar: ['undo', 'redo'] }}
                                                             data={this.state.acceptanceSMSBody}
                                                             onChange={(event, editor) => this.setState(state => state.acceptanceSMSBody = editor?.getData())}
                                                             onInit={editor => this.setState(state => state.acceptanceSMSBody = editor?.getData())}
@@ -426,15 +434,15 @@ class AutoPilot extends React.Component {
                                                 valuePropName: 'checked'
                                             })(
                                                 <>
-                                                    <Switch onChange={this.onRejectChange} style={{marginRight: 15}}
+                                                    <Switch onChange={this.onRejectChange} style={{ marginRight: 15 }}
                                                             checked={this.state.rejectApplications}/>
                                                     A score less than
                                                     <InputNumber min={1} max={100}
-                                                                 onChange={value => this.setState({rejectionScore: value})}
+                                                                 onChange={value => this.setState({ rejectionScore: value })}
                                                                  formatter={value => `${value}%`}
                                                                  key={autoPilot?.RejectionScore ? 'notLoadedYet' : 'loaded'}
                                                                  value={this.state.rejectionScore}
-                                                                 style={{marginLeft: 15}}
+                                                                 style={{ marginLeft: 15 }}
                                                                  disabled={!this.state.rejectApplications}/>
                                                 </>
                                             )}
@@ -446,7 +454,7 @@ class AutoPilot extends React.Component {
                                                 initialValue: autoPilot.SendRejectionEmail,
                                                 rules: []
                                             })(
-                                                <div style={{marginLeft: 3}}>
+                                                <div style={{ marginLeft: 3 }}>
                                                     <Switch onChange={this.onSendRejectionEmailChange}
                                                             checked={this.state.sendRejectionEmail}
                                                             disabled={!this.state.rejectApplications}/>
@@ -459,7 +467,7 @@ class AutoPilot extends React.Component {
                                             <FormItem label="Rejection Email Title">
                                                 {getFieldDecorator('rejectionEmailTitle', {
                                                     initialValue: autoPilot?.RejectionEmailTitle,
-                                                    rules: [{required: true,}]
+                                                    rules: [{ required: true }]
                                                 })(
                                                     <Input placeholder="Sorry you got rejected"/>
                                                 )}
@@ -473,10 +481,10 @@ class AutoPilot extends React.Component {
 
                                                 {
                                                     this.state.sendRejectionEmailErrors &&
-                                                    <p style={{color: 'red'}}> * Title and Body field are requierd</p>
+                                                    <p style={{ color: 'red' }}> * Title and Body field are requierd</p>
                                                 }
 
-                                                <ButtonGroup style={{margin: '5px 0px'}}>
+                                                <ButtonGroup style={{ margin: '5px 0px' }}>
                                                     <Button
                                                         onClick={() =>
                                                             this.setState({
@@ -499,7 +507,7 @@ class AutoPilot extends React.Component {
                                                     <Col span={15}>
                                                         <CKEditor
                                                             editor={ClassicEditor}
-                                                            config={{toolbar: toolbar}}
+                                                            config={{ toolbar: toolbar }}
                                                             data={this.state.rejectionEmailBody}
                                                             onChange={(event, editor) => this.setState(state => state.rejectionEmailBody = editor?.getData())}
                                                             onInit={editor => this.setState(state => state.rejectionEmailBody = editor?.getData())}
@@ -515,7 +523,7 @@ class AutoPilot extends React.Component {
                                                 initialValue: autoPilot.SendRejectionSMS,
                                                 rules: []
                                             })(
-                                                <div style={{marginLeft: 3}}>
+                                                <div style={{ marginLeft: 3 }}>
                                                     <Switch onChange={this.onSendRejectionSMSChange}
                                                             checked={this.state.sendRejectionSMS}
                                                             disabled={!this.state.rejectApplications}/>
@@ -530,9 +538,9 @@ class AutoPilot extends React.Component {
 
                                                 {
                                                     this.state.sendRejectionSMSErrors &&
-                                                    <p style={{color: 'red'}}> * Body field is requierd</p>
+                                                    <p style={{ color: 'red' }}> * Body field is requierd</p>
                                                 }
-                                                <ButtonGroup style={{margin: '5px 0px'}}>
+                                                <ButtonGroup style={{ margin: '5px 0px' }}>
                                                     <Button
                                                         onClick={() =>
                                                             this.setState({
@@ -555,7 +563,7 @@ class AutoPilot extends React.Component {
                                                     <Col span={15}>
                                                         <CKEditor
                                                             editor={ClassicEditor}
-                                                            config={{toolbar: ['undo', 'redo']}}
+                                                            config={{ toolbar: ['undo', 'redo'] }}
                                                             data={this.state.rejectionSMSBody}
                                                             onChange={(event, editor) => this.setState(state => state.rejectionSMSBody = editor?.getData())}
                                                             onInit={editor => this.setState(state => state.rejectionSMSBody = editor?.getData())}
@@ -569,8 +577,8 @@ class AutoPilot extends React.Component {
                                 </Collapse>
 
                                 <Divider/>
-                                <h2> Manage Appointments Automation (coming soon)</h2>
-                                <FormItem label="Auto manage candidates appointments"
+                                <h2> Manage Appointments Automation</h2>
+                                <FormItem label="Auto manage and send candidates appointments"
                                           help="Accepted candidates will receive an email (if provided) to pick
                                            a time slot for an appointment. You can then confirm these
                                            appointments from the Calendar page"
@@ -580,25 +588,35 @@ class AutoPilot extends React.Component {
                                         initialValue: autoPilot.SendCandidatesAppointments,
                                         rules: []
                                     })(
-                                        <div style={{marginLeft: 3}}>
-                                            <Switch onChange={this.onAppointmentChange}
-                                                    checked={this.state.sendCandidatesAppointments}
-                                                    disabled={true}/>
+                                        <div style={{ marginLeft: 3 }}>
+                                            <Switch onChange={(value) => this.setState({sendCandidatesAppointments: value})}
+                                                    checked={this.state.sendCandidatesAppointments}/>
                                         </div>
                                     )}
                                 </FormItem>
-                                <Form.Item label="Choose a timetable from the list to allocate when you would like to have your appointments (Coming Soon)"
-                                           help="Select from the dropdown list">
+                                <Form.Item
+                                    label="Time table"
+                                    help="Select a time table to be used for automatic appointment slots generation">
                                     {getFieldDecorator('AppointmentAllocationTimes', {
-                                        // initialValue: allocTime ? allocTime : this.props.appointmentAllocationTime[0] ?
-                                        //     this.props.appointmentAllocationTime[0].ID : null,
-                                        initialValue: null,
-                                        rules: [],
+                                        initialValue: this.props.autoPilot?.AppointmentAllocationTimeID,
+                                        rules: [{
+                                            required: this.state.sendCandidatesAppointments,
+                                            message: 'Select a time table '
+                                        }]
                                     })(
-                                        <Select disabled={true}>
-                                            <Select.Option value={null}>None selected</Select.Option>
-                                            {this.props.appointmentAllocationTime.map(time => {
-                                                return (<Select.Option value={time.ID}>{time.Name}</Select.Option>)
+                                        <Select
+                                            disabled={!this.state.sendCandidatesAppointments}
+                                            dropdownRender={menu => (
+                                                <div>
+                                                    {menu}
+                                                    <Divider style={{ margin: '4px 0' }} />
+                                                    <div onMouseDown={() => history.push(`/dashboard/appointments?tab=TimeSlots`)} style={{ padding: '8px', cursor: 'pointer' }}>
+                                                        <Icon type="plus" /> Create time table
+                                                    </div>
+                                                </div>
+                                            )}>
+                                            {this.props.appointmentAllocationTime.map((time, i) => {
+                                                return (<Select.Option key={i} value={time.ID}>{time.Name}</Select.Option>);
                                             })}
                                         </Select>
                                     )}
@@ -609,7 +627,7 @@ class AutoPilot extends React.Component {
 
 
                         <Button type={'primary'} size={'large'} onClick={this.onSubmit}
-                                style={{marginTop: 30}}>
+                                style={{ marginTop: 30 }}>
                             Save changes
                         </Button>
 
@@ -618,7 +636,7 @@ class AutoPilot extends React.Component {
 
 
                         {/*Blur Effect (Hidden) */}
-                        <div style={{display: 'none'}}>
+                        <div style={{ display: 'none' }}>
                             <svg id="svg-filter">
                                 <filter id="svg-blur">
                                     <feGaussianBlur in="SourceGraphic" stdDeviation="2"></feGaussianBlur>

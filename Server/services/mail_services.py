@@ -66,6 +66,27 @@ def sendVerificationEmail(firstName, lastName, email, companyName, companyID) ->
         helpers.logError("mail_service.sendVerificationEmail(): " + str(exc))
         return Callback(False, 'Could not send a verification email to ' + email)
 
+def sendAppointmentConfirmationEmail(name, email, dateTime, userTimeZone, companyName, logoPath):
+    try:
+        callback: Callback = __sendEmail(
+            email,
+            'Appointment Confirmation',
+            '/emails/appointment_confirmation.html',
+            companyName=companyName,
+            userName=name,
+            dateTime=dateTime.strftime("%d/%m/%Y %H:%M"),
+            userTimeZone=userTimeZone,
+            logoPath=logoPath)
+
+        if not callback.Success:
+            raise Exception(callback.Message)
+
+        return Callback(True, 'Appointment confirmation email is on its way to ' + email)
+
+    except Exception as exc:
+        helpers.logError("mail_service.sendAppointmentConfirmationEmail(): " + str(exc))
+        return Callback(False, 'Could not send the confirmation email to ' + email)
+
 
 def sendAcceptanceEmail(title, body, userName, email, logoPath, companyName):
     try:
@@ -256,7 +277,7 @@ def notifyNewConversation(assistant: Assistant, conversation: Conversation):
             'status': conversation.ApplicationStatus.name,
             'fileURLsSinged': fileURLsSinged,
             'completed': "Yes" if conversation.Completed else "No",
-            'dateTime': conversation.DateTime.strftime("%Y-%m-%d %H:%M"),
+            'dateTime': conversation.DateTime.strftime("%Y/%m/%d %H:%M"),
             'link': helpers.getDomain() + "/dashboard/assistants/" +
                                str(assistant.ID) + "?tab=Conversations&conversation_id=" + str(conversation.ID)
 
@@ -313,7 +334,7 @@ def notifyNewConversations(assistant: Assistant, conversations, lastNotification
                 'status': conversation.ApplicationStatus.name,
                 'fileURLsSinged': fileURLsSinged,
                 'completed': "Yes" if conversation.Completed else "No",
-                'dateTime': conversation.DateTime.strftime("%Y-%m-%d %H:%M"),
+                'dateTime': conversation.DateTime.strftime("%Y/%m/%d %H:%M"),
                 'link': helpers.getDomain() + "/dashboard/assistants/" +
                         str(assistant.ID) + "?tab=Conversations&conversation_id=" + str(conversation.ID)
             })
@@ -321,7 +342,8 @@ def notifyNewConversations(assistant: Assistant, conversations, lastNotification
         if not len(conversationsList) > 0:
             return Callback(True, "No new conversation to send")
 
-        logo = helpers.keyFromStoredFile(Assistant.Company.StoredFile, enums.FileAssetType.Logo)
+        # Get company logo
+        logoPath = helpers.keyFromStoredFile(Assistant.Company.StoredFile.StoredFile, enums.FileAssetType.Logo).AbsFilePath
 
         # send emails, jobs applied for
         for user in users_callback.Data:
@@ -332,7 +354,7 @@ def notifyNewConversations(assistant: Assistant, conversations, lastNotification
                                                    assistantName = assistant["Name"],
                                                    assistantID = assistant["ID"],
                                                    conversations = conversationsList,
-                                                   logoPath = logo.AbsFilePath or "" if logo else None,
+                                                   logoPath = logoPath,
                                                    companyName = assistant["CompanyName"],
                                                    companyURL=assistant["CompanyURL"],
                                                    )

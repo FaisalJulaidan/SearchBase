@@ -12,7 +12,7 @@ def generate():
 
     # Companies creation
     db.session.add(Company(Name='Aramco', URL='ff.com', StripeID='cus_00000000000000', SubID='sub_00000000000000',
-                           Active=True, AccessAssistants=True, AccessCampaigns=True, AccessAutoPilot=False,
+                           Active=True, AccessAssistants=True, AccessCampaigns=True, AccessAutoPilot=True,
                            AccessDatabases=True, AccessAppointments=True))
 
     db.session.add(Company(Name='Sabic', URL='ff.com', StripeID='cus_DbgKupMRLNYXly', Active=True,
@@ -261,7 +261,7 @@ def generate():
     appointment_services.dummyCreateAppointmentAllocationTime("Test Times", aramco.ID)
 
     # Add Appointment
-    a = Appointment(DateTime=datetime.now() + timedelta(days=5), Conversation=conversation1)
+    a = Appointment(DateTime=datetime.now() + timedelta(days=5), Conversation=conversation1, UserTimeZone="Europe/London")
 
     db.session.add(a)
     db.session.commit()

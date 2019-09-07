@@ -119,11 +119,16 @@ def getPlanNickname(SubID=None):
         return None
 
 def keyFromStoredFile(storedFile: StoredFile, key: FileAssetType) -> StoredFileInfo or None:
-    if not storedFile: return None
+
+    class StoredFileInfoMocked(): # To avoid null pointer exceptions
+        def __init__(self, absFilePath: str or None):
+            self.AbsFilePath: str = absFilePath
+
+    if not storedFile: return StoredFileInfoMocked(None)
     for file in storedFile.StoredFileInfo:
         if file.Key.value == key.value:
             return file
-    return None
+    return StoredFileInfoMocked(None)
 
 
 def isValidEmail(email: str) -> bool:
@@ -144,7 +149,6 @@ def jsonResponseFlask(success: bool, http_code: int, msg: str, data=None):
         status=http_code,
         mimetype='application/json'
     )
-
 
 
 # Note: Hourly is not supported because it varies and number of working hours is required
@@ -211,6 +215,7 @@ def getDictFromSQLAlchemyObj(obj, eager: bool = False) -> dict:
             dict[attr] = getattr(obj, attr)
 
     return dict
+
 
 """Convert a SQLAlchemy list of objects to a list of dicts"""
 def getListFromSQLAlchemyList(SQLAlchemyList, eager: bool = False):
@@ -309,6 +314,7 @@ class owns(object):
         method_name = "owns_" + str(type)
         method = getattr(self, method_name, lambda: "Invalid Function type")
         return method(jwt, *args)
+
     def owns_Appointment(self, jwt, key):
         id = request.get_json()[key]
         callback: Callback = appointment_services.hasAppointment(jwt['companyID'], id)

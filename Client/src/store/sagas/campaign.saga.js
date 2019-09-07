@@ -2,7 +2,6 @@ import {all, takeEvery, put} from 'redux-saga/effects'
 import * as actionTypes from "../actions/actionTypes";
 import {campaignActions} from "../actions";
 import {http, errorMessage, loadingMessage, successMessage} from "helpers";
-import axios from 'axios';
 
 
 //Fetch Campaign data
@@ -16,18 +15,35 @@ function* fetchCampaignData() {
             res.data?.data.messengers)
         );
     } catch (error) {
-        const msg = error.response?.data?.msg || "Couldn't load full assistants data";
+        const msg = error.response?.data?.msg || "Couldn't load campaign data";
         errorMessage(msg);
         yield put(campaignActions.fetchCampaignDataFailure(msg));
     }
 }
 
+//Fetch Candidates data
+function* fetchCampaignCandidatesData({assistant_id, use_crm, crm_id, database_id, messenger_id, location, jobTitle, skills, text}) {
+    try {
+        const res = yield http.post('/campaign_data',
+            {assistant_id, use_crm, crm_id, database_id, messenger_id, location, jobTitle, skills, text}, {
+                headers: {'Content-Type': 'application/json'},
+            });
+        yield put(campaignActions.fetchCampaignCandidatesDataSuccess(
+            res.data?.data.candidate_list
+        ));
+    } catch (error) {
+        const msg = error.response?.data?.msg || "Couldn't load candidates data";
+        errorMessage(msg);
+        yield put(campaignActions.fetchCampaignCandidatesDataFailure(msg));
+    }
+}
+
 //Launch Campaign
-function* launchCampaign({assistant_id, use_crm, crm_id, database_id, messenger_id, location, jobTitle, skills, text}) {
+function* launchCampaign({assistant_id, use_crm, crm_id, database_id, messenger_id, location, jobTitle, skills, text,candidate_list}) {
     try {
         loadingMessage('Launching the campaign...', 0);
         const res = yield http.post('/send_campaign',
-            {assistant_id, use_crm, crm_id, database_id, messenger_id, location, jobTitle, skills, text}, {
+            {assistant_id, use_crm, crm_id, database_id, messenger_id, location, jobTitle, skills, text,candidate_list}, {
                 headers: {'Content-Type': 'application/json'},
             });
         yield put(campaignActions.launchCampaignSuccess());
@@ -45,6 +61,10 @@ function* watchFetchCampaignData() {
     yield takeEvery(actionTypes.FETCH_CAMPAIGN_DATA_REQUEST, fetchCampaignData)
 }
 
+function* watchFetchCampaignCandidatesData() {
+    yield takeEvery(actionTypes.FETCH_CAMPAIGN_CANDIDATES_DATA_REQUEST, fetchCampaignCandidatesData)
+}
+
 function* watchLaunchCampaign() {
     yield takeEvery(actionTypes.LAUNCH_CAMPAIGN_REQUEST, launchCampaign)
 }
@@ -52,6 +72,7 @@ function* watchLaunchCampaign() {
 export function* campaignSaga() {
     yield all([
         watchFetchCampaignData(),
+        watchFetchCampaignCandidatesData(),
         watchLaunchCampaign()
     ])
 }

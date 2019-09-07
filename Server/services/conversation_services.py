@@ -68,26 +68,36 @@ def processConversation(assistantHashID, data: dict) -> Callback:
         }
 
         webhook_services.fireRequests(webhookData, callback.Data.CompanyID, Webhooks.Conversations)
+        print("crmInformation: ", data.get("crmInformation"))
+        if not data.get("crmInformation"):
+            # AutoPilot Operations
+            if assistant.AutoPilot and conversation.Completed:
+                ap_callback: Callback = auto_pilot_services.processConversation(conversation, assistant.AutoPilot, assistant)
+                if ap_callback.Success:
+                    conversation.AutoPilotStatus = True
+                    conversation.ApplicationStatus = ap_callback.Data['applicationStatus']
+                    conversation.AcceptanceEmailSentAt = ap_callback.Data['acceptanceEmailSentAt']
+                    conversation.AcceptanceSMSSentAt = ap_callback.Data['acceptanceSMSSentAt']
+                    conversation.RejectionEmailSentAt = ap_callback.Data['rejectionEmailSentAt']
+                    conversation.RejectionSMSSentAt = ap_callback.Data['rejectionSMSSentAt']
+                    conversation.AppointmentEmailSentAt = ap_callback.Data['appointmentEmailSentAt']
+                conversation.AutoPilotResponse = ap_callback.Message
 
-        # AutoPilot Operations
-        if assistant.AutoPilot and conversation.Completed:
-            ap_callback: Callback = auto_pilot_services.processConversation(conversation, assistant.AutoPilot, assistant)
-            if ap_callback.Success:
-                conversation.AutoPilotStatus = True
-                conversation.ApplicationStatus = ap_callback.Data['applicationStatus']
-                conversation.AcceptanceEmailSentAt = ap_callback.Data['acceptanceEmailSentAt']
-                conversation.AcceptanceSMSSentAt = ap_callback.Data['acceptanceSMSSentAt']
-                conversation.RejectionEmailSentAt = ap_callback.Data['rejectionEmailSentAt']
-                conversation.RejectionSMSSentAt = ap_callback.Data['rejectionSMSSentAt']
-                conversation.AppointmentEmailSentAt = ap_callback.Data['appointmentEmailSentAt']
-            conversation.AutoPilotResponse = ap_callback.Message
-
-        # CRM integration
-        if assistant.CRM and conversation.Completed:
-            crm_callback: Callback = crm_services.processConversation(assistant, conversation)
-            if crm_callback.Success:
-                conversation.CRMSynced = True
-            conversation.CRMResponse = crm_callback.Message
+            # CRM integration
+            if assistant.CRM and conversation.Completed:
+                crm_callback: Callback = crm_services.processConversation(assistant, conversation)
+                if crm_callback.Success:
+                    conversation.CRMSynced = True
+                conversation.CRMResponse = crm_callback.Message
+        else:
+            print("STARTING")
+            crmInformation = data["crmInformation"]
+            print(crmInformation.get("source"))
+            if crmInformation.get("source") == "crm":
+                crm_callback: Callback = crm_services.updateCandidate(crmInformation, conversation, assistant.CompanyID)
+                if crm_callback.Success:
+                    conversation.CRMSynced = True
+                conversation.CRMResponse = crm_callback.Message
 
         # Notify company about the new chatbot session only if set as immediate -> NotifyEvery=0
         # Note: if there is a file upload the /file route in chatbot.py will handle the notification instead
@@ -96,7 +106,6 @@ def processConversation(assistantHashID, data: dict) -> Callback:
                 callback_mail: Callback = mail_services.notifyNewConversation(assistant, conversation)
                 if callback_mail.Success:
                     assistant.LastNotificationDate = datetime.now()
-
 
         # Save conversation data
         db.session.add(conversation)

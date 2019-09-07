@@ -229,14 +229,16 @@ def getUnusedAndDelete():
                               aws_secret_access_key=os.environ['SPACES_SECRET_KEY'])
                 # Delete file
 
-                print(key)
                 response = s3.delete_object(
                     Bucket=BUCKET,
                     Key=key
                 )
+
+                db.session.delete(file)
             except ClientError as e:
                 raise Exception("DigitalOcean Error")
 
+        db.session.commit()
         return Callback(True, "Files found to delete", files)
     except Exception as exc:
         helpers.logError("stored_file_services.getUnusedFiles(): " + str(exc))

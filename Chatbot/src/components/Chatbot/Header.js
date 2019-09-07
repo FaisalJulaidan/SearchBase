@@ -46,7 +46,7 @@ const Header = ({ title, logoPath, isDirectLink, resetChatbot, closeWindow }) =>
     }
     return (
         <div className={'Header'} id={'Chatbot_Header'}>
-            <Row>
+            <Row style={{ width: '100%' }}>
                 {
                     !isDirectLink ?
                     <Col span={3}>

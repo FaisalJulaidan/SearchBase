@@ -85,8 +85,9 @@ export const dataHandler = (() => {
             };
             // CHECK IF UPDATING CANDIDATE
 
-
-            if(window.location.href.indexOf("directLink") !== -1){
+            console.log(window.location.href)
+            console.log(window.location.href.includes("chatbot_direct_link"))
+            if(window.location.href.includes("chatbot_direct_link")){
                 let allowedKeys = ['source', 'source_id', 'id']
                 let params = queryString.parse(window.location.search)
                 let crmInformation = {}
@@ -95,6 +96,7 @@ export const dataHandler = (() => {
                         crmInformation[key] = params[key]
                     }
                 }
+                console.log("CRM INFO: ", crmInformation)
                 if(Object.keys(crmInformation).length !== 0 ){
                     result['crmInformation'] = crmInformation
                 }

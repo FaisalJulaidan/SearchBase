@@ -36,7 +36,7 @@
 
 
 .footer .row .logo {
-    display: block;
+    display: inline;
     line-height: normal;
     font-weight: bold;
     cursor: pointer;
@@ -70,12 +70,12 @@
     flex-flow: row;
 }
 
-.copyright{
+.copyright {
     font-size: .75em;
     text-align: center;
 }
 
-.copyright h4{
+.copyright h4 {
     color: white;
     line-height: 1.5em;
 }
@@ -106,7 +106,7 @@
     }
 
 
-    .navigation_bottom ul li{
+    .navigation_bottom ul li {
         margin: .1em 0;
     }
 

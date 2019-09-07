@@ -1,6 +1,6 @@
 from sqlalchemy import and_
-from sqlalchemy.orm import joinedload
-from models import db, Assistant, Callback, AutoPilot
+
+from models import db, Assistant, Callback, AutoPilot, AppointmentAllocationTime
 from services import auto_pilot_services, flow_services
 from services.Marketplace.CRM import crm_services
 from services.Marketplace.Calendar import calendar_services
@@ -66,8 +66,8 @@ def getByHashID(hashID):
 def getByID(id: int, companyID: int) -> Callback:
     try:
         # Get result and check if None then raise exception
-        result: Assistant = db.session.query(Assistant)\
-            .filter(and_(Assistant.ID == id, Assistant.CompanyID == companyID)).options(joinedload('StoredFile').joinedload('StoredFileInfo')).first()
+        result = db.session.query(Assistant)\
+            .filter(and_(Assistant.ID == id, Assistant.CompanyID == companyID)).first()
         if not result: raise Exception
         return Callback(True, "Got assistant successfully.", result)
 
@@ -156,13 +156,17 @@ def getAppointmentAllocationTime(assistantID) -> Callback:
         if not assistant: raise Exception
 
         connectedAutoPilot: AutoPilot = assistant.AutoPilot
-
         # If the assistant is not connected to an autoPilot then return an empty array which means no open times
         if not connectedAutoPilot:
-            return Callback(True,"There are no open time slots")
+            return Callback(True, "There are no available time slots")
+
+        appointmentAllocationTime: AppointmentAllocationTime = connectedAutoPilot.AppointmentAllocationTime
+        # Check if the auto pilot is not linked with an AppointmentAllocationTime table
+        if not (appointmentAllocationTime and connectedAutoPilot.SendCandidatesAppointments):
+            return Callback(True, "There are no available time slots")
 
         # OpenTimes is an array of all open slots per day
-        return Callback(True, "Got open time slots successfully.", connectedAutoPilot.AppointmentAllocationTime)
+        return Callback(True, "Got open time slots successfully.", appointmentAllocationTime)
 
     except Exception as exc:
         helpers.logError("assistant_services.getOpenTimes(): " + str(exc))

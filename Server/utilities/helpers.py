@@ -146,7 +146,6 @@ def jsonResponseFlask(success: bool, http_code: int, msg: str, data=None):
     )
 
 
-
 # Note: Hourly is not supported because it varies and number of working hours is required
 def convertSalaryPeriod(salary, fromPeriod: Period, toPeriod: Period):
 
@@ -211,6 +210,7 @@ def getDictFromSQLAlchemyObj(obj, eager: bool = False) -> dict:
             dict[attr] = getattr(obj, attr)
 
     return dict
+
 
 """Convert a SQLAlchemy list of objects to a list of dicts"""
 def getListFromSQLAlchemyList(SQLAlchemyList, eager: bool = False):
@@ -309,6 +309,7 @@ class owns(object):
         method_name = "owns_" + str(type)
         method = getattr(self, method_name, lambda: "Invalid Function type")
         return method(jwt, *args)
+
     def owns_Appointment(self, jwt, key):
         id = request.get_json()[key]
         callback: Callback = appointment_services.hasAppointment(jwt['companyID'], id)

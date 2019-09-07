@@ -56,8 +56,8 @@ class App extends Component {
                 <Suspense fallback={<div className={styles.Loader}> Loading...</div>}>
                     <TimezoneContext.Provider value={this.state.timezone}>
                         <Switch>
-                            <Route path="/login" component={Login}/>
-                            <Route path="/signup" component={Signup}/>
+                            {/*<Route path="/login" component={Login}/>*/}
+                            {/*<Route path="/signup" component={Signup}/>*/}
                             <Route path="/forget_password" component={ForgetPassword}/>
                             <Route path="/reset_password/" component={NewResetPassword}/>
                             <Route path="/verify_account/" component={AccountVerification}/>

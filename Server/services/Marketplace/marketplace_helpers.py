@@ -105,11 +105,11 @@ def disconnect(type, companyID):
 def sendRequest(url, method, headers, data=None):
     data = helpers.cleanDict(data)
     request = None
-    if method is "put":
+    if method.lower() == "put":
         request = requests.put(url, headers=headers, data=data)
-    elif method is "post":
+    elif method.lower() == "post":
         request = requests.post(url, headers=headers, data=data)
-    elif method is "get":
+    elif method.lower() == "get":
         request = requests.get(url, headers=headers, data=data)
     return request
 

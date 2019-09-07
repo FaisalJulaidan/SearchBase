@@ -13,7 +13,7 @@ import Flow from './Flow/Flow';
 import Connections from './Connections/Connections';
 
 import { history } from 'helpers';
-import { assistantActions, conversationActions, optionsActions } from 'store/actions';
+import { assistantActions, conversationActions } from 'store/actions';
 import NoHeaderPanel from 'components/NoHeaderPanel/NoHeaderPanel';
 import queryString from 'query-string';
 
@@ -36,9 +36,7 @@ class Assistant extends Component {
 
     componentWillMount() {
         this.props.dispatch(assistantActions.fetchAssistant(this.props.match.params.id))
-            .then(() => {
-            }).catch(() => history.push(`/dashboard/assistants`));
-        if (!this.props.options) this.props.dispatch(optionsActions.getOptions());
+            .then(() => {}).catch(() => history.push(`/dashboard/assistants`));
 
         // Set tab from url search params
         let params = queryString.parse(this.props.location.search);
@@ -125,7 +123,6 @@ class Assistant extends Component {
     };
 
     render() {
-        console.log(this.props)
         const { assistant, location } = this.props;
 
         return (

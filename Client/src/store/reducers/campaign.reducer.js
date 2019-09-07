@@ -6,8 +6,10 @@ const initialState = {
     crms: [],
     databases: [],
     messengers: [],
+    candidate_list: [],
     isLoading: false,
-    isLaunching: true,
+    isCandidatesLoading: false,
+    isLaunchingCampaign: false,
     errorMsg: null
 };
 
@@ -43,19 +45,42 @@ export const campaign = (state = initialState, action) => {
                 errorMsg: action.error
             });
 
+
+        //Fetch Candidate Data
+        case actionTypes.FETCH_CAMPAIGN_CANDIDATES_DATA_REQUEST:
+            return updateObject(state, {
+                candidate_list: [],
+                isCandidatesLoading: true,
+                errorMsg: null,
+            });
+        case actionTypes.FETCH_CAMPAIGN_CANDIDATES_DATA_SUCCESS:
+            return updateObject(state, {
+                candidate_list: action.candidate_list || [],
+                isCandidatesLoading: false,
+                errorMsg: null,
+            });
+        case actionTypes.FETCH_CAMPAIGN_CANDIDATES_DATA_FAILURE:
+            return updateObject(state, {
+                candidate_list: [],
+                isCandidatesLoading: false,
+                errorMsg: action.error
+            });
+
+
         //Launch Campaign
         case actionTypes.LAUNCH_CAMPAIGN_REQUEST:
             return updateObject(state, {
-                isLaunching: true,
+                isLaunchingCampaign: true,
                 errorMsg: null,
             });
         case actionTypes.LAUNCH_CAMPAIGN_SUCCESS:
             return updateObject(state, {
-                isLaunching: false,
+                isLaunchingCampaign: false,
+                errorMsg: null,
             });
         case actionTypes.LAUNCH_CAMPAIGN_FAILURE:
             return updateObject(state, {
-                isLaunching: false,
+                isLaunchingCampaign: false,
                 errorMsg: action.error
             });
         default:

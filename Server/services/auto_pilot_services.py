@@ -39,21 +39,6 @@ def processConversation(conversation: Conversation, autoPilot: AutoPilot, assist
                 # Send Acceptance Letters
                 if status is Status.Accepted:
 
-                    if autoPilot.SendAcceptanceEmail:
-                        # Process candidates Acceptance email
-                        emailTitle = autoPilot.AcceptanceEmailTitle \
-                            .replace("${candidateName}$", userName) \
-                            .replace("${candidateEmail}$", email)
-                        emailBody = autoPilot.AcceptanceEmailBody \
-                            .replace("${candidateName}$", userName) \
-                            .replace("${candidateEmail}$", email)
-
-                        acceptance_email_callback: Callback = \
-                            mail_services.sendAcceptanceEmail(emailTitle, emailBody, userName, email, logoPath, companyName)
-
-                        if acceptance_email_callback.Success:
-                            result['acceptanceEmailSentAt'] = datetime.now()
-
                     # Process candidates Appointment email only if score is accepted
                     if autoPilot.SendCandidatesAppointments:
 
@@ -69,6 +54,22 @@ def processConversation(conversation: Conversation, autoPilot: AutoPilot, assist
 
                         if appointments_email_callback.Success:
                             result['appointmentEmailSentAt'] = datetime.now()
+
+                    elif autoPilot.SendAcceptanceEmail:
+                        # Process candidates Acceptance email
+                        emailTitle = autoPilot.AcceptanceEmailTitle \
+                            .replace("${candidateName}$", userName) \
+                            .replace("${candidateEmail}$", email)
+                        emailBody = autoPilot.AcceptanceEmailBody \
+                            .replace("${candidateName}$", userName) \
+                            .replace("${candidateEmail}$", email)
+
+                        acceptance_email_callback: Callback = \
+                            mail_services.sendAcceptanceEmail(emailTitle, emailBody, userName, email, logoPath, companyName)
+
+                        if acceptance_email_callback.Success:
+                            result['acceptanceEmailSentAt'] = datetime.now()
+
 
                 # ======================
                 # Send Rejection Letters

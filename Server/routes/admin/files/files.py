@@ -10,10 +10,11 @@ files_router: Blueprint = Blueprint('files_router', __name__, template_folder=".
 
 # Auth this?
 # Get connected marketplace items without testing the connection (CRMs, Calendars etc.)
-@files_router.route("/files/unused", methods=["GET"])
+@files_router.route("/files/delete", methods=["GET"])
 def get_unused_files():
-    FileList: Callback = stored_file_services.getUnusedFiles()
+    FileList: Callback = stored_file_services.getUnusedAndDelete()
 
     if not FileList.Success:
         return helpers.jsonResponse(False, 400, FileList.Message)
+
     return helpers.jsonResponse(True, 200, "Gathered filelist", helpers.getListFromSQLAlchemyList(FileList.Data))

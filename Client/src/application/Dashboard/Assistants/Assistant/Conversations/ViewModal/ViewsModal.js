@@ -43,9 +43,9 @@ class ViewsModal extends Component {
             this.props.deleteConversation(this.props.conversation)
     };
 
-    downloadFileHandler = (fileKey) => {
+    downloadFileHandler = (filePath) => {
         // Get file name by index
-        let file = this.props.conversation.StoredFile.StoredFileInfo.find(sf => sf.FilePath === fileKey);
+        let file = this.props.conversation.StoredFile.StoredFileInfo.find(sf => sf.FilePath === filePath);
         if (!file){
             errorMessage("File doesn't exist!");
             return;
@@ -53,7 +53,7 @@ class ViewsModal extends Component {
 
         loadingMessage("Downloading file...", 0);
         this.setState({isDownloadingFile: true});
-        const conversationID = this.props.conversation.ID
+        const conversationID = this.props.conversation.ID;
         // Get the pre singed generated url to download from DigitalOcean
         http.get(`/assistant/${this.props.assistant.ID}/conversation/${conversationID}/${file.FilePath}`)
             .then((response) => {

@@ -15,7 +15,7 @@ class StoredFileInfo(db.Model):
     Key = db.Column(Enum(enums.FileAssetType), nullable=True)
     FilePath = db.Column(db.String(250), nullable=True, default=None)
 
-    StoredFileID = db.Column(db.Integer, db.ForeignKey('stored_file.ID', ondelete='SET NULL'), nullable=False)
+    StoredFileID = db.Column(db.Integer, db.ForeignKey('stored_file.ID', ondelete='SET NULL'), nullable=True)
     StoredFile = db.relationship('StoredFile', back_populates='StoredFileInfo')
 
     __serialize__ = ["AbsFilePath"]

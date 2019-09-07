@@ -68,10 +68,8 @@ def createRef(file, model, identifier, value, storedFileID, key: enums.FileAsset
             return Callback(False,'Provided model does not have StoredFileID Attribute')
 
 
-        key = key.value if key is not None else None
-
+        key = key if key else enums.FileAssetType.NoType
         filename = realFileName or file.filename
-
         file : StoredFileInfo = StoredFileInfo(StoredFileID=storedFileID, Key=key, FilePath=filename)
 
         # conversation.StoredFileID = storedFileID
@@ -136,7 +134,7 @@ def uploadFile(file, filename, public=False, **kwargs):
         return Callback(True, "File uploaded successfully",  PUBLIC_URL + UPLOAD_FOLDER + '/' + filename)
 
     except Exception as exc:
-        helpers.logError("stored_file_services.uploadFile(): " + str(exc))
+        helpers.logError("stored_file_services.uploadFile() FileName: " + filename + "\n" + str(exc))
         return Callback(False, "Couldn't upload file")
 
 

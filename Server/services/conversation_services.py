@@ -134,28 +134,32 @@ def uploadFiles(files, conversation, data, keys):
 
         db.session.add(sf)
         db.session.flush()
-        
 
-        uploadedFiles = []
-
+        uploadedFilesCallbacks = []
         for item in data['collectedData']:
             if item['input'] == "&FILE_UPLOAD&": # enum for this?
                 for file in files:
                     print(item)
                     for submittedFile in data['submittedFiles']:
                         if file.filename == submittedFile['uploadedFileName']:
-                            key = enums.FileAssetType(submittedFile['key']) or None
+                            key = enums.FileAssetType.NoType # TODO once BlockType-Upgrade is done
                             upload_callback: Callback = stored_file_services.uploadFile(file, item['fileName'], True, model=Conversation,
                                                                                                             identifier="ID",
                                                                                                             identifier_value=conversation.ID,
                                                                                                             stored_file_id=sf.ID,
                                                                                                             key=key)
-                            uploadedFiles.append(upload_callback.Data)
-        
+                            uploadedFilesCallbacks.append(upload_callback)
+
+        # Check if a file failed to be uploaded
+        for callback in uploadedFilesCallbacks:
+            if not callback.Success:
+                raise Exception(callback.Message)
+
         db.session.commit()
+        return Callback(True, "Gathered storedfile.")
 
     except Exception as exc:
-        helpers.logError("conversation_services.uploadFiles(): " + str(exc))
+        # helpers.logError("conversation_services.uploadFiles(): " + str(exc))
         db.session.rollback()
         return Callback(False, "An error occurred while uploading files.")
 

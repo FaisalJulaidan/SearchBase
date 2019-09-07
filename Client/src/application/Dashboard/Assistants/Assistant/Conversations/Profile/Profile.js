@@ -44,8 +44,8 @@ class Profile extends Component {
         }
     }];
 
-    createDownloadFileBtn = (index) => {
-        return (<Button key={index} hreftype="primary" file-path-index={index} icon="download"
+    createDownloadFileBtn = (filePath) => {
+        return (<Button key={filePath} hreftype="primary" file-path-index={filePath} icon="download"
                         size="small" style={{margin: '0 5px 0 5px'}}
                         onClick={(e) => {this.props.downloadFile(e.target.getAttribute('file-path-index'))}}>
                     Download File

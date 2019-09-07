@@ -121,7 +121,7 @@ class LogoUploader extends Component {
                 </div>
 
                 <Modal
-                    title="Basic Modal"
+                    title="Resize your image"
                     visible={this.state.visible}
                     onOk={this.handleOk}
                     onCancel={this.handleCancel}

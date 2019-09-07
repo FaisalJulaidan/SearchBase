@@ -1,6 +1,6 @@
 from models import Callback, db, User, Role, Company
 from services import user_services, role_services, mail_services, company_services
-from utilities import helpers
+from utilities import helpers, enums
 import random, string
 
 
@@ -112,8 +112,9 @@ def addUser(firstname, surname, email, phoneNumber,  givenRoleID, editorUserID, 
         db.session.add(newUser)
 
         # Send account invitation email to new user
+        logoPath = helpers.keyFromStoredFile(company.StoredFile, enums.FileAssetType.Logo).AbsFilePath # Get company logo
         email_callback: Callback = mail_services.sendAccountInvitation(firstname, surname, email, password,
-                                                                       company.Name, company.LogoPath, company.ID)
+                                                                       company.Name, logoPath, company.ID)
 
 
         if not email_callback.Success:

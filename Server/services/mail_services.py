@@ -342,7 +342,8 @@ def notifyNewConversations(assistant: Assistant, conversations, lastNotification
         if not len(conversationsList) > 0:
             return Callback(True, "No new conversation to send")
 
-        logo = helpers.keyFromStoredFile(Assistant.Company.StoredFile, enums.FileAssetType.Logo)
+        # Get company logo
+        logoPath = helpers.keyFromStoredFile(Assistant.Company.StoredFile.StoredFile, enums.FileAssetType.Logo).AbsFilePath
 
         # send emails, jobs applied for
         for user in users_callback.Data:
@@ -353,7 +354,7 @@ def notifyNewConversations(assistant: Assistant, conversations, lastNotification
                                                    assistantName = assistant["Name"],
                                                    assistantID = assistant["ID"],
                                                    conversations = conversationsList,
-                                                   logoPath = logo.AbsFilePath or "" if logo else None,
+                                                   logoPath = logoPath,
                                                    companyName = assistant["CompanyName"],
                                                    companyURL=assistant["CompanyURL"],
                                                    )

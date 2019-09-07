@@ -119,11 +119,16 @@ def getPlanNickname(SubID=None):
         return None
 
 def keyFromStoredFile(storedFile: StoredFile, key: FileAssetType) -> StoredFileInfo or None:
-    if not storedFile: return None
+
+    class StoredFileInfoMocked(): # To avoid null pointer exceptions
+        def __init__(self, absFilePath: str or None):
+            self.AbsFilePath: str = absFilePath
+
+    if not storedFile: return StoredFileInfoMocked(None)
     for file in storedFile.StoredFileInfo:
         if file.Key.value == key.value:
             return file
-    return None
+    return StoredFileInfoMocked(None)
 
 
 def isValidEmail(email: str) -> bool:

@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from models import db, Callback, Conversation, AutoPilot, Assistant, Messenger
+from models import db, Callback, Conversation, AutoPilot, Assistant, Messenger, Company
 from services import mail_services, stored_file_services as sfs
 from services.Marketplace.Messenger import messenger_servicess
 from sqlalchemy import and_
@@ -26,15 +26,11 @@ def processConversation(conversation: Conversation, autoPilot: AutoPilot, assist
             phone = conversation.PhoneNumber
 
             def __processSendingEmails(email, status: Status, autoPilot: AutoPilot):
-
+                company: Company = autoPilot.Company
+                companyName = company.Name
                 userName = conversation.Name or 'Anonymous'
-                logoPath = ""
-                logo = helpers.keyFromStoredFile(autoPilot.Company.StoredFile, enums.FileAssetType.Logo)
+                logoPath = helpers.keyFromStoredFile(company.StoredFile, enums.FileAssetType.Logo).AbsFilePath
 
-                if logo:
-                    logoPath = logo.AbsFilePath
-
-                companyName = autoPilot.Company.Name
                 # ======================
                 # Send Acceptance Letters
                 if status is Status.Accepted:

@@ -35,21 +35,22 @@ def create(name, url, ownerEmail) -> Company or None:
 
 def getByID(id: int, eager: bool = False) -> Company or None:
     try:
-        if id:
-            # Get result and check if None then raise exception
-            query = db.session.query(Company)
-            if eager:
-                query.options(joinedload('StoredFile'), joinedload('StoredFileInfo'))
-            result = query.get(id)
-            if not result: raise Exception
+        if not id: raise Exception("id is required")
 
-            return Callback(True,
-                            'Company with ID ' + str(id) + ' was successfully retrieved',
-                            result)
-        else:
-            raise Exception
+        # Get result and check if None then raise exception
+        query = db.session.query(Company)
+        if eager:
+            query.options(joinedload('StoredFile').joinedload('StoredFileInfo'))
+        result = query.get(id)
+        if not result: raise Exception
+
+        return Callback(True,
+                        'Company with ID ' + str(id) + ' was successfully retrieved',
+                        result)
+
     except Exception as exc:
         db.session.rollback()
+        print(exc)
         return Callback(False,
                         'Company with ID ' + str(id) + ' does not exist')
 

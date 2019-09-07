@@ -600,11 +600,12 @@ class AutoPilot extends React.Component {
                                     {getFieldDecorator('AppointmentAllocationTimes', {
                                         initialValue: this.props.autoPilot?.AppointmentAllocationTimeID,
                                         rules: [{
-                                            required: true,
+                                            required: this.state.sendCandidatesAppointments,
                                             message: 'Select a time table '
                                         }]
                                     })(
                                         <Select
+                                            disabled={!this.state.sendCandidatesAppointments}
                                             dropdownRender={menu => (
                                                 <div>
                                                     {menu}

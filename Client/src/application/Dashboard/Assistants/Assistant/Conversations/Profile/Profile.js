@@ -29,8 +29,7 @@ class Profile extends Component {
             if(values){
                 values.forEach(input => {
                     if (input === '&FILE_UPLOAD&'){
-                        this.counter += 1;
-                        inputs.push(this.createDownloadFileBtn(this.counter))
+                        inputs.push(this.createDownloadFileBtn(dataType.files[0])) // #TODO: Make this so it takes the appropriate file (dropdown or smth in the future)
                     } else {
                         inputs.push(input + " ")
                     }
@@ -54,12 +53,23 @@ class Profile extends Component {
  
     render() {
         const {conversation, dataTypes} = this.props;
-        console.log(this.state);
+        let typeFiles = {}
+        //aggregate files by type
+        for(let idx in conversation.Data.collectedData){
+            let item = conversation.Data.collectedData[idx]
+            if(item.input === "&FILE_UPLOAD&"){
+                if(!typeFiles[item.dataType]){
+                    typeFiles[item.dataType] = []
+                }
+                typeFiles[item.dataType].push(item.fileName)
+            }
+        }
+        let realTypes = dataTypes.map(type => ({...type, files: typeFiles[type.name] ? typeFiles[type.name] : null}))
         return (
             conversation?.UserType !== "Unknown" ?
                 <Table
                     columns={this.columns}
-                    dataSource={dataTypes.filter((type) => type.userTypes.includes(conversation.UserType))}
+                    dataSource={realTypes.filter((type) => type.userTypes.includes(conversation.UserType))}
                     size='middle'
                     pagination={false}
                 />

@@ -169,6 +169,7 @@ def uploadLogo(file, companyID):
                     Bucket=BUCKET,
                     Key=key
                 )
+                # delete old sf?
 
             except ClientError as e:
                 raise Exception("DigitalOcean Error")

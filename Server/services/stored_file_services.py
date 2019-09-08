@@ -71,8 +71,6 @@ def createRef(file, model, identifier, value, storedFileID, key: enums.FileAsset
         key = key if key else enums.FileAssetType.NoType
         filename = realFileName or file.filename
         file : StoredFileInfo = StoredFileInfo(StoredFileID=storedFileID, Key=key, FilePath=filename)
-
-        # conversation.StoredFileID = storedFileID
         obj.StoredFileID = storedFileID
 
         db.session.add(file)
@@ -102,12 +100,10 @@ def removeByID(id):
 def uploadFile(file, filename, public=False, **kwargs):
     try:
         if 'model' in kwargs:
-            print(file)
             #files, model, identifier, value, storedFileID, keys: List = None
             dbRef_callback: Callback = createRef(file, kwargs['model'], kwargs['identifier'], kwargs['identifier_value'], kwargs['stored_file_id'] , kwargs['key'], realFileName=filename)
 
             if not dbRef_callback.Success:
-                helpers.logError("Couldn't Save Stored Files Reference")
                 raise Exception(dbRef_callback.Message)
 
         # Set config arguments

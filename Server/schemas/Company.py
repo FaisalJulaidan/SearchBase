@@ -3,8 +3,6 @@ from schemas import Assistant, Conversation
 
 class Company(db.Model):
 
-
-
     # @property
     # def Conversations(self):
     #     c = db.session.query(Conversation).join(Assistant).filter(Assistant. == self)
@@ -16,7 +14,7 @@ class Company(db.Model):
     StripeID = db.Column(db.String(68), unique=True, nullable=False)
     SubID = db.Column(db.String(68), unique=True, default=None)
 
-    StoredFileID = db.Column(db.Integer, db.ForeignKey('stored_file.ID', ondelete='cascade'), nullable=True)
+    StoredFileID = db.Column(db.Integer, db.ForeignKey('stored_file.ID', ondelete='SET NULL'), nullable=True)
     StoredFile = db.relationship('StoredFile', order_by="desc(StoredFile.ID)")
 
     TrackingData = db.Column(db.Boolean, nullable=False, default=False)

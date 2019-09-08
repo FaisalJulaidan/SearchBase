@@ -148,20 +148,20 @@ def uploadLogo(file, companyID):
         company: Company = getByCompanyID(companyID).Data
         if not company: raise Exception
 
+        # Delete old logo ref from DB. DigitalOcean will override the old logo since they have the same name
+        oldLogo: StoredFileInfo = helpers.keyFromStoredFile(company.StoredFile, enums.FileAssetType.Logo)
+        if oldLogo.AbsFilePath:
+            db.session.delete(oldLogo.StoredFile)
+            db.session.delete(oldLogo) # comment this if u want to use a unique filename for every new logo instead of company id encoded
+
         # Generate unique name: hash_sessionIDEncrypted.extension
         filename = helpers.encodeID(companyID) + '.' + \
                    secure_filename(file.filename).rsplit('.', 1)[1].lower()
 
-
-        # # Upload file to cloud Space
-        # upload_callback : Callback = stored_file_services.uploadFile(file,
-        #                                                              filename,
-        #                                                              public=True)
-
         sf = StoredFile()
         db.session.add(sf)
-
         db.session.flush()
+
 
         upload_callback: Callback = stored_file_services.uploadFile(file, filename, True, model=Company,
                                 identifier="ID",

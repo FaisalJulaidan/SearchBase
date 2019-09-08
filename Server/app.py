@@ -11,18 +11,16 @@ from flask_babel import Babel
 from flask_migrate import Migrate, MigrateCommand
 from flask_script import Manager
 from sqlalchemy_utils import create_database, database_exists
-import time
 import config
 from models import db
 # Import all routers to register them as blueprints
 from routes.admin.routers import account_router, analytics_router, sub_router, \
     conversation_router, users_router, flow_router, assistant_router, \
-    database_router, options_router, marketplace_router, auto_pilot_router, appointment_router, \
-    files_router, database_router, options_router, marketplace_router, auto_pilot_router, appointment_router, webhook_router, \
+    database_router, options_router, marketplace_router, auto_pilot_router, appointment_router, webhook_router, \
     campaign_router
 from routes.public.routers import public_router, reset_password_router, chatbot_router, auth_router
 from routes.staff.routers import staff_router
-from services import scheduler_services, appointment_services
+from services import scheduler_services
 from services.auth_services import jwt
 from services.mail_services import mail
 from utilities import helpers, tasks, dummy_data
@@ -47,7 +45,6 @@ app.register_blueprint(database_router, url_prefix='/api')
 app.register_blueprint(auto_pilot_router, url_prefix='/api')
 app.register_blueprint(options_router, url_prefix='/api')
 app.register_blueprint(appointment_router, url_prefix='/api')
-app.register_blueprint(files_router, url_prefix='/api')
 app.register_blueprint(webhook_router, url_prefix='/api')
 app.register_blueprint(staff_router, url_prefix='/api/staff')
 

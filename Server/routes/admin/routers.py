@@ -42,8 +42,5 @@ auto_Pilot_router: Blueprint = auto_pilot_router
 from .appointment.appointment import appointment_router
 appointment_router: Blueprint = appointment_router
 
-from .files.files import files_router
-files_router: Blueprint = files_router
-
 from .webhook.webhook import webhook_router
 webhook_router: Blueprint = webhook_router

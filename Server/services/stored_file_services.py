@@ -209,37 +209,3 @@ def deleteFile(filename):
     except Exception as exc:
         helpers.logError("stored_file_services.deleteFile(): " + str(exc) + " >>> File Name:" + filename)
         return Callback(False, "Couldn't delete file")
-
-
-def getUnusedAndDelete():
-    try:
-        files: List[StoredFileInfo] = db.session.query(StoredFileInfo).filter(StoredFileInfo.StoredFileID == None).all()
-
-        if len(files) == 0 or files is None:
-            return Callback(False, "No files to delete", None)
-
-        for file in files:
-            key = file.FilePath
-            try:
-                session = boto3.session.Session()
-                s3 = session.client('s3',
-                              region_name='ams3',
-                              endpoint_url=os.environ['SPACES_SERVER_URI'],
-                              aws_access_key_id=os.environ['SPACES_PUBLIC_KEY'],
-                              aws_secret_access_key=os.environ['SPACES_SECRET_KEY'])
-                # Delete file
-
-                response = s3.delete_object(
-                    Bucket=BUCKET,
-                    Key=key
-                )
-
-                db.session.delete(file)
-            except ClientError as e:
-                raise Exception("DigitalOcean Error")
-
-        db.session.commit()
-        return Callback(True, "Files found to delete", files)
-    except Exception as exc:
-        helpers.logError("stored_file_services.getUnusedFiles(): " + str(exc))
-        return Callback(False, "Couldn't find files to delete")

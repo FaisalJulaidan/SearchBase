@@ -9,6 +9,7 @@ import FileUpload from '../CardTypes/FileUpload';
 import Solutions from '../CardTypes/Solutions';
 import RawText from '../CardTypes/RawText';
 import SalaryPicker from '../CardTypes/SalaryPicker';
+import JobType from '../CardTypes/JobType';
 
 const TabPane = Tabs.TabPane;
 const MyModal = Modal;
@@ -68,6 +69,13 @@ class NewBlockModal extends Component {
                                           handleNewBlock={this.handleNewBlock}
                                           options={this.props.options}/>
                         </TabPane>
+
+                        <TabPane tab={<span><Icon type="solution"/>Job Type</span>} key="JobType">
+                            <JobType modalState={this.state}
+                                     handleNewBlock={this.handleNewBlock}
+                                     options={this.props.options}/>
+                        </TabPane>
+
 
                         <TabPane tab={<span><Icon type="form"/>Open Answer</span>}
                                  key="UserInput">

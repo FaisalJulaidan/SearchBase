@@ -41,6 +41,8 @@ class Assistant(db.Model):
     #  - Many to one
     Conversations = db.relationship('Conversation', back_populates='Assistant')
 
+    Campaigns = db.relationship('Campaign', back_populates='Assistant')
+
     # Constraints:
     # cannot have two assistants with the same name under one company
     __table_args__ = (db.UniqueConstraint('CompanyID', 'Name', name='uix1_assistant'),)

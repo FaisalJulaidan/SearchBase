@@ -16,6 +16,8 @@ class Messenger(db.Model):
 
     Assistants = db.relationship('Assistant', back_populates='Messenger')
 
+    Campaigns = db.relationship('Campaign', back_populates='Messenger')
+
     # Constraints:
     # each company will have one Messenger of each type
     __table_args__ = (db.UniqueConstraint('Type', 'CompanyID', name='uix1_messenger'),)

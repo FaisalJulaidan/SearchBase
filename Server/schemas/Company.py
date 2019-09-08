@@ -45,6 +45,7 @@ class Company(db.Model):
     Calendars = db.relationship('Calendar', back_populates='Company')
     Messengers = db.relationship('Messenger', back_populates='Company')
     AutoPilots = db.relationship('AutoPilot', back_populates='Company')
+    Campaigns = db.relationship('Campaign', back_populates='Company')
     AppointmentAllocationTimes = db.relationship('AppointmentAllocationTime', back_populates='Company')
     Webhooks = db.relationship('Webhook', back_populates='Company')
 

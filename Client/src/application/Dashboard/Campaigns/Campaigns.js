@@ -73,7 +73,7 @@ class Campaigns extends Component {
                         {
                             this.props.isLoading ? <LoadingViewBox/>
                                 :
-                                this.props.campaignsList.map(
+                                this.props.campaignsList?.map(
                                     (/**@type campaignsList*/ campaign, i) =>
                                         <ViewBox
                                             onClick={() => history.push(`/dashboard/campaigns/${campaign.ID}`)}

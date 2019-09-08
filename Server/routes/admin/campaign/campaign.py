@@ -60,6 +60,23 @@ def fill_assistants():
         return helpers.jsonResponse(True, 200, "Campaign has been prepared!", callback.Data)
 
 
+@campaign_router.route("/campaign", methods=['GET', 'POST'])
+@jwt_required
+@wrappers.AccessAssistantsRequired
+def send_campaign():
+    user = get_jwt_identity()['user']
+
+    if request.method == "GET":
+        callback: Callback = campaign_services.getCampaign(request.json.get("id"), user['companyID'])
+        if not callback.Success:
+            return helpers.jsonResponse(False, 400, callback.Message)
+
+    if request.method == "POST":
+        callback: Callback = campaign_services.saveCampaign(request.json, user['companyID'])
+        if not callback.Success:
+            return helpers.jsonResponse(False, 400, callback.Message)
+
+
 @campaign_router.route("/send_campaign", methods=['POST'])
 @jwt_required
 @wrappers.AccessAssistantsRequired

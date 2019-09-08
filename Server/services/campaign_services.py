@@ -1,10 +1,60 @@
-from models import Callback
+from sqlalchemy import and_
+
+from models import Callback, db, Campaign
 from services import assistant_services, databases_services
 from services.Marketplace.CRM import crm_services
 from services.Marketplace.Messenger import messenger_servicess
 from services.Marketplace.Messenger.messenger_servicess import sendMessage
 from utilities import helpers
 from utilities.enums import CRM
+
+
+def getCampaign(campaign_id: int, companyID: int):
+    try:
+        # Get result and check if None then raise exception
+        result = db.session.query(Campaign)\
+            .filter(and_(Campaign.ID == campaign_id, Campaign.CompanyID == companyID)).first()
+        if not result: raise Exception
+        return Callback(True, "Got campaign successfully.", result)
+
+    except Exception as exc:
+        helpers.logError("campaign_services.getByID(): " + str(exc))
+        return Callback(False, 'Could not get the campaign.')
+
+
+def saveCampaign(campaign_details, companyID):
+    try:
+        campaign_id = campaign_details.get("id")
+        if campaign_id:
+            campaign_callback = getCampaign(campaign_id, companyID)
+            if not campaign_callback.Success:
+                raise Exception(campaign_callback.Message)
+
+            campaign = campaign_callback.Data
+        else:
+            campaign = Campaign()
+
+        campaign.Name = campaign_details.get("name")
+        campaign.JobTitle = campaign_details.get("jobTitle")
+        campaign.Skills = campaign_details.get("skills")
+        campaign.Location = campaign_details.get("location")
+        campaign.Message = campaign_details.get("message")
+        campaign.UseCRM = campaign_details.get("use_crm")
+        campaign.CompanyID = companyID
+        campaign.AssistantID = campaign_details.get("assistant_id")
+        campaign.MessengerID = campaign_details.get("messenger_id")
+        campaign.DatabaseID = campaign_details.get("database_id")
+        campaign.CRMID = campaign_details.get("crm_id")
+
+        if not campaign_id:
+            db.session.add(campaign)
+        db.session.commit()
+
+        return Callback(True, 'Campaign Saved', campaign_details)
+
+    except Exception as exc:
+        helpers.logError("campaign_services.saveCampaign(): " + str(exc))
+        return Callback(False, 'Error while saving the campaign!')
 
 
 def prepareCampaign(campaign_details, companyID):
@@ -44,7 +94,7 @@ def prepareCampaign(campaign_details, companyID):
         return Callback(True, 'Campaign Ready', campaign_details)
 
     except Exception as exc:
-        helpers.logError("campaign_service.prepareCampaign(): " + str(exc))
+        helpers.logError("campaign_services.prepareCampaign(): " + str(exc))
         return Callback(False, 'Error while search the database for matches!')
 
 
@@ -89,5 +139,5 @@ def sendCampaign(campaign_details, companyID):
         return Callback(True, '')
 
     except Exception as exc:
-        helpers.logError("campaign_service.sendCampaign(): " + str(exc))
+        helpers.logError("campaign_services.sendCampaign(): " + str(exc))
         return Callback(False, 'Error while search the database for matches!')

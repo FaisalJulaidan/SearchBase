@@ -18,6 +18,11 @@ def fill_assistants():
     user = get_jwt_identity()['user']
 
     if request.method == "GET":
+        # fetch Campaigns
+        campaigns_callback: Callback = campaign_services.getAll(user['companyID'])
+        if not campaigns_callback.Success:
+            return helpers.jsonResponse(False, 404, "Cannot fetch Assistants")
+
         # fetch Assistants
         assistants_callback: Callback = assistant_services.getAll(user['companyID'])
         if not assistants_callback.Success:
@@ -40,6 +45,7 @@ def fill_assistants():
 
         return helpers.jsonResponse(True, 200, "Data Returned!",
                                     {
+                                        "campaigns": helpers.getListFromSQLAlchemyList(campaigns_callback.Data),
                                         "assistants": helpers.getListFromLimitedQuery(['ID',
                                                                                        'Name',
                                                                                        'Description',
@@ -67,7 +73,7 @@ def campaign():
     user = get_jwt_identity()['user']
 
     if request.method == "GET":
-        callback: Callback = campaign_services.getCampaign(request.json.get("id"), user['companyID'])
+        callback: Callback = campaign_services.getByID(request.json.get("id"), user['companyID'])
         if not callback.Success:
             return helpers.jsonResponse(False, 400, callback.Message)
 

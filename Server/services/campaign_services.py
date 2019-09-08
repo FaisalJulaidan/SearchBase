@@ -9,7 +9,7 @@ from utilities import helpers
 from utilities.enums import CRM
 
 
-def getCampaign(campaign_id: int, companyID: int):
+def getByID(campaign_id: int, companyID: int):
     try:
         # Get result and check if None then raise exception
         result = db.session.query(Campaign)\
@@ -22,11 +22,30 @@ def getCampaign(campaign_id: int, companyID: int):
         return Callback(False, 'Could not get the campaign.')
 
 
+def getAll(companyID) -> Callback:
+    try:
+        if not companyID:
+            raise Exception("Company ID have not been provided")
+
+        result = db.session.query(Campaign)\
+            .filter(Campaign.CompanyID == companyID).all()
+
+        if len(result) == 0:
+            return Callback(True, "No campaigns found", [])
+
+        return Callback(True, "Campaigns have been retrieved", result)
+
+    except Exception as exc:
+        db.session.rollback()
+        helpers.logError("campaign_services.getAll(): " + str(exc))
+        return Callback(False, 'Could not get campaigns.')
+
+
 def saveCampaign(campaign_details, companyID):
     try:
         campaign_id = campaign_details.get("id")
         if campaign_id:
-            campaign_callback = getCampaign(campaign_id, companyID)
+            campaign_callback = getByID(campaign_id, companyID)
             if not campaign_callback.Success:
                 raise Exception(campaign_callback.Message)
 

@@ -71,10 +71,14 @@ def campaign():
         if not callback.Success:
             return helpers.jsonResponse(False, 400, callback.Message)
 
+        return helpers.jsonResponse(True, 200, "Campaign has been retrieved!", callback.Data)
+
     if request.method == "POST":
         callback: Callback = campaign_services.saveCampaign(request.json, user['companyID'])
         if not callback.Success:
             return helpers.jsonResponse(False, 400, callback.Message)
+
+        return helpers.jsonResponse(True, 200, "Campaign has been saved!", callback.Data)
 
 
 @campaign_router.route("/send_campaign", methods=['POST'])

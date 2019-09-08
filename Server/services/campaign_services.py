@@ -50,7 +50,7 @@ def saveCampaign(campaign_details, companyID):
             db.session.add(campaign)
         db.session.commit()
 
-        return Callback(True, 'Campaign Saved', campaign_details)
+        return Callback(True, 'Campaign Saved', campaign)
 
     except Exception as exc:
         helpers.logError("campaign_services.saveCampaign(): " + str(exc))

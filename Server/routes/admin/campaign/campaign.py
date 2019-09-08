@@ -63,7 +63,7 @@ def fill_assistants():
 @campaign_router.route("/campaign", methods=['GET', 'POST'])
 @jwt_required
 @wrappers.AccessAssistantsRequired
-def send_campaign():
+def campaign():
     user = get_jwt_identity()['user']
 
     if request.method == "GET":

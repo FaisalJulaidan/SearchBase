@@ -5,11 +5,7 @@ from sqlalchemy.orm import joinedload
 from werkzeug.utils import secure_filename
 import logging, stripe
 
-import boto3
-import os
-from botocore.exceptions import ClientError
 
-BUCKET = 'tsb'
 
 def create(name, url, ownerEmail) -> Company or None:
 
@@ -155,25 +151,12 @@ def uploadLogo(file, companyID):
         # Generate unique name: hash_sessionIDEncrypted.extension
         filename = helpers.encodeID(companyID) + '.' + \
                    secure_filename(file.filename).rsplit('.', 1)[1].lower()
-        if company.StoredFile:
-            try:
-                session = boto3.session.Session()
-                s3 = session.client('s3',
-                                region_name='ams3',
-                                endpoint_url=os.environ['SPACES_SERVER_URI'],
-                                aws_access_key_id=os.environ['SPACES_PUBLIC_KEY'],
-                                aws_secret_access_key=os.environ['SPACES_SECRET_KEY'])
 
-            # Upload file
-                key = company.StoredFile.StoredFileInfo[0].FilePath
-                response = s3.delete_object(
-                    Bucket=BUCKET,
-                    Key=key
-                )
-                # delete old sf?
 
-            except ClientError as e:
-                raise Exception("DigitalOcean Error")
+        # # Upload file to cloud Space
+        # upload_callback : Callback = stored_file_services.uploadFile(file,
+        #                                                              filename,
+        #                                                              public=True)
 
         sf = StoredFile()
         db.session.add(sf)

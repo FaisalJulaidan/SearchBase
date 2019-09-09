@@ -20,8 +20,14 @@ def fill_assistants():
         if not campaigns_callback.Success:
             return helpers.jsonResponse(False, 404, "Cannot fetch Campaigns")
 
+        campaignOptions_callback: Callback = campaign_services.getCampaignOptions(user['companyID'])
+        if not campaignOptions_callback.Success:
+            return helpers.jsonResponse(False, 404, "Cannot fetch Campaigns Options")
+
         return helpers.jsonResponse(True, 200, "Data Returned!",
-                                    {"campaigns": helpers.getListFromSQLAlchemyList(campaigns_callback.Data)})
+                                    {"campaigns": helpers.getListFromSQLAlchemyList(campaigns_callback.Data),
+                                     "campaignOptions":
+                                         campaignOptions_callback.Data})
 
     if request.method == "POST":
         callback: Callback = campaign_services.prepareCampaign(request.json, user['companyID'])
@@ -66,9 +72,9 @@ def campaign_id(campaignID):
             return helpers.jsonResponse(False, 404, "Cannot fetch Campaigns Options")
 
         return helpers.jsonResponse(True, 200, "Campaign has been retrieved!", {"campaign": callback.Data,
-                                                                                "campaignOptions": {
+                                                                                "campaignOptions":
                                                                                     campaignOptions_callback.Data
-                                                                                }})
+                                                                                })
 
     if request.method == "POST":
         callback: Callback = campaign_services.save(request.json, user['companyID'], campaignID)

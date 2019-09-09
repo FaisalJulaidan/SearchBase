@@ -42,6 +42,7 @@ function* saveCampaign({name, assistant_id, use_crm, crm_id, database_id, messen
         yield put(campaignActions.saveCampaignSuccess(
             res.data?.data.campaign
         ));
+        successMessage("Campaign saved successfully.");
     } catch (error) {
         const msg = error.response?.data?.msg || "Couldn't Save Campaign.";
         errorMessage(msg);
@@ -50,13 +51,14 @@ function* saveCampaign({name, assistant_id, use_crm, crm_id, database_id, messen
 }
 
 //update Campaign
-function* updateCampaign({campaignID, name,assistant_id, use_crm, crm_id, database_id, messenger_id, location, jobTitle, skills, message}) {
+function* updateCampaign({campaignID, name, assistant_id, use_crm, crm_id, database_id, messenger_id, location, jobTitle, skills, message}) {
     try {
         const res = yield http.post(`/campaign/${campaignID}`,
-            {name,assistant_id, use_crm, crm_id, database_id, messenger_id, location, jobTitle, skills, message}, {
+            {name, assistant_id, use_crm, crm_id, database_id, messenger_id, location, jobTitle, skills, message}, {
                 headers: {'Content-Type': 'application/json'},
             });
         yield put(campaignActions.updateCampaignSuccess());
+        successMessage("Campaign updated.");
     } catch (error) {
         const msg = error.response?.data?.msg || "Couldn't update campaign.";
         errorMessage(msg);
@@ -69,6 +71,7 @@ function* deleteCampaign({campaignID, meta}) {
     try {
         const res = yield http.delete(`/campaign/${campaignID}`);
         yield put({...campaignActions.deleteCampaignSuccess(), meta});
+        successMessage("Campaign deleted.");
     } catch (error) {
         const msg = error.response?.data?.msg || "Couldn't delete campaign.";
         errorMessage(msg);

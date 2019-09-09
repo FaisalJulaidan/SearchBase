@@ -1,6 +1,6 @@
 import {all, put, takeEvery, takeLatest} from 'redux-saga/effects'
 import * as actionTypes from '../actions/actionTypes';
-import {assistantActions, flowActions} from "../actions";
+import { accountActions, assistantActions, flowActions } from '../actions';
 import {errorMessage, flow, http, loadingMessage, successMessage} from "helpers";
 
 function* fetchAssistants() {
@@ -17,7 +17,15 @@ function* fetchAssistants() {
 function* fetchAssistant({assistantID, meta}) {
     try {
         const res = yield http.get(`/assistant/${assistantID}`);
-        yield put({...assistantActions.fetchAssistantSuccess(res.data?.data), meta});
+
+        // Update username in localStorage
+        let assistant = res.data?.data;
+        let file = assistant.StoredFile?.StoredFileInfo?.find(
+            item => item.Key === 'Logo'
+        );
+        assistant.LogoPath = file?.AbsFilePath || null;
+
+        yield put({...assistantActions.fetchAssistantSuccess(assistant), meta});
     } catch (error) {
         const msg = error.response?.data?.msg || "Couldn't load assistants";
         errorMessage(msg);
@@ -199,6 +207,40 @@ function* disconnectFromAutoPilot({assistantID, autoPilotID}) {
     }
 }
 
+function* uploadLogo({ assistantID, file }) {
+    try {
+        loadingMessage('Uploading logo', 0);
+        const res = yield http.post(`/assistant/${assistantID}/logo`, file);
+        yield successMessage('Logo uploaded');
+        yield put(assistantActions.uploadLogoSuccess(res.data?.data));
+    } catch (error) {
+        const msg = error.response?.data?.msg || "Couldn't upload logo";
+        errorMessage(msg);
+        yield put(assistantActions.uploadLogoFailure(msg));
+    }
+}
+
+function* deleteLogo({assistantID}) {
+    try {
+        loadingMessage('Deleting logo', 0);
+        const res = yield http.delete(`/assistant/${assistantID}/logo`);
+        successMessage('Logo deleted');
+        yield put(assistantActions.deleteLogoSuccess());
+    } catch (error) {
+        const msg = error.response?.data?.msg || "Can't delete logo";
+        errorMessage(msg);
+        yield put(assistantActions.deleteLogoFailure(msg));
+    }
+}
+
+function* watchUploadLogo() {
+    yield takeEvery(actionTypes.UPLOAD_LOGO_REQUEST, uploadLogo);
+}
+
+function* watchDeleteLogo() {
+    yield takeEvery(actionTypes.DELETE_LOGO_REQUEST, deleteLogo);
+}
+
 function* watchDisconnectAutoPilot() {
     yield takeEvery(actionTypes.DISCONNECT_ASSISTANT_FROM_AUTO_PILOT_REQUEST, disconnectFromAutoPilot)
 }
@@ -289,8 +331,9 @@ export function* assistantSaga() {
 
 
         watchConnectAutoPilot(),
-        watchDisconnectAutoPilot()
+        watchDisconnectAutoPilot(),
 
-
+        watchUploadLogo(),
+        watchDeleteLogo(),
     ])
 }

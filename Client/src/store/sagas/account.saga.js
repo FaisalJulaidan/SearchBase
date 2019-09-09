@@ -19,7 +19,7 @@ function* getAccountDetails() {
         let file = account.company.StoredFile?.StoredFileInfo?.find(
             item => item.Key === 'Logo'
         );
-        // console.log()
+
         account.company.LogoPath = file?.AbsFilePath || null;
         yield updateUsername(account.user.Firstname, account.user.Surname);
         yield updateTimezone(account.user.TimeZone);
@@ -84,7 +84,6 @@ function* uploadLogo({ file }) {
         loadingMessage('Uploading logo', 0);
         const res = yield http.post(`/company/logo`, file);
         yield successMessage('Logo uploaded');
-        console.log(res.data.data);
         yield put(accountActions.uploadLogoSuccess(res.data?.data));
     } catch (error) {
         const msg = error.response?.data?.msg || "Couldn't upload logo";

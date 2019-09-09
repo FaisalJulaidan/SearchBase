@@ -65,7 +65,6 @@ export const account = (state = initialState, action) => {
                 errorMsg: null,
             });
         case actionTypes.UPLOAD_LOGO_SUCCESS:
-            console.log(action)
             return updateObject(state, {
                 successMsg: action.msg,
                 account: {...state.account, company: {...state.account.company, LogoPath: action.UpdatedLogoPath, }}

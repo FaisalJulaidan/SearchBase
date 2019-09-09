@@ -178,7 +178,7 @@ const disconnectFromCRMFailure = (error) => ({
 });
 
 
-// Calendar
+// Calendar Connection
 const connectToCalendar = (calendarID, assistantID) => ({
     type: actionTypes.CONNECT_ASSISTANT_TO_CALENDAR_REQUEST,
     calendarID,
@@ -214,7 +214,7 @@ const disconnectFromCalendarFailure = (error) => ({
 
 
 
-// Messenger
+// Messenger Connection
 const connectToMessenger = (messengerID, assistantID) => ({
     type: actionTypes.CONNECT_ASSISTANT_TO_MESSENGER_REQUEST,
     assistantID,
@@ -247,7 +247,7 @@ const disconnectFromMessengerFailure = (error) => ({
 });
 
 
-// Auto Pilot
+// Auto Pilot Connection
 const connectToAutoPilot = (autoPilotID, assistantID) => ({
     type: actionTypes.CONNECT_ASSISTANT_TO_AUTO_PILOT_REQUEST,
     assistantID,
@@ -276,6 +276,39 @@ const disconnectFromAutoPilotSuccess = (msg) => ({
 
 const disconnectFromAutoPilotFailure = (error) => ({
     type: actionTypes.DISCONNECT_ASSISTANT_FROM_AUTO_PILOT_FAILURE,
+    error
+});
+
+
+// Assistant Logo
+const uploadLogo = (assistantID, file) => ({
+    type: actionTypes.UPLOAD_ASSISTANT_LOGO_REQUEST,
+    assistantID,
+    file
+});
+
+const uploadLogoSuccess = (UpdatedLogoPath) => ({
+    type: actionTypes.UPLOAD_ASSISTANT_LOGO_SUCCESS,
+    UpdatedLogoPath
+});
+
+const uploadLogoFailure = (error) => ({
+    type: actionTypes.UPLOAD_ASSISTANT_LOGO_FAILURE,
+    error
+});
+
+const deleteLogo = (assistantID) => ({
+    type: actionTypes.DELETE_ASSISTANT_LOGO_REQUEST,
+    assistantID
+});
+
+const deleteLogoSuccess = (msg) => ({
+    type: actionTypes.DELETE_ASSISTANT_LOGO_SUCCESS,
+    msg
+});
+
+const deleteLogoFailure = (error) => ({
+    type: actionTypes.DELETE_ASSISTANT_LOGO_FAILURE,
     error
 });
 
@@ -344,4 +377,12 @@ export const assistantActions = {
     disconnectFromAutoPilot,
     disconnectFromAutoPilotSuccess,
     disconnectFromAutoPilotFailure,
+
+    uploadLogo,
+    uploadLogoSuccess,
+    uploadLogoFailure,
+
+    deleteLogo,
+    deleteLogoSuccess,
+    deleteLogoFailure,
 };

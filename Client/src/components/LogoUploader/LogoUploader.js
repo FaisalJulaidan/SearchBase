@@ -4,7 +4,6 @@ import { croppedImg } from 'helpers/cropImage';
 import { Button, Card, Icon, Modal, Upload } from 'antd';
 import Cropper from 'react-easy-crop';
 import styles from './LogoUploader.module.less';
-import { accountActions } from 'store/actions';
 
 const Dragger = Upload.Dragger;
 
@@ -77,8 +76,7 @@ class LogoUploader extends Component {
             accept: 'image/png',
             showUploadList: false
         };
-        const { account } = this.props;
-        const logo = account?.company?.LogoPath;
+        const { logoPath } = this.props;
         return (
             <div>
                 <div style={{ width: 300 }}>
@@ -96,7 +94,7 @@ class LogoUploader extends Component {
                         </p>
                     </Dragger>
 
-                    {logo ? (
+                    {logoPath ? (
                         <div>
                             <h3>The current logo</h3>
                             <Card
@@ -105,7 +103,7 @@ class LogoUploader extends Component {
                                 cover={
                                     <img
                                         alt="example"
-                                        src={`${logo}?timestamp=${this.state.timeStamp}`}
+                                        src={`${logoPath}?timestamp=${this.state.timeStamp}`}
                                     />
                                 }
                             >

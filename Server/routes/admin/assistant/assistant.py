@@ -212,3 +212,6 @@ def assistant_auto_pilot_connect(assistantID):
     if not callback.Success:
         return helpers.jsonResponse(False, 400, callback.Message, None)
     return helpers.jsonResponse(True, 200, callback.Message, None)
+
+
+# TODO UPLOAD AND DELETE LOGO

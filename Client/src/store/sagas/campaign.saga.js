@@ -6,9 +6,10 @@ import {http, errorMessage, loadingMessage, successMessage} from "helpers";
 //Fetch All
 function* fetchCampaigns() {
     try {
-        const res = yield http.get(`/campaigns_data`);
+        const res = yield http.get(`/campaign_data`);
+        console.log(res);
         yield put(campaignActions.fetchCampaignsSuccess(
-            res.data?.data.campaignsList)
+            res.data?.data.campaigns)
         );
     } catch (error) {
         const msg = error.response?.data?.msg || "Couldn't load campaigns";

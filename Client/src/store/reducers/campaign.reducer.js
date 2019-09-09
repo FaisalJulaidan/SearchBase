@@ -2,7 +2,7 @@ import * as actionTypes from '../actions/actionTypes';
 import {updateObject} from '../utility';
 
 const initialState = {
-    campaignsList:[],
+    campaigns:[],
     assistants: [],
     crms: [],
     databases: [],
@@ -20,19 +20,19 @@ export const campaign = (state = initialState, action) => {
         //Fetch All
         case actionTypes.FETCH_CAMPAIGNS_REQUEST:
             return updateObject(state, {
-                campaignsList: [],
+                campaigns: [],
                 isLoading: true,
                 errorMsg: null,
             });
         case actionTypes.FETCH_CAMPAIGNS_SUCCESS:
             return updateObject(state, {
-                campaignsList: action.campaignsList,
+                campaigns: action.campaigns,
                 isLoading: false,
                 errorMsg: null,
             });
         case actionTypes.FETCH_CAMPAIGNS_FAILURE:
             return updateObject(state, {
-                campaignsList: [],
+                campaigns: [],
                 isLoading: false,
                 errorMsg: action.error
             });

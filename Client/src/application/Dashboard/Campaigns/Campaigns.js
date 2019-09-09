@@ -73,7 +73,7 @@ class Campaigns extends Component {
                         {
                             this.props.isLoading ? <LoadingViewBox/>
                                 :
-                                this.props.campaignsList?.map(
+                                this.props.campaigns?.map(
                                     (/**@type campaignsList*/ campaign, i) =>
                                         <ViewBox
                                             onClick={() => history.push(`/dashboard/campaigns/${campaign.ID}`)}
@@ -97,7 +97,7 @@ class Campaigns extends Component {
 
 function mapStateToProps(state) {
     return {
-        campaignsList: state.campaign.campaignsList,
+        campaigns: state.campaign.campaigns,
         isLoading: state.campaign.isLoading
     };
 }

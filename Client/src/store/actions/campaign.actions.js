@@ -6,9 +6,9 @@ const fetchCampaigns = () => ({
     type: actionTypes.FETCH_CAMPAIGNS_REQUEST
 });
 
-const fetchCampaignsSuccess = (campaignsList) => ({
+const fetchCampaignsSuccess = (campaigns) => ({
     type: actionTypes.FETCH_CAMPAIGNS_SUCCESS,
-    campaignsList
+    campaigns
 });
 
 const fetchCampaignsFailure = (errorMsg) => ({

@@ -193,7 +193,7 @@ def setAppointmentStatus(req, companyID: int) -> Callback:
             return Callback(False, "Appointment status is {} and cannot be modified.".format(appointment.Status.value))
 
 
-        # appointment.Status = resp['inputs']['status']
+        appointment.Status = resp['inputs']['status']
         # When appointment is accepted
         if resp['inputs']['status'] == enums.Status.Accepted.name and appointment.Conversation.Email:
             email_callback: Callback = mail_services.sendAppointmentConfirmationEmail(

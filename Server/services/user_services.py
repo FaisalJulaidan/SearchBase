@@ -200,7 +200,6 @@ def updateUser(firstname, surname, phoneNumber, chatbotNotifications: bool,  new
 
         if not (firstname
                 and surname
-                and isinstance(phoneNumber, str)
                 and isinstance(chatbotNotifications, bool)
                 and isinstance(newsletters, bool)):
             raise Exception("Did not provide all required fields")

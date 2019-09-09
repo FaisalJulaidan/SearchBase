@@ -6,13 +6,15 @@ import traceback
 from datetime import time
 from enum import Enum
 from typing import List
-
+import app
 import geoip2.webservice
 import stripe
 from cryptography.fernet import Fernet
 from flask import json, after_this_request, request, Response
 from flask_jwt_extended import get_jwt_identity
 from forex_python.converter import CurrencyRates
+from flask_limiter import Limiter
+from flask_limiter.util import get_remote_address
 from flask_jwt_extended import get_jwt_identity
 from hashids import Hashids
 from itsdangerous import URLSafeTimedSerializer
@@ -329,3 +331,16 @@ def HPrint(message):
     print(message + " - (%s, line %s)" % (filename, info.lineno))
 
 # def csrf():
+
+
+# Sort out limiter here:
+def createLimiter():
+    # Requests limiter:
+    limiter = Limiter(
+        app,
+        key_func=get_remote_address,
+        default_limits=["480 per day", "20 per hour"]
+    )
+    return limiter
+
+# TODO: How to get this object from a helpers import?

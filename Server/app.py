@@ -11,8 +11,6 @@ from flask_babel import Babel
 from flask_migrate import Migrate, MigrateCommand
 from flask_script import Manager
 from sqlalchemy_utils import create_database, database_exists
-from flask_limiter import Limiter
-from flask_limiter.util import get_remote_address
 import time
 import config
 from models import db
@@ -101,13 +99,6 @@ if os.environ['FLASK_ENV'] in ['production', 'staging']:
     db.init_app(app)
     mail.init_app(app)
     app.app_context().push()
-
-    # Requests limiter:
-    limiter = Limiter(
-        app,
-        key_func=get_remote_address,
-        default_limits=["480 per day", "20 per hour"]
-    )
 
     if not database_exists(url):
         print('Create db tables')

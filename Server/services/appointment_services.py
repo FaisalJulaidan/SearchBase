@@ -7,6 +7,7 @@ from sqlalchemy import and_
 from sqlalchemy.orm import joinedload, contains_eager
 from utilities import helpers, enums
 from services import mail_services, company_services
+import json
 
 def dummyCreateAppointmentAllocationTime(name, companyID: int):
     try:
@@ -173,25 +174,18 @@ def setAppointmentStatusPublic(token, appointmentID, status):
 def setAppointmentStatus(req, companyID: int) -> Callback:
     try:
         resp: dict = helpers.validateRequest(req, {"appointmentID": {"type": int, "required": True},
-                                            "status": {"type": str, "required": True},
-                                            "name": {"type": str, "required": False},
-                                            "email": {"type": str, "required": False},
-                                            "phone": {"type": str, "required": False}})
+                                            "status": {"type": str, "required": True},})
 
         company: Company = company_services.getByID(companyID).Data
         logoPath = helpers.keyFromStoredFile(company.StoredFile, enums.FileAssetType.Logo).AbsFilePath
         if not company: raise Exception("Company does not exist")
-
-        # appointment = db.session.query(Appointment).join((contains_eager("Conversation").contains_eager("Assistant").contains_eager("Company"))\
-        #                                             .filter(and_(Appointment.ID == resp['inputs']['appointmentID'], Company.ID == companyID)).first()
-                                                    
+                                    
         appointment = db.session.query(Appointment).join(Appointment.Conversation)\
                                                     .join(Conversation.Assistant)\
                                                     .join(Assistant.Company)\
                                                     .filter(and_(Appointment.ID == resp['inputs']['appointmentID'], Company.ID == companyID)).first()
 
-        print(appointment)
-                                                
+                     
         if appointment is None:
             return Callback(False, "Either you do not own this appointment, or it does not exist!")
         
@@ -199,13 +193,12 @@ def setAppointmentStatus(req, companyID: int) -> Callback:
             return Callback(False, "Appointment status is {} and cannot be modified.".format(appointment.Status.value))
 
 
-        appointment.Status = resp['inputs']['status']
-
+        # appointment.Status = resp['inputs']['status']
         # When appointment is accepted
-        if resp['inputs']['status'] == enums.Status.Accepted.name and resp['inputs']['email']:
+        if resp['inputs']['status'] == enums.Status.Accepted.name and appointment.Conversation.Email:
             email_callback: Callback = mail_services.sendAppointmentConfirmationEmail(
-                resp['inputs']['name'],
-                resp['inputs']['email'],
+                appointment.Conversation.Name,
+                appointment.Conversation.Email,
                 utc.localize(appointment.DateTime).astimezone(timezone(appointment.UserTimeZone)),
                 appointment.UserTimeZone,
                 company.Name,

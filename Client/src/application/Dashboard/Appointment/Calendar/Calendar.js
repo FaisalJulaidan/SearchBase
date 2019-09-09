@@ -2,6 +2,7 @@ import React from 'react';
 import {connect} from 'react-redux';
 import {Badge, Calendar as AntdCalendar, Col, Divider, Icon, Input, Modal, Row, Typography, Button} from 'antd';
 import moment from 'moment';
+import momentTZ from 'moment-timezone'
 import {appointmentActions} from "store/actions";
 import './Calendar.less'
 
@@ -14,7 +15,7 @@ class Calendar extends React.Component {
     constructor(props){
         super(props)
         this.state = {
-            value: moment(),
+            value: momentTZ().tz(props.tz),
             appointmentModalVisible: false,
             appointments: []
         };
@@ -26,7 +27,7 @@ class Calendar extends React.Component {
     };
 
     onSelect = value => {
-        let d = this.state.appointments.filter(d => value.utc().isSame(moment(d.DateTime).utc(), 'day'))
+        let d = this.props.appointments.filter(d => value.utc().isSame(moment(d.DateTime).utc(), 'day'))
 
         if (d.length)
             this.setState({value, appointmentModalVisible: true});
@@ -36,7 +37,7 @@ class Calendar extends React.Component {
 
 
     dateCellRender = (value) => {
-        let today = this.state.appointments.filter(d => value.utc().isSame(moment(d.DateTime).utc(), 'day'))
+        let today = this.props.appointments.filter(d => value.utc().isSame(moment(d.DateTime).utc(), 'day'))
         let a = today.filter(a => a.Status === "Accepted")
         let p = today.filter(a => a.Status === "Pending")
         return (
@@ -76,13 +77,13 @@ class Calendar extends React.Component {
             okType: 'danger',
             onOk: () => {
                 this.props.dispatch(appointmentActions.setAppointmentStatusRequest(appointmentID, status))
-                let {appointments} = this.state
-                this.setState({
-                    appointments: appointments.map(a => ({
-                        ...a,
-                        Status: a.ID === appointmentID ? status : a.Status
-                    }))
-                })
+                // let {appointments} = this.state
+                // this.setState({
+                //     appointments: appointments.map(a => ({
+                //         ...a,
+                //         Status: a.ID === appointmentID ? status : a.Status
+                //     }))
+                // })
             },
             maskClosable: true
         });
@@ -96,9 +97,11 @@ class Calendar extends React.Component {
 
     render() {
         const {value} = this.state;
-        const todayAppointments = this.state.appointments.filter(d => value.utc().isSame(moment(d.DateTime).utc(), 'day'))
+
+        const todayAppointments = this.props.appointments.filter(d => value.utc().isSame(moment(d.DateTime).utc(), 'day'))
         const notRejectedAppointments = todayAppointments.filter(d => d.Status !== "Rejected")
         const visibleAppointments = notRejectedAppointments
+      
         return (
 
                 <div>
@@ -116,7 +119,8 @@ class Calendar extends React.Component {
                                visible={this.state.appointmentModalVisible}>
                             {
                                 visibleAppointments.map((a, index) =>{
-                                    let name = a.Conversation.keywordsByDataType.Email[0]
+                                    console.log(a)
+                                    let name = a.Conversation.Data.keywordsByDataType.Email[0]
                                     return (
                                     <div key={index}>
                                         <Title level={4}>Appointment for {name}</Title>

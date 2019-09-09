@@ -4,6 +4,7 @@ from pytz import timezone, utc
 from models import db, Callback, Appointment, Conversation, Assistant,\
     AppointmentAllocationTime, AppointmentAllocationTimeInfo, Company
 from sqlalchemy import and_
+from sqlalchemy.orm import joinedload, contains_eager
 from utilities import helpers, enums
 from services import mail_services, company_services
 
@@ -168,41 +169,63 @@ def setAppointmentStatusPublic(token, appointmentID, status):
         helpers.logError("appointment_services.setAppointmentStatusPublic(): " + str(exc))
         return Callback(False, 'Could not set appointment status.')
 
-
-def setAppointmentStatus(appointmentID, name, email, phone, status, companyID) -> Callback:
+#appointmentID: int, status: str, companyID: int, name: str = None, email: str = None, phone: str = None
+def setAppointmentStatus(req, companyID: int) -> Callback:
     try:
+        resp: dict = helpers.validateRequest(req, {"appointmentID": {"type": int, "required": True},
+                                            "status": {"type": str, "required": True},
+                                            "name": {"type": str, "required": False},
+                                            "email": {"type": str, "required": False},
+                                            "phone": {"type": str, "required": False}})
+
         company: Company = company_services.getByID(companyID).Data
         logoPath = helpers.keyFromStoredFile(company.StoredFile, enums.FileAssetType.Logo).AbsFilePath
         if not company: raise Exception("Company does not exist")
 
-        appointment = db.session.query(Appointment).filter(Appointment.ID == appointmentID).first()
+        # appointment = db.session.query(Appointment).join((contains_eager("Conversation").contains_eager("Assistant").contains_eager("Company"))\
+        #                                             .filter(and_(Appointment.ID == resp['inputs']['appointmentID'], Company.ID == companyID)).first()
+                                                    
+        appointment = db.session.query(Appointment).join(Appointment.Conversation)\
+                                                    .join(Conversation.Assistant)\
+                                                    .join(Assistant.Company)\
+                                                    .filter(and_(Appointment.ID == resp['inputs']['appointmentID'], Company.ID == companyID)).first()
+
+        print(appointment)
+                                                
+        if appointment is None:
+            return Callback(False, "Either you do not own this appointment, or it does not exist!")
+        
         if appointment.Status != enums.Status.Pending:
             return Callback(False, "Appointment status is {} and cannot be modified.".format(appointment.Status.value))
 
 
-        appointment.Status = status
+        appointment.Status = resp['inputs']['status']
 
         # When appointment is accepted
-        if status == enums.Status.Accepted.name:
+        if resp['inputs']['status'] == enums.Status.Accepted.name and resp['inputs']['email']:
             email_callback: Callback = mail_services.sendAppointmentConfirmationEmail(
-                name,
-                email,
+                resp['inputs']['name'],
+                resp['inputs']['email'],
                 utc.localize(appointment.DateTime).astimezone(timezone(appointment.UserTimeZone)),
                 appointment.UserTimeZone,
                 company.Name,
                 logoPath
             )
             if not email_callback.Success:
-                return email_callback
-            db.session.commit()
-            return Callback(True, "Appointment status has been set to {}.".format(appointment.Status.value))
+                  email_callback
+            return Callback(True, "The client has been informed about their application being {}.".format(appointment.Status.value))
 
         # When appointment is rejected
-        if status == enums.Status.Rejected.name:
+        if resp['inputs']['status'] == enums.Status.Rejected.name:
             db.session.delete(appointment)
-            db.session.commit()
             return Callback(True, "Appointment status has been set to rejected.")
 
+        
+        db.session.commit()
+        return Callback(True, "Appointment status has been set to {}.".format(appointment.Status.value))
+    except helpers.requestException as exc:
+        helpers.logError("appointment_services.setAppointmentStatus(): " + str(exc))
+        return Callback(False, str(exc))
     except Exception as exc:
         helpers.logError("appointment_services.setAppointmentStatus(): " + str(exc))
         return Callback(False, 'Could not set appointment status.')

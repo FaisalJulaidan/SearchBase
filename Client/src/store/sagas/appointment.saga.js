@@ -18,7 +18,7 @@ function* fetchAppointments() {
 
 function* setAppointmentStatus({appointmentID, name, email, phone, status}) {
     try {
-        const res = yield http.post('/appointments/set_status', {appointmentID, name, email, phone, status});
+        const res = yield http.post('/appointments/set_status', {appointmentID, status, name, email, phone});
         yield put(appointmentActions.setAppointmentStatusSuccess(appointmentID, status));
         successMessage(`Appointment ${status}`);
     } catch (error) {

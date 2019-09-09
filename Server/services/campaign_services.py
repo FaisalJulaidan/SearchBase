@@ -41,11 +41,10 @@ def getAll(companyID) -> Callback:
         return Callback(False, 'Could not get campaigns.')
 
 
-def saveCampaign(campaign_details, companyID):
+def save(campaign_details, companyID, campaignID=None):
     try:
-        campaign_id = campaign_details.get("id")
-        if campaign_id:
-            campaign_callback = getByID(campaign_id, companyID)
+        if campaignID:
+            campaign_callback = getByID(campaignID, companyID)
             if not campaign_callback.Success:
                 raise Exception(campaign_callback.Message)
 
@@ -65,15 +64,27 @@ def saveCampaign(campaign_details, companyID):
         campaign.DatabaseID = campaign_details.get("database_id")
         campaign.CRMID = campaign_details.get("crm_id")
 
-        if not campaign_id:
+        if not campaignID:
             db.session.add(campaign)
         db.session.commit()
 
         return Callback(True, 'Campaign Saved', campaign)
 
     except Exception as exc:
-        helpers.logError("campaign_services.saveCampaign(): " + str(exc))
+        helpers.logError("campaign_services.save(): " + str(exc))
         return Callback(False, 'Error while saving the campaign!')
+
+
+def removeByID(campaignID, companyID) -> Callback:
+    try:
+        db.session.query(Campaign).filter(and_(Campaign.ID == campaignID, Campaign.CompanyID == companyID)).delete()
+        db.session.commit()
+        return Callback(True, 'Campaign has been deleted.')
+
+    except Exception as exc:
+        helpers.logError("assistant_services.removeByID(): " + str(exc))
+        db.session.rollback()
+        return Callback(False, 'Error in deleting campaign.')
 
 
 def prepareCampaign(campaign_details, companyID):

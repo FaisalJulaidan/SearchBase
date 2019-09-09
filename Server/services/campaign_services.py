@@ -12,7 +12,7 @@ from utilities.enums import CRM
 def getByID(campaign_id: int, companyID: int):
     try:
         # Get result and check if None then raise exception
-        result = db.session.query(Campaign)\
+        result = db.session.query(Campaign) \
             .filter(and_(Campaign.ID == campaign_id, Campaign.CompanyID == companyID)).first()
         if not result: raise Exception
         return Callback(True, "Got campaign successfully.", result)
@@ -27,7 +27,7 @@ def getAll(companyID) -> Callback:
         if not companyID:
             raise Exception("Company ID have not been provided")
 
-        result = db.session.query(Campaign)\
+        result = db.session.query(Campaign) \
             .filter(Campaign.CompanyID == companyID).all()
 
         if len(result) == 0:
@@ -85,6 +85,50 @@ def removeByID(campaignID, companyID) -> Callback:
         helpers.logError("assistant_services.removeByID(): " + str(exc))
         db.session.rollback()
         return Callback(False, 'Error in deleting campaign.')
+
+
+def getCampaignOptions(companyID):
+    try:
+
+        # fetch Assistants
+        assistants_callback: Callback = assistant_services.getAll(companyID)
+        if not assistants_callback.Success:
+            return helpers.jsonResponse(False, 404, "Cannot fetch Assistants")
+
+        # fetch CRMs
+        crms_callback: Callback = crm_services.getAll(companyID)
+        if not crms_callback.Success:
+            return helpers.jsonResponse(False, 404, "Cannot fetch CRMs")
+
+        # fetch Messengers
+        messengers_callback: Callback = messenger_servicess.getAll(companyID)
+        if not messengers_callback.Success:
+            return helpers.jsonResponse(False, 404, "Cannot fetch Messengers")
+
+        # fetch Databases
+        databases_callback: Callback = databases_services.getDatabasesList(companyID)
+        if not databases_callback.Success:
+            return helpers.jsonResponse(False, 400, "Cannot fetch Databases")
+
+        return Callback(True, "Information has been retrieved", {
+            "assistants": helpers.getListFromLimitedQuery(['ID',
+                                                           'Name',
+                                                           'Description',
+                                                           'Message',
+                                                           'TopBarText',
+                                                           'Active'],
+                                                          assistants_callback.Data),
+            "crms": helpers.getListFromSQLAlchemyList(
+                crms_callback.Data),
+            "messengers": helpers.getListFromSQLAlchemyList(
+                messengers_callback.Data),
+            "databases": helpers.getListFromSQLAlchemyList(
+                databases_callback.Data)
+        })
+
+    except Exception as exc:
+        helpers.logError("campaign_services.getCampaignOptions(): " + str(exc))
+        return Callback(False, 'Error while searching the information!')
 
 
 def prepareCampaign(campaign_details, companyID):

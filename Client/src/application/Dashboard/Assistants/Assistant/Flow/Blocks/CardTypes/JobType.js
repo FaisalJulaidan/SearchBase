@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Card, Divider, Form, Select, Spin } from 'antd';
+import { Card, Checkbox, Divider, Form, Input, Select, Spin } from 'antd';
 
 import { getInitialVariables, initActionType, initActionTypeSkip } from './CardTypesHelpers';
 import {
@@ -15,6 +15,7 @@ import {
     SkippableFormItem,
     SkipTextFormItem
 } from './FormItems';
+import styles from "../Blocks.module.less";
 
 const FormItem = Form.Item;
 const Option = Select.Option;
@@ -92,6 +93,18 @@ class JobType extends Component {
                                       getFieldDecorator={getFieldDecorator}
                                       layout={layout}
                                       placeholder="Ex: What is your job?"/>
+
+
+                    {
+                        blockOptions.types.map(
+                            (type, i) =>
+                                <div className={styles.PredefinedValues} key={i}>
+                                    <Checkbox className={styles.CheckBox}>{type}</Checkbox>
+                                    <Input value={type} disabled className={styles.Input}/>
+                                    <Input placeholder={'Score'} className={styles.Input}/>
+                                </div>
+                        )
+                    }
 
                     <FormItem label="Available Types"
                               extra="123"

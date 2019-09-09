@@ -53,7 +53,7 @@ class NewBlockModal extends Component {
                          footer={null}>
 
                     <Tabs type="card"
-                          defaultActiveKey={'SalaryPicker'}
+                          defaultActiveKey={'JobType'}
                           onChange={this.onChangeTab}>
 
                         <TabPane tab={<span><Icon type="question-circle"/>Pre-Selected Answers</span>}

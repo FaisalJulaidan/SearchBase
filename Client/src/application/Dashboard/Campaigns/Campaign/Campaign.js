@@ -445,7 +445,7 @@ class Campaign extends React.Component {
                                 style={{display: this.state.isSaved ? 'unset' : 'none'}}>
                             Delete Campaign
                         </Button>
-                        <Button type="default" icon="save" onClick={this.handleSave}>
+                        <Button type="primary" icon="save" onClick={this.handleSave}>
                             {this.state.isSaved ? 'Save Changes' : 'Save Campaign'}
                         </Button>
                     </Form>

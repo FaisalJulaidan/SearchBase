@@ -51,7 +51,22 @@ class Campaign extends React.Component {
         } else {
             this.props.dispatch(campaignActions.fetchCampaign(id))
                 .then(() => {
-                    this.props.form.setFieldsValue({text: id}); //Update Message Input
+                    let campaign = this.props.campaign;
+                    this.props.form.setFieldsValue({
+                        name: campaign?.Name,
+                        assistant_id: campaign?.AssistantID,
+                        crm_id: campaign?.CRMID,
+                        database_id: campaign?.DatabaseID,
+                        messenger_id: campaign?.MessengerID,
+                        location: campaign?.Location,
+                        jobTitle: campaign?.JobTitle,
+                        text: campaign?.Message,
+                    });
+                    this.setState({
+                        skills: campaign?.Skills,
+                        textMessage: campaign?.Message,
+                        use_crm: campaign?.UseCRM,
+                    })
                 }).catch(() => history.push(`/dashboard/campaigns`));
         }
     }

@@ -7,6 +7,7 @@ from utilities import helpers
 
 campaign_router: Blueprint = Blueprint('campaign_router', __name__, template_folder="../../templates")
 
+
 # Get data needed for form / Retrieve candidates to which to send / Send Campaign
 @campaign_router.route("/campaign/action", methods=['GET', 'POST', 'PUT'])
 @jwt_required
@@ -74,10 +75,10 @@ def campaign_id(campaignID):
         if not campaignOptions_callback.Success:
             return helpers.jsonResponse(False, 404, "Cannot fetch Campaigns Options")
 
-        return helpers.jsonResponse(True, 200, "Campaign has been retrieved!", {"campaign": callback.Data,
-                                                                                "campaignOptions":
-                                                                                    campaignOptions_callback.Data
-                                                                                })
+        return helpers.jsonResponse(True, 200, "Campaign has been retrieved!", {
+            "campaign": helpers.getDictFromSQLAlchemyObj(callback.Data),
+            "campaignOptions": campaignOptions_callback.Data 
+        })
 
     if request.method == "POST":
         callback: Callback = campaign_services.save(request.json, user['companyID'], campaignID)

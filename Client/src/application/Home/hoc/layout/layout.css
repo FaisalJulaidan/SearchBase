@@ -32,7 +32,7 @@ footer, header, hgroup, menu, nav, section {
 }
 
 body {
-    background: white;
+    background: #ffffff;
     min-height: 100vh;
     position: relative;
 }
@@ -56,8 +56,8 @@ table {
     border-spacing: 0;
 }
 
-#content-wrap{
-    padding-bottom: 1rem;    /* Footer height */
+#content-wrap {
+    padding-bottom: 1rem; /* Footer height */
 }
 
 .group:before,

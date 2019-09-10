@@ -7,7 +7,16 @@ import requests
 from models import Callback, Calendar, db
 from sqlalchemy import exc
 from utilities import helpers, enums
+from services import appointment_services
+from models import Appointment, Conversation, Company, Assistant, User
+from datetime import datetime, timezone
+import dateutil
+import grequests
+from hashids import Hashids
+from config import BaseConfig
 
+
+hashids = Hashids(salt=BaseConfig.HASH_IDS_SALT, min_length=5)
 
 # TODO - csrf - if necessary
 # TODO - need to get company id automatically
@@ -43,7 +52,7 @@ def getToken(type, companyID):
         return None
 
 
-def authorizeUser(code):
+def authorizeUser(code, companyID: int):
     try:
         resp = requests.post("https://oauth2.googleapis.com/token",
                              data={
@@ -65,7 +74,7 @@ def authorizeUser(code):
             'access': resp.json()['access_token'],
             'refresh': resp.json()['refresh_token']
         }
-        cal = Calendar(Auth=tokenInfo, Type=enums.Calendar.Google, CompanyID=2)
+        cal = Calendar(Auth=tokenInfo, Type=enums.Calendar.Google, CompanyID=companyID)
         db.session.add(cal)
         db.session.commit()
         return Callback(True, 'User authorized successfully')
@@ -74,7 +83,110 @@ def authorizeUser(code):
         return Callback(False,
                         "You already have authorization data relating to your google calendar in the database, please remove these keys first.")
     except Exception as e:
+        print(resp.status_code)
         return Callback(False, str(e))
+
+def sync(companyID):
+    try:
+        token = getToken(enums.Calendar.Google, companyID)
+        calendarID = getCalendar(companyID, token)
+        syncAppointments(calendarID, token, companyID)
+    except Exception as exc:
+        helpers.logError("Google.sync(): " + str(exc))
+
+def getCalendar(companyID, token):
+    try:
+        token = getToken(enums.Calendar.Google, companyID)
+        calendar = db.session.query(Calendar) \
+            .filter(Calendar.CompanyID == companyID) \
+            .filter(Calendar.Type == enums.Calendar.Google) \
+            .first()
+
+        calendarID = None
+        if calendar.MetaData is None:
+            calendarID = createCalendar(token)
+            # copy pre existing data?
+            calendar.MetaData = {'calendarID': calendarID}
+            db.session.commit()
+        else:
+            calendarID = calendar.MetaData['calendarID']
+            if not verifyCalendarExists(calendarID, token):
+                calendarID = createCalendar(token)
+                calendar.MetaData = {'calendarID': calendarID}
+                db.session.commit()
+        return calendarID
+    except Exception as exc:
+        helpers.logError("Google.getCalendar(): " + str(exc))
+
+def test(e):
+    print('test')
+    print(e)
+
+def syncAppointments(calendarID, token, companyID):
+    try:
+        headers = {'Authorization': 'Bearer ' + token}
+        eventURL = "https://www.googleapis.com/calendar/v3/calendars/{}/events".format(calendarID)
+
+        eventList = requests.get(eventURL, headers=headers)
+
+        appointments = db.session.query(Appointment).join(Conversation).join(Assistant).join(Company).filter(Company.ID == companyID).all()
+        user: User = db.session.query(User).join(Company).filter(Company.ID == companyID).first()
+
+        events = {}
+        for event in eventList.json()['items']:
+            if event['description'].startswith("A_ID"):
+                desc = event['description'].split("<br>")
+                aid = hashids.decrypt(desc[0].replace("A_ID.", ""))[0]
+                print(aid)
+                events[aid] = event['id']
+
+        requestList = []
+        for appointment in appointments:
+            eventID = None
+            if appointment.ID in events:
+                eventID = events[appointment.ID]
+            appointmentToken = appointment_services.generateEmailUrl(appointment.ID)
+            appointmentStatus = "Appointment pending approval " if appointment.Status.value == enums.Status.Pending.value else "Appointment "
+            eventTitle = appointmentStatus + "with {}".format(appointment.Conversation.Name)
+            
+            id = hashids.encrypt(appointment.ID)
+            appointmentURL = "http://localhost:3000/appointment_status?token={}".format(appointmentToken)
+
+            eventDesc = "A_ID.{}<br><a href='{}'>Accept Appointment</a>".format(id, appointmentURL) if appointment.Status.value == enums.Status.Pending.value else "A_ID.{}<br>Appointment accepted".format(id)
+            data = { 
+                'summary': eventTitle,
+                'description': eventDesc,
+                'start': {
+                    'dateTime': appointment.DateTime.astimezone().isoformat(),
+                    'timeZone': user.TimeZone
+                },
+                'end': {
+                    'dateTime': appointment.DateTime.astimezone().isoformat(),
+                    'timeZone': user.TimeZone
+                }
+            }
+
+            requestList.append({'data': data, 'eventID': eventID})
+
+        rs = []
+        for request in requestList:
+            if request['eventID'] is None:
+                rs.append(grequests.post(eventURL, headers=headers, json=request['data']))
+            else:
+                print('patch')
+                rs.append(grequests.patch(eventURL+ "/" + request['eventID'], headers=headers, json=request['data']))
+
+        grequests.map(rs)
+        return data
+        # GET https://www.googleapis.com/calendar/v3/calendars/calendarId/events
+
+        
+
+        # rs = (grequests.post(u, json=formattedData) for u in requestList)
+        # grequests.map(rs, exception_handler=handleExceptions)
+    except Exception as exc:
+        helpers.logError("Google.syncAppointments(): " + str(exc))
+
 
 
 '''Add event function'''
@@ -92,23 +204,7 @@ def addEvent(companyID, eventName, description, start, end):
         end = dateutil.parser.parse(end)
 
         token = getToken(enums.Calendar.Google, companyID)
-        calendar = db.session.query(Calendar) \
-            .filter(Calendar.CompanyID == companyID) \
-            .filter(Calendar.Type == enums.Calendar.Google) \
-            .first()
-
-        calendarID = None
-        if calendar.MetaData is None:
-            calendarID = createCalendar(token)
-            # copy pre existing data?
-            calendar.MetaData = {'calendarID': calendarID}
-        else:
-            calendarID = calendar.MetaData['calendarID']
-            if not verifyCalendarExists(calendarID, token):
-                calendarID = createCalendar(token)
-                calendar.MetaData = {'calendarID': calendarID}
-
-        db.session.commit()
+        calendarID = getCalendar(companyID, token)
 
         headers = {'Authorization': 'Bearer ' + token}
         data = {'summary': eventName,

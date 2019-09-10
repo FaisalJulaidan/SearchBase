@@ -5,6 +5,7 @@ from models import db, Callback, Calendar as Calendar_Model
 from services import assistant_services
 from services.Marketplace.Calendar import Google, Outlook
 from utilities import helpers
+import json
 
 
 # Process chatbot session
@@ -68,8 +69,8 @@ def testConnection(type, auth, companyID) -> Callback:
 
         if calendar_type == Calendar_Enum.Outlook:
             return Outlook.testConnection(auth, companyID)
-        # elif calendar_type == Calendar_Enum.Google:
-        #     return Google.authorizeUser()
+        elif calendar_type == Calendar_Enum.Google:
+            return Google.authorizeUser(auth['code'], companyID)
         else:
             return Callback(False, "Could not match Calendar's type")
 

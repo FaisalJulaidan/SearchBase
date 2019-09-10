@@ -48,7 +48,7 @@ def set_appointment_status():
 
 
 @appointment_router.route("/appointments/set_status_public", methods=['POST'])
-@wrappers.AccessAppointmentsRequired
+# @wrappers.AccessAppointmentsRequired
 def set_appointment_status_public():
     data = request.get_json()
     callback = appointment_services.setAppointmentStatusPublic(data['token'], data['appointmentID'], data['status'])
@@ -60,7 +60,7 @@ def set_appointment_status_public():
 
 
 @appointment_router.route("/appointments/verify/<token>", methods=['GET'])
-@wrappers.AccessAppointmentsRequired
+# @wrappers.AccessAppointmentsRequired
 def verify_get_appointment(token):
     callback = appointment_services.verifyRequest(token)
 

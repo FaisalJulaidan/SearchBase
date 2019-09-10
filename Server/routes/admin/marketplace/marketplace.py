@@ -34,6 +34,13 @@ def marketplace():
                                     })
 
 
+@marketplace_router.route("/google/events", methods=['GET'])
+def googleEvents():
+    # Authenticate
+    
+    return helpers.jsonResponse(True, 200, "Success", Google.sync(1))
+
+
 # ===== Connect ===== #
 @marketplace_router.route("/marketplace/connect", methods=['POST'])
 @jwt_required

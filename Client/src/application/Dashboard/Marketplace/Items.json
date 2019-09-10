@@ -69,7 +69,7 @@
       "desc": "Google Calendar is a time-management and scheduling calendar service lets you keep track of important events, share your schedule.",
       "image": "/static/images/CRM/gmail.svg",
       "type": "Google",
-      "disabled": true,
+      "disabled": false,
       "status": "NOT_CONNECTED"
     }
   ]

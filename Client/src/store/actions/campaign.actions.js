@@ -6,9 +6,10 @@ const fetchCampaigns = () => ({
     type: actionTypes.FETCH_CAMPAIGNS_REQUEST
 });
 
-const fetchCampaignsSuccess = (campaignsList) => ({
+const fetchCampaignsSuccess = (campaigns, campaignOptions) => ({
     type: actionTypes.FETCH_CAMPAIGNS_SUCCESS,
-    campaignsList
+    campaigns,
+    campaignOptions
 });
 
 const fetchCampaignsFailure = (errorMsg) => ({
@@ -17,16 +18,17 @@ const fetchCampaignsFailure = (errorMsg) => ({
 });
 
 
-const fetchCampaign = () => ({
-    type: actionTypes.FETCH_CAMPAIGN_REQUEST
+// Fetch Campaign
+const fetchCampaign = (campaignID) => ({
+    type: actionTypes.FETCH_CAMPAIGN_REQUEST,
+    meta: {thunk: true},
+    campaignID
 });
 
-const fetchCampaignSuccess = (assistants, crms, databases, messengers) => ({
+const fetchCampaignSuccess = (campaign, campaignOptions) => ({
     type: actionTypes.FETCH_CAMPAIGN_SUCCESS,
-    assistants,
-    crms,
-    databases,
-    messengers
+    campaign,
+    campaignOptions
 });
 
 const fetchCampaignFailure = (error) => ({
@@ -34,6 +36,73 @@ const fetchCampaignFailure = (error) => ({
     error
 });
 
+// Save Campaign
+const saveCampaign = (name, assistant_id, use_crm, crm_id, database_id, messenger_id, location, jobTitle, skills, message) => ({
+    type: actionTypes.SAVE_CAMPAIGN_REQUEST,
+    name,
+    assistant_id,
+    use_crm,
+    crm_id,
+    database_id,
+    messenger_id,
+    location,
+    jobTitle,
+    skills,
+    message
+});
+
+const saveCampaignSuccess = (campaign) => ({
+    type: actionTypes.SAVE_CAMPAIGN_SUCCESS,
+    campaign
+});
+
+const saveCampaignFailure = (error) => ({
+    type: actionTypes.SAVE_CAMPAIGN_FAILURE,
+    error
+});
+
+
+// Update Campaign
+const updateCampaign = (name, assistant_id, use_crm, crm_id, database_id, messenger_id, location, jobTitle, skills, message) => ({
+    type: actionTypes.UPDATE_CAMPAIGN_REQUEST,
+    name,
+    assistant_id,
+    use_crm,
+    crm_id,
+    database_id,
+    messenger_id,
+    location,
+    jobTitle,
+    skills,
+    message
+});
+
+const updateCampaignSuccess = () => ({
+    type: actionTypes.UPDATE_CAMPAIGN_SUCCESS,
+});
+
+const updateCampaignFailure = (error) => ({
+    type: actionTypes.UPDATE_CAMPAIGN_FAILURE,
+    error
+});
+
+
+// Delete Campaign
+const deleteCampaign = () => ({
+    type: actionTypes.DELETE_CAMPAIGN_REQUEST,
+    meta: {thunk: true}
+});
+
+const deleteCampaignSuccess = () => ({
+    type: actionTypes.DELETE_CAMPAIGN_SUCCESS,
+});
+
+const deleteCampaignFailure = (error) => ({
+    type: actionTypes.DELETE_CAMPAIGN_FAILURE,
+    error
+});
+
+// Fetch Candidates List
 const fetchCampaignCandidatesData = (assistant_id, use_crm, crm_id, database_id, messenger_id, location, jobTitle, skills, text) => ({
     type: actionTypes.FETCH_CAMPAIGN_CANDIDATES_DATA_REQUEST,
     assistant_id,
@@ -58,7 +127,8 @@ const fetchCampaignCandidatesDataFailure = (error) => ({
 });
 
 
-const launchCampaign = (assistant_id, use_crm, crm_id, database_id, messenger_id, location, jobTitle, skills, text,candidate_list) => ({
+// Launch Campaign
+const launchCampaign = (assistant_id, use_crm, crm_id, database_id, messenger_id, location, jobTitle, skills, text, candidate_list) => ({
     type: actionTypes.LAUNCH_CAMPAIGN_REQUEST,
     assistant_id,
     use_crm,
@@ -81,6 +151,7 @@ const launchCampaignFailure = (errorMsg) => ({
     errorMsg
 });
 
+
 export const campaignActions = {
     fetchCampaigns,
     fetchCampaignsSuccess,
@@ -89,6 +160,18 @@ export const campaignActions = {
     fetchCampaign,
     fetchCampaignSuccess,
     fetchCampaignFailure,
+
+    saveCampaign,
+    saveCampaignSuccess,
+    saveCampaignFailure,
+
+    updateCampaign,
+    updateCampaignSuccess,
+    updateCampaignFailure,
+
+    deleteCampaign,
+    deleteCampaignSuccess,
+    deleteCampaignFailure,
 
     fetchCampaignCandidatesData,
     fetchCampaignCandidatesDataSuccess,

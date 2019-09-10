@@ -2,15 +2,15 @@ import * as actionTypes from '../actions/actionTypes';
 import {updateObject} from '../utility';
 
 const initialState = {
-    campaignsList:[],
-    assistants: [],
-    crms: [],
-    databases: [],
-    messengers: [],
-    candidate_list: [],
+    campaigns: [],
+    campaignOptions: null,
+    campaign: null,
     isLoading: false,
+    candidate_list: [],
     isCandidatesLoading: false,
     isLaunchingCampaign: false,
+    isSaving: false,
+    isDeleting: false,
     errorMsg: null
 };
 
@@ -20,52 +20,106 @@ export const campaign = (state = initialState, action) => {
         //Fetch All
         case actionTypes.FETCH_CAMPAIGNS_REQUEST:
             return updateObject(state, {
-                campaignsList: [],
+                campaigns: [],
+                campaignOptions: null,
                 isLoading: true,
                 errorMsg: null,
             });
         case actionTypes.FETCH_CAMPAIGNS_SUCCESS:
             return updateObject(state, {
-                campaignsList: action.campaignsList,
+                campaigns: action.campaigns,
+                campaignOptions: action.campaignOptions,
                 isLoading: false,
                 errorMsg: null,
             });
         case actionTypes.FETCH_CAMPAIGNS_FAILURE:
             return updateObject(state, {
-                campaignsList: [],
+                campaigns: [],
+                campaignOptions: null,
                 isLoading: false,
                 errorMsg: action.error
             });
 
-        //Fetch campaign
+        //Fetch Campaign
         case actionTypes.FETCH_CAMPAIGN_REQUEST:
             return updateObject(state, {
-                assistants: [],
-                crms: [],
-                databases: [],
-                messengers: [],
+                campaign: null,
+                campaignOptions: null,
                 isLoading: true,
                 errorMsg: null,
             });
         case actionTypes.FETCH_CAMPAIGN_SUCCESS:
             return updateObject(state, {
-                assistants: action.assistants,
-                crms: action.crms,
-                databases: action.databases,
-                messengers: action.messengers,
+                campaign: action.campaign,
+                campaignOptions: action.campaignOptions,
                 isLoading: false,
                 errorMsg: null,
             });
         case actionTypes.FETCH_CAMPAIGN_FAILURE:
             return updateObject(state, {
-                assistants: [],
-                crms: [],
-                databases: [],
-                messengers: [],
+                campaign: null,
+                campaignOptions: null,
                 isLoading: false,
                 errorMsg: action.error
             });
 
+
+        //Save Campaign
+        case actionTypes.SAVE_CAMPAIGN_REQUEST:
+            return updateObject(state, {
+                campaign: null,
+                isSaving: true,
+                errorMsg: null,
+            });
+        case actionTypes.SAVE_CAMPAIGN_SUCCESS:
+            return updateObject(state, {
+                campaign: action.campaign,
+                isSaving: false,
+                errorMsg: null,
+            });
+        case actionTypes.SAVE_CAMPAIGN_FAILURE:
+            return updateObject(state, {
+                campaign: null,
+                isSaving: false,
+                errorMsg: action.error
+            });
+
+
+        //Update Campaign
+        case actionTypes.UPDATE_CAMPAIGN_REQUEST:
+            return updateObject(state, {
+                isSaving: true,
+                errorMsg: null,
+            });
+        case actionTypes.UPDATE_CAMPAIGN_SUCCESS:
+            return updateObject(state, {
+                isSaving: false,
+                errorMsg: null,
+            });
+        case actionTypes.UPDATE_CAMPAIGN_FAILURE:
+            return updateObject(state, {
+                isSaving: false,
+                errorMsg: action.error
+            });
+
+
+        //Delete Campaign
+        case actionTypes.DELETE_CAMPAIGN_REQUEST:
+            return updateObject(state, {
+                isDeleting: true,
+                errorMsg: null,
+            });
+        case actionTypes.DELETE_CAMPAIGN_SUCCESS:
+            return updateObject(state, {
+                campaigns: [...state.campaigns].filter(campaign => campaign.ID !== action.campaignID),
+                isDeleting: false,
+                errorMsg: null,
+            });
+        case actionTypes.DELETE_CAMPAIGN_FAILURE:
+            return updateObject(state, {
+                isDeleting: false,
+                errorMsg: action.error
+            });
 
         //Fetch Candidate Data
         case actionTypes.FETCH_CAMPAIGN_CANDIDATES_DATA_REQUEST:

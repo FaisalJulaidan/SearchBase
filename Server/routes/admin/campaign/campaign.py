@@ -8,7 +8,7 @@ from utilities import helpers
 campaign_router: Blueprint = Blueprint('campaign_router', __name__, template_folder="../../templates")
 
 
-@campaign_router.route("/campaign/action", methods=['GET', 'POST'])
+@campaign_router.route("/campaign/action", methods=['GET', 'POST', 'PUT'])
 @jwt_required
 def fill_assistants():
     # Authenticate

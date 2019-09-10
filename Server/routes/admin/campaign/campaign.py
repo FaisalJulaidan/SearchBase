@@ -84,7 +84,8 @@ def campaign_id(campaignID):
         if not callback.Success:
             return helpers.jsonResponse(False, 400, callback.Message)
 
-        return helpers.jsonResponse(True, 200, "Campaign has been saved!", helpers.getDictFromSQLAlchemyObj(callback.Data))
+        return helpers.jsonResponse(True, 200, "Campaign has been saved!",
+                                    helpers.getDictFromSQLAlchemyObj(callback.Data))
 
     if request.method == "DELETE":
         callback: Callback = campaign_services.removeByID(campaignID, user['companyID'])

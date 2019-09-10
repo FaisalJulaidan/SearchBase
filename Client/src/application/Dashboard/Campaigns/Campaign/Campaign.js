@@ -44,6 +44,7 @@ class Campaign extends React.Component {
     }
 
     componentDidMount() {
+        console.log(this.props)
         let id = this.props.match.params.id;
         if (id === 'new') {
             this.props.dispatch(campaignActions.fetchCampaigns());
@@ -238,7 +239,10 @@ class Campaign extends React.Component {
                     values.jobTitle,
                     this.state.skills,
                     this.state.textMessage,
-                )).then(() => history.push('/dashboard/campaigns'));
+                )).then(() => {
+                    this.setState({campaignNameModalVisibility:false})
+                    history.push('/dashboard/campaigns')
+                });
             }
         });
     };

@@ -1,6 +1,6 @@
 import {all, takeEvery, put} from 'redux-saga/effects'
 import * as actionTypes from "../actions/actionTypes";
-import {autoPilotActions, campaignActions} from "../actions";
+import {campaignActions} from "../actions";
 import {http, errorMessage, loadingMessage, successMessage} from "helpers";
 
 //Fetch All
@@ -33,15 +33,17 @@ function* fetchCampaign({campaignID, meta}) {
 }
 
 //Save Campaign
-function* saveCampaign({name, assistant_id, use_crm, crm_id, database_id, messenger_id, location, jobTitle, skills, message}) {
+function* saveCampaign({name, assistant_id, use_crm, crm_id, database_id, messenger_id, location, jobTitle, skills, message, meta}) {
     try {
         const res = yield http.post('/campaign',
             {name, assistant_id, use_crm, crm_id, database_id, messenger_id, location, jobTitle, skills, message}, {
                 headers: {'Content-Type': 'application/json'},
             });
-        yield put(campaignActions.saveCampaignSuccess(
-            res.data?.data.campaign
-        ));
+        yield put({
+            ...campaignActions.saveCampaignSuccess(
+                res.data?.data.campaign
+            ), meta
+        });
         successMessage("Campaign saved successfully.");
     } catch (error) {
         const msg = error.response?.data?.msg || "Couldn't Save Campaign.";
@@ -70,7 +72,7 @@ function* updateCampaign({campaignID, name, assistant_id, use_crm, crm_id, datab
 function* deleteCampaign({campaignID, meta}) {
     try {
         const res = yield http.delete(`/campaign/${campaignID}`);
-        yield put({...campaignActions.deleteCampaignSuccess(), meta});
+        yield put({...campaignActions.deleteCampaignSuccess(campaignID), meta});
         successMessage("Campaign deleted.");
     } catch (error) {
         const msg = error.response?.data?.msg || "Couldn't delete campaign.";

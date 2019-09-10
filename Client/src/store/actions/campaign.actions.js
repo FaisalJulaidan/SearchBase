@@ -39,6 +39,7 @@ const fetchCampaignFailure = (error) => ({
 // Save Campaign
 const saveCampaign = (name, assistant_id, use_crm, crm_id, database_id, messenger_id, location, jobTitle, skills, message) => ({
     type: actionTypes.SAVE_CAMPAIGN_REQUEST,
+    meta: {thunk: true},
     name,
     assistant_id,
     use_crm,
@@ -88,13 +89,15 @@ const updateCampaignFailure = (error) => ({
 
 
 // Delete Campaign
-const deleteCampaign = () => ({
+const deleteCampaign = (campaignID) => ({
     type: actionTypes.DELETE_CAMPAIGN_REQUEST,
-    meta: {thunk: true}
+    meta: {thunk: true},
+    campaignID
 });
 
-const deleteCampaignSuccess = () => ({
+const deleteCampaignSuccess = (campaignID) => ({
     type: actionTypes.DELETE_CAMPAIGN_SUCCESS,
+    campaignID
 });
 
 const deleteCampaignFailure = (error) => ({

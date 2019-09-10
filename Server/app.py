@@ -50,15 +50,6 @@ app.register_blueprint(appointment_router, url_prefix='/api')
 app.register_blueprint(webhook_router, url_prefix='/api')
 app.register_blueprint(staff_router, url_prefix='/api/staff')
 
-# Add limiter:
-# Requests limiter:
-# TODO: Place this in helpers for request restrictions elsewhere
-limiter.init_app(app)
-# Add custom error response
-@app.errorhandler(429)
-def ratelimit_handler(e):
-    return helpers.jsonResponse(False, 429, "ratelimit exceeded %s" % e.description, None)
-
 
 @app.after_request
 def apply_caching(response):
@@ -75,6 +66,15 @@ def page_not_found(e):
     except:
         print("Error without description")
         return render_template('errors/404.html'), status.HTTP_404_NOT_FOUND
+
+
+# Requests limiter initialisation:
+limiter.init_app(app)
+
+# Custom limiter exceeded error response
+@app.errorhandler(429)
+def ratelimit_handler(e):
+    return helpers.jsonResponse(False, 429, "ratelimit exceeded %s" % e.description, None)
 
 
 @marketplace_router.route("/bullhorn_callback", methods=['GET', 'POST', 'PUT'])

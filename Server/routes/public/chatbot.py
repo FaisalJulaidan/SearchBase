@@ -80,10 +80,9 @@ def getSolutions_forChatbot(assistantHashID):
 
 
 @chatbot_router.route("/assistant/<string:assistantIDAsHash>/chatbot", methods=['GET', 'POST'])
-@limiter.limit("480/day;1/hour", methods=['POST'], error_message='User Chatbot Spam (429)')  # NOTE: Need to see if this works (what error is given?)
+@limiter.limit("2/5minutes", methods=['POST'])
 def chatbot(assistantIDAsHash):
     if request.method == "GET":
-        print("A GET request is being sent...")
         # Get blocks for the chatbot to use
         callback: Callback = flow_services.getChatbot(assistantIDAsHash)
         if not callback.Success:
@@ -92,8 +91,6 @@ def chatbot(assistantIDAsHash):
 
     # Process sent data coming from the chatbot
     if request.method == "POST":
-        print("A POST request is being sent...")
-
         # Chatbot collected information
         data = json.loads(request.form.get('conversation'))
         callback: Callback = conversation_services.processConversation(assistantIDAsHash, data)

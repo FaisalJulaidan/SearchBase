@@ -5,7 +5,7 @@ from gevent import monkey
 monkey.patch_all()
 
 import os
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, jsonify
 from flask_api import status
 from flask_babel import Babel
 from flask_migrate import Migrate, MigrateCommand
@@ -55,6 +55,11 @@ app.register_blueprint(staff_router, url_prefix='/api/staff')
 # Requests limiter:
 # TODO: Place this in helpers for request restrictions elsewhere
 limiter.init_app(app)
+# Add custom error response
+@app.errorhandler(429)
+def ratelimit_handler(e):
+    return helpers.jsonResponse(False, 429, "ratelimit exceeded %s" % e.description, None)
+
 
 @app.after_request
 def apply_caching(response):

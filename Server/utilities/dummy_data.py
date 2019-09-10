@@ -105,6 +105,432 @@ def generate():
             }
         ]
     }
+
+    flow = {
+        "groups": [
+            {
+                "blocks": [
+                    {
+                        "Content": {
+                            "answers": [
+                                {
+                                    "action": "Go To Next Block",
+                                    "afterMessage": "",
+                                    "blockToGoID": "1Nto4DL8B",
+                                    "id": "WZXp26mdL",
+                                    "keywords": [
+                                        "python"
+                                    ],
+                                    "score": 2,
+                                    "text": "low"
+                                },
+                                {
+                                    "action": "Go To Next Block",
+                                    "afterMessage": "",
+                                    "blockToGoID": "1Nto4DL8B",
+                                    "id": "godj9rom5",
+                                    "keywords": [],
+                                    "score": 5,
+                                    "text": "medium"
+                                },
+                                {
+                                    "action": "Go To Next Block",
+                                    "afterMessage": "",
+                                    "blockToGoID": "1Nto4DL8B",
+                                    "id": "E6phkGY5u",
+                                    "keywords": [],
+                                    "score": 8,
+                                    "text": "high"
+                                }
+                            ],
+                            "text": "what?"
+                        },
+                        "DataType": enums.DataType.CandidateSkills.value['enumName'],
+                        "ID": "8EDEBiDHa",
+                        "SkipAction": "End Chat",
+                        "SkipBlockToGoID": None,
+                        "SkipText": "Skip!",
+                        "Skippable": False,
+                        "StoreInDB": True,
+                        "Type": "Question"
+                    },
+                    {
+                        "Type": "Solutions",
+                        "StoreInDB": False,
+                        "Skippable": True,
+                        "SkipText": "Not found what you're looking for?",
+                        "SkipAction": "Go To Next Block",
+                        "SkipBlockToGoID": None,
+                        "DataType": enums.DataType.NoType.value['enumName'],
+                        "Content": {
+                            "showTop": 5,
+                            "action": "Go To Next Block",
+                            "blockToGoID": None,
+                            "afterMessage": "123",
+                            "databaseType": "Candidates"
+                        },
+                        "ID": "1Nto4DL8B"
+                    }
+                ],
+                "description": "The best group",
+                "id": "tisd83f4",
+                "name": "group 1"
+            }
+        ]
+    }
+
+    flow = {
+        "groups": [
+            {
+                "blocks": [
+                    {
+                        "Content": {
+                            "answers": [
+                                {
+                                    "action": "Go To Next Block",
+                                    "afterMessage": "",
+                                    "blockToGoID": "1Nto4DL8B",
+                                    "id": "WZXp26mdL",
+                                    "keywords": [
+                                        "python"
+                                    ],
+                                    "score": 2,
+                                    "text": "low"
+                                },
+                                {
+                                    "action": "Go To Next Block",
+                                    "afterMessage": "",
+                                    "blockToGoID": "1Nto4DL8B",
+                                    "id": "godj9rom5",
+                                    "keywords": [],
+                                    "score": 5,
+                                    "text": "medium"
+                                },
+                                {
+                                    "action": "Go To Next Block",
+                                    "afterMessage": "",
+                                    "blockToGoID": "1Nto4DL8B",
+                                    "id": "E6phkGY5u",
+                                    "keywords": [],
+                                    "score": 8,
+                                    "text": "high"
+                                }
+                            ],
+                            "text": "what?"
+                        },
+                        "DataType": enums.DataType.CandidateSkills.value['enumName'],
+                        "ID": "8EDEBiDHa",
+                        "SkipAction": "End Chat",
+                        "SkipBlockToGoID": None,
+                        "SkipText": "Skip!",
+                        "Skippable": False,
+                        "StoreInDB": True,
+                        "Type": "Question"
+                    },
+                    {
+                        "Type": "Solutions",
+                        "StoreInDB": False,
+                        "Skippable": True,
+                        "SkipText": "Not found what you're looking for?",
+                        "SkipAction": "Go To Next Block",
+                        "SkipBlockToGoID": None,
+                        "DataType": enums.DataType.NoType.value['enumName'],
+                        "Content": {
+                            "showTop": 5,
+                            "action": "Go To Next Block",
+                            "blockToGoID": None,
+                            "afterMessage": "123",
+                            "databaseType": "Candidates"
+                        },
+                        "ID": "1Nto4DL8B"
+                    }
+                ],
+                "description": "The best group",
+                "id": "tisd83f4",
+                "name": "group 1"
+            }
+        ]
+    }
+
+    # Insert candidate flow
+    candidate_insert_flow = {
+        "groups": [
+            {
+                "blocks": [
+                    # Candidate NAME
+                    {"Type": "User Input", "StoreInDB": True, "Skippable": False, "SkipText": "Skip!",
+                     "SkipAction": "End Chat",
+                     "SkipBlockToGoID": 'null', "DataType": "CandidateName",
+                     "Content": {"text": "Can you please provide us with your name?", "blockToGoID": "002",
+                                 "action": "Go To Next Block", "afterMessage": "Thank you for the name",
+                                 "keywords": []},
+                     "ID": "001"},
+                    # Candidate EMAIL
+                    {"Type": "User Input", "StoreInDB": True, "Skippable": False, "SkipText": "Skip!",
+                     "SkipAction": "End Chat",
+                     "SkipBlockToGoID": 'null', "DataType": "CandidateEmail",
+                     "Content": {"text": "Can you please provide us with email?", "blockToGoID": "003",
+                                 "action": "Go To Next Block", "afterMessage": "Thank you for the email",
+                                 "keywords": []},
+                     "ID": "002"},
+                    # Candidate LOCATION
+                    {"Type": "User Input", "StoreInDB": True, "Skippable": False, "SkipText": "Skip!",
+                     "SkipAction": "End Chat",
+                     "SkipBlockToGoID": 'null', "DataType": "CandidateLocation",
+                     "Content": {"text": "What city are you in?", "blockToGoID": "004",
+                                 "action": "Go To Next Block", "afterMessage": "Thank you for the city",
+                                 "keywords": []},
+                     "ID": "003"},
+                    # Candidate PHONE
+                    {"Type": "User Input", "StoreInDB": True, "Skippable": False, "SkipText": "Skip!",
+                     "SkipAction": "End Chat",
+                     "SkipBlockToGoID": 'null', "DataType": "CandidateMobile",
+                     "Content": {"text": "What is your phone number?", "blockToGoID": "005",
+                                 "action": "Go To Next Block", "afterMessage": "Thank you for the phone number",
+                                 "keywords": []},
+                     "ID": "004"},
+                    # Candidate EDUCATION
+                    # {"Type": "User Input", "StoreInDB": True, "Skippable": False, "SkipText": "Skip!",
+                    #  "SkipAction": "End Chat",
+                    #  "SkipBlockToGoID": 'null', "DataType": "CandidateEducation",
+                    #  "Content": {"text": "What is your education?", "blockToGoID": "006",
+                    #              "action": "Go To Next Block", "afterMessage": "Thank you for the edcuation",
+                    #              "keywords": []},
+                    #  "ID": "005"},
+                    # # Candidate SALARY
+                    # {"Type": "User Input", "StoreInDB": True, "Skippable": False, "SkipText": "Skip!",
+                    #  "SkipAction": "End Chat",
+                    #  "SkipBlockToGoID": 'null', "DataType": "CandidateAnnualDesiredSalary",
+                    #  "Content": {"text": "What is your annual desired salary?", "blockToGoID": "007",
+                    #              "action": "Go To Next Block", "afterMessage": "Thank you for the salary",
+                    #              "keywords": []},
+                    #  "ID": "006"},
+                    # # Candidate JOB TITLE
+                    # {"Type": "User Input", "StoreInDB": True, "Skippable": False, "SkipText": "Skip!",
+                    #  "SkipAction": "End Chat",
+                    #  "SkipBlockToGoID": 'null', "DataType": "CandidateJobTitle",
+                    #  "Content": {"text": "What job title are you looking for?", "blockToGoID": "008",
+                    #              "action": "Go To Next Block", "afterMessage": "Thank you for the title",
+                    #              "keywords": []},
+                    #  "ID": "007"},
+                    # # Candidate LINKDIN URL
+                    # {"Type": "User Input", "StoreInDB": True, "Skippable": False, "SkipText": "Skip!",
+                    #  "SkipAction": "End Chat",
+                    #  "SkipBlockToGoID": 'null', "DataType": "CandidateLinkdinURL",
+                    #  "Content": {"text": "Linkdin URL?", "blockToGoID": "009",
+                    #              "action": "Go To Next Block", "afterMessage": "Thank you for the URL",
+                    #              "keywords": []},
+                    #  "ID": "008"},
+                    # # Candidate SKILLS
+                    # {"Type": "User Input", "StoreInDB": True, "Skippable": False, "SkipText": "Skip!",
+                    #  "SkipAction": "End Chat",
+                    #  "SkipBlockToGoID": 'null', "DataType": "CandidateSkills",
+                    #  "Content": {"text": "What are your skills?", "blockToGoID": None,
+                    #              "action": "End Chat", "afterMessage": "Thank you for the skills",
+                    #              "keywords": ["SQL", "Python"]},
+                    #  "ID": "009"},
+                ],
+                "description": "To search candidates",
+                "id": "tisd83f4",
+                "name": "Search Candidates Group"
+            }
+        ]
+    }
+
+    # Search candidate flow
+    candidate_search_flow = {
+        "groups": [
+            {
+                "blocks": [
+
+                    # Candidate LOCATION
+                    {"Type": "User Input", "StoreInDB": True, "Skippable": False, "SkipText": "Skip!",
+                     "SkipAction": "End Chat",
+                     "SkipBlockToGoID": 'null', "DataType": "CandidateLocation",
+                     "Content": {"text": "What city are you in?", "blockToGoID": "002",
+                                 "action": "Go To Next Block", "afterMessage": "Thank you for the city",
+                                 "keywords": []},
+                     "ID": "001"},
+
+                    # Candidate EDUCATION
+                    {"Type": "User Input", "StoreInDB": True, "Skippable": False, "SkipText": "Skip!",
+                     "SkipAction": "End Chat",
+                     "SkipBlockToGoID": 'null', "DataType": "CandidateEducation",
+                     "Content": {"text": "What is your education?", "blockToGoID": "003",
+                                 "action": "Go To Next Block", "afterMessage": "Thank you for the edcuation",
+                                 "keywords": []},
+                     "ID": "002"},
+                    # Candidate SALARY
+                    {"Type": "User Input", "StoreInDB": True, "Skippable": False, "SkipText": "Skip!",
+                     "SkipAction": "End Chat",
+                     "SkipBlockToGoID": 'null', "DataType": "CandidateAnnualDesiredSalary",
+                     "Content": {"text": "What is your annual desired salary?", "blockToGoID": "004",
+                                 "action": "Go To Next Block", "afterMessage": "Thank you for the salary",
+                                 "keywords": []},
+                     "ID": "003"},
+                    # Candidate JOB TITLE
+                    {"Type": "User Input", "StoreInDB": True, "Skippable": False, "SkipText": "Skip!",
+                     "SkipAction": "End Chat",
+                     "SkipBlockToGoID": 'null', "DataType": "CandidateJobTitle",
+                     "Content": {"text": "What job title are you looking for?", "blockToGoID": "005",
+                                 "action": "Go To Next Block", "afterMessage": "Thank you for the title",
+                                 "keywords": []},
+                     "ID": "004"},
+                    # Candidate AVAILABILITY
+                    {"Type": "User Input", "StoreInDB": True, "Skippable": False, "SkipText": "Skip!",
+                     "SkipAction": "End Chat",
+                     "SkipBlockToGoID": 'null', "DataType": "CandidateAvailability",
+                     "Content": {"text": "Required availability of candidate?", "blockToGoID": "006",
+                                 "action": "Go To Next Block", "afterMessage": "Thank you for the availability",
+                                 "keywords": []},
+                     "ID": "005"},
+                    # Candidate SKILLS
+                    {"Type": "User Input", "StoreInDB": True, "Skippable": False, "SkipText": "Skip!",
+                     "SkipAction": "End Chat",
+                     "SkipBlockToGoID": 'null', "DataType": "CandidateSkills",
+                     "Content": {"text": "What are your skills?", "blockToGoID": "007",
+                                 "action": "Go To Next Block", "afterMessage": "skills will be searched",
+                                 "keywords": ["SQL", "Python"]},
+                     "ID": "006"},
+                    # Candidate SEARCH
+                    {"Content": {"action": "End Chat", "afterMessage": "", "blockToGoID": None,
+                                 "databaseType": "Candidates", "showTop": 5}, "DataType": "NoType", "ID": "007",
+                     "SkipAction": "End Chat", "SkipBlockToGoID": None,
+                     "SkipText": "I didn't find what I was looking for.", "Skippable": True, "StoreInDB": True,
+                     "Type": "Solutions"}
+                ],
+                "description": "To search candidates",
+                "id": "tisd83f4",
+                "name": "Search Candidates Group"
+            }
+        ]
+    }
+
+    # Search jobs flow
+    # NOTE: Search params -> title, location, years required, skills, employment type
+    job_search_flow = {
+        "groups": [
+            {
+                "blocks": [
+
+                    # Job TITLE
+                    {"Type": "User Input", "StoreInDB": True, "Skippable": False, "SkipText": "Skip!",
+                     "SkipAction": "End Chat",
+                     "SkipBlockToGoID": 'null', "DataType": "JobTitle",
+                     "Content": {"text": "Title of job?", "blockToGoID": "002",
+                                 "action": "Go To Next Block", "afterMessage": "thanks",
+                                 "keywords": []},
+                     "ID": "001"},
+
+                    # Job LOCATION
+                    {"Type": "User Input", "StoreInDB": True, "Skippable": False, "SkipText": "Skip!",
+                     "SkipAction": "End Chat",
+                     "SkipBlockToGoID": 'null', "DataType": "JobLocation",
+                     "Content": {"text": "Job location?", "blockToGoID": "003",
+                                 "action": "Go To Next Block", "afterMessage": "thanks",
+                                 "keywords": []},
+                     "ID": "002"},
+                    # job SALARY
+                    {"Type": "User Input", "StoreInDB": True, "Skippable": False, "SkipText": "Skip!",
+                     "SkipAction": "End Chat",
+                     "SkipBlockToGoID": 'null', "DataType": "JobAnnualSalary",
+                     "Content": {"text": "Job salary?", "blockToGoID": "004",
+                                 "action": "Go To Next Block", "afterMessage": "Thank you for the salary",
+                                 "keywords": []},
+                     "ID": "003"},
+                    # Job START DATE
+                    {"Type": "User Input", "StoreInDB": True, "Skippable": False, "SkipText": "Skip!",
+                     "SkipAction": "End Chat",
+                     "SkipBlockToGoID": 'null', "DataType": "JobStartDate",
+                     "Content": {"text": "Start date of job?", "blockToGoID": "005",
+                                 "action": "Go To Next Block", "afterMessage": "Thank you for the start date",
+                                 "keywords": []},
+                     "ID": "004"},
+                    # Job END DATE
+                    {"Type": "User Input", "StoreInDB": True, "Skippable": False, "SkipText": "Skip!",
+                     "SkipAction": "End Chat",
+                     "SkipBlockToGoID": 'null', "DataType": "JobEndDate",
+                     "Content": {"text": "End date of job?", "blockToGoID": "006",
+                                 "action": "Go To Next Block", "afterMessage": "Thank you for the end date",
+                                 "keywords": []},
+                     "ID": "005"},
+                    # Job SKILLS
+                    {"Type": "User Input", "StoreInDB": True, "Skippable": False, "SkipText": "Skip!",
+                     "SkipAction": "End Chat",
+                     "SkipBlockToGoID": 'null', "DataType": "JobEssentialSkills",
+                     "Content": {"text": "Skills of job?", "blockToGoID": "007",
+                                 "action": "Go To Next Block", "afterMessage": "thanks for the skills",
+                                 "keywords": ["SQL", "Python"]},
+                     "ID": "006"},
+                    # Job SEARCH
+                    {"Content": {"action": "End Chat", "afterMessage": "", "blockToGoID": None,
+                                 "databaseType": "Jobs", "showTop": 10}, "DataType": "NoType", "ID": "007",
+                     "SkipAction": "End Chat", "SkipBlockToGoID": None,
+                     "SkipText": "I didn't find what I was looking for.", "Skippable": True, "StoreInDB": True,
+                     "Type": "Solutions"}
+                ],
+                "description": "To search candidates",
+                "id": "tisd83f4",
+                "name": "Search Candidates Group"
+            }
+        ]
+    }
+
+    # Client insert flow
+    client_insert_flow = {
+        "groups": [
+            {
+                "blocks": [
+
+                    # CLIENT LOCATION
+                    {"Type": "User Input", "StoreInDB": True, "Skippable": False, "SkipText": "Skip!",
+                     "SkipAction": "End Chat",
+                     "SkipBlockToGoID": 'null', "DataType": "ClientLocation",
+                     "Content": {"text": "What city are you in?", "blockToGoID": "002",
+                                 "action": "Go To Next Block", "afterMessage": "Thank you for the city",
+                                 "keywords": []},
+                     "ID": "001"},
+
+                    # COMPANY NAME
+                    {"Type": "User Input", "StoreInDB": True, "Skippable": False, "SkipText": "Skip!",
+                     "SkipAction": "End Chat",
+                     "SkipBlockToGoID": 'null', "DataType": "CompanyName",
+                     "Content": {"text": "What is your name?", "blockToGoID": "003",
+                                 "action": "Go To Next Block", "afterMessage": "Thank you for the edcuation",
+                                 "keywords": []},
+                     "ID": "002"},
+
+                    # CLIENT PHONE NUMBER
+                    {"Type": "User Input", "StoreInDB": True, "Skippable": False, "SkipText": "Skip!",
+                     "SkipAction": "End Chat",
+                     "SkipBlockToGoID": 'null', "DataType": "ClientTelephone",
+                     "Content": {"text": "What is your phone number?", "blockToGoID": "004",
+                                 "action": "Go To Next Block", "afterMessage": "Thank you for the number",
+                                 "keywords": []},
+                     "ID": "003"},
+                ],
+                "description": "To search candidates",
+                "id": "tisd83f4",
+                "name": "Search Candidates Group"
+            }
+        ]
+    }
+
+    flow_services.updateFlow(flow, reader_a)
+
+    helper_a = Assistant(Name="Candidate Insert Bot", Message="Test candidate insert", TopBarText="Insert Candidate",
+                         SecondsUntilPopup=1, Active=True, Company=aramco)
+    flow_services.updateFlow(candidate_insert_flow, helper_a)
+    helper_b = Assistant(Name="Candidate Search Bot", Message="Test candidate search", TopBarText="Search Candidates",
+                         SecondsUntilPopup=1, Active=True, Company=aramco)
+    flow_services.updateFlow(candidate_search_flow, helper_b)
+    helper_c = Assistant(Name="Job Search Bot", Message="Test job search", TopBarText="Search Jobs",
+                         SecondsUntilPopup=1, Active=True, Company=aramco)
+    flow_services.updateFlow(job_search_flow, helper_c)
+    helper_d = Assistant(Name="Client Insert Bot", Message="Test client insert", TopBarText="Insert Client",
+                         SecondsUntilPopup=1, Active=True, Company=aramco)
+    flow_services.updateFlow(client_insert_flow, helper_d)
+
     flow_services.updateFlow(flow, reader_a)
 
     helper_a = Assistant(Name="Helper", Message="Hey there", TopBarText="Aramco Bot", SecondsUntilPopup=1, Active=True, Company=aramco)

@@ -64,8 +64,9 @@ const saveCampaignFailure = (error) => ({
 
 
 // Update Campaign
-const updateCampaign = (name, assistant_id, use_crm, crm_id, database_id, messenger_id, location, jobTitle, skills, message) => ({
+const updateCampaign = (campaignID, name, assistant_id, use_crm, crm_id, database_id, messenger_id, location, jobTitle, skills, message) => ({
     type: actionTypes.UPDATE_CAMPAIGN_REQUEST,
+    campaignID,
     name,
     assistant_id,
     use_crm,

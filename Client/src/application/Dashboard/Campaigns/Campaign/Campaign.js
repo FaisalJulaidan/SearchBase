@@ -44,7 +44,6 @@ class Campaign extends React.Component {
     }
 
     componentDidMount() {
-        console.log(this.props)
         let id = this.props.match.params.id;
         if (id === 'new') {
             this.props.dispatch(campaignActions.fetchCampaigns());
@@ -53,6 +52,11 @@ class Campaign extends React.Component {
             this.props.dispatch(campaignActions.fetchCampaign(id))
                 .then(() => {
                     let campaign = this.props.campaign;
+                    this.setState({
+                        skills: JSON.parse(campaign?.Skills.replace(/'/g, '"')), //Fix JSON with REGEXP
+                        textMessage: campaign?.Message,
+                        use_crm: campaign?.UseCRM,
+                    });
                     this.props.form.setFieldsValue({
                         name: campaign?.Name,
                         assistant_id: campaign?.AssistantID,
@@ -63,12 +67,7 @@ class Campaign extends React.Component {
                         jobTitle: campaign?.JobTitle,
                         text: campaign?.Message,
                     });
-                    this.setState({
-                        skills: campaign?.Skills,
-                        textMessage: campaign?.Message,
-                        use_crm: campaign?.UseCRM,
-                    })
-                }).catch(() => history.push(`/dashboard/campaigns`));
+                }).catch((err) => { console.log(err); history.push(`/dashboard/campaigns`)});
         }
     }
 
@@ -206,8 +205,8 @@ class Campaign extends React.Component {
             if (!err) {
                 if (this.state.isSaved) {
                     this.props.dispatch(campaignActions.updateCampaign(
-                        values.name,
                         this.props.campaign.ID,
+                        values.name,
                         values.assistant_id,
                         this.state.use_crm,
                         values.crm_id,
@@ -240,7 +239,7 @@ class Campaign extends React.Component {
                     this.state.skills,
                     this.state.textMessage,
                 )).then(() => {
-                    this.setState({campaignNameModalVisibility:false})
+                    this.setState({campaignNameModalVisibility: false})
                     history.push('/dashboard/campaigns')
                 });
             }
@@ -370,7 +369,8 @@ class Campaign extends React.Component {
                                 )}
                             </FormItem>
                             <FormItem label={"Use CRM"} labelCol={{xs: {span: 4, offset: 0}}}>
-                                <Switch onChange={(checked) => this.setState({use_crm: checked})}
+                                <Switch checked={this.state.use_crm}
+                                        onChange={(checked) => this.setState({use_crm: checked})}
                                         defaultChecked={this.state.use_crm}/>
                             </FormItem>
                             {(() => {

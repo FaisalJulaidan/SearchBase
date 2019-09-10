@@ -20,13 +20,12 @@ class Campaigns extends Component {
 
     deleteCampaign = (campaignID) => {
         Modal.confirm({
-            title: `Delete campaign confirmation`,
-            content: `If you click OK, this campaign will be deleted.`,
-            onOk: () => {
-                console.log(this.props);
-                //TODO::
-                // this.props.dispatch(campaignActions.deleteCampaign(campaignID))
-            }
+            title: 'Are you sure delete this campaign?',
+            content: `If you click YES, this campaign data will be deleted.`,
+            okText: 'Yes',
+            okType: 'danger',
+            cancelText: 'No',
+            onOk: () => {this.props.dispatch(campaignActions.deleteCampaign(this.props.campaign.ID))}
         });
     };
 

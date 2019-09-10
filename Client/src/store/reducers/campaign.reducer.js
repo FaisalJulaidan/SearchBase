@@ -111,6 +111,7 @@ export const campaign = (state = initialState, action) => {
             });
         case actionTypes.DELETE_CAMPAIGN_SUCCESS:
             return updateObject(state, {
+                campaigns: [...state.campaigns].filter(campaign => campaign.ID !== action.campaignID),
                 isDeleting: false,
                 errorMsg: null,
             });

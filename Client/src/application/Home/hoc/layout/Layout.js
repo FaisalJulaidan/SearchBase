@@ -9,7 +9,7 @@ class Layout extends Component {
 
     render() {
         return (
-            <StickyContainer id="content-wrap">
+            <StickyContainer id="content-wrap" style={{background: this.props.background}}>
                 <Header id="header"/>
                 {this.props.children}
                 <Footer background={this.props.background} id="footer"/>

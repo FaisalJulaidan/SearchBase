@@ -21,9 +21,9 @@ from itsdangerous import URLSafeTimedSerializer
 from sqlalchemy_utils import Currency
 
 from config import BaseConfig
-from models import db, Assistant, Job, Callback, Role, Company
+from models import db, Assistant, Job, Callback, Role, Company, StoredFile, StoredFileInfo
 from services import flow_services, assistant_services, appointment_services, company_services
-from utilities.enums import Period
+from utilities.enums import Period, FileAssetType
 
 # ======== Global Variables ======== #
 
@@ -123,6 +123,18 @@ def getPlanNickname(SubID=None):
     except stripe.error.StripeError as e:
         return None
 
+def keyFromStoredFile(storedFile: StoredFile, key: FileAssetType) -> StoredFileInfo or None:
+
+    class StoredFileInfoMocked(): # To avoid null pointer exceptions
+        def __init__(self, absFilePath: str or None):
+            self.AbsFilePath: str = absFilePath
+
+    if not storedFile: return StoredFileInfoMocked(None)
+    for file in storedFile.StoredFileInfo:
+        if file.Key.value == key.value:
+            return file
+    return StoredFileInfoMocked(None)
+
 
 def isValidEmail(email: str) -> bool:
     # Validate the email address using a regex.
@@ -165,12 +177,15 @@ def convertSalaryPeriod(salary, fromPeriod: Period, toPeriod: Period):
 
 # -------- SQLAlchemy Converters -------- #
 """Convert a SQLAlchemy object to a single dict """
-def getDictFromSQLAlchemyObj(obj) -> dict:
+def getDictFromSQLAlchemyObj(obj, eager: bool = False) -> dict:
     dict = {}  # Results
+    protected = getattr(obj, "__protected__") if hasattr(obj, "__protected__") else []
+    serialize = getattr(obj, "__serialize__") if hasattr(obj, "__serialize__") else []
     if not obj: return dict
-
     # A nested for loop for joining two tables
     for attr in obj.__table__.columns:
+        if attr in protected:
+            continue
         key = attr.name
         if key not in ['Password', 'Auth', 'Secret']:
             dict[key] = getattr(obj, key)
@@ -189,15 +204,27 @@ def getDictFromSQLAlchemyObj(obj) -> dict:
             if key == Assistant.Flow.name and dict[key]:  # Parse Flow !!
                 flow_services.parseFlow(dict[key])  # pass by reference
 
-    for attr in obj.__dict__.keys():
-        if attr.startswith("__"):
-            dict[attr[2:]] = getattr(obj, attr)
+    keys = obj.__dict__.keys()
+
+    if hasattr(obj, 'all_attributes'):
+        keys = getattr(obj, 'all_attributes')
+
+    for attr in keys:
+        if eager:
+            if isinstance(getattr(obj, attr), List):
+                if all(hasattr(sub, '_sa_instance_state') for sub in getattr(obj, attr)):
+                    dict[attr] = getListFromSQLAlchemyList(getattr(obj, attr), True)
+            elif hasattr(getattr(obj, attr), '_sa_instance_state'):
+                dict[attr] = getDictFromSQLAlchemyObj(getattr(obj, attr), True)
+        if attr in serialize and attr not in protected:
+            dict[attr] = getattr(obj, attr)
+
     return dict
 
 
 """Convert a SQLAlchemy list of objects to a list of dicts"""
-def getListFromSQLAlchemyList(SQLAlchemyList):
-    return list(map(getDictFromSQLAlchemyObj, SQLAlchemyList))
+def getListFromSQLAlchemyList(SQLAlchemyList, eager: bool = False):
+    return [getDictFromSQLAlchemyObj(item, eager) for item in SQLAlchemyList]
 
 """Used when you want to only gather specific data from a table (columns)"""
 """Provide a list of keys (e.g ['id', 'name']) and the list of tuples"""

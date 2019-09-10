@@ -1,8 +1,14 @@
-import {all, put, takeEvery, takeLatest} from 'redux-saga/effects'
+import { all, put, takeEvery, takeLatest } from 'redux-saga/effects';
 import * as actionTypes from '../actions/actionTypes';
-import {accountActions} from "../actions";
-import {errorMessage, http, loadingMessage, successMessage, updateUsername, updateTimezone} from "helpers";
-
+import { accountActions } from '../actions';
+import {
+    errorMessage,
+    http,
+    loadingMessage,
+    successMessage,
+    updateUsername,
+    updateTimezone
+} from 'helpers';
 
 function* getAccountDetails() {
     try {
@@ -10,26 +16,31 @@ function* getAccountDetails() {
         const account = yield res.data?.data;
 
         // Update username in localStorage
+        let file = account.company.StoredFile?.StoredFileInfo?.find(
+            item => item.Key === 'Logo'
+        );
+        // console.log()
+        account.company.LogoPath = file?.AbsFilePath || null;
         yield updateUsername(account.user.Firstname, account.user.Surname);
-        yield updateTimezone(account.user.TimeZone)
+        yield updateTimezone(account.user.TimeZone);
 
-        yield put(accountActions.getAccountSuccess(account))
-
+        yield put(accountActions.getAccountSuccess(account));
     } catch (error) {
-        const msg = error.response?.data?.msg || "Couldn't load account details";
+        console.log(error);
+        const msg =
+            error.response?.data?.msg || "Couldn't load account details";
         yield put(accountActions.getAccountFailure(msg));
         errorMessage(msg);
     }
 }
 
-function* saveProfileData({profileData}) {
+function* saveProfileData({ profileData }) {
     try {
         loadingMessage('Saving profile...', 0);
         const res = yield http.post(`/profile`, profileData);
         yield put(accountActions.saveProfileDetailsSuccess(res.data.msg));
         yield put(accountActions.getAccount());
         successMessage('Profile saved');
-
     } catch (error) {
         const msg = error.response?.data?.msg || "Couldn't save profile";
         yield put(accountActions.saveProfileDetailsFailure(msg));
@@ -37,7 +48,7 @@ function* saveProfileData({profileData}) {
     }
 }
 
-function* saveCompanyDetails({companyData}) {
+function* saveCompanyDetails({ companyData }) {
     try {
         loadingMessage('Saving company settings...', 0);
         const res = yield http.post(`/company`, companyData);
@@ -51,27 +62,30 @@ function* saveCompanyDetails({companyData}) {
     }
 }
 
-function* changePassword({newPassword, oldPassword}) {
+function* changePassword({ newPassword, oldPassword }) {
     try {
         loadingMessage('Updating passwords...', 0);
-        const res = yield http.post(`/profile/password`, {newPassword, oldPassword});
+        const res = yield http.post(`/profile/password`, {
+            newPassword,
+            oldPassword
+        });
         yield put(accountActions.changePasswordSuccess(res.data.msg));
         successMessage('Password updated');
     } catch (error) {
         console.log(error.response);
-        const msg = error.response?.data?.msg || "Old password is incorrect";
+        const msg = error.response?.data?.msg || 'Old password is incorrect';
         yield put(accountActions.changePasswordFailure(msg));
         errorMessage(msg);
     }
 }
 
-function* uploadLogo({file}) {
+function* uploadLogo({ file }) {
     try {
         loadingMessage('Uploading logo', 0);
         const res = yield http.post(`/company/logo`, file);
         yield successMessage('Logo uploaded');
+        console.log(res.data.data);
         yield put(accountActions.uploadLogoSuccess(res.data?.data));
-
     } catch (error) {
         const msg = error.response?.data?.msg || "Couldn't upload logo";
         errorMessage(msg);
@@ -93,27 +107,30 @@ function* deleteLogo() {
 }
 
 function* watchUploadLogo() {
-    yield takeEvery(actionTypes.UPLOAD_LOGO_REQUEST, uploadLogo)
+    yield takeEvery(actionTypes.UPLOAD_LOGO_REQUEST, uploadLogo);
 }
 
 function* watchDeleteLogo() {
-    yield takeEvery(actionTypes.DELETE_LOGO_REQUEST, deleteLogo)
+    yield takeEvery(actionTypes.DELETE_LOGO_REQUEST, deleteLogo);
 }
 
-function* watchAccountRequests(){
-    yield takeLatest(actionTypes.GET_ACCOUNT_REQUEST, getAccountDetails)
+function* watchAccountRequests() {
+    yield takeLatest(actionTypes.GET_ACCOUNT_REQUEST, getAccountDetails);
 }
 
 function* watchProfileUpdates() {
-    yield takeLatest(actionTypes.SAVE_PROFILE_DETAILS_REQUEST, saveProfileData)
+    yield takeLatest(actionTypes.SAVE_PROFILE_DETAILS_REQUEST, saveProfileData);
 }
 
 function* watchCompanyDetailsUpdates() {
-    yield takeLatest(actionTypes.SAVE_COMPANY_DETAILS_REQUEST, saveCompanyDetails)
+    yield takeLatest(
+        actionTypes.SAVE_COMPANY_DETAILS_REQUEST,
+        saveCompanyDetails
+    );
 }
 
-function* watchChangePassword(){
-    yield takeLatest(actionTypes.CHANGE_PASS_REQUEST, changePassword)
+function* watchChangePassword() {
+    yield takeLatest(actionTypes.CHANGE_PASS_REQUEST, changePassword);
 }
 
 export function* accountSaga() {
@@ -123,6 +140,6 @@ export function* accountSaga() {
         watchCompanyDetailsUpdates(),
         watchChangePassword(),
         watchUploadLogo(),
-        watchDeleteLogo(),
-    ])
+        watchDeleteLogo()
+    ]);
 }

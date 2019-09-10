@@ -5,6 +5,9 @@ from models import Callback
 from services import assistant_services
 from utilities import helpers, wrappers
 
+
+import json
+
 assistant_router: Blueprint = Blueprint('assistant_router', __name__, template_folder="../../templates")
 
 
@@ -57,9 +60,13 @@ def assistant(assistantID):
         callback: Callback = assistant_services.getByID(assistantID, user['companyID'])
         if not callback.Success:
             return helpers.jsonResponse(False, 404, "Can't fetch assistant")
+
+        # print(json.dumps(callback.Data))
         return helpers.jsonResponse(True, 200,
                                     "Assistant fetched successfully",
-                                    helpers.getDictFromSQLAlchemyObj(callback.Data))
+                                    helpers.getDictFromSQLAlchemyObj(callback.Data, True))
+
+
     # Update assistant
     if request.method == "PUT":
         data = request.json

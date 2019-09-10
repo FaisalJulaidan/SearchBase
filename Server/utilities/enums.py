@@ -33,7 +33,18 @@ class Calendar(Enum):
     def has_value(cls, value):
         return any(value == item.value for item in cls)
 
+@unique
+class FileAssetType(Enum):
+    NoType = 'No Type'
+    CandidateCV = 'Candidate CV'
+    Passport = 'Passport'
+    DrivingLicense = 'Driving License'
+    DrugTest = 'Drug Test'
+    Logo = 'Logo'
 
+    @classmethod
+    def has_value(cls, value):
+        return any(value == item.value for item in cls)
 @unique
 class Messenger(Enum):
     Twilio = 'Twilio'

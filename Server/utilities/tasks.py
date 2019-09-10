@@ -6,12 +6,73 @@ from os.path import join
 from jsonschema import validate
 
 from config import BaseConfig
-from models import db, Assistant
+from models import db, Assistant, Conversation, StoredFileInfo
+from services import stored_file_services
 from utilities import json_schemas, enums
+from sqlalchemy.orm import joinedload
+from typing import List
+import boto3
+from botocore.exceptions import ClientError
 
 
 # NOTE: Make sure to take a backup of the database before running these functions
 # =============================================================================
+
+def cleanStoredFiles():
+    try:
+        files: List[StoredFileInfo] = db.session.query(StoredFileInfo).filter(StoredFileInfo.StoredFileID == None).all()
+
+        if len(files) == 0 or files is None:
+            return "No files to delete..."
+
+        for file in files:
+            key = file.FilePath
+            try:
+                session = boto3.session.Session()
+                s3 = session.client('s3',
+                                    region_name='ams3',
+                                    endpoint_url=os.environ['SPACES_SERVER_URI'],
+                                    aws_access_key_id=os.environ['SPACES_PUBLIC_KEY'],
+                                    aws_secret_access_key=os.environ['SPACES_SECRET_KEY'])
+                # Delete file
+                response = s3.delete_object(
+                    Bucket=stored_file_services.BUCKET,
+                    Key=key
+                )
+
+                db.session.delete(file)
+            except ClientError as e:
+                raise Exception("DigitalOcean Error")
+
+        db.session.commit()
+        print("Files found to delete")
+    except Exception as exc:
+        return print("Couldn't find files to delete")
+
+
+def migrateConversations():
+    try:
+        for conversation in db.session.query(Conversation).options(joinedload('StoredFile').joinedload("StoredFileInfo")).all():
+            counter = 0
+            storedFile = conversation.StoredFile
+            if storedFile:
+                # print(storedFile.StoredFileInfo)
+                newData = copy.deepcopy(conversation.Data) # deep clone is IMPORTANT
+                for cd in newData['collectedData']:
+                    if cd['input'] == "&FILE_UPLOAD&":
+                        cd["fileName"] = storedFile.StoredFileInfo[counter].FilePath
+                        counter += 1
+                conversation.Data = newData
+
+        # Save all changes
+        db.session.commit()
+        print("Conversation migration done successfully :)")
+
+    except Exception as exc:
+        print(exc.args)
+        db.session.rollback()
+        print("migrateConversation failed :(")
+
 
 def migrateFlows():
     try:

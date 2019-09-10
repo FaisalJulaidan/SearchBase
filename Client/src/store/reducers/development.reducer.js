@@ -53,7 +53,7 @@ export const development = (state = initialState, action) => {
 
         case actionTypes.DELETE_WEBHOOK_FAILURE:
             return updateObject(state, {
-                error: action.error,
+                errorMsg: action.error,
                 webhooks: state.webhooks.map(webhook => ({...webhook, isLoading: action.ID === webhook.ID ? false : webhook.isLoading}))
             });
 

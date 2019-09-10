@@ -1,6 +1,7 @@
-from models import db, Callback, Company, User, AppointmentAllocationTime, AppointmentAllocationTimeInfo
+from models import db, Callback, Company, User, AppointmentAllocationTime, AppointmentAllocationTimeInfo, StoredFile, StoredFileInfo
 from services import stored_file_services
-from utilities import helpers
+from utilities import helpers, enums
+from sqlalchemy.orm import joinedload
 from werkzeug.utils import secure_filename
 import logging, stripe
 
@@ -32,20 +33,24 @@ def create(name, url, ownerEmail) -> Company or None:
 
 
 
-def getByID(id) -> Company or None:
+def getByID(id: int, eager: bool = False) -> Company or None:
     try:
-        if id:
-            # Get result and check if None then raise exception
-            result = db.session.query(Company).get(id)
-            if not result: raise Exception
+        if not id: raise Exception("id is required")
 
-            return Callback(True,
-                            'Company with ID ' + str(id) + ' was successfully retrieved',
-                            result)
-        else:
-            raise Exception
+        # Get result and check if None then raise exception
+        query = db.session.query(Company)
+        if eager:
+            query.options(joinedload('StoredFile').joinedload('StoredFileInfo'))
+        result = query.get(id)
+        if not result: raise Exception
+
+        return Callback(True,
+                        'Company with ID ' + str(id) + ' was successfully retrieved',
+                        result)
+
     except Exception as exc:
         db.session.rollback()
+        print(exc)
         return Callback(False,
                         'Company with ID ' + str(id) + ' does not exist')
 
@@ -76,9 +81,14 @@ def getByEmail(email) -> Callback:
         return Callback(False, 'Company could not be retrieved')
 
 
-def getByCompanyID(id) -> Callback:
+def getByCompanyID(id, eager: bool = False) -> Callback:
     try:
-        result = db.session.query(Company).filter(Company.ID == id).first()
+        query = db.session.query(Company).filter(Company.ID == id)
+
+        if eager:
+            query.options(joinedload('StoredFile').joinedload('StoredFileInfo'))
+
+        result = query.first()
         if not result: return Callback(False, 'Could not retrieve company\'s data.')
 
         return Callback(True, 'Company was successfully retrieved.', result)
@@ -138,22 +148,28 @@ def uploadLogo(file, companyID):
         company: Company = getByCompanyID(companyID).Data
         if not company: raise Exception
 
+        # Delete old logo ref from DB. DigitalOcean will override the old logo since they have the same name
+        oldLogo: StoredFileInfo = helpers.keyFromStoredFile(company.StoredFile, enums.FileAssetType.Logo)
+        if oldLogo.AbsFilePath:
+            db.session.delete(oldLogo.StoredFile)
+            db.session.delete(oldLogo) # comment this if u want to use a unique filename for every new logo instead of company id encoded
+
         # Generate unique name: hash_sessionIDEncrypted.extension
         filename = helpers.encodeID(companyID) + '.' + \
                    secure_filename(file.filename).rsplit('.', 1)[1].lower()
-        company.LogoPath = filename
 
-        # Upload file to cloud Space
-        upload_callback : Callback = stored_file_services.uploadFile(file,
-                                                                     filename,
-                                                                     stored_file_services.COMPANY_LOGOS_PATH,
-                                                                     public=True)
-        if not upload_callback.Success:
-            raise Exception(upload_callback.Message)
+        sf = StoredFile()
+        db.session.add(sf)
+        db.session.flush()
 
-        db.session.commit()
 
-        return Callback(True, 'Logo uploaded successfully.', filename)
+        upload_callback: Callback = stored_file_services.uploadFile(file, filename, True, model=Company,
+                                identifier="ID",
+                                identifier_value=company.ID,
+                                stored_file_id=sf.ID,
+                                key=enums.FileAssetType.Logo)
+        
+        return Callback(True, 'Logo uploaded successfully.', upload_callback.Data)
 
     except Exception as exc:
         helpers.logError("company_service.uploadLogo(): " + str(exc))
@@ -164,17 +180,17 @@ def uploadLogo(file, companyID):
 def deleteLogo(companyID):
     try:
 
-        company: Company = getByCompanyID(companyID).Data
+        company: Company = getByCompanyID(companyID, True).Data
         if not company: raise Exception
 
 
-        logoPath = company.LogoPath
-        if not logoPath: return Callback(False, 'No logo to delete')
+        logo = company.StoredFile
+        if not logo: return Callback(False, 'No logo to delete')
 
         # Delete file from cloud Space and reference from database
-        company.LogoPath = None
-        delete_callback : Callback = stored_file_services.deleteFile(logoPath,
-                                                                     stored_file_services.COMPANY_LOGOS_PATH)
+        path = helpers.keyFromStoredFile(logo, enums.FileAssetType.Logo).FilePath
+        company.StoredFile = None
+        delete_callback : Callback = stored_file_services.deleteFile(path)
         if not delete_callback.Success:
             raise Exception(delete_callback.Message)
 

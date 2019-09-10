@@ -21,13 +21,16 @@ def webhooks(companyID: int) -> Callback:
         webhooks: List[Webhook] = db.session.query(Webhook).filter(Webhook.CompanyID == companyID).all()
 
         if webhooks is None:
-            raise Exception("No webhooks found")
+            raise webhookException("No webhooks found")
 
         return Callback(True, "Webhooks gathered successfully", webhooks)
 
-    except Exception as e:
+    except webhookException as e:
         helpers.logError("webhook_serivces.webhooks(): " + str(e))
         return Callback(False, str(e), None)
+    except Exception as e:
+        helpers.logError("webhook_serivces.webhooks(): " + str(e))
+        return Callback(False, 'Failed to gather webhooks', None)
 
 
 def webhook(ID: int, companyID: int) -> Callback:
@@ -36,10 +39,12 @@ def webhook(ID: int, companyID: int) -> Callback:
             and_(Webhook.CompanyID == companyID, Webhook.ID == ID)).first()
 
         if webhook is None:
-            raise Exception("Webhook with specified ID not found")
+            raise webhookException("Webhook with specified ID not found")
 
         return Callback(True, "Webhook gathered successfully", webhook)
-
+    except webhookException as e:
+        helpers.logError("webhook_serivces.webhook(): " + str(e))
+        return Callback(False, str(e), None)
     except Exception as e:
         helpers.logError("webhook_serivces.webhook(): " + str(e))
         return Callback(False, "Failed to get webhooks", None)

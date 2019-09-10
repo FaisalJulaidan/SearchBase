@@ -66,7 +66,7 @@ class App extends Component {
                             <Route path="/chatbot_direct_link/" component={ChatbotDirectLink}/>
                             <PrivateRoute path="/dashboard" component={Dashboard}/>
                             <Route path="/" component={Home}/>
-                            {/*<Redirect to={{pathname: '/'}}/>*/}
+                            {/* <Redirect to={{pathname: '/'}}/> */}
                         </Switch>
                     </TimezoneContext.Provider>
                 </Suspense>

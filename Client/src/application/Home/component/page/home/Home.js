@@ -18,7 +18,7 @@ const Home = () => {
     document.title = WEBSITE_TITLE;
 
     return (
-        <Layout>
+        <Layout background={"#FFFFFF"}>
             <div>
                 <section className={styles.section}>
                     <Intro/>

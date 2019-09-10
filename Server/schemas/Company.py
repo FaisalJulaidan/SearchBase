@@ -3,13 +3,6 @@ from schemas import Assistant, Conversation
 
 class Company(db.Model):
 
-    @property
-    def logo(self):
-        from services import stored_file_services as sfs
-        logo = sfs.PUBLIC_URL + sfs.UPLOAD_FOLDER + sfs.COMPANY_LOGOS_PATH + "/" + (
-                self.LogoPath or "")
-        return logo if self.LogoPath else None
-
     # @property
     # def Conversations(self):
     #     c = db.session.query(Conversation).join(Assistant).filter(Assistant. == self)
@@ -18,9 +11,11 @@ class Company(db.Model):
     ID = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
     Name = db.Column(db.String(80), nullable=False)
     URL = db.Column(db.String(250), nullable=False)
-    LogoPath = db.Column(db.String(64), nullable=True)
     StripeID = db.Column(db.String(68), unique=True, nullable=False)
     SubID = db.Column(db.String(68), unique=True, default=None)
+
+    StoredFileID = db.Column(db.Integer, db.ForeignKey('stored_file.ID', ondelete='SET NULL'), nullable=True)
+    StoredFile = db.relationship('StoredFile', order_by="desc(StoredFile.ID)")
 
     TrackingData = db.Column(db.Boolean, nullable=False, default=False)
     TechnicalSupport = db.Column(db.Boolean, nullable=False, default=True)
@@ -47,6 +42,7 @@ class Company(db.Model):
     AutoPilots = db.relationship('AutoPilot', back_populates='Company')
     AppointmentAllocationTimes = db.relationship('AppointmentAllocationTime', back_populates='Company')
     Webhooks = db.relationship('Webhook', back_populates='Company')
+
 
     def __repr__(self):
         return '<Company {}>'.format(self.Name)

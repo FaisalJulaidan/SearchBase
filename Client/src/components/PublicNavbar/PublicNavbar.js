@@ -14,7 +14,7 @@ const PublicNavbar = ({companyLogo, CompanyName, HideOnMobile}) =>
                         companyLogo ?
                             <div style={{display: 'flex'}}>
                                 <img
-                                    src={`https://tsb.ams3.digitaloceanspaces.com/production/company_logos/${companyLogo}`}
+                                    src={`${companyLogo}`}
                                     alt="company logo" height={40}/>
                                 <div style={{
                                     lineHeight: '40px',

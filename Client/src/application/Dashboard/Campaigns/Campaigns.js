@@ -9,6 +9,7 @@ import LoadingViewBox from "components/LoadingViewBox/LoadingViewBox";
 import {AutoPilotIcon} from "components/SVGs";
 import {history} from "helpers";
 import {campaignActions} from "store/actions";
+import {trimText} from "../../../helpers";
 
 const {Title, Paragraph} = Typography;
 
@@ -85,8 +86,8 @@ class Campaigns extends Component {
                                             optionsMenuItems={this.optionsMenuItems}
                                             optionsMenuClickHandler={(e) => this.optionsMenuClickHandler(e, campaign)}
                                             key={i}
-                                            title={campaign.Name}
-                                            text={campaign.Description}
+                                            title={trimText.capitalize(trimText.trimDash(campaign.Name))}
+                                            text={trimText.capitalize(trimText.trimDash(campaign.Location))}
                                             icon={<Icon type="rocket" style={{fontSize: '2em'}}/>}
                                             iconTop={175}
                                             iconRight={15}

@@ -58,7 +58,7 @@ class Campaign extends React.Component {
                         use_crm: campaign?.UseCRM,
                     });
                     this.props.form.setFieldsValue({
-                        name: campaign?.Name,
+                        name: trimText.capitalize(trimText.trimDash(campaign?.Name)),
                         assistant_id: campaign?.AssistantID,
                         crm_id: campaign?.CRMID,
                         database_id: campaign?.DatabaseID,
@@ -67,7 +67,10 @@ class Campaign extends React.Component {
                         jobTitle: campaign?.JobTitle,
                         text: campaign?.Message,
                     });
-                }).catch((err) => { console.log(err); history.push(`/dashboard/campaigns`)});
+                }).catch((err) => {
+                console.log(err);
+                history.push(`/dashboard/campaigns`)
+            });
         }
     }
 
@@ -337,14 +340,8 @@ class Campaign extends React.Component {
 
                     <div className={styles.formContainer}>
                         <Form layout='vertical' onSubmit={this.handleSubmit}>
-                            <FormItem style={{display: this.state.isSaved ? 'unset' : 'none'}} label={"Campaign Name"}>
-                                {getFieldDecorator("name", {
-                                    rules: [{
-                                        required: this.state.isSaved,
-                                        whitespace: true,
-                                        message: "Please enter a name for your campaign"
-                                    }],
-                                })(
+                            <FormItem style={{display: this.state.isSaved ? 'block' : 'none'}} label={"Campaign Name"}>
+                                {getFieldDecorator("name")(
                                     <Input placeholder={"Please enter a name for your campaign"}/>
                                 )}
                             </FormItem>

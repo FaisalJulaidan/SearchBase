@@ -7,7 +7,7 @@ from utilities import helpers
 
 campaign_router: Blueprint = Blueprint('campaign_router', __name__, template_folder="../../templates")
 
-
+# Get data needed for form / Retrieve candidates to which to send / Send Campaign
 @campaign_router.route("/campaign/action", methods=['GET', 'POST', 'PUT'])
 @jwt_required
 def fill_assistants():
@@ -44,6 +44,7 @@ def fill_assistants():
         return helpers.jsonResponse(True, 200, "Campaign has been sent!")
 
 
+# Save New
 @campaign_router.route("/campaign", methods=['POST'])
 @jwt_required
 def campaign():
@@ -54,9 +55,11 @@ def campaign():
         if not callback.Success:
             return helpers.jsonResponse(False, 400, callback.Message)
 
-        return helpers.jsonResponse(True, 200, "Campaign has been saved!", callback.Data)
+        return helpers.jsonResponse(True, 200, "Campaign has been saved!",
+                                    helpers.getDictFromSQLAlchemyObj(callback.Data))
 
 
+# Get / Update / Delete
 @campaign_router.route("/campaign/<int:campaignID>", methods=['GET', 'POST', 'DELETE'])
 @jwt_required
 def campaign_id(campaignID):

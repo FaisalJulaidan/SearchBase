@@ -58,7 +58,7 @@ def assistant(assistantID):
     if request.method == "GET":
         # Fetch assistant
         callback: Callback = assistant_services.getByID(assistantID, user['companyID'], True)
-        print(helpers.getDictFromSQLAlchemyObj(callback.Data, True))
+        # print(helpers.getDictFromSQLAlchemyObj(callback.Data, True))
         if not callback.Success:
             return helpers.jsonResponse(False, 404, "Can't fetch assistant")
 

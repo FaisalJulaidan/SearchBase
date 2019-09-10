@@ -71,7 +71,7 @@ def getByID(id: int, companyID: int, eager= False) -> Callback:
         query = db.session.query(Assistant)
 
         if eager:
-            query.options(joinedload('StoredFile').joinedload('StoredFileInfo'))
+            query.options(joinedload('StoredFile').joinedload("StoredFileInfo"))
 
         result = query.filter(and_(Assistant.ID == id, Assistant.CompanyID == companyID)).first()
         # print(result.StoredFile.StoredFileInfo)

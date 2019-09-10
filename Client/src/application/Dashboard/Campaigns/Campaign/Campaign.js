@@ -305,7 +305,7 @@ class Campaign extends React.Component {
                     </Modal>
 
                     <Modal
-                        title="Please enter campaign name"
+                        title="Campaign Name"
                         visible={this.state.campaignNameModalVisibility}
                         okText={"Save"}
                         onOk={this.handleSaveNewCampaign}

@@ -155,7 +155,7 @@ def uploadLogo(file, companyID):
             db.session.delete(oldLogo) # comment this if u want to use a unique filename for every new logo instead of company id encoded
 
         # Generate unique name: hash_sessionIDEncrypted.extension
-        filename = helpers.encodeID(companyID) + '.' + \
+        filename = helpers.encodeID(companyID) + "_AssistantLogo" + '.' + \
                    secure_filename(file.filename).rsplit('.', 1)[1].lower()
 
         sf = StoredFile()

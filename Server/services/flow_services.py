@@ -128,11 +128,13 @@ def isValidBlock(block: dict, blockType: str):
 
 
 # This function will be used to replace all enum.name to enums.value
-# flow is passed by reference so no need to return  a new one
 def parseFlow(flow: dict):
     try:
         for group in flow['groups']:
             for block in group['blocks']:
+                print("========================")
+                print(enums.DataType[block['DataType']])
+                # print(block.get('DataType', {})['enumName'])
                 block['DataType'] = enums.DataType[block['DataType']].value
         return flow
     except Exception as exc:

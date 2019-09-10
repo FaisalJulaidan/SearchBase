@@ -79,6 +79,8 @@ class Settings extends Component {
     };
 
     uploadLogo = async (file) => {
+        console.log('UPLOADDDD');
+        console.log(file);
         this.props.dispatch(assistantActions.uploadLogo(this.props.assistant.ID, file));
     };
 
@@ -245,8 +247,8 @@ class Settings extends Component {
                 </p>
                 <LogoUploader
                     logoPath={assistant.LogoPath}
-                    uploadLogo={this.props.uploadLogo}
-                    deleteLogo={this.props.deleteLogo}/>
+                    uploadLogo={this.uploadLogo}
+                    deleteLogo={this.deleteLogo}/>
 
 
                 <br/>

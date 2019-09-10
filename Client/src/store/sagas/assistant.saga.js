@@ -18,7 +18,7 @@ function* fetchAssistant({assistantID, meta}) {
     try {
         const res = yield http.get(`/assistant/${assistantID}`);
 
-        // Update username in localStorage
+        // Set logo path
         let assistant = res.data?.data;
         let file = assistant.StoredFile?.StoredFileInfo?.find(
             item => item.Key === 'Logo'
@@ -234,11 +234,11 @@ function* deleteLogo({assistantID}) {
 }
 
 function* watchUploadLogo() {
-    yield takeEvery(actionTypes.UPLOAD_LOGO_REQUEST, uploadLogo);
+    yield takeEvery(actionTypes.UPLOAD_ASSISTANT_LOGO_REQUEST, uploadLogo);
 }
 
 function* watchDeleteLogo() {
-    yield takeEvery(actionTypes.DELETE_LOGO_REQUEST, deleteLogo);
+    yield takeEvery(actionTypes.DELETE_ASSISTANT_LOGO_REQUEST, deleteLogo);
 }
 
 function* watchDisconnectAutoPilot() {

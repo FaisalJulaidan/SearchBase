@@ -287,9 +287,9 @@ const uploadLogo = (assistantID, file) => ({
     file
 });
 
-const uploadLogoSuccess = (UpdatedLogoPath) => ({
+const uploadLogoSuccess = (LogoPath) => ({
     type: actionTypes.UPLOAD_ASSISTANT_LOGO_SUCCESS,
-    UpdatedLogoPath
+    LogoPath
 });
 
 const uploadLogoFailure = (error) => ({

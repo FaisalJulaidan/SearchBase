@@ -4,9 +4,10 @@ from flask import request
 from jsonschema import validate
 
 from sqlalchemy.orm import joinedload
-from models import db, Callback, Assistant, Company
+from models import db, Callback, Assistant
 from services import options_services
 from utilities import json_schemas, helpers, enums
+import json
 
 
 # ----- Getters ----- #
@@ -41,8 +42,10 @@ def getChatbot(assistantHashID) -> Callback:
 
         assistantDict = helpers.getDictFromSQLAlchemyObj(assistant)
 
-        # Get and set company logo
-        logoPath = helpers.keyFromStoredFile(assistant.Company.StoredFile, enums.FileAssetType.Logo).AbsFilePath
+        # Get assistant logo if null then override it with company logo
+        logoPath = helpers.keyFromStoredFile(assistant.StoredFile, enums.FileAssetType.Logo).AbsFilePath
+        if not logoPath:
+            logoPath = helpers.keyFromStoredFile(assistant.Company.StoredFile, enums.FileAssetType.Logo).AbsFilePath
         assistantDict['LogoPath'] = logoPath
 
         data = {
@@ -128,7 +131,6 @@ def isValidBlock(block: dict, blockType: str):
 
 
 # This function will be used to replace all enum.name to enums.value
-# flow is passed by reference so no need to return  a new one
 def parseFlow(flow: dict):
     try:
         for group in flow['groups']:

@@ -57,7 +57,8 @@ def assistant(assistantID):
 
     if request.method == "GET":
         # Fetch assistant
-        callback: Callback = assistant_services.getByID(assistantID, user['companyID'])
+        callback: Callback = assistant_services.getByID(assistantID, user['companyID'], True)
+        # print(helpers.getDictFromSQLAlchemyObj(callback.Data, True))
         if not callback.Success:
             return helpers.jsonResponse(False, 404, "Can't fetch assistant")
 
@@ -212,3 +213,23 @@ def assistant_auto_pilot_connect(assistantID):
     if not callback.Success:
         return helpers.jsonResponse(False, 400, callback.Message, None)
     return helpers.jsonResponse(True, 200, callback.Message, None)
+
+
+# Upload and delete custom assistant logo
+@assistant_router.route("/assistant/<int:assistantID>/logo", methods=['POST', 'DELETE'])
+@jwt_required
+@wrappers.AccessAssistantsRequired
+def assistant_logo(assistantID):
+    # Authenticate
+    user = get_jwt_identity()['user']
+
+    callback: Callback = Callback(False, 'Error!')
+    if request.method == "POST":
+        callback: Callback = assistant_services.uploadLogo(request.files['file'], assistantID, user['companyID'])
+
+    if request.method == "DELETE":
+        callback: Callback = assistant_services.deleteLogo(assistantID, user['companyID'])
+
+    if not callback.Success:
+        return helpers.jsonResponse(False, 400, callback.Message, None)
+    return helpers.jsonResponse(True, 200, callback.Message, callback.Data)

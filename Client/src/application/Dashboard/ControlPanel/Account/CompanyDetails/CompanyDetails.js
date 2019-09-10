@@ -1,7 +1,7 @@
 import React from "react";
 import {Button, Form, Switch, Input, Divider, Icon, Select} from "antd";
 import {isEmpty} from "lodash";
-import LogoUploader from "./LogoUploader/LogoUploader"
+import LogoUploader from "components/LogoUploader/LogoUploader"
 
 const FormItem = Form.Item;
 const { Option } = Select;
@@ -123,7 +123,7 @@ class CompanyDetails extends React.Component {
                     chatbot and emails sent on behalf of your company by us
                 </p>
                 <LogoUploader
-                    account={account}
+                    logoPath={account?.company?.LogoPath}
                     uploadLogo={this.props.uploadLogo}
                     deleteLogo={this.props.deleteLogo}/>
             </>

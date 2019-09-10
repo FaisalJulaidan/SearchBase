@@ -581,7 +581,7 @@ class AutoPilot extends React.Component {
                                 <FormItem label="Auto manage and send candidates appointments"
                                           help="Accepted candidates will receive an email (if provided) to pick
                                            a time slot for an appointment. You can then confirm these
-                                           appointments from the Calendar page"
+                                           appointments from the Appointments page"
 
                                 >
                                     {getFieldDecorator('sendCandidatesAppointments', {

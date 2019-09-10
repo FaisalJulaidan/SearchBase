@@ -71,10 +71,9 @@ def getByID(id: int, companyID: int, eager= False) -> Callback:
         query = db.session.query(Assistant)
 
         if eager:
-            query.options(joinedload('StoredFile').joinedload("StoredFileInfo"))
+            query = query.options(joinedload('StoredFile').joinedload("StoredFileInfo"))
 
         result = query.filter(and_(Assistant.ID == id, Assistant.CompanyID == companyID)).first()
-        # print(result.StoredFile.StoredFileInfo)
 
         if not result: raise Exception
         return Callback(True, "Got assistant successfully.", result)
@@ -443,13 +442,13 @@ def deleteLogo(assistantID, companyID):
         if not assistant: raise Exception
 
 
-        logo = assistant.StoredFile
+        logo: StoredFile = assistant.StoredFile
         if not logo: return Callback(False, 'No logo to delete')
 
         # Delete file from cloud Space and reference from database
         path = helpers.keyFromStoredFile(logo, enums.FileAssetType.Logo).FilePath
-        assistant.StoredFile = None
-        delete_callback : Callback = stored_file_services.deleteFile(path)
+
+        delete_callback : Callback = stored_file_services.deleteFile(path, logo)
         if not delete_callback.Success:
             raise Exception(delete_callback.Message)
 

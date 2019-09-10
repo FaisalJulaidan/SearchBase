@@ -155,7 +155,7 @@ def uploadLogo(file, companyID):
             db.session.delete(oldLogo) # comment this if u want to use a unique filename for every new logo instead of company id encoded
 
         # Generate unique name: hash_sessionIDEncrypted.extension
-        filename = helpers.encodeID(companyID) + "_AssistantLogo" + '.' + \
+        filename = helpers.encodeID(companyID) + "_CompanyLogo" + '.' + \
                    secure_filename(file.filename).rsplit('.', 1)[1].lower()
 
         sf = StoredFile()
@@ -184,13 +184,13 @@ def deleteLogo(companyID):
         if not company: raise Exception
 
 
-        logo = company.StoredFile
+        logo: StoredFile = company.StoredFile
         if not logo: return Callback(False, 'No logo to delete')
 
         # Delete file from cloud Space and reference from database
         path = helpers.keyFromStoredFile(logo, enums.FileAssetType.Logo).FilePath
-        company.StoredFile = None
-        delete_callback : Callback = stored_file_services.deleteFile(path)
+
+        delete_callback : Callback = stored_file_services.deleteFile(path, logo)
         if not delete_callback.Success:
             raise Exception(delete_callback.Message)
 

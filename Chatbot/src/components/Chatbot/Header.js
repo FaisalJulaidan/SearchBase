@@ -53,7 +53,7 @@ const Header = ({ title, logoPath, isDirectLink, resetChatbot, closeWindow }) =>
                         {
                             logoPath ?
                                 <img alt="header" width={30}
-                                        src={`${logoPath}`}/> :
+                                        src={`${logoPath}?timestamp=${new Date().getTime()}`}/> :
                                 <FontAwesomeIcon size="2x" icon={faCloud} style={{ color: '#673AB7' }}/>
                         }
                     </Col>

@@ -204,7 +204,6 @@ def getDictFromSQLAlchemyObj(obj, eager: bool = False) -> dict:
     if hasattr(obj, 'all_attributes'):
         keys = getattr(obj, 'all_attributes')
 
-    print(keys)
     for attr in keys:
         if eager:
             if isinstance(getattr(obj, attr), List):

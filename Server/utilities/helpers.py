@@ -44,6 +44,9 @@ fernet = Fernet(os.environ['TEMP_SECRET_KEY'])
 # Currency converter by forex-python
 currencyConverter = CurrencyRates()
 
+# Set params here
+limiter = Limiter(key_func=get_remote_address)
+
 
 # ======== Helper Functions ======== #
 

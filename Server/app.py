@@ -26,6 +26,8 @@ from services.auth_services import jwt
 from services.mail_services import mail
 from utilities import helpers, tasks, dummy_data
 
+from utilities.helpers import limiter
+
 app = Flask(__name__, static_folder='static')
 
 # Register Routes:
@@ -49,6 +51,10 @@ app.register_blueprint(appointment_router, url_prefix='/api')
 app.register_blueprint(webhook_router, url_prefix='/api')
 app.register_blueprint(staff_router, url_prefix='/api/staff')
 
+# Add limiter:
+# Requests limiter:
+# TODO: Place this in helpers for request restrictions elsewhere
+limiter.init_app(app)
 
 @app.after_request
 def apply_caching(response):

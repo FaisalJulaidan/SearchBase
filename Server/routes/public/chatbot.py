@@ -9,20 +9,13 @@ from services import conversation_services, flow_services, databases_services, s
 from services.Marketplace.CRM import crm_services
 from utilities import helpers, wrappers
 from utilities.helpers import logError
-
-import app
-from flask_limiter import Limiter
-from flask_limiter.util import get_remote_address
-
+from utilities.helpers import limiter
 chatbot_router = Blueprint('chatbot_router', __name__, template_folder="../templates")
 CORS(chatbot_router)
 
+
 # Requests limiter:
-limiter = Limiter(
-    app,
-    key_func=get_remote_address,
-    default_limits=["480 per day", "20 per hour"]
-)
+# TODO: Place this in helpers for request restrictions elsewhere
 
 
 @chatbot_router.after_request
@@ -70,7 +63,7 @@ def get_widget_legacy():
 
 
 @chatbot_router.route("/assistant/<string:assistantIDAsHash>/chatbot", methods=['GET', 'POST'])
-@limiter.limit("480/day;20/hour", methods=['POST']) # NOTE: Need to see if this works
+@limiter.limit("480/day;20/hour", methods=['POST'])  # NOTE: Need to see if this works (what error is given?)
 def chatbot(assistantIDAsHash):
     if request.method == "GET":
         # Get blocks for the chatbot to use

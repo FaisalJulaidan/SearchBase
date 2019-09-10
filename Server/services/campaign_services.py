@@ -54,7 +54,7 @@ def save(campaign_details, companyID, campaignID=None):
 
         campaign.Name = campaign_details.get("name")
         campaign.JobTitle = campaign_details.get("jobTitle")
-        campaign.Skills = campaign_details.get("skills")
+        campaign.Skills = str(campaign_details.get("skills"))
         campaign.Location = campaign_details.get("location")
         campaign.Message = campaign_details.get("message")
         campaign.UseCRM = campaign_details.get("use_crm")

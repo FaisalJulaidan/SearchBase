@@ -35,6 +35,7 @@ function* fetchCampaign({campaignID, meta}) {
 //Save Campaign
 function* saveCampaign({name, assistant_id, use_crm, crm_id, database_id, messenger_id, location, jobTitle, skills, message, meta}) {
     try {
+        loadingMessage('Saving campaign...', 0);
         const res = yield http.post('/campaign',
             {name, assistant_id, use_crm, crm_id, database_id, messenger_id, location, jobTitle, skills, message}, {
                 headers: {'Content-Type': 'application/json'},
@@ -55,6 +56,7 @@ function* saveCampaign({name, assistant_id, use_crm, crm_id, database_id, messen
 //update Campaign
 function* updateCampaign({campaignID, name, assistant_id, use_crm, crm_id, database_id, messenger_id, location, jobTitle, skills, message}) {
     try {
+        loadingMessage('Updating campaign...', 0);
         const res = yield http.post(`/campaign/${campaignID}`,
             {name, assistant_id, use_crm, crm_id, database_id, messenger_id, location, jobTitle, skills, message}, {
                 headers: {'Content-Type': 'application/json'},
@@ -71,6 +73,7 @@ function* updateCampaign({campaignID, name, assistant_id, use_crm, crm_id, datab
 //update Campaign
 function* deleteCampaign({campaignID, meta}) {
     try {
+        loadingMessage('Deleting campaign...', 0);
         const res = yield http.delete(`/campaign/${campaignID}`);
         yield put({...campaignActions.deleteCampaignSuccess(campaignID), meta});
         successMessage("Campaign deleted.");

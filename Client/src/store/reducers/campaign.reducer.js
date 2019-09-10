@@ -20,6 +20,7 @@ export const campaign = (state = initialState, action) => {
         //Fetch All
         case actionTypes.FETCH_CAMPAIGNS_REQUEST:
             return updateObject(state, {
+                ...initialState,
                 campaigns: [],
                 campaignOptions: null,
                 isLoading: true,

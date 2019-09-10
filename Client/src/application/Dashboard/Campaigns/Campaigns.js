@@ -25,15 +25,21 @@ class Campaigns extends Component {
             okText: 'Yes',
             okType: 'danger',
             cancelText: 'No',
-            onOk: () => {this.props.dispatch(campaignActions.deleteCampaign(this.props.campaign.ID))}
+            onOk: () => {
+                this.props.dispatch(campaignActions.deleteCampaign(campaignID))
+            }
         });
     };
 
     optionsMenuClickHandler = (e, campaign) => {
-        if (e.key === 'edit')
-            history.push(`/dashboard/campaigns/${campaign.ID}`);
-        if (e.key === 'delete')
-            this.deleteCampaign(campaign.ID)
+        switch (e.key) {
+            case "edit":
+                history.push(`/dashboard/campaigns/${campaign.ID}`);
+                break;
+            case "delete":
+                this.deleteCampaign(campaign.ID)
+                break;
+        }
     };
 
     // it must be an array of Menu.Item. ViewBox expect that in its options Menu
@@ -97,7 +103,9 @@ class Campaigns extends Component {
 function mapStateToProps(state) {
     return {
         campaigns: state.campaign.campaigns,
-        isLoading: state.campaign.isLoading
+        isLoading: state.campaign.isLoading,
+        isDeleting: state.campaign.isDeleting,
+        errorMsg: state.campaign.errorMsg
     };
 }
 

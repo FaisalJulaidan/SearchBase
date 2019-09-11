@@ -26,6 +26,12 @@ def connect(type, auth, companyID):
         helpers.logError("Marketplace.marketplace_helpers.processRedirect() ERROR: " + str(exc))
         return Callback(False, str(exc))
 
+def sync(companyID):
+    try:
+        return calendar_services.syncAll(companyID)
+    except Exception as exc:
+        helpers.logError("Marketplace.marketplace_helpers.sync() ERROR: " + str(exc))
+        return Callback(False, str(exc))
 
 # Test marketplace item connection (e.g. CRM, Calendar...)
 def testConnection(type, companyID):

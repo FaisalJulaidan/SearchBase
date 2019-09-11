@@ -38,7 +38,7 @@ def marketplace():
 def googleEvents():
     # Authenticate
     
-    return helpers.jsonResponse(True, 200, "Success", Google.sync(1))
+    return helpers.jsonResponse(True, 200, "Success", Google.sync(1).Data)
 
 
 # ===== Connect ===== #

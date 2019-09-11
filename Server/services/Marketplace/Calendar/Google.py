@@ -28,6 +28,8 @@ def getToken(type, companyID):
         .filter(Calendar.CompanyID == companyID) \
         .filter(Calendar.Type == type) \
         .first()
+    if cal is None:
+        return None
     try:
         expiry = dateutil.parser.parse(cal.Auth['expiry'])
         if expiry < datetime.now():
@@ -89,12 +91,16 @@ def authorizeUser(code, companyID: int):
 def sync(companyID):
     try:
         token = getToken(enums.Calendar.Google, companyID)
-        calendarID = getCalendar(companyID, token)
+        if token is None:
+            return Callback(False, "Calendar needs to be set up before it is synced")
+        calendarID = getCalendar(companyID)
         syncAppointments(calendarID, token, companyID)
+        return Callback(False, "Calendar succesfully synced")
     except Exception as exc:
         helpers.logError("Google.sync(): " + str(exc))
+        return Callback(False, "Calendar sync failed")
 
-def getCalendar(companyID, token):
+def getCalendar(companyID):
     try:
         token = getToken(enums.Calendar.Google, companyID)
         calendar = db.session.query(Calendar) \
@@ -118,9 +124,6 @@ def getCalendar(companyID, token):
     except Exception as exc:
         helpers.logError("Google.getCalendar(): " + str(exc))
 
-def test(e):
-    print('test')
-    print(e)
 
 def syncAppointments(calendarID, token, companyID):
     try:
@@ -132,24 +135,39 @@ def syncAppointments(calendarID, token, companyID):
         appointments = db.session.query(Appointment).join(Conversation).join(Assistant).join(Company).filter(Company.ID == companyID).all()
         user: User = db.session.query(User).join(Company).filter(Company.ID == companyID).first()
 
+        #TODO: Encode
+
         events = {}
         for event in eventList.json()['items']:
             if event['description'].startswith("A_ID"):
                 desc = event['description'].split("<br>")
                 aid = hashids.decrypt(desc[0].replace("A_ID.", ""))[0]
-                print(aid)
                 events[aid] = event['id']
 
         requestList = []
+        removeList = []
+
+        for key, val in events.items():
+            valid = False
+            for appointment in appointments:
+                if key == appointment.ID:
+                    valid = True
+                    continue
+            if valid == False:
+                removeList.append(val)
+
+
         for appointment in appointments:
             eventID = None
             if appointment.ID in events:
                 eventID = events[appointment.ID]
+            
             appointmentToken = appointment_services.generateEmailUrl(appointment.ID)
             appointmentStatus = "Appointment pending approval " if appointment.Status.value == enums.Status.Pending.value else "Appointment "
             eventTitle = appointmentStatus + "with {}".format(appointment.Conversation.Name)
             
             id = hashids.encrypt(appointment.ID)
+            #TODO: Needs to change to whatever environment is using
             appointmentURL = "http://localhost:3000/appointment_status?token={}".format(appointmentToken)
 
             eventDesc = "A_ID.{}<br><a href='{}'>Accept Appointment</a>".format(id, appointmentURL) if appointment.Status.value == enums.Status.Pending.value else "A_ID.{}<br>Appointment accepted".format(id)
@@ -173,11 +191,14 @@ def syncAppointments(calendarID, token, companyID):
             if request['eventID'] is None:
                 rs.append(grequests.post(eventURL, headers=headers, json=request['data']))
             else:
-                print('patch')
                 rs.append(grequests.patch(eventURL+ "/" + request['eventID'], headers=headers, json=request['data']))
 
+        for request in removeList:
+            rs.append(grequests.delete(eventURL + "/" + request, headers=headers))
+
         grequests.map(rs)
-        return data
+
+        
         # GET https://www.googleapis.com/calendar/v3/calendars/calendarId/events
 
         

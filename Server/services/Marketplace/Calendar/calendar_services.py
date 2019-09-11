@@ -61,6 +61,15 @@ def connect(type, auth, companyID) -> Callback:
         db.session.rollback()
         return Callback(False, "Calendar connection failed")
 
+def syncAll(companyID):
+    try:
+        # Outlook.sync() # TODO: IMplement
+        google_callback: Callback = Google.sync(companyID)
+        return Callback(True, 'Calendar has been synced successfully')
+    except Exception as exc:
+        helpers.logError("calendar_services.sync(): " + str(exc))
+        db.session.rollback()
+        return Callback(False, "Could not synchronize all calendars")
 
 # Test connection to a Calendar (details must include the auth)
 def testConnection(type, auth, companyID) -> Callback:

@@ -7,6 +7,7 @@ from sqlalchemy import and_
 from sqlalchemy.orm import joinedload, contains_eager
 from utilities import helpers, enums
 from services import mail_services, company_services
+from services.Marketplace import marketplace_helpers
 import json
 
 def dummyCreateAppointmentAllocationTime(name, companyID: int):
@@ -119,6 +120,7 @@ def addNewAppointment(conversationID, dateTime, userTimezone: str):
         )
 
         db.session.commit()
+        marketplace_helpers.sync()
         return Callback(True, 'Appointment added successfully.')
 
     except Exception as exc:
@@ -153,17 +155,47 @@ def verifyRequest(token):
         helpers.logError("appointment_services.verifyRequest(): " + str(exc))
         return Callback(False, "Could not gather appointment")
 
-
 def setAppointmentStatusPublic(token, appointmentID, status):
     try:
         verificationLink = helpers.verificationSigner.loads(token, salt='verify-appointment')
-        appointment = db.session.query(Appointment).filter(Appointment.ID == appointmentID).first()
+        appointment = db.session.query(Appointment).join(Appointment.Conversation)\
+                                            .join(Conversation.Assistant)\
+                                            .join(Assistant.Company)\
+                                            .filter(Appointment.ID == appointmentID).first()
+        logoPath = helpers.keyFromStoredFile(appointment.Conversation.Assistant.Company.StoredFile, enums.FileAssetType.Logo).AbsFilePath
+
+        company: Company = appointment.Conversation.Assistant.Company
+        
         if appointment.Status != enums.Status.Pending:
-            return Callback(False, "Appointment status is {} and cannot be modified.".format(appointment.Status.value))
-        appointment.Status = status
+            return Callback(False, "Appointment status is {} and cannot be modified.".format(appointment.Status.value)) 
+
+        appointment.Status = enums.Status[status]
+
+        if status == enums.Status.Rejected.name:
+            db.session.delete(appointment)
+
+        db.session.commit()
+        marketplace_helpers.sync(company.ID)
+
+        # When appointment is accepted
+        if status == enums.Status.Accepted.name and appointment.Conversation.Email:
+            email_callback: Callback = mail_services.sendAppointmentConfirmationEmail(
+                appointment.Conversation.Name,
+                appointment.Conversation.Email,
+                utc.localize(appointment.DateTime).astimezone(timezone(appointment.UserTimeZone)),
+                appointment.UserTimeZone,
+                company.Name,
+                logoPath
+            )
+            if not email_callback.Success:
+                  email_callback
+            return Callback(True, "The client has been informed about their application being {}.".format(appointment.Status.value))
+
+        # When appointment is rejected
+
+
         db.session.commit()
         return Callback(True, "Appointment status has been set to {}.".format(appointment.Status.value))
-
         # TODO send confirmation email when appointment Accepted
 
     except Exception as exc:
@@ -194,6 +226,14 @@ def setAppointmentStatus(req, companyID: int) -> Callback:
 
 
         appointment.Status = resp['inputs']['status']
+
+        if resp['inputs']['status'] == enums.Status.Rejected.name:
+            db.session.delete(appointment)
+            
+        db.session.commit()        
+        marketplace_helpers.sync(company.ID)
+
+
         # When appointment is accepted
         if resp['inputs']['status'] == enums.Status.Accepted.name and appointment.Conversation.Email:
             email_callback: Callback = mail_services.sendAppointmentConfirmationEmail(
@@ -209,9 +249,7 @@ def setAppointmentStatus(req, companyID: int) -> Callback:
             return Callback(True, "The client has been informed about their application being {}.".format(appointment.Status.value))
 
         # When appointment is rejected
-        if resp['inputs']['status'] == enums.Status.Rejected.name:
-            db.session.delete(appointment)
-            return Callback(True, "Appointment status has been set to rejected.")
+
 
         
         db.session.commit()

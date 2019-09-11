@@ -12,6 +12,18 @@
     "desc": "Massive Tennis fan, RDLC Pirate ☠️ , 22 years of Recruitment experience"
   },
   {
+    "name": "Jan-Paul Boos",
+    "title": "Board Advisor",
+    "img": "/static/images/home/team/jan.jpg",
+    "desc": ""
+  },
+  {
+    "name": "Gareth Morris",
+    "title": "Board Advisor",
+    "img": "/static/images/home/team/gareth-morris.jpg",
+    "desc": ""
+  },
+  {
     "name": "Faisal Juladan",
     "title": "CTO",
     "img": "/static/images/home/team/faisal.jpeg",
@@ -56,12 +68,6 @@
     "title": "AI Researcher",
     "img": "/static/images/home/team/saber.svg",
     "desc": "Gets the most amount of work done with the least amount of effort... probably using AI. Ph.D., University of Tehran"
-  },
-  {
-    "name": "Gareth Morris",
-    "title": "Advisor",
-    "img": "/static/images/home/team/gareth-morris.jpg",
-    "desc": ""
   },
   {
     "name": "Henri Huws",

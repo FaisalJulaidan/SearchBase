@@ -100,7 +100,7 @@ def processConversation(conversation: Conversation, autoPilot: AutoPilot, assist
 
                     SMSBody = autoPilot.AcceptanceSMSBody \
                         .replace("${candidateName}$", userName) \
-                        .replace("${candidateEmail}$", email or "[Candidate.Email]") \
+                        .replace("${candidateEmail}$", email or "${candidateEmail}$") \
                         .replace("&nbsp;", "\n")
 
                     acceptance_SMS_callback: Callback = \
@@ -115,7 +115,7 @@ def processConversation(conversation: Conversation, autoPilot: AutoPilot, assist
 
                     SMSBody = autoPilot.RejectionSMSBody \
                         .replace("${candidateName}$", userName) \
-                        .replace("${candidateEmail}$", email or "[Candidate.Email]") \
+                        .replace("${candidateEmail}$", email or "${candidateEmail}$") \
                         .replace("&nbsp;", "\n")
 
                     rejection_SMS_callback: Callback = \
@@ -150,10 +150,10 @@ def create(name, desc, companyID: int) -> Callback:
                               Description=desc,
                               CompanyID=companyID,
                               AcceptanceEmailTitle="Acceptance Letter",
-                              AcceptanceEmailBody="<h2>Hello ${candidateName},</h2><p>We are happy to announce that your application has been accepted based on your responses and we will get back to you very soon.</p><p>Regards,</p>",
+                              AcceptanceEmailBody="<h2>Hello ${candidateName}$,</h2><p>We are happy to announce that your application has been accepted based on your responses and we will get back to you very soon.</p><p>Regards,</p>",
                               AcceptanceSMSBody="Hello ${candidateName}$,\n\nWe are happy to announce that your application has been accepted based on your responses and we will get back to you very soon.\n\nRegard,",
                               RejectionEmailTitle="Rejection Letter",
-                              RejectionEmailBody="<h2>Hello ${candidateName},</h2><p>Unfortunately, we are very sorry to announce that your application has been rejected based on your responses.<br><br>Please feel free to visit our website and explore other opportunities that you feel may be better suited.<br>&nbsp;</p><p>Regards,</p>",
+                              RejectionEmailBody="<h2>Hello ${candidateName}$,</h2><p>Unfortunately, we are very sorry to announce that your application has been rejected based on your responses.<br><br>Please feel free to visit our website and explore other opportunities that you feel may be better suited.<br>&nbsp;</p><p>Regards,</p>",
                               RejectionSMSBody="Hello ${candidateName}$,\n\nUnfortunately, we are very sorry to announce that your application has been rejected based on your responses.Please feel free to visit our website and explore other opportunities that you feel may be better suited.\n\nRegards,",
                               )
         db.session.add(autoPilot)

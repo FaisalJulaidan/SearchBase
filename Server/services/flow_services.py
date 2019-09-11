@@ -3,9 +3,11 @@ import os
 from flask import request
 from jsonschema import validate
 
-from models import db, Callback, Assistant, Company
+from sqlalchemy.orm import joinedload
+from models import db, Callback, Assistant
 from services import options_services
 from utilities import json_schemas, helpers, enums
+import json
 
 
 # ----- Getters ----- #
@@ -16,12 +18,8 @@ def getChatbot(assistantHashID) -> Callback:
         if not assistantID:
             return Callback(False, "Assistant not found!", None)
 
-        assistant: Assistant = db.session.query(Assistant.Name, Assistant.Flow, Assistant.Message, Assistant.TopBarText,
-                                                Assistant.SecondsUntilPopup, Assistant.Active, Assistant.Config,
-                                                Company.HideSignature,
-                                                Company.Name.label("CompanyName"), Company.LogoPath.label("LogoPath")) \
-            .join(Company)\
-            .filter(Assistant.ID == assistantID[0]).first()
+        assistant: Assistant = db.session.query(Assistant).options(joinedload("Company").joinedload("StoredFile").joinedload("StoredFileInfo"))\
+                                     .filter(Assistant.ID == assistantID[0]).first()
 
         if not assistant:
             return Callback(False, '')
@@ -42,10 +40,16 @@ def getChatbot(assistantHashID) -> Callback:
             helpers.logError("flow_service.getChatbot() geoIP restrict countries: " + str(exc))
             pass
 
+        assistantDict = helpers.getDictFromSQLAlchemyObj(assistant)
+
+        # Get assistant logo if null then override it with company logo
+        logoPath = helpers.keyFromStoredFile(assistant.StoredFile, enums.FileAssetType.Logo).AbsFilePath
+        if not logoPath:
+            logoPath = helpers.keyFromStoredFile(assistant.Company.StoredFile, enums.FileAssetType.Logo).AbsFilePath
+        assistantDict['LogoPath'] = logoPath
+
         data = {
-            "assistant": helpers.getDictFromLimitedQuery(['Name', 'Flow', 'Message', 'TopBarText', 'SecondsUntilPopup',
-                                                          'Active', 'Config', 'HideSignature', 'CompanyName',
-                                                          'LogoPath'], assistant),
+            "assistant": assistantDict,
             "isDisabled": False,
             "currencies": options_services.getOptions().Data['databases']['currencyCodes']
         }
@@ -127,7 +131,6 @@ def isValidBlock(block: dict, blockType: str):
 
 
 # This function will be used to replace all enum.name to enums.value
-# flow is passed by reference so no need to return  a new one
 def parseFlow(flow: dict):
     try:
         for group in flow['groups']:

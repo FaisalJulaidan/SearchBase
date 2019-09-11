@@ -1,10 +1,10 @@
 from datetime import datetime
 
-from models import db, Callback, Conversation, AutoPilot, Assistant, Messenger
+from models import db, Callback, Conversation, AutoPilot, Assistant, Messenger, Company
 from services import mail_services, stored_file_services as sfs
 from services.Marketplace.Messenger import messenger_servicess
 from sqlalchemy import and_
-from utilities import helpers
+from utilities import helpers, enums
 from utilities.enums import UserType, Status
 
 
@@ -26,33 +26,14 @@ def processConversation(conversation: Conversation, autoPilot: AutoPilot, assist
             phone = conversation.PhoneNumber
 
             def __processSendingEmails(email, status: Status, autoPilot: AutoPilot):
-
+                company: Company = autoPilot.Company
+                companyName = company.Name
                 userName = conversation.Name or 'Anonymous'
-                logoPath = autoPilot.Company.LogoPath
-                if logoPath:
-                    logoPath = sfs.PUBLIC_URL \
-                               + sfs.UPLOAD_FOLDER + sfs.COMPANY_LOGOS_PATH \
-                               + "/" + logoPath
+                logoPath = helpers.keyFromStoredFile(company.StoredFile, enums.FileAssetType.Logo).AbsFilePath
 
-                companyName = autoPilot.Company.Name
                 # ======================
                 # Send Acceptance Letters
                 if status is Status.Accepted:
-
-                    if autoPilot.SendAcceptanceEmail:
-                        # Process candidates Acceptance email
-                        emailTitle = autoPilot.AcceptanceEmailTitle \
-                            .replace("${candidateName}$", userName) \
-                            .replace("${candidateEmail}$", email)
-                        emailBody = autoPilot.AcceptanceEmailBody \
-                            .replace("${candidateName}$", userName) \
-                            .replace("${candidateEmail}$", email)
-
-                        acceptance_email_callback: Callback = \
-                            mail_services.sendAcceptanceEmail(emailTitle, emailBody, userName, email, logoPath, companyName)
-
-                        if acceptance_email_callback.Success:
-                            result['acceptanceEmailSentAt'] = datetime.now()
 
                     # Process candidates Appointment email only if score is accepted
                     if autoPilot.SendCandidatesAppointments:
@@ -69,6 +50,22 @@ def processConversation(conversation: Conversation, autoPilot: AutoPilot, assist
 
                         if appointments_email_callback.Success:
                             result['appointmentEmailSentAt'] = datetime.now()
+
+                    elif autoPilot.SendAcceptanceEmail:
+                        # Process candidates Acceptance email
+                        emailTitle = autoPilot.AcceptanceEmailTitle \
+                            .replace("${candidateName}$", userName) \
+                            .replace("${candidateEmail}$", email)
+                        emailBody = autoPilot.AcceptanceEmailBody \
+                            .replace("${candidateName}$", userName) \
+                            .replace("${candidateEmail}$", email)
+
+                        acceptance_email_callback: Callback = \
+                            mail_services.sendAcceptanceEmail(emailTitle, emailBody, userName, email, logoPath, companyName)
+
+                        if acceptance_email_callback.Success:
+                            result['acceptanceEmailSentAt'] = datetime.now()
+
 
                 # ======================
                 # Send Rejection Letters

@@ -172,6 +172,7 @@ def setAppointmentStatusPublic(token, appointmentID, status):
 def setAppointmentStatus(appointmentID, name, email, phone, status, companyID) -> Callback:
     try:
         company: Company = company_services.getByID(companyID).Data
+        logoPath = helpers.keyFromStoredFile(company.StoredFile, enums.FileAssetType.Logo).AbsFilePath
         if not company: raise Exception("Company does not exist")
 
         appointment = db.session.query(Appointment).filter(Appointment.ID == appointmentID).first()
@@ -189,7 +190,7 @@ def setAppointmentStatus(appointmentID, name, email, phone, status, companyID) -
                 utc.localize(appointment.DateTime).astimezone(timezone(appointment.UserTimeZone)),
                 appointment.UserTimeZone,
                 company.Name,
-                company.LogoPath
+                logoPath
             )
             if not email_callback.Success:
                 return email_callback

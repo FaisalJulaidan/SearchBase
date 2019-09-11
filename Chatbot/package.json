@@ -86,6 +86,7 @@
     "ts-pnp": "1.1.2",
     "uninstall": "0.0.0",
     "url-loader": "1.1.2",
+    "uuid": "^3.3.3",
     "webfontloader": "^1.6.28",
     "webpack": "4.29.6",
     "webpack-dev-server": "3.2.1",

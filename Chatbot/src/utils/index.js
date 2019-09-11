@@ -1,4 +1,6 @@
 import * as constants from '../constants/Constants';
+import uuid from 'uuid/v4';
+
 
 const isReady = (chatbot) => {
     return !chatbot.status.loading && !chatbot.status.finished;
@@ -61,6 +63,7 @@ const delayMessageLength = (message) => {
 
 };
 
+export const genUniqueFileName = (file) => uuid() + "." + file.name.split('.').splice(-1)[0];
 
 export { isReady, getServerDomain, optionalDelayExecution, createBlock, delayMessageLength, getLink };
 

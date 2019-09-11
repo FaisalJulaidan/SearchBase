@@ -22,7 +22,8 @@ conversation = {
                 "questionText": {"type": "string"},
                 "dataType": {"enum": [e.value['name'] for e in enums.DataType]},
                 "input": {"type": "string"},
-                "keywords": {"type": "array", "items": {"type": "string"}}
+                "keywords": {"type": "array", "items": {"type": "string"}},
+                "fileName": {"type": "string"}, # not required
             },
             "required": ["blockID", "questionText", "dataType", "input", "keywords"],
             "additionalProperties": False

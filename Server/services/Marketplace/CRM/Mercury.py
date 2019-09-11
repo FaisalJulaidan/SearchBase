@@ -5,7 +5,7 @@ import os
 import requests
 from sqlalchemy_utils import Currency
 
-from models import Callback, Conversation, StoredFile
+from models import Callback, Conversation, StoredFileInfo
 from services import stored_file_services, databases_services
 from services.Marketplace import marketplace_helpers
 from services.Marketplace.CRM import crm_services
@@ -192,14 +192,14 @@ def insertCandidate(auth, data, companyID) -> Callback:
         return Callback(False, str(exc))
 
 
-def uploadFile(auth, storedFile: StoredFile):  # TODO
+def uploadFile(auth, storedFileInfo: StoredFileInfo):  # TODO
     try:
-        conversation = storedFile.Conversation
+        conversation = storedFileInfo.Conversation
 
         if not conversation.CRMResponse:
             raise Exception("Can't upload file for record with no CRM Response")
 
-        file_callback = stored_file_services.downloadFile(storedFile.FilePath, stored_file_services.USER_FILES_PATH)
+        file_callback = stored_file_services.downloadFile(storedFileInfo.AbsFilePath)
         if not file_callback.Success:
             raise Exception(file_callback.Message)
         file = file_callback.Data
@@ -207,9 +207,9 @@ def uploadFile(auth, storedFile: StoredFile):  # TODO
         file_content = base64.b64encode(file_content).decode('ascii')
 
         body = {
-            "externalID": storedFile.ID,
+            "externalID": storedFileInfo.ID,
             "fileType": "SAMPLE",
-            "name": "TSB_" + storedFile.FilePath,
+            "name": "TSB_" + storedFileInfo.FilePath,
             "fileContent": file_content
         }
 

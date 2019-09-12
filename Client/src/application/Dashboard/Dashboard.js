@@ -180,9 +180,9 @@ class Dashboard extends Component {
                         </Menu.Item>: null }
 
                         {company.AccessCampaigns ?
-                        <Menu.Item key="campaign">
+                        <Menu.Item key="campaigns">
                             <Icon type="rocket"/>
-                            <span>Campaign</span>
+                            <span>Campaigns</span>
                         </Menu.Item> : null }
                         {company.AccessAutoPilot ?
                         <Menu.Item  key="auto_pilots">

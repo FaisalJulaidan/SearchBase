@@ -50,7 +50,7 @@ COPY Server/Pipfile .
 #COPY Server/Pipfile.lock .
 # Install pipenv to install dependecies
 RUN pip install pipenv
-RUN pip lock
+RUN pipenv lock
 RUN pipenv install --system --deploy --ignore-pipfile
 
 # Copy (host) Server and paste in (container) Server directory

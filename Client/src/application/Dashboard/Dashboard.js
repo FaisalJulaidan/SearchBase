@@ -179,7 +179,7 @@ class Dashboard extends Component {
                             <span>Assistants</span>
                         </Menu.Item>: null }
 
-                        {!company.AccessCampaigns ?
+                        {company.AccessCampaigns ?
                         <Menu.Item key="campaign">
                             <Icon type="rocket"/>
                             <span>Campaign</span>

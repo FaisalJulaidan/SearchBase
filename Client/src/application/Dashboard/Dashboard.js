@@ -173,31 +173,32 @@ class Dashboard extends Component {
                             <Icon type="home"/>
                             <span>Home</span>
                         </Menu.Item>
-
-                        <Menu.Item disabled={!company.AccessAssistants} key="assistants">
+                        {company.AccessAssistants ?
+                        <Menu.Item key="assistants">
                             <Icon type="robot"/>
                             <span>Assistants</span>
-                        </Menu.Item>
+                        </Menu.Item>: null }
 
-                        <Menu.Item disabled={!company.AccessCampaigns} key="campaigns">
+                        {!company.AccessCampaigns ?
+                        <Menu.Item key="campaign">
                             <Icon type="rocket"/>
-                            <span>Campaigns</span>
-                        </Menu.Item>
-
-                        <Menu.Item disabled={!company.AccessAutoPilot} key="auto_pilots">
+                            <span>Campaign</span>
+                        </Menu.Item> : null }
+                        {company.AccessAutoPilot ?
+                        <Menu.Item  key="auto_pilots">
                             <Icon type="clock-circle"/>
                             <span>Auto Pilot</span>
-                        </Menu.Item>
-
-                        <Menu.Item disabled={!company.AccessDatabases} key="databases">
+                        </Menu.Item> : null }
+                        {company.AccessDatabases ?
+                        <Menu.Item key="databases">
                             <Icon type="database"/>
                             <span>Database</span>
-                        </Menu.Item>
-
-                        <Menu.Item disabled={!company.AccessAppointments} key="appointments">
+                        </Menu.Item> : null }
+                        {company.AccessAppointments ?
+                        <Menu.Item key="appointments">
                             <Icon type="calendar"/>
                             <span>Appointments (beta)</span>
-                        </Menu.Item>
+                        </Menu.Item> : null }
 
                         <Menu.Item key="marketplace">
                             <Icon type="interation"/>

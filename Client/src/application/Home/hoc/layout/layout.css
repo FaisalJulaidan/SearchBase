@@ -57,6 +57,7 @@ table {
 }
 
 #content-wrap {
+    background: white;
     padding-bottom: 1rem; /* Footer height */
 }
 

@@ -1,6 +1,9 @@
 from models import db, MagicJSON
+from schemas.Webhook import owners_table
 from .Appointment import Appointment
 from .Conversation import Conversation
+
+
 class Assistant(db.Model):
 
     @property
@@ -44,6 +47,8 @@ class Assistant(db.Model):
     Conversations = db.relationship('Conversation', back_populates='Assistant')
 
     Campaigns = db.relationship('Campaign', back_populates='Assistant')
+
+    Users = db.relationship("Parent", secondary=owners_table, back_populates="Assistants")
 
     # Constraints:
     # cannot have two assistants with the same name under one company

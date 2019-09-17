@@ -188,8 +188,10 @@ UserType = {
                 "properties": {
                     "text": {"type": "string"},
                     "value": {"enum": [ut.value for ut in enums.UserType]},
+                    "blockToGoID": {"type": ["string", "null"]},
+                    "action": {"enum": [e.value for e in enums.BlockAction]},
                 },
-                "required": ["text", "value"],
+                "required": ["text", "value", "blockToGoID", "action"],
                 "additionalProperties": False
             }
         }
@@ -209,8 +211,10 @@ JobType = {
                 "properties": {
                     "text": {"type": "string"},
                     "value": {"enum": [jt.value for jt in enums.JobType]},
+                    "blockToGoID": {"type": ["string", "null"]},
+                    "action": {"enum": [e.value for e in enums.BlockAction]},
                 },
-                "required": ["text", "value"],
+                "required": ["text", "value", "blockToGoID", "action"],
                 "additionalProperties": False
             }
         }

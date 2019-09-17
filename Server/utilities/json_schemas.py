@@ -173,7 +173,7 @@ SalaryPicker = {
         "action": {"enum": [e.value for e in enums.BlockAction]},
         "afterMessage": {"type": "string"},
     },
-    "required": ["text", "min", "max", "period", "defaultCurrency", "action", "afterMessage", "blockToGoID"],
+    "required": ["text", "min", "max", "period", "defaultCurrency", "action", "blockToGoID", "afterMessage", ],
     "additionalProperties": False
 }
 
@@ -190,8 +190,9 @@ UserType = {
                     "value": {"enum": [ut.value for ut in enums.UserType]},
                     "blockToGoID": {"type": ["string", "null"]},
                     "action": {"enum": [e.value for e in enums.BlockAction]},
+                    "afterMessage": {"type": "string"},
                 },
-                "required": ["text", "value", "blockToGoID", "action"],
+                "required": ["text", "value", "blockToGoID", "action", "afterMessage"],
                 "additionalProperties": False
             }
         }
@@ -213,8 +214,9 @@ JobType = {
                     "value": {"enum": [jt.value for jt in enums.JobType]},
                     "blockToGoID": {"type": ["string", "null"]},
                     "action": {"enum": [e.value for e in enums.BlockAction]},
+                    "afterMessage": {"type": "string"},
                 },
-                "required": ["text", "value", "blockToGoID", "action"],
+                "required": ["text", "value", "blockToGoID", "action", "afterMessage"],
                 "additionalProperties": False
             }
         }
@@ -232,6 +234,6 @@ DatePicker = {
         "action": {"enum": [e.value for e in enums.BlockAction]},
         "afterMessage": {"type": "string"},
     },
-    "required": ["text", "action", "afterMessage", "blockToGoID"],
+    "required": ["text", "action", "blockToGoID", "afterMessage"],
     "additionalProperties": False
 }

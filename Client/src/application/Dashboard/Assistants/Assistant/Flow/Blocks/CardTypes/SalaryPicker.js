@@ -44,7 +44,7 @@ class SalaryPicker extends Component {
                     SkipAction: values.SkipAction || 'End Chat',
                     SkipBlockToGoID: values.skipBlockToGoID || values.skipBlockToGoIDGroup || null,
 
-                    DataType: flowOptions.dataTypes.find((dataType) => dataType.name === 'No Type'),
+                    DataType: flowOptions.dataTypes.find(dataType => dataType.name === "Job Salary"),
                     Content: {
                         text: values.text,
                         min: +values.minSalary,

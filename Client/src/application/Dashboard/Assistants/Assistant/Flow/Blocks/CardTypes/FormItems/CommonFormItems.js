@@ -75,11 +75,11 @@ export const StoreInDBFormItem = ({ FormItem, layout, getFieldDecorator, block, 
     </FormItem>
 );
 
-export const AfterMessageFormItem = ({ FormItem, layout, getFieldDecorator, block }) => (
+export const AfterMessageFormItem = ({ FormItem, layout, getFieldDecorator, block, fieldName }) => (
     <FormItem label="After message"
               extra="This message will display straight after the user's response"
               {...layout}>
-        {getFieldDecorator('afterMessage', {
+        {getFieldDecorator(fieldName || 'afterMessage', {
             initialValue: block.Content.afterMessage ? block.Content.afterMessage : undefined,
             rules: [{
                 required: false,
@@ -91,11 +91,11 @@ export const AfterMessageFormItem = ({ FormItem, layout, getFieldDecorator, bloc
     </FormItem>
 );
 
-export const ActionFormItem = ({ FormItem, layout, getFieldDecorator, setStateHandler, blockOptions, block }) => (
+export const ActionFormItem = ({ FormItem, layout, getFieldDecorator, setStateHandler, blockOptions, block, fieldName }) => (
     <FormItem label="Action" {...layout}>
         {
             blockOptions.actions ?
-                getFieldDecorator('action', {
+                getFieldDecorator(fieldName || 'action', {
                     initialValue: block.Content.action ? block.Content.action : undefined,
                     rules: [{
                         required: true,
@@ -113,14 +113,14 @@ export const ActionFormItem = ({ FormItem, layout, getFieldDecorator, setStateHa
     </FormItem>
 );
 
-export const ShowGoToBlockFormItem = ({ FormItem, layout, getFieldDecorator, allBlocks, showGoToBlock, block }) => {
+export const ShowGoToBlockFormItem = ({ FormItem, layout, getFieldDecorator, allBlocks, showGoToBlock, block, fieldName }) => {
     let currentBlock = block;
     return (
         showGoToBlock ?
             (
                 <FormItem label="Go To Specific Block" {...layout}>
                     {
-                        getFieldDecorator('blockToGoID',
+                        getFieldDecorator(fieldName || 'blockToGoID',
                             {
                                 initialValue: currentBlock.Content.blockToGoID ? currentBlock.Content.blockToGoID : undefined,
                                 rules: [{ required: true, message: 'Please select your next block' }]
@@ -141,7 +141,7 @@ export const ShowGoToBlockFormItem = ({ FormItem, layout, getFieldDecorator, all
     );
 };
 
-export const ShowGoToGroupFormItem = ({ FormItem, layout, getFieldDecorator, block, currentGroup, allGroups, showGoToGroup }) => {
+export const ShowGoToGroupFormItem = ({ FormItem, layout, getFieldDecorator, block, currentGroup, allGroups, showGoToGroup, fieldName }) => {
     allGroups = allGroups.filter(group => group.id !== currentGroup.id);
     const selectedGroup = allGroups.find(group => !!group.blocks.find(groupBlock => block.Content?.blockToGoID === groupBlock.ID));
 
@@ -152,7 +152,7 @@ export const ShowGoToGroupFormItem = ({ FormItem, layout, getFieldDecorator, blo
                           extra="The selected group will start from its first block"
                           {...layout}>
                     {
-                        getFieldDecorator('blockToGoIDGroup',
+                        getFieldDecorator(fieldName || 'blockToGoIDGroup',
                             {
                                 initialValue: block && selectedGroup ? selectedGroup.blocks[0].ID : undefined,
                                 rules: [{ required: true, message: 'Please select your next group' }]

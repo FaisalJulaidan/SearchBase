@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Card, Checkbox, Divider, Form, Input, Select, Spin } from 'antd';
+import { Card, Checkbox, Divider, Form, Input, Select } from 'antd';
 
 import { getInitialVariables, initActionType, initActionTypeSkip } from './CardTypesHelpers';
 import {
@@ -15,7 +15,7 @@ import {
     SkippableFormItem,
     SkipTextFormItem
 } from './FormItems';
-import styles from "../Blocks.module.less";
+import styles from '../Blocks.module.less';
 
 const FormItem = Form.Item;
 const Option = Select.Option;
@@ -29,20 +29,45 @@ class JobType extends Component {
 
     onSubmit = () => this.props.form.validateFields((err, values) => {
         if (!err) {
+
+            const flowOptions = this.props.options.flow;
+
+            // prepare the objects to be sent to the server
+            const jobTypesState = { ...this.state.jobTypesState };
+            Object.keys(jobTypesState).map(key => {
+                if (!jobTypesState[key].checked)
+                    delete jobTypesState[key];
+            });
+            const types = [];
+            Object.keys(jobTypesState).map(key => {
+                delete jobTypesState[key].checked;
+
+                jobTypesState[key] = {
+                    ...jobTypesState[key],
+                    blockToGoID: values[`${key}_blockToGoID`] || values[`${key}_blockToGoIDGroup`] || null,
+                    action: values[`${key}_action`],
+                    afterMessage: values[`${key}_afterMessage`] || ''
+                };
+
+                types.push({ ...jobTypesState[key] });
+            });
+
+            console.log(types);
+
             let options = {
                 Type: 'Job Type',
                 StoreInDB: false,
+
+                DataType: flowOptions.dataTypes.find((dataType) => dataType.name === 'Job Salary'),
 
                 Skippable: values.isSkippable || false,
                 SkipText: values.SkipText || 'Skip!',
                 SkipAction: values.SkipAction || 'End Chat',
                 SkipBlockToGoID: values.skipBlockToGoID || values.skipBlockToGoIDGroup || null,
 
-                DataType: 'JobType',
                 Content: {
                     text: values.text,
-                    action: values.action,
-                    blockToGoID: values.blockToGoID || values.blockToGoIDGroup || null
+                    types
                 }
             };
             console.log(options);
@@ -65,6 +90,18 @@ class JobType extends Component {
             ...initActionTypeSkip(block, this.props.modalState.allGroups),
             showSkip: block.Skippable || false,
             tags: block.Content.keywords || []
+        }, () => {
+            const { blockOptions } = getInitialVariables(options.flow, modalState, 'Job Type');
+            const jobTypesState = {};
+            for (const type of blockOptions.types) {
+                jobTypesState[type] = {
+                    checked: false,
+                    value: type,
+                    text: undefined,
+                    score: undefined
+                };
+            }
+            this.setState({ jobTypesState });
         });
     }
 
@@ -80,7 +117,7 @@ class JobType extends Component {
         const { blockOptions, block } = getInitialVariables(options.flow, modalState, 'Job Type');
         const { allGroups, allBlocks, currentGroup, layout } = modalState;
         const { getFieldDecorator } = form;
-        const { showSkip } = this.state;
+        const { showSkip, jobTypesState } = this.state;
 
         const buttons = ButtonsForm(handleNewBlock, handleEditBlock, handleDeleteBlock, this.onSubmit, block);
 
@@ -94,63 +131,109 @@ class JobType extends Component {
                                       layout={layout}
                                       placeholder="Ex: What is your job?"/>
 
-
+                    <div className={styles.PredefinedValues}>
+                        <h4>Job Types:</h4>
+                    </div>
                     {
                         blockOptions.types.map(
                             (type, i) =>
-                                <div className={styles.PredefinedValues} key={i}>
-                                    <Checkbox className={styles.CheckBox}>{type}</Checkbox>
-                                    <Input value={type} disabled className={styles.Input}/>
-                                    <Input placeholder={'Score'} className={styles.Input}/>
+                                <div key={i}>
+                                    <div className={styles.PredefinedValues}>
+                                        <Checkbox className={styles.CheckBox}
+                                                  onChange={e => {
+                                                      this.setState(state => {
+                                                          state.jobTypesState[type].checked = e.target.checked;
+                                                          return state;
+                                                      });
+                                                  }}>
+                                            {type}
+                                        </Checkbox>
+
+                                        <Input disabled={jobTypesState && !jobTypesState[type].checked}
+                                               onChange={e => {
+                                                   const val = e.target.value;
+                                                   this.setState(state => {
+                                                       state.jobTypesState[type].text = val;
+                                                       return state;
+                                                   });
+                                               }}
+                                               style={{ width: 100, margin: '0 10px' }} placeholder={'Text'}/>
+
+                                        <Select disabled={jobTypesState && !jobTypesState[type].checked}
+                                                placeholder="Select score weight"
+                                                onChange={value => this.setState(state => state.jobTypesState[type].score = value)}
+                                                className={styles.Input}>
+                                            <Option value={5}>5</Option>
+                                            <Option value={4}>4</Option>
+                                            <Option value={3}>3</Option>
+                                            <Option value={2}>2</Option>
+                                            <Option value={1}>1</Option>
+                                            <Option value={-999}>Disqualify Immediately</Option>
+                                        </Select>
+                                    </div>
+
+                                    {jobTypesState && jobTypesState[type].checked &&
+
+                                    <div>
+                                        <ActionFormItem FormItem={FormItem}
+                                                        blockOptions={blockOptions}
+                                                        block={{
+                                                            Content: {
+                                                                ID: block.ID,
+                                                                action: this.state.editedAnswer?.action
+                                                            }
+                                                        }}
+                                                        setStateHandler={(state) => this.setState(state)}
+                                                        getFieldDecorator={getFieldDecorator}
+                                                        layout={layout}
+                                                        fieldName={`${type}_action`}/>
+
+                                        <ShowGoToBlockFormItem FormItem={FormItem}
+                                                               block={{
+                                                                   ID: block.ID,
+                                                                   Content: {
+                                                                       blockToGoID: this.state.editedAnswer?.blockToGoID
+                                                                   }
+                                                               }}
+                                                               allBlocks={allBlocks}
+                                                               showGoToBlock={this.state.showGoToBlock}
+                                                               getFieldDecorator={getFieldDecorator}
+                                                               layout={layout}
+                                                               fieldName={`${type}_blockToGoID`}/>
+
+                                        <ShowGoToGroupFormItem FormItem={FormItem}
+                                                               block={{
+                                                                   ID: block.ID,
+                                                                   Content: {
+                                                                       blockToGoID: this.state.editedAnswer?.blockToGoID
+                                                                   }
+                                                               }}
+                                                               allGroups={allGroups}
+                                                               currentGroup={currentGroup}
+                                                               showGoToGroup={this.state.showGoToGroup}
+                                                               getFieldDecorator={getFieldDecorator}
+                                                               layout={layout}
+                                                               fieldName={`${type}_blockToGoIDGroup`}/>
+
+                                        <AfterMessageFormItem FormItem={FormItem}
+                                                              block={{
+                                                                  ID: block.ID,
+                                                                  Content: {
+                                                                      afterMessage: this.state.editedAnswer?.afterMessage
+                                                                  }
+                                                              }}
+                                                              getFieldDecorator={getFieldDecorator}
+                                                              layout={layout}
+                                                              fieldName={`${type}_afterMessage`}/>
+                                    </div>
+
+                                    }
+
+                                    <Divider/>
+
                                 </div>
                         )
                     }
-
-                    <FormItem label="Available Types"
-                              extra="123"
-                              {...layout}>
-                        {
-                            blockOptions.types?.length > 0 ?
-                                getFieldDecorator('availableTypes', {
-                                    initialValue: block.Content.availableTypes ? block.Content.availableTypes : undefined,
-                                    rules: [{
-                                        required: true,
-                                        message: 'Please input a question'
-                                    }]
-                                })(
-                                    <Select placeholder="Select one of the available types">
-                                        {
-                                            blockOptions.types.map((type, i) => <Option key={i}
-                                                                                        value={type}>{type}</Option>)
-                                        }
-                                    </Select>
-                                )
-                                : <Spin><Select placeholder="Select one of the available types"></Select></Spin>
-                        }
-                    </FormItem>
-
-                    <AfterMessageFormItem FormItem={FormItem} block={block}
-                                          getFieldDecorator={getFieldDecorator}
-                                          layout={layout}/>
-
-                    <ActionFormItem FormItem={FormItem} blockOptions={blockOptions} block={block}
-                                    setStateHandler={(state) => this.setState(state)}
-                                    getFieldDecorator={getFieldDecorator}
-                                    layout={layout}/>
-
-
-                    <ShowGoToBlockFormItem FormItem={FormItem} allBlocks={allBlocks} block={block}
-                                           showGoToBlock={this.state.showGoToBlock}
-                                           getFieldDecorator={getFieldDecorator}
-                                           layout={layout}/>
-
-                    <ShowGoToGroupFormItem FormItem={FormItem}
-                                           block={block}
-                                           allGroups={allGroups}
-                                           currentGroup={currentGroup}
-                                           showGoToGroup={this.state.showGoToGroup}
-                                           getFieldDecorator={getFieldDecorator}
-                                           layout={layout}/>
 
                     <SkippableFormItem FormItem={FormItem} block={block}
                                        setStateHandler={(state) => this.setState(state)}

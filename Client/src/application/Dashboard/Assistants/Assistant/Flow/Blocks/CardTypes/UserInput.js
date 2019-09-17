@@ -1,6 +1,6 @@
-import React, {Component} from 'react';
-import {Card, Divider, Form, Icon, Input, Tag, Tooltip} from "antd";
-import {getInitialVariables, initActionType, initActionTypeSkip} from './CardTypesHelpers'
+import React, { Component } from 'react';
+import { Card, Divider, Form, Icon, Input, Tag, Tooltip } from 'antd';
+import { getInitialVariables, initActionType, initActionTypeSkip } from './CardTypesHelpers';
 import {
     ActionFormItem,
     AfterMessageFormItem,
@@ -15,7 +15,7 @@ import {
     SkippableFormItem,
     SkipTextFormItem,
     StoreInDBFormItem
-} from './FormItems'
+} from './FormItems';
 
 const FormItem = Form.Item;
 
@@ -35,8 +35,8 @@ class UserInput extends Component {
     };
 
     componentDidMount() {
-        const {modalState, options} = this.props;
-        const {block} = getInitialVariables(options.flow, modalState);
+        const { modalState, options } = this.props;
+        const { block } = getInitialVariables(options.flow, modalState);
         this.setState({
             ...initActionType(block, this.props.modalState.allGroups),
             ...initActionTypeSkip(block, this.props.modalState.allGroups),

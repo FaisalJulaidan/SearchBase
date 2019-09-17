@@ -8,6 +8,41 @@ export class MinMaxSalaryFormItem extends Component {
         errorMsg: ''
     };
 
+    componentDidMount() {
+        this.props.onRef(this);
+
+        this.props.form.setFieldsValue({
+            minSalary: this.props.block.Content.min || undefined,
+            maxSalary: this.props.block.Content.max || undefined
+        });
+        this.props.form.validateFields(['minSalary', 'maxSalary'], (err, val) => {
+            console.log(err, val);
+        });
+    }
+
+    componentWillUnmount() {
+        this.props.onRef(undefined);
+    }
+
+    checkFields = () => new Promise(res => {
+        this.props.form.validateFields(['minSalary', 'maxSalary'], (err, val) => {
+            if (val.minSalary === undefined || !val.maxSalary === undefined)
+                this.setState({
+                    minMaxValidateStatus: 'error',
+                    errorMsg: 'Fields are required!'
+                }, () => res(false));
+            else if (!val.minSalary || !val.maxSalary) {
+                // sometime there are an error can be happended
+                // when we change the form fields couple of times
+                this.setState({
+                    minMaxValidateStatus: 'error',
+                    errorMsg: 'Re-enter  the fields'
+                }, () => res(false));
+            } else
+                return res(true);
+        });
+    });
+
     validateFields = (event, key) => {
         let maxSalary, minSalary;
         let value = maxSalary = minSalary = event.target.value;
@@ -70,9 +105,11 @@ export class MinMaxSalaryFormItem extends Component {
                 <FormItem validateStatus={this.state.minMaxValidateStatus}
                           label="Min - Max Salary"
                           help={this.state.errorMsg}
+                          extra="This will be converated to be shown in the chatbot as slider"
                           {...layout}>
                     <Input.Group compact>
                         <Input onChange={(num) => this.validateFields(num, 'minSalary')}
+                               defaultValue={this.props.block.Content.min || undefined}
                                style={{ width: 'calc(50% - 30px)', textAlign: 'center' }}
                                placeholder="Minimum"/>
                         <Input
@@ -87,6 +124,7 @@ export class MinMaxSalaryFormItem extends Component {
                         />
 
                         <Input onChange={(num) => this.validateFields(num, 'maxSalary')}
+                               defaultValue={this.props.block.Content.max || undefined}
                                style={{ width: 'calc(50% - 0px)', textAlign: 'center', borderLeft: 0 }}
                                placeholder="Maximum"/>
                     </Input.Group>

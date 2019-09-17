@@ -223,7 +223,7 @@ DatePicker = {
     "type": "object",
     "properties": {
         "text": {"type": "string"},
-        "type": {"enum": ["Range", "Specific"]},
+        "type": {"enum": ["Range", "Exact"]},
         "blockToGoID": {"type": ["string", "null"]},
         "action": {"enum": [e.value for e in enums.BlockAction]},
         "afterMessage": {"type": "string"},

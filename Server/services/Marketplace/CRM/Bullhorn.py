@@ -446,7 +446,9 @@ def searchCandidates(auth, companyID, data, fields=None) -> Callback:
 
         # check if no conditions submitted
         if len(query) < 6:
-            query = "query=*:*"
+            query = "query=status:Available"
+        else:
+            query += "&status:Available"
 
         # send query
         sendQuery_callback: Callback = sendQuery(auth, "search/Candidate", "get", {}, companyID,
@@ -506,7 +508,7 @@ def searchPerfectCandidates(auth, companyID, data, fields=None) -> Callback:
 
         # check if no conditions submitted
         if len(query) < 6:
-            query = "query=*:*"
+            query = "query=status:Available"
 
             # send query
             sendQuery_callback: Callback = sendQuery(auth, "search/Candidate", "get", {}, companyID,

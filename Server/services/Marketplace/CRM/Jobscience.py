@@ -39,6 +39,7 @@ def testConnection(auth, companyID):
         helpers.logError("Marketplace.CRM.Jobscience.testConnection() ERROR: " + str(exc))
         return Callback(False, str(exc))
 
+# NOTE: For production, we need to change the domain name (currently it is pointing to sandbox)
 
 def login(auth):
     try:
@@ -353,6 +354,18 @@ def searchCandidates(access_token, companyID, conversation, fields=None) -> Call
         return Callback(False, str(exc))
 
 
+def populateFilter(value, string, quote_wrap):
+    if value:
+        if quote_wrap:
+            value = "'" + value + "'"
+            return string + "=" + value + "+or+"
+        else:
+            # Convert date format:
+            new_date = datetime.strptime(value, "%m/%d/%Y").strftime("%Y-%m-%d")
+        return string + "=" + new_date + "+or+"
+
+    return ""
+
 def checkFilter(keywords, dataType: DT, string, quote_wrap, exact: bool):
     if keywords.get(dataType.value["name"]):
         altered_list = []
@@ -373,12 +386,12 @@ def checkFilter(keywords, dataType: DT, string, quote_wrap, exact: bool):
     return ""
 
 
-# TODO: BASIC CHECK [CHECK]
-
-def searchJobs(access_token, companyID, conversation, fields=None) -> Callback:
+# TODO: CONVERT TO BULLHORN STYLE:
+def searchJobs(access_token, conversation) -> Callback:
     # print("CONVERSATION IS: ")
     # print(conversation)
-    keywords = conversation['keywordsByDataType']
+    print(conversation)
+    # keywords = conversation['keywordsByDataType']  # BUG: THIS HAS BEEN REMOVED
     # keywords = {'Job Location': ['London'], 'Job Title': ['chef'], 'Job Type': []}
     # print("keywords: ")
     # print(keywords)
@@ -386,26 +399,29 @@ def searchJobs(access_token, companyID, conversation, fields=None) -> Callback:
     try:
         query = "WHERE+"
 
-        query += checkFilter(keywords, DT.JobTitle, "Name", quote_wrap=True, exact=True)
+        query += populateFilter(conversation.get('jobTitle'), "Name", quote_wrap=True)
 
-        query += checkFilter(keywords, DT.JobLocation, "ts2__Location__c", quote_wrap=True, exact=True)
+        query += populateFilter(conversation.get('city'), "ts2__Location__c", quote_wrap=True)
 
-        query += checkFilter(keywords, DT.JobType, "ts2__Employment_Type__c", quote_wrap=True, exact=False)
+        query += populateFilter(conversation.get('employmentType'), "ts2__Employment_Type__c", quote_wrap=True)
 
-        query += checkFilter(keywords, DT.JobEssentialSkills, "ts2__Job_Tag__c", quote_wrap=True, exact=False)
+        query += populateFilter(conversation.get('skills'), "ts2__Job_Tag__c", quote_wrap=True)
 
-        query += checkFilter(keywords, DT.JobStartDate, "ts2__Estimated_Start_Date__c", quote_wrap=False, exact=False)
+        # NOTE: Have these changed
 
-        query += checkFilter(keywords, DT.JobEndDate, "ts2__Estimated_End_Date__c", quote_wrap=False, exact=False)
+        # query += populateFilter(DT.JobStartDate, "ts2__Estimated_Start_Date__c", quote_wrap=False)
+
+        # query += populateFilter(DT.JobEndDate, "ts2__Estimated_End_Date__c", quote_wrap=False)
 
         query = query[:-4]  # To remove final +or
         print("QUERY IS: ")
         print(query)
+
         # NOTE: No years experience property available
 
         # send query NOTE: Properties to return must be stated, no [*] operator
         sendQuery_callback: Callback = sendQuery(
-            access_token, "get", "{}", "SELECT+Name,Rate_Type__c,ts2__Text_Description__c," +
+            access_token, "get", {}, "SELECT+Name,Rate_Type__c,ts2__Text_Description__c," +
                                        "ts2__Max_Salary__c,ts2__Location__c,ts2__Job_Tag__c," +
                                        "ts2__Estimated_Start_Date__c,ts2__Estimated_End_Date__c+from+ts2__Job__c+" +
                                        query + "+LIMIT+500")  # Return 500 records at most
@@ -510,7 +526,8 @@ def sendQuery(access_token, method, body, query):
             'Authorization': "Bearer " + access_token,
             'cache-control': "no-cache"
         }
-
+        print("BODY OF THE SEND QUERY")
+        print(url)
         response = marketplace_helpers.sendRequest(url, method, headers, json.dumps(body))
         if not response.ok:
             raise Exception(response.text + ". Query could not be sent")

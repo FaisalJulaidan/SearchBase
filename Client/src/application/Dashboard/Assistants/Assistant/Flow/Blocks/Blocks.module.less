@@ -1,16 +1,37 @@
 @import "../../../../Dashboard.module.less";
 
 .PredefinedValues {
-  display: flex;
-  padding: 0 90px;
-  margin: 10px 0;
-}
+    display: flex;
+    padding: 0 90px;
+    margin: 10px 0;
 
-.CheckBox {
-  width: 110px
-}
+    .CheckBox {
+        width: 110px;
 
-.Input {
-  width: 50% !important;
-  margin: 0 4px;
+        span {
+            font-weight: 500;
+            color: rgba(0, 0, 0, 0.85);
+        }
+    }
+
+    .Inputs {
+        width: calc(100% - 137px);
+        display: inline-flex;
+
+        .Text {
+            padding-right: 15px;
+            width: 35%;
+        }
+
+        .Score {
+            width: 65%;
+        }
+    }
+
+    .Text,
+    .Score,
+    .CheckBox {
+        line-height: 40px;
+    }
+
 }

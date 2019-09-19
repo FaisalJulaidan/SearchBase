@@ -24,24 +24,40 @@ class JobType extends Component {
 
     state = {
         showGoToBlock: false,
-        showGoToGroup: false
+        showGoToGroup: false,
+        errors: {}
     };
 
     onSubmit = () => this.props.form.validateFields((err, values) => {
-        if (!err) {
 
-            const flowOptions = this.props.options.flow;
+        const flowOptions = this.props.options.flow;
 
-            // prepare the objects to be sent to the server
-            const jobTypesState = { ...this.state.jobTypesState };
+        // prepare the objects to be sent to the server
+        const jobTypesState = { ...this.state.jobTypesState };
+
+        Object.keys(jobTypesState).map(key => {
+            if (!jobTypesState[key].checked)
+                delete jobTypesState[key];
+        });
+
+        const validateCustomInputs = () => (
             Object.keys(jobTypesState).map(key => {
-                if (!jobTypesState[key].checked)
-                    delete jobTypesState[key];
-            });
+                if (!jobTypesState[key].text)
+                    this.setState(state => state.errors[key].text = true);
+                else
+                    this.setState(state => state.errors[key].text = false);
+
+                if (!jobTypesState[key].score)
+                    this.setState(state => state.errors[key].score = true);
+                else
+                    this.setState(state => state.errors[key].score = false);
+            })
+        );
+
+        if (!err) {
             const types = [];
             Object.keys(jobTypesState).map(key => {
                 delete jobTypesState[key].checked;
-
                 jobTypesState[key] = {
                     ...jobTypesState[key],
                     blockToGoID: values[`${key}_blockToGoID`] || values[`${key}_blockToGoIDGroup`] || null,
@@ -101,7 +117,15 @@ class JobType extends Component {
                     score: undefined
                 };
             }
-            this.setState({ jobTypesState });
+
+            const jobTypesErrors = {};
+            for (const type of blockOptions.types) {
+                jobTypesErrors[type] = {
+                    text: false,
+                    score: false
+                };
+            }
+            this.setState({ jobTypesState, errors: jobTypesErrors });
         });
     }
 
@@ -131,9 +155,10 @@ class JobType extends Component {
                                       layout={layout}
                                       placeholder="Ex: What is your job?"/>
 
-                    <div className={styles.PredefinedValues}>
-                        <h4>Job Types:</h4>
-                    </div>
+                    <Divider dashed={true} style={{ fontWeight: 'normal', fontSize: '14px' }}>
+                        Job Types
+                    </Divider>
+
                     {
                         blockOptions.types.map(
                             (type, i) =>
@@ -149,27 +174,46 @@ class JobType extends Component {
                                             {type}
                                         </Checkbox>
 
-                                        <Input disabled={jobTypesState && !jobTypesState[type].checked}
-                                               onChange={e => {
-                                                   const val = e.target.value;
-                                                   this.setState(state => {
-                                                       state.jobTypesState[type].text = val;
-                                                       return state;
-                                                   });
-                                               }}
-                                               style={{ width: 100, margin: '0 10px' }} placeholder={'Text'}/>
+                                        <div className={styles.Inputs}>
 
-                                        <Select disabled={jobTypesState && !jobTypesState[type].checked}
-                                                placeholder="Select score weight"
-                                                onChange={value => this.setState(state => state.jobTypesState[type].score = value)}
-                                                className={styles.Input}>
-                                            <Option value={5}>5</Option>
-                                            <Option value={4}>4</Option>
-                                            <Option value={3}>3</Option>
-                                            <Option value={2}>2</Option>
-                                            <Option value={1}>1</Option>
-                                            <Option value={-999}>Disqualify Immediately</Option>
-                                        </Select>
+                                            <div
+                                                className={[this.state.errors[type]?.text && 'has-error', styles.Text].join(' ')}>
+                                                <Input disabled={jobTypesState && !jobTypesState[type].checked}
+                                                       onChange={e => {
+                                                           const val = e.target.value;
+                                                           this.setState(state => {
+                                                               state.jobTypesState[type].text = val;
+                                                               return state;
+                                                           });
+                                                       }}
+                                                       placeholder={type}/>
+                                                {
+                                                    this.state.errors[type]?.text &&
+                                                    <div className="ant-form-explain">Please add text</div>
+                                                }
+                                            </div>
+
+                                            <div
+                                                className={[this.state.errors[type]?.score && 'has-error', styles.Score].join(' ')}>
+                                                <Select disabled={jobTypesState && !jobTypesState[type].checked}
+                                                        placeholder="Select score weight"
+                                                        onChange={value => this.setState(state => state.jobTypesState[type].score = value)}>
+                                                    <Option value={5}>5</Option>
+                                                    <Option value={4}>4</Option>
+                                                    <Option value={3}>3</Option>
+                                                    <Option value={2}>2</Option>
+                                                    <Option value={1}>1</Option>
+                                                    <Option value={-999}>Disqualify Immediately</Option>
+                                                </Select>
+                                                {
+                                                    this.state.errors[type]?.score &&
+                                                    <div className="ant-form-explain">Please select a score</div>
+                                                }
+
+                                            </div>
+
+                                        </div>
+
                                     </div>
 
                                     {jobTypesState && jobTypesState[type].checked &&

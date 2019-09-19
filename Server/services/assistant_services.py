@@ -106,7 +106,8 @@ def getAll(companyID) -> Callback:
                                   Assistant.Description,
                                   Assistant.Message,
                                   Assistant.TopBarText,
-                                  Assistant.Active)\
+                                  Assistant.Active,
+                                  Assistant.User)\
             .filter(Assistant.CompanyID == companyID).all()
 
         if len(result) == 0:

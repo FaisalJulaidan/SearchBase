@@ -28,33 +28,42 @@ class JobType extends Component {
         errors: {}
     };
 
-    onSubmit = () => this.props.form.validateFields((err, values) => {
 
-        const flowOptions = this.props.options.flow;
-
-        // prepare the objects to be sent to the server
+    validateCustomFormItmes = () => {
+        // prepare the types objects to be sent to the server
         const jobTypesState = { ...this.state.jobTypesState };
 
         Object.keys(jobTypesState).map(key => {
             if (!jobTypesState[key].checked)
-                delete jobTypesState[key];
+                return delete jobTypesState[key];
+
+            if (!jobTypesState[key].text)
+                this.setState(state => state.errors[key].text = true);
+            else
+                this.setState(state => state.errors[key].text = false);
+
+            if (!jobTypesState[key].score)
+                this.setState(state => state.errors[key].score = true);
+            else
+                this.setState(state => state.errors[key].score = false);
         });
+    };
+    onSubmit = () => this.props.form.validateFields((err, values) => {
 
-        const validateCustomInputs = () => (
-            Object.keys(jobTypesState).map(key => {
-                if (!jobTypesState[key].text)
-                    this.setState(state => state.errors[key].text = true);
-                else
-                    this.setState(state => state.errors[key].text = false);
+        const flowOptions = this.props.options.flow;
 
-                if (!jobTypesState[key].score)
-                    this.setState(state => state.errors[key].score = true);
-                else
-                    this.setState(state => state.errors[key].score = false);
-            })
-        );
+        // prepare the types objects to be sent to the server
+        const jobTypesState = { ...this.state.jobTypesState };
 
-        if (!err) {
+        this.validateCustomFormItmes();
+
+        let jobTypesErrors = { ...this.state.errors };
+        jobTypesErrors = Object.keys(jobTypesErrors).reduce((r, k) => r.concat(jobTypesErrors[k]), []);
+        jobTypesErrors = jobTypesErrors.map(item => Object.keys(item).reduce((r, k) => r.concat(item[k]), [])).flat();
+
+        const hasErr = jobTypesErrors.includes(true);
+
+        if (!err && !hasErr) {
             const types = [];
             Object.keys(jobTypesState).map(key => {
                 delete jobTypesState[key].checked;
@@ -182,9 +191,10 @@ class JobType extends Component {
                                                        onChange={e => {
                                                            const val = e.target.value;
                                                            this.setState(state => {
-                                                               state.jobTypesState[type].text = val;
-                                                               return state;
-                                                           });
+                                                                   state.jobTypesState[type].text = val;
+                                                                   return state;
+                                                               },
+                                                               () => this.validateCustomFormItmes());
                                                        }}
                                                        placeholder={type}/>
                                                 {
@@ -197,7 +207,10 @@ class JobType extends Component {
                                                 className={[this.state.errors[type]?.score && 'has-error', styles.Score].join(' ')}>
                                                 <Select disabled={jobTypesState && !jobTypesState[type].checked}
                                                         placeholder="Select score weight"
-                                                        onChange={value => this.setState(state => state.jobTypesState[type].score = value)}>
+                                                        onChange={value => {
+                                                            this.setState(state => state.jobTypesState[type].score = value,
+                                                                () => this.validateCustomFormItmes());
+                                                        }}>
                                                     <Option value={5}>5</Option>
                                                     <Option value={4}>4</Option>
                                                     <Option value={3}>3</Option>

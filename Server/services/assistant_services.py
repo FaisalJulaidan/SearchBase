@@ -246,6 +246,24 @@ def updateStatus(assistantID, newStatus, companyID):
         return Callback(False, "Could not change the assistant's status.")
 
 
+def updateContacts(contacts, assistantID, companyID):
+    try:
+        if not contacts:
+            db.session.query(Assistant).filter(and_(Assistant.ID == assistantID, Assistant.CompanyID == companyID)) \
+                .update({"User": None})
+
+        db.session.query(Assistant).filter(and_(Assistant.ID == assistantID, Assistant.CompanyID == companyID)) \
+            .update({"User": contacts[0]})
+
+        db.session.commit()
+        return Callback(True, 'Assistant contacts have been changed.')
+
+    except Exception as exc:
+        helpers.logError("assistant_services.updateContacts(): " + str(exc))
+        db.session.rollback()
+        return Callback(False, "Could not change the assistant's contacts.")
+
+
 # ----- Deletion ----- #
 def removeByID(id, companyID) -> Callback:
     try:

@@ -21,11 +21,11 @@ const Home = () => {
         <Layout background={"#FFFFFF"}>
             <div>
                 <section className={styles.section}>
-                    <MessageIntro id="videoIntro"/>
+                    <Intro/>
                 </section>
-                <DividerButton scrollTo="intro"/>
+                <DividerButton scrollTo="intro2"/>
                 <section className={styles.section}>
-                    <Intro id="intro"/>
+                    <MessageIntro id="intro2"/>
                 </section>
                 <DividerButton scrollTo="ourFocus"/>
                 <section className={styles.section}>

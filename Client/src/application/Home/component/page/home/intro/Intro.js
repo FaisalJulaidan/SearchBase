@@ -28,7 +28,7 @@ class Intro extends React.Component {
 
     render() {
         return (
-            <Container>
+            <Container id={this.props.id}>
                 <Row>
                     <Col className={styles.text_col} xs={12} md={5} lg={5}>
                         <Bounce left big>

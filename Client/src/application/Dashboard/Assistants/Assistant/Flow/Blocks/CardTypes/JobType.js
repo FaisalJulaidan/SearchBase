@@ -66,7 +66,12 @@ class JobType extends Component {
         if (!err && !hasErr) {
             const types = [];
             Object.keys(jobTypesState).map(key => {
+
+                if (!jobTypesState[key].checked)
+                    return delete jobTypesState[key];
+
                 delete jobTypesState[key].checked;
+
                 jobTypesState[key] = {
                     ...jobTypesState[key],
                     blockToGoID: values[`${key}_blockToGoID`] || values[`${key}_blockToGoIDGroup`] || null,

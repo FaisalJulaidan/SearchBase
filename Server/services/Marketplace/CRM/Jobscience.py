@@ -26,6 +26,16 @@ CLIENT_SECRET = os.environ['JOBSCIENCE_CLIENT_SECRET']
 # NOTE: Before use in dev or prod, the callback url must be changed both in items.js and on the Salesforce dashboard
 
 
+# CHECKLIST
+# [1] SearchJobs [DATA RETURNED]
+# [2] SearchCandidates [DATA RETURNED]
+# [3] Merge skills with title and validate [DATA RETURNED]
+# [3] Clean & refactor []
+# [4] TEST []
+# [5] IMPROVE []
+# [6] TRY WITH PROD SALESFORCE []
+
+
 def testConnection(auth, companyID):
     try:
         callback: Callback = login(auth)
@@ -262,18 +272,21 @@ def insertCompany(auth, conversation: Conversation) -> Callback:
         return Callback(False, str(exc))
 
 
+# TODO: First get other info, then get the skills and filter them - may be slow
+# NOTE: JOB title may need to query CRM Skills field
 # TODO: Check speed of this approach
 # NOTE: This needs to be a query!
-def fetchSkillsForCandidateSearch(list_of_contactIDs: list, access_token):
+def fetchSkillsForCandidateSearch(list_of_contactIDs: list, list_of_skills, access_token):
     # [1] Need set of contact ID's returned from searchCandidates()
-    # print("Contact IDs: ")
-    # print(list_of_contactIDs)
     # [2] Use a IN(CID1,CID2,...,CIDx) to retrieve all associated skills
     query_segment = ",".join(list_of_contactIDs)
+    skills = str((', '.join("'" + skill + "'" for skill in list_of_skills)))
     # print(query_segment)
-    sendQuery_callback: Callback = sendQuery(access_token, "get", "{}",
+    sendQuery_callback: Callback = sendQuery(access_token, "get", {},
                                              "SELECT+ts2__Skill_Name__c,ts2__Contact__c+FROM+ts2__Skill__c+WHERE+" +
-                                             "ts2__Contact__c+IN+(" + query_segment + ")")
+                                             "ts2__Contact__c+IN+(" + query_segment + ")+AND+ts2__Skill_Name__c+IN+(" +
+                                             skills + ")+LIMIT+20")
+
 
     if not sendQuery_callback.Success:
         raise Exception(sendQuery_callback.Message)
@@ -282,36 +295,53 @@ def fetchSkillsForCandidateSearch(list_of_contactIDs: list, access_token):
     print(candidate_skills_fetch)
     return candidate_skills_fetch['records']
 
+# jobtitle, location, category, experience
+# NOTE: Bullhorn is using AND always
+# Need to make it so that if only skill is provided, a search can still be done.
+def searchCandidates(access_token, conversation) -> Callback:
 
-def searchCandidates(access_token, companyID, conversation, fields=None) -> Callback:
+    #########################################################
+    print("HERE")
+    print(conversation.get("skills"))
+    print("-------------------------")
+    #exit(0)
+    #########################################################
+
+    # Should add employment type (permanent or temporary)
     list_of_contactIDs = []
-    keywords = conversation['keywordsByDataType']
 
     try:
         # TODO: Add more filters, perhaps with a hierarchy of what to search on (maybe skills more important than
         # education) --> Could be set by user and sent with the conversation.
         # Note: Date will need to be reversed for comparison, also dates could be compared with a range rather than
         # requiring an exact match --> unrealistic
-        query = ""
-        a = checkFilter(keywords, DT.CandidateLocation, "MailingCity", quote_wrap=True)
-        if a != "":
-            query = "WHERE+"
-            query += a
-            query = query[:-4]
-            query += "+AND+RecordType.Name+IN+('Candidate')"  # Fetch contacts who are candidates
+        query = "WHERE+"
+        print("Search candidates got to here...")
 
-        else:
-            query = "WHERE+RecordType.Name+=+'Candidate'"
+        # populate filter
 
-        sendQuery_callback: Callback = sendQuery(access_token, "get", "{}",
-                                                 "SELECT+X18_Digit_ID__c,ID,Name,email,phone,MailingCity," +
+        # NOTE: Currently, closest thing to jobtype
+        query += populateFilter(conversation.get('location'), "MailingCity", quote_wrap=True, SOQL_type="=")
+        query += populateFilter("%"+conversation.get('preferredJotTitle')+"%",
+                                "Title", quote_wrap=True, SOQL_type="+LIKE+")
+
+        query = query[:-4]
+        query += "+AND+RecordType.Name+IN+('Candidate')"  # Fetch contacts who are candidates
+
+        print("Query is:")
+        print(query)
+
+
+        # TODO: Differentiate between hourly and salary
+        sendQuery_callback: Callback = sendQuery(access_token, "get", {},
+                                                 "SELECT+X18_Digit_ID__c,ID,Name,Title,email,phone,MailingCity," +
                                                  "ts2__Desired_Salary__c,ts2__Desired_Hourly__c," +
                                                  "ts2__EduDegreeName1__c,ts2__Education__c+from+Contact+" + query +
-                                                 "+LIMIT+50")  # Limit set to 10 TODO: Customize
+                                                 "+LIMIT+200")  # Limit set to 10 TODO: Customize
 
         if not sendQuery_callback.Success:
             raise Exception(sendQuery_callback.Message)
-
+        print("QUERY HAS BEEN SENT")
         candidate_fetch = json.loads(sendQuery_callback.Data.text)
 
         # Iterate through candidates
@@ -321,48 +351,52 @@ def searchCandidates(access_token, companyID, conversation, fields=None) -> Call
             list_of_contactIDs.append("'" + record.get("Id") + "'")
 
         # Fetch associated candidate skills
-        candidate_skills = fetchSkillsForCandidateSearch(list_of_contactIDs, access_token)
+        skills = conversation.get("skills")
+
+        candidate_skills = fetchSkillsForCandidateSearch(list_of_contactIDs, skills.split(","), access_token)
 
         # NOTE: Possibly add restriction on how many skills to show
         for record in candidate_fetch['records']:
+            print("SALARY FOUND: ", record.get('ts2__Desired_Salary__c'))
+            print("SALARY FOUND: ", record.get('ts2__Desired_Hourly__c'))
             skills_string = ""
             for skill in candidate_skills:
                 if skill.get("ts2__Contact__c") == record.get("Id"):
                     skills_string += skill.get("ts2__Skill_Name__c") + ", "
-
-            skills_string = skills_string[:-1]
+            skills_string += record.get("Title")  # Merging skills and job title together...
+            #skills_string = skills_string[:-1]
             # NOTE: Serious review of efficiency is needed also should try to find years experience field
             result.append(databases_services.createPandaCandidate(id=record.get("id", ""),
                                                                   name=record.get("Name"),
                                                                   email=record.get("Email"),
                                                                   mobile=record.get("Phone"),
                                                                   location=record.get("MailingCity"),
-                                                                  skills="SQL",  # Need to fetch from skills
+                                                                  skills=skills_string,  # Need to fetch from skills
                                                                   # Set temporarily to engineering
                                                                   linkdinURL=None,
                                                                   availability=record.get("status"),
-                                                                  jobTitle=None,
+                                                                  jobTitle=record.get("Title"),
                                                                   education=record.get('ts2__EduDegreeName1__c'),
                                                                   yearsExperience=0,  # When 0 -> No skills displayed
-                                                                  desiredSalary=record.get('ts2__Desired_Salary__c'),
+                                                                  desiredSalary=record.get('ts2__Desired_Salary__c', 0),
                                                                   currency=Currency("GBP"),
                                                                   source="Jobscience"))
-
+        print("RETURNING RECORDS ...")
         return Callback(True, sendQuery_callback.Message, result)
     except Exception as exc:
         helpers.logError("Marketplace.CRM.Jobscience.searchCandidates() ERROR: " + str(exc))
         return Callback(False, str(exc))
 
 
-def populateFilter(value, string, quote_wrap):
+def populateFilter(value, string, quote_wrap, SOQL_type: str):
     if value:
         if quote_wrap:
             value = "'" + value + "'"
-            return string + "=" + value + "+or+"
+            return string + SOQL_type + value + "+AND+"
         else:
             # Convert date format:
             new_date = datetime.strptime(value, "%m/%d/%Y").strftime("%Y-%m-%d")
-        return string + "=" + new_date + "+or+"
+        return string + SOQL_type + new_date + "+AND+"
 
     return ""
 
@@ -399,13 +433,15 @@ def searchJobs(access_token, conversation) -> Callback:
     try:
         query = "WHERE+"
 
-        query += populateFilter(conversation.get('jobTitle'), "Name", quote_wrap=True)
+        # Add (%) for LIKE operator...
+        query += populateFilter("%"+conversation.get('jobTitle')+"%", "Name", quote_wrap=True, SOQL_type="+LIKE+")
 
-        query += populateFilter(conversation.get('city'), "ts2__Location__c", quote_wrap=True)
+        query += populateFilter(conversation.get('city'), "ts2__Location__c", quote_wrap=True, SOQL_type="=")
 
-        query += populateFilter(conversation.get('employmentType'), "ts2__Employment_Type__c", quote_wrap=True)
+        query += populateFilter(conversation.get('employmentType'),
+                                "ts2__Employment_Type__c", quote_wrap=True, SOQL_type="LIKE")
 
-        query += populateFilter(conversation.get('skills'), "ts2__Job_Tag__c", quote_wrap=True)
+        query += populateFilter(conversation.get('skills'), "ts2__Job_Tag__c", quote_wrap=True, SOQL_type="+LIKE+")
 
         # NOTE: Have these changed
 
@@ -413,7 +449,7 @@ def searchJobs(access_token, conversation) -> Callback:
 
         # query += populateFilter(DT.JobEndDate, "ts2__Estimated_End_Date__c", quote_wrap=False)
 
-        query = query[:-4]  # To remove final +or
+        query = query[:-5]  # To remove final +or
         print("QUERY IS: ")
         print(query)
 
@@ -447,6 +483,7 @@ def searchJobs(access_token, conversation) -> Callback:
                                                             linkURL=None,
                                                             currency=Currency("GBP"),
                                                             source="Jobscience"))
+        print("FINISHED")
 
         return Callback(True, sendQuery_callback.Message, result)
 
@@ -476,7 +513,6 @@ def searchJobsCustomQuery(access_token, companyID, query, fields=None) -> Callba
 
 
 # TODO: Match to Bullhorn and trigger from chatbot
-
 
 def getAllCandidates(access_token, companyID, fields=None) -> Callback:
     try:

@@ -5,8 +5,8 @@ from datetime import datetime
 import requests
 from sqlalchemy_utils import Currency
 
-from models import Callback, Conversation, StoredFile
-from services import databases_services
+from models import Callback, Conversation, StoredFile, StoredFileInfo
+from services import databases_services, stored_file_services
 from services.Marketplace import marketplace_helpers
 from utilities import helpers
 from utilities.enums import DataType as DT, Period
@@ -32,7 +32,7 @@ CLIENT_SECRET = os.environ['JOBSCIENCE_CLIENT_SECRET']
 # [2] SearchCandidates [DATA RETURNED]
 # [3] Complete iterative generalisation for candidate search[CHECK]
 # [4] Complete iterative generalisation for job search[CHECK]
-# [4.5] Fix and check insert functions
+# [4.5] Fix and check insert functions [CHECK]
 # [5] Clean & refactor []
 # [6] TEST []
 # [7] IMPROVE []
@@ -136,6 +136,11 @@ def insertCandidateSkills(access_token, conversation: Conversation, contactID) -
 
 # BUG: Education not showing, may need to add to EDU object [~]
 
+def convertDate(date:str):
+    if date is None:
+        return ""
+    return datetime.strptime(date, "%m/%d/%Y").strftime("%Y-%m-%d")
+
 def insertCandidate(access_token, conversation: Conversation) -> Callback:
     try:
 
@@ -161,13 +166,13 @@ def insertCandidate(access_token, conversation: Conversation) -> Callback:
             "phone": conversation.get('mobile') or " ",
             "MailingCity": conversation.get("city") or "",
             "email": conversation.get("email") or " ",
-            "ts2__Date_Available__c": datetime.strptime(conversation.get("availability"), "%m/%d/%Y")
-                .strftime("%Y-%m-%d"),  # TODO CHECK
+            "ts2__Date_Available__c": convertDate(conversation.get("availability")),  # TODO CHECK
             "ts2__Education__c": "",  # Needs to be in a separate post request
             "ts2__Desired_Salary__c": conversation.get("annualSalary"),
             "ts2__Desired_Hourly__c": conversation.get("dayRate"),
             "ts2__LinkedIn_Profile__c": conversation.get("CandidateLinkdinURL"),
             "Attributes__c": conversation.get("skills"),
+            # "ts2__Text_Resume__c": "",
             "sirenum__General_Comments__c": crm_services.additionalCandidateNotesBuilder(
                 {
                     "preferredJobTitle": conversation.get("preferredJobTitle"),
@@ -231,17 +236,20 @@ def insertClient(auth, conversation: Conversation) -> Callback:
 
 def insertClientContact(access_token, conversation: Conversation, prsCompanyID) -> Callback:
     try:
-        # New candidate details
-        emails = conversation.Data.get('keywordsByDataType').get(DT.ClientEmail.value['name'], [" "])
+        # New client contact details
+        if conversation.get("firstName") == "":
+            conversation["firstName"] = "DEFAULT_FIRST"
+        if conversation.get("lastName") == "":
+            conversation["lastName"] = "DEFAULT_LAST"
+        print(conversation)
 
         body = {
-            "FirstName": conversation.Name or "FIRST_DEFAULT",  # TODO: Decide on default values
-            "LastName": conversation.Name or "DEFAULT",
-            "phone": conversation.PhoneNumber or " ",
-            "MailingCity": "".join(conversation.Data.get('keywordsByDataType').get(
-                DT.ClientLocation.value['name'], [" "])),
+            "FirstName": conversation.get("firstName"),  # TODO: Decide on default values
+            "LastName": conversation.get("lastName"),
+            "phone": conversation.get("mobile", ""),
+            "MailingCity": conversation.get("city"),
             # check number of emails and submit them
-            "email": emails[0],
+            "email": conversation.get("email"),
             "AccountId": prsCompanyID
         }
 
@@ -261,9 +269,7 @@ def insertCompany(auth, conversation: Conversation) -> Callback:
     try:
 
         body = {
-            "Name": " ".join(conversation.Data.get('keywordsByDataType').get(
-                DT.CompanyName.value['name'],
-                ["Undefined Company - TSB"]))
+            "Name": conversation.get("companyName")
         }
 
         sendQuery_callback: Callback = sendQuery(auth, "post", body, "sobjects/Account/")
@@ -685,3 +691,7 @@ def buildUrl(query, method):
     elif method == "get":
         url = url + "query/?q=" + query  # Append SOQL query
     return url
+
+
+def uploadFile(auth, storedFileInfo: StoredFileInfo):
+    print("ATTEMPT FILE UPLOAD")

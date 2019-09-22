@@ -139,6 +139,7 @@ def getFileByConversationID(assistantID, conversationID, filePath):
 
 def uploadFiles(files, conversation, data, keys):
     try:
+        print("SHOULD ATTEMPT TO UPLOAD FILES")
         sf : StoredFile = StoredFile()
 
         db.session.add(sf)

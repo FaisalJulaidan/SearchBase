@@ -10,6 +10,7 @@ from services import databases_services
 from services.Marketplace import marketplace_helpers
 from utilities import helpers
 from utilities.enums import DataType as DT, Period
+from services.Marketplace.CRM import crm_services
 
 CLIENT_ID = os.environ['JOBSCIENCE_CLIENT_ID']
 CLIENT_SECRET = os.environ['JOBSCIENCE_CLIENT_SECRET']
@@ -29,11 +30,13 @@ CLIENT_SECRET = os.environ['JOBSCIENCE_CLIENT_SECRET']
 # CHECKLIST
 # [1] SearchJobs [DATA RETURNED]
 # [2] SearchCandidates [DATA RETURNED]
-# [3] Merge skills with title and validate [DATA RETURNED]
-# [3] Clean & refactor []
-# [4] TEST []
-# [5] IMPROVE []
-# [6] TRY WITH PROD SALESFORCE []
+# [3] Complete iterative generalisation for candidate search[CHECK]
+# [4] Complete iterative generalisation for job search[CHECK]
+# [4.5] Fix and check insert functions
+# [5] Clean & refactor []
+# [6] TEST []
+# [7] IMPROVE []
+# [8] TRY WITH PROD SALESFORCE []
 
 
 def testConnection(auth, companyID):
@@ -48,6 +51,7 @@ def testConnection(auth, companyID):
     except Exception as exc:
         helpers.logError("Marketplace.CRM.Jobscience.testConnection() ERROR: " + str(exc))
         return Callback(False, str(exc))
+
 
 # NOTE: For production, we need to change the domain name (currently it is pointing to sandbox)
 
@@ -99,7 +103,7 @@ def logout(access_token, companyID):  # QUESTION: Purpose of companyID param?
 
 def insertCandidateSkills(access_token, conversation: Conversation, contactID) -> Callback:
     try:
-        skills = conversation.Data.get('keywordsByDataType').get(DT.CandidateSkills.value['name'], [" "])
+        skills = conversation.get("skills")
 
         entries = []
         counter = 0
@@ -134,46 +138,47 @@ def insertCandidateSkills(access_token, conversation: Conversation, contactID) -
 
 def insertCandidate(access_token, conversation: Conversation) -> Callback:
     try:
-        salary = conversation.Data.get('keywordsByDataType').get(DT.CandidateAnnualDesiredSalary.value['name'], [""])
-        avg_sal = 0
-        if salary[0] != "":
-            # NOTE: Splitting salary
-            salary_splitted = salary[0].split(" ")
-            low_and_high = salary_splitted[0].split("-")
 
-            # print("MINIMAL DESIRED SALARY: ")
-            min_sal = low_and_high[0]
-            # print(min_sal)
-
-            # print("MAX DESIRED SALARY: ")
-            max_sal = low_and_high[1]
-            # print(max_sal)
-
-            # print("AVERAGE DESIRED SALARY: ")
-            avg_sal = str(0.5 * (int(min_sal) + int(max_sal)))
-            # print(avg_sal)
+        print("TITLE")
+        print(conversation)
+        # salary = conversation.get("annualSalary", "")
+        # avg_sal = 0
+        # if salary !=0 :
+        #
+        #     salary_splitted = salary[0].split(" ")
+        #     low_and_high = salary_splitted[0].split("-")
+        #
+        #     min_sal = low_and_high[0]
+        #     max_sal = low_and_high[1]
+        #     avg_sal = str(0.5 * (int(min_sal) + int(max_sal)))
 
         # NOTE: Should require on front-end that a full name is provided --> reduce data inconsistency
-        name = (conversation.Name or " ").split(" ")
+        name = (conversation.get("name") or " ").split(" ")
         body = {
             "FirstName": helpers.getListValue(name, 0, "") or "FIRST_DEFAULT",
             "LastName": helpers.getListValue(name, 1, "") or "LAST_DEFAULT",  # LastName is only required field
-            "Title": "".join(conversation.Data.get('keywordsByDataType').get(DT.CandidateJobTitle.value['name'],
-                                                                             [" "])),
-            "phone": conversation.PhoneNumber or " ",
-            "MailingCity": "".join(conversation.Data.get('keywordsByDataType').get(DT.CandidateLocation.value['name'],
-                                                                                   [""])),
-            # "ts2__Desired_Salary__c": conversation.Data.get(DT.CandidateDailyDesiredSalary.value['name']),
-            "email": conversation.Email or " ",
+            "Title": conversation.get("preferredJobTitle"),
+            "phone": conversation.get('mobile') or " ",
+            "MailingCity": conversation.get("city") or "",
+            "email": conversation.get("email") or " ",
+            "ts2__Date_Available__c": datetime.strptime(conversation.get("availability"), "%m/%d/%Y")
+                .strftime("%Y-%m-%d"),  # TODO CHECK
             "ts2__Education__c": "",  # Needs to be in a separate post request
-            "ts2__Desired_Salary__c": avg_sal,
-            "ts2__LinkedIn_Profile__c": "".join(conversation.Data.get('keywordsByDataType').get(
-                DT.CandidateLinkdinURL.value['name'],
-                [""])),
-            "Attributes__c": "; ".join(
-                conversation.Data.get('keywordsByDataType').get(DT.CandidateSkills.value['name'], [" "])),
+            "ts2__Desired_Salary__c": conversation.get("annualSalary"),
+            "ts2__Desired_Hourly__c": conversation.get("dayRate"),
+            "ts2__LinkedIn_Profile__c": conversation.get("CandidateLinkdinURL"),
+            "Attributes__c": conversation.get("skills"),
+            "sirenum__General_Comments__c": crm_services.additionalCandidateNotesBuilder(
+                {
+                    "preferredJobTitle": conversation.get("preferredJobTitle"),
+                    "preferredJobType": conversation.get("preferredJobType"),
+                    "yearsExperience": conversation.get("yearsExperience"),
+                    "skills": conversation.get("skills")
+                }, conversation.get("selectedSolutions")
+            ),
             "RecordTypeId": "0120O000000tJIAQA2"  # ID for a candidate person record type
         }
+
 
         # Send query
         sendQuery_callback: Callback = sendQuery(access_token, "post", body, "sobjects/Contact/")
@@ -185,11 +190,14 @@ def insertCandidate(access_token, conversation: Conversation) -> Callback:
         return_body = json.loads(sendQuery_callback.Data.text)
 
         # Insert candidate skills
-        insertCandidateSkills_callback: Callback = insertCandidateSkills(
-            access_token, conversation, return_body.get("id"))
+        print("THE CANDIDATE SKILLS:")
+        print(conversation.get("skills"))
+        if conversation.get("skills") is not None:
+            insertCandidateSkills_callback: Callback = insertCandidateSkills(
+                access_token, conversation, return_body.get("id"))
 
-        if not insertCandidateSkills_callback.Success:  # Needs to  fetch the Account ID
-            raise Exception(insertCandidateSkills_callback.Message)
+            if not insertCandidateSkills_callback.Success:  # Needs to  fetch the Account ID
+                raise Exception(insertCandidateSkills_callback.Message)
         return Callback(True, sendQuery_callback.Data.text)
 
     except Exception as exc:
@@ -284,9 +292,7 @@ def fetchSkillsForCandidateSearch(list_of_contactIDs: list, list_of_skills, acce
     # print(query_segment)
     sendQuery_callback: Callback = sendQuery(access_token, "get", {},
                                              "SELECT+ts2__Skill_Name__c,ts2__Contact__c+FROM+ts2__Skill__c+WHERE+" +
-                                             "ts2__Contact__c+IN+(" + query_segment + ")+AND+ts2__Skill_Name__c+IN+(" +
-                                             skills + ")+LIMIT+20")
-
+                                             "ts2__Contact__c+IN+(" + query_segment + ")+LIMIT+200")
 
     if not sendQuery_callback.Success:
         raise Exception(sendQuery_callback.Message)
@@ -295,42 +301,30 @@ def fetchSkillsForCandidateSearch(list_of_contactIDs: list, list_of_skills, acce
     print(candidate_skills_fetch)
     return candidate_skills_fetch['records']
 
+
 # jobtitle, location, category, experience
 # NOTE: Bullhorn is using AND always
 # Need to make it so that if only skill is provided, a search can still be done.
 def searchCandidates(access_token, conversation) -> Callback:
-
-    #########################################################
-    print("HERE")
-    print(conversation.get("skills"))
-    print("-------------------------")
-    #exit(0)
-    #########################################################
-
     # Should add employment type (permanent or temporary)
     list_of_contactIDs = []
 
     try:
-        # TODO: Add more filters, perhaps with a hierarchy of what to search on (maybe skills more important than
-        # education) --> Could be set by user and sent with the conversation.
-        # Note: Date will need to be reversed for comparison, also dates could be compared with a range rather than
-        # requiring an exact match --> unrealistic
-        query = "WHERE+"
-        print("Search candidates got to here...")
 
-        # populate filter
-
-        # NOTE: Currently, closest thing to jobtype
+        # Create filter:
+        query = "WHERE+RecordType.Name+IN+('Candidate')+AND+"  # Fetch contacts who are candidates"
         query += populateFilter(conversation.get('location'), "MailingCity", quote_wrap=True, SOQL_type="=")
-        query += populateFilter("%"+conversation.get('preferredJotTitle')+"%",
-                                "Title", quote_wrap=True, SOQL_type="+LIKE+")
+        query += populateFilter("%" + conversation.get('preferredJotTitle') + "%", "Title", quote_wrap=True,
+                                SOQL_type="+LIKE+")
+        query += populateFilter(conversation.get("desiredSalary", 0), "ts2__Desired_Salary__c", quote_wrap=True,
+                                SOQL_type="=")
 
-        query = query[:-4]
-        query += "+AND+RecordType.Name+IN+('Candidate')"  # Fetch contacts who are candidates
+        query = query[:-5]
 
         print("Query is:")
         print(query)
-
+        # print("Exiting...")
+        # exit(0)
 
         # TODO: Differentiate between hourly and salary
         sendQuery_callback: Callback = sendQuery(access_token, "get", {},
@@ -343,29 +337,85 @@ def searchCandidates(access_token, conversation) -> Callback:
             raise Exception(sendQuery_callback.Message)
         print("QUERY HAS BEEN SENT")
         candidate_fetch = json.loads(sendQuery_callback.Data.text)
-
+        records = candidate_fetch['records']
         # Iterate through candidates
         result = []
         # TODO: Fetch job title
-        for record in candidate_fetch['records']:
+        print("NUMBER OF RECORDS RETRIEVED: ", len(candidate_fetch['records']))
+
+        # <-- CALL SKILLS SEARCH -->
+        # for record in candidate_fetch['records']:
+        #     list_of_contactIDs.append("'" + record.get("Id") + "'")
+        #
+        # # Fetch associated candidate skills
+        # skills = conversation.get("skills")
+        # candidate_skills = []
+        # if len(candidate_fetch['records']) > 0:
+        #     candidate_skills = fetchSkillsForCandidateSearch(list_of_contactIDs, skills.split(","), access_token)
+        # <-- CALL SKILLS SEARCH -->
+
+        #  Iterative generalisation:
+        while len(candidate_fetch['records']) < 20:
+            # send query
+            sendQuery_callback: Callback = sendQuery(access_token, "get", {},
+                                                     "SELECT+X18_Digit_ID__c,ID,Name,Title,email,phone,MailingCity," +
+                                                     "ts2__Desired_Salary__c,ts2__Desired_Hourly__c," +
+                                                     "ts2__EduDegreeName1__c,ts2__Education__c+from+Contact+" + query +
+                                                     "+LIMIT+200")  # Limit set to 10 TODO: Customize
+            if not sendQuery_callback.Success:
+                raise Exception(sendQuery_callback.Message)
+
+            # get query result
+            return_body = json.loads(sendQuery_callback.Data.text)
+
+            # TODO: Call skills fetch here
+            if return_body["records"]:
+                print("Records length:", str(len(records)))
+                # add the candidates to the records
+                records = records + list(return_body["records"])
+
+                # remove duplicate records
+                seen = set()
+                new_l = []
+                for d in records:
+                    t = tuple(d.items())
+                    if str(t) not in seen:
+                        seen.add(str(t))
+                        new_l.append(d)
+
+                records = []
+                for l in new_l:
+                    records.append(dict(l))
+
+            # remove the last (least important filter)
+            query = "AND".join(query.split("AND")[:-1])
+            print("QUERY IS: ", query)
+
+            # if no filters left - stop
+            if not query:
+                break
+
+        # <-- CALL SKILLS SEARCH -->
+        for record in records:
             list_of_contactIDs.append("'" + record.get("Id") + "'")
 
         # Fetch associated candidate skills
         skills = conversation.get("skills")
+        candidate_skills = []
+        if len(candidate_fetch['records']) > 0:
+            candidate_skills = fetchSkillsForCandidateSearch(list_of_contactIDs, skills.split(","), access_token)
+        # <-- CALL SKILLS SEARCH -->
 
-        candidate_skills = fetchSkillsForCandidateSearch(list_of_contactIDs, skills.split(","), access_token)
-
-        # NOTE: Possibly add restriction on how many skills to show
-        for record in candidate_fetch['records']:
+        for record in records:
             print("SALARY FOUND: ", record.get('ts2__Desired_Salary__c'))
             print("SALARY FOUND: ", record.get('ts2__Desired_Hourly__c'))
             skills_string = ""
             for skill in candidate_skills:
+                print(skill.get("ts2__Skill_Name__c"))
                 if skill.get("ts2__Contact__c") == record.get("Id"):
                     skills_string += skill.get("ts2__Skill_Name__c") + ", "
-            skills_string += record.get("Title")  # Merging skills and job title together...
-            #skills_string = skills_string[:-1]
-            # NOTE: Serious review of efficiency is needed also should try to find years experience field
+            skills_string += record.get("Title", "")  # Merging skills and job title together...
+
             result.append(databases_services.createPandaCandidate(id=record.get("id", ""),
                                                                   name=record.get("Name"),
                                                                   email=record.get("Email"),
@@ -378,7 +428,8 @@ def searchCandidates(access_token, conversation) -> Callback:
                                                                   jobTitle=record.get("Title"),
                                                                   education=record.get('ts2__EduDegreeName1__c'),
                                                                   yearsExperience=0,  # When 0 -> No skills displayed
-                                                                  desiredSalary=record.get('ts2__Desired_Salary__c', 0),
+                                                                  desiredSalary=record.get('ts2__Desired_Salary__c') or
+                                                                                record.get('ts2__Desired_Hourly__c', 0),
                                                                   currency=Currency("GBP"),
                                                                   source="Jobscience"))
         print("RETURNING RECORDS ...")
@@ -399,6 +450,7 @@ def populateFilter(value, string, quote_wrap, SOQL_type: str):
         return string + SOQL_type + new_date + "+AND+"
 
     return ""
+
 
 def checkFilter(keywords, dataType: DT, string, quote_wrap, exact: bool):
     if keywords.get(dataType.value["name"]):
@@ -424,7 +476,7 @@ def checkFilter(keywords, dataType: DT, string, quote_wrap, exact: bool):
 def searchJobs(access_token, conversation) -> Callback:
     # print("CONVERSATION IS: ")
     # print(conversation)
-    print(conversation)
+    #print(conversation)
     # keywords = conversation['keywordsByDataType']  # BUG: THIS HAS BEEN REMOVED
     # keywords = {'Job Location': ['London'], 'Job Title': ['chef'], 'Job Type': []}
     # print("keywords: ")
@@ -434,20 +486,20 @@ def searchJobs(access_token, conversation) -> Callback:
         query = "WHERE+"
 
         # Add (%) for LIKE operator...
-        query += populateFilter("%"+conversation.get('jobTitle')+"%", "Name", quote_wrap=True, SOQL_type="+LIKE+")
+        query += populateFilter("%" + conversation.get('jobTitle') + "%", "Name", quote_wrap=True, SOQL_type="+LIKE+")
 
         query += populateFilter(conversation.get('city'), "ts2__Location__c", quote_wrap=True, SOQL_type="=")
 
-        query += populateFilter(conversation.get('employmentType'),
-                                "ts2__Employment_Type__c", quote_wrap=True, SOQL_type="LIKE")
+        # query += populateFilter(conversation.get('employmentType'),
+        #                         "ts2__Employment_Type__c", quote_wrap=True, SOQL_type="=")
 
         query += populateFilter(conversation.get('skills'), "ts2__Job_Tag__c", quote_wrap=True, SOQL_type="+LIKE+")
 
         # NOTE: Have these changed
 
-        # query += populateFilter(DT.JobStartDate, "ts2__Estimated_Start_Date__c", quote_wrap=False)
+        query += populateFilter(conversation.get('JobStartDate'), "ts2__Estimated_Start_Date__c", quote_wrap=False, SOQL_type=">")
 
-        # query += populateFilter(DT.JobEndDate, "ts2__Estimated_End_Date__c", quote_wrap=False)
+        #query += populateFilter(DT.JobEndDate, "ts2__Estimated_End_Date__c", quote_wrap=False)
 
         query = query[:-5]  # To remove final +or
         print("QUERY IS: ")
@@ -458,24 +510,72 @@ def searchJobs(access_token, conversation) -> Callback:
         # send query NOTE: Properties to return must be stated, no [*] operator
         sendQuery_callback: Callback = sendQuery(
             access_token, "get", {}, "SELECT+Name,Rate_Type__c,ts2__Text_Description__c," +
-                                       "ts2__Max_Salary__c,ts2__Location__c,ts2__Job_Tag__c," +
-                                       "ts2__Estimated_Start_Date__c,ts2__Estimated_End_Date__c+from+ts2__Job__c+" +
-                                       query + "+LIMIT+500")  # Return 500 records at most
+                                     "ts2__Max_Salary__c,ts2__Max_Pay_Rate__c,ts2__Min_Pay_Rate__c,ts2__Location__c,ts2__Job_Tag__c," +
+                                     "ts2__Estimated_Start_Date__c,ts2__Estimated_End_Date__c+from+ts2__Job__c+" +
+                                     query + "+LIMIT+500")  # Return 500 records at most
         if not sendQuery_callback.Success:
             raise Exception(sendQuery_callback.Message)
 
         job_fetch = json.loads(sendQuery_callback.Data.text)
+        records = job_fetch['records']
+        #  Iterative generalisation:
+        while len(job_fetch['records']) < 200:
+            # send query
+            sendQuery_callback: Callback = sendQuery(
+                access_token, "get", {}, "SELECT+Name,Rate_Type__c,ts2__Text_Description__c," +
+                                         "ts2__Max_Salary__c,ts2__Max_Pay_Rate__c,ts2__Min_Pay_Rate__c,ts2__Location__c,ts2__Job_Tag__c," +
+                                         "ts2__Estimated_Start_Date__c,ts2__Estimated_End_Date__c+from+ts2__Job__c+" +
+                                         query + "+LIMIT+100")  # Return 500 records at most
+            if not sendQuery_callback.Success:
+                raise Exception(sendQuery_callback.Message)
+
+            # get query result
+            return_body = json.loads(sendQuery_callback.Data.text)
+
+            # TODO: Call skills fetch here
+            if return_body["records"]:
+                print("Records length:", str(len(records)))
+                # add the candidates to the records
+                records = records + list(return_body["records"])
+
+                # remove duplicate records
+                seen = set()
+                new_l = []
+                for d in records:
+                    t = tuple(d.items())
+                    if str(t) not in seen:
+                        seen.add(str(t))
+                        new_l.append(d)
+
+                records = []
+                for l in new_l:
+                    records.append(dict(l))
+
+            # remove the last (least important filter)
+            query = "AND".join(query.split("AND")[:-1])
+            print("QUERY IS: ", query)
+
+            # if no filters left - stop
+            if not query:
+                break
 
         # Iterate through jobs
         result = []
-        for record in job_fetch['records']:
+        for record in records:
+            print("NEW JOB RECORD")
+            print(record.get('Name'))
+            print(record.get('ts2__Max_Pay_Rate__c'))
+            print(record.get('ts2__Min_Pay_Rate__c'))
             # Add jobs to database
             result.append(databases_services.createPandaJob(id=record.get('id'),
                                                             title=record.get('Name'),
                                                             desc=record.get('ts2__Text_Description__c'),
                                                             location=record.get('ts2__Location__c'),
                                                             type=record.get('ts2__Job_Tag__c'),
-                                                            salary=record.get('ts2__Max_Salary__c'),
+                                                            salary=record.get('ts2__Max_Salary__c') or
+                                                                   record.get('ts2__Max_Pay_Rate__c') or
+                                                                   record.get('ts2__Min_Pay_Rate__c'),
+
                                                             essentialSkills=record.get('ts2__Job_Tag__c'),
                                                             yearsRequired=0,
                                                             startDate=record.get('ts2__Estimated_Start_Date__c'),

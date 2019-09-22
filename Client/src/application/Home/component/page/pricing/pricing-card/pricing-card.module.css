@@ -1,10 +1,10 @@
 .card {
     height: 100%;
     line-height: normal;
-    color: #726a84;
+    color: #848484;
     box-shadow: 0 3px 4px rgba(0, 0, 0, 0.10), 0 1px 2px rgba(0, 0, 0, 0.18);
     transition: all 0.3s cubic-bezier(.25, .8, .25, 1);
-    /*border-color: #008FC2;*/
+    text-align: center;
 }
 
 .card:hover {
@@ -12,6 +12,7 @@
 }
 
 .card .icon {
+    margin-top: .25em;
     color: #9254de;
 }
 
@@ -26,4 +27,51 @@
 .card .header h1 {
     padding: 0;
     margin: 0 10px;
+}
+
+.title{
+    color: #444444;
+    font-weight: bold;
+    font-size: 1.3em;
+    margin-top: .5em;
+}
+
+.price{
+    color: #9254de;
+    font-size: 1.4em;
+    font-weight: bold;
+    margin-top: 1em;
+}
+
+.list{
+    height: 100%;
+    margin-top: 1em;
+}
+
+/**** Primary Button ****/
+.button {
+    margin-top: 2em;
+    text-decoration: none;
+    color: white !important;
+    border: solid transparent 0;
+    background-color: #9254de;
+    transition: border-color 0.4s ease 0s, background-color 0.4s ease 0s;
+}
+
+.button:hover {
+    background-color: #9C7DED;
+    transition: border-color 0.4s ease 0s, background-color 0.4s ease 0s;
+}
+
+.button:not(:disabled):not(.disabled):active {
+    background-color: #9C7DED;
+    transition: border-color 0.4s ease 0s, background-color 0.4s ease 0s;
+}
+
+.button:focus {
+    box-shadow: 0 0 0 0.2rem rgba(138, 107, 219, .5);
+}
+
+.button:not(:disabled):not(.disabled):active:focus {
+    box-shadow: 0 0 0 0.2rem rgba(138, 107, 219, .5);
 }

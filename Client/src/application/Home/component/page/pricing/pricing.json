@@ -1,1 +1,45 @@
-[]
+[
+  {
+    "title": "Essential",
+    "subtitle": "Suitable for teams of upto 3",
+    "price": "99£ / month",
+    "icon": "",
+    "items": [
+      "Website Chatbot",
+      "CRM Integration",
+      "Outbound Messages"
+    ]
+  },
+  {
+    "title": "Pro",
+    "subtitle": "Suitable for teams of upto 10",
+    "price": "249£ / month",
+    "icon": "",
+    "items": [
+      "Website Chatbot",
+      "CRM Integration",
+      "Outbound Messages",
+      "Pre-screen Candidates",
+      "Qualify Candidates",
+      "Automated Decision Making",
+      "Automated Engagement"
+    ]
+  },
+  {
+    "title": "Premium",
+    "subtitle": "Suitable for teams of upto 50",
+    "price": "1,150£ / month",
+    "icon": "",
+    "items": [
+      "Website Chatbot",
+      "CRM Integration",
+      "Outbound Messages",
+      "Pre-screen Candidates",
+      "Qualify Candidates",
+      "Automated Decision Making",
+      "Automated Engagement",
+      "Automated Scheduling",
+      "Re-engage Passive Candidates"
+    ]
+  }
+]

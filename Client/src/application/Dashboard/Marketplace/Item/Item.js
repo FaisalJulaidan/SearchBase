@@ -189,7 +189,7 @@ class Item extends React.Component {
                 if (place === 'features')
                     return <VincereFeatures/>;
                 if (place === 'button') {
-                    windowObject.url = "https://id.vincere.io/oauth2/authorize?client_id=9829f4ad-3ff3-4d00-8ecf-e5d7fa2983d1&response_type=code&redirect_uri=" + ""+getLink("/dashboard/marketplace/Vincere");
+                    windowObject.url = "https://id.vincere.io/oauth2/authorize?client_id=14e3d987-7f09-4aa0-af7c-9192f02d545f&response_type=code&redirect_uri=" +getLink("/dashboard/marketplace/Vincere");
                     return <DefaultButton buttonText={'Connect to Vincere'}
                                           windowObject={windowObject}
                                           {...buttonsOptions}/>;

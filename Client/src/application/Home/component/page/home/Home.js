@@ -23,9 +23,9 @@ const Home = () => {
                 <section className={styles.section}>
                     <Intro/>
                 </section>
-                <DividerButton scrollTo="videoIntro"/>
+                <DividerButton scrollTo="intro2"/>
                 <section className={styles.section}>
-                    <MessageIntro id="videoIntro"/>
+                    <MessageIntro id="intro2"/>
                 </section>
                 <DividerButton scrollTo="ourFocus"/>
                 <section className={styles.section}>

@@ -153,6 +153,9 @@ def uploadFiles(files, conversation, data, keys):
                         continue
                     for submittedFile in data['submittedFiles']:
                         if file.filename == submittedFile['uploadedFileName']:
+                            print("uploading file...")
+                            print(file.filename)
+                            print(conversation)
                             uploadedFiles.append(file.filename)
                             key = enums.FileAssetType.NoType # TODO once BlockType-Upgrade is done
                             upload_callback: Callback = stored_file_services.uploadFile(file, submittedFile['fileName'], True, model=Conversation,

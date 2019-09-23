@@ -9,19 +9,24 @@ from models import Callback, Conversation, StoredFile, StoredFileInfo
 from services import databases_services, stored_file_services
 from services.Marketplace import marketplace_helpers
 from utilities import helpers
-from utilities.enums import DataType as DT, Period
 from services.Marketplace.CRM import crm_services
 
 CLIENT_ID = os.environ['JOBSCIENCE_CLIENT_ID']
 CLIENT_SECRET = os.environ['JOBSCIENCE_CLIENT_SECRET']
 
-# TODO CHECKLIST
+
+# TODO CHECKLIST:
 # [1] SearchJobs [DATA RETURNED]
 # [2] SearchCandidates [DATA RETURNED]
 # [3] Complete iterative generalisation for candidate search[CHECK]
 # [4] Complete iterative generalisation for job search[CHECK]
 # [4.5] Fix and check insert functions [CHECK]
+
+# --- URGENT ----
 # [4.6] Add job type (perm or temp) []
+# [4.7] Get primitive file upload working []
+# --- URGENT ---
+
 # [5] Clean & refactor []
 # [6] TEST []
 # [7] IMPROVE []
@@ -125,7 +130,7 @@ def insertCandidateSkills(access_token, conversation: Conversation, contactID) -
 
 # BUG: Education not showing, may need to add to EDU object [~]
 
-def convertDate(date:str):
+def convertDate(date: str):
     if date is None:
         return ""
     return datetime.strptime(date, "%m/%d/%Y").strftime("%Y-%m-%d")
@@ -149,7 +154,8 @@ def insertCandidate(access_token, conversation: Conversation) -> Callback:
             "ts2__Desired_Hourly__c": conversation.get("dayRate"),
             "ts2__LinkedIn_Profile__c": conversation.get("CandidateLinkdinURL"),
             "Attributes__c": conversation.get("skills"),
-            # "ts2__Text_Resume__c": "",
+            "ts2__Job_Type__c": conversation.get("preferredJobType"),
+            # "ts2__Text_Resume__c": "", # TODO: Link this with File upload
             "sirenum__General_Comments__c": crm_services.additionalCandidateNotesBuilder(
                 {
                     "preferredJobTitle": conversation.get("preferredJobTitle"),
@@ -160,7 +166,6 @@ def insertCandidate(access_token, conversation: Conversation) -> Callback:
             ),
             "RecordTypeId": "0120O000000tJIAQA2"  # ID for a candidate person record type
         }
-
 
         # Send query
         sendQuery_callback: Callback = sendQuery(access_token, "post", body, "sobjects/Contact/")
@@ -264,7 +269,6 @@ def insertCompany(auth, conversation: Conversation) -> Callback:
 
 
 def fetchSkillsForCandidateSearch(list_of_contactIDs: list, list_of_skills, access_token):
-
     # Need set of contact ID's returned from searchCandidates()
     query_segment = ",".join(list_of_contactIDs)
     skills = str((', '.join("'" + skill + "'" for skill in list_of_skills)))
@@ -399,8 +403,7 @@ def searchCandidates(access_token, conversation) -> Callback:
                                                                   email=record.get("Email"),
                                                                   mobile=record.get("Phone"),
                                                                   location=record.get("MailingCity"),
-                                                                  skills=skills_string,  # Need to fetch from skills
-                                                                  # Set temporarily to engineering
+                                                                  skills=skills_string,
                                                                   linkdinURL=None,
                                                                   availability=record.get("status"),
                                                                   jobTitle=record.get("Title"),
@@ -431,7 +434,6 @@ def populateFilter(value, string, quote_wrap, SOQL_type: str):
 
 
 def searchJobs(access_token, conversation) -> Callback:
-
     try:
         query = "WHERE+"
 
@@ -447,9 +449,10 @@ def searchJobs(access_token, conversation) -> Callback:
 
         # NOTE: Have these changed
 
-        query += populateFilter(conversation.get('JobStartDate'), "ts2__Estimated_Start_Date__c", quote_wrap=False, SOQL_type=">")
+        query += populateFilter(conversation.get('JobStartDate'), "ts2__Estimated_Start_Date__c", quote_wrap=False,
+                                SOQL_type=">")
 
-        #query += populateFilter(DT.JobEndDate, "ts2__Estimated_End_Date__c", quote_wrap=False)
+        # query += populateFilter(DT.JobEndDate, "ts2__Estimated_End_Date__c", quote_wrap=False)
 
         query = query[:-5]  # To remove final +AND
         print("QUERY IS: ", query)
@@ -634,5 +637,6 @@ def buildUrl(query, method):
     return url
 
 
+# TODO
 def uploadFile(auth, storedFileInfo: StoredFileInfo):
     print("ATTEMPT FILE UPLOAD")

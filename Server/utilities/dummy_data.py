@@ -106,7 +106,6 @@ def generate():
         ]
     }
 
-
     flow = {
         "groups": [
             {
@@ -179,11 +178,6 @@ def generate():
             }
         ]
     }
-
-
-
-
-
 
     flow = {
         "groups": [
@@ -279,23 +273,23 @@ def generate():
                                  "action": "Go To Next Block", "afterMessage": "Thank you for the email",
                                  "keywords": []},
                      "ID": "002"},
-                    # # Candidate LOCATION
-                    # {"Type": "User Input", "StoreInDB": True, "Skippable": False, "SkipText": "Skip!",
-                    #  "SkipAction": "End Chat",
-                    #  "SkipBlockToGoID": 'null', "DataType": "CandidateLocation",
-                    #  "Content": {"text": "What city are you in?", "blockToGoID": "004",
-                    #              "action": "Go To Next Block", "afterMessage": "Thank you for the city",
-                    #              "keywords": []},
-                    #  "ID": "003"},
-                    # # Candidate PHONE
-                    # {"Type": "User Input", "StoreInDB": True, "Skippable": False, "SkipText": "Skip!",
-                    #  "SkipAction": "End Chat",
-                    #  "SkipBlockToGoID": 'null', "DataType": "CandidateMobile",
-                    #  "Content": {"text": "What is your phone number?", "blockToGoID": "005",
-                    #              "action": "Go To Next Block", "afterMessage": "Thank you for the phone number",
-                    #              "keywords": []},
-                    #  "ID": "004"},
-                    # # Candidate EDUCATION
+                    # Candidate LOCATION
+                    {"Type": "User Input", "StoreInDB": True, "Skippable": False, "SkipText": "Skip!",
+                     "SkipAction": "End Chat",
+                     "SkipBlockToGoID": 'null', "DataType": "CandidateLocation",
+                     "Content": {"text": "What city are you in?", "blockToGoID": "004",
+                                 "action": "Go To Next Block", "afterMessage": "Thank you for the city",
+                                 "keywords": []},
+                     "ID": "003"},
+                    # Candidate PHONE
+                    {"Type": "User Input", "StoreInDB": True, "Skippable": False, "SkipText": "Skip!",
+                     "SkipAction": "End Chat",
+                     "SkipBlockToGoID": 'null', "DataType": "CandidateMobile",
+                     "Content": {"text": "What is your phone number?", "blockToGoID": "005",
+                                 "action": "Go To Next Block", "afterMessage": "Thank you for the phone number",
+                                 "keywords": []},
+                     "ID": "004"},
+                    # Candidate EDUCATION
                     # {"Type": "User Input", "StoreInDB": True, "Skippable": False, "SkipText": "Skip!",
                     #  "SkipAction": "End Chat",
                     #  "SkipBlockToGoID": 'null', "DataType": "CandidateEducation",
@@ -303,7 +297,7 @@ def generate():
                     #              "action": "Go To Next Block", "afterMessage": "Thank you for the edcuation",
                     #              "keywords": []},
                     #  "ID": "005"},
-                    # # # Candidate SALARY
+                    # # Candidate SALARY
                     # {"Type": "User Input", "StoreInDB": True, "Skippable": False, "SkipText": "Skip!",
                     #  "SkipAction": "End Chat",
                     #  "SkipBlockToGoID": 'null', "DataType": "CandidateAnnualDesiredSalary",
@@ -311,15 +305,15 @@ def generate():
                     #              "action": "Go To Next Block", "afterMessage": "Thank you for the salary",
                     #              "keywords": []},
                     #  "ID": "006"},
-                    # # # Candidate JOB TITLE
+                    # # Candidate JOB TITLE
                     # {"Type": "User Input", "StoreInDB": True, "Skippable": False, "SkipText": "Skip!",
                     #  "SkipAction": "End Chat",
-                    #  "SkipBlockToGoID": 'null', "DataType": "JobTitle",
+                    #  "SkipBlockToGoID": 'null', "DataType": "CandidateJobTitle",
                     #  "Content": {"text": "What job title are you looking for?", "blockToGoID": "008",
                     #              "action": "Go To Next Block", "afterMessage": "Thank you for the title",
                     #              "keywords": []},
                     #  "ID": "007"},
-                    # # # Candidate LINKDIN URL
+                    # # Candidate LINKDIN URL
                     # {"Type": "User Input", "StoreInDB": True, "Skippable": False, "SkipText": "Skip!",
                     #  "SkipAction": "End Chat",
                     #  "SkipBlockToGoID": 'null', "DataType": "CandidateLinkdinURL",
@@ -327,31 +321,14 @@ def generate():
                     #              "action": "Go To Next Block", "afterMessage": "Thank you for the URL",
                     #              "keywords": []},
                     #  "ID": "008"},
-                    # # # Candidate SKILLS
+                    # # Candidate SKILLS
                     # {"Type": "User Input", "StoreInDB": True, "Skippable": False, "SkipText": "Skip!",
                     #  "SkipAction": "End Chat",
                     #  "SkipBlockToGoID": 'null', "DataType": "CandidateSkills",
-                    #  "Content": {"text": "What are your skills?", "blockToGoID": "010",
+                    #  "Content": {"text": "What are your skills?", "blockToGoID": None,
                     #              "action": "End Chat", "afterMessage": "Thank you for the skills",
                     #              "keywords": ["SQL", "Python"]},
                     #  "ID": "009"},
-                    # # Candidate AVAILABILITY
-                    # {"Type": "User Input", "StoreInDB": True, "Skippable": False, "SkipText": "Skip!",
-                    #  "SkipAction": "End Chat",
-                    #  "SkipBlockToGoID": 'null', "DataType": "CandidateAvailability",
-                    #  "Content": {"text": "When are you free?", "blockToGoID": None,
-                    #              "action": "End Chat", "afterMessage": "Thank you for the skills",
-                    #              "keywords": ["SQL", "Python"]},
-                    #  "ID": "010"},
-
-                    # Candidate CV UPLOAD
-                    {"Type": "User Input", "StoreInDB": True, "Skippable": False, "SkipText": "Skip!",
-                     "SkipAction": "End Chat",
-                     "SkipBlockToGoID": 'null', "DataType": "CandidateCV",
-                     "Content": {"text": "Please upload your CV", "blockToGoID": None,
-                                 "action": "End Chat", "afterMessage": "Thank you for the skills",
-                                 "keywords": ["SQL", "Python"]},
-                     "ID": "003"},
                 ],
                 "description": "To search candidates",
                 "id": "tisd83f4",
@@ -395,18 +372,18 @@ def generate():
                     {"Type": "User Input", "StoreInDB": True, "Skippable": False, "SkipText": "Skip!",
                      "SkipAction": "End Chat",
                      "SkipBlockToGoID": 'null', "DataType": "CandidateJobTitle",
-                     "Content": {"text": "What job title are you looking for?", "blockToGoID": "006",
+                     "Content": {"text": "What job title are you looking for?", "blockToGoID": "005",
                                  "action": "Go To Next Block", "afterMessage": "Thank you for the title",
                                  "keywords": []},
                      "ID": "004"},
-                    # # Candidate AVAILABILITY
-                    # {"Type": "User Input", "StoreInDB": True, "Skippable": False, "SkipText": "Skip!",
-                    #  "SkipAction": "End Chat",
-                    #  "SkipBlockToGoID": 'null', "DataType": "CandidateAvailability",
-                    #  "Content": {"text": "Required availability of candidate?", "blockToGoID": "006",
-                    #              "action": "Go To Next Block", "afterMessage": "Thank you for the availability",
-                    #              "keywords": []},
-                    #  "ID": "005"},
+                    # Candidate AVAILABILITY
+                    {"Type": "User Input", "StoreInDB": True, "Skippable": False, "SkipText": "Skip!",
+                     "SkipAction": "End Chat",
+                     "SkipBlockToGoID": 'null', "DataType": "CandidateAvailability",
+                     "Content": {"text": "Required availability of candidate?", "blockToGoID": "006",
+                                 "action": "Go To Next Block", "afterMessage": "Thank you for the availability",
+                                 "keywords": []},
+                     "ID": "005"},
                     # Candidate SKILLS
                     {"Type": "User Input", "StoreInDB": True, "Skippable": False, "SkipText": "Skip!",
                      "SkipAction": "End Chat",

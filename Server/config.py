@@ -68,20 +68,20 @@ class BaseConfig(object):
     HASH_IDS_SALT = 'b9iLXiAa'  # Never change it
 
     # Calendar Config
-    MAIL_SERVER = 'smtp.gmail.com'
-    MAIL_PORT = 465
-    MAIL_USE_SSL = True
-    MAIL_USERNAME = 'thesearchbase@gmail.com'
-    MAIL_PASSWORD = 'orfqpgqiusxcoeif'
-    MAIL_SUPPRESS_SEND = False
+    # MAIL_SERVER = 'smtp.gmail.com'
+    # MAIL_PORT = 465
+    # MAIL_USE_SSL = True
+    # MAIL_USERNAME = 'thesearchbase@gmail.com'
+    # MAIL_PASSWORD = 'orfqpgqiusxcoeif'
+    # MAIL_SUPPRESS_SEND = False
 
     # # Calendar Config
-    # MAIL_SERVER = 'smtp.office365.com'
-    # MAIL_PORT = 587
-    # MAIL_USE_TLS = True
-    # MAIL_USERNAME = 'info@thesearchbase.com'
-    # MAIL_PASSWORD = 'yyfcnddsbwhnqknj'
-    # MAIL_SUPPRESS_SEND = False
+    MAIL_SERVER = 'smtp.office365.com'
+    MAIL_PORT = 587
+    MAIL_USE_TLS = True
+    MAIL_USERNAME = 'info@thesearchbase.com'
+    MAIL_PASSWORD = 'yyfcnddsbwhnqknj'
+    MAIL_SUPPRESS_SEND = False
 
 
 class ProductionConfig(BaseConfig):

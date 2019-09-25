@@ -3,28 +3,91 @@ import * as actionTypes from "../actions/actionTypes";
 import {campaignActions} from "../actions";
 import {http, errorMessage, loadingMessage, successMessage} from "helpers";
 
-
-//Fetch Campaign data
-function* fetchCampaignData() {
+//Fetch All
+function* fetchCampaigns() {
     try {
-        const res = yield http.get(`/campaign_data`);
-        yield put(campaignActions.fetchCampaignDataSuccess(
-            res.data?.data.assistants,
-            res.data?.data.crms,
-            res.data?.data.databases,
-            res.data?.data.messengers)
+        const res = yield http.get(`/campaign/action`);
+        yield put(campaignActions.fetchCampaignsSuccess(
+            res.data?.data.campaigns, res.data?.data.campaignOptions)
         );
     } catch (error) {
-        const msg = error.response?.data?.msg || "Couldn't load campaign data";
+        const msg = error.response?.data?.msg || "Couldn't load campaigns";
         errorMessage(msg);
-        yield put(campaignActions.fetchCampaignDataFailure(msg));
+        yield put(campaignActions.fetchCampaignsFailure(msg));
+    }
+}
+
+//Fetch Campaign
+function* fetchCampaign({campaignID, meta}) {
+    try {
+        const res = yield http.get(`/campaign/${campaignID}`);
+        yield put({
+            ...campaignActions.fetchCampaignSuccess(res.data?.data.campaign, res.data?.data.campaignOptions),
+            meta
+        });
+    } catch (error) {
+        const msg = error.response?.data?.msg || "Couldn't load campaigns";
+        errorMessage(msg);
+        yield put({...campaignActions.fetchCampaignFailure(msg), meta});
+    }
+}
+
+//Save Campaign
+function* saveCampaign({name, assistant_id, use_crm, crm_id, database_id, messenger_id, location, jobTitle, skills, message, meta}) {
+    try {
+        loadingMessage('Saving campaign...', 0);
+        const res = yield http.post('/campaign',
+            {name, assistant_id, use_crm, crm_id, database_id, messenger_id, location, jobTitle, skills, message}, {
+                headers: {'Content-Type': 'application/json'},
+            });
+        yield put({
+            ...campaignActions.saveCampaignSuccess(
+                res.data?.data.campaign
+            ), meta
+        });
+        successMessage("Campaign saved successfully.");
+    } catch (error) {
+        const msg = error.response?.data?.msg || "Couldn't Save Campaign.";
+        errorMessage(msg);
+        yield put(campaignActions.saveCampaignFailure(msg));
+    }
+}
+
+//update Campaign
+function* updateCampaign({campaignID, name, assistant_id, use_crm, crm_id, database_id, messenger_id, location, jobTitle, skills, message}) {
+    try {
+        loadingMessage('Updating campaign...', 0);
+        const res = yield http.post(`/campaign/${campaignID}`,
+            {name, assistant_id, use_crm, crm_id, database_id, messenger_id, location, jobTitle, skills, message}, {
+                headers: {'Content-Type': 'application/json'},
+            });
+        yield put(campaignActions.updateCampaignSuccess());
+        successMessage("Campaign updated.");
+    } catch (error) {
+        const msg = error.response?.data?.msg || "Couldn't update campaign.";
+        errorMessage(msg);
+        yield put(campaignActions.updateCampaignFailure(msg));
+    }
+}
+
+//update Campaign
+function* deleteCampaign({campaignID, meta}) {
+    try {
+        loadingMessage('Deleting campaign...', 0);
+        const res = yield http.delete(`/campaign/${campaignID}`);
+        yield put({...campaignActions.deleteCampaignSuccess(campaignID), meta});
+        successMessage("Campaign deleted.");
+    } catch (error) {
+        const msg = error.response?.data?.msg || "Couldn't delete campaign.";
+        errorMessage(msg);
+        yield put(campaignActions.deleteCampaignFailure(msg));
     }
 }
 
 //Fetch Candidates data
 function* fetchCampaignCandidatesData({assistant_id, use_crm, crm_id, database_id, messenger_id, location, jobTitle, skills, text}) {
     try {
-        const res = yield http.post('/campaign_data',
+        const res = yield http.post('/campaign/action',
             {assistant_id, use_crm, crm_id, database_id, messenger_id, location, jobTitle, skills, text}, {
                 headers: {'Content-Type': 'application/json'},
             });
@@ -39,26 +102,52 @@ function* fetchCampaignCandidatesData({assistant_id, use_crm, crm_id, database_i
 }
 
 //Launch Campaign
-function* launchCampaign({assistant_id, use_crm, crm_id, database_id, messenger_id, location, jobTitle, skills, text,candidate_list}) {
+function* launchCampaign({assistant_id, use_crm, crm_id, database_id, messenger_id, location, jobTitle, skills, text, candidate_list}) {
     try {
         loadingMessage('Launching the campaign...', 0);
-        const res = yield http.post('/send_campaign',
-            {assistant_id, use_crm, crm_id, database_id, messenger_id, location, jobTitle, skills, text,candidate_list}, {
+        const res = yield http.put('/campaign/action',
+            {
+                assistant_id,
+                use_crm,
+                crm_id,
+                database_id,
+                messenger_id,
+                location,
+                jobTitle,
+                skills,
+                text,
+                candidate_list
+            }, {
                 headers: {'Content-Type': 'application/json'},
             });
         yield put(campaignActions.launchCampaignSuccess());
         successMessage('Campaign has been launched successfully.');
 
     } catch (error) {
-        console.log(error);
         const msg = error.response?.data?.msg || "Couldn't launch the campaign - contact support.";
         yield put(campaignActions.launchCampaignFailure(error.response.data));
         errorMessage(msg, 0);
     }
 }
 
-function* watchFetchCampaignData() {
-    yield takeEvery(actionTypes.FETCH_CAMPAIGN_DATA_REQUEST, fetchCampaignData)
+function* watchFetchCampaigns() {
+    yield takeEvery(actionTypes.FETCH_CAMPAIGNS_REQUEST, fetchCampaigns)
+}
+
+function* watchSaveCampaign() {
+    yield takeEvery(actionTypes.SAVE_CAMPAIGN_REQUEST, saveCampaign)
+}
+
+function* watchUpdateCampaign() {
+    yield takeEvery(actionTypes.UPDATE_CAMPAIGN_REQUEST, updateCampaign)
+}
+
+function* watchDeleteCampaign() {
+    yield takeEvery(actionTypes.DELETE_CAMPAIGN_REQUEST, deleteCampaign)
+}
+
+function* watchFetchCampaign() {
+    yield takeEvery(actionTypes.FETCH_CAMPAIGN_REQUEST, fetchCampaign)
 }
 
 function* watchFetchCampaignCandidatesData() {
@@ -71,7 +160,11 @@ function* watchLaunchCampaign() {
 
 export function* campaignSaga() {
     yield all([
-        watchFetchCampaignData(),
+        watchFetchCampaigns(),
+        watchFetchCampaign(),
+        watchSaveCampaign(),
+        watchUpdateCampaign(),
+        watchDeleteCampaign(),
         watchFetchCampaignCandidatesData(),
         watchLaunchCampaign()
     ])

@@ -1,22 +1,112 @@
 import * as actionTypes from './actionTypes';
 
-const fetchCampaignData = () => ({
-    type: actionTypes.FETCH_CAMPAIGN_DATA_REQUEST
+
+// Fetch All
+const fetchCampaigns = () => ({
+    type: actionTypes.FETCH_CAMPAIGNS_REQUEST
 });
 
-const fetchCampaignDataSuccess = (assistants, crms, databases, messengers) => ({
-    type: actionTypes.FETCH_CAMPAIGN_DATA_SUCCESS,
-    assistants,
-    crms,
-    databases,
-    messengers
+const fetchCampaignsSuccess = (campaigns, campaignOptions) => ({
+    type: actionTypes.FETCH_CAMPAIGNS_SUCCESS,
+    campaigns,
+    campaignOptions
 });
 
-const fetchCampaignDataFailure = (error) => ({
-    type: actionTypes.FETCH_CAMPAIGN_DATA_FAILURE,
+const fetchCampaignsFailure = (errorMsg) => ({
+    type: actionTypes.FETCH_CAMPAIGNS_FAILURE,
+    errorMsg
+});
+
+
+// Fetch Campaign
+const fetchCampaign = (campaignID) => ({
+    type: actionTypes.FETCH_CAMPAIGN_REQUEST,
+    meta: {thunk: true},
+    campaignID
+});
+
+const fetchCampaignSuccess = (campaign, campaignOptions) => ({
+    type: actionTypes.FETCH_CAMPAIGN_SUCCESS,
+    campaign,
+    campaignOptions
+});
+
+const fetchCampaignFailure = (error) => ({
+    type: actionTypes.FETCH_CAMPAIGN_FAILURE,
     error
 });
 
+// Save Campaign
+const saveCampaign = (name, assistant_id, use_crm, crm_id, database_id, messenger_id, location, jobTitle, skills, message) => ({
+    type: actionTypes.SAVE_CAMPAIGN_REQUEST,
+    meta: {thunk: true},
+    name,
+    assistant_id,
+    use_crm,
+    crm_id,
+    database_id,
+    messenger_id,
+    location,
+    jobTitle,
+    skills,
+    message
+});
+
+const saveCampaignSuccess = (campaign) => ({
+    type: actionTypes.SAVE_CAMPAIGN_SUCCESS,
+    campaign
+});
+
+const saveCampaignFailure = (error) => ({
+    type: actionTypes.SAVE_CAMPAIGN_FAILURE,
+    error
+});
+
+
+// Update Campaign
+const updateCampaign = (campaignID, name, assistant_id, use_crm, crm_id, database_id, messenger_id, location, jobTitle, skills, message) => ({
+    type: actionTypes.UPDATE_CAMPAIGN_REQUEST,
+    campaignID,
+    name,
+    assistant_id,
+    use_crm,
+    crm_id,
+    database_id,
+    messenger_id,
+    location,
+    jobTitle,
+    skills,
+    message
+});
+
+const updateCampaignSuccess = () => ({
+    type: actionTypes.UPDATE_CAMPAIGN_SUCCESS,
+});
+
+const updateCampaignFailure = (error) => ({
+    type: actionTypes.UPDATE_CAMPAIGN_FAILURE,
+    error
+});
+
+
+// Delete Campaign
+const deleteCampaign = (campaignID) => ({
+    type: actionTypes.DELETE_CAMPAIGN_REQUEST,
+    meta: {thunk: true},
+    campaignID
+});
+
+const deleteCampaignSuccess = (campaignID) => ({
+    type: actionTypes.DELETE_CAMPAIGN_SUCCESS,
+    campaignID
+});
+
+const deleteCampaignFailure = (error) => ({
+    type: actionTypes.DELETE_CAMPAIGN_FAILURE,
+    error
+});
+
+// Fetch Candidates List
 const fetchCampaignCandidatesData = (assistant_id, use_crm, crm_id, database_id, messenger_id, location, jobTitle, skills, text) => ({
     type: actionTypes.FETCH_CAMPAIGN_CANDIDATES_DATA_REQUEST,
     assistant_id,
@@ -41,7 +131,8 @@ const fetchCampaignCandidatesDataFailure = (error) => ({
 });
 
 
-const launchCampaign = (assistant_id, use_crm, crm_id, database_id, messenger_id, location, jobTitle, skills, text,candidate_list) => ({
+// Launch Campaign
+const launchCampaign = (assistant_id, use_crm, crm_id, database_id, messenger_id, location, jobTitle, skills, text, candidate_list) => ({
     type: actionTypes.LAUNCH_CAMPAIGN_REQUEST,
     assistant_id,
     use_crm,
@@ -64,10 +155,27 @@ const launchCampaignFailure = (errorMsg) => ({
     errorMsg
 });
 
+
 export const campaignActions = {
-    fetchCampaignData,
-    fetchCampaignDataSuccess,
-    fetchCampaignDataFailure,
+    fetchCampaigns,
+    fetchCampaignsSuccess,
+    fetchCampaignsFailure,
+
+    fetchCampaign,
+    fetchCampaignSuccess,
+    fetchCampaignFailure,
+
+    saveCampaign,
+    saveCampaignSuccess,
+    saveCampaignFailure,
+
+    updateCampaign,
+    updateCampaignSuccess,
+    updateCampaignFailure,
+
+    deleteCampaign,
+    deleteCampaignSuccess,
+    deleteCampaignFailure,
 
     fetchCampaignCandidatesData,
     fetchCampaignCandidatesDataSuccess,

@@ -27,7 +27,8 @@ import Account from './ControlPanel/Account/Account';
 import Billing from './ControlPanel/Billing/Billing';
 import UsersManagement from './ControlPanel/UsersManagement/UsersManagement';
 import Documentation from './Documentation/Documentation';
-import Campaign from './Campaign/Campaign';
+import Campaigns from './Campaigns/Campaigns';
+import Campaign from "./Campaigns/Campaign/Campaign";
 import AutoPilots from './AutoPilots/AutoPilots';
 import AutoPilot from './AutoPilots/AutoPilot/AutoPilot';
 import Appointment from './Appointment/Appointment';
@@ -121,11 +122,11 @@ class Dashboard extends Component {
             '/dashboard/assistants',
             '/dashboard/marketplace',
             '/dashboard/appointments',
-            '/dashboard/auto_pilot',
+            '/dashboard/auto_pilots',
             '/dashboard/databases',
             '/dashboard/account',
             '/dashboard/users_management',
-            '/dashboard/campaign'
+            '/dashboard/campaigns'
         ];
         const isNewLayout = newLayoutRoutes.some(a => this.props.location.pathname.indexOf(a) > -1);
         return (
@@ -172,31 +173,32 @@ class Dashboard extends Component {
                             <Icon type="home"/>
                             <span>Home</span>
                         </Menu.Item>
-
-                        <Menu.Item disabled={!company.AccessAssistants} key="assistants">
+                        {company.AccessAssistants ?
+                        <Menu.Item key="assistants">
                             <Icon type="robot"/>
                             <span>Assistants</span>
-                        </Menu.Item>
+                        </Menu.Item>: null }
 
-                        <Menu.Item disabled={!company.AccessCampaigns} key="campaign">
+                        {company.AccessCampaigns ?
+                        <Menu.Item key="campaigns">
                             <Icon type="rocket"/>
-                            <span>Campaign</span>
-                        </Menu.Item>
-
-                        <Menu.Item disabled={!company.AccessAutoPilot} key="auto_pilots">
+                            <span>Campaigns</span>
+                        </Menu.Item> : null }
+                        {company.AccessAutoPilot ?
+                        <Menu.Item  key="auto_pilots">
                             <Icon type="clock-circle"/>
                             <span>Auto Pilot</span>
-                        </Menu.Item>
-
-                        <Menu.Item disabled={!company.AccessDatabases} key="databases">
+                        </Menu.Item> : null }
+                        {company.AccessDatabases ?
+                        <Menu.Item key="databases">
                             <Icon type="database"/>
                             <span>Database</span>
-                        </Menu.Item>
-
-                        <Menu.Item disabled={!company.AccessAppointments} key="appointments">
+                        </Menu.Item> : null }
+                        {company.AccessAppointments ?
+                        <Menu.Item key="appointments">
                             <Icon type="calendar"/>
                             <span>Appointments (beta)</span>
-                        </Menu.Item>
+                        </Menu.Item> : null }
 
                         <Menu.Item key="marketplace">
                             <Icon type="interation"/>
@@ -271,6 +273,9 @@ class Dashboard extends Component {
                                                 <AuthorisedRoute path={`${match.path}/assistants`} permission={company.AccessAssistants} component={Assistants} exact/>
                                                 <AuthorisedRoute path={`${match.path}/assistants/:id`} permission={company.AccessAssistants} component={Assistant} exact/>
 
+                                                <AuthorisedRoute path={`${match.path}/campaigns`} permission={company.AccessCampaigns} component={Campaigns} exact/>
+                                                <AuthorisedRoute path={`${match.path}/campaigns/:id`} permission={company.AccessCampaigns} component={Campaign} exact/>
+
                                                 <Route path={`${match.path}/marketplace`} component={Marketplace} exact/>
                                                 <Route path={`${match.path}/marketplace/:type`} component={Item} exact/>
 
@@ -286,7 +291,6 @@ class Dashboard extends Component {
                                                 <Route path={`${match.path}/users_management`} component={UsersManagement} exact/>
                                                 <Route path={`${match.path}/documentation`} component={Documentation} exact/>
                                                 <AuthorisedRoute path={`${match.path}/appointments`} permission={company.AccessAppointments} component={Appointment} exact/>
-                                                <AuthorisedRoute path={`${match.path}/campaign`} permission={company.AccessCampaigns} component={Campaign} exact/>
                                                 <Route path="/dashboard" component={Home}/>
                                             </Switch>
                                         </Suspense>

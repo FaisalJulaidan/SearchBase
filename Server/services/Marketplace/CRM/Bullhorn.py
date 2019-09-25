@@ -183,6 +183,7 @@ def sendQuery(auth, query, method, body, companyID, optionalParams=None):
 
 def buildUrl(rest_data, query, optionalParams=None):
     # set up initial url
+    print(rest_data.get("rest_token", "none"))
     url = rest_data.get("rest_url", "https://rest.bullhornstaffing.com/rest-services/5i3n9d/") + query + \
           "?BhRestToken=" + rest_data.get("rest_token", "none")
     # add additional params
@@ -445,7 +446,9 @@ def searchCandidates(auth, companyID, data, fields=None) -> Callback:
 
         # check if no conditions submitted
         if len(query) < 6:
-            query = "query=*:*"
+            query = "query=status:Available"
+        else:
+            query += "&status:Available"
 
         # send query
         sendQuery_callback: Callback = sendQuery(auth, "search/Candidate", "get", {}, companyID,
@@ -505,7 +508,7 @@ def searchPerfectCandidates(auth, companyID, data, fields=None) -> Callback:
 
         # check if no conditions submitted
         if len(query) < 6:
-            query = "query=*:*"
+            query = "query=status:Available"
 
             # send query
             sendQuery_callback: Callback = sendQuery(auth, "search/Candidate", "get", {}, companyID,

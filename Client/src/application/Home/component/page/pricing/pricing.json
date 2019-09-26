@@ -1,9 +1,9 @@
 [
   {
     "title": "Essential",
-    "subtitle": "Suitable for teams of upto 3",
-    "price": "99£ / month",
-    "icon": "",
+    "subtitle": "Suitable for teams of up to 3 members",
+    "price": "£99 / month",
+    "icon": "home",
     "items": [
       "Website Chatbot",
       "CRM Integration",
@@ -12,9 +12,9 @@
   },
   {
     "title": "Pro",
-    "subtitle": "Suitable for teams of upto 10",
-    "price": "249£ / month",
-    "icon": "",
+    "subtitle": "Suitable for teams of up to 10 members",
+    "price": "£249 / month",
+    "icon": "building",
     "items": [
       "Website Chatbot",
       "CRM Integration",
@@ -27,9 +27,9 @@
   },
   {
     "title": "Premium",
-    "subtitle": "Suitable for teams of upto 50",
-    "price": "1,150£ / month",
-    "icon": "",
+    "subtitle": "Suitable for teams of up to 50 members",
+    "price": "£1,150 / month",
+    "icon": "city",
     "items": [
       "Website Chatbot",
       "CRM Integration",

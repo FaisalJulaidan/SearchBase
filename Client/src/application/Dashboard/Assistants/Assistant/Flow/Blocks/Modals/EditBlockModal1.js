@@ -6,6 +6,7 @@ import FileUpload from '../CardTypes/FileUpload';
 import Solutions from '../CardTypes/Solutions';
 import RawText from '../CardTypes/RawText';
 import SalaryPicker from '../CardTypes/SalaryPicker';
+import JobType from '../CardTypes/JobType';
 
 class EditBlockModal extends Component {
 
@@ -76,6 +77,13 @@ class EditBlockModal extends Component {
                                   handleEditBlock={this.handleEditBlock}
                                   handleDeleteBlock={this.props.handleDeleteBlock}
                                   options={this.props.options}/> : null
+                }
+
+                {this.props.block.Type === 'Job Type' ?
+                    <JobType modalState={this.state}
+                             handleEditBlock={this.handleEditBlock}
+                             handleDeleteBlock={this.props.handleDeleteBlock}
+                             options={this.props.options}/> : null
                 }
 
 

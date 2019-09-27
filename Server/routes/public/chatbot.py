@@ -80,7 +80,7 @@ def getSolutions_forChatbot(assistantHashID):
 
 
 @chatbot_router.route("/assistant/<string:assistantIDAsHash>/chatbot", methods=['GET', 'POST'])
-@limiter.limit("2/5minutes", methods=['POST'])
+@limiter.limit("2/3minutes", methods=['POST'])
 def chatbot(assistantIDAsHash):
     if request.method == "GET":
         # Get blocks for the chatbot to use

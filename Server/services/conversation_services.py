@@ -146,7 +146,7 @@ def uploadFiles(files, conversation, data, keys):
         uploadedFiles = []
         uploadedFilesCallbacks = []
         for item in data['collectedData']:
-            if item['input'] == "&FILE_UPLOAD&": # enum for this?
+            if item['input'] == "&FILE_UPLOAD&":  # enum for this?
                 for file in files:
                     if file.filename in uploadedFiles:
                         continue

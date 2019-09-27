@@ -56,7 +56,7 @@ def login(auth):
 
         headers = {'Content-Type': 'application/json'}
 
-        access_token_url = "https://test.salesforce.com/services/oauth2/token?" + \
+        access_token_url = "https://login.salesforce.com/services/oauth2/token?" + \
                            "&grant_type=authorization_code" + \
                            "&redirect_uri=" + helpers.getDomain(3000) + "/dashboard/marketplace/Jobscience" + \
                            "&client_id=" + CLIENT_ID + \
@@ -65,11 +65,12 @@ def login(auth):
 
         # get the access token and refresh token
         access_token_request = requests.post(access_token_url, headers=headers)
-
+        print(access_token_request.status_code)
         if not access_token_request.ok:
             raise Exception(access_token_request.text)
 
         result_body = json.loads(access_token_request.text)
+        print(result_body)
 
         return Callback(True, 'Logged in successfully', result_body.get('access_token'))  # No refresh token currently
 
@@ -81,7 +82,7 @@ def login(auth):
 def logout(access_token, companyID):  # QUESTION: Purpose of companyID param?
     try:
         # Attempt logout
-        logout_url = "https://test.salesforce.com/services/oauth2/revoke?token=" + access_token
+        logout_url = "https://salesforce.com/services/oauth2/revoke?token=" + access_token
         headers = {
             'Content-Type': 'application/json',
             'Authorization': "Bearer " + access_token,
@@ -610,10 +611,13 @@ def sendQuery(access_token, method, body, query):
         headers = {
             'Content-Type': 'application/json',
             'Authorization': "Bearer " + access_token,
-            'cache-control': "no-cache"
+            'cache-control': "no-cache",
+            'Cookie': 'inst=APP_3X'
         }
-        print("BODY OF THE SEND QUERY")
+        print("URL OF THE SEND QUERY")
         print(url)
+        print("HEADERS OF SEND QUERY")
+        print(headers)
         response = marketplace_helpers.sendRequest(url, method, headers, json.dumps(body))
         if not response.ok:
             raise Exception(response.text + ". Query could not be sent")
@@ -629,7 +633,8 @@ def sendQuery(access_token, method, body, query):
 
 
 def buildUrl(query, method):
-    url = "https://prsjobs--jsfull.cs83.my.salesforce.com/services/data/v46.0/"
+
+    url = "https://prsjobs.cs83.my.salesforce.com/services/data/v46.0/"
     if method == "post":
         url = url + query  # Append object to be edited
     elif method == "get":

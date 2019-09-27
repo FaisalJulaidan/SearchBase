@@ -81,7 +81,7 @@ class LogoUploader extends Component {
             <div>
                 <div style={{ width: 300 }}>
                     <Dragger {...props}>
-                        <p className="ant-upload-drag-icon"> ̰
+                        <p className="ant-upload-drag-icon"> 
                             <Icon type="inbox" />
                         </p>
                         <p className="ant-upload-text">

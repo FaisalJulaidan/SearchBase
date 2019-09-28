@@ -294,24 +294,29 @@ def searchCandidates(access_token, conversation) -> Callback:
     try:
 
         # Create filter:
-        query = "WHERE+RecordType.Name+IN+('Candidate')+AND+"  # Fetch contacts who are candidates"
+
+        # Candidate must be available
+        # Candidate desired type must match inputted type
+
+        # Fetch contacts who are candidates and are active"
+        query = "WHERE+RecordType.Name+IN+('Candidate')+AND+ts2__People_Status__c+IN+('Active', 'Live')+AND+"
+
         query += populateFilter(conversation.get('location'), "MailingCity", quote_wrap=True, SOQL_type="=")
+
         query += populateFilter("%" + conversation.get('preferredJotTitle') + "%", "Title", quote_wrap=True,
                                 SOQL_type="+LIKE+")
+
         query += populateFilter(conversation.get("desiredSalary", 0), "ts2__Desired_Salary__c", quote_wrap=True,
                                 SOQL_type="=")
-
         query = query[:-5]
 
         print("Query is:")
         print(query)
-        # print("Exiting...")
-        # exit(0)
 
         # TODO: Differentiate between hourly and salary
         sendQuery_callback: Callback = sendQuery(access_token, "get", {},
                                                  "SELECT+X18_Digit_ID__c,ID,Name,Title,email,phone,MailingCity," +
-                                                 "ts2__Desired_Salary__c,ts2__Desired_Hourly__c," +
+                                                 "ts2__Desired_Salary__c,ts2__Date_Available__c,ts2__Years_of_Experience__c,ts2__Desired_Hourly__c," +
                                                  "ts2__EduDegreeName1__c,ts2__Education__c,Attributes__c+from+Contact+" + query +
                                                  "+LIMIT+200")  # Limit set to 10 TODO: Customize
 
@@ -341,7 +346,7 @@ def searchCandidates(access_token, conversation) -> Callback:
             # send query
             sendQuery_callback: Callback = sendQuery(access_token, "get", {},
                                                      "SELECT+X18_Digit_ID__c,ID,Name,Title,email,phone,MailingCity," +
-                                                     "ts2__Desired_Salary__c,ts2__Desired_Hourly__c," +
+                                                     "ts2__Desired_Salary__c,ts2__Date_Available__c,ts2__Years_of_Experience__c,ts2__Desired_Hourly__c," +
                                                      "ts2__EduDegreeName1__c,ts2__Education__c,Attributes__c+from+Contact+" + query +
                                                      "+LIMIT+200")  # Limit set to 10 TODO: Customize
             if not sendQuery_callback.Success:
@@ -397,7 +402,6 @@ def searchCandidates(access_token, conversation) -> Callback:
                 if skill.get("ts2__Contact__c") == record.get("Id"):
                     skills_string += skill.get("ts2__Skill_Name__c") + ", "
             # skills_string += (record.get("Attributes__c", "") or "")  # Merging skills and job title together...
-            # Ignoring skills string for now
 
             result.append(databases_services.createPandaCandidate(id=record.get("id", ""),
                                                                   name=record.get("Name"),
@@ -406,10 +410,12 @@ def searchCandidates(access_token, conversation) -> Callback:
                                                                   location=record.get("MailingCity"),
                                                                   skills=skills_string,
                                                                   linkdinURL=None,
-                                                                  availability=record.get("status"),
+                                                                  availability=record.get("ts2__Date_Available__c") or
+                                                                               "Not Specified",
                                                                   jobTitle=record.get("Title"),
                                                                   education=record.get('ts2__EduDegreeName1__c'),
-                                                                  yearsExperience=0,  # When 0 -> No skills displayed
+                                                                  yearsExperience=record.get(
+                                                                      'ts2__Years_of_Experience__c'),
                                                                   desiredSalary=record.get('ts2__Desired_Salary__c') or
                                                                                 record.get('ts2__Desired_Hourly__c', 0),
                                                                   currency=Currency("GBP"),

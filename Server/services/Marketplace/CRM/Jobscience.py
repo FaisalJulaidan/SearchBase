@@ -139,7 +139,7 @@ def convertDate(date: str):
 
 def insertCandidate(access_token, conversation: Conversation) -> Callback:
     try:
-
+        print("INSERTING CANDIDATE")
         # NOTE: Should require on front-end that a full name is provided --> reduce data inconsistency
         name = (conversation.get("name") or " ").split(" ")
         body = {
@@ -157,7 +157,7 @@ def insertCandidate(access_token, conversation: Conversation) -> Callback:
             "Attributes__c": conversation.get("skills"),
             "ts2__Job_Type__c": conversation.get("preferredJobType"),
             # "ts2__Text_Resume__c": "", # TODO: Link this with File upload
-            "sirenum__General_Comments__c": crm_services.additionalCandidateNotesBuilder(
+            "Internal_Notes__c": crm_services.additionalCandidateNotesBuilder(
                 {
                     "preferredJobTitle": conversation.get("preferredJobTitle"),
                     "preferredJobType": conversation.get("preferredJobType"),
@@ -396,7 +396,7 @@ def searchCandidates(access_token, conversation) -> Callback:
                 print(skill.get("ts2__Skill_Name__c"))
                 if skill.get("ts2__Contact__c") == record.get("Id"):
                     skills_string += skill.get("ts2__Skill_Name__c") + ", "
-            skills_string += record.get("Attributes__c", "")  # Merging skills and job title together...
+            # skills_string += (record.get("Attributes__c", "") or "")  # Merging skills and job title together...
             # Ignoring skills string for now
 
             result.append(databases_services.createPandaCandidate(id=record.get("id", ""),
@@ -438,6 +438,8 @@ def searchJobs(access_token, conversation) -> Callback:
     try:
         query = "WHERE+"
 
+        # Job must be open:
+        query += populateFilter("Open", "ts2__Status__c", quote_wrap=True, SOQL_type="=")
         # Add (%) for LIKE operator...
         query += populateFilter("%" + conversation.get('jobTitle') + "%", "Name", quote_wrap=True, SOQL_type="+LIKE+")
 
@@ -460,7 +462,7 @@ def searchJobs(access_token, conversation) -> Callback:
 
         # NOTE: Properties to return must be stated, no [*] operator
         sendQuery_callback: Callback = sendQuery(
-            access_token, "get", {}, "SELECT+Name,Rate_Type__c,ts2__Text_Description__c," +
+            access_token, "get", {}, "SELECT+Name,ts2__Employment_Type__c,RecordType.Name,Rate_Type__c,ts2__Text_Description__c," +
                                      "ts2__Max_Salary__c,ts2__Max_Pay_Rate__c,ts2__Min_Pay_Rate__c,ts2__Location__c,ts2__Job_Tag__c," +
                                      "ts2__Estimated_Start_Date__c,ts2__Estimated_End_Date__c+from+ts2__Job__c+" +
                                      query + "+LIMIT+500")  # Return 500 records at most
@@ -473,7 +475,7 @@ def searchJobs(access_token, conversation) -> Callback:
         while len(job_fetch['records']) < 200:
             # send query
             sendQuery_callback: Callback = sendQuery(
-                access_token, "get", {}, "SELECT+Name,Rate_Type__c,ts2__Text_Description__c," +
+                access_token, "get", {}, "SELECT+Name,ts2__Employment_Type__c,RecordType.Name,Rate_Type__c,ts2__Text_Description__c," +
                                          "ts2__Max_Salary__c,ts2__Max_Pay_Rate__c,ts2__Min_Pay_Rate__c,ts2__Location__c,ts2__Job_Tag__c," +
                                          "ts2__Estimated_Start_Date__c,ts2__Estimated_End_Date__c+from+ts2__Job__c+" +
                                          query + "+LIMIT+100")  # Return 500 records at most
@@ -517,16 +519,18 @@ def searchJobs(access_token, conversation) -> Callback:
             print(record.get('Name'))
             print(record.get('ts2__Max_Pay_Rate__c'))
             print(record.get('ts2__Min_Pay_Rate__c'))
+            print(record.get('ts2__Employment_Type__c'))
+            print(record.get('RecordType').get('Name'))
+            print("----------------")
             # Add jobs to database
             result.append(databases_services.createPandaJob(id=record.get('id'),
                                                             title=record.get('Name'),
                                                             desc=record.get('ts2__Text_Description__c'),
                                                             location=record.get('ts2__Location__c'),
-                                                            type=record.get('ts2__Job_Tag__c'),
+                                                            type=record.get('RecordType').get('Name'),
                                                             salary=record.get('ts2__Max_Salary__c') or
                                                                    record.get('ts2__Max_Pay_Rate__c') or
-                                                                   record.get('ts2__Min_Pay_Rate__c'),
-
+                                                                   record.get('ts2__Min_Pay_Rate__c') or 0,
                                                             essentialSkills=record.get('ts2__Job_Tag__c'),
                                                             yearsRequired=0,
                                                             startDate=record.get('ts2__Estimated_Start_Date__c'),

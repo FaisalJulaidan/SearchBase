@@ -15,7 +15,7 @@ const MultiDatePicker = ({message, submitMessage}) => {
     let [settings, setSettings] = useState(false);
     let [selectedDate, setSelectedDate] = useState(null);
     let [selectedDates, setSelectedDates] = useState({individual: [], range: []})
-    let [temporaryRange, setTemporaryRange] = useState({start: null, end: null})
+    let [temporaryRange, setTemporaryRange] = useState({start: null, end: null, reverse: false})
     let [mouseDown, setMouseDown] = useState(null)
     let [open, setOpen] = useState(false)
 
@@ -29,8 +29,7 @@ const MultiDatePicker = ({message, submitMessage}) => {
         className += endCheck ? " end" : ""  // end of range
         className += firstRangeItem ? " range-start" : "" // start of range
         className += lastRangeItem ? " range-end" : ""  // end of range
-        className += 
-        className += date.isBetween(start, end) && !endCheck && !startCheck ? " range": "" // in range
+        className += (date.isBetween(start, end) || date.isBetween(end, start)) && !endCheck && !startCheck ? " range": "" // in range
         return className
     }
 
@@ -89,16 +88,18 @@ const MultiDatePicker = ({message, submitMessage}) => {
       if(temporaryRange.start){
         // click same day
         let dates = Object.assign({}, selectedDates)
-        if(Math.abs(date.diff(temporaryRange.start, 'hours')) < 24){
+        let first = temporaryRange.start.isAfter(temporaryRange.end) // start is after date
+        let compare = temporaryRange.reverse ? temporaryRange.end : temporaryRange.start
+        if(Math.abs(date.diff(compare, 'hours')) < 24){
           dates.individual.push(date)
           setSelectedDates(dates)
         } else {
-          dates.range.push([temporaryRange.start, date])
+          dates.range.push(first ? [temporaryRange.end, temporaryRange.start] : [temporaryRange.start, temporaryRange.end])
           setSelectedDates(dates)
         }
-        setTemporaryRange({start: null, end: null})
+        setTemporaryRange({start: null, end: null, reverse: false})
       } else {
-        setTemporaryRange({start: date, end: null})
+        setTemporaryRange({start: date, end: null, reverse: false})
       }
       setOpen(true)
     }
@@ -111,12 +112,18 @@ const MultiDatePicker = ({message, submitMessage}) => {
       if(mouseDown){
         setMouseDown(null)
         // setOpen(false)
-      }
+      } 
     }
 
     const dateMouseOver = (e, date) => {
       if(temporaryRange.start){
-        setTemporaryRange(obj => ({...obj, end: date}))
+        if(!temporaryRange.start.isAfter(date) && !temporaryRange.reverse){
+          setTemporaryRange(obj => ({...obj, end: date, reverse: false}))
+        } else if(!temporaryRange.reverse) {
+          setTemporaryRange(obj => ({end: obj.start, start: date, reverse: true}))
+        } else {
+          setTemporaryRange(obj => ({...obj, start: date, reverse: true}))
+        }
       }
     }
 

@@ -16,21 +16,10 @@ CLIENT_SECRET = os.environ['JOBSCIENCE_CLIENT_SECRET']
 
 
 # TODO CHECKLIST:
-# [1] SearchJobs [DATA RETURNED]
-# [2] SearchCandidates [DATA RETURNED]
-# [3] Complete iterative generalisation for candidate search[CHECK]
-# [4] Complete iterative generalisation for job search[CHECK]
-# [4.5] Fix and check insert functions [CHECK]
-
-# --- URGENT ----
-# [4.6] Add job type (perm or temp) []
-# [4.7] Get primitive file upload working []
-# --- URGENT ---
 
 # [5] Clean & refactor []
-# [6] TEST []
-# [7] IMPROVE []
-# [8] TRY WITH PROD SALESFORCE []
+
+# [7] IMPROVE SUCH AS ADD FILE UPLOAD []
 
 
 def testConnection(auth, companyID):
@@ -65,12 +54,12 @@ def login(auth):
 
         # get the access token and refresh token
         access_token_request = requests.post(access_token_url, headers=headers)
-        print(access_token_request.status_code)
+        #print(access_token_request.status_code)
         if not access_token_request.ok:
             raise Exception(access_token_request.text)
 
         result_body = json.loads(access_token_request.text)
-        print(result_body)
+        #print(result_body)
 
         return Callback(True, 'Logged in successfully', result_body.get('access_token'))  # No refresh token currently
 
@@ -139,7 +128,7 @@ def convertDate(date: str):
 
 def insertCandidate(access_token, conversation: Conversation) -> Callback:
     try:
-        print("INSERTING CANDIDATE")
+        #print("INSERTING CANDIDATE")
         # NOTE: Should require on front-end that a full name is provided --> reduce data inconsistency
         name = (conversation.get("name") or " ").split(" ")
         body = {
@@ -178,8 +167,8 @@ def insertCandidate(access_token, conversation: Conversation) -> Callback:
         return_body = json.loads(sendQuery_callback.Data.text)
 
         # Insert candidate skills
-        print("THE CANDIDATE SKILLS:")
-        print(conversation.get("skills"))
+        # print("THE CANDIDATE SKILLS:")
+        # print(conversation.get("skills"))
         if conversation.get("skills") is not None:
             insertCandidateSkills_callback: Callback = insertCandidateSkills(
                 access_token, conversation, return_body.get("id"))
@@ -425,7 +414,7 @@ def searchCandidates(access_token, conversation) -> Callback:
                                                                                 record.get('ts2__Desired_Hourly__c', 0),
                                                                   currency=Currency("GBP"),
                                                                   source="Jobscience"))
-        print("RETURNING RECORDS ...")
+        #print("RETURNING RECORDS ...")
         return Callback(True, sendQuery_callback.Message, result)
     except Exception as exc:
         helpers.logError("Marketplace.CRM.Jobscience.searchCandidates() ERROR: " + str(exc))
@@ -469,7 +458,7 @@ def searchJobs(access_token, conversation) -> Callback:
         # query += populateFilter(DT.JobEndDate, "ts2__Estimated_End_Date__c", quote_wrap=False)
 
         query = query[:-5]  # To remove final +AND
-        print("QUERY IS: ", query)
+        #print("QUERY IS: ", query)
 
         # NOTE: Properties to return must be stated, no [*] operator
         sendQuery_callback: Callback = sendQuery(
@@ -498,7 +487,7 @@ def searchJobs(access_token, conversation) -> Callback:
 
             # TODO: Call skills fetch here
             if return_body["records"]:
-                print("Records length:", str(len(records)))
+                #print("Records length:", str(len(records)))
                 # add the candidates to the records
                 records = records + list(return_body["records"])
 
@@ -517,7 +506,7 @@ def searchJobs(access_token, conversation) -> Callback:
 
             # remove the last (least important filter)
             query = "AND".join(query.split("AND")[:-1])
-            print("QUERY IS: ", query)
+            #print("QUERY IS: ", query)
 
             # if no filters left - stop
             if not query:
@@ -526,13 +515,13 @@ def searchJobs(access_token, conversation) -> Callback:
         # Iterate through jobs
         result = []
         for record in records:
-            print("NEW JOB RECORD")
-            print(record.get('Name'))
-            print(record.get('ts2__Max_Pay_Rate__c'))
-            print(record.get('ts2__Min_Pay_Rate__c'))
-            print(record.get('ts2__Employment_Type__c'))
-            print(record.get('RecordType').get('Name'))
-            print("----------------")
+            # print("NEW JOB RECORD")
+            # print(record.get('Name'))
+            # print(record.get('ts2__Max_Pay_Rate__c'))
+            # print(record.get('ts2__Min_Pay_Rate__c'))
+            # print(record.get('ts2__Employment_Type__c'))
+            # print(record.get('RecordType').get('Name'))
+            # print("----------------")
             # Add jobs to database
             result.append(databases_services.createPandaJob(id=record.get('id'),
                                                             title=record.get('Name'),
@@ -549,7 +538,7 @@ def searchJobs(access_token, conversation) -> Callback:
                                                             linkURL=None,
                                                             currency=Currency("GBP"),
                                                             source="Jobscience"))
-        print("FINISHED")
+        #print("FINISHED")
 
         return Callback(True, sendQuery_callback.Message, result)
 

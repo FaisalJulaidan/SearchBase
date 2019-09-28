@@ -275,8 +275,8 @@ def fetchSkillsForCandidateSearch(list_of_contactIDs: list, list_of_skills, acce
     skills = str((', '.join("'" + skill + "'" for skill in list_of_skills)))
 
     sendQuery_callback: Callback = sendQuery(access_token, "get", {},
-                                             "SELECT+ts2__Skill_Name__c,ts2__Contact__c+FROM+ts2__Skill__c+WHERE+" +
-                                             "ts2__Contact__c+IN+(" + query_segment + ")+LIMIT+200")
+                                             "SELECT+ts2__Skill_Name__c,ts2__Last_Used__c,ts2__Contact__c+FROM+ts2__Skill__c+WHERE+" +
+                                             "ts2__Contact__c+IN+(" + query_segment + ")+LIMIT+500")
 
     if not sendQuery_callback.Success:
         raise Exception(sendQuery_callback.Message)
@@ -318,7 +318,7 @@ def searchCandidates(access_token, conversation) -> Callback:
                                                  "SELECT+X18_Digit_ID__c,ID,Name,Title,email,phone,MailingCity," +
                                                  "ts2__Desired_Salary__c,ts2__Date_Available__c,ts2__Years_of_Experience__c,ts2__Desired_Hourly__c," +
                                                  "ts2__EduDegreeName1__c,ts2__Education__c,Attributes__c+from+Contact+" + query +
-                                                 "+LIMIT+200")  # Limit set to 10 TODO: Customize
+                                                 "+LIMIT+500")  # Limit set to 10 TODO: Customize
 
         if not sendQuery_callback.Success:
             raise Exception(sendQuery_callback.Message)
@@ -394,13 +394,18 @@ def searchCandidates(access_token, conversation) -> Callback:
         # <-- CALL SKILLS SEARCH -->
 
         for record in records:
-            print("SALARY FOUND: ", record.get('ts2__Desired_Salary__c'))
-            print("SALARY FOUND: ", record.get('ts2__Desired_Hourly__c'))
+            print("-- NEW RECORD --")
             skills_string = ""
             for skill in candidate_skills:
-                print(skill.get("ts2__Skill_Name__c"))
                 if skill.get("ts2__Contact__c") == record.get("Id"):
-                    skills_string += skill.get("ts2__Skill_Name__c") + ", "
+                    print(skill.get("ts2__Skill_Name__c"))
+                    print(skill.get("ts2__Last_Used__c"))
+
+                    skills_string += skill.get("ts2__Skill_Name__c")
+                    if skill.get("ts2__Last_Used__c") is not None:
+                        skills_string += "(" + skill.get("ts2__Last_Used__c") + "),"  # Display year of use
+                    else:
+                        skills_string += ","
             # skills_string += (record.get("Attributes__c", "") or "")  # Merging skills and job title together...
 
             result.append(databases_services.createPandaCandidate(id=record.get("id", ""),

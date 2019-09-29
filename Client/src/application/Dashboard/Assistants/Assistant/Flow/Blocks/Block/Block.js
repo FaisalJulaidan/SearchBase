@@ -37,6 +37,8 @@ class Block extends Component {
                 return <Tag color="magenta">{type}</Tag>;
             case 'Job Type':
                 return <Tag color="red">{type}</Tag>;
+            case 'User Type':
+                return <Tag color="orange">{type}</Tag>;
         }
     };
 

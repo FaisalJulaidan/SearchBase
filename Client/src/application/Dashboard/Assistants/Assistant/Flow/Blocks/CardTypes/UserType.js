@@ -20,7 +20,7 @@ import styles from '../Blocks.module.less';
 const FormItem = Form.Item;
 const Option = Select.Option;
 
-class JobType extends Component {
+class UserType extends Component {
 
     state = {
         errors: {}
@@ -29,59 +29,54 @@ class JobType extends Component {
     componentDidMount() {
         const { modalState, options } = this.props;
         const { block } = getInitialVariables(options.flow, modalState);
-
         this.setState({
-
             ...initActionType(block, this.props.modalState.allGroups),
             ...initActionTypeSkip(block, this.props.modalState.allGroups),
             showSkip: block.Skippable || false,
             tags: block.Content.keywords || []
-
         }, () => {
-
-            const { blockOptions } = getInitialVariables(options.flow, modalState, 'Job Type');
-            const jobTypesState = {};
+            const { blockOptions } = getInitialVariables(options.flow, modalState, 'User Type');
+            const UserTypesState = {};
 
             for (const type of blockOptions.types) {
-                jobTypesState[type] = {
-                    checked: !!this.getJobType(type, 'value'),
+                UserTypesState[type] = {
+                    checked: !!this.getUserType(type, 'value'),
                     value: type,
-                    text: this.getJobType(type, 'text'),
-                    score: this.getJobType(type, 'score')
+                    text: this.getUserType(type, 'text'),
+                    score: this.getUserType(type, 'score')
                 };
             }
 
-            const jobTypesErrors = {};
+            const UserTypesErrors = {};
             for (const type of blockOptions.types) {
-                jobTypesErrors[type] = {
+                UserTypesErrors[type] = {
                     text: false,
                     score: false
                 };
             }
 
             this.setState({
-                jobTypesState,
-                errors: jobTypesErrors,
+                UserTypesState,
+                errors: UserTypesErrors,
                 hasChecked: true
             });
-
         });
     }
 
     validateCustomFormItmes = () => {
         // prepare the types objects to be sent to the server
-        const jobTypesState = { ...this.state.jobTypesState };
+        const UserTypesState = { ...this.state.UserTypesState };
 
-        Object.keys(jobTypesState).map(key => {
-            if (!jobTypesState[key].checked)
-                return delete jobTypesState[key];
+        Object.keys(UserTypesState).map(key => {
+            if (!UserTypesState[key].checked)
+                return delete UserTypesState[key];
 
-            if (!jobTypesState[key].text)
+            if (!UserTypesState[key].text)
                 this.setState(state => state.errors[key].text = true);
             else
                 this.setState(state => state.errors[key].text = false);
 
-            if (!jobTypesState[key].score)
+            if (!UserTypesState[key].score)
                 this.setState(state => state.errors[key].score = true);
             else
                 this.setState(state => state.errors[key].score = false);
@@ -93,47 +88,48 @@ class JobType extends Component {
         const flowOptions = this.props.options.flow;
 
         // prepare the types objects to be sent to the server
-        const jobTypesState = { ...this.state.jobTypesState };
+        const UserTypesState = { ...this.state.UserTypesState };
 
         this.validateCustomFormItmes();
 
-        let jobTypesErrors = { ...this.state.errors };
-        jobTypesErrors = Object.keys(jobTypesErrors).reduce((r, k) => r.concat(jobTypesErrors[k]), []);
-        jobTypesErrors = jobTypesErrors.map(item => Object.keys(item).reduce((r, k) => r.concat(item[k]), [])).flat();
+        let UserTypesErrors = { ...this.state.errors };
+        UserTypesErrors = Object.keys(UserTypesErrors).reduce((r, k) => r.concat(UserTypesErrors[k]), []);
+        UserTypesErrors = UserTypesErrors.map(item => Object.keys(item).reduce((r, k) => r.concat(item[k]), [])).flat();
 
-        const hasErr = jobTypesErrors.includes(true);
-        const hasChecked = Object.keys(jobTypesState).reduce((r, k) => r.concat(jobTypesState[k].checked), []).includes(true);
+        const hasErr = UserTypesErrors.includes(true);
+        const hasChecked = Object.keys(UserTypesState).reduce((r, k) => r.concat(UserTypesState[k].checked), []).includes(true);
 
         if (!hasChecked) {
             return this.setState({ hasChecked: false });
         }
 
-        if (!err && !hasErr && hasChecked) {
+        if (!err && !hasErr) {
             const types = [];
-            Object.keys(jobTypesState).map(key => {
+            Object.keys(UserTypesState).map(key => {
 
-                if (!jobTypesState[key].checked)
-                    return delete jobTypesState[key];
+                if (!UserTypesState[key].checked)
+                    return delete UserTypesState[key];
 
-                delete jobTypesState[key].checked;
+                delete UserTypesState[key].checked;
 
-                jobTypesState[key] = {
-                    ...jobTypesState[key],
+                UserTypesState[key] = {
+                    ...UserTypesState[key],
                     blockToGoID: values[`${key}_blockToGoID`] || values[`${key}_blockToGoIDGroup`] || null,
                     action: values[`${key}_action`],
                     afterMessage: values[`${key}_afterMessage`] || ''
                 };
 
-                types.push({ ...jobTypesState[key] });
+                types.push({ ...UserTypesState[key] });
             });
 
             console.log(types);
 
             let options = {
-                Type: 'Job Type',
+                Type: 'User Type',
                 StoreInDB: false,
 
-                DataType: flowOptions.dataTypes.find((dataType) => dataType.name === 'Job Salary'),
+                // TODO: ADD USER TYPE for data types
+                DataType: flowOptions.dataTypes.find((dataType) => dataType.name === 'User Type'),
 
                 Skippable: values.isSkippable || false,
                 SkipText: values.SkipText || 'Skip!',
@@ -158,9 +154,9 @@ class JobType extends Component {
     });
 
 
-    getJobType = (type, attr) => {
+    getUserType = (type, attr) => {
         const { modalState, options } = this.props;
-        const { block } = getInitialVariables(options.flow, modalState, 'Job Type');
+        const { block } = getInitialVariables(options.flow, modalState, 'User Type');
         return (
             block.Content.types &&
             block.Content.types.find(x => x.value === type) &&
@@ -179,10 +175,10 @@ class JobType extends Component {
 
     render() {
         const { modalState, options, form, handleNewBlock, handleEditBlock, handleDeleteBlock } = this.props;
-        const { blockOptions, block } = getInitialVariables(options.flow, modalState, 'Job Type');
+        const { blockOptions, block } = getInitialVariables(options.flow, modalState, 'User Type');
         const { allGroups, allBlocks, currentGroup, layout } = modalState;
         const { getFieldDecorator } = form;
-        const { showSkip, jobTypesState } = this.state;
+        const { showSkip, UserTypesState } = this.state;
 
         const buttons = ButtonsForm(handleNewBlock, handleEditBlock, handleDeleteBlock, this.onSubmit, block);
 
@@ -190,13 +186,14 @@ class JobType extends Component {
             <Card style={{ width: '100%' }} actions={buttons}>
                 <Form layout='horizontal'>
 
+
                     <QuestionFormItem FormItem={FormItem} block={block}
                                       getFieldDecorator={getFieldDecorator}
                                       layout={layout}
-                                      placeholder="Ex: What is your job?"/>
+                                      placeholder="Ex: What best describes you?"/>
 
                     <Divider dashed={true} style={{ fontWeight: 'normal', fontSize: '14px' }}>
-                        Job Types
+                        User Types
                     </Divider>
 
                     {
@@ -206,10 +203,10 @@ class JobType extends Component {
                                     <div className={styles.PredefinedValues}>
                                         <div className={[!this.state.hasChecked && 'has-error'].join(' ')}>
                                             <Checkbox className={styles.CheckBox}
-                                                      defaultChecked={!!this.getJobType(type, 'value')}
+                                                      defaultChecked={!!this.getUserType(type, 'value')}
                                                       onChange={e => {
                                                           this.setState(state => {
-                                                              state.jobTypesState[type].checked = e.target.checked;
+                                                              state.UserTypesState[type].checked = e.target.checked;
                                                               state.hasChecked = true;
 
                                                               if (!e.target.checked)
@@ -233,11 +230,11 @@ class JobType extends Component {
 
                                             <div
                                                 className={[this.state.errors[type]?.text && 'has-error', styles.Text].join(' ')}>
-                                                <Input disabled={jobTypesState && !jobTypesState[type].checked}
+                                                <Input disabled={UserTypesState && !UserTypesState[type].checked}
                                                        onChange={e => {
                                                            const val = e.target.value;
                                                            this.setState(state => {
-                                                                   state.jobTypesState[type].text = val;
+                                                                   state.UserTypesState[type].text = val;
                                                                    return state;
                                                                },
                                                                () => this.validateCustomFormItmes());
@@ -252,11 +249,11 @@ class JobType extends Component {
 
                                             <div
                                                 className={[this.state.errors[type]?.score && 'has-error', styles.Score].join(' ')}>
-                                                <Select disabled={jobTypesState && !jobTypesState[type].checked}
+                                                <Select disabled={UserTypesState && !UserTypesState[type].checked}
                                                         placeholder="Select score weight"
-                                                        defaultValue={this.getJobType(type, 'score')}
+                                                        defaultValue={this.getUserType(type, 'score')}
                                                         onChange={value => {
-                                                            this.setState(state => state.jobTypesState[type].score = value,
+                                                            this.setState(state => state.UserTypesState[type].score = value,
                                                                 () => this.validateCustomFormItmes());
                                                         }}>
                                                     <Option value={5}>5</Option>
@@ -277,7 +274,7 @@ class JobType extends Component {
 
                                     </div>
 
-                                    {jobTypesState && jobTypesState[type].checked &&
+                                    {UserTypesState && UserTypesState[type].checked &&
 
                                     <div>
                                         <ActionFormItem FormItem={FormItem}
@@ -285,7 +282,7 @@ class JobType extends Component {
                                                         block={{
                                                             Content: {
                                                                 ID: block.ID,
-                                                                action: this.getJobType(type, 'action')
+                                                                action: this.getUserType(type, 'action')
                                                             }
                                                         }}
                                                         setStateHandler={(state) => this.setState(state)}
@@ -297,11 +294,11 @@ class JobType extends Component {
                                                                block={{
                                                                    ID: block.ID,
                                                                    Content: {
-                                                                       blockToGoID: this.getJobType(type, 'blockToGoID')
+                                                                       blockToGoID: this.getUserType(type, 'blockToGoID')
                                                                    }
                                                                }}
                                                                allBlocks={allBlocks}
-                                                               showGoToBlock={this.getJobType(type, 'action') === 'Go To Specific Block'}
+                                                               showGoToBlock={this.getUserType(type, 'action') === 'Go To Specific Block'}
                                                                getFieldDecorator={getFieldDecorator}
                                                                layout={layout}
                                                                fieldName={`${type}_blockToGoID`}/>
@@ -310,12 +307,12 @@ class JobType extends Component {
                                                                block={{
                                                                    ID: block.ID,
                                                                    Content: {
-                                                                       blockToGoID: this.getJobType(type, 'blockToGoID')
+                                                                       blockToGoID: this.getUserType(type, 'blockToGoID')
                                                                    }
                                                                }}
                                                                allGroups={allGroups}
                                                                currentGroup={currentGroup}
-                                                               showGoToGroup={this.getJobType(type, 'action') === 'Go To Group'}
+                                                               showGoToGroup={this.getUserType(type, 'action') === 'Go To Group'}
                                                                getFieldDecorator={getFieldDecorator}
                                                                layout={layout}
                                                                fieldName={`${type}_blockToGoIDGroup`}/>
@@ -324,7 +321,7 @@ class JobType extends Component {
                                                               block={{
                                                                   ID: block.ID,
                                                                   Content: {
-                                                                      afterMessage: this.getJobType(type, 'afterMessage')
+                                                                      afterMessage: this.getUserType(type, 'afterMessage')
                                                                   }
                                                               }}
                                                               getFieldDecorator={getFieldDecorator}
@@ -382,5 +379,5 @@ class JobType extends Component {
     }
 }
 
-export default Form.create()(JobType);
+export default Form.create()(UserType);
 

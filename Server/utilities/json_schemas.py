@@ -186,6 +186,7 @@ UserType = {
                     "value": {"enum": [ut.value for ut in enums.UserType]},
                     "blockToGoID": {"type": ["string", "null"]},
                     "action": {"enum": [e.value for e in enums.BlockAction]},
+                    "score": {"type": "integer"},
                     "afterMessage": {"type": "string"},
                 },
                 "required": ["text", "value", "blockToGoID", "action", "afterMessage"],

@@ -136,6 +136,7 @@ class DataTypeSection(Enum):
     Company = 'Company'
     Candidate = 'Candidate'
     Job = 'Job'
+    User = 'User'
 
     @classmethod
     def has_value(cls, value):
@@ -515,3 +516,14 @@ class DataType(Enum):
         DataTypeSection.Job,
         [UserType.Candidate, UserType.Client],
         [BlockType.UserInput])
+
+    # ======================================================================
+    # User
+
+    UserType = dataTypeCreator(
+        'User Type',
+        'UserType',
+        ValidationType.String,
+        DataTypeSection.User,
+        [UserType.Candidate, UserType.Client], # Not sure about this
+        [BlockType.UserType])

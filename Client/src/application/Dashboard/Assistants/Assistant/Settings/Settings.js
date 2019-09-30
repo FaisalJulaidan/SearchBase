@@ -7,6 +7,8 @@ import { assistantActions, marketplaceActions } from 'store/actions';
 import { history } from 'helpers';
 
 import countries from 'helpers/static_data/countries';
+import LogoUploader from 'components/LogoUploader/LogoUploader';
+
 
 const FormItem = Form.Item;
 const Option = Select.Option;
@@ -75,6 +77,15 @@ class Settings extends Component {
             }
         });
     };
+
+    uploadLogo = async (file) => {
+        console.log('UPLOADDDD');
+        console.log(file);
+        this.props.dispatch(assistantActions.uploadLogo(this.props.assistant.ID, file));
+    };
+
+    deleteLogo = () => this.props.dispatch(assistantActions.deleteLogo(this.props.assistant.ID));
+
 
     render() {
         const { getFieldDecorator } = this.props.form;
@@ -204,6 +215,7 @@ class Settings extends Component {
                                          }}/>
                             : null}
                     </Form.Item>
+
                     <FormItem
                         label="Restricted Countries"
                         extra="Chatbot will be disabled for users who live in the selected countries"
@@ -221,32 +233,23 @@ class Settings extends Component {
                         }
                     </FormItem>
 
-
-                    {/*<FormItem*/}
-                    {/*label="Records Notifications"*/}
-                    {/*extra="If you turn this on, we will notify you through your email"*/}
-                    {/*>*/}
-                    {/*<Switch checked={this.state.isAlertsEnabled} onChange={this.toggleAlertsSwitch}*/}
-                    {/*style={{marginRight: '5px'}}/>*/}
-                    {/*</FormItem>*/}
-
-                    {/*<FormItem*/}
-                    {/*label="Alert Me Every:"*/}
-                    {/*extra="Select how often you would like to be notified"*/}
-                    {/*>*/}
-                    {/*{getFieldDecorator('alertEveryy', {*/}
-                    {/*initialValue: this.props.assistant.MailPeriod*/}
-                    {/*})(*/}
-                    {/*<Slider*/}
-                    {/*max={maxAlertsLength}*/}
-                    {/*disabled={!this.state.isAlertsEnabled}*/}
-                    {/*marks={this.state.alertOptions} step={null}/>*/}
-                    {/*)}*/}
-                    {/*</FormItem>*/}
-
-
                     <Button type={'primary'} size={'large'} onClick={this.handleSave}>Save changes</Button>
                 </Form>
+
+
+                <br/>
+                <Divider/>
+                <h2>Assistant Logo</h2>
+                <p>
+                    your assistant logo will replace TheSearchBase logo in the
+                    chatbot. If you did not upload a logo specifically for this assistant, your company logo will be used instead. You can upload your company logo from
+                    <a onClick={()=> history.push(`/dashboard/account?tab=Company`)}> <b>here</b></a>
+                </p>
+                <LogoUploader
+                    logoPath={assistant.LogoPath}
+                    uploadLogo={this.uploadLogo}
+                    deleteLogo={this.deleteLogo}/>
+
 
                 <br/>
                 <Divider/>

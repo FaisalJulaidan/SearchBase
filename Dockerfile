@@ -47,10 +47,10 @@ WORKDIR /Server
 
 # Copy Pipfile and paste it in Server - To be cached -
 COPY Server/Pipfile .
-COPY Server/Pipfile.lock .
-
+#COPY Server/Pipfile.lock .
 # Install pipenv to install dependecies
 RUN pip install pipenv
+RUN pipenv lock
 RUN pipenv install --system --deploy --ignore-pipfile
 
 # Copy (host) Server and paste in (container) Server directory
@@ -69,4 +69,4 @@ RUN chmod +x /wait-for-it.sh
 # Run the production server
 CMD ["/wait-for-it.sh", "mysql:3306", "--", \
      "gunicorn", "--bind", "0.0.0.0:5000", \
-     "--no-sendfile", "thesearchbase:app"]
+     "--no-sendfile", "--timeout", "90", "thesearchbase:app"]

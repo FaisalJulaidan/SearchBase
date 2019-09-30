@@ -1,12 +1,12 @@
-import React from 'react'
-import styles from './AppointmentsPicker.module.less'
-import {faCloud} from '@fortawesome/free-solid-svg-icons'
-import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
-import {appointmentsPickerActions} from "store/actions";
-import {connect} from 'react-redux';
-import AppointmentsTimetable from './AppointmentsTimetable/AppointmentsTimetable'
-import {getLink} from "helpers";
-import {Typography} from 'antd';
+import React from 'react';
+import styles from './AppointmentsPicker.module.less';
+import { appointmentsPickerActions } from 'store/actions';
+import { connect } from 'react-redux';
+import AppointmentsTimetable from './AppointmentsTimetable/AppointmentsTimetable';
+import PublicNavbar from "components/PublicNavbar/PublicNavbar";
+import { getLink } from 'helpers';
+import { Typography } from 'antd';
+import moment from 'moment';
 
 
 class AppointmentsPicker extends React.Component {
@@ -18,13 +18,16 @@ class AppointmentsPicker extends React.Component {
         this.props.dispatch(appointmentsPickerActions.fetchAppointment(this.requestToken));
     }
 
-    onSubmit = selectedTimeSlot => this.props.dispatch(
-        appointmentsPickerActions.selectAppointmentTime(this.requestToken, selectedTimeSlot)
-    );
+    onSubmit = ({ selectedTimeSlot, userTimeZone }) => {
+        const convertedTimeBackToUTC = moment(selectedTimeSlot, 'YYYY-MM-DD hh:mm').utc().format('YYYY-MM-DD hh:mm');
+        this.props.dispatch(
+            appointmentsPickerActions.selectAppointmentTime(this.requestToken, convertedTimeBackToUTC, userTimeZone)
+        );
+    };
 
 
     render() {
-
+        const {logoPath, companyName} = this.props.appointment;
         const timeTable = (
             this.props.appointment &&
             !this.props.isSelected &&
@@ -40,7 +43,7 @@ class AppointmentsPicker extends React.Component {
                     Thanks for your selection
                 </Typography.Title>
                 <h3>
-                    Your appointment will be confirmed when the recruiter confrims the appointment
+                    Your appointment will be confirmed when the recruiter confirms the appointment
                     You will be notified by email
                 </h3>
             </div>
@@ -48,17 +51,8 @@ class AppointmentsPicker extends React.Component {
 
         return (
             <div style={{height: '100%'}}>
-                <div className={styles.Navbar}>
-                    <div>
-                        <FontAwesomeIcon size="2x" icon={faCloud} style={{color: '#9254de'}}/>
-                        <div style={{
-                            lineHeight: '40px',
-                            marginLeft: 18,
-                            color: "#9254de"
-                        }}>TheSearchBase
-                        </div>
-                    </div>
-                </div>
+                <PublicNavbar logoPath={logoPath} companyName={companyName}
+                              hideOnMobile={true}/>
 
                 <div className={styles.Wrapper}>
 

@@ -1,11 +1,13 @@
 from sqlalchemy import and_
 
-from models import db, Assistant, Callback, AutoPilot
-from services import auto_pilot_services, flow_services
+from werkzeug.utils import secure_filename
+from models import db, Assistant, Callback, AutoPilot, AppointmentAllocationTime, Company, StoredFileInfo, StoredFile
+from services import auto_pilot_services, flow_services, stored_file_services
 from services.Marketplace.CRM import crm_services
 from services.Marketplace.Calendar import calendar_services
-from services.Marketplace.Messenger import mesenger_services
-from utilities import helpers, json_schemas
+from services.Marketplace.Messenger import messenger_servicess
+from utilities import helpers, json_schemas, enums
+from sqlalchemy.orm import joinedload
 from os.path import join
 from config import BaseConfig
 from jsonschema import validate
@@ -63,11 +65,16 @@ def getByHashID(hashID):
         return Callback(False, "Assistant not found!")
 
 
-def getByID(id: int, companyID: int) -> Callback:
+def getByID(id: int, companyID: int, eager= False) -> Callback:
     try:
         # Get result and check if None then raise exception
-        result = db.session.query(Assistant)\
-            .filter(and_(Assistant.ID == id, Assistant.CompanyID == companyID)).first()
+        query = db.session.query(Assistant)
+
+        if eager:
+            query = query.options(joinedload('StoredFile').joinedload("StoredFileInfo"))
+
+        result = query.filter(and_(Assistant.ID == id, Assistant.CompanyID == companyID)).first()
+
         if not result: raise Exception
         return Callback(True, "Got assistant successfully.", result)
 
@@ -113,6 +120,24 @@ def getAll(companyID) -> Callback:
         return Callback(False, 'Could not get all assistants.')
 
 
+def getAllFull(companyID) -> Callback:
+    try:
+        if not companyID: raise Exception
+        # Get result and check if None then raise exception
+        result = db.session.query(Assistant)\
+            .filter(Assistant.CompanyID == companyID).all()
+
+        if len(result) == 0:
+            return Callback(True, "No assistants  to be retrieved.", [])
+
+        return Callback(True, "Got all assistants  successfully.", result)
+
+    except Exception as exc:
+        db.session.rollback()
+        helpers.logError("assistant_services.getAll(): " + str(exc))
+        return Callback(False, 'Could not get all assistants.')
+
+
 def getAllWithEnabledNotifications(companyID) -> Callback:
     try:
         if companyID:
@@ -138,13 +163,17 @@ def getAppointmentAllocationTime(assistantID) -> Callback:
         if not assistant: raise Exception
 
         connectedAutoPilot: AutoPilot = assistant.AutoPilot
-
         # If the assistant is not connected to an autoPilot then return an empty array which means no open times
         if not connectedAutoPilot:
-            return Callback(True,"There are no open time slots")
+            return Callback(True, "There are no available time slots")
+
+        appointmentAllocationTime: AppointmentAllocationTime = connectedAutoPilot.AppointmentAllocationTime
+        # Check if the auto pilot is not linked with an AppointmentAllocationTime table
+        if not (appointmentAllocationTime and connectedAutoPilot.SendCandidatesAppointments):
+            return Callback(True, "There are no available time slots")
 
         # OpenTimes is an array of all open slots per day
-        return Callback(True, "Got open time slots successfully.", connectedAutoPilot.AppointmentAllocationTime)
+        return Callback(True, "Got open time slots successfully.", appointmentAllocationTime)
 
     except Exception as exc:
         helpers.logError("assistant_services.getOpenTimes(): " + str(exc))
@@ -234,7 +263,7 @@ def removeByID(id, companyID) -> Callback:
 def connectToCRM(assistantID, CRMID, companyID):
     try:
 
-        crm_callback: Callback = crm_services.getCRMByID(CRMID, companyID)
+        crm_callback: Callback = crm_services.getByID(CRMID, companyID)
         if not crm_callback.Success:
             raise Exception(crm_callback.Message)
 
@@ -306,7 +335,7 @@ def disconnectFromCalendar(assistantID, companyID):
 def connectToMessenger(assistantID, messengerID, companyID):
     try:
 
-        messenger_callback: Callback = mesenger_services.getMessengerByID(messengerID, companyID)
+        messenger_callback: Callback = messenger_servicess.getByID(messengerID, companyID)
         if not messenger_callback.Success:
             raise Exception(messenger_callback.Message)
 
@@ -370,3 +399,63 @@ def disconnectFromAutoPilot(assistantID, companyID):
         helpers.logError("assistant_services.disconnectFromAutoPilot(): " + str(exc))
         db.session.rollback()
         return Callback(False, 'Error in disconnecting assistant from AutoPilot.')
+
+    # ----- Logo Operations ----- #
+def uploadLogo(file, assistantID, companyID):
+    try:
+
+        assistant: Assistant = getByID(assistantID, companyID, True).Data
+        if not assistant: raise Exception
+
+        # Delete old logo ref from DB. DigitalOcean will override the old logo since they have the same name
+        oldLogo: StoredFileInfo = helpers.keyFromStoredFile(assistant.StoredFile, enums.FileAssetType.Logo)
+        if oldLogo.AbsFilePath:
+            db.session.delete(oldLogo.StoredFile)
+            db.session.delete(oldLogo) # comment this if u want to use a unique filename for every new logo instead of company id encoded
+
+        # Generate unique name using assistant name encoded
+        filename = helpers.encodeID(assistantID) + "_AssistantLogo" + '.' + \
+                   secure_filename(file.filename).rsplit('.', 1)[1].lower()
+
+        sf = StoredFile()
+        db.session.add(sf)
+        db.session.flush()
+
+        upload_callback: Callback = stored_file_services.uploadFile(file, filename, True, model=Assistant,
+                                                                    identifier="ID",
+                                                                    identifier_value=assistant.ID,
+                                                                    stored_file_id=sf.ID,
+                                                                    key=enums.FileAssetType.Logo)
+
+        return Callback(True, 'Logo uploaded successfully.', upload_callback.Data)
+
+    except Exception as exc:
+        helpers.logError("assistant_service.uploadLogo(): " + str(exc))
+        db.session.rollback()
+        return Callback(False, 'Error in uploading assistant logo.')
+
+
+def deleteLogo(assistantID, companyID):
+    try:
+
+        assistant: Assistant = getByID(assistantID, companyID, True).Data
+        if not assistant: raise Exception
+
+
+        logo: StoredFile = assistant.StoredFile
+        if not logo: return Callback(False, 'No logo to delete')
+
+        # Delete file from cloud Space and reference from database
+        path = helpers.keyFromStoredFile(logo, enums.FileAssetType.Logo).FilePath
+
+        delete_callback : Callback = stored_file_services.deleteFile(path, logo)
+        if not delete_callback.Success:
+            raise Exception(delete_callback.Message)
+
+        db.session.commit()
+        return Callback(True, 'Logo deleted successfully.')
+
+    except Exception as exc:
+        helpers.logError("company_service.deleteLogo(): " + str(exc))
+        db.session.rollback()
+        return Callback(False, 'Error in deleting logo.')

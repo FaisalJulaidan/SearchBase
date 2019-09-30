@@ -68,6 +68,9 @@ Candidate: Candidate = Candidate
 from schemas.Company import Company
 Company: Company = Company
 
+from schemas.Campaign import Campaign
+Campaign: Campaign = Campaign
+
 from schemas.Conversation import Conversation
 Conversation: Conversation = Conversation
 

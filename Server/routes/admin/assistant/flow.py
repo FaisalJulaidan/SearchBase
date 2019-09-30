@@ -1,7 +1,7 @@
 from flask import Blueprint, request
 from services import assistant_services, flow_services
 from models import Callback, Assistant
-from utilities import helpers
+from utilities import helpers, wrappers
 from flask_jwt_extended import jwt_required, get_jwt_identity
 
 
@@ -10,6 +10,7 @@ flow_router: Blueprint = Blueprint('flow_router', __name__, template_folder="../
 
 @flow_router.route("/assistant/<int:assistantID>/flow", methods=['PUT'])
 @jwt_required
+@wrappers.AccessAssistantsRequired
 def flow(assistantID):
 
     # Authenticate

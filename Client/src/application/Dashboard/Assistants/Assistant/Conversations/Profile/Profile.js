@@ -26,13 +26,13 @@ class Profile extends Component {
             let values = this.props.conversation.Data.keywordsByDataType[dataType.name];
 
             let inputs = [];
+            let idx = 0;
             if(values){
                 values.forEach(input => {
                     if (input === '&FILE_UPLOAD&'){
-                        this.counter += 1;
-                        inputs.push(this.createDownloadFileBtn(this.counter))
+                        inputs.push(this.createDownloadFileBtn(dataType.files[idx++])); // #TODO: Make this so it takes the appropriate file (dropdown or smth in the future)
                     } else {
-                        inputs.push(input + " ")
+                        inputs.push(input + " ");
                     }
                 });
             }
@@ -44,8 +44,8 @@ class Profile extends Component {
         }
     }];
 
-    createDownloadFileBtn = (index) => {
-        return (<Button key={index} hreftype="primary" file-path-index={index} icon="download"
+    createDownloadFileBtn = (filePath) => {
+        return (<Button key={filePath} hreftype="primary" file-path-index={filePath} icon="download"
                         size="small" style={{margin: '0 5px 0 5px'}}
                         onClick={(e) => {this.props.downloadFile(e.target.getAttribute('file-path-index'))}}>
                     Download File
@@ -54,12 +54,23 @@ class Profile extends Component {
  
     render() {
         const {conversation, dataTypes} = this.props;
-        console.log(this.state);
+        let typeFiles = {}
+        //aggregate files by type
+        for(let idx in conversation.Data.collectedData){
+            let item = conversation.Data.collectedData[idx]
+            if(item.input === "&FILE_UPLOAD&"){
+                if(!typeFiles[item.dataType]){
+                    typeFiles[item.dataType] = []
+                }
+                typeFiles[item.dataType].push(item.fileName)
+            }
+        }
+        let realTypes = dataTypes.map(type => ({...type, files: typeFiles[type.name] ? typeFiles[type.name] : null}))
         return (
             conversation?.UserType !== "Unknown" ?
                 <Table
                     columns={this.columns}
-                    dataSource={dataTypes.filter((type) => type.userTypes.includes(conversation.UserType))}
+                    dataSource={realTypes.filter((type) => type.userTypes.includes(conversation.UserType))}
                     size='middle'
                     pagination={false}
                 />

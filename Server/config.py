@@ -75,7 +75,7 @@ class BaseConfig(object):
     # MAIL_PASSWORD = 'orfqpgqiusxcoeif'
     # MAIL_SUPPRESS_SEND = False
 
-    # Calendar Config
+    # # Calendar Config
     MAIL_SERVER = 'smtp.office365.com'
     MAIL_PORT = 587
     MAIL_USE_TLS = True

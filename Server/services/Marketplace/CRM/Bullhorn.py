@@ -6,7 +6,7 @@ from datetime import datetime
 import requests
 from sqlalchemy_utils import Currency
 
-from models import Callback, Conversation, db, CRM as CRM_Model, StoredFile
+from models import Callback, Conversation, db, CRM as CRM_Model, StoredFileInfo
 from services import databases_services, stored_file_services
 from services.Marketplace import marketplace_helpers
 from services.Marketplace.CRM import crm_services
@@ -58,7 +58,7 @@ def login(auth):
 
         headers = {'Content-Type': 'application/json'}
 
-        access_token_url = "https://auth9.bullhornstaffing.com/oauth/token?" + \
+        access_token_url = "https://auth-emea.bullhornstaffing.com/oauth/token?" + \
                            "&grant_type=authorization_code" + \
                            "&redirect_uri=" + helpers.getDomain(3000) + "/dashboard/marketplace/Bullhorn" + \
                            "&client_id=" + CLIENT_ID + \
@@ -102,10 +102,14 @@ def retrieveRestToken(auth, companyID):
         headers = {'Content-Type': 'application/json'}
 
         # use refresh_token to generate access_token and refresh_token
-        url = "https://auth.bullhornstaffing.com/oauth/token?grant_type=refresh_token&refresh_token=" + \
+        url = "https://auth-emea.bullhornstaffing.com/oauth/token?grant_type=refresh_token&refresh_token=" + \
               authCopy.get("refresh_token") + \
               "&client_id=" + CLIENT_ID + \
               "&client_secret=" + CLIENT_SECRET
+
+        if os.environ['FLASK_ENV'] != "production":
+            url = url.replace("auth-emea.", "auth9.")
+
         helpers.logError("--------------------------------------------------------------------------------------------")
         helpers.logError("--------------------------------------------------------------------------------------------")
         helpers.logError("TESTING BUG " + str(companyID) + " REQUEST: " + url)
@@ -113,6 +117,7 @@ def retrieveRestToken(auth, companyID):
         helpers.logError("TESTING BUG " + str(companyID) + " TEXT: " + get_access_token.text)
         helpers.logError("--------------------------------------------------------------------------------------------")
         helpers.logError("--------------------------------------------------------------------------------------------")
+
         if get_access_token.ok:
             result_body = json.loads(get_access_token.text)
             access_token = result_body["access_token"]
@@ -153,10 +158,20 @@ def sendQuery(auth, query, method, body, companyID, optionalParams=None):
         # get url
         url = buildUrl(auth, query, optionalParams)
 
+        if os.environ['FLASK_ENV'] != "production":
+            url = url.replace("rest.", "rest9.")
+
+        # remove None values from body
+        body = {key: value for key, value in body.items() if value is not None}
+
         # set headers
         headers = {'Content-Type': 'application/json'}
+
         # test the BhRestToken (rest_token)
         r = marketplace_helpers.sendRequest(url, method, headers, json.dumps(body))
+        # print(url)
+        # print(r.status_code)
+        # print(r.text)
         if r.status_code == 401:  # wrong rest token
             callback: Callback = retrieveRestToken(auth, companyID)
             if not callback.Success:
@@ -169,7 +184,7 @@ def sendQuery(auth, query, method, body, companyID, optionalParams=None):
                 raise Exception(r.text + ". Query could not be sent")
 
         elif not r.ok:
-            raise Exception("Rest url for query is incorrect")
+            raise Exception("send query failed: ", r.text)
 
         return Callback(True, "Query was successful", r)
 
@@ -180,7 +195,8 @@ def sendQuery(auth, query, method, body, companyID, optionalParams=None):
 
 def buildUrl(rest_data, query, optionalParams=None):
     # set up initial url
-    url = rest_data.get("rest_url", "https://rest91.bullhornstaffing.com/rest-services/5i3n9d/") + query + \
+    print(rest_data.get("rest_token", "none"))
+    url = rest_data.get("rest_url", "https://rest.bullhornstaffing.com/rest-services/5i3n9d/") + query + \
           "?BhRestToken=" + rest_data.get("rest_token", "none")
     # add additional params
     if optionalParams:
@@ -249,14 +265,14 @@ def insertCandidate(auth, data, companyID) -> Callback:
         return Callback(False, str(exc))
 
 
-def uploadFile(auth, storedFile: StoredFile):
+def uploadFile(auth, storedFileInfo: StoredFileInfo):
     try:
-        conversation = storedFile.Conversation
+        conversation = storedFileInfo.Conversation
 
         if not conversation.CRMResponse:
             raise Exception("Can't upload file for record with no CRM Response")
 
-        file_callback = stored_file_services.downloadFile(storedFile.FilePath, stored_file_services.USER_FILES_PATH)
+        file_callback = stored_file_services.downloadFile(storedFileInfo.AbsFilePath)
         if not file_callback.Success:
             raise Exception(file_callback.Message)
         file = file_callback.Data
@@ -264,9 +280,9 @@ def uploadFile(auth, storedFile: StoredFile):
         file_content = base64.b64encode(file_content).decode('ascii')
 
         body = {
-            "externalID": storedFile.ID,
+            "externalID": storedFileInfo.ID,
             "fileType": "SAMPLE",
-            "name": "TSB_" + storedFile.FilePath,
+            "name": "TSB_" + storedFileInfo.FilePath,
             "fileContent": file_content
         }
 
@@ -366,6 +382,66 @@ def insertCompany(auth, data, companyID) -> Callback:
         return Callback(False, str(exc))
 
 
+def updateCandidate(auth, data, companyID) -> Callback:
+    try:
+        # availability, yearsExperience
+        body = {
+            "id": data.get("id"),
+            "name": data.get("name"),
+            "firstName": data.get("firstName"),
+            "lastName": data.get("lastName"),
+            "mobile": data.get("mobile"),
+            "address": {
+                "city": data.get("city"),
+            },
+            "email": data.get("email"),
+
+            # "primarySkills": data.get("skills"),
+            "experience": data.get("yearsExperience"),
+
+            "secondaryAddress": {
+                "city": data.get("preferredWorkCity"),
+            },
+
+            "educationDegree": data.get("educations"),
+            "dateAvailable": data.get("availability"),  # TODO CHECK
+
+            "salary": data.get("annualSalary"),
+            "dayRate": data.get("dayRate"),
+
+            "comments": crm_services.additionalCandidateNotesBuilder(
+                {
+                    "preferredJobTitle": data.get("preferredJobTitle"),
+                    "preferredJobType": data.get("preferredJobType"),
+                    "yearsExperience": data.get("yearsExperience"),
+                    "skills": data.get("skills")
+                }, data.get("selectedSolutions")
+            )
+        }
+
+        # Add additional emails to email2 and email3
+        emails = data.get("emails")
+        for email in emails:
+            index = emails.index(email)
+            if index != 0:
+                body["email" + str(index + 1)] = email
+
+        if body.get("dayRate") == 0:
+            body["dayRate"] = None
+
+        # send query
+        sendQuery_callback: Callback = sendQuery(auth, "entity/Candidate/" + str(data["id"]), "post", body, companyID)
+
+        if not sendQuery_callback.Success:
+            raise Exception(sendQuery_callback.Message)
+
+        return Callback(True, sendQuery_callback.Data.text)
+
+    except Exception as exc:
+        helpers.logError("Marketplace.CRM.Bullhorn.insertCandidate() ERROR: " + str(exc))
+        return Callback(False, str(exc))
+
+
 def searchCandidates(auth, companyID, data, fields=None) -> Callback:
     try:
         query = "query="
@@ -382,7 +458,9 @@ def searchCandidates(auth, companyID, data, fields=None) -> Callback:
 
         # check if no conditions submitted
         if len(query) < 6:
-            query = "query=*:*"
+            query = "query=status:Available"
+        else:
+            query += "&status:Available"
 
         # send query
         sendQuery_callback: Callback = sendQuery(auth, "search/Candidate", "get", {}, companyID,
@@ -442,7 +520,7 @@ def searchPerfectCandidates(auth, companyID, data, fields=None) -> Callback:
 
         # check if no conditions submitted
         if len(query) < 6:
-            query = "query=*:*"
+            query = "query=status:Available"
 
             # send query
             sendQuery_callback: Callback = sendQuery(auth, "search/Candidate", "get", {}, companyID,
@@ -467,11 +545,22 @@ def searchPerfectCandidates(auth, companyID, data, fields=None) -> Callback:
                 # get query result
                 return_body = json.loads(sendQuery_callback.Data.text)
 
-                # add the candidates to the records
-                records.append(list(return_body["data"]))
+                if return_body["data"]:
+                    # add the candidates to the records
+                    records = records + list(return_body["data"])
 
-                # remove duplicate records
-                records = list(dict.fromkeys(records))
+                    # remove duplicate records
+                    seen = set()
+                    new_l = []
+                    for d in records:
+                        t = tuple(d.items())
+                        if str(t) not in seen:
+                            seen.add(str(t))
+                            new_l.append(d)
+
+                    records = []
+                    for l in new_l:
+                        records.append(dict(l))
 
                 # remove the last (least important filter)
                 query = "and".join(query.split("and")[:-1])
@@ -491,7 +580,7 @@ def searchPerfectCandidates(auth, companyID, data, fields=None) -> Callback:
                                                                   skills=record.get("primarySkills", {}).get("data"),
                                                                   linkdinURL=None,
                                                                   availability=record.get("status"),
-                                                                  jobTitle=None,  #
+                                                                  jobTitle=None,
                                                                   education=None,
                                                                   yearsExperience=0,
                                                                   desiredSalary=record.get("salary") or
@@ -499,7 +588,7 @@ def searchPerfectCandidates(auth, companyID, data, fields=None) -> Callback:
                                                                   currency=Currency("GBP"),
                                                                   source="Bullhorn"))
 
-        return Callback(True, sendQuery_callback.Message, result)
+        return Callback(True, "Search has been successful", result)
 
     except Exception as exc:
         helpers.logError("Marketplace.CRM.Bullhorn.searchCandidates() ERROR: " + str(exc))
@@ -527,7 +616,7 @@ def searchJobs(auth, companyID, data, fields=None) -> Callback:
 
         # query += populateFilter(data.get("yearsRequired"), "yearsRequired")
 
-        query = query[:-3]
+        query = query[:-4]
 
         # check if no conditions submitted
         if len(query) < 4:
@@ -566,7 +655,7 @@ def searchJobs(auth, companyID, data, fields=None) -> Callback:
 
 def populateFilter(value, string):
     if value:
-        return string + ":" + value + " and"
+        return string + ":" + value + " and "
     return ""
 
 

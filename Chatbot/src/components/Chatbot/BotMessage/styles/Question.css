@@ -1,3 +1,15 @@
+.Question button[disabled] {
+    color: rgba(0, 0, 0, .25) !important;
+    background-color: #f5f5f5 !important;
+    border-color: #d9d9d9 !important;
+    text-shadow: none;
+    -webkit-box-shadow: none;
+    box-shadow: none;
+    border: none !important;
+    border-bottom: 1px #ddd solid !important;
+    cursor: not-allowed !important;
+}
+
 .Question > button {
     min-height: 40px;
     border: none;
@@ -8,9 +20,9 @@
     z-index: 10;
     color: #298bef !important;
 }
+
 .Question > button > span {
     display: block;
-
 }
 
 /* for the skip button */
@@ -27,8 +39,8 @@
 }
 
 .Question > button:last-child {
-    border-bottom-left-radius: 25px  !important;
-    border-bottom-right-radius: 25px  !important;
+    border-bottom-left-radius: 25px !important;
+    border-bottom-right-radius: 25px !important;
 }
 
 .Selected {

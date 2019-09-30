@@ -1,15 +1,19 @@
 from datetime import datetime, timedelta
 from typing import List
 
+# import joi from sqlalchemy_utils
+
 from jsonschema import validate
 from sqlalchemy.sql import and_
 from sqlalchemy.sql import desc
+from sqlalchemy.orm import joinedload
 
-from utilities.enums import UserType, Status, Webhooks
-from models import db, Callback, Conversation, Assistant
+from utilities.enums import UserType, Status, Webhooks, FileAssetType
+from models import db, Callback, Conversation, Assistant, StoredFile, StoredFileInfo
 from services import assistant_services, stored_file_services, auto_pilot_services, mail_services, webhook_services
 from services.Marketplace.CRM import crm_services
-from utilities import json_schemas, helpers
+from utilities import json_schemas, helpers, enums
+import json
 
 
 # Process chatbot conversation data
@@ -64,26 +68,36 @@ def processConversation(assistantHashID, data: dict) -> Callback:
         }
 
         webhook_services.fireRequests(webhookData, callback.Data.CompanyID, Webhooks.Conversations)
+        print("crmInformation: ", data.get("crmInformation"))
+        if not data.get("crmInformation"):
+            # AutoPilot Operations
+            if assistant.AutoPilot and conversation.Completed:
+                ap_callback: Callback = auto_pilot_services.processConversation(conversation, assistant.AutoPilot, assistant)
+                if ap_callback.Success:
+                    conversation.AutoPilotStatus = True
+                    conversation.ApplicationStatus = ap_callback.Data['applicationStatus']
+                    conversation.AcceptanceEmailSentAt = ap_callback.Data['acceptanceEmailSentAt']
+                    conversation.AcceptanceSMSSentAt = ap_callback.Data['acceptanceSMSSentAt']
+                    conversation.RejectionEmailSentAt = ap_callback.Data['rejectionEmailSentAt']
+                    conversation.RejectionSMSSentAt = ap_callback.Data['rejectionSMSSentAt']
+                    conversation.AppointmentEmailSentAt = ap_callback.Data['appointmentEmailSentAt']
+                conversation.AutoPilotResponse = ap_callback.Message
 
-        # AutoPilot Operations
-        if assistant.AutoPilot and conversation.Completed:
-            ap_callback: Callback = auto_pilot_services.processConversation(conversation, assistant.AutoPilot, assistant)
-            if ap_callback.Success:
-                conversation.AutoPilotStatus = True
-                conversation.ApplicationStatus = ap_callback.Data['applicationStatus']
-                conversation.AcceptanceEmailSentAt = ap_callback.Data['acceptanceEmailSentAt']
-                conversation.AcceptanceSMSSentAt = ap_callback.Data['acceptanceSMSSentAt']
-                conversation.RejectionEmailSentAt = ap_callback.Data['rejectionEmailSentAt']
-                conversation.RejectionSMSSentAt = ap_callback.Data['rejectionSMSSentAt']
-                conversation.AppointmentEmailSentAt = ap_callback.Data['appointmentEmailSentAt']
-            conversation.AutoPilotResponse = ap_callback.Message
-
-        # CRM integration
-        if assistant.CRM and conversation.Completed:
-            crm_callback: Callback = crm_services.processConversation(assistant, conversation)
-            if crm_callback.Success:
-                conversation.CRMSynced = True
-            conversation.CRMResponse = crm_callback.Message
+            # CRM integration
+            if assistant.CRM and conversation.Completed:
+                crm_callback: Callback = crm_services.processConversation(assistant, conversation)
+                if crm_callback.Success:
+                    conversation.CRMSynced = True
+                conversation.CRMResponse = crm_callback.Message
+        else:
+            print("STARTING")
+            crmInformation = data["crmInformation"]
+            print(crmInformation.get("source"))
+            if crmInformation.get("source") == "crm":
+                crm_callback: Callback = crm_services.updateCandidate(crmInformation, conversation, assistant.CompanyID)
+                if crm_callback.Success:
+                    conversation.CRMSynced = True
+                conversation.CRMResponse = crm_callback.Message
 
         # Notify company about the new chatbot session only if set as immediate -> NotifyEvery=0
         # Note: if there is a file upload the /file route in chatbot.py will handle the notification instead
@@ -93,29 +107,88 @@ def processConversation(assistantHashID, data: dict) -> Callback:
                 if callback_mail.Success:
                     assistant.LastNotificationDate = datetime.now()
 
-
         # Save conversation data
         db.session.add(conversation)
         db.session.commit()
 
 
-        return Callback(True, 'Chatbot data has been processed successfully!', conversation)
+        return Callback(True, 'Chatbot data has been processed successfully!', (conversation, data,))
 
     except Exception as exc:
         helpers.logError("conversation_services.processConversation(): " + str(exc))
         db.session.rollback()
         return Callback(False, "An error occurred while processing chatbot data.")
 
+def getFileByConversationID(assistantID, conversationID, filePath):
+    try:
+        file: StoredFileInfo = db.session.query(StoredFileInfo)\
+            .filter(Assistant.ID == assistantID)\
+            .filter(Conversation.ID == conversationID)\
+            .filter(StoredFileInfo.FilePath == filePath)\
+            .first()
+        if not file:
+            return Callback(False, "Could not gather file.")
+
+
+        return Callback(False, "Gathered storedfile.", file)
+    except Exception as exc:
+        helpers.logError("conversation_services.getFileByConversationID(): " + str(exc))
+        db.session.rollback()
+        return Callback(False, "Could not gather file.")
+
+
+def uploadFiles(files, conversation, data, keys):
+    try:
+        print("SHOULD ATTEMPT TO UPLOAD FILES")
+        sf : StoredFile = StoredFile()
+
+        db.session.add(sf)
+        db.session.flush()
+        uploadedFiles = []
+        uploadedFilesCallbacks = []
+        for item in data['collectedData']:
+            if item['input'] == "&FILE_UPLOAD&":  # enum for this?
+                for file in files:
+                    if file.filename in uploadedFiles:
+                        continue
+                    for submittedFile in data['submittedFiles']:
+                        if file.filename == submittedFile['uploadedFileName']:
+                            print("uploading file...")
+                            print(file.filename)
+                            print(conversation)
+                            uploadedFiles.append(file.filename)
+                            key = enums.FileAssetType.NoType # TODO once BlockType-Upgrade is done
+                            upload_callback: Callback = stored_file_services.uploadFile(file, submittedFile['fileName'], True, model=Conversation,
+                                                                                                            identifier="ID",
+                                                                                                            identifier_value=conversation.ID,
+                                                                                                            stored_file_id=sf.ID,
+                                                                                                            key=key)
+                            uploadedFilesCallbacks.append(upload_callback)
+
+        # Check if a file failed to be uploaded
+        for callback in uploadedFilesCallbacks:
+            if not callback.Success:
+                raise Exception(callback.Message)
+
+        db.session.commit()
+        return Callback(True, "Gathered storedfile.")
+
+    except Exception as exc:
+        # helpers.logError("conversation_services.uploadFiles(): " + str(exc))
+        db.session.rollback()
+        return Callback(False, "An error occurred while uploading files.")
+
 
 # ----- Getters ----- #
 def getAllByAssistantID(assistantID):
     try:
         conversations: List[Conversation] = db.session.query(Conversation) \
+            .options(joinedload('StoredFile').joinedload("StoredFileInfo"))\
             .filter(Conversation.AssistantID == assistantID) \
             .order_by(desc(Conversation.DateTime)).all()
-        for conversation in conversations:
-            if(conversation.StoredFile != None):
-                conversation.__Files = helpers.getListFromSQLAlchemyList(conversation.StoredFile.StoredFileInfo)
+        # for conversation in conversations:
+            # if(conversation.StoredFile != None):
+                # conversation.__Files = helpers.getListFromSQLAlchemyList()
         return Callback(True, "Conversations retrieved successfully.", conversations)
     except Exception as exc:
         helpers.logError("conversation_services.getAllByAssistantID(): " + str(exc))
@@ -130,9 +203,9 @@ def getByID(conversationID, assistantID):
         if not conversation:
             return Callback(False, "Conversation does not exist")
 
-        storedFile_callback: Callback = stored_file_services.getByConversation(conversation)
-        if storedFile_callback.Success:
-            conversation.__Files = storedFile_callback.Data.StoredFileInfo
+        # storedFile_callback: Callback = stored_file_services.getByConversation(conversation)
+        # if storedFile_callback.Success:
+        #     conversation.__Files = storedFile_callback.Data.StoredFileInfo
 
         return Callback(True, "ChatbotConversation retrieved successfully.", conversation)
 
@@ -176,6 +249,19 @@ def getAllRecordsByAssistantIDInTheLast(hours, assistantID):
         return Callback(False, "Error in returning records for the last " + str(hours) +
                         " hours for assistant with ID: " + str(assistantID))
 
+def setFileByID(conversationID: int, fileID: int) -> Callback:
+    try:
+        result: Conversation = db.session.query(Conversation).filter(Conversation.ID == conversationID).first()
+        result.StoredFileID = fileID
+
+        if not result:
+            raise Exception("Conversation files failed to be set")
+
+        return Callback(True, "Conversations found", result)
+    except Exception as exc:
+        helpers.logError("conversation_services.setFileByID(): " + str(exc))
+        db.session.rollback()
+        return Callback(False, "Could not set file by ID")
 
 # ----- Deletions ----- #
 def deleteByID(conversationID):

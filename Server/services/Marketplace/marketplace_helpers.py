@@ -1,7 +1,7 @@
 import requests
 import json
 
-from services.Marketplace.Messenger import mesenger_services
+from services.Marketplace.Messenger import messenger_servicess
 from utilities.enums import Calendar as Calendar_Enum, CRM as CRM_Enum, Messenger as Messenger_Enum
 from models import Callback
 from services.Marketplace.CRM import crm_services
@@ -18,7 +18,7 @@ def connect(type, auth, companyID):
         elif Calendar_Enum.has_value(type):
             return calendar_services.connect(type, auth, companyID)
         elif Messenger_Enum.has_value(type):
-            return mesenger_services.connect(type, auth, companyID)
+            return messenger_servicess.connect(type, auth, companyID)
         else:
             return Callback(False, "The Marketplace object did not match any on the system")
 
@@ -61,14 +61,14 @@ def testConnection(type, companyID):
 
         elif Messenger_Enum.has_value(type):
             # Check if connection exist
-            exist_callback: Callback = mesenger_services.getMessengerByType(type, companyID)
+            exist_callback: Callback = messenger_servicess.getMessengerByType(type, companyID)
             if not exist_callback.Success:
                 return Callback(True, "", {"Status": "NOT_CONNECTED"})
 
             # If yes test connection
             return Callback(True, "",
                             {"Status":
-                                 "CONNECTED" if mesenger_services
+                                 "CONNECTED" if messenger_servicess
                                  .testConnection(type, exist_callback.Data.Auth).Success else "FAILED"
                              })
 
@@ -92,7 +92,7 @@ def disconnect(type, companyID):
         elif Calendar_Enum.has_value(type):
             return calendar_services.disconnectByType(type, companyID)
         elif Messenger_Enum.has_value(type):
-            return mesenger_services.disconnectByType(type, companyID)
+            return messenger_servicess.disconnectByType(type, companyID)
         else:
             return Callback(False, "The Marketplace object did not match any on the system")
 
@@ -105,11 +105,11 @@ def disconnect(type, companyID):
 def sendRequest(url, method, headers, data=None):
     data = helpers.cleanDict(data)
     request = None
-    if method is "put":
+    if method.lower() == "put":
         request = requests.put(url, headers=headers, data=data)
-    elif method is "post":
+    elif method.lower() == "post":
         request = requests.post(url, headers=headers, data=data)
-    elif method is "get":
+    elif method.lower() == "get":
         request = requests.get(url, headers=headers, data=data)
     return request
 

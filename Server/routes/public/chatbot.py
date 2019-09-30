@@ -7,11 +7,17 @@ from werkzeug.utils import secure_filename
 from models import Callback, db, Conversation, Assistant, StoredFile, StoredFileInfo
 from services import conversation_services, flow_services, databases_services, stored_file_services, mail_services
 from services.Marketplace.CRM import crm_services
-from utilities import helpers
-from utilities.helpers import logError
+from utilities import helpers, enums, wrappers
+from utilities.helpers import logError, limiter
+
+import json
 
 chatbot_router = Blueprint('chatbot_router', __name__, template_folder="../templates")
 CORS(chatbot_router)
+
+
+# Requests limiter:
+# TODO: Place this in helpers for request restrictions elsewhere
 
 
 @chatbot_router.after_request
@@ -32,7 +38,7 @@ def add_header(r):
 
 # To give an access to the static/widgets/chatbot folder
 @chatbot_router.route("/static/widgets/chatbot/<path:path>", methods=['GET'])
-@helpers.gzipped
+@wrappers.gzipped
 def get_chatbot_static(path):
     if request.method == "GET":
         return send_from_directory('static/widgets/chatbot/', path)
@@ -40,7 +46,7 @@ def get_chatbot_static(path):
 
 # To load the loadChatbo
 @chatbot_router.route("/widgets/chatbot", methods=['GET'])
-@helpers.gzipped
+@wrappers.gzipped
 def get_widget():
     if request.method == "GET":
         return send_from_directory('static/js',
@@ -51,34 +57,11 @@ def get_widget():
 # TO BE REMOVED
 # To load the loadChatbot
 @chatbot_router.route("/widgets/chatbot.js", methods=['GET'])
-@helpers.gzipped
+@wrappers.gzipped
 def get_widget_legacy():
     if request.method == "GET":
         return send_from_directory('static/js',
                                    'loadChatbot.js')
-
-
-@chatbot_router.route("/assistant/<string:assistantIDAsHash>/chatbot", methods=['GET', 'POST'])
-def chatbot(assistantIDAsHash):
-    if request.method == "GET":
-        # Get blocks for the chatbot to use
-        callback: Callback = flow_services.getChatbot(assistantIDAsHash)
-        if not callback.Success:
-            return helpers.jsonResponseFlask(False, 400, callback.Message)
-        return helpers.jsonResponseFlask(True, 200, "No Message", callback.Data)
-
-    # Process sent data coming from the chatbot
-    if request.method == "POST":
-
-        # Chatbot collected information
-        data = request.json
-        callback: Callback = conversation_services.processConversation(assistantIDAsHash, data)
-        if not callback.Success:
-            return helpers.jsonResponseFlask(False, 400, callback.Message, callback.Data)
-
-        return helpers.jsonResponseFlask(True, 200,
-                                    "Collected data is successfully processed",
-                                    {'sessionID': callback.Data.ID})
 
 
 @chatbot_router.route("/assistant/<string:assistantHashID>/chatbot/solutions", methods=['POST'])
@@ -96,71 +79,28 @@ def getSolutions_forChatbot(assistantHashID):
         return helpers.jsonResponseFlask(True, 200, "show top is 0", [])
 
 
-@chatbot_router.route("/assistant/<string:assistantIDAsHash>/chatbot/<int:sessionID>/file", methods=['POST'])
-def chatbot_upload_files(assistantIDAsHash, sessionID):
-    print('call')
-    callback: Callback = conversation_services.getByID(sessionID, helpers.decodeID(assistantIDAsHash)[0])
-    if not callback.Success:
-        return helpers.jsonResponseFlask(False, 404, "Session not found.", None)
-    conversation: Conversation = callback.Data
+@chatbot_router.route("/assistant/<string:assistantIDAsHash>/chatbot", methods=['GET', 'POST'])
+@limiter.limit("2/3minutes", methods=['POST'])
+def chatbot(assistantIDAsHash):
+    if request.method == "GET":
+        # Get blocks for the chatbot to use
+        callback: Callback = flow_services.getChatbot(assistantIDAsHash)
+        if not callback.Success:
+            return helpers.jsonResponseFlask(False, 400, callback.Message)
+        return helpers.jsonResponseFlask(True, 200, "No Message", callback.Data)
 
-    if request.method == 'POST':
+    # Process sent data coming from the chatbot
+    if request.method == "POST":
+        # Chatbot collected information
+        data = json.loads(request.form.get('conversation'))
+        callback: Callback = conversation_services.processConversation(assistantIDAsHash, data)
 
-        try:
-            assistant: Assistant = conversation.Assistant
-            # Check if the post request has the file part
-            if 'file' not in request.files:
-                return helpers.jsonResponseFlask(False, 404, "No file part")
+        file_callback: Callback = Callback(True, '')
+        if request.files:
+            file_callback = conversation_services.uploadFiles(request.files.getlist('file'), callback.Data[0], callback.Data[1], request.form.get('keys'))
 
-            files = request.files.getlist('file')
-            filenames = ''
-            sf : StoredFile = StoredFile()
+        if not (callback.Success and file_callback.Success):
+            return helpers.jsonResponseFlask(False, 400, callback.Message, callback.Data)
 
-            db.session.add(sf)
-            db.session.flush()
-
-            for file in files:
-
-                if file.filename == '':
-                    return helpers.jsonResponseFlask(False, 404, "No selected file")
-                # Generate unique name: hash_sessionIDEncrypted.extension
-                filename = str(uuid.uuid4()) + '_' + helpers.encodeID(sessionID) + '.' + \
-                           secure_filename(file.filename).rsplit('.', 1)[1].lower()
-
-                # Upload file to DigitalOcean Space
-                upload_callback: Callback = stored_file_services.uploadFile(file, filename,
-                                                                            stored_file_services.USER_FILES_PATH,
-                                                                            True)
-                file.realFileName = filename
-                # if not upload_callback.Success:
-                #     filename = 'fileCorrupted'
-
-
-                # if there is multiple files, split there name by commas to store a ref of the uploaded files in DB
-                # file.realFileName = filename
-
-
-            # Store filePaths in the DB as reference
-            dbRef_callback: Callback = stored_file_services.createRef(files, conversation, sf.ID)
-            if not dbRef_callback.Success:
-                logError("Couldn't Save Stored Files Reference For: " + str(filenames))
-                raise Exception(dbRef_callback.Message)
-
-            # Save changes
-            db.session.commit()
-
-            # Notify company of new conversation
-            if assistant.NotifyEvery == 0:
-                mail_services.notifyNewConversation(assistant, conversation)
-
-            if assistant.CRM:
-                # Send through CRM
-                sendCRMFile_callback: Callback = crm_services.uploadFile(assistant, dbRef_callback.Data)
-                if not sendCRMFile_callback:
-                    # TODO we should not raise expcetion just becuase CRM fail beucase this mean the chatbot will fail too
-                    # TODO but instead we should log this in the db and notify
-                    raise Exception("Could not submit file to CRM")
-
-        except Exception as exc:
-            return helpers.jsonResponseFlask(False, 404, "I am having difficulties saving your uploaded the files :(")
-        return helpers.jsonResponseFlask(True, 200, "File uploaded successfully!!")
+        return helpers.jsonResponseFlask(True, 200,
+                                    "Collected data is successfully processed")

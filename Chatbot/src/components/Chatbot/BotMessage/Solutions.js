@@ -102,7 +102,7 @@ const Solution = ({solution, index, selected, responded, toggleSelect}) => {
 
     return (
         <Card hoverable className={'Card'}
-              cover={<img alt="example" style={{ objectFit: 'cover', height: '100%' }}
+              cover={<img alt="example" height="100px" style={{ objectFit: 'cover', height: 100 }}
                           src="https://42f2671d685f51e10fc6-b9fcecea3e50b3b59bdc28dead054ebc.ssl.cf5.rackcdn.com/illustrations/voice_control_ofo1.svg"/>}
         >
             <div className={'Card_Text'}>
@@ -128,7 +128,7 @@ const SingleSolution = ({solution, index, selected, responded, toggleSelect}) =>
     return (
         <div className={'Single_Solution'}>
             <Card hoverable className={'Card'}
-                  cover={<img alt="example" height="100px" style={{objectFit: 'cover'}}
+                  cover={<img alt="example" height="100px" style={{ objectFit: 'cover', height: 100 }}
                               src="https://42f2671d685f51e10fc6-b9fcecea3e50b3b59bdc28dead054ebc.ssl.cf5.rackcdn.com/illustrations/voice_control_ofo1.svg"/>}
             >
                 <div className={'Card_Text'}>

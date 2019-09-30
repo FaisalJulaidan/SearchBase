@@ -1,9 +1,9 @@
 from flask import Blueprint, request
 from flask_jwt_extended import jwt_required, get_jwt_identity
 
-from models import Callback, Assistant, Conversation, Appointment
+from models import Callback, Assistant, Conversation, Appointment, AppointmentAllocationTime, AppointmentAllocationTimeInfo
 from services import assistant_services, conversation_services, appointment_services, company_services
-from utilities import helpers
+from utilities import helpers, wrappers, enums
 
 appointment_router: Blueprint = Blueprint('appointment_router', __name__, template_folder="../../templates")
 
@@ -11,6 +11,7 @@ appointment_router: Blueprint = Blueprint('appointment_router', __name__, templa
 # Get all appointments for a company
 @appointment_router.route("/appointments", methods=['GET'])
 @jwt_required
+@wrappers.AccessAppointmentsRequired
 def appointments():
     user = get_jwt_identity()['user']
     callback = appointment_services.getAppointments(user['companyID'])
@@ -31,17 +32,23 @@ POST REQUEST EXAMPLE:
 
 @appointment_router.route("/appointments/set_status", methods=['POST'])
 @jwt_required
-@helpers.validOwner('Appointment', 'appointmentID')
+@wrappers.validOwner('Appointment', 'appointmentID')
+@wrappers.AccessAppointmentsRequired
 def set_appointment_status():
+    # Authenticate
+    user = get_jwt_identity()['user']
+
     data = request.get_json()
-    callback = appointment_services.setAppointmentStatus(data['appointmentID'], data['status'])
+    callback = appointment_services.setAppointmentStatus(data['appointmentID'], data['name'], data['email'], data['phone'], data['status'], user['companyID'])
 
     if callback.Success:
         return helpers.jsonResponse(True, 200, callback.Message)
     else:
         return helpers.jsonResponse(False, 401, callback.Message)
 
+
 @appointment_router.route("/appointments/set_status_public", methods=['POST'])
+@wrappers.AccessAppointmentsRequired
 def set_appointment_status_public():
     data = request.get_json()
     callback = appointment_services.setAppointmentStatusPublic(data['token'], data['appointmentID'], data['status'])
@@ -51,7 +58,9 @@ def set_appointment_status_public():
     else:
         return helpers.jsonResponse(False, 401, callback.Message)
 
+
 @appointment_router.route("/appointments/verify/<token>", methods=['GET'])
+@wrappers.AccessAppointmentsRequired
 def verify_get_appointment(token):
     callback = appointment_services.verifyRequest(token)
 
@@ -60,11 +69,11 @@ def verify_get_appointment(token):
     else:
         return helpers.jsonResponse(False, 401, callback.Message)
 
-@appointment_router.route("/allocation_times/<payload>", methods=['GET', 'POST'])
-def allocation_time(payload):
+@appointment_router.route("/allocation_times/<token>", methods=['GET', 'POST'])
+def allocation_time(token):
     try:
         # Token expires in 5 days
-        data = helpers.verificationSigner.loads(payload, salt='appointment-key', max_age=432000)
+        data = helpers.verificationSigner.loads(token, salt='appointment-key', max_age=432000)
 
     except Exception as exc:
         return helpers.jsonResponse(False, 400, "Invalid token")
@@ -82,10 +91,12 @@ def allocation_time(payload):
         if not times_callback.Success:
             return helpers.jsonResponse(False, 404, "Couldn't load available time slots")
 
+        times: AppointmentAllocationTime = times_callback.Data
+
         data = {
             "companyName": assistant.Company.Name,
-            "companyLogoURL": assistant.Company.LogoPath,
-            "appointmentAllocationTime": helpers.getListFromSQLAlchemyList(times_callback.Data.Info or []),
+            "logoPath": helpers.keyFromStoredFile(assistant.Company.StoredFile, enums.FileAssetType.Logo).AbsFilePath,
+            "appointmentAllocationTime": helpers.getListFromSQLAlchemyList(times.Info if times else []),
             "takenTimeSlots": helpers.getListFromSQLAlchemyList(assistant.Appointments),
             "userName": data['userName']
         }
@@ -109,26 +120,31 @@ def allocation_time(payload):
 
         # Add new appointment
         appointment_callback: Callback = appointment_services.addNewAppointment(data['conversationID'],
-                                                                                request.json.get('pickedTimeSlot'))
+                                                                                request.json.get('pickedTimeSlot'),
+                                                                                request.json.get('userTimeZone'))
 
         if not appointment_callback.Success:
             return helpers.jsonResponse(False, 400, "Sorry, we couldn't add your appointment")
         return helpers.jsonResponse(True, 200, "Appointment has been added. You should receive a confirmation email")
 
-@appointment_router.route("/allocation_times/save", methods=['POST'])
+@appointment_router.route("/allocation_times", methods=['PUT'])
 @jwt_required
 def save_allocation_time():
     companyID = get_jwt_identity()['user']['companyID']
     data = request.get_json()
     #e(companyID, name, times, duration)
-    save_callback : Callback = appointment_services.saveAppointmentAllocationTime(companyID, data['ID'], data['Name'], data['Info'], data['Duration'])
-
+    save_callback : Callback = \
+        appointment_services.saveAppointmentAllocationTime(companyID,
+                                                           data['ID'],
+                                                           data['Name'],
+                                                           data['Info'],
+                                                           data['Duration'])
 
     if not save_callback.Success:
         return helpers.jsonResponse(False, 400, "Sorry, we couldn't save your timetable changes")
-    return helpers.jsonResponse(True, 200, "Timetable changes have succesfully been saved", __parseAppointmentAllocationlist(save_callback.Data))
+    return helpers.jsonResponse(True, 200, "Timetable changes have successfully been saved", __parseAppointmentAllocationlist(save_callback.Data))
 
-@appointment_router.route("/allocation_times/create", methods=['POST'])
+@appointment_router.route("/allocation_times", methods=['POST'])
 @jwt_required
 def create_allocation_time():
     companyID = get_jwt_identity()['user']['companyID']
@@ -138,9 +154,9 @@ def create_allocation_time():
 
     if not save_callback.Success:
         return helpers.jsonResponse(False, 400, "Sorry, we couldn't save your timetable changes")
-    return helpers.jsonResponse(True, 200, "Timetable changes have succesfully been saved", __parseAppointmentAllocationlist(save_callback.Data))
+    return helpers.jsonResponse(True, 200, "Timetable changes have successfully been saved", __parseAppointmentAllocationlist(save_callback.Data))
 
-@appointment_router.route("/allocation_times/<id>/delete", methods=['GET'])
+@appointment_router.route("/allocation_times/<id>", methods=['DELETE'])
 @jwt_required
 def delete_allocation_time(id):
     companyID = get_jwt_identity()['user']['companyID']
@@ -162,7 +178,7 @@ def allocation_time_list():
         return helpers.jsonResponse(False, 400, times_callback.Message)
     return helpers.jsonResponse(True, 200, times_callback.Message, returnObj)
 
-# hmm should move tihs
+# hmm should move this
 def __parseAppointmentAllocationlist(aatList):
     returnObj = []
     ret = aatList if type(aatList) is list else [aatList]

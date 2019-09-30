@@ -4,9 +4,9 @@ from flask_jwt_extended import jwt_required, get_jwt_identity
 from models import Callback
 from services.Marketplace import marketplace_helpers
 from services.Marketplace.CRM import crm_services
-from services.Marketplace.Messenger import mesenger_services
+from services.Marketplace.Messenger import messenger_servicess
 from services.Marketplace.Calendar import Google, calendar_services
-from utilities import helpers
+from utilities import helpers, wrappers
 
 marketplace_router: Blueprint = Blueprint('marketplace_router', __name__, template_folder="../../templates")
 
@@ -21,7 +21,7 @@ def marketplace():
 
         crm_callback: Callback = crm_services.getAll(user.get("companyID"))
         calendar_callback: Callback = calendar_services.getAll(user.get("companyID"))
-        messenger_callback: Callback = mesenger_services.getAll(user.get("companyID"))
+        messenger_callback: Callback = messenger_servicess.getAll(user.get("companyID"))
 
         if not (crm_callback.Success or calendar_callback.Success or messenger_callback.Success):
             return helpers.jsonResponse(False, 400, "Error in fetching marketplace connections")
@@ -91,7 +91,7 @@ def recruiter_value_report():
 
 @marketplace_router.route("/calendar/<assistantID>/Google/authorize", methods=['GET', 'POST'])
 @jwt_required
-@helpers.validAssistant
+@wrappers.validAssistant
 def calendar_auth(assistantID):
     params = request.get_json()
     callback: Callback = Google.authorizeUser(params['code'])

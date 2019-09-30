@@ -6,7 +6,7 @@ import requests
 
 from utilities.enums import DataType as DT, Period, CRM
 from sqlalchemy_utils import Currency
-from models import Callback, Conversation, db, StoredFile
+from models import Callback, Conversation, db, StoredFileInfo
 from services import stored_file_services, databases_services
 from services.Marketplace import marketplace_helpers
 from services.Marketplace.CRM import crm_services
@@ -18,8 +18,6 @@ from services.Marketplace.CRM import crm_services
 # id_token (used to verify users when making queries), expires in 10 minutes(unconfirmed)
 # auth needs to contain client_id, redirect_uri, response_type=code (get request)
 # token needs client_id, code=auth_code, grant_type=authorization_code (post request)
-# To Do: login and token refresh
-# To Test: inserting
 from utilities import helpers
 
 client_id = os.environ['VINCERE_CLIENT_ID']
@@ -193,14 +191,14 @@ def insertCandidate(auth, data, companyID) -> Callback:
 
 
 # vincere only takes in candidate documents
-def uploadFile(auth, storedFile: StoredFile):
+def uploadFile(auth, storedFileInfo: StoredFileInfo):
     try:
-        conversation = storedFile.Conversation
+        conversation = storedFileInfo.Conversation
 
         if not conversation.CRMResponse:
             raise Exception("Can't upload file for record with no CRM Response")
 
-        file_callback = stored_file_services.downloadFile(storedFile.FilePath, stored_file_services.USER_FILES_PATH)
+        file_callback = stored_file_services.downloadFile(storedFileInfo.AbsFilePath)
         if not file_callback.Success:
             raise Exception(file_callback.Message)
         file = file_callback.Data
@@ -208,9 +206,9 @@ def uploadFile(auth, storedFile: StoredFile):
         file_content = base64.b64encode(file_content).decode('ascii')
 
         body = {
-            "externalID": storedFile.ID,
+            "externalID": storedFileInfo.ID,
             "fileType": "SAMPLE",
-            "name": "TSB_" + storedFile.FilePath,
+            "name": "TSB_" + storedFileInfo.FilePath,
             "fileContent": file_content
         }
 
@@ -237,7 +235,7 @@ def uploadFile(auth, storedFile: StoredFile):
         return Callback(False, str(exc))
 
 
-def insertClient(auth, data, comppanyID) -> Callback:
+def insertClient(auth, data, companyID) -> Callback:
     try:
         # get query url
         insertCompany_callback: Callback = insertCompany(auth, data, companyID)
@@ -410,7 +408,7 @@ def searchJobs(auth, companyID, data) -> Callback:
 
 def populateFilter(value, string):
     if value:
-        return string + ":" + value + " or"
+        return string + ":" + value + " or "
     return ""
 
 

@@ -27,59 +27,6 @@
     margin-bottom: 2em;
 }
 
-.label {
-    font-weight: bold;
-    margin-bottom: 0.2em;
-}
-
-.input::placeholder {
-    color: #d8d8d8;
-}
-
-.input:focus {
-    box-shadow: none;
-    border-color: #9254de;
-}
-
-.checkbox {
-    padding-top: 1em;
-    font-weight: bold;
-    color: #726a84;
-}
-
-.checkbox input:checked ~ label:before {
-    background-color: #9254de !important;
-    border-color: #9254de !important;
-}
-
-
-.submit {
-    margin-top: 1.5em;
-    border: solid transparent 0;
-    border-radius: 7px;
-    padding: 8px 20px;
-    background-color: #9254de;
-    transition: border-color 0.4s ease 0s, background-color 0.4s ease 0s;
-}
-
-.submit:hover {
-    background-color: #9C7DED;
-    transition: border-color 0.4s ease 0s, background-color 0.4s ease 0s;
-}
-
-.submit:not(:disabled):not(.disabled):active {
-    background-color: #9C7DED;
-    transition: border-color 0.4s ease 0s, background-color 0.4s ease 0s;
-}
-
-.submit:focus {
-    box-shadow: 0 0 0 0.2rem rgba(138, 107, 219, .5);
-}
-
-.submit:not(:disabled):not(.disabled):active:focus {
-    box-shadow: 0 0 0 0.2rem rgba(138, 107, 219, .5);
-}
-
 .bottom_desc {
     margin-top: 3em;
     font-size: .85em;

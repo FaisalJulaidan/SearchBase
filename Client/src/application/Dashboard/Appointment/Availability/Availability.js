@@ -138,16 +138,17 @@ class Availability extends React.Component {
         const { assistant } = this.state;
         const { conversations } = this.props;
         let availability = null;
+        let availableText = <Icon type="check" style={{textAlign: 'center'}}/>
         if (conversations) {
             availability = this.filterThisWeek(conversations).map(item => ({
                 name: 'Bob',
-                monday: item.dates.find(date => date.day() === 1) !== undefined ? 'Available' : '',
-                tuesday: item.dates.find(date => date.day() === 2) !== undefined ? 'Available' : '',
-                wednesday: item.dates.find(date => date.day() === 3) !== undefined ? 'Available' : '',
-                thursday: item.dates.find(date => date.day() === 4) !== undefined ? 'Available' : '',
-                friday: item.dates.find(date => date.day() === 5) !== undefined ? 'Available' : '',
-                saturday: item.dates.find(date => date.day() === 6) !== undefined ? 'Available' : '',
-                sunday: item.dates.find(date => date.day() === 0) !== undefined ? 'Available' : ''
+                monday: item.dates.find(date => date.day() === 1) !== undefined ? availableText : '',
+                tuesday: item.dates.find(date => date.day() === 2) !== undefined ? availableText : '',
+                wednesday: item.dates.find(date => date.day() === 3) !== undefined ? availableText : '',
+                thursday: item.dates.find(date => date.day() === 4) !== undefined ? availableText : '',
+                friday: item.dates.find(date => date.day() === 5) !== undefined ? availableText : '',
+                saturday: item.dates.find(date => date.day() === 6) !== undefined ? availableText : '',
+                sunday: item.dates.find(date => date.day() === 0) !== undefined ? availableText : ''
             }));
         }
 

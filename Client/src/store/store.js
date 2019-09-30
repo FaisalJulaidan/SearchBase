@@ -19,8 +19,7 @@ import {
     appointmentAllocationTimeSaga,
     developmentSaga,
     appointmentSaga,
-    campaignSaga,
-    availabilitySaga
+    campaignSaga
 } from './sagas'
 
 const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
@@ -56,7 +55,6 @@ sagaMiddleware.run(appointmentSaga);
 sagaMiddleware.run(appointmentAllocationTimeSaga);
 sagaMiddleware.run(developmentSaga);
 sagaMiddleware.run(campaignSaga);
-sagaMiddleware.run(availabilitySaga);
 
 
 export { store, persistor }

@@ -171,6 +171,7 @@ def updateCandidate(details, conversation, companyID):
 
 
 def uploadFile(assistant: Assistant, storedFile: StoredFile):
+    print("IN CRM_SERVICES...")
     crm_type = assistant.CRM.Type
     if CRM.has_value(crm_type.value):
         if crm_type is CRM.Jobscience or crm_type is CRM.Mercury:
@@ -236,6 +237,7 @@ def searchCandidatesCustom(crm, companyID, candidate_data, perfect=False):
 
 
 def searchJobs(assistant: Assistant, session):
+    print("NOW WE ARE HERE:")
     data = {
         "jobTitle": __checkFilter(session['keywordsByDataType'], DT.JobTitle) or
                     __checkFilter(session['keywordsByDataType'], DT.CandidateJobTitle),
@@ -248,6 +250,8 @@ def searchJobs(assistant: Assistant, session):
         # "endDate": checkFilter(session['keywordsByDataType'], DT.JobEndDate),
         "yearsRequired": __checkFilter(session['keywordsByDataType'], DT.JobYearsRequired),
     }
+
+    print("WE GOT TO HERE:")
 
     crm_type = assistant.CRM.Type
     if CRM.has_value(crm_type.value):
@@ -265,6 +269,7 @@ def searchJobs(assistant: Assistant, session):
 
 # private helper function
 def __checkFilter(keywords, dataType: DT):
+    print("FILTERING...")
     if keywords.get(dataType.value["name"]):
         return " ".join(keywords[dataType.value["name"]])
     return None

@@ -33,7 +33,7 @@ class Appointments extends React.Component {
     reject = (id, name, email, phone) => {
         confirm({
             title: `Reject appointment confirmation`,
-            content: `If you click Reject, this appointment will be deleted forever and you cannot undo that but it will make the appointment time slot available again for candidates to pick`,
+            content: `If you click Reject, this appointment will be deleted forever and you cannot undo that but it will make the appointment time slot available again for other new candidates to pick`,
             onOk: () => {this.props.dispatch(appointmentActions.setAppointmentStatusRequest(id, name, email, phone, 'Rejected'))},
             okText: "Reject",
         });

@@ -174,8 +174,8 @@ class Item extends React.Component {
                 if (place === 'features')
                     return <JobscienceFeatures/>;
                 if (place === 'button') {
-                    windowObject.url = "https://prsjobs--jsfull.cs83.my.salesforce.com/services/oauth2/authorize?" +
-                        "response_type=code&client_id=3MVG9w8uXui2aB_pIyoEOL_U6UgvUQqi5KNnTkD95XSD2NQjWfWakra7aHmltLO8e.xdwY.1WgkJAp7KUWsCN&" +
+                    windowObject.url = "https://login.salesforce.com/services/oauth2/authorize?" +
+                        "response_type=code&client_id=3MVG9I5UQ_0k_hTlh64o5U2MnkGkPmYj_xkMpFkEi0tIJXl_CGhXpux_w5khN6pvnNd.IH6Yvo82ZAcRystWE&" +
                         "redirect_uri=" + getLink("/dashboard/marketplace/Jobscience");
                     return <DefaultButton buttonText={'Connect to Jobscience Recruitment'}
                                           windowObject={windowObject}
@@ -189,7 +189,7 @@ class Item extends React.Component {
                 if (place === 'features')
                     return <VincereFeatures/>;
                 if (place === 'button') {
-                    windowObject.url = "https://id.vincere.io/oauth2/authorize?client_id=9829f4ad-3ff3-4d00-8ecf-e5d7fa2983d1&response_type=code&redirect_uri=" + ""+getLink("/dashboard/marketplace/Vincere");
+                    windowObject.url = "https://id.vincere.io/oauth2/authorize?client_id=14e3d987-7f09-4aa0-af7c-9192f02d545f&response_type=code&redirect_uri=" +getLink("/dashboard/marketplace/Vincere");
                     return <DefaultButton buttonText={'Connect to Vincere'}
                                           windowObject={windowObject}
                                           {...buttonsOptions}/>;

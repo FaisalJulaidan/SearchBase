@@ -171,6 +171,7 @@ def updateCandidate(details, conversation, companyID):
 
 
 def uploadFile(assistant: Assistant, storedFile: StoredFile):
+    print("IN CRM_SERVICES...")
     crm_type = assistant.CRM.Type
     if CRM.has_value(crm_type.value):
         if crm_type is CRM.Jobscience or crm_type is CRM.Mercury:
@@ -183,12 +184,12 @@ def uploadFile(assistant: Assistant, storedFile: StoredFile):
 
 def searchCandidates(assistant: Assistant, session):
     data = {
-        "location": checkFilter(session['keywordsByDataType'], DT.CandidateLocation),
-        "preferredJotTitle": checkFilter(session['keywordsByDataType'], DT.CandidateJobTitle),
-        "yearsExperience": checkFilter(session['keywordsByDataType'], DT.CandidateYearsExperience),
-        "skills": checkFilter(session['keywordsByDataType'], DT.CandidateSkills),
-        "jobCategory": checkFilter(session['keywordsByDataType'], DT.CandidateJobCategory),
-        "education": checkFilter(session['keywordsByDataType'], DT.CandidateEducation)
+        "location": __checkFilter(session['keywordsByDataType'], DT.CandidateLocation),
+        "preferredJotTitle": __checkFilter(session['keywordsByDataType'], DT.CandidateJobTitle),
+        "yearsExperience": __checkFilter(session['keywordsByDataType'], DT.CandidateYearsExperience),
+        "skills": __checkFilter(session['keywordsByDataType'], DT.CandidateSkills),
+        "jobCategory": __checkFilter(session['keywordsByDataType'], DT.CandidateJobCategory),
+        "education": __checkFilter(session['keywordsByDataType'], DT.CandidateEducation)
     }
 
     crm_type = assistant.CRM.Type
@@ -236,18 +237,21 @@ def searchCandidatesCustom(crm, companyID, candidate_data, perfect=False):
 
 
 def searchJobs(assistant: Assistant, session):
+    print("NOW WE ARE HERE:")
     data = {
-        "jobTitle": checkFilter(session['keywordsByDataType'], DT.JobTitle) or
-                    checkFilter(session['keywordsByDataType'], DT.CandidateJobTitle),
-        "city": checkFilter(session['keywordsByDataType'], DT.JobLocation) or
-                checkFilter(session['keywordsByDataType'], DT.CandidateLocation),
-        "employmentType": checkFilter(session['keywordsByDataType'], DT.JobType),
-        "skills": checkFilter(session['keywordsByDataType'], DT.JobEssentialSkills) or
-                  checkFilter(session['keywordsByDataType'], DT.CandidateSkills),
+        "jobTitle": __checkFilter(session['keywordsByDataType'], DT.JobTitle) or
+                    __checkFilter(session['keywordsByDataType'], DT.CandidateJobTitle),
+        "city": __checkFilter(session['keywordsByDataType'], DT.JobLocation) or
+                __checkFilter(session['keywordsByDataType'], DT.CandidateLocation),
+        "employmentType": __checkFilter(session['keywordsByDataType'], DT.JobType),
+        "skills": __checkFilter(session['keywordsByDataType'], DT.JobEssentialSkills) or
+                  __checkFilter(session['keywordsByDataType'], DT.CandidateSkills),
         # "startDate": checkFilter(session['keywordsByDataType'], DT.JobStartDate),
         # "endDate": checkFilter(session['keywordsByDataType'], DT.JobEndDate),
-        "yearsRequired": checkFilter(session['keywordsByDataType'], DT.JobYearsRequired),
+        "yearsRequired": __checkFilter(session['keywordsByDataType'], DT.JobYearsRequired),
     }
+
+    print("WE GOT TO HERE:")
 
     crm_type = assistant.CRM.Type
     if CRM.has_value(crm_type.value):
@@ -263,7 +267,9 @@ def searchJobs(assistant: Assistant, session):
         return Callback(False, "CRM type did not match with those on the system")
 
 
-def checkFilter(keywords, dataType: DT):
+# private helper function
+def __checkFilter(keywords, dataType: DT):
+    print("FILTERING...")
     if keywords.get(dataType.value["name"]):
         return " ".join(keywords[dataType.value["name"]])
     return None

@@ -18,8 +18,6 @@ from services.Marketplace.CRM import crm_services
 # id_token (used to verify users when making queries), expires in 10 minutes(unconfirmed)
 # auth needs to contain client_id, redirect_uri, response_type=code (get request)
 # token needs client_id, code=auth_code, grant_type=authorization_code (post request)
-# To Do: login and token refresh
-# To Test: inserting
 from utilities import helpers
 
 client_id = os.environ['VINCERE_CLIENT_ID']

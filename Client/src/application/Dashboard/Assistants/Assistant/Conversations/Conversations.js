@@ -30,7 +30,7 @@ class Conversations extends React.Component {
             {
                 title: '#',
                 key: '#',
-                render: (text, record, index) => (<p>{index + 1}</p>)
+                render: (text, record) => (<p>{record.ID}</p>)
 
             }, {
                 title: 'User Type',
@@ -39,7 +39,7 @@ class Conversations extends React.Component {
                     { text: 'Candidate', value: 'Candidate' },
                     { text: 'Client', value: 'Client' }
                 ],
-                onFilter: (value, record) => record.UserType ? record.UserType.indexOf(value) === 0 : false,
+                onFilter: (value, record) => record.UserType.indexOf(value) === 0,
                 render: (text, record) => (<Tag key={record.UserType}>{record.UserType}</Tag>)
 
             }, {
@@ -48,15 +48,7 @@ class Conversations extends React.Component {
                 render: (text, record) => (
                     <p style={{ textTransform: 'capitalize' }}>{record.Name}</p>)
 
-            },
-            // {
-            //     title: 'Email',
-            //     key: 'Email',
-            //     render: (text, record) => (
-            //         <p>{record.Email}</p>)
-            //
-            // },
-            {
+            }, {
                 title: 'Duration',
                 key: 'TimeSpent',
                 sorter: (a, b) => a.TimeSpent - b.TimeSpent,
@@ -92,12 +84,13 @@ class Conversations extends React.Component {
             }, {
                 title: 'Status',
                 key: 'ApplicationStatus',
-                width: "120px",
-                // filters: [
-                //     {text: 'Completed', value: 'Completed'},
-                //     {text: 'Incomplete', value: 'Incomplete'},
-                // ],
-                // onFilter: (value, record) => record.Completed ? record.UserType.indexOf(value) === 0 : false,
+                width: '120px',
+                filters: [
+                    { text: 'Accepted', value: 'Accepted' },
+                    { text: 'Pending', value: 'Pending' },
+                    { text: 'Rejected', value: 'Rejected' }
+                ],
+                onFilter: (value, record) => record.ApplicationStatus.indexOf(value) === 0,
                 render: (text, record) => {
                     const { isUpdatingStatus } = this.props;
                     const content = (
@@ -135,11 +128,13 @@ class Conversations extends React.Component {
             }, {
                 title: 'Conversation',
                 key: 'Completed',
-                // filters: [
-                //     {text: 'Completed', value: 'Completed'},
-                //     {text: 'Incomplete', value: 'Incomplete'},
-                // ],
-                // onFilter: (value, record) => record.Completed ? record.UserType.indexOf(value) === 0 : false,
+                filters: [
+                    { text: 'Completed', value: 'Completed' },
+                    { text: 'Incomplete', value: 'Incomplete' }
+                ],
+                onFilter: (value, record) => {
+                    return (record.Completed ? 'Completed' : 'Incomplete').indexOf(value) === 0;
+                },
                 render: (text, record) => (
                     record.Completed ?
                         <Tag color="#87d068">Completed</Tag> :

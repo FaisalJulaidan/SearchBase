@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { Card, Checkbox, Divider, Form, Input, Select } from 'antd';
 
-import { getInitialVariables, initActionType, initActionTypeSkip } from './CardTypesHelpers';
+import { getInitialVariables, initActionType, initActionTypeSkip, onSelectAction } from './CardTypesHelpers';
 import {
     ActionFormItem,
     AfterMessageFormItem,
@@ -43,7 +43,10 @@ class UserType extends Component {
                     checked: !!this.getUserType(type, 'value'),
                     value: type,
                     text: this.getUserType(type, 'text'),
-                    score: this.getUserType(type, 'score')
+                    score: this.getUserType(type, 'score'),
+                    action: this.getUserType(type, `action`),
+                    showGoToBlock: onSelectAction(this.getUserType(type, `action`)).showGoToBlock,
+                    showGoToGroup: onSelectAction(this.getUserType(type, `action`)).showGoToGroup
                 };
             }
 
@@ -111,6 +114,8 @@ class UserType extends Component {
                     return delete UserTypesState[key];
 
                 delete UserTypesState[key].checked;
+                delete UserTypesState[key].showGoToBlock;
+                delete UserTypesState[key].showGoToGroup;
 
                 UserTypesState[key] = {
                     ...UserTypesState[key],
@@ -122,13 +127,11 @@ class UserType extends Component {
                 types.push({ ...UserTypesState[key] });
             });
 
-            console.log(types);
 
             let options = {
                 Type: 'User Type',
                 StoreInDB: false,
 
-                // TODO: ADD USER TYPE for data types
                 DataType: flowOptions.dataTypes.find((dataType) => dataType.name === 'User Type'),
 
                 Skippable: values.isSkippable || false,
@@ -285,7 +288,11 @@ class UserType extends Component {
                                                                 action: this.getUserType(type, 'action')
                                                             }
                                                         }}
-                                                        setStateHandler={(state) => this.setState(state)}
+                                                        setStateHandler={(showActions) => {
+                                                            UserTypesState[type].showGoToBlock = showActions.showGoToBlock;
+                                                            UserTypesState[type].showGoToGroup = showActions.showGoToGroup;
+                                                            this.setState({ ...UserTypesState });
+                                                        }}
                                                         getFieldDecorator={getFieldDecorator}
                                                         layout={layout}
                                                         fieldName={`${type}_action`}/>
@@ -298,7 +305,7 @@ class UserType extends Component {
                                                                    }
                                                                }}
                                                                allBlocks={allBlocks}
-                                                               showGoToBlock={this.getUserType(type, 'action') === 'Go To Specific Block'}
+                                                               showGoToBlock={UserTypesState[type].showGoToBlock}
                                                                getFieldDecorator={getFieldDecorator}
                                                                layout={layout}
                                                                fieldName={`${type}_blockToGoID`}/>
@@ -312,7 +319,7 @@ class UserType extends Component {
                                                                }}
                                                                allGroups={allGroups}
                                                                currentGroup={currentGroup}
-                                                               showGoToGroup={this.getUserType(type, 'action') === 'Go To Group'}
+                                                               showGoToGroup={UserTypesState[type].showGoToGroup}
                                                                getFieldDecorator={getFieldDecorator}
                                                                layout={layout}
                                                                fieldName={`${type}_blockToGoIDGroup`}/>

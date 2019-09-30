@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { Card, Checkbox, Divider, Form, Input, Select } from 'antd';
 
-import { getInitialVariables, initActionType, initActionTypeSkip } from './CardTypesHelpers';
+import { getInitialVariables, initActionType, initActionTypeSkip, onSelectAction } from './CardTypesHelpers';
 import {
     ActionFormItem,
     AfterMessageFormItem,
@@ -47,7 +47,9 @@ class JobType extends Component {
                     checked: !!this.getJobType(type, 'value'),
                     value: type,
                     text: this.getJobType(type, 'text'),
-                    score: this.getJobType(type, 'score')
+                    score: this.getJobType(type, 'score'),
+                    showGoToBlock: onSelectAction(this.getJobType(type, `action`)).showGoToBlock,
+                    showGoToGroup: onSelectAction(this.getJobType(type, `action`)).showGoToGroup
                 };
             }
 
@@ -116,6 +118,8 @@ class JobType extends Component {
                     return delete jobTypesState[key];
 
                 delete jobTypesState[key].checked;
+                delete jobTypesState[key].showGoToBlock;
+                delete jobTypesState[key].showGoToGroup;
 
                 jobTypesState[key] = {
                     ...jobTypesState[key],
@@ -288,7 +292,11 @@ class JobType extends Component {
                                                                 action: this.getJobType(type, 'action')
                                                             }
                                                         }}
-                                                        setStateHandler={(state) => this.setState(state)}
+                                                        setStateHandler={(showActions) => {
+                                                            jobTypesState[type].showGoToBlock = showActions.showGoToBlock;
+                                                            jobTypesState[type].showGoToGroup = showActions.showGoToGroup;
+                                                            this.setState({ ...jobTypesState });
+                                                        }}
                                                         getFieldDecorator={getFieldDecorator}
                                                         layout={layout}
                                                         fieldName={`${type}_action`}/>
@@ -301,7 +309,7 @@ class JobType extends Component {
                                                                    }
                                                                }}
                                                                allBlocks={allBlocks}
-                                                               showGoToBlock={this.getJobType(type, 'action') === 'Go To Specific Block'}
+                                                               showGoToBlock={jobTypesState[type].showGoToBlock}
                                                                getFieldDecorator={getFieldDecorator}
                                                                layout={layout}
                                                                fieldName={`${type}_blockToGoID`}/>
@@ -315,7 +323,7 @@ class JobType extends Component {
                                                                }}
                                                                allGroups={allGroups}
                                                                currentGroup={currentGroup}
-                                                               showGoToGroup={this.getJobType(type, 'action') === 'Go To Group'}
+                                                               showGoToGroup={jobTypesState[type].showGoToGroup}
                                                                getFieldDecorator={getFieldDecorator}
                                                                layout={layout}
                                                                fieldName={`${type}_blockToGoIDGroup`}/>

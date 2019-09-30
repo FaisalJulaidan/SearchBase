@@ -10,7 +10,7 @@ import { addBotMessage, addUserMessage, setChatbotAnimation, setChatbotStatus } 
 // Styles
 import './UserInputs/styles/Inputs.css';
 // Components
-import { DatePicker, FileUpload, SalaryPicker, Text } from './UserInputs';
+import { DatePicker, MultiDatePicker, FileUpload, SalaryPicker, Text } from './UserInputs';
 
 
 const Input = ({setChatbotStatus, hideSignature, addUserMessage, lastMessage, addBotMessage, setChatbotAnimation, visible}) => {
@@ -42,7 +42,7 @@ const Input = ({setChatbotStatus, hideSignature, addUserMessage, lastMessage, ad
                     case constants.SALARY:
                         return (<SalaryPicker period={message.block[flowAttributes.DATA_TYPE][flowAttributes.DATA_TYPE_ENUM]}/>);
                     case constants.DATEPICKER:
-                        return (<DatePicker/>);
+                        return (<MultiDatePicker/>);
                     default:
                         return (<Text/>);
                 }

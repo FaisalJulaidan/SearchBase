@@ -8,6 +8,7 @@ import './styles/Inputs.css';
 import { DatePicker as AntdDatePicker, Icon, Tooltip } from 'antd';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTelegramPlane } from '@fortawesome/free-brands-svg-icons';
+import { ETIME } from 'constants';
 
 
 const MultiDatePicker = ({ message, submitMessage }) => {
@@ -18,16 +19,17 @@ const MultiDatePicker = ({ message, submitMessage }) => {
     let [mouseDown, setMouseDown] = useState(null);
     let [open, setOpen] = useState(false);
 
-    const addClasses = (date, start, end) => {
+    const addClasses = (date, start, end, temp) => {
         let startCheck = date.isSame(start, 'date');
         let endCheck = date.isSame(end, 'date');
         let firstRangeItem = date.isSame(start.clone().add(1, 'days'), 'date');
         let lastRangeItem = date.isSame(end.clone().subtract(1, 'days'), 'date');
         let className = '';
-        className += startCheck ? ' start' : ''; // start of range
-        className += endCheck ? ' end' : '';  // end of range
+        className += startCheck ? ' begin' : ''; // start of range
+        className += endCheck ? ' finish' : '';  // end of range
         className += firstRangeItem ? ' range-start' : ''; // start of range
         className += lastRangeItem ? ' range-end' : '';  // end of range
+        className += temp ? ' temp' : '';
         className += (date.isBetween(start, end) || date.isBetween(end, start)) && !endCheck && !startCheck ? ' range' : ''; // in range
         return className;
     };
@@ -37,23 +39,39 @@ const MultiDatePicker = ({ message, submitMessage }) => {
         className += curDate.isSame(today, 'month') ? '' : ' fade';
         let element;
         if (temporaryRange.start && temporaryRange.end) {
-            className += addClasses(curDate, temporaryRange.start, temporaryRange.end);
+            className += addClasses(curDate, temporaryRange.start, temporaryRange.end, true);
         }
 
         if (selectedDates.range.length !== 0) {
             for (let dateRange in selectedDates.range) {
-                className += addClasses(curDate, selectedDates.range[dateRange][0], selectedDates.range[dateRange][1]);
+                className += addClasses(curDate, selectedDates.range[dateRange][0], selectedDates.range[dateRange][1], false);
             }
         }
 
         for (let date in selectedDates.individual) {
             if (Math.abs(selectedDates.individual[date].diff(curDate, 'hours')) < 23) {
-                className += ' selected';
+                className += ' selected individual finish';
             }
         }
-        element = (<div className={className}><span>{curDate.format('D')}</span></div>);
+        let closeIcon = className.indexOf("finish") !== -1 && className.indexOf("temp") === -1 ? true : false
+        element = (<div className={className}><span>{curDate.format('D')}</span>{closeIcon ? <span className="delete-range" onClick={() => deleteRange(curDate)}></span> : null}</div>);
         return addEventHandlers(element, curDate);
     };
+
+    const deleteRange = (startDate) => {
+      let dates = Object.assign({}, selectedDates)
+      for(let date in selectedDates.range){
+        if(startDate.isSame(selectedDates.range[date][1], 'date')){
+          dates.range.splice(date, 1)
+        }
+      }
+      for(let date in selectedDates.individual){
+        if(startDate.isSame(selectedDates.individual[date], 'date')){
+          dates.individual.splice(date, 1)
+        }
+      }
+      setSelectedDates(dates)
+    }
 
     const addEventHandlers = (element, date) => {
         return React.cloneElement(element, {
@@ -88,6 +106,9 @@ const MultiDatePicker = ({ message, submitMessage }) => {
 
     const dateMouseDown = (e, date) => {
         setMouseDown(date);
+        if(e.target.classList.contains("delete-range")){
+          return false;
+        }
         if (temporaryRange.start) {
             // click same day
             let dates = Object.assign({}, selectedDates);
@@ -206,6 +227,12 @@ const MultiDatePicker = ({ message, submitMessage }) => {
     return (
         <React.Fragment>
             <div className={'InputContainer'} onClick={() => setOpen(true)}>
+                <Tooltip title={'lofl'} visible={open} getTooltipContainer={() => {
+                        if (document.getElementById('TheSearchBase_Chatbot_Input'))
+                            return document.getElementById('TheSearchBase_Chatbot_Input');
+                        else
+                            return document.getElementById('TheSearchBase_Chatbot');
+                    }}>
                 <AntdDatePicker getCalendarContainer={
                     () => {
                         if (document.getElementById('TheSearchBase_Chatbot_Input'))
@@ -226,6 +253,7 @@ const MultiDatePicker = ({ message, submitMessage }) => {
                     //             setSelectedDate(e.target.value);
                     // }}
                 />
+                </Tooltip>
             </div>
             <div className={'Submit'}>
                 <i className={'SendIconActive'} onClick={inputOnChangeHandler}>

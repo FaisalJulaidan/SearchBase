@@ -42,6 +42,10 @@
     border: none !important;
 }
 
+.antd-date-multi {
+  position: relative;
+}
+
 .antd-date-multi > span {
     padding: 3px;
     border-radius: 3px;
@@ -80,12 +84,42 @@
   border-bottom-right-radius: 4px
 }
 
-.antd-date-multi.start > span{
+.antd-date-multi.begin > span{
   background: rgb(186, 231, 255);
 }
 
-.antd-date-multi.end > span{
+.antd-date-multi.finish > span{
   background: rgb(186, 231, 255);
+}
+
+.antd-date-multi.finish > span.delete-range {
+  width: 10px;
+  position: absolute;
+  background-color: rgb(244, 67, 54);
+  top: -6px;
+  height: 10px;
+}
+
+.antd-date-multi.finish > span.delete-range::after {
+  position: absolute;
+  background-color: #fff;
+  height: 1px;
+  left: 1px;
+  top: 4px;
+  width: 8px;
+  content: '';
+  transform: rotate(45deg)
+}
+
+.antd-date-multi.finish > span.delete-range::before {
+  position: absolute;
+  background-color: #fff;
+  height: 1px;
+  left: 1px;
+  top: 4px;
+  width: 8px;
+  content: '';
+  transform: rotate(-45deg)
 }
 
 .Text {

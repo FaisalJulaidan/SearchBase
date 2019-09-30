@@ -300,7 +300,7 @@ def generate():
                     # # Candidate SALARY
                     # {"Type": "User Input", "StoreInDB": True, "Skippable": False, "SkipText": "Skip!",
                     #  "SkipAction": "End Chat",
-                    #  "SkipBlockToGoID": 'None', "DataType": "CandidateAnnualDesiredSalary",
+                    #  "SkipBlockToGoID": 'None', "DataType": "CandidateDesiredSalary",
                     #  "Content": {"text": "What is your annual desired salary?", "blockToGoID": "007",
                     #              "action": "Go To Next Block", "afterMessage": "Thank you for the salary",
                     #              "keywords": []},
@@ -363,7 +363,7 @@ def generate():
                     # Candidate SALARY
                     {"Type": "User Input", "StoreInDB": True, "Skippable": False, "SkipText": "Skip!",
                      "SkipAction": "End Chat",
-                     "SkipBlockToGoID": 'None', "DataType": "CandidateAnnualDesiredSalary",
+                     "SkipBlockToGoID": 'None', "DataType": "CandidateDesiredSalary",
                      "Content": {"text": "What is your annual desired salary?", "blockToGoID": "004",
                                  "action": "Go To Next Block", "afterMessage": "Thank you for the salary",
                                  "keywords": []},
@@ -379,7 +379,7 @@ def generate():
                     # Candidate AVAILABILITY
                     {"Type": "User Input", "StoreInDB": True, "Skippable": False, "SkipText": "Skip!",
                      "SkipAction": "End Chat",
-                     "SkipBlockToGoID": 'None', "DataType": "CandidateAvailability",
+                     "SkipBlockToGoID": 'None', "DataType": "AvailabilityDate",
                      "Content": {"text": "Required availability of candidate?", "blockToGoID": "006",
                                  "action": "Go To Next Block", "afterMessage": "Thank you for the availability",
                                  "keywords": []},
@@ -433,7 +433,7 @@ def generate():
                     # job SALARY
                     {"Type": "User Input", "StoreInDB": True, "Skippable": False, "SkipText": "Skip!",
                      "SkipAction": "End Chat",
-                     "SkipBlockToGoID": 'None', "DataType": "JobAnnualSalary",
+                     "SkipBlockToGoID": 'None', "DataType": "JobSalary",
                      "Content": {"text": "Job salary?", "blockToGoID": "004",
                                  "action": "Go To Next Block", "afterMessage": "Thank you for the salary",
                                  "keywords": []},

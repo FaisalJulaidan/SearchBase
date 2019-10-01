@@ -91,7 +91,6 @@ def retrieveRestToken(auth, companyID):
             if get_tokens.ok:
                 result_body = json.loads(get_tokens.text)
                 authCopy["access_token"] = result_body["access_token"]
-                authCopy["refresh_token"] = result_body["refresh_token"]
                 authCopy["id_token"] = result_body["id_token"]
             else:
                 raise Exception("CRM not set up properly")

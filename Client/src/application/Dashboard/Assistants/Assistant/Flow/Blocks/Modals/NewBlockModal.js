@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-
+import styles from '../Blocks.module.less';
 
 import { Icon, Modal, Tabs } from 'antd';
 
@@ -46,7 +46,7 @@ class NewBlockModal extends Component {
     render() {
         return (
             <div>
-                <MyModal width={800}
+                <MyModal className={styles.NewBlockModal}
                          title="Add New Question"
                          visible={this.props.visible}
                          onCancel={this.props.closeModal}
@@ -54,6 +54,7 @@ class NewBlockModal extends Component {
                          footer={null}>
 
                     <Tabs type="card"
+                          tabPosition={'right'}
                           defaultActiveKey={'JobType'}
                           onChange={this.onChangeTab}>
 

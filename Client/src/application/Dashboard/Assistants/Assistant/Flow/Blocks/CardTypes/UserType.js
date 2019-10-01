@@ -204,7 +204,12 @@ class UserType extends Component {
                             (type, i) =>
                                 <div key={i}>
                                     <div className={styles.PredefinedValues}>
-                                        <div className={[!this.state.hasChecked && 'has-error'].join(' ')}>
+                                        <div className={
+                                            [
+                                                !this.state.hasChecked && 'has-error',
+                                                'ant-col ant-col-6 ant-form-item-label'
+                                            ].join(' ')
+                                        }>
                                             <Checkbox className={styles.CheckBox}
                                                       defaultChecked={!!this.getUserType(type, 'value')}
                                                       onChange={e => {
@@ -229,7 +234,12 @@ class UserType extends Component {
                                             }
                                         </div>
 
-                                        <div className={styles.Inputs}>
+                                        <div className={
+                                            [
+                                                styles.Inputs,
+                                                'ant-col ant-col-14 ant-form-item-control-wrapper'
+                                            ].join(' ')
+                                        }>
 
                                             <div
                                                 className={[this.state.errors[type]?.text && 'has-error', styles.Text].join(' ')}>

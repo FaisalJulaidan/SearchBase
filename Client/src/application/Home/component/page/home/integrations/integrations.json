@@ -30,5 +30,9 @@
   {
     "title": "LinkedIn",
     "image": "/static/images/home/integrations/link-logo.png"
+  },
+  {
+    "title": "Bold Identities",
+    "image": "/static/images/home/integrations/bold.png"
   }
 ]

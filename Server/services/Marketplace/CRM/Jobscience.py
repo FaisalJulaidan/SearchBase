@@ -17,6 +17,8 @@ CLIENT_SECRET = os.environ['JOBSCIENCE_CLIENT_SECRET']
 
 # TODO CHECKLIST:
 
+# [4] Filter by contract or perm
+# [4.5] Fix skills upload
 # [5] Clean & refactor []
 
 # [7] IMPROVE SUCH AS ADD FILE UPLOAD []
@@ -209,6 +211,7 @@ def insertClient(auth, conversation: Conversation) -> Callback:
 def insertClientContact(access_token, conversation: Conversation, prsCompanyID) -> Callback:
     try:
         # New client contact details
+
         if conversation.get("firstName") == "":
             conversation["firstName"] = "DEFAULT_FIRST"
         if conversation.get("lastName") == "":
@@ -284,40 +287,53 @@ def searchCandidates(access_token, conversation) -> Callback:
 
         # Create filter:
 
-        # Candidate must be available
-        # Candidate desired type must match inputted type
-
         # Fetch contacts who are candidates and are active"
         query = "WHERE+RecordType.Name+IN+('Candidate')+AND+ts2__People_Status__c+IN+('Active', 'Live')+AND+"
 
-        query += populateFilter(conversation.get('location'), "MailingCity", quote_wrap=True, SOQL_type="=")
+        # Filter by job type:
+        #print("THE TYPE: ")
+        #print(conversation.get('JobType'))
+        #print(conversation)
+        #exit(0)
 
-        query += populateFilter("%" + conversation.get('preferredJotTitle') + "%", "Title", quote_wrap=True,
-                                SOQL_type="+LIKE+")
+        # Filter on location:
+        if conversation.get('location') is not None:
+            query += populateFilter(conversation.get('location'), "MailingCity", quote_wrap=True, SOQL_type="=")
 
-        query += populateFilter(conversation.get("desiredSalary", 0), "ts2__Desired_Salary__c", quote_wrap=True,
-                                SOQL_type="=")
+        # Filter on job title:
+        if conversation.get('preferredJotTitle') is not None:
+            query += populateFilter("%" + conversation.get('preferredJotTitle') + "%", "Title", quote_wrap=True,
+                                    SOQL_type="+LIKE+")
+        else:
+            # Set job title to skills value:
+            query += populateFilter("%" + conversation.get('skills').split(" ")[0]+ "%", "Title", quote_wrap=True,
+                                    SOQL_type="+LIKE+")
+
+        # Filter on desired salary:
+        if conversation.get('desiredSalary') is not None:
+            query += populateFilter(conversation.get("desiredSalary", 0), "ts2__Desired_Salary__c", quote_wrap=True,
+                                    SOQL_type="=")
         query = query[:-5]
 
-        print("Query is:")
-        print(query)
+        #print("Query is:")
+        #print(query)
 
         # TODO: Differentiate between hourly and salary
         sendQuery_callback: Callback = sendQuery(access_token, "get", {},
                                                  "SELECT+X18_Digit_ID__c,ID,Name,Title,email,phone,MailingCity," +
-                                                 "ts2__Desired_Salary__c,ts2__Date_Available__c,ts2__Years_of_Experience__c,ts2__Desired_Hourly__c," +
+                                                 "ts2__Desired_Salary__c,ts2__Date_Available__c,ts2__Years_of_Experience__c,ts2__Desired_Hourly__c,Min_Basic__c," +
                                                  "ts2__EduDegreeName1__c,ts2__Education__c,Attributes__c+from+Contact+" + query +
                                                  "+LIMIT+500")  # Limit set to 10 TODO: Customize
 
         if not sendQuery_callback.Success:
             raise Exception(sendQuery_callback.Message)
-        print("QUERY HAS BEEN SENT")
+        #print("QUERY HAS BEEN SENT")
         candidate_fetch = json.loads(sendQuery_callback.Data.text)
         records = candidate_fetch['records']
         # Iterate through candidates
         result = []
         # TODO: Fetch job title
-        print("NUMBER OF RECORDS RETRIEVED: ", len(candidate_fetch['records']))
+        #print("NUMBER OF RECORDS RETRIEVED: ", len(candidate_fetch['records']))
 
         # <-- CALL SKILLS SEARCH -->
         # for record in candidate_fetch['records']:
@@ -331,11 +347,11 @@ def searchCandidates(access_token, conversation) -> Callback:
         # <-- CALL SKILLS SEARCH -->
 
         #  Iterative generalisation:
-        while len(candidate_fetch['records']) < 20:
+        while len(records) < 20:
             # send query
             sendQuery_callback: Callback = sendQuery(access_token, "get", {},
                                                      "SELECT+X18_Digit_ID__c,ID,Name,Title,email,phone,MailingCity," +
-                                                     "ts2__Desired_Salary__c,ts2__Date_Available__c,ts2__Years_of_Experience__c,ts2__Desired_Hourly__c," +
+                                                     "ts2__Desired_Salary__c,ts2__Date_Available__c,ts2__Years_of_Experience__c,ts2__Desired_Hourly__c,Min_Basic__c," +
                                                      "ts2__EduDegreeName1__c,ts2__Education__c,Attributes__c+from+Contact+" + query +
                                                      "+LIMIT+200")  # Limit set to 10 TODO: Customize
             if not sendQuery_callback.Success:
@@ -365,7 +381,7 @@ def searchCandidates(access_token, conversation) -> Callback:
 
             # remove the last (least important filter)
             query = "AND".join(query.split("AND")[:-1])
-            print("QUERY IS: ", query)
+            #print("QUERY IS: ", query)
 
             # if no filters left - stop
             if not query:
@@ -373,28 +389,37 @@ def searchCandidates(access_token, conversation) -> Callback:
 
         # <-- CALL SKILLS SEARCH -->
         for record in records:
+            #print(record.get("ts2__Desired_Hourly__c"))
+            #print(record.get("ts2__Desired_Salary__c"))
+            #print(record.get("Min_Basic__c"))
             list_of_contactIDs.append("'" + record.get("Id") + "'")
 
         # Fetch associated candidate skills
         skills = conversation.get("skills")
+        #print("THE SKILLS ARE: ")
+        #print(skills)
         candidate_skills = []
         if len(candidate_fetch['records']) > 0:
-            candidate_skills = fetchSkillsForCandidateSearch(list_of_contactIDs, skills.split(","), access_token)
+            candidate_skills = fetchSkillsForCandidateSearch(list_of_contactIDs, skills.split(" "), access_token)
         # <-- CALL SKILLS SEARCH -->
 
         for record in records:
-            print("-- NEW RECORD --")
+            #print("-- NEW RECORD --")
             skills_string = ""
+            counter = 0
             for skill in candidate_skills:
-                if skill.get("ts2__Contact__c") == record.get("Id"):
-                    print(skill.get("ts2__Skill_Name__c"))
-                    print(skill.get("ts2__Last_Used__c"))
+                # Cap skills at 5:
+
+                if skill.get("ts2__Contact__c") == record.get("Id") and counter < 5:
+                    counter += 1
+                    #print(skill.get("ts2__Skill_Name__c"))
+                    #print(skill.get("ts2__Last_Used__c"))
 
                     skills_string += skill.get("ts2__Skill_Name__c")
                     if skill.get("ts2__Last_Used__c") is not None:
-                        skills_string += "(" + skill.get("ts2__Last_Used__c") + "),"  # Display year of use
+                        skills_string += "(" + skill.get("ts2__Last_Used__c") + "), "  # Display year of use
                     else:
-                        skills_string += ","
+                        skills_string += ""
             # skills_string += (record.get("Attributes__c", "") or "")  # Merging skills and job title together...
 
             result.append(databases_services.createPandaCandidate(id=record.get("id", ""),
@@ -411,7 +436,8 @@ def searchCandidates(access_token, conversation) -> Callback:
                                                                   yearsExperience=record.get(
                                                                       'ts2__Years_of_Experience__c'),
                                                                   desiredSalary=record.get('ts2__Desired_Salary__c') or
-                                                                                record.get('ts2__Desired_Hourly__c', 0),
+                                                                                record.get('ts2__Desired_Hourly__c') or
+                                                                                record.get('Min_Basic__c', 0),
                                                                   currency=Currency("GBP"),
                                                                   source="Jobscience"))
         #print("RETURNING RECORDS ...")

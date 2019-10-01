@@ -343,7 +343,7 @@ def notifyNewConversations(assistant: Assistant, conversations, lastNotification
             return Callback(True, "No new conversation to send")
 
         # Get company logo
-        logoPath = helpers.keyFromStoredFile(Assistant.Company.StoredFile.StoredFile, enums.FileAssetType.Logo).AbsFilePath
+        logoPath = helpers.keyFromStoredFile(Assistant.Company.StoredFile, enums.FileAssetType.Logo).AbsFilePath
 
         # send emails, jobs applied for
         for user in users_callback.Data:

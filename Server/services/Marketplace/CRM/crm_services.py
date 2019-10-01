@@ -1,7 +1,7 @@
 from sqlalchemy.sql import and_
 
 from models import db, Callback, Conversation, Assistant, CRM as CRM_Model, StoredFile
-from services.Marketplace.CRM import Greenhouse, Bullhorn, Mercury, Jobscience
+from services.Marketplace.CRM import Greenhouse, Bullhorn, Mercury, Jobscience, Vincere
 # Process chatbot session
 from utilities import helpers
 from utilities.enums import CRM, UserType, DataType, Period, DataType as DT

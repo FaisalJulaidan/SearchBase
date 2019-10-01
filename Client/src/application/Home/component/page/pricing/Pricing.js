@@ -23,16 +23,15 @@ const Pricing = () => {
     });
 
     return (
-        <Layout background={"linear-gradient(to bottom, #ffffff, #ffffff, #ebebf2)"}>
+        <Layout background={"linear-gradient(to bottom, #ffffff, #fdfdfd, #fbfbfb)"}>
             <div>
                 <div className={styles.hero}>
                     <Container>
                         <Row>
                             <Col className={styles.text_wrapper}>
                                 <h1 className={styles.title}>Choose your plan</h1>
-                                <h1 className={styles.subtitle}>SearchBase is simply designed to help you make more
-                                    sales,
-                                    boost user interaction and revolutionise your website.</h1>
+                                <h1 className={styles.subtitle}>SearchBase is simply designed to
+                                    boost candidates interaction and revolutionise your business.</h1>
                             </Col>
                         </Row>
                     </Container>

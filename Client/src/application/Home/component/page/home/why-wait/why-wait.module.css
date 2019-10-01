@@ -6,16 +6,14 @@
 }
 
 .text {
-    font-size: 3em;
-    color: #494949;
-    font-weight: bold;
+    font-size: 2.8em;
     margin: .3em 0 .5em 0;
     text-align: center;
 }
 
 .text h1{
     font-weight: bold;
-    color: #494949;
+    color: #444444;
 }
 
 .logo_wrapper {

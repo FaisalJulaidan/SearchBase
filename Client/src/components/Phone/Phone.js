@@ -10,8 +10,8 @@ export default class Phone extends React.Component {
         return(
             <div style={{backgroundImage: `url(${phone})`}} className={styles.image}>
                 <div className={styles.messages}>
-                    {this.props.messages.map(message => {
-                        return (<div className={styles.message}>{message}</div>)
+                    {this.props.messages.map((message,key) => {
+                        return (<div key={key} className={styles.message}>{message}</div>)
                     })}
                 </div>
             </div>

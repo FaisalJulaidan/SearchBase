@@ -4,12 +4,6 @@ import {Button, Table, Tag, Icon} from "antd";
 
 class Conversation extends Component {
 
-    counter = -1; // this is important for specifying what is the file name's index
-
-    componentWillUpdate(nextProps, nextState, nextContext) {
-        this.counter = -1;
-    }
-
     emailUser = email => {
         window.location.href = "mailto:"+email;
     };
@@ -22,12 +16,10 @@ class Conversation extends Component {
         title: 'Input',
         key: 'input',
         render: (text, record, index) => {
-
             if (record.input === '&FILE_UPLOAD&') {
-                this.counter+=1;
                 return (<Button
                     disabled={this.props.isDownloadingFile}
-                    hreftype="primary" file-path-index={this.counter} icon="download" size="small"
+                    hreftype="primary" file-path-index={record.fileName} icon="download" size="small"
                     onClick={(e) => {this.props.downloadFile(e.target.getAttribute('file-path-index'))}}>
                     Download File
                 </Button>);

@@ -56,8 +56,8 @@ class App extends Component {
                 <Suspense fallback={<div className={styles.Loader}> Loading...</div>}>
                     <TimezoneContext.Provider value={this.state.timezone}>
                         <Switch>
-                            <Route path="/login" component={Login}/>
-                            <Route path="/signup" component={Signup}/>
+                            {/*<Route path="/login" component={Login}/>*/}
+                            {/*<Route path="/signup" component={Signup}/>*/}
                             <Route path="/forget_password" component={ForgetPassword}/>
                             <Route path="/reset_password/" component={NewResetPassword}/>
                             <Route path="/verify_account/" component={AccountVerification}/>
@@ -66,7 +66,7 @@ class App extends Component {
                             <Route path="/chatbot_direct_link/" component={ChatbotDirectLink}/>
                             <PrivateRoute path="/dashboard" component={Dashboard}/>
                             <Route path="/" component={Home}/>
-                            {/*<Redirect to={{pathname: '/'}}/>*/}
+                            {/* <Redirect to={{pathname: '/'}}/> */}
                         </Switch>
                     </TimezoneContext.Provider>
                 </Suspense>

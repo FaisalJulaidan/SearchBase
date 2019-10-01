@@ -294,6 +294,37 @@ export const assistant = (state = initialState, action) => {
                 errorMsg: action.error
             });
 
+
+        // Assistant Custom Logo
+        case actionTypes.UPLOAD_ASSISTANT_LOGO_REQUEST:
+            return updateObject(state, {
+                errorMsg: null,
+            });
+        case actionTypes.UPLOAD_ASSISTANT_LOGO_SUCCESS:
+            return updateObject(state, {
+                successMsg: action.msg,
+                assistant: {...state.assistant, LogoPath: action.LogoPath}
+            });
+        case actionTypes.UPLOAD_ASSISTANT_LOGO_FAILURE:
+            return updateObject(state, {
+                errorMsg: action.error
+            });
+
+        case actionTypes.DELETE_ASSISTANT_LOGO_REQUEST:
+            return updateObject(state, {
+                errorMsg: null,
+            });
+        case actionTypes.DELETE_ASSISTANT_LOGO_SUCCESS:
+            return updateObject(state, {
+                successMsg: action.msg,
+                assistant: {...state.assistant, LogoPath: null}
+            });
+        case actionTypes.DELETE_ASSISTANT_LOGO_FAILURE:
+            return updateObject(state, {
+                errorMsg: action.error
+            });
+
+
         default:
             return state
     }

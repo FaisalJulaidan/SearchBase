@@ -1,11 +1,11 @@
 from threading import Thread
-
+import os
 from flask import render_template, current_app
 from flask_mail import Mail, Message
 
 from models import Callback, Assistant, Conversation, Company, StoredFileInfo
 from services import user_services, stored_file_services as sfs
-from utilities import helpers
+from utilities import helpers,enums
 
 mail = Mail()
 tsbEmail = "info@thesearchbase.com"
@@ -13,8 +13,8 @@ tsbEmail = "info@thesearchbase.com"
 
 def sendDemoRequest(data) -> Callback:
     try:
-        if not (data["name"] or data["companyName"] or (data["phone"] or data["email"])):
-            return Callback(False, "Required information is missing")
+        # if not data["name"] or data["company"] or (data["phone"] or data["email"]):
+        #     return Callback(False, "Required information is missing")
 
         callback: Callback = __sendEmail(tsbEmail, 'Demo Request', '/emails/arrange_demo.html', data=data)
 
@@ -65,6 +65,27 @@ def sendVerificationEmail(firstName, lastName, email, companyName, companyID) ->
     except Exception as exc:
         helpers.logError("mail_service.sendVerificationEmail(): " + str(exc))
         return Callback(False, 'Could not send a verification email to ' + email)
+
+def sendAppointmentConfirmationEmail(name, email, dateTime, userTimeZone, companyName, logoPath):
+    try:
+        callback: Callback = __sendEmail(
+            email,
+            'Appointment Confirmation',
+            '/emails/appointment_confirmation.html',
+            companyName=companyName,
+            userName=name,
+            dateTime=dateTime.strftime("%d/%m/%Y %H:%M"),
+            userTimeZone=userTimeZone,
+            logoPath=logoPath)
+
+        if not callback.Success:
+            raise Exception(callback.Message)
+
+        return Callback(True, 'Appointment confirmation email is on its way to ' + email)
+
+    except Exception as exc:
+        helpers.logError("mail_service.sendAppointmentConfirmationEmail(): " + str(exc))
+        return Callback(False, 'Could not send the confirmation email to ' + email)
 
 
 def sendAcceptanceEmail(title, body, userName, email, logoPath, companyName):
@@ -232,7 +253,7 @@ def sendSolutionAlert(record, solutions):
 def notifyNewConversation(assistant: Assistant, conversation: Conversation):
     try:
 
-        users_callback: Callback = user_services.getAllByCompanyIDWithEnabledNotifications(assistant.CompanyID)
+        users_callback: Callback = user_services.getAllByCompanyIDWithEnabledNotifications(assistant.CompanyID, True)
         if not users_callback.Success:
             return Callback(False, "Users not found!")
 
@@ -247,7 +268,7 @@ def notifyNewConversation(assistant: Assistant, conversation: Conversation):
         if conversation.StoredFile:
             if conversation.StoredFile.StoredFileInfo:
                 for file in conversation.StoredFile.StoredFileInfo:
-                    fileURLsSinged.append(sfs.genPresigendURL(file.FilePath, sfs.USER_FILES_PATH, 2592000).Data) # Expires in a month
+                    fileURLsSinged.append(sfs.genPresigendURL(file.FilePath, 2592000).Data) # Expires in a month
 
 
         conversations = [{
@@ -256,12 +277,13 @@ def notifyNewConversation(assistant: Assistant, conversation: Conversation):
             'status': conversation.ApplicationStatus.name,
             'fileURLsSinged': fileURLsSinged,
             'completed': "Yes" if conversation.Completed else "No",
-            'dateTime': conversation.DateTime.strftime("%Y-%m-%d %H:%M"),
+            'dateTime': conversation.DateTime.strftime("%Y/%m/%d %H:%M"),
             'link': helpers.getDomain() + "/dashboard/assistants/" +
                                str(assistant.ID) + "?tab=Conversations&conversation_id=" + str(conversation.ID)
 
         }]
 
+        logoPath = helpers.keyFromStoredFile(company.StoredFile, enums.FileAssetType.Logo).AbsFilePath
         # send emails, jobs applied for
         for user in users_callback.Data:
             email_callback: Callback = __sendEmail(to=user.Email,
@@ -272,7 +294,7 @@ def notifyNewConversation(assistant: Assistant, conversation: Conversation):
                                                    assistantName = assistant.Name,
                                                    assistantID = assistant.ID,
                                                    conversations = conversations,
-                                                   logoPath=company.logo,
+                                                   logoPath= logoPath,
                                                    companyName=company.Name,
                                                    companyURL=company.URL,
                                                    )
@@ -287,10 +309,10 @@ def notifyNewConversation(assistant: Assistant, conversation: Conversation):
 
 
 # Notify company about a new conversation
-def notifyNewConversations(assistant: dict, conversations, lastNotificationDate):
+def notifyNewConversations(assistant: Assistant, conversations, lastNotificationDate):
     try:
 
-        users_callback: Callback = user_services.getAllByCompanyIDWithEnabledNotifications(assistant["CompanyID"])
+        users_callback: Callback = user_services.getAllByCompanyIDWithEnabledNotifications(assistant.CompanyID)
         if not users_callback.Success:
             return Callback(False, "Users not found!")
 
@@ -304,7 +326,7 @@ def notifyNewConversations(assistant: dict, conversations, lastNotificationDate)
             if conversation.StoredFile:
                 if conversation.StoredFile.StoredFileInfo:
                     for file in conversation.StoredFile.StoredFileInfo:
-                        fileURLsSinged.append(sfs.genPresigendURL(file.FilePath, sfs.USER_FILES_PATH, 2592000).Data) # Expires in a month
+                        fileURLsSinged.append(sfs.genPresigendURL(file.FilePath, 2592000).Data) # Expires in a month
 
             conversationsList.append({
                 'userType': conversation.UserType.name,
@@ -312,15 +334,16 @@ def notifyNewConversations(assistant: dict, conversations, lastNotificationDate)
                 'status': conversation.ApplicationStatus.name,
                 'fileURLsSinged': fileURLsSinged,
                 'completed': "Yes" if conversation.Completed else "No",
-                'dateTime': conversation.DateTime.strftime("%Y-%m-%d %H:%M"),
+                'dateTime': conversation.DateTime.strftime("%Y/%m/%d %H:%M"),
                 'link': helpers.getDomain() + "/dashboard/assistants/" +
-                        str(assistant["ID"]) + "?tab=Conversations&conversation_id=" + str(conversation.ID)
+                        str(assistant.ID) + "?tab=Conversations&conversation_id=" + str(conversation.ID)
             })
 
         if not len(conversationsList) > 0:
             return Callback(True, "No new conversation to send")
 
-        logo = assistant["LogoPath"]
+        # Get company logo
+        logoPath = helpers.keyFromStoredFile(Assistant.Company.StoredFile.StoredFile, enums.FileAssetType.Logo).AbsFilePath
 
         # send emails, jobs applied for
         for user in users_callback.Data:
@@ -331,8 +354,7 @@ def notifyNewConversations(assistant: dict, conversations, lastNotificationDate)
                                                    assistantName = assistant["Name"],
                                                    assistantID = assistant["ID"],
                                                    conversations = conversationsList,
-                                                   logoPath = sfs.PUBLIC_URL + sfs.UPLOAD_FOLDER + sfs.COMPANY_LOGOS_PATH + "/" + (
-                                                           logo or "") if logo else None,
+                                                   logoPath = logoPath,
                                                    companyName = assistant["CompanyName"],
                                                    companyURL=assistant["CompanyURL"],
                                                    )

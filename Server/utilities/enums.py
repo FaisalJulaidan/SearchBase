@@ -33,6 +33,19 @@ class Calendar(Enum):
     def has_value(cls, value):
         return any(value == item.value for item in cls)
 
+@unique
+class FileAssetType(Enum):
+    NoType = 'No Type'
+    CandidateCV = 'Candidate CV'
+    Passport = 'Passport'
+    DrivingLicense = 'Driving License'
+    DrugTest = 'Drug Test'
+    Logo = 'Logo'
+
+    @classmethod
+    def has_value(cls, value):
+        return any(value == item.value for item in cls)
+
 
 @unique
 class Messenger(Enum):
@@ -183,14 +196,22 @@ class DataType(Enum):
         [UserType.Unknown],
         [BlockType.UserInput, BlockType.Question, BlockType.FileUpload, BlockType.UserType])
 
-
-    UserAvailabilityDate =  dataTypeCreator(
-        'UserAvailabilityDate',
+    AvailabilityDate = dataTypeCreator(
         'User Availability Date',
+        'UserAvailabilityDate',
         ValidationType.DateTime,
         DataTypeSection.NoType,
         [UserType.Candidate, UserType.Client],
         [BlockType.DatePicker])
+
+    # TODO DELETE MIGRATE FIND_USAGES => NO NEED, USE (UserAvailabilityDate)
+    CandidateAvailability =  dataTypeCreator(
+        'Candidate Availability',
+        'CandidateAvailability',
+        ValidationType.DateTime,
+        DataTypeSection.Candidate,
+        [UserType.Candidate, UserType.Client],
+        [BlockType.UserInput])
 
     # Candidate
     CandidateName = dataTypeCreator(
@@ -517,9 +538,7 @@ class DataType(Enum):
         [UserType.Candidate, UserType.Client],
         [BlockType.UserInput])
 
-    # ======================================================================
-    # User
-
+    # Warning: should ways be the last dateType to avoid recursion with UserType Enum class
     UserType = dataTypeCreator(
         'User Type',
         'UserType',

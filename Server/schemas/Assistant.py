@@ -38,8 +38,12 @@ class Assistant(db.Model):
     AutoPilotID = db.Column(db.Integer, db.ForeignKey('auto_pilot.ID', ondelete='SET NULL'))
     AutoPilot = db.relationship("AutoPilot", back_populates="Assistants", foreign_keys=[AutoPilotID])
 
+    StoredFileID = db.Column(db.Integer, db.ForeignKey('stored_file.ID', ondelete='SET NULL'), nullable=True)
+    StoredFile = db.relationship('StoredFile', order_by="desc(StoredFile.ID)")
     #  - Many to one
     Conversations = db.relationship('Conversation', back_populates='Assistant')
+
+    Campaigns = db.relationship('Campaign', back_populates='Assistant')
 
     # Constraints:
     # cannot have two assistants with the same name under one company

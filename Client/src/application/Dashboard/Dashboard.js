@@ -5,7 +5,7 @@ import momenttz from 'moment-timezone';
 import './Dashboard.less';
 import styles from './Dashboard.module.less';
 
-import { getUser, history, getTimezone } from 'helpers';
+import { getUser, history, getCompany, getTimezone } from 'helpers';
 import { Route, Switch, withRouter } from 'react-router-dom';
 import { authActions, optionsActions } from 'store/actions';
 import { store } from 'store/store';
@@ -16,6 +16,7 @@ import { CSSTransition, TransitionGroup } from 'react-transition-group';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCloud } from '@fortawesome/free-solid-svg-icons';
 import { TimezoneContext } from '../../contexts/timezone';
+import {AuthorisedRoute} from "../../hoc/AuthorisedRoute";
 
 import Home from  './Home/Home';
 import Assistants from './Assistants/Assistants';
@@ -26,7 +27,8 @@ import Account from './ControlPanel/Account/Account';
 import Billing from './ControlPanel/Billing/Billing';
 import UsersManagement from './ControlPanel/UsersManagement/UsersManagement';
 import Documentation from './Documentation/Documentation';
-import Campaign from './Campaign/Campaign';
+import Campaigns from './Campaigns/Campaigns';
+import Campaign from "./Campaigns/Campaign/Campaign";
 import AutoPilots from './AutoPilots/AutoPilots';
 import AutoPilot from './AutoPilots/AutoPilot/AutoPilot';
 import Appointment from './Appointment/Appointment';
@@ -77,6 +79,7 @@ class Dashboard extends Component {
         const timezone = getTimezone();
         const validTimezone = timezone ? timezone : momenttz.tz.guess();
         const user = getUser();
+        const company = getCompany();
 
         let userInfo = null;
         // User Information at the top
@@ -119,11 +122,11 @@ class Dashboard extends Component {
             '/dashboard/assistants',
             '/dashboard/marketplace',
             '/dashboard/appointments',
-            '/dashboard/auto_pilot',
+            '/dashboard/auto_pilots',
             '/dashboard/databases',
             '/dashboard/account',
             '/dashboard/users_management',
-            '/dashboard/campaign'
+            '/dashboard/campaigns'
         ];
         const isNewLayout = newLayoutRoutes.some(a => this.props.location.pathname.indexOf(a) > -1);
         return (
@@ -170,31 +173,32 @@ class Dashboard extends Component {
                             <Icon type="home"/>
                             <span>Home</span>
                         </Menu.Item>
-
+                        {company.AccessAssistants ?
                         <Menu.Item key="assistants">
                             <Icon type="robot"/>
                             <span>Assistants</span>
-                        </Menu.Item>
+                        </Menu.Item>: null }
 
-                        <Menu.Item key="campaign">
+                        {company.AccessCampaigns ?
+                        <Menu.Item key="campaigns">
                             <Icon type="rocket"/>
-                            <span>Campaign</span>
-                        </Menu.Item>
-
-                        <Menu.Item key="auto_pilots">
+                            <span>Campaigns</span>
+                        </Menu.Item> : null }
+                        {company.AccessAutoPilot ?
+                        <Menu.Item  key="auto_pilots">
                             <Icon type="clock-circle"/>
                             <span>Auto Pilot</span>
-                        </Menu.Item>
-
+                        </Menu.Item> : null }
+                        {company.AccessDatabases ?
                         <Menu.Item key="databases">
                             <Icon type="database"/>
                             <span>Database</span>
-                        </Menu.Item>
-
+                        </Menu.Item> : null }
+                        {company.AccessAppointments ?
                         <Menu.Item key="appointments">
                             <Icon type="calendar"/>
                             <span>Appointments (beta)</span>
-                        </Menu.Item>
+                        </Menu.Item> : null }
 
                         <Menu.Item key="marketplace">
                             <Icon type="interation"/>
@@ -266,25 +270,27 @@ class Dashboard extends Component {
                                         <Suspense fallback={<div> Loading...</div>}>
                                             <Switch location={location} style={{ height: '100%' }}>
 
-                                                <Route path={`${match.path}/assistants`} component={Assistants} exact/>
-                                                <Route path={`${match.path}/assistants/:id`} component={Assistant} exact/>
+                                                <AuthorisedRoute path={`${match.path}/assistants`} permission={company.AccessAssistants} component={Assistants} exact/>
+                                                <AuthorisedRoute path={`${match.path}/assistants/:id`} permission={company.AccessAssistants} component={Assistant} exact/>
+
+                                                <AuthorisedRoute path={`${match.path}/campaigns`} permission={company.AccessCampaigns} component={Campaigns} exact/>
+                                                <AuthorisedRoute path={`${match.path}/campaigns/:id`} permission={company.AccessCampaigns} component={Campaign} exact/>
 
                                                 <Route path={`${match.path}/marketplace`} component={Marketplace} exact/>
                                                 <Route path={`${match.path}/marketplace/:type`} component={Item} exact/>
 
-                                                <Route path={`${match.path}/databases`} component={Databases} exact/>
-                                                <Route path={`${match.path}/databases/:id`} component={Database} exact/>
+                                                <AuthorisedRoute path={`${match.path}/databases`} permission={company.AccessDatabases} component={Databases} exact/>
+                                                <AuthorisedRoute path={`${match.path}/databases/:id`} permission={company.AccessDatabases} component={Database} exact/>
 
                                                 <Route path={`${match.path}/account`} component={Account} exact/>
                                                 <Route path={`${match.path}/billing`} component={Billing} exact/>
 
-                                                <Route path={`${match.path}/auto_pilots`} component={AutoPilots} exact/>
-                                                <Route path={`${match.path}/auto_pilots/:id`} component={AutoPilot} exact/>
+                                                <AuthorisedRoute path={`${match.path}/auto_pilots`} permission={company.AccessAutoPilot} component={AutoPilots} exact/>
+                                                <AuthorisedRoute path={`${match.path}/auto_pilots/:id`} permission={company.AccessAutoPilot} component={AutoPilot} exact/>
 
                                                 <Route path={`${match.path}/users_management`} component={UsersManagement} exact/>
                                                 <Route path={`${match.path}/documentation`} component={Documentation} exact/>
-                                                <Route path={`${match.path}/appointments`} component={Appointment} exact/>
-                                                <Route path={`${match.path}/campaign`} component={Campaign} exact/>
+                                                <AuthorisedRoute path={`${match.path}/appointments`} permission={company.AccessAppointments} component={Appointment} exact/>
                                                 <Route path="/dashboard" component={Home}/>
                                             </Switch>
                                         </Suspense>

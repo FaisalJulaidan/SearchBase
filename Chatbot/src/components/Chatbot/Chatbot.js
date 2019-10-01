@@ -19,7 +19,8 @@ import {
     isReady,
     optionalDelayExecution,
     promiseWrapper,
-    useInterval
+    useInterval,
+    genUniqueFileName,
 } from '../../utils';
 import { fetchData, getCurBlock } from '../../utils/flowHandler';
 // Constants
@@ -84,9 +85,9 @@ export const Chatbot = ({
 
     useEffect(() => {
         const hasBeenUsed = () => {
-            let used = sessionStorage.getItem('TSB_CHATBOT_USED');
+            let used = localStorage.getItem('TSB_CHATBOT_USED');
             if (used === null) {
-                sessionStorage.setItem('TSB_CHATBOT_USED', 'true');
+                localStorage.setItem('TSB_CHATBOT_USED', true);
                 return false;
             } else {
                 return true;
@@ -211,6 +212,7 @@ export const Chatbot = ({
                 return;
             }
             if (nextBlock.extra.end) {
+              console.log("end")
                 setChatbotStatus({ finished: true });
                 let { cancelled } = await dataHandler.sendData(nextBlock.extra.finished);
                 if (cancelled) return;
@@ -257,6 +259,7 @@ export const Chatbot = ({
             window.__TSB_CHATBOT.close = () => closeWindow();
         }
     }, [initChatbot, setChatbotStatus]);
+
 
     return (
         <>

@@ -1,0 +1,25 @@
+.icon {
+    color: rgba(0, 0, 0, .25);
+}
+
+.label {
+    transition: all .5s;
+    font-weight: bold;
+    margin-bottom: 1em;
+}
+
+.label div {
+    line-height: 2.5em;
+}
+
+.label label {
+    font-size: 1.1em;
+    font-weight: bold;
+    color: #444444;
+
+}
+
+.checkbox {
+    font-weight: bold;
+    color: #726a84;
+}

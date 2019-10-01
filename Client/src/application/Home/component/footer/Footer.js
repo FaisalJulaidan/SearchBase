@@ -19,10 +19,12 @@ const Footer = (props) => {
                     <Row className={styles.row}>
                         <Col xs="auto" sm={4} md={6} lg={{span: 6, offset: 1}}
                              xl={{span: 7, offset: 1}}>
+                            <div>
                             <Link className={styles.logo} to="/">
                                 <FontAwesomeIcon size="6x" icon={faCloud}/>
                                 <h1>SearchBase</h1>
                             </Link>
+                            </div>
                         </Col>
                         <Col xs="auto" className={styles.nav}>
                             <ul>

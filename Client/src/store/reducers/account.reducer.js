@@ -67,7 +67,7 @@ export const account = (state = initialState, action) => {
         case actionTypes.UPLOAD_LOGO_SUCCESS:
             return updateObject(state, {
                 successMsg: action.msg,
-                account: {...state.account, company: {...state.account.company, LogoPath: action.UpdatedLogoPath}}
+                account: {...state.account, company: {...state.account.company, LogoPath: action.UpdatedLogoPath, }}
             });
         case actionTypes.UPLOAD_LOGO_FAILURE:
             return updateObject(state, {

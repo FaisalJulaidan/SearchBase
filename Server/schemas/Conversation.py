@@ -38,8 +38,8 @@ class Conversation(db.Model):
     AssistantID = db.Column(db.Integer, db.ForeignKey('assistant.ID', ondelete='cascade'), nullable=False)
     Assistant = db.relationship('Assistant', back_populates='Conversations')
 
-    StoredFileID = db.Column(db.Integer, db.ForeignKey('stored_file.ID'), nullable=True)
-    StoredFile = db.relationship('StoredFile', order_by="desc(StoredFile.ID)")
+    StoredFileID = db.Column(db.Integer, db.ForeignKey('stored_file.ID', ondelete='SET NULL'), nullable=True)
+    StoredFile = db.relationship('StoredFile')
 
     Appointment = db.relationship('Appointment', uselist=False, back_populates='Conversation')
 

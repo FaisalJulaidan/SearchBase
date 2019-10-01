@@ -1,5 +1,3 @@
-import functools
-import gzip
 import inspect
 import logging
 import os
@@ -7,24 +5,22 @@ import re
 import traceback
 from datetime import time
 from enum import Enum
-from io import BytesIO
 from typing import List
-
+import app
 import geoip2.webservice
 import stripe
 from cryptography.fernet import Fernet
-from flask import json, after_this_request, request, Response
-from flask_jwt_extended import get_jwt_identity
+from flask import json, request, Response
 from forex_python.converter import CurrencyRates
-from flask_jwt_extended import get_jwt_identity
+from flask_limiter import Limiter
 from hashids import Hashids
 from itsdangerous import URLSafeTimedSerializer
 from sqlalchemy_utils import Currency
 
 from config import BaseConfig
-from models import db, Assistant, Job, Callback, Role
-from services import flow_services, assistant_services, appointment_services
-from utilities.enums import Period
+from models import db, Assistant, Job, Callback, Role, Company, StoredFile, StoredFileInfo
+from services import flow_services, assistant_services, appointment_services, company_services
+from utilities.enums import Period, FileAssetType
 
 # ======== Global Variables ======== #
 
@@ -44,6 +40,16 @@ fernet = Fernet(os.environ['TEMP_SECRET_KEY'])
 
 # Currency converter by forex-python
 currencyConverter = CurrencyRates()
+
+
+
+# Crate request limiter
+def getRemoteAddress():
+    if os.environ['FLASK_ENV'] == 'development':
+        return request.remote_addr
+    else:
+        return request.headers['X-Real-IP']
+limiter = Limiter(key_func=getRemoteAddress)
 
 
 # ======== Helper Functions ======== #
@@ -121,6 +127,18 @@ def getPlanNickname(SubID=None):
     except stripe.error.StripeError as e:
         return None
 
+def keyFromStoredFile(storedFile: StoredFile, key: FileAssetType) -> StoredFileInfo or None:
+
+    class StoredFileInfoMocked(): # To avoid null pointer exceptions
+        def __init__(self, absFilePath: str or None):
+            self.AbsFilePath: str = absFilePath
+
+    if not storedFile: return StoredFileInfoMocked(None)
+    for file in storedFile.StoredFileInfo:
+        if file.Key.value == key.value:
+            return file
+    return StoredFileInfoMocked(None)
+
 
 def isValidEmail(email: str) -> bool:
     # Validate the email address using a regex.
@@ -140,39 +158,6 @@ def jsonResponseFlask(success: bool, http_code: int, msg: str, data=None):
         status=http_code,
         mimetype='application/json'
     )
-
-def gzipped(f):
-    @functools.wraps(f)
-    def view_func(*args, **kwargs):
-        @after_this_request
-        def zipper(response):
-            accept_encoding = request.headers.get('Accept-Encoding', '')
-
-            if 'gzip' not in accept_encoding.lower():
-                return response
-
-            response.direct_passthrough = False
-
-            if (response.status_code < 200 or
-                    response.status_code >= 300 or
-                    'Content-Encoding' in response.headers):
-                return response
-            gzip_buffer = BytesIO()
-            gzip_file = gzip.GzipFile(mode='wb',
-                                      fileobj=gzip_buffer)
-            gzip_file.write(response.data)
-            gzip_file.close()
-
-            response.data = gzip_buffer.getvalue()
-            response.headers['Content-Encoding'] = 'gzip'
-            response.headers['Vary'] = 'Accept-Encoding'
-            response.headers['Content-Length'] = len(response.data)
-
-            return response
-
-        return f(*args, **kwargs)
-
-    return view_func
 
 
 # Note: Hourly is not supported because it varies and number of working hours is required
@@ -196,12 +181,15 @@ def convertSalaryPeriod(salary, fromPeriod: Period, toPeriod: Period):
 
 # -------- SQLAlchemy Converters -------- #
 """Convert a SQLAlchemy object to a single dict """
-def getDictFromSQLAlchemyObj(obj) -> dict:
+def getDictFromSQLAlchemyObj(obj, eager: bool = False) -> dict:
     dict = {}  # Results
+    protected = getattr(obj, "__protected__") if hasattr(obj, "__protected__") else []
+    serialize = getattr(obj, "__serialize__") if hasattr(obj, "__serialize__") else []
     if not obj: return dict
-
     # A nested for loop for joining two tables
     for attr in obj.__table__.columns:
+        if attr in protected:
+            continue
         key = attr.name
         if key not in ['Password', 'Auth', 'Secret']:
             dict[key] = getattr(obj, key)
@@ -220,14 +208,27 @@ def getDictFromSQLAlchemyObj(obj) -> dict:
             if key == Assistant.Flow.name and dict[key]:  # Parse Flow !!
                 flow_services.parseFlow(dict[key])  # pass by reference
 
-    for attr in obj.__dict__.keys():
-        if attr.startswith("__"):
-            dict[attr[2:]] = getattr(obj, attr)
+    keys = obj.__dict__.keys()
+
+    if hasattr(obj, 'all_attributes'):
+        keys = getattr(obj, 'all_attributes')
+
+    for attr in keys:
+        if eager:
+            if isinstance(getattr(obj, attr), List):
+                if all(hasattr(sub, '_sa_instance_state') for sub in getattr(obj, attr)):
+                    dict[attr] = getListFromSQLAlchemyList(getattr(obj, attr), True)
+            elif hasattr(getattr(obj, attr), '_sa_instance_state'):
+                dict[attr] = getDictFromSQLAlchemyObj(getattr(obj, attr), True)
+        if attr in serialize and attr not in protected:
+            dict[attr] = getattr(obj, attr)
+
     return dict
 
+
 """Convert a SQLAlchemy list of objects to a list of dicts"""
-def getListFromSQLAlchemyList(SQLAlchemyList):
-    return list(map(getDictFromSQLAlchemyObj, SQLAlchemyList))
+def getListFromSQLAlchemyList(SQLAlchemyList, eager: bool = False):
+    return [getDictFromSQLAlchemyObj(item, eager) for item in SQLAlchemyList]
 
 """Used when you want to only gather specific data from a table (columns)"""
 """Provide a list of keys (e.g ['id', 'name']) and the list of tuples"""
@@ -283,19 +284,6 @@ def getDictFromLimitedQuery(columnsList, tuple) -> dict:
     return dict
 
 
-# Check if the logged in user owns the accessed assistant for security
-def validAssistant(func):
-    def wrapper(assistantID):
-        user = get_jwt_identity()['user']
-        callback: Callback = assistant_services.getByID(assistantID, user['companyID'])
-        if not callback.Success:
-            return jsonResponse(False, 404, "Assistant not found.", None)
-        assistant: Assistant = callback.Data
-        return func(assistant)
-
-    wrapper.__name__ = func.__name__
-    return wrapper
-
 class requestException(Exception):
     pass
 
@@ -329,35 +317,19 @@ def validateRequest(req, check: dict, throwIfNotValid: bool = True):
     else:
         return returnDict
 
+
 class owns(object):
     def getOwner(self, type, jwt, *args):
         method_name = "owns_" + str(type)
         method = getattr(self, method_name, lambda: "Invalid Function type")
         return method(jwt, *args)
+
     def owns_Appointment(self, jwt, key):
         id = request.get_json()[key]
         callback: Callback = appointment_services.hasAppointment(jwt['companyID'], id)
         if not callback.Success:
             return jsonResponse(False, 401, "You do not own this appointment", None)
         return True
-
-
-def validOwner(type, *args):
-    def wrap(func):
-        def wrapper():
-            jwt = get_jwt_identity()['user']
-            Owns = owns()
-            valid = Owns.getOwner(type, jwt, *args)
-            if valid != True:
-                return valid
-            return func()
-        wrapper.__name__ = func.__name__
-        return wrapper
-    wrap.__name__ = type #needs to change
-    return wrap
-
-
-
 
 
 def findIndexOfKeyInArray(key, value, array):
@@ -392,4 +364,9 @@ def HPrint(message):
 
     print(message + " - (%s, line %s)" % (filename, info.lineno))
 
-# def csrf():
+
+# Sort out limiter here:
+def createLimiter():
+    return Limiter(app, key_func=getRemoteAddress, default_limits=["480 per day", "20 per hour"])
+
+# TODO: How to get this object from a helpers import?

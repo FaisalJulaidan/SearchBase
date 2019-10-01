@@ -12,3 +12,4 @@ export * from "./appointmentsPicker.actions";
 export * from "./appointment.actions";
 export * from "./appointmentAllocationTime.actions";
 export * from './development.actions';
+export * from './campaign.actions';

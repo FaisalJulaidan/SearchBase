@@ -79,9 +79,10 @@ const deleteWebhookSuccess = (ID) => {
 };
 
 
-const deleteWebhookFailure = () => {
+const deleteWebhookFailure = (error) => {
     return {
-        type: actionTypes.DELETE_WEBHOOK_FAILURE
+        type: actionTypes.DELETE_WEBHOOK_FAILURE,
+        error
     };
 };
 

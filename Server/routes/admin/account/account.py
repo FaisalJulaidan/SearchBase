@@ -19,7 +19,7 @@ def account():
         # Get user profile
         user_callback: Callback = user_services.getProfile(user.get('id', 0))
         if not user_callback.Success:
-            return helpers.jsonResponse(False, 400, " Could not retrieve profile", user_callback.Data)
+            return helpers.jsonResponse(False, 400, "Could not retrieve profile", user_callback.Data)
         return helpers.jsonResponse(True, 200, "Profile retrieved successfully", user_callback.Data)
 
 

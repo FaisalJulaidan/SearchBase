@@ -42,7 +42,7 @@ export const DataTypeFormItem = ({ FormItem, layout, getFieldDecorator, options,
 
     // Define initial value. Because cascader only accepts array as initial value we need to create one
     let initialValue = [block.DataType?.dataTypeSection, block.DataType?.name];
-    if (!(initialValue[0])) initialValue = ['No Type'];
+    if (!(initialValue[0])) initialValue = [];
 
 
     return (

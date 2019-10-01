@@ -8,6 +8,7 @@ import RawText from '../CardTypes/RawText';
 import SalaryPicker from '../CardTypes/SalaryPicker';
 import JobType from '../CardTypes/JobType';
 import UserType from '../CardTypes/UserType';
+import DatePicker from '../CardTypes/DatePicker';
 
 class EditBlockModal extends Component {
 
@@ -92,6 +93,13 @@ class EditBlockModal extends Component {
                               handleEditBlock={this.handleEditBlock}
                               handleDeleteBlock={this.props.handleDeleteBlock}
                               options={this.props.options}/> : null
+                }
+
+                {this.props.block.Type === 'Date Picker' ?
+                    <DatePicker modalState={this.state}
+                                handleEditBlock={this.handleEditBlock}
+                                handleDeleteBlock={this.props.handleDeleteBlock}
+                                options={this.props.options}/> : null
                 }
 
 

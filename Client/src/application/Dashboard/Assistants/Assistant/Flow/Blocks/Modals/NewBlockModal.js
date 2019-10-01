@@ -11,15 +11,17 @@ import RawText from '../CardTypes/RawText';
 import SalaryPicker from '../CardTypes/SalaryPicker';
 import JobType from '../CardTypes/JobType';
 import UserType from '../CardTypes/UserType';
+import DatePicker from '../CardTypes/DatePicker';
 
 const TabPane = Tabs.TabPane;
 const MyModal = Modal;
+
 class NewBlockModal extends Component {
 
     state = {
         layout: {
-            labelCol: {span: 6},
-            wrapperCol: {span: 14}
+            labelCol: { span: 6 },
+            wrapperCol: { span: 14 }
         },
         allBlocks: [],
         allGroups: [],
@@ -31,8 +33,8 @@ class NewBlockModal extends Component {
         this.setState({
             allBlocks: nextProps.allBlocks,
             allGroups: nextProps.allGroups,
-            currentGroup: nextProps.currentGroup,
-        })
+            currentGroup: nextProps.currentGroup
+        });
     }
 
     handleNewBlock = (newBlock) => {
@@ -41,7 +43,7 @@ class NewBlockModal extends Component {
         this.props.closeModal();
     };
 
-    onChangeTab = (currentTab) => this.setState({currentTab});
+    onChangeTab = (currentTab) => this.setState({ currentTab });
 
     render() {
         return (
@@ -78,7 +80,13 @@ class NewBlockModal extends Component {
                                      options={this.props.options}/>
                         </TabPane>
 
-                        <TabPane tab={<span><Icon type="solution"/>User Type</span>} key="UserType">
+                        <TabPane tab={<span><Icon type="calendar"/>Date Picker</span>} key="DatePicker">
+                            <DatePicker modalState={this.state}
+                                        handleNewBlock={this.handleNewBlock}
+                                        options={this.props.options}/>
+                        </TabPane>
+
+                        <TabPane tab={<span><Icon type="contacts"/>User Type</span>} key="UserType">
                             <UserType modalState={this.state}
                                       handleNewBlock={this.handleNewBlock}
                                       options={this.props.options}/>
@@ -121,10 +129,9 @@ class NewBlockModal extends Component {
             </div>
 
 
-
         );
     }
 }
 
 
-export default NewBlockModal
+export default NewBlockModal;

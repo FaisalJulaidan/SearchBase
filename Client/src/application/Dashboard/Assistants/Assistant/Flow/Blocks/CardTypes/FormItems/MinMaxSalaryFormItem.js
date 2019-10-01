@@ -15,9 +15,6 @@ export class MinMaxSalaryFormItem extends Component {
             minSalary: this.props.block.Content.min || undefined,
             maxSalary: this.props.block.Content.max || undefined
         });
-        this.props.form.validateFields(['minSalary', 'maxSalary'], (err, val) => {
-            console.log(err, val);
-        });
     }
 
     componentWillUnmount() {
@@ -104,6 +101,7 @@ export class MinMaxSalaryFormItem extends Component {
 
                 <FormItem validateStatus={this.state.minMaxValidateStatus}
                           label="Min - Max Salary"
+                          className={'SalaryPicker'}
                           help={this.state.errorMsg}
                           extra="This will be converated to be shown in the chatbot as slider"
                           {...layout}>

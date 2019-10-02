@@ -122,7 +122,7 @@ def sendQuery(auth, query, method, body, companyID, optionalParams=None):
     try:
         # get url
         url = buildUrl(auth, query, optionalParams)
-
+        helpers.logError(url)
         # set headers
         headers = {'Content-Type': 'application/json',
                    "id-token": auth.get("rest_token", "none")}

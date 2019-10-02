@@ -21,6 +21,7 @@ from services.Marketplace.CRM import crm_services
 from utilities import helpers
 
 client_id = os.environ['VINCERE_CLIENT_ID']
+api_key = os.environ['VINCERE_API_KEY']
 
 
 # login requires: client_id
@@ -124,7 +125,7 @@ def sendQuery(auth, query, method, body, companyID, optionalParams=None):
         url = buildUrl(auth, query, optionalParams)
         helpers.logError(url)
         # set headers
-        headers = {'Content-Type': 'application/json'}
+        headers = {'Content-Type': 'application/json', "x-api-key": api_key, "id-token": auth.get("rest_token", "none")}
 
         # test the BhRestToken (rest_token)
         r = marketplace_helpers.sendRequest(url, method, headers, json.dumps(body))
@@ -135,7 +136,7 @@ def sendQuery(auth, query, method, body, companyID, optionalParams=None):
             if not callback.Success:
                 raise Exception("Rest token could not be retrieved")
 
-            url = buildUrl(callback.Data, query, optionalParams)
+            headers["id-token"] = callback.Data.get("rest_token", "none")
 
             r = marketplace_helpers.sendRequest(url, method, headers, json.dumps(body))
             if not r.ok:
@@ -153,8 +154,7 @@ def sendQuery(auth, query, method, body, companyID, optionalParams=None):
 
 def buildUrl(rest_data, query, optionalParams=None):
     # set up initial url
-    url = "https://" + rest_data.get("domain", "") + ".vincere.io/api/v2/" + query + \
-          "?id-token=" + rest_data.get("rest_token", "none")
+    url = "https://" + rest_data.get("domain", "") + ".vincere.io/api/v2/" + query + "?"
     # add additional params
     if optionalParams:
         for param in optionalParams:

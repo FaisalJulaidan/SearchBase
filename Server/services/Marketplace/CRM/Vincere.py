@@ -124,8 +124,7 @@ def sendQuery(auth, query, method, body, companyID, optionalParams=None):
         url = buildUrl(auth, query, optionalParams)
         helpers.logError(url)
         # set headers
-        headers = {'Content-Type': 'application/json',
-                   "id-token": auth.get("rest_token", "none")}
+        headers = {'Content-Type': 'application/json'}
 
         # test the BhRestToken (rest_token)
         r = marketplace_helpers.sendRequest(url, method, headers, json.dumps(body))
@@ -154,7 +153,8 @@ def sendQuery(auth, query, method, body, companyID, optionalParams=None):
 
 def buildUrl(rest_data, query, optionalParams=None):
     # set up initial url
-    url = "https://" + rest_data.get("domain", "") + ".vincere.io/api/v2/" + query
+    url = "https://" + rest_data.get("domain", "") + ".vincere.io/api/v2/" + query + \
+          "id_token" + rest_data.get("rest_token", "none")
     # add additional params
     if optionalParams:
         url += "?"

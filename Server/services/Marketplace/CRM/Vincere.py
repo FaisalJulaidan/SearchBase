@@ -32,7 +32,7 @@ def login(auth):
                            "&grant_type=authorization_code" + \
                            "&client_id=" + client_id + \
                            "&code=" + auth.get("code")
-        helpers.logError("CRM.Vincere.login() ACCESS_TOKEN_URL: " + str(access_token_url))
+        helpers.logError("CRM.Vincere.login() auth: " + str(auth))
 
         # get the access token and refresh token
         access_token_request = requests.post(access_token_url, headers=headers)
@@ -47,7 +47,8 @@ def login(auth):
                         {
                             "access_token": result_body.get("access_token"),
                             "refresh_token": result_body.get("refresh_token"),
-                            "rest_token": result_body.get("id_token")
+                            "rest_token": result_body.get("id_token"),
+                            "domain": auth.get("domain")
                         })
 
     except Exception as exc:

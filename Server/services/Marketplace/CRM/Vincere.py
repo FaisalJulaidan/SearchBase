@@ -124,7 +124,8 @@ def sendQuery(auth, query, method, body, companyID, optionalParams=None):
         url = buildUrl(auth, query, optionalParams)
 
         # set headers
-        headers = {'Content-Type': 'application/json'}
+        headers = {'Content-Type': 'application/json',
+                   "id-token": auth.get("rest_token", "none")}
 
         helpers.logError("url: "+url)
         # test the BhRestToken (rest_token)
@@ -153,8 +154,7 @@ def sendQuery(auth, query, method, body, companyID, optionalParams=None):
 
 def buildUrl(rest_data, query, optionalParams=None):
     # set up initial url
-    url = "https://" + rest_data.get("domain", "") + ".vincere.io/api/v2" + query + \
-          "?id_token=" + rest_data.get("rest_token", "none")
+    url = "https://" + rest_data.get("domain", "") + ".vincere.io/api/v2" + query
     # add additional params
     if optionalParams:
         for param in optionalParams:

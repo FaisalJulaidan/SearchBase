@@ -157,6 +157,7 @@ def buildUrl(rest_data, query, optionalParams=None):
     url = "https://" + rest_data.get("domain", "") + ".vincere.io/api/v2" + query
     # add additional params
     if optionalParams:
+        url += "?"
         for param in optionalParams:
             url += "&" + param
     # return the url

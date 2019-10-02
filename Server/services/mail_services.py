@@ -351,12 +351,12 @@ def notifyNewConversations(assistant: Assistant, conversations, lastNotification
                                                    subject="New users has engaged with your "
                                                           + assistant["Name"] + " assistant",
                                                    template='emails/new_conversations_notification.html',
-                                                   assistantName = assistant["Name"],
-                                                   assistantID = assistant["ID"],
+                                                   assistantName = assistant.Name,
+                                                   assistantID = assistant.ID,
                                                    conversations = conversationsList,
                                                    logoPath = logoPath,
-                                                   companyName = assistant["CompanyName"],
-                                                   companyURL=assistant["CompanyURL"],
+                                                   companyName = assistant.Company.Name,
+                                                   companyURL=assistant.Company.URL,
                                                    )
             if not email_callback.Success:
                 raise Exception(email_callback.Message)

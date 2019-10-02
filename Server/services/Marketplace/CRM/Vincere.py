@@ -308,7 +308,7 @@ def searchCandidates(auth, companyID, data) -> Callback:
         query = "query="
 
         # populate filter
-        helpers.logError("data: " + data)
+        helpers.logError("data: " + str(data))
 
         query += populateFilter(data.get("location"), "address.city")
 

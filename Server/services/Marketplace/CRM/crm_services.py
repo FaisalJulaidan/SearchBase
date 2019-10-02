@@ -215,7 +215,7 @@ def searchCandidatesCustom(crm, companyID, candidate_data, perfect=False):
         # "jobCategory": checkFilter(session['keywordsByDataType'], DT.CandidateJobCategory),
         # "education": checkFilter(session['keywordsByDataType'], DT.CandidateEducation)
     }
-    helpers.logError("candidate_data: " + candidate_data)
+    helpers.logError("candidate_data: " + str(candidate_data))
     helpers.logError("candidate_data.get(\"location\"): " + candidate_data.get("location"))
     helpers.logError("data.get(\"location\"): " + data.get("location"))
     crm_type = crm.Type.value

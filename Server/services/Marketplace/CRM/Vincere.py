@@ -321,7 +321,7 @@ def searchCandidates(auth, companyID, data) -> Callback:
 
         # send query
         sendQuery_callback: Callback = sendQuery(auth, "search/Candidate", "get", {}, companyID,
-                                                 ["fields=*", query, "count=99999999"])
+                                                 ["fields=*", query, "count=9999"])
         if not sendQuery_callback.Success:
             raise Exception(sendQuery_callback.Message)
 
@@ -376,7 +376,7 @@ def searchJobs(auth, companyID, data) -> Callback:
 
         # send query
         sendQuery_callback: Callback = sendQuery(auth, "search/JobOrder", "get", {}, companyID,
-                                                 ["fields=*", query, "count=99999999"])
+                                                 ["fields=*", query, "count=9999"])
         if not sendQuery_callback.Success:
             raise Exception(sendQuery_callback.Message)
 

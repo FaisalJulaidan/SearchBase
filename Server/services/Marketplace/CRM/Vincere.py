@@ -126,7 +126,7 @@ def sendQuery(auth, query, method, body, companyID, optionalParams=None):
         # set headers
         headers = {'Content-Type': 'application/json'}
         helpers.logError("BODY: ")
-        helpers.logError(body)
+        helpers.logError(str(body))
         # test the BhRestToken (rest_token)
         r = marketplace_helpers.sendRequest(url, method, headers, json.dumps(body))
 

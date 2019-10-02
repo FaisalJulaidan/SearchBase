@@ -28,6 +28,7 @@ def login(auth):
     try:
         headers = {'Content-Type': 'application/x-www-form-urlencoded'}
 
+        helpers.logError("CRM.Vincere.login() auth.get(code): " + str(auth.get("code")))
         access_token_url = "https://id.vincere.io/oauth2/token?" + \
                            "&grant_type=authorization_code" + \
                            "&client_id=" + client_id + \

@@ -125,10 +125,12 @@ def sendQuery(auth, query, method, body, companyID, optionalParams=None):
 
         # set headers
         headers = {'Content-Type': 'application/json'}
-        helpers.logError("BODY: ")
-        helpers.logError(str(body))
+
+        if body:
+            body = json.dumps(body)
+
         # test the BhRestToken (rest_token)
-        r = marketplace_helpers.sendRequest(url, method, headers, json.dumps(body))
+        r = marketplace_helpers.sendRequest(url, method, headers, body)
 
         if r.status_code == 401:  # wrong rest token
             callback: Callback = retrieveRestToken(auth, companyID)
@@ -137,7 +139,7 @@ def sendQuery(auth, query, method, body, companyID, optionalParams=None):
 
             url = buildUrl(callback.Data, query, optionalParams)
 
-            r = marketplace_helpers.sendRequest(url, method, headers, json.dumps(body))
+            r = marketplace_helpers.sendRequest(url, method, headers, body)
             if not r.ok:
                 raise Exception(r.text + ". Query could not be sent")
 
@@ -308,8 +310,6 @@ def searchCandidates(auth, companyID, data) -> Callback:
         query = "query="
 
         # populate filter
-        helpers.logError("data: " + str(data))
-
         query += populateFilter(data.get("location"), "address.city")
 
         # if keywords[DT.CandidateSkills.value["name"]]:
@@ -320,7 +320,6 @@ def searchCandidates(auth, companyID, data) -> Callback:
         # check if no conditions submitted
         if len(query) < 6:
             query = "query=*:*"
-        helpers.logError("query: " + query)
 
         # send query
         sendQuery_callback: Callback = sendQuery(auth, "search/Candidate", "get", {}, companyID,

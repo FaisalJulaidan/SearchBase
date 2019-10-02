@@ -32,7 +32,6 @@ def login(auth):
                            "&grant_type=authorization_code" + \
                            "&client_id=" + client_id + \
                            "&code=" + auth.get("code")
-        helpers.logError("CRM.Vincere.login() auth: " + str(auth))
 
         # get the access token and refresh token
         access_token_request = requests.post(access_token_url, headers=headers)
@@ -130,7 +129,8 @@ def sendQuery(auth, query, method, body, companyID, optionalParams=None):
 
         # test the BhRestToken (rest_token)
         r = marketplace_helpers.sendRequest(url, method, headers, json.dumps(body))
-
+        helpers.logError(str(r.status_code))
+        helpers.logError(r.text)
         if r.status_code == 401:  # wrong rest token
             callback: Callback = retrieveRestToken(auth, companyID)
             if not callback.Success:

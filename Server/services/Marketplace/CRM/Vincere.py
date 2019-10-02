@@ -32,6 +32,7 @@ def login(auth):
                            "&grant_type=authorization_code" + \
                            "&client_id=" + client_id + \
                            "&code=" + auth.get("code")[0]
+        helpers.logError("CRM.Vincere.login() ACCESS_TOKEN_URL: " + str(access_token_url))
 
         # get the access token and refresh token
         access_token_request = requests.post(access_token_url, headers=headers)

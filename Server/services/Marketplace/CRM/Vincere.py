@@ -128,9 +128,9 @@ def sendQuery(auth, query, method, body, companyID, optionalParams=None):
 
         if body:
             body = json.dumps(body)
-
+        helpers.logError("url: " + url)
         # test the BhRestToken (rest_token)
-        r = marketplace_helpers.sendRequest(url, method, headers, body)
+        r = marketplace_helpers.sendRequest(url, method, headers)
 
         if r.status_code == 401:  # wrong rest token
             callback: Callback = retrieveRestToken(auth, companyID)

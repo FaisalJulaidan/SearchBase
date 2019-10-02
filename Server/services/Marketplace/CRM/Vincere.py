@@ -308,6 +308,7 @@ def searchCandidates(auth, companyID, data) -> Callback:
         query = "query="
 
         # populate filter
+        helpers.logError("data: " + data)
 
         query += populateFilter(data.get("location"), "address.city")
 
@@ -319,6 +320,7 @@ def searchCandidates(auth, companyID, data) -> Callback:
         # check if no conditions submitted
         if len(query) < 6:
             query = "query=*:*"
+        helpers.logError("query: " + query)
 
         # send query
         sendQuery_callback: Callback = sendQuery(auth, "search/Candidate", "get", {}, companyID,

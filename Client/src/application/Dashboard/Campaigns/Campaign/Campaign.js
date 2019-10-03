@@ -144,7 +144,8 @@ class Campaign extends React.Component {
                     values.jobTitle,
                     this.state.skills,
                     values.text,
-                    this.state.candidate_list
+                    this.state.candidate_list,
+                    values.outreach_type
                 ));
             }
         });
@@ -198,6 +199,7 @@ class Campaign extends React.Component {
                     values.jobTitle,
                     this.state.skills,
                     this.state.textMessage,
+                    values.outreach_type
                 ));
             }
         });
@@ -498,6 +500,17 @@ class Campaign extends React.Component {
                                     />
                                 )}
                             </FormItem>
+
+                            <FormItem label={"Outreach Type "}>
+                                {getFieldDecorator("outreach_type", {initialValue: "sms"})(
+                                    <Select placeholder={"Please select the message delivery platform"}>
+                                        <Select.Option key="sms">SMS</Select.Option>
+                                        <Select.Option key="email">Email</Select.Option>
+                                    </Select>
+                                )}
+                            </FormItem>
+
+
                             <Button loading={this.props.isCandidatesLoading} icon="rocket" type="primary"
                                     onClick={this.handleSubmit}
                                     size={"large"}>

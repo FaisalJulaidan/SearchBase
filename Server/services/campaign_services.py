@@ -1,10 +1,9 @@
 from sqlalchemy import and_
 
 from models import Callback, db, Campaign
-from services import assistant_services, databases_services
+from services import assistant_services, databases_services, mail_services
 from services.Marketplace.CRM import crm_services
 from services.Marketplace.Messenger import messenger_servicess
-from services.Marketplace.Messenger.messenger_servicess import sendMessage
 from utilities import helpers
 from utilities.enums import CRM
 
@@ -194,10 +193,12 @@ def sendCampaign(campaign_details, companyID):
             if campaign_details.get("use_crm") and crm:
                 if crm.Type is CRM.Bullhorn:
                     candidate_phone = candidate.get("CandidateMobile")
+                    candidate_email = candidate.get("CandidateEmail")
                 else:
                     raise Exception("CRM is not supported for this operation")
             else:
                 candidate_phone = candidate.get("CandidateMobile")
+                candidate_email = candidate.get("CandidateEmail")
 
             if not candidate_phone:
                 continue
@@ -209,7 +210,10 @@ def sendCampaign(campaign_details, companyID):
             text = text.split("&id")[0]
             text += "&id=" + str(candidate.get("ID"))
 
-            sendMessage(messenger.Type, candidate_phone, text, messenger.Auth)
+            if campaign_details.get("outreach_type") == "sms":
+                messenger_servicess.sendMessage(messenger.Type, candidate_phone, text, messenger.Auth)
+            elif campaign_details.get("outreach_type") == "email":
+                mail_services.simpleSend(candidate_email, campaign_details.get("email_title"), text)
 
         return Callback(True, '')
 

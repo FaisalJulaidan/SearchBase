@@ -392,6 +392,13 @@ class DataType(Enum):
         [UserType.Candidate],
         [BlockType.NoType])
 
+    CandidateConsultantName = dataTypeCreator(
+        'Candidate Consultant Name',
+        'CandidateConsultantName',
+        ValidationType.String,
+        DataTypeSection.Candidate,
+        [UserType.Candidate])
+
     # Company
     CompanyName = dataTypeCreator(
         'Company Name',

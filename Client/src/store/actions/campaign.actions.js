@@ -132,7 +132,7 @@ const fetchCampaignCandidatesDataFailure = (error) => ({
 
 
 // Launch Campaign
-const launchCampaign = (assistant_id, use_crm, crm_id, database_id, messenger_id, location, jobTitle, skills, text, candidate_list) => ({
+const launchCampaign = (assistant_id, use_crm, crm_id, database_id, messenger_id, location, jobTitle, skills, text, candidate_list,outreach_type) => ({
     type: actionTypes.LAUNCH_CAMPAIGN_REQUEST,
     assistant_id,
     use_crm,
@@ -143,7 +143,8 @@ const launchCampaign = (assistant_id, use_crm, crm_id, database_id, messenger_id
     jobTitle,
     skills,
     text,
-    candidate_list
+    candidate_list,
+    outreach_type
 });
 
 const launchCampaignSuccess = () => ({

@@ -110,7 +110,7 @@ def sendRequest(url, method, headers, data=None):
     elif method.lower() == "post":
         request = requests.post(url, headers=headers, data=data)
     elif method.lower() == "get":
-        request = requests.get(url, headers=headers, data=data)
+        request = requests.get(url, headers=headers)
     return request
 
 

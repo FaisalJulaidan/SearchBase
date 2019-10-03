@@ -226,7 +226,7 @@ class DataType(Enum):
     CandidateAvailability = dataTypeCreator(
         'Candidate Availability',
         'CandidateAvailability',
-        ValidationType.DateTime,
+        ValidationType.String,
         DataTypeSection.Candidate,
         [UserType.Candidate])
 
@@ -360,6 +360,13 @@ class DataType(Enum):
     CandidateOptIn = dataTypeCreator(
         'CandidateOptIn',
         'Candidate OptIn',
+        ValidationType.String,
+        DataTypeSection.Candidate,
+        [UserType.Candidate])
+
+    CandidateConsultantName = dataTypeCreator(
+        'Candidate Consultant Name',
+        'CandidateConsultantName',
         ValidationType.String,
         DataTypeSection.Candidate,
         [UserType.Candidate])

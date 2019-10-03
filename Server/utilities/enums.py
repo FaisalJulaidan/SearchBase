@@ -376,14 +376,6 @@ class DataType(Enum):
         [UserType.Candidate],
         [BlockType.NoType])
 
-    CandidateJobCategory = dataTypeCreator(
-        'Candidate Job Category',
-        'CandidateJobCategory',
-        ValidationType.String,
-        DataTypeSection.Candidate,
-        [UserType.Candidate],
-        [BlockType.UserInput, BlockType.Question])
-
     CandidateOptIn = dataTypeCreator(
         'CandidateOptIn',
         'Candidate OptIn',
@@ -481,6 +473,14 @@ class DataType(Enum):
         [UserType.Candidate, UserType.Client],
         [BlockType.JobType])
 
+    JobCategory = dataTypeCreator(
+        'Job Category',
+        'JobCategory',
+        ValidationType.String,
+        DataTypeSection.Job,
+        [UserType.Candidate, UserType.Client],
+        [BlockType.UserInput, BlockType.Question])
+
     JobSalary = dataTypeCreator(
         'Job Salary',
         'JobSalary',
@@ -545,11 +545,11 @@ class DataType(Enum):
         [UserType.Candidate, UserType.Client],
         [BlockType.UserInput])
 
-    # Warning: should ways be the last dateType to avoid recursion with UserType Enum class
+    # Warning: this should aways be the last dateType to avoid recursion with UserType Enum class
     UserType = dataTypeCreator(
         'User Type',
         'UserType',
         ValidationType.String,
         DataTypeSection.User,
-        [UserType.Candidate, UserType.Client], # Not sure about this
+        [UserType.Candidate, UserType.Client],
         [BlockType.UserType])

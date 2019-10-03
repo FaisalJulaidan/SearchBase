@@ -27,16 +27,24 @@ my_test_here = "hi"
 
 def testConnection(auth, companyID):
     try:
-        callback: Callback = login(auth)
+        print("testing connection...")
+        print(auth)
 
-        if not callback.Success:
-            raise Exception("Testing failed")
+        if not auth.get("refresh_token"):
+            callback: Callback = login(auth)
+
+            if not callback.Success:
+                raise Exception("Testing failed")
+        else:
+            return Callback(True, 'Logged in successfully', auth)
 
         return Callback(True, 'Logged in successfully', callback.Data)
 
     except Exception as exc:
         helpers.logError("Marketplace.CRM.Jobscience.testConnection() ERROR: " + str(exc))
         return Callback(False, str(exc))
+
+
 
 
 # NOTE: For production, we need to change the domain name (currently it is pointing to sandbox)
@@ -56,37 +64,44 @@ def login(auth):
                            "&code=" + authCopy.get("code")
 
         # get the access token and refresh token
-        access_token_request = requests.post(access_token_url, headers=headers)
+        response = requests.post(access_token_url, headers=headers)
         global my_test_here
 
-        #print(access_token_request.status_code)
-        if not access_token_request.ok:
-            raise Exception(access_token_request.text)
+        if response.status_code == 200:
+            print("Login to Jobscience Successful")
+        else:
+            print("Login to Jobscience Unsuccessful")
 
-        result_body = json.loads(access_token_request.text)
+        if not response.ok:
+            raise Exception(response.text)
+
+        result_body = json.loads(response.text)
         print(result_body)
-
-        print("Access token is: ")
-        print(result_body.get('access_token'))
         my_test_here = result_body.get('refresh_token')
-        return Callback(True, 'Logged in successfully', result_body.get('access_token'))  # No refresh token currently
+
+        return Callback(True, 'Logged in successfully', {"access_token":result_body.get('access_token'),
+                                                         "refresh_token": result_body.get("refresh_token")})
 
     except Exception as exc:
         helpers.logError("Marketplace.CRM.Jobscience.login() ERROR: " + str(exc))
         return Callback(False, str(exc))
 
 
-def logout(access_token, companyID):  # QUESTION: Purpose of companyID param?
+def logout(auth, companyID):  # QUESTION: Purpose of companyID param?
     try:
         # Attempt logout
-        logout_url = "https://salesforce.com/services/oauth2/revoke?token=" + access_token
+        logout_url = "https://login.salesforce.com/services/oauth2/revoke?token=" + auth.get("access_token")
         headers = {
             'Content-Type': 'application/json',
-            'Authorization': "Bearer " + access_token,
+            'Authorization': "Bearer " + auth.get("access_token"),
             'cache-control': "no-cache"
         }
 
         response = marketplace_helpers.sendRequest(logout_url, "get", headers, {})
+        if response.status_code == 200:
+            print("Disconnect from Jobscience Successful")
+        else:
+            print("Disconnect from Jobscience Unsuccessful")
 
     except Exception as exc:
         helpers.logError("Marketplace.CRM.Jobscience.logout() ERROR: " + str(exc))

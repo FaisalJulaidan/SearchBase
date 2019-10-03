@@ -389,7 +389,8 @@ class DataType(Enum):
         'CandidateConsultantName',
         ValidationType.String,
         DataTypeSection.Candidate,
-        [UserType.Candidate])
+        [UserType.Candidate],
+        [BlockType.UserInput])
 
     # Company
     CompanyName = dataTypeCreator(

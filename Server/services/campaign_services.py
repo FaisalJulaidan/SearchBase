@@ -203,11 +203,9 @@ def sendCampaign(campaign_details, companyID):
 
             # insert candidate details in text
             text = text.replace("{candidate.name}", candidate.get("CandidateName"))
-            print("TEXT 1: ", text)
             # insert candidate id in link
             text = text.split("&id")[0]
             text += "&id=" + str(candidate.get("ID"))
-            print("TEXT 2: ", text)
 
             messenger_servicess.sendMessage(messenger.Type, candidate_phone, text, messenger.Auth)
 

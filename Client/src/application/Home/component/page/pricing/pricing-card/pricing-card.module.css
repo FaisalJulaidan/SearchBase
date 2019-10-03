@@ -66,6 +66,7 @@
 
 /**** Primary Button ****/
 .button {
+    text-decoration: none;
     margin-top: 2em;
     color: #9254de;
     border-color: #9254de;

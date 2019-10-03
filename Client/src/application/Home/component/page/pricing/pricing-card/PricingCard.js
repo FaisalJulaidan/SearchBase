@@ -1,6 +1,7 @@
 import React from 'react';
 import styles from './pricing-card.module.css';
 import PropTypes from "prop-types";
+import {Link} from "react-router-dom";
 import {Card} from "react-bootstrap";
 import Button from "react-bootstrap/Button";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -24,7 +25,9 @@ const PricingCard = (props) => {
                     <ul className={styles.list}>
                         {items}
                     </ul>
-                    <Button variant="outline-light" className={styles.button} block>Order now</Button>
+                    <Link to={`/order-plan?plan=${props.id}`} style={{display:'block',width:'100%',textDecoration:'none'}}>
+                        <Button variant="outline-light" className={styles.button} block>Order now</Button>
+                    </Link>
                 </Card.Body>
             </Card>
     );

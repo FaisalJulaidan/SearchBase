@@ -1,0 +1,64 @@
+import React from 'react';
+import styles from "./payment.module.css"
+import queryString from 'query-string';
+import {Link} from "react-router-dom";
+import {Container, Row, Col,Card} from "react-bootstrap";
+import {Fade} from "react-reveal";
+import {Steps} from 'antd';
+import SignupForm from "./SignupFormPayment";
+import {WEBSITE_TITLE} from "../../../../../constants/config";
+
+const {Step} = Steps;
+
+const Payment = () => {
+
+    document.title = "Payment | " + WEBSITE_TITLE;
+
+    return (
+        <div className={styles.wrapper}>
+            <Container>
+                <Row className={styles.row_steps}>
+                    <Col xs={{span:6,offset:3}}>
+                    <Steps current={0}>
+                        <Step title="Sign-up"/>
+                        <Step title="Payment" />
+                    </Steps>
+                    </Col>
+                </Row>
+                <Row>
+                    <Col sm={6} md={6} lg={{span: 6, offset: 1}} className={styles.col_desc}>
+                        <Fade left>
+                            <h1 className={styles.text1}>You're just few minutes away from using our ChatBot!</h1>
+                            <h1 className={styles.text2}>Registration is free and takes less than 30 seconds (no credit
+                                card required).</h1>
+                        </Fade>
+                    </Col>
+                    <Col sm={6} md xl={4}>
+                        <Fade right>
+                            <div className={styles.form_wrapper}>
+                                <Card className={styles.card}>
+                                    <Card.Body>
+                                        <h1 className={styles.title}>Sign up</h1>
+                                        <SignupForm/>
+                                        <h6 className={styles.sign_up}>Or log into an
+                                            <Link to="/login">existing account!</Link>
+                                        </h6>
+                                    </Card.Body>
+                                </Card>
+                                <div className={styles.navigation}>
+                                    <ul>
+                                        <li><Link to={"/"}>Home</Link></li>
+                                        <li><Link to={"/terms"}>Terms & Conditions</Link></li>
+                                        <li><Link to={"/privacy"}>Privacy Policy</Link></li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </Fade>
+                    </Col>
+                </Row>
+            </Container>
+        </div>
+    );
+};
+
+export default Payment;

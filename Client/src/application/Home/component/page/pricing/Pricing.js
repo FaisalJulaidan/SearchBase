@@ -16,7 +16,7 @@ const Pricing = () => {
     let pricing = pricingJSON.map((plan, key) => {
         return (
             <Col key={key}>
-                <PricingCard title={plan.title} subtitle={plan.subtitle} price={plan.price} items={plan.items}
+                <PricingCard id={plan.id} title={plan.title} subtitle={plan.subtitle} price={plan.price} items={plan.items}
                 icon={plan.icon}/>
             </Col>
         );

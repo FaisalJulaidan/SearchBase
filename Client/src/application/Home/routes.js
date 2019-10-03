@@ -13,6 +13,7 @@ import Signup from "./component/page/signup/Signup";
 import GDPR from "./component/page/gdpr/GDPR";
 import GetStarted from "./component/page/get-started/GetStarted";
 import Pricing from "./component/page/pricing/Pricing";
+import Payment from "./component/page/payment/Payment";
 
 class Routes extends Component {
     render() {
@@ -22,6 +23,7 @@ class Routes extends Component {
                 <Route path="/features" exact component={HowItWorks}/>
                 <Route path="/how-it-works" exact component={HowItWorks}/>
                 <Route path="/pricing" exact component={Pricing}/>
+                <Route path="/order-plan" exact component={Payment}/>
                 <Route path="/our-team" exact component={OurTeam}/>
                 <Route path="/terms" exact component={Terms}/>
                 <Route path="/privacy" exact component={Policies}/>

@@ -9,7 +9,7 @@ import {DefaultButton} from './Components/Common'
 import {AdaptFeatures, AdaptFormItems, AdaptHeader} from "./Components/Adapt";
 import {BullhornFeatures, BullhornHeader} from "./Components/Bullhorn";
 import {JobscienceFeatures, JobscienceHeader} from "./Components/Jobscience";
-import {VincereFeatures, VincereHeader} from "./Components/Vincere";
+import {VincereFeatures, VincereFormItems, VincereHeader} from "./Components/Vincere";
 import {GreenhouseFeatures, GreenhouseFormItem, GreenhouseHeader} from "./Components/Greenhouse";
 import {GoogleFeatures, GoogleHeader} from './Components/Google'
 import {OutlookFeatures, OutlookHeader} from "./Components/Outlook";
@@ -188,10 +188,11 @@ class Item extends React.Component {
                     return <VincereHeader/>;
                 if (place === 'features')
                     return <VincereFeatures/>;
+                if (place === 'form')
+                    return <VincereFormItems {...formOptions}/>;
                 if (place === 'button') {
-                    windowObject.url = "https://id.vincere.io/oauth2/authorize?client_id=14e3d987-7f09-4aa0-af7c-9192f02d545f&response_type=code&redirect_uri=" +getLink("/dashboard/marketplace/Vincere");
                     return <DefaultButton buttonText={'Connect to Vincere'}
-                                          windowObject={windowObject}
+                                          // windowObject={windowObject}
                                           {...buttonsOptions}/>;
                 }
                 break;

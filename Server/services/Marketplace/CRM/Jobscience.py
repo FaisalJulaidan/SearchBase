@@ -14,6 +14,7 @@ from services.Marketplace.CRM import crm_services
 CLIENT_ID = os.environ['JOBSCIENCE_CLIENT_ID']
 CLIENT_SECRET = os.environ['JOBSCIENCE_CLIENT_SECRET']
 
+my_test_here = "hi"
 
 # TODO CHECKLIST:
 
@@ -56,13 +57,18 @@ def login(auth):
 
         # get the access token and refresh token
         access_token_request = requests.post(access_token_url, headers=headers)
+        global my_test_here
+
         #print(access_token_request.status_code)
         if not access_token_request.ok:
             raise Exception(access_token_request.text)
 
         result_body = json.loads(access_token_request.text)
-        #print(result_body)
+        print(result_body)
 
+        print("Access token is: ")
+        print(result_body.get('access_token'))
+        my_test_here = result_body.get('refresh_token')
         return Callback(True, 'Logged in successfully', result_body.get('access_token'))  # No refresh token currently
 
     except Exception as exc:
@@ -635,6 +641,9 @@ def getAllJobs(access_token, companyID, fields=None) -> Callback:  # TODO: See t
 
 def sendQuery(access_token, method, body, query):
     try:
+        print("-----------------")
+        print(my_test_here)
+        print("------------------")
         url = buildUrl(query, method)
 
         # set headers
@@ -649,6 +658,34 @@ def sendQuery(access_token, method, body, query):
         print("HEADERS OF SEND QUERY")
         print(headers)
         response = marketplace_helpers.sendRequest(url, method, headers, json.dumps(body))
+
+        if response.status_code == 401:  # wrong rest token
+
+            # get new access token:
+
+            print("Getting a new access token")
+            headers_refresh = {
+                'Content-Type': "application/x-www-form-urlencoded",
+                'Cache-Control': "no-cache",
+                'Cookie': "inst=APP_3X",
+                'cache-control': "no-cache"
+            }
+
+            body_refresh = {
+                'grant_type': "refresh_token",
+                'client_id': "3MVG9I5UQ_0k_hTlh64o5U2MnkGkPmYj_xkMpFkEi0tIJXl_CGhXpux_w5khN6pvnNd.IH6Yvo82ZAcRystWE",
+                'client_secret': "972A46C725406EE38D971409A1509EF164B100A9B8B42CA4C39AB3952B65A215",
+                'refresh_token': my_test_here
+            }
+
+            resp = json.loads(requests.request("POST", "https://login.salesforce.com/services/oauth2/token?", headers=headers_refresh, data=body_refresh).text)
+            print(resp)
+            headers['Authorization'] = "Bearer " + resp.get('access_token')
+
+            # Try again
+            response = marketplace_helpers.sendRequest(url, method, headers, json.dumps(body))
+
+
         if not response.ok:
             raise Exception(response.text + ". Query could not be sent")
 

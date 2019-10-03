@@ -44,10 +44,6 @@ def sendConversationsNotifications(assistantID=None):
             now = datetime.now()
             assistantsQuery = db.session.query(Assistant).options(joinedload("Company").joinedload("StoredFile").joinedload("StoredFileInfo")) \
                 .filter(and_(Assistant.NotifyEvery))
-            # assistantsQuery = db.session.query(Assistant.ID, Assistant.CompanyID, Company.Name,
-            #                                    Company.URL, Assistant.NotifyEvery, Assistant.Name,
-            #                                    Assistant.LastNotificationDate) \
-            #     .join(Company)\
 
             if assistantID != None:
                 assistantsQuery.filter(Assistant.ID == assistantID)

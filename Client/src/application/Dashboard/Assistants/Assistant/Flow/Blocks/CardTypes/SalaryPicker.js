@@ -50,7 +50,7 @@ class SalaryPicker extends Component {
                         min: +values.minSalary,
                         max: +values.maxSalary,
                         period: values.payPeriod,
-                        defaultCurrency: values.defualtCurrency,
+                        currency: values.currency,
                         action: values.action,
                         afterMessage: values.afterMessage || '',
                         blockToGoID: values.blockToGoID || values.blockToGoIDGroup || null

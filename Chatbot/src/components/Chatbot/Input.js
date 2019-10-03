@@ -10,7 +10,7 @@ import { addBotMessage, addUserMessage, setChatbotAnimation, setChatbotStatus } 
 // Styles
 import './UserInputs/styles/Inputs.css';
 // Components
-import { DatePicker, MultiDatePicker, FileUpload, SalaryPicker, Text } from './UserInputs';
+import { FileUpload, MultiDatePicker, SalaryPicker, Text } from './UserInputs';
 
 
 const Input = ({setChatbotStatus, hideSignature, addUserMessage, lastMessage, addBotMessage, setChatbotAnimation, visible}) => {
@@ -37,10 +37,16 @@ const Input = ({setChatbotStatus, hideSignature, addUserMessage, lastMessage, ad
         switch (message.type) {
             case messageTypes.FILE_UPLOAD:
                 return (<FileUpload/>);
+            case messageTypes.SALARY_PICKER:
+                return (
+                    <SalaryPicker block_min={message.block.Content.min}
+                                  block_max={message.block.Content.max}
+                                  period={message.block.Content.period}
+                                  currency={message.block.Content.currency}
+                    />
+                );
             case messageTypes.USER_INPUT:
                 switch (message.block[flowAttributes.DATA_TYPE][flowAttributes.DATA_TYPE_VALIDATION]) {
-                    case constants.SALARY:
-                        return (<SalaryPicker period={message.block[flowAttributes.DATA_TYPE][flowAttributes.DATA_TYPE_ENUM]}/>);
                     case constants.DATEPICKER:
                         return (<MultiDatePicker/>);
                     default:

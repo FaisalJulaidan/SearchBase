@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, { useEffect, useState } from 'react';
 // Constants
 import * as flowAttributes from '../../../constants/FlowAttributes';
 import * as messageTypes from '../../../constants/MessageType';
@@ -67,29 +67,29 @@ const BotMessage = ({ type, message, addUserMessage, addBotMessage, setChatbotSt
     const findMessageType = (type, message) => {
         let { block } = message;
         switch (type) {
-            case messageTypes.TEXT:
-            case messageTypes.USER_INPUT:
-            case messageTypes.FILE_UPLOAD:
-            case messageTypes.RAW_TEXT:
-                return (
-                    <TextMessage
-                        key={message.index}
-                        text={message.text}
-                    />);
             case messageTypes.QUESTION:
                 return (
                     <Question
                         submitAnswer={submitAnswer}
                         key={message.index}
                         answers={message.block[flowAttributes.CONTENT][flowAttributes.QUESTION_ANSWERS]}
-                        question={message.block[flowAttributes.CONTENT][flowAttributes.QUESTION_TEXT]}/>);
+                        question={message.block[flowAttributes.CONTENT][flowAttributes.QUESTION_TEXT]}/>
+                );
             case messageTypes.SOLUTIONS:
-                return (<Solutions
-                    solutions={block.fetchedData.solutions}
-                    submitSolution={submitSolution}
-                    afterMessage={message.block[flowAttributes.CONTENT][flowAttributes.CONTENT_AFTER_MESSAGE]}/>);
+                return (
+                    <Solutions
+                        solutions={block.fetchedData.solutions}
+                        submitSolution={submitSolution}
+                        afterMessage={message.block[flowAttributes.CONTENT][flowAttributes.CONTENT_AFTER_MESSAGE]}/>
+                );
 
             default:
+                return (
+                    <TextMessage
+                        key={message.index}
+                        text={message.text}
+                    />
+                );
         }
     };
 

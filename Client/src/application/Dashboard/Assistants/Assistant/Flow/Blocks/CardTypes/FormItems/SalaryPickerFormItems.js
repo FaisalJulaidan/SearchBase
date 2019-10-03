@@ -5,24 +5,24 @@ export * from './MinMaxSalaryFormItem';
 const Option = Select.Option;
 
 export const DefualtCurrencyFormItem = ({ FormItem, layout, getFieldDecorator, currencyCodes, block }) => (
-    <FormItem label="Defualt Currency" {...layout}>
+    <FormItem label="Currency" {...layout}>
         {
             currencyCodes && currencyCodes[0] ?
-                getFieldDecorator('defualtCurrency', {
-                    initialValue: block.Content.defaultCurrency,
+                getFieldDecorator('currency', {
+                    initialValue: block.Content.currency,
                     rules: [{
                         required: true,
-                        message: 'Please select default currency'
+                        message: 'Please select currency'
                     }]
                 })(
-                    <Select placeholder="Select the defualt currency">
+                    <Select placeholder="Select the currency">
                         {
                             currencyCodes.map((currencyCode, i) =>
                                 <Option key={i} value={currencyCode}>{currencyCode}</Option>)
                         }
                     </Select>
                 )
-                : <Spin><Select placeholder="Select the defualt currency"></Select></Spin>
+                : <Spin><Select placeholder="Select the currency"></Select></Spin>
         }
     </FormItem>
 );

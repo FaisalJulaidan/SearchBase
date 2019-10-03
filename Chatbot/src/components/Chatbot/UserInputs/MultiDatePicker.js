@@ -1,13 +1,14 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 // Constants
 import * as messageTypes from '../../../constants/MessageType';
 import * as flowAttributes from '../../../constants/FlowAttributes';
 // Styles
 import './styles/Inputs.css';
 // Components
-import { DatePicker as AntdDatePicker, Icon, Tooltip } from 'antd';
+import { DatePicker as AntdDatePicker } from 'antd';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTelegramPlane } from '@fortawesome/free-brands-svg-icons';
+import { getContainerElement } from '../../helpers';
 
 
 const MultiDatePicker = ({ message, submitMessage }) => {
@@ -206,13 +207,7 @@ const MultiDatePicker = ({ message, submitMessage }) => {
     return (
         <React.Fragment>
             <div className={'InputContainer'} onClick={() => setOpen(true)}>
-                <AntdDatePicker getCalendarContainer={
-                    () => {
-                        if (document.getElementById('TheSearchBase_Chatbot_Input'))
-                            return document.getElementById('TheSearchBase_Chatbot_Input');
-                        else
-                            return document.getElementById('TheSearchBase_Chatbot');
-                    }}
+                <AntdDatePicker getCalendarContainer={() => getContainerElement()}
                                 className={'Datepicker'} suffixIcon={<div/>}
                                 dropdownClassName={'DatepickerCalendar'}
                                 showToday={false}

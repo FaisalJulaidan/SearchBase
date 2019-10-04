@@ -16,7 +16,9 @@ class Availability extends React.Component {
         super(props);
         this.state = {
             assistant: null,
-            database: null
+            database: null,
+            start: moment().startOf('week'),
+            end:  moment().endOf('week')
         };
     }
 
@@ -40,8 +42,7 @@ class Availability extends React.Component {
             return null;
         };
         let availability = [];
-        let start = moment().startOf('week');
-        let end = moment().endOf('week');
+        const { start, end } = this.state
 
         records.filter(record => record.CandidateAvailability).filter(record => {
             let dates = record.CandidateAvailability.split(',');
@@ -88,6 +89,12 @@ class Availability extends React.Component {
         });
         return availability;
     };
+
+    moveWeek = change => {
+      const { start, end } = this.state
+      this.setState({start: start.clone().add(change, 'weeks'), end: end.clone().add(change, 'weeks')})
+    }
+    
     render() {
         const columns = [
             {
@@ -196,6 +203,13 @@ class Availability extends React.Component {
                             Select a database <Icon type="down"/>
                         </Button>}
                 </Dropdown>
+                <Button onClick={() => this.moveWeek(-1)}>
+                  <Icon type="left" />
+                </Button>
+                {this.state.start.format("L")} 
+                <Button onClick={() => this.moveWeek(1)} style={{marginLeft: 6}}>
+                  <Icon type="right" />
+                </Button>
 
                 {availability ?
                     <Table style={{marginTop: '22px'}} columns={columns} dataSource={availability}/>

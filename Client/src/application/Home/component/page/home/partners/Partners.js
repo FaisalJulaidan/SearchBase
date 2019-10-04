@@ -1,8 +1,8 @@
 import React from 'react';
 import styles from './partners.module.css'
+import {Image,Col, Container, Row} from "react-bootstrap";
 import partners from './partners.json'
 import "react-alice-carousel/lib/alice-carousel.css";
-import {Container, Col, Image, Row} from "react-bootstrap";
 import {getLink} from "helpers";
 
 class Partners extends React.Component {
@@ -10,8 +10,10 @@ class Partners extends React.Component {
     items = partners.map((item, i) => {
         return (
             <Col key={i} className={styles.col_item}>
-                <Image className={styles.image}
-                       src={getLink(item.image)}/>
+                <a href={item.link} target="_blank">
+                    <Image className={styles.image}
+                           src={getLink(item.image)}/>
+                </a>
                 <h1 id="title" className={styles.title}>{item.title}</h1>
             </Col>
         );
@@ -23,7 +25,7 @@ class Partners extends React.Component {
             <Container id={this.props.id}>
                 <Row>
                     <Col className={styles.col_text}>
-                        <h1 className={styles.title}>Integrated with the platforms you are familiar with</h1>
+                        <h1 className={styles.title}>Trusted by top companies in recruitment industry</h1>
                         <hr/>
                     </Col>
                 </Row>

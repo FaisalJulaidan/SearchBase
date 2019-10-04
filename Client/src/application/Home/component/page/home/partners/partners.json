@@ -1,38 +1,27 @@
 [
   {
-    "title": "Bullhorn",
-    "image": "/static/images/home/integrations/bullhorn.png"
+    "title": "Cordant",
+    "image": "/static/images/home/partners/cordant.png",
+    "link": "https://www.cordantgroup.com/"
   },
   {
-    "title": "Erecruit",
-    "image": "/static/images/home/integrations/erecruit.png"
+    "title": "Acorn",
+    "image": "/static/images/home/partners/acorn.png",
+    "link": "https://www.acornpeople.com/"
   },
   {
-    "title": "Access Group",
-    "image": "/static/images/home/integrations/accessgroup.png"
+    "title": "PRS Recruitment Service",
+    "image": "/static/images/home/partners/prs.png",
+    "link": "https://www.prsjobs.com/"
   },
   {
-    "title": "Salesforce",
-    "image": "/static/images/home/integrations/salesforce.png"
+    "title": "CPS Group",
+    "image": "/static/images/home/partners/cps.png",
+    "link": "https://www.cpsgroupuk.com/"
   },
   {
-    "title": "Dynamics 365",
-    "image": "/static/images/home/integrations/dynamic-365.png"
-  },
-  {
-    "title": "Outlook",
-    "image": "/static/images/home/integrations/outlook.png"
-  },
-  {
-    "title": "Gmail",
-    "image": "/static/images/home/integrations/gmail.png"
-  },
-  {
-    "title": "LinkedIn",
-    "image": "/static/images/home/integrations/link-logo.png"
-  },
-  {
-    "title": "Bold Identities",
-    "image": "/static/images/home/integrations/bold.png"
+    "title": "Claremont Consulting",
+    "image": "/static/images/home/partners/claremont.png",
+    "link": "https://www.claremontconsulting.com/"
   }
 ]

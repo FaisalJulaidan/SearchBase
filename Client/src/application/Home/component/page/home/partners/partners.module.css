@@ -30,16 +30,17 @@
 
 .col_item .title {
     text-align: center;
-    font-weight: bold;
+    font-weight: bolder;
     color: #444444;
     opacity: 0;
     transition: opacity 0.1s linear;
     font-size: 0.9em;
+    max-width: 120px;
 }
 
 .col_item:hover .image{
     cursor: pointer;
-    transform: translateY(-10px);
+    transform: translateY(-5px);
 }
 
 

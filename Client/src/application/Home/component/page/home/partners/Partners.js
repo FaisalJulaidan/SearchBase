@@ -14,7 +14,7 @@ class Partners extends React.Component {
                     <Image className={styles.image}
                            src={getLink(item.image)}/>
                 </a>
-                <h1 id="title" className={styles.title}>{item.title}</h1>
+                {/*<h1 id="title" className={styles.title}>{item.title}</h1>*/}
             </Col>
         );
     });

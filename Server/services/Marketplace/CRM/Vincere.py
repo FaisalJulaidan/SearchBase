@@ -18,11 +18,10 @@ from services.Marketplace.CRM import crm_services
 # id_token (used to verify users when making queries), expires in 10 minutes(unconfirmed)
 # auth needs to contain client_id, redirect_uri, response_type=code (get request)
 # token needs client_id, code=auth_code, grant_type=authorization_code (post request)
-# To Do: login and token refresh
-# To Test: inserting
 from utilities import helpers
 
 client_id = os.environ['VINCERE_CLIENT_ID']
+api_key = os.environ['VINCERE_API_KEY']
 
 
 # login requires: client_id
@@ -33,7 +32,7 @@ def login(auth):
         access_token_url = "https://id.vincere.io/oauth2/token?" + \
                            "&grant_type=authorization_code" + \
                            "&client_id=" + client_id + \
-                           "&code=" + auth.get("code")[0]
+                           "&code=" + auth.get("code")
 
         # get the access token and refresh token
         access_token_request = requests.post(access_token_url, headers=headers)
@@ -48,7 +47,8 @@ def login(auth):
                         {
                             "access_token": result_body.get("access_token"),
                             "refresh_token": result_body.get("refresh_token"),
-                            "rest_token": result_body.get("id_token")
+                            "rest_token": result_body.get("id_token"),
+                            "domain": auth.get("state")
                         })
 
     except Exception as exc:
@@ -93,7 +93,6 @@ def retrieveRestToken(auth, companyID):
             if get_tokens.ok:
                 result_body = json.loads(get_tokens.text)
                 authCopy["access_token"] = result_body["access_token"]
-                authCopy["refresh_token"] = result_body["refresh_token"]
                 authCopy["id_token"] = result_body["id_token"]
             else:
                 raise Exception("CRM not set up properly")
@@ -125,18 +124,21 @@ def sendQuery(auth, query, method, body, companyID, optionalParams=None):
         # get url
         url = buildUrl(auth, query, optionalParams)
 
+        helpers.logError(url)
+        helpers.logError(url)
         # set headers
-        headers = {'Content-Type': 'application/json'}
+        headers = {'Content-Type': 'application/json', "x-api-key": api_key, "id-token": auth.get("rest_token", "none")}
 
         # test the BhRestToken (rest_token)
         r = marketplace_helpers.sendRequest(url, method, headers, json.dumps(body))
-
+        helpers.logError(str(r.status_code))
+        helpers.logError(r.text)
         if r.status_code == 401:  # wrong rest token
             callback: Callback = retrieveRestToken(auth, companyID)
             if not callback.Success:
                 raise Exception("Rest token could not be retrieved")
 
-            url = buildUrl(callback.Data, query, optionalParams)
+            headers["id-token"] = callback.Data.get("rest_token", "none")
 
             r = marketplace_helpers.sendRequest(url, method, headers, json.dumps(body))
             if not r.ok:
@@ -154,8 +156,7 @@ def sendQuery(auth, query, method, body, companyID, optionalParams=None):
 
 def buildUrl(rest_data, query, optionalParams=None):
     # set up initial url
-    url = "https://" + rest_data.get("domain", "") + ".vincere.io/api/v2" + query + \
-          "?id_token=" + rest_data.get("rest_token", "none")
+    url = "https://" + rest_data.get("domain", "") + ".vincere.io/api/v2/" + query + "?"
     # add additional params
     if optionalParams:
         for param in optionalParams:
@@ -309,7 +310,6 @@ def searchCandidates(auth, companyID, data) -> Callback:
         query = "query="
 
         # populate filter
-
         query += populateFilter(data.get("location"), "address.city")
 
         # if keywords[DT.CandidateSkills.value["name"]]:
@@ -323,7 +323,7 @@ def searchCandidates(auth, companyID, data) -> Callback:
 
         # send query
         sendQuery_callback: Callback = sendQuery(auth, "search/Candidate", "get", {}, companyID,
-                                                 ["fields=*", query, "count=99999999"])
+                                                 ["fields=*", query, "count=9999"])
         if not sendQuery_callback.Success:
             raise Exception(sendQuery_callback.Message)
 
@@ -378,7 +378,7 @@ def searchJobs(auth, companyID, data) -> Callback:
 
         # send query
         sendQuery_callback: Callback = sendQuery(auth, "search/JobOrder", "get", {}, companyID,
-                                                 ["fields=*", query, "count=99999999"])
+                                                 ["fields=*", query, "count=9999"])
         if not sendQuery_callback.Success:
             raise Exception(sendQuery_callback.Message)
 

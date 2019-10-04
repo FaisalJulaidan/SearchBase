@@ -106,6 +106,10 @@ def retrieveRestToken(auth, companyID):
               authCopy.get("refresh_token") + \
               "&client_id=" + CLIENT_ID + \
               "&client_secret=" + CLIENT_SECRET
+
+        if os.environ['FLASK_ENV'] != "production":
+            url = url.replace("auth-emea.", "auth9.")
+
         helpers.logError("--------------------------------------------------------------------------------------------")
         helpers.logError("--------------------------------------------------------------------------------------------")
         helpers.logError("TESTING BUG " + str(companyID) + " REQUEST: " + url)
@@ -113,6 +117,7 @@ def retrieveRestToken(auth, companyID):
         helpers.logError("TESTING BUG " + str(companyID) + " TEXT: " + get_access_token.text)
         helpers.logError("--------------------------------------------------------------------------------------------")
         helpers.logError("--------------------------------------------------------------------------------------------")
+
         if get_access_token.ok:
             result_body = json.loads(get_access_token.text)
             access_token = result_body["access_token"]
@@ -153,13 +158,20 @@ def sendQuery(auth, query, method, body, companyID, optionalParams=None):
         # get url
         url = buildUrl(auth, query, optionalParams)
 
+        if os.environ['FLASK_ENV'] != "production":
+            url = url.replace("rest.", "rest9.")
+
+        # remove None values from body
+        body = {key: value for key, value in body.items() if value is not None}
+
         # set headers
         headers = {'Content-Type': 'application/json'}
+
         # test the BhRestToken (rest_token)
         r = marketplace_helpers.sendRequest(url, method, headers, json.dumps(body))
-        print(url)
-        print(r.status_code)
-        print(r.text)
+        # print(url)
+        # print(r.status_code)
+        # print(r.text)
         if r.status_code == 401:  # wrong rest token
             callback: Callback = retrieveRestToken(auth, companyID)
             if not callback.Success:
@@ -183,7 +195,6 @@ def sendQuery(auth, query, method, body, companyID, optionalParams=None):
 
 def buildUrl(rest_data, query, optionalParams=None):
     # set up initial url
-    print(rest_data.get("rest_token", "none"))
     url = rest_data.get("rest_url", "https://rest.bullhornstaffing.com/rest-services/5i3n9d/") + query + \
           "?BhRestToken=" + rest_data.get("rest_token", "none")
     # add additional params
@@ -523,7 +534,7 @@ def searchPerfectCandidates(auth, companyID, data, fields=None) -> Callback:
         else:
             records = []
 
-            while len(records) < 200:
+            while len(records) < 2000:
                 # send query
                 sendQuery_callback: Callback = sendQuery(auth, "search/Candidate", "get", {}, companyID,
                                                          [fields, query, "count=500"])

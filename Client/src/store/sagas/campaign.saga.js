@@ -102,7 +102,7 @@ function* fetchCampaignCandidatesData({assistant_id, use_crm, crm_id, database_i
 }
 
 //Launch Campaign
-function* launchCampaign({assistant_id, use_crm, crm_id, database_id, messenger_id, location, jobTitle, skills, text, candidate_list}) {
+function* launchCampaign({assistant_id, use_crm, crm_id, database_id, messenger_id, location, jobTitle, skills, text, candidate_list,outreach_type}) {
     try {
         loadingMessage('Launching the campaign...', 0);
         const res = yield http.put('/campaign/action',
@@ -116,7 +116,8 @@ function* launchCampaign({assistant_id, use_crm, crm_id, database_id, messenger_
                 jobTitle,
                 skills,
                 text,
-                candidate_list
+                candidate_list,
+                outreach_type
             }, {
                 headers: {'Content-Type': 'application/json'},
             });

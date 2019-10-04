@@ -139,6 +139,7 @@ def getFileByConversationID(assistantID, conversationID, filePath):
 
 def uploadFiles(files, conversation, data, keys):
     try:
+        print("SHOULD ATTEMPT TO UPLOAD FILES")
         sf : StoredFile = StoredFile()
 
         db.session.add(sf)
@@ -146,12 +147,15 @@ def uploadFiles(files, conversation, data, keys):
         uploadedFiles = []
         uploadedFilesCallbacks = []
         for item in data['collectedData']:
-            if item['input'] == "&FILE_UPLOAD&": # enum for this?
+            if item['input'] == "&FILE_UPLOAD&":  # enum for this?
                 for file in files:
                     if file.filename in uploadedFiles:
                         continue
                     for submittedFile in data['submittedFiles']:
                         if file.filename == submittedFile['uploadedFileName']:
+                            print("uploading file...")
+                            print(file.filename)
+                            print(conversation)
                             uploadedFiles.append(file.filename)
                             key = enums.FileAssetType.NoType # TODO once BlockType-Upgrade is done
                             upload_callback: Callback = stored_file_services.uploadFile(file, submittedFile['fileName'], True, model=Conversation,

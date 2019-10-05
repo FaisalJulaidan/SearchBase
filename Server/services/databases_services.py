@@ -144,6 +144,34 @@ def getRecord(recordID, databaseType: DatabaseType) -> Callback:
     return Callback(False, "Database type is not recognised")
 
 
+def getCandidate(candidateID):
+    try:
+        candidate = db.session.query(Candidate) \
+            .filter(Candidate.ID == candidateID).first()
+        if not candidate: raise Exception
+
+        return Callback(True, "Candidate retrieved successfully.", candidate)
+
+    except Exception as exc:
+        helpers.logError("databases_service.getCandidate(): " + str(exc))
+        db.session.rollback()
+        return Callback(False, 'Could not retrieve the candidate.')
+
+
+def getJob(jobID):
+    try:
+        job = db.session.query(Job) \
+            .filter(Job.ID == jobID).first()
+        if not job: raise Exception
+
+        return Callback(True, "Job retrieved successfully.", job)
+
+    except Exception as exc:
+        helpers.logError("databases_service.getJob(): " + str(exc))
+        db.session.rollback()
+        return Callback(False, 'Could not retrieve the job.')
+
+
 def updateCandidate(candidateID, conversation) -> Callback:
     try:
         candidate = db.session.query(Candidate) \
@@ -200,34 +228,6 @@ def updateCandidate(candidateID, conversation) -> Callback:
         db.session.rollback()
         helpers.logError(exc)
         return Callback(False, "Candidate could not be updated")
-
-
-def getCandidate(candidateID):
-    try:
-        candidate = db.session.query(Candidate) \
-            .filter(Candidate.ID == candidateID).first()
-        if not candidate: raise Exception
-
-        return Callback(True, "Candidate retrieved successfully.", candidate)
-
-    except Exception as exc:
-        helpers.logError("databases_service.getCandidate(): " + str(exc))
-        db.session.rollback()
-        return Callback(False, 'Could not retrieve the candidate.')
-
-
-def getJob(jobID):
-    try:
-        job = db.session.query(Job) \
-            .filter(Job.ID == jobID).first()
-        if not job: raise Exception
-
-        return Callback(True, "Job retrieved successfully.", job)
-
-    except Exception as exc:
-        helpers.logError("databases_service.getJob(): " + str(exc))
-        db.session.rollback()
-        return Callback(False, 'Could not retrieve the job.')
 
 
 # Get All

@@ -68,7 +68,7 @@ def processConversation(assistantHashID, data: dict) -> Callback:
         }
 
         webhook_services.fireRequests(webhookData, callback.Data.CompanyID, Webhooks.Conversations)
-        print("crmInformation: ", data.get("crmInformation"))
+
         if not data.get("crmInformation"):
             # AutoPilot Operations
             if assistant.AutoPilot and conversation.Completed:
@@ -90,14 +90,14 @@ def processConversation(assistantHashID, data: dict) -> Callback:
                     conversation.CRMSynced = True
                 conversation.CRMResponse = crm_callback.Message
         else:
-            print("STARTING")
             crmInformation = data["crmInformation"]
-            print(crmInformation.get("source"))
             if crmInformation.get("source") == "crm":
                 crm_callback: Callback = crm_services.updateCandidate(crmInformation, conversation, assistant.CompanyID)
                 if crm_callback.Success:
                     conversation.CRMSynced = True
                 conversation.CRMResponse = crm_callback.Message
+            elif crmInformation.get("source") == "database":
+                pass
 
         # Notify company about the new chatbot session only if set as immediate -> NotifyEvery=0
         # Note: if there is a file upload the /file route in chatbot.py will handle the notification instead
@@ -110,7 +110,6 @@ def processConversation(assistantHashID, data: dict) -> Callback:
         # Save conversation data
         db.session.add(conversation)
         db.session.commit()
-
 
         return Callback(True, 'Chatbot data has been processed successfully!', (conversation, data,))
 

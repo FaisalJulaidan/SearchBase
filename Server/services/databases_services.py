@@ -207,17 +207,21 @@ def updateCandidate(candidateID, conversation) -> Callback:
             "dayRate": crm_services.getSalary(conversation, DT.CandidateDailyDesiredSalary, "Min") or
                        crm_services.getSalary(conversation, DT.JobDayRate, "Min")
         }
-        
-        candidate.CandidateName = data.get("name").strip() or candidate.CandidateName
-        candidate.CandidateMobile = data.get("mobile").strip() or candidate.CandidateMobile
-        candidate.CandidateLocation = data.get("city").strip() or candidate.CandidateLocation
-        candidate.CandidateEmail = data.get("email").strip() or candidate.CandidateEmail
-        candidate.CandidateSkills = data.get("skills").strip() or candidate.CandidateSkills
-        candidate.CandidateYearsExperience = data.get("yearsExperience").strip() or candidate.CandidateYearsExperience
-        candidate.CandidateJobTitle = data.get("preferredJobTitle").strip() or candidate.CandidateJobTitle
-        candidate.CandidateEducation = data.get("educations").strip() or candidate.CandidateEducation
-        candidate.CandidateAvailability = data.get("availability").strip() or candidate.CandidateAvailability
-        candidate.CandidateDesiredSalary = data.get("annualSalary").strip() or data.get("dayRate").strip() \
+
+        for key, value in data.items():
+            if type(value) is str:
+                data[key] = value.strip()
+
+        candidate.CandidateName = data.get("name") or candidate.CandidateName
+        candidate.CandidateMobile = data.get("mobile") or candidate.CandidateMobile
+        candidate.CandidateLocation = data.get("city") or candidate.CandidateLocation
+        candidate.CandidateEmail = data.get("email") or candidate.CandidateEmail
+        candidate.CandidateSkills = data.get("skills") or candidate.CandidateSkills
+        candidate.CandidateYearsExperience = data.get("yearsExperience") or candidate.CandidateYearsExperience
+        candidate.CandidateJobTitle = data.get("preferredJobTitle") or candidate.CandidateJobTitle
+        candidate.CandidateEducation = data.get("educations") or candidate.CandidateEducation
+        candidate.CandidateAvailability = data.get("availability") or candidate.CandidateAvailability
+        candidate.CandidateDesiredSalary = data.get("annualSalary") or data.get("dayRate") \
                                            or candidate.CandidateDesiredSalary
 
         db.session.commit()

@@ -208,6 +208,10 @@ def updateCandidate(candidateID, conversation) -> Callback:
                        crm_services.getSalary(conversation, DT.JobDayRate, "Min")
         }
 
+        for key, value in data.items():
+            if type(value) is str:
+                data[key] = value.strip()
+
         candidate.CandidateName = data.get("name") or candidate.CandidateName
         candidate.CandidateMobile = data.get("mobile") or candidate.CandidateMobile
         candidate.CandidateLocation = data.get("city") or candidate.CandidateLocation

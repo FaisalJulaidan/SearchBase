@@ -160,7 +160,7 @@ def buildUrl(rest_data, query, optionalParams=None):
     # add additional params
     if optionalParams:
         for param in optionalParams:
-            url += "&" + param
+            url += "&" + param.strip()
     # return the url
     return url
 

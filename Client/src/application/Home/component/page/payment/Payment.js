@@ -18,7 +18,7 @@ const Payment = () => {
         <div className={styles.wrapper}>
             <Container>
                 <Row className={styles.row_steps}>
-                    <Col xs={{span:6,offset:3}}>
+                    <Col xs={{span:8,offset:2}}>
                     <Steps current={0}>
                         <Step title="Sign-up"/>
                         <Step title="Payment" />
@@ -38,7 +38,7 @@ const Payment = () => {
                             <div className={styles.form_wrapper}>
                                 <Card className={styles.card}>
                                     <Card.Body>
-                                        <h1 className={styles.title}>Sign up</h1>
+                                        {/*<h1 className={styles.title}>Sign up</h1>*/}
                                         <SignupForm/>
                                         <h6 className={styles.sign_up}>Or log into an
                                             <Link to="/login">existing account!</Link>

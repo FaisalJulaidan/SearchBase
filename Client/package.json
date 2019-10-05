@@ -87,6 +87,7 @@
     "react-scroll": "^1.7.13",
     "react-sortable-hoc": "^0.8.4",
     "react-sticky": "^6.0.3",
+    "react-stripe-elements": "^5.0.1",
     "react-text-transition": "^0.1.8",
     "react-transition-group": "^2.5.3",
     "react-trello": "^2.0.5",

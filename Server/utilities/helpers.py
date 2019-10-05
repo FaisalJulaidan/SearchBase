@@ -350,7 +350,7 @@ def objectListContains(list, filter):
 def getListValue(list, idx, default=None):
     try:
         return list[idx]
-    except IndexError:
+    except:
         return default
 
 

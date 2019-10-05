@@ -14,6 +14,8 @@ class Availability extends React.Component {
 
     constructor(props) {
         super(props);
+        console.log(moment())
+        console.log(moment().startOf('week').format("L"))
         this.state = {
             assistant: null,
             database: null,

@@ -25,7 +25,7 @@ class Partners extends React.Component {
             <Container id={this.props.id}>
                 <Row>
                     <Col className={styles.col_text}>
-                        <h1 className={styles.title}>Trusted by top companies in recruitment industry</h1>
+                        <h1 className={styles.title}>Trusted by over 100+ Recruitment Companies</h1>
                         <hr/>
                     </Col>
                 </Row>

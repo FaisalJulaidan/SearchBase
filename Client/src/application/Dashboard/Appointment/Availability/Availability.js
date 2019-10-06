@@ -14,8 +14,6 @@ class Availability extends React.Component {
 
     constructor(props) {
         super(props);
-        console.log(moment())
-        console.log(moment().startOf('week').format("L"))
         this.state = {
             assistant: null,
             database: null,
@@ -37,7 +35,7 @@ class Availability extends React.Component {
     filterThisWeek = (records) => {
         const searchArray = (convID) => {
             for (let idx in availability) {
-                if (availability[idx].conversationID === convID) {
+                if (availability[idx].ID === convID) {
                     return idx;
                 }
             }

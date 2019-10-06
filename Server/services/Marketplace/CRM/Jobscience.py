@@ -493,7 +493,7 @@ def searchCandidates(access_token, conversation) -> Callback:
             candidate_skills = fetchSkillsForCandidateSearch(list_of_contactIDs, skills, access_token)
         # <-- CALL SKILLS SEARCH -->
 
-        for record in records:
+        for record_num, record in enumerate(records):
             # print("-- NEW RECORD --")
             skills_string = ""
             counter = 0
@@ -512,7 +512,7 @@ def searchCandidates(access_token, conversation) -> Callback:
                         skills_string += ""
             # skills_string += (record.get("Attributes__c", "") or "")  # Merging skills and job title together...
 
-            result.append(databases_services.createPandaCandidate(id=record.get("id", ""),
+            result.append(databases_services.createPandaCandidate(id=record.get("X18_Digit_ID__c", str(record_num)),
                                                                   name=record.get("Name"),
                                                                   email=record.get("Email"),
                                                                   mobile=record.get("Phone"),

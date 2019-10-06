@@ -1,10 +1,6 @@
 .wrapper {
     padding: 1em 1em;
     min-height: 100vh;
-    background-image: linear-gradient(to right top, #a865e1, #9d69e5, #916ce8, #8570eb, #7773ed);
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
     color: #726a84;
 }
 
@@ -20,7 +16,7 @@
 
 .col_desc .text1 {
     text-align: left;
-    color: white;
+    color: #444444;
     font-weight: bold;
     padding: 0 0 .5em 0;
     font-size: 2em;
@@ -28,7 +24,7 @@
 
 .col_desc .text2 {
     text-align: left;
-    color: white;
+    color: #444444;
     font-size: 1em;
 }
 

@@ -50,8 +50,8 @@ function* signup({signupDetails}) {
 
 
         // Redirect to login ans ask user to verify account
-        yield history.push('/login');
-        warningMessage('Please check your email to verify your account', 0);
+        // yield history.push('/login');
+        warningMessage('Please check your email to verify your account');
 
     } catch (error) {
         const msg = error.response?.data?.msg || "Couldn't signup";

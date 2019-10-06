@@ -1,11 +1,13 @@
 import React from 'react';
+import PropTypes from "prop-types";
 import {connect} from 'react-redux';
 import styles from './signup-form-payment.module.css'
 import momenttz from 'moment-timezone'
-import {Form, Icon, Input, Select, Checkbox,Button} from 'antd';
-import {Link} from "react-router-dom";
+import {Form, Icon, Input, Select, Checkbox, Button} from 'antd';
+import {Link, withRouter} from "react-router-dom";
 
 import {authActions} from '../../../../../store/actions/index';
+import pricingJSON from "../pricing/pricing";
 
 const FormItem = Form.Item;
 const {Option} = Select;
@@ -18,18 +20,34 @@ const selectBeforeURL = (
     </Select>
 );
 
-class SignupForm extends React.Component {
+class SignupFormPayment extends React.Component {
+
+    componentDidMount() {
+        const found = pricingJSON.some(item => item.id === this.props?.plan);
+        if (!found) {
+            this.setState({plan: pricingJSON[0].id})
+        } else {
+            this.setState({plan: this.props.plan})
+        }
+    }
+
 
     state = {
         confirmDirty: false,
     };
+
+    componentDidUpdate(prevProps, prevState, snapshot) {
+        if (prevProps.isSigningUp && (this.props.errorMsg === null)) {
+            this.props.onSignupSuccessful(this.state.plan);
+        } else if (prevState.plan !== this.state.plan)
+            this.props.history.push(`/order-plan?plan=${this.state.plan}`);
+    }
 
     handleSubmit = (e) => {
         e.preventDefault();
         this.props.form.validateFields((err, values) => {
             if (!err) {
                 values.timeZone = momenttz.tz.guess();
-                console.log('Received values of form: ', values);
                 this.props.dispatch(authActions.signup(values));
             }
         });
@@ -154,31 +172,55 @@ class SignupForm extends React.Component {
                     )}
                 </FormItem>
 
+                <FormItem className={styles.SignupFormItem}>
+                    {getFieldDecorator('plan', {
+                        initialValue: this.state.plan,
+                        rules: [
+                            {required: true, message: 'Please select a plan'},
+                        ],
+                    })(
+                        <Select onSelect={(value) => {
+                            this.setState({plan: value})
+                        }}>
+                            {
+                                pricingJSON.map((plan) => {
+                                    return (
+                                        <Select.Option key={plan.id}>{plan.title}</Select.Option>
+                                    );
+                                })
+                            }
+                        </Select>
+                    )}
+                </FormItem>
+
                 <Form.Item>
                     {getFieldDecorator('agreement', {
                         rules: [{required: true, message: 'You must agree to terms & privacy policy'}],
                     })(
-                        <Checkbox className={styles.checkbox}>I have read the <Link className={styles.link} to="/terms">terms</Link> & <Link
+                        <Checkbox className={styles.checkbox}>I have read the <Link className={styles.link}
+                                                                                    to="/terms">terms</Link> & <Link
                             className={styles.link} to="/privacy">privacy
                             policy</Link></Checkbox>
                     )}
                 </Form.Item>
                 <Form.Item className={styles.SignupFormItem}>
-                    <Button type="primary" htmlType="submit" block>
-                        Sign up
-                    </Button>
+                    <Button type="primary" htmlType="submit" block>Submit</Button>
                 </Form.Item>
-
-
             </Form>
         );
     }
 }
 
+SignupFormPayment.propTypes = {
+    plan: PropTypes.string,
+    onSignupSuccessful: PropTypes.func.isRequired
+};
+
 function mapStateToProps(state) {
     return {
-        isSigningUp: state.auth.isSigningUp
+        isSigningUp: state.auth.isSigningUp,
+        errorMsg: state.auth.errorMsg
     };
 }
 
-export default connect(mapStateToProps)(Form.create()(SignupForm));
+export default connect(mapStateToProps)(Form.create()(withRouter(SignupFormPayment)));

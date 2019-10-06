@@ -1,3 +1,4 @@
+import base64
 import json
 import os
 from datetime import datetime
@@ -5,16 +6,20 @@ from datetime import datetime
 import requests
 from sqlalchemy_utils import Currency
 
-from models import Callback, Conversation, StoredFile, StoredFileInfo
+from models import Callback, Conversation, db, CRM as CRM_Model, StoredFileInfo
 from services import databases_services, stored_file_services
 from services.Marketplace import marketplace_helpers
-from utilities import helpers
 from services.Marketplace.CRM import crm_services
+from services.Marketplace.marketplace_helpers import convertSkillsToString
+
+from utilities import helpers
+from utilities.enums import DataType as DT, Period, CRM
 
 CLIENT_ID = os.environ['JOBSCIENCE_CLIENT_ID']
 CLIENT_SECRET = os.environ['JOBSCIENCE_CLIENT_SECRET']
 
 my_test_here = "hi"
+
 
 # TODO CHECKLIST:
 
@@ -24,19 +29,20 @@ my_test_here = "hi"
 
 # [7] IMPROVE SUCH AS ADD FILE UPLOAD []
 
-
+# TODO: Sort out token persistance problems
 def testConnection(auth, companyID):
     try:
         print("testing connection...")
         print(auth)
 
-        if not auth.get("refresh_token"):
+        if auth.get("refresh_token"):
+            callback: Callback = refreshToken(auth, companyID)
+
+        else:
             callback: Callback = login(auth)
 
             if not callback.Success:
                 raise Exception("Testing failed")
-        else:
-            return Callback(True, 'Logged in successfully', auth)
 
         return Callback(True, 'Logged in successfully', callback.Data)
 
@@ -45,7 +51,44 @@ def testConnection(auth, companyID):
         return Callback(False, str(exc))
 
 
+def refreshToken(auth, companyID):
+    # get new access token:
+    try:
+        print("Getting a new access token")
 
+        headers = {
+            'Content-Type': "application/x-www-form-urlencoded",
+            'Cache-Control': "no-cache",
+            'Cookie': "inst=APP_3X",
+            'cache-control': "no-cache"
+        }
+
+        body = {
+            'grant_type': "refresh_token",
+            'client_id': "3MVG9I5UQ_0k_hTlh64o5U2MnkGkPmYj_xkMpFkEi0tIJXl_CGhXpux_w5khN6pvnNd.IH6Yvo82ZAcRystWE",
+            'client_secret': "972A46C725406EE38D971409A1509EF164B100A9B8B42CA4C39AB3952B65A215",
+            'refresh_token': auth.get('refresh_token')
+        }
+
+        resp = json.loads(
+            requests.request("POST", "https://login.salesforce.com/services/oauth2/token?", headers=headers,
+                             data=body).text)
+        print(resp)
+        auth['access_token'] = resp.get('access_token')
+
+        saveAuth_callback: Callback = crm_services.updateByType(CRM.Jobscience, auth, companyID)
+        if not saveAuth_callback.Success:
+            raise Exception(saveAuth_callback.Message)
+
+        return Callback(True, 'New access token', {
+            "access_token": auth.get("access_token"),
+            "refresh_token": auth("refresh_token")
+        })
+
+    except Exception as exc:
+        db.session.rollback()
+        helpers.logError("Marketplace.CRM.Bullhorn.retrieveRestToken() ERROR: " + str(exc))
+        return Callback(False, "Failed to retrieve CRM tokens. Please check login information")
 
 # NOTE: For production, we need to change the domain name (currently it is pointing to sandbox)
 
@@ -65,7 +108,6 @@ def login(auth):
 
         # get the access token and refresh token
         response = requests.post(access_token_url, headers=headers)
-        global my_test_here
 
         if response.status_code == 200:
             print("Login to Jobscience Successful")
@@ -77,9 +119,8 @@ def login(auth):
 
         result_body = json.loads(response.text)
         print(result_body)
-        my_test_here = result_body.get('refresh_token')
 
-        return Callback(True, 'Logged in successfully', {"access_token":result_body.get('access_token'),
+        return Callback(True, 'Logged in successfully', {"access_token": result_body.get('access_token'),
                                                          "refresh_token": result_body.get("refresh_token")})
 
     except Exception as exc:
@@ -151,7 +192,7 @@ def convertDate(date: str):
 
 def insertCandidate(access_token, conversation: Conversation) -> Callback:
     try:
-        #print("INSERTING CANDIDATE")
+        # print("INSERTING CANDIDATE")
         # NOTE: Should require on front-end that a full name is provided --> reduce data inconsistency
         name = (conversation.get("name") or " ").split(" ")
         body = {
@@ -205,8 +246,8 @@ def insertCandidate(access_token, conversation: Conversation) -> Callback:
         return Callback(False, str(exc))
 
 
-def uploadFile(auth, storedFile: StoredFile):  # ISSUE: NO CURRENT API OPTION FOR RESUME UPLOAD
-    print("UPLOAD FILE NOT SUPORTED")
+# def uploadFile(auth, storedFile: StoredFile):  # ISSUE: NO CURRENT API OPTION FOR RESUME UPLOAD
+#     print("UPLOAD FILE NOT SUPORTED")
 
 
 def insertClient(auth, conversation: Conversation) -> Callback:
@@ -312,10 +353,10 @@ def searchCandidates(access_token, conversation) -> Callback:
         query = "WHERE+RecordType.Name+IN+('Candidate')+AND+ts2__People_Status__c+IN+('Active', 'Live')+AND+"
 
         # Filter by job type:
-        #print("THE TYPE: ")
-        #print(conversation.get('JobType'))
-        #print(conversation)
-        #exit(0)
+        # print("THE TYPE: ")
+        # print(conversation.get('JobType'))
+        # print(conversation)
+        # exit(0)
 
         # Filter on location:
         if conversation.get('location') is not None:
@@ -327,7 +368,7 @@ def searchCandidates(access_token, conversation) -> Callback:
                                     SOQL_type="+LIKE+")
         else:
             # Set job title to skills value:
-            query += populateFilter("%" + conversation.get('skills').split(" ")[0]+ "%", "Title", quote_wrap=True,
+            query += populateFilter("%" + conversation.get('skills').split(" ")[0] + "%", "Title", quote_wrap=True,
                                     SOQL_type="+LIKE+")
 
         # Filter on desired salary:
@@ -336,8 +377,8 @@ def searchCandidates(access_token, conversation) -> Callback:
                                     SOQL_type="=")
         query = query[:-5]
 
-        #print("Query is:")
-        #print(query)
+        # print("Query is:")
+        # print(query)
 
         # TODO: Differentiate between hourly and salary
         sendQuery_callback: Callback = sendQuery(access_token, "get", {},
@@ -348,13 +389,13 @@ def searchCandidates(access_token, conversation) -> Callback:
 
         if not sendQuery_callback.Success:
             raise Exception(sendQuery_callback.Message)
-        #print("QUERY HAS BEEN SENT")
+        # print("QUERY HAS BEEN SENT")
         candidate_fetch = json.loads(sendQuery_callback.Data.text)
         records = candidate_fetch['records']
         # Iterate through candidates
         result = []
         # TODO: Fetch job title
-        #print("NUMBER OF RECORDS RETRIEVED: ", len(candidate_fetch['records']))
+        # print("NUMBER OF RECORDS RETRIEVED: ", len(candidate_fetch['records']))
 
         # <-- CALL SKILLS SEARCH -->
         # for record in candidate_fetch['records']:
@@ -402,7 +443,7 @@ def searchCandidates(access_token, conversation) -> Callback:
 
             # remove the last (least important filter)
             query = "AND".join(query.split("AND")[:-1])
-            #print("QUERY IS: ", query)
+            # print("QUERY IS: ", query)
 
             # if no filters left - stop
             if not query:
@@ -410,22 +451,27 @@ def searchCandidates(access_token, conversation) -> Callback:
 
         # <-- CALL SKILLS SEARCH -->
         for record in records:
-            #print(record.get("ts2__Desired_Hourly__c"))
-            #print(record.get("ts2__Desired_Salary__c"))
-            #print(record.get("Min_Basic__c"))
+            # print(record.get("ts2__Desired_Hourly__c"))
+            # print(record.get("ts2__Desired_Salary__c"))
+            # print(record.get("Min_Basic__c"))
             list_of_contactIDs.append("'" + record.get("Id") + "'")
 
         # Fetch associated candidate skills
         skills = conversation.get("skills")
-        #print("THE SKILLS ARE: ")
-        #print(skills)
+        print("THE SKILLS ARE: ")
+        print(skills)
+        if type(skills) == list:
+            print("Skills are a list...")
+        else:
+            skills = skills.split(" ")
+
         candidate_skills = []
         if len(candidate_fetch['records']) > 0:
-            candidate_skills = fetchSkillsForCandidateSearch(list_of_contactIDs, skills.split(" "), access_token)
+            candidate_skills = fetchSkillsForCandidateSearch(list_of_contactIDs, skills, access_token)
         # <-- CALL SKILLS SEARCH -->
 
         for record in records:
-            #print("-- NEW RECORD --")
+            # print("-- NEW RECORD --")
             skills_string = ""
             counter = 0
             for skill in candidate_skills:
@@ -433,8 +479,8 @@ def searchCandidates(access_token, conversation) -> Callback:
 
                 if skill.get("ts2__Contact__c") == record.get("Id") and counter < 5:
                     counter += 1
-                    #print(skill.get("ts2__Skill_Name__c"))
-                    #print(skill.get("ts2__Last_Used__c"))
+                    # print(skill.get("ts2__Skill_Name__c"))
+                    # print(skill.get("ts2__Last_Used__c"))
 
                     skills_string += skill.get("ts2__Skill_Name__c")
                     if skill.get("ts2__Last_Used__c") is not None:
@@ -461,7 +507,7 @@ def searchCandidates(access_token, conversation) -> Callback:
                                                                                 record.get('Min_Basic__c', 0),
                                                                   currency=Currency("GBP"),
                                                                   source="Jobscience"))
-        #print("RETURNING RECORDS ...")
+        # print("RETURNING RECORDS ...")
         return Callback(True, sendQuery_callback.Message, result)
     except Exception as exc:
         helpers.logError("Marketplace.CRM.Jobscience.searchCandidates() ERROR: " + str(exc))
@@ -505,14 +551,15 @@ def searchJobs(access_token, conversation) -> Callback:
         # query += populateFilter(DT.JobEndDate, "ts2__Estimated_End_Date__c", quote_wrap=False)
 
         query = query[:-5]  # To remove final +AND
-        #print("QUERY IS: ", query)
+        # print("QUERY IS: ", query)
 
         # NOTE: Properties to return must be stated, no [*] operator
         sendQuery_callback: Callback = sendQuery(
-            access_token, "get", {}, "SELECT+Name,ts2__Employment_Type__c,RecordType.Name,Rate_Type__c,ts2__Text_Description__c," +
-                                     "ts2__Max_Salary__c,ts2__Max_Pay_Rate__c,ts2__Min_Pay_Rate__c,ts2__Location__c,ts2__Job_Tag__c," +
-                                     "ts2__Estimated_Start_Date__c,ts2__Estimated_End_Date__c+from+ts2__Job__c+" +
-                                     query + "+LIMIT+500")  # Return 500 records at most
+            access_token, "get", {},
+            "SELECT+Name,ts2__Employment_Type__c,RecordType.Name,Rate_Type__c,ts2__Text_Description__c," +
+            "ts2__Max_Salary__c,ts2__Max_Pay_Rate__c,ts2__Min_Pay_Rate__c,ts2__Location__c,ts2__Job_Tag__c," +
+            "ts2__Estimated_Start_Date__c,ts2__Estimated_End_Date__c+from+ts2__Job__c+" +
+            query + "+LIMIT+500")  # Return 500 records at most
         if not sendQuery_callback.Success:
             raise Exception(sendQuery_callback.Message)
 
@@ -522,10 +569,11 @@ def searchJobs(access_token, conversation) -> Callback:
         while len(job_fetch['records']) < 200:
             # send query
             sendQuery_callback: Callback = sendQuery(
-                access_token, "get", {}, "SELECT+Name,ts2__Employment_Type__c,RecordType.Name,Rate_Type__c,ts2__Text_Description__c," +
-                                         "ts2__Max_Salary__c,ts2__Max_Pay_Rate__c,ts2__Min_Pay_Rate__c,ts2__Location__c,ts2__Job_Tag__c," +
-                                         "ts2__Estimated_Start_Date__c,ts2__Estimated_End_Date__c+from+ts2__Job__c+" +
-                                         query + "+LIMIT+100")  # Return 500 records at most
+                access_token, "get", {},
+                "SELECT+Name,ts2__Employment_Type__c,RecordType.Name,Rate_Type__c,ts2__Text_Description__c," +
+                "ts2__Max_Salary__c,ts2__Max_Pay_Rate__c,ts2__Min_Pay_Rate__c,ts2__Location__c,ts2__Job_Tag__c," +
+                "ts2__Estimated_Start_Date__c,ts2__Estimated_End_Date__c+from+ts2__Job__c+" +
+                query + "+LIMIT+100")  # Return 500 records at most
             if not sendQuery_callback.Success:
                 raise Exception(sendQuery_callback.Message)
 
@@ -534,7 +582,7 @@ def searchJobs(access_token, conversation) -> Callback:
 
             # TODO: Call skills fetch here
             if return_body["records"]:
-                #print("Records length:", str(len(records)))
+                # print("Records length:", str(len(records)))
                 # add the candidates to the records
                 records = records + list(return_body["records"])
 
@@ -553,7 +601,7 @@ def searchJobs(access_token, conversation) -> Callback:
 
             # remove the last (least important filter)
             query = "AND".join(query.split("AND")[:-1])
-            #print("QUERY IS: ", query)
+            # print("QUERY IS: ", query)
 
             # if no filters left - stop
             if not query:
@@ -585,7 +633,7 @@ def searchJobs(access_token, conversation) -> Callback:
                                                             linkURL=None,
                                                             currency=Currency("GBP"),
                                                             source="Jobscience"))
-        #print("FINISHED")
+        # print("FINISHED")
 
         return Callback(True, sendQuery_callback.Message, result)
 
@@ -654,18 +702,17 @@ def getAllJobs(access_token, companyID, fields=None) -> Callback:  # TODO: See t
         return Callback(False, str(exc))
 
 
-def sendQuery(access_token, method, body, query):
+# TODO: Clean up this sendquery and enacpsulate refresh token logic:
+def sendQuery(auth, method, body, query):
     try:
-        print("-----------------")
-        print(my_test_here)
-        print("------------------")
+
         url = buildUrl(query, method)
 
         # set headers
         headers = {
             'Content-Type': 'application/json',
-            'Authorization': "Bearer " + access_token,
-            'cache-control': "no-cache",
+            'Authorization': 'Bearer ' + auth.get('access_token'),
+            'cache-control': 'no-cache',
             'Cookie': 'inst=APP_3X'
         }
         print("URL OF THE SEND QUERY")
@@ -676,36 +723,14 @@ def sendQuery(access_token, method, body, query):
 
         if response.status_code == 401:  # wrong rest token
 
-            # get new access token:
-
-            print("Getting a new access token")
-            headers_refresh = {
-                'Content-Type': "application/x-www-form-urlencoded",
-                'Cache-Control': "no-cache",
-                'Cookie': "inst=APP_3X",
-                'cache-control': "no-cache"
-            }
-
-            body_refresh = {
-                'grant_type': "refresh_token",
-                'client_id': "3MVG9I5UQ_0k_hTlh64o5U2MnkGkPmYj_xkMpFkEi0tIJXl_CGhXpux_w5khN6pvnNd.IH6Yvo82ZAcRystWE",
-                'client_secret': "972A46C725406EE38D971409A1509EF164B100A9B8B42CA4C39AB3952B65A215",
-                'refresh_token': my_test_here
-            }
-
-            resp = json.loads(requests.request("POST", "https://login.salesforce.com/services/oauth2/token?", headers=headers_refresh, data=body_refresh).text)
-            print(resp)
-            headers['Authorization'] = "Bearer " + resp.get('access_token')
+            refreshToken(auth, None)
+            headers['Authorization'] = "Bearer " + auth.get('access_token')
 
             # Try again
             response = marketplace_helpers.sendRequest(url, method, headers, json.dumps(body))
 
-
         if not response.ok:
             raise Exception(response.text + ". Query could not be sent")
-
-        elif not response.ok:
-            raise Exception("Rest url for query is incorrect")
 
         return Callback(True, "Query was successful", response)
 
@@ -715,7 +740,6 @@ def sendQuery(access_token, method, body, query):
 
 
 def buildUrl(query, method):
-
     url = "https://prsjobs.cs83.my.salesforce.com/services/data/v46.0/"
     if method == "post":
         url = url + query  # Append object to be edited

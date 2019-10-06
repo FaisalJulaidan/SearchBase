@@ -19,8 +19,8 @@
 }
 
 .col_item .image {
-    height: 100px;
-    width: 100px;
+    height: 150px;
+    width: 150px;
     /*padding: 5px;*/
     /*background: #6c63ff0F;*/
     /*border-radius: 25%;*/
@@ -54,8 +54,8 @@
     }
 
     .col_item .image {
-        height: 64px;
-        width: 64px;
+        height: 110px;
+        width: 110px;
     }
 }
 

@@ -1,13 +1,14 @@
 import React from 'react';
-import styles from '../../AutoPilots/AutoPilot/AutoPilot.module.less';
 import { connect } from 'react-redux';
 
 import moment from 'moment';
-import { Dropdown, Button, Menu, Icon, Table } from 'antd';
+import { AutoComplete, Button, Dropdown, Icon, Input, Menu, Table } from 'antd';
 import 'types/TimeSlots_Types';
 import 'types/AutoPilot_Types';
+import './Availabilty.less';
+import { assistantActions, databaseActions } from 'store/actions';
 
-import { conversationActions, assistantActions, databaseActions } from 'store/actions';
+const { Option, OptGroup } = AutoComplete;
 
 
 class Availability extends React.Component {
@@ -18,7 +19,7 @@ class Availability extends React.Component {
             assistant: null,
             database: null,
             start: moment().startOf('week'),
-            end:  moment().endOf('week')
+            end: moment().endOf('week')
         };
     }
 
@@ -29,7 +30,7 @@ class Availability extends React.Component {
 
     handleMenuClick = (item) => {
         this.setState({ assistant: item.key, database: item.key });
-        this.props.dispatch(databaseActions.fetchDatabase(item.key))  
+        this.props.dispatch(databaseActions.fetchDatabase(item.key));
     };
 
     filterThisWeek = (records) => {
@@ -42,17 +43,17 @@ class Availability extends React.Component {
             return null;
         };
         let availability = [];
-        const { start, end } = this.state
+        const { start, end } = this.state;
 
         records.filter(record => record.CandidateAvailability).filter(record => {
             let dates = record.CandidateAvailability.split(',');
             let data = {
-              name: record.CandidateName,
-              skills: record.CandidateSkills,
-              location: record.CandidateLocation,
-              consultant: "Unknown",
-              jobTitle: record.CandidateJobTitle
-            }
+                name: record.CandidateName,
+                skills: record.CandidateSkills,
+                location: record.CandidateLocation,
+                consultant: 'Unknown',
+                jobTitle: record.CandidateJobTitle
+            };
             dates.forEach(date => {
                 let range = date.split('-');
                 if (range.length > 1) { // range handlers
@@ -70,7 +71,7 @@ class Availability extends React.Component {
                             if (key) {
                                 availability[key].dates.push(realDate);
                             } else {
-                                availability.push({ID: record.ID, dates: [realDate], data: data });
+                                availability.push({ ID: record.ID, dates: [realDate], data: data });
                             }
                         }
                     });
@@ -91,10 +92,10 @@ class Availability extends React.Component {
     };
 
     moveWeek = change => {
-      const { start, end } = this.state
-      this.setState({start: start.clone().add(change, 'weeks'), end: end.clone().add(change, 'weeks')})
-    }
-    
+        const { start, end } = this.state;
+        this.setState({ start: start.clone().add(change, 'weeks'), end: end.clone().add(change, 'weeks') });
+    };
+
     render() {
         const columns = [
             {
@@ -170,9 +171,9 @@ class Availability extends React.Component {
 
         const { assistant, database } = this.state;
         const { conversations, db } = this.props;
-        let records  = db.databaseContent ? db.databaseContent.records : null
+        let records = db.databaseContent ? db.databaseContent.records : null;
         let availability = null;
-        let availableText = <Icon type="check" style={{textAlign: 'center'}}/>
+        let availableText = <Icon type="check" style={{ textAlign: 'center' }}/>;
 
         if (records) {
             availability = this.filterThisWeek(records).map(item => ({
@@ -193,6 +194,53 @@ class Availability extends React.Component {
 
         return (
             <div>
+                <div style={{ display: 'flex' }}>
+                    <div className="certain-category-search-wrapper"
+                         style={{ width: 200, margin: '10px 10px 10px 0px' }}>
+                        <AutoComplete
+                            className="certain-category-search"
+                            dropdownClassName="certain-category-search-dropdown"
+                            dropdownMatchSelectWidth={false}
+                            dropdownStyle={{ width: 300 }}
+                            size="large"
+                            style={{ width: '100%' }}
+                            placeholder="Skills"
+                            optionLabelProp="value"
+                        >
+                            <Input suffix={<Icon type="search" className="certain-category-icon"/>}/>
+                        </AutoComplete>
+                    </div>
+
+                    <div className="certain-category-search-wrapper" style={{ width: 200, margin: 10 }}>
+                        <AutoComplete
+                            className="certain-category-search"
+                            dropdownClassName="certain-category-search-dropdown"
+                            dropdownMatchSelectWidth={false}
+                            dropdownStyle={{ width: 300 }}
+                            size="large"
+                            style={{ width: '100%' }}
+                            placeholder="Location"
+                            optionLabelProp="value"
+                        >
+                            <Input suffix={<Icon type="search" className="certain-category-icon"/>}/>
+                        </AutoComplete>
+                    </div>
+
+                    <div className="certain-category-search-wrapper" style={{ width: 200, margin: 10 }}>
+                        <AutoComplete
+                            className="certain-category-search"
+                            dropdownClassName="certain-category-search-dropdown"
+                            dropdownMatchSelectWidth={false}
+                            dropdownStyle={{ width: 300 }}
+                            size="large"
+                            style={{ width: '100%' }}
+                            placeholder="Job Title"
+                            optionLabelProp="value"
+                        >
+                            <Input suffix={<Icon type="search" className="certain-category-icon"/>}/>
+                        </AutoComplete>
+                    </div>
+                </div>
                 <Dropdown overlay={menu}>
                     {database ?
                         <Button>
@@ -204,15 +252,15 @@ class Availability extends React.Component {
                         </Button>}
                 </Dropdown>
                 <Button onClick={() => this.moveWeek(-1)}>
-                  <Icon type="left" />
+                    <Icon type="left"/>
                 </Button>
-                {this.state.start.format("L")} 
-                <Button onClick={() => this.moveWeek(1)} style={{marginLeft: 6}}>
-                  <Icon type="right" />
+                {this.state.start.format('L')}
+                <Button onClick={() => this.moveWeek(1)} style={{ marginLeft: 6 }}>
+                    <Icon type="right"/>
                 </Button>
 
                 {availability ?
-                    <Table style={{marginTop: '22px'}} columns={columns} dataSource={availability}/>
+                    <Table style={{ marginTop: '22px' }} columns={columns} dataSource={availability}/>
                     : null}
             </div>);
     }
@@ -220,7 +268,7 @@ class Availability extends React.Component {
 
 
 function mapStateToProps(state) {
-  console.log(state)
+    console.log(state);
     return {
         dbList: state.database.databasesList,
         conversations: state.conversation.conversations.conversationsList,

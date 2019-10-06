@@ -32,23 +32,45 @@ my_test_here = "hi"
 # TODO: Sort out token persistance problems
 def testConnection(auth, companyID):
     try:
-        print("testing connection...")
-        print(auth)
 
         if auth.get("refresh_token"):
-            callback: Callback = refreshToken(auth, companyID)
+
+            if token_is_ok(auth, companyID):
+                print("[1] Do nothing")
+                return Callback(True, 'Logged in successfully', auth)
+
+            else:
+                print("[2] Refresh expired token")
+                callback: Callback = refreshToken(auth, companyID)
 
         else:
+            print("[3] Login")
             callback: Callback = login(auth)
 
-            if not callback.Success:
-                raise Exception("Testing failed")
+        if not callback.Success:
+            raise Exception("Testing failed")
 
         return Callback(True, 'Logged in successfully', callback.Data)
 
     except Exception as exc:
         helpers.logError("Marketplace.CRM.Jobscience.testConnection() ERROR: " + str(exc))
         return Callback(False, str(exc))
+
+
+def token_is_ok(auth, companyID):
+    url = "https://prsjobs.cs83.my.salesforce.com/services/data/v46.0/"
+    method = "GET"
+    headers = {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + auth.get('access_token'),
+        'cache-control': 'no-cache',
+        'Cookie': 'inst=APP_3X'
+    }
+    response = marketplace_helpers.sendRequest(url, method, headers, {})
+    if response.ok:
+        return True
+    else:
+        return False
 
 
 def refreshToken(auth, companyID):
@@ -89,6 +111,7 @@ def refreshToken(auth, companyID):
         db.session.rollback()
         helpers.logError("Marketplace.CRM.Bullhorn.retrieveRestToken() ERROR: " + str(exc))
         return Callback(False, "Failed to retrieve CRM tokens. Please check login information")
+
 
 # NOTE: For production, we need to change the domain name (currently it is pointing to sandbox)
 

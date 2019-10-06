@@ -244,7 +244,7 @@ export const dataHandler = (() => {
 
                 __collectData(
                     blockRef[flowAttributes.ID],
-                    blockRef[flowAttributes.CONTENT]['value'],
+                    blockRef[flowAttributes.CONTENT][flowAttributes.QUESTION_TEXT],
                     text,
                     blockRef[flowAttributes.DATA_TYPE],
                     modifiedKeywords,

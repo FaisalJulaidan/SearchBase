@@ -6,8 +6,8 @@ import * as flowAttributes from '../constants/FlowAttributes';
 import * as solutionAttributes from '../constants/SolutionAttributes';
 import * as constants from '../constants/Constants';
 // Utils
-import {promiseWrapper} from './wrappers';
-import {getServerDomain} from './index';
+import { promiseWrapper } from './wrappers';
+import { getServerDomain } from './index';
 
 
 export const dataHandler = (() => {
@@ -229,6 +229,29 @@ export const dataHandler = (() => {
                 __accumulateScore(score, Math.max(...answers.map(answer => answer.score)));
             };
 
+            const __processPredefinedAnswers = (message) => {
+                const { blockRef, content, text } = message;
+                const answers = blockRef[flowAttributes.CONTENT][flowAttributes.QUESTION_TYPES];
+
+                // there will be no selectedAnswer when question skipped
+                let keywords = content.selectedAnswer ? [content.selectedAnswer.value] : [];
+                let score = content.selectedAnswer ? content.selectedAnswer.score : 0;
+
+                // Adds the answer text as part of the keywords list
+                let modifiedKeywords = [];
+                if (!content.skipped)
+                    modifiedKeywords = keywords.concat(text.trim().split(' ').filter(n => n));
+
+                __collectData(
+                    blockRef[flowAttributes.ID],
+                    blockRef[flowAttributes.CONTENT]['value'],
+                    text,
+                    blockRef[flowAttributes.DATA_TYPE],
+                    modifiedKeywords,
+                    content.skipped);
+                __accumulateScore(score, Math.max(...answers.map(answer => answer.score)));
+            };
+
             const __processUserInput = (message) => {
                 const {blockRef, content, text} = message;
                 const {input} = content;
@@ -346,6 +369,11 @@ export const dataHandler = (() => {
                             break;
                         case messageTypes.SOLUTIONS:
                             __processSolutions(message);
+                            break;
+
+                        case messageTypes.USER_TYPE:
+                        case messageTypes.JOB_TYPE:
+                            __processPredefinedAnswers(message);
                             break;
                         default:
                     }

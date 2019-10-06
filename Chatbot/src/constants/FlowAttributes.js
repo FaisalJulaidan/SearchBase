@@ -32,6 +32,8 @@ export const FILE_UPLOAD_FILE_TYPES = 'fileTypes';
 export const FILE_UPLOAD_ACTION = SUPER_ACTION;
 export const FILE_UPLOAD_BLOCKTOGOID = SUPER_BLOCKTOGOID;
 
+export const QUESTION_TYPES = 'types';
+
 export const QUESTION_ANSWERS = 'answers';
 export const QUESTION_TEXT = 'text';
 export const QUESTION_ANSWERS_ACTION = SUPER_ACTION;

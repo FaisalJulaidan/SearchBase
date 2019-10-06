@@ -24,7 +24,8 @@ const PredefinedAnswers = ({ answers, question, submitAnswer, responded, skipRes
             messageTypes.TEXT,
             newState,
             { skipped: false, selectedAnswer: answer, otherAnswers: answers },
-            afterMessage);
+            afterMessage
+        );
     };
 
     const answersButtons = [];

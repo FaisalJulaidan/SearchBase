@@ -137,7 +137,7 @@ class JobType extends Component {
                 Type: 'Job Type',
                 StoreInDB: false,
 
-                DataType: flowOptions.dataTypes.find((dataType) => dataType.name === 'Job Salary'),
+                DataType: flowOptions.dataTypes.find((dataType) => dataType.name === 'Job Type'),
 
                 Skippable: values.isSkippable || false,
                 SkipText: values.SkipText || 'Skip!',

@@ -35,7 +35,7 @@ export const dataHandler = (() => {
         };
 
         const fetchSolutions = async (showTop, databaseType) => {
-            let resolve = {cancelled: false, solutions: []};
+            let resolve = { cancelled: false, solutions: [] };
             source = CancelToken.source();
             const result = processMessages(false);
             const payload = {
@@ -50,7 +50,7 @@ export const dataHandler = (() => {
             headers.append('Content-Type', 'application/json');
             headers.append('Accept', 'application/json');
 
-            const {data, error} = await promiseWrapper(
+            const { data, error } = await promiseWrapper(
                 axios.post(`${getServerDomain()}/api/assistant/${assistantID}/chatbot/solutions`, payload, {
                     headers,
                     cancelToken: source.token
@@ -78,39 +78,39 @@ export const dataHandler = (() => {
             source = CancelToken.source();
             let cancelled;
             const result = processMessages(completed); // loop messages
-            if ((!completed && result.collectedData.length < 1) || sessionID) return {cancelled};
+            if ((!completed && result.collectedData.length < 1) || sessionID) return { cancelled };
 
             const cancel = {
                 cancelToken: source.token
             };
             // CHECK IF UPDATING CANDIDATE
 
-            console.log(window.location.href)
-            console.log(window.location.href.includes("chatbot_direct_link"))
-            if(window.location.href.includes("chatbot_direct_link")){
-                let allowedKeys = ['source', 'source_id', 'id']
-                let params = queryString.parse(window.location.search)
-                let crmInformation = {}
-                for(let key in params){
-                    if(allowedKeys.includes(key)){
-                        crmInformation[key] = params[key]
+            console.log(window.location.href);
+            console.log(window.location.href.includes('chatbot_direct_link'));
+            if (window.location.href.includes('chatbot_direct_link')) {
+                let allowedKeys = ['source', 'source_id', 'id'];
+                let params = queryString.parse(window.location.search);
+                let crmInformation = {};
+                for (let key in params) {
+                    if (allowedKeys.includes(key)) {
+                        crmInformation[key] = params[key];
                     }
                 }
-                console.log("CRM INFO: ", crmInformation)
-                if(Object.keys(crmInformation).length !== 0 ){
-                    result['crmInformation'] = crmInformation
+                console.log('CRM INFO: ', crmInformation);
+                if (Object.keys(crmInformation).length !== 0) {
+                    result['crmInformation'] = crmInformation;
                 }
             }
 
             const files = result.submittedFiles;
 
             const formData = new FormData();
-            const config = {headers: {'content-type': 'multipart/form-data'}, ...cancel};
+            const config = { headers: { 'content-type': 'multipart/form-data' }, ...cancel };
             files.forEach(file => formData.append('file', file.file, file.file.name));
-            formData.append('keys', files.map(file => file.key).join(","));
+            formData.append('keys', files.map(file => file.key).join(','));
             formData.append('conversation', JSON.stringify(result));
             // send data to server
-            const {data, error} = await promiseWrapper(axios.post(`${getServerDomain()}/api/assistant/${assistantID}/chatbot`, formData, config));
+            const { data, error } = await promiseWrapper(axios.post(`${getServerDomain()}/api/assistant/${assistantID}/chatbot`, formData, config));
 
             if (axios.isCancel(error)) {
                 console.log('cancelled');
@@ -126,7 +126,7 @@ export const dataHandler = (() => {
             let filesSentFailed = false;
 
 
-            return {dataSent: !!sessionID, filesSent: !filesSentFailed, cancelled};
+            return { dataSent: !!sessionID, filesSent: !filesSentFailed, cancelled };
         };
 
         const processMessages = (completed) => {
@@ -147,10 +147,10 @@ export const dataHandler = (() => {
                 ClientTelephone: null
             };
 
-            const __collectData = (blockID, questionText, input, dataType, keywords, skipped, extras={}) => {
-                const {name, enumName} = dataType;
+            const __collectData = (blockID, questionText, input, dataType, keywords, skipped, extras = {}) => {
+                const { name, enumName } = dataType;
                 if (!skipped) {
-                    const kdt = {...keywordsByDataType};
+                    const kdt = { ...keywordsByDataType };
                     if (name in kdt) {
                         kdt[name] = kdt[name].concat(keywords || input);
                     } else {
@@ -207,7 +207,7 @@ export const dataHandler = (() => {
             };
 
             const __processQuestion = (message) => {
-                const {blockRef, content, text} = message;
+                const { blockRef, content, text } = message;
                 const answers = blockRef[flowAttributes.CONTENT][flowAttributes.CONTENT_ANSWERS];
 
                 // there will be no selectedAnswer when question skipped
@@ -231,21 +231,23 @@ export const dataHandler = (() => {
 
             const __processPredefinedAnswers = (message) => {
                 const { blockRef, content, text } = message;
-                const answers = blockRef[flowAttributes.CONTENT][flowAttributes.QUESTION_TYPES];
+                const answers = blockRef[flowAttributes.CONTENT][flowAttributes.CONTENT_TYPES];
 
                 // there will be no selectedAnswer when question skipped
                 let keywords = content.selectedAnswer ? [content.selectedAnswer.value] : [];
                 let score = content.selectedAnswer ? content.selectedAnswer.score : 0;
+                let answer = content.skipped ? text : content.selectedAnswer.value;
 
                 // Adds the answer text as part of the keywords list
                 let modifiedKeywords = [];
-                if (!content.skipped)
+                if (!content.skipped) {
                     modifiedKeywords = keywords.concat(text.trim().split(' ').filter(n => n));
+                }
 
                 __collectData(
                     blockRef[flowAttributes.ID],
-                    blockRef[flowAttributes.CONTENT][flowAttributes.QUESTION_TEXT],
-                    text,
+                    blockRef[flowAttributes.CONTENT][flowAttributes.CONTENT_TEXT],
+                    answer,
                     blockRef[flowAttributes.DATA_TYPE],
                     modifiedKeywords,
                     content.skipped);
@@ -253,8 +255,8 @@ export const dataHandler = (() => {
             };
 
             const __processUserInput = (message) => {
-                const {blockRef, content, text} = message;
-                const {input} = content;
+                const { blockRef, content, text } = message;
+                const { input } = content;
                 let keywords = text.trim().split(' ').filter(n => n);
 
                 switch (blockRef[flowAttributes.DATA_TYPE][flowAttributes.DATA_TYPE_VALIDATION]) {
@@ -282,7 +284,7 @@ export const dataHandler = (() => {
             };
 
             const __processFileUpload = (message) => {
-                const {blockRef, content, text} = message;
+                const { blockRef, content, text } = message;
                 const input = !content.skipped ? '&FILE_UPLOAD&' : text;
                 __collectData(
                     blockRef[flowAttributes.ID],
@@ -291,18 +293,19 @@ export const dataHandler = (() => {
                     blockRef[flowAttributes.DATA_TYPE],
                     input.trim().split(' ').filter(n => n),
                     content.skipped,
-                    {fileName: content.fileName});
+                    { fileName: content.fileName });
 
                 if (!content.skipped)
                     submittedFiles = submittedFiles.concat({
                         file: content.file,
                         uploadedFileName: content.file.name,
                         fileName: content.fileName,
-                        key: blockRef.DataType.enumName});
+                        key: blockRef.DataType.enumName
+                    });
             };
 
             const __processSolutions = (message) => {
-                const {blockRef, content, text} = message;
+                const { blockRef, content, text } = message;
                 const solutions = !content.skipped ? content.selectedSolutions : [];
                 __collectData(
                     blockRef[flowAttributes.ID],
@@ -353,7 +356,7 @@ export const dataHandler = (() => {
             let message;
             for (message of messages) {
                 if (message.sender === 'USER') {
-                    const {blockRef} = message;
+                    const { blockRef } = message;
                     // const storeInDB = blockRef[flowAttributes.STORE_IN_DB];
                     __recordUserTypes(blockRef[flowAttributes.DATA_TYPE][flowAttributes.DATA_TYPE_USER_TYPES]);
 
@@ -399,6 +402,6 @@ export const dataHandler = (() => {
     if (!instance) {
         instance = init();
     }
-    return {...instance};
+    return { ...instance };
 })();
 

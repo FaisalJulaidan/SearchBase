@@ -82,7 +82,7 @@ def refreshToken(auth, companyID):
 
         return Callback(True, 'New access token', {
             "access_token": auth.get("access_token"),
-            "refresh_token": auth("refresh_token")
+            "refresh_token": auth.get("refresh_token")
         })
 
     except Exception as exc:

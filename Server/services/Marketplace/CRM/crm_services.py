@@ -372,8 +372,13 @@ def disconnectByID(crmID, companyID) -> Callback:
 
 def logoutOfCRM(auth, crm_type, companyID) -> Callback:
     try:
-        if crm_type == CRM.Bullhorn:
+
+        if crm_type == CRM.Bullhorn: # Need to change this?
             return Bullhorn.logout(auth, companyID)
+
+        elif crm_type == "Jobscience":
+            return Jobscience.logout(auth, companyID)
+
 
         return Callback(False, 'Logout failed')
 

@@ -175,7 +175,7 @@ def updateCandidate(details, conversation, companyID):
 
 
 def uploadFile(assistant: Assistant, storedFile: StoredFile):
-    print("IN CRM_SERVICES...")
+
     crm_type = assistant.CRM.Type
     if CRM.has_value(crm_type.value):
         if crm_type is CRM.Jobscience or crm_type is CRM.Mercury:
@@ -270,7 +270,7 @@ def searchJobs(assistant: Assistant, session):
 
 # private helper function
 def __checkFilter(keywords, dataType: DT):
-    print("FILTERING...")
+
     if keywords.get(dataType.value["name"]):
         return " ".join(keywords[dataType.value["name"]])
     return None

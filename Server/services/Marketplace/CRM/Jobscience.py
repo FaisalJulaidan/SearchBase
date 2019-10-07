@@ -1,4 +1,3 @@
-import base64
 import json
 import os
 from datetime import datetime
@@ -6,30 +5,35 @@ from datetime import datetime
 import requests
 from sqlalchemy_utils import Currency
 
-from models import Callback, Conversation, db, CRM as CRM_Model, StoredFileInfo
-from services import databases_services, stored_file_services
+from models import Callback, Conversation, db, StoredFileInfo
+from services import databases_services
 from services.Marketplace import marketplace_helpers
 from services.Marketplace.CRM import crm_services
-from services.Marketplace.marketplace_helpers import convertSkillsToString
 
 from utilities import helpers
-from utilities.enums import DataType as DT, Period, CRM
+from utilities.enums import CRM
 
-CLIENT_ID = os.environ['JOBSCIENCE_CLIENT_ID']
-CLIENT_SECRET = os.environ['JOBSCIENCE_CLIENT_SECRET']
+# USE Jobscience SANDBOX or PROD environment:
 
-my_test_here = "hi"
+if os.environ['FLASK_ENV'] == 'development':
+    print("Jobscience running in development")
+    CLIENT_ID = os.environ['JOBSCIENCE_SANDBOX_CLIENT_ID']
+    CLIENT_SECRET = os.environ['JOBSCIENCE_SANDBOX_CLIENT_SECRET']
+    BASE_URL = "https://prsjobs--jsfull.cs83.my.salesforce.com/services/data/v46.0/"
+    BASE_URL_LOGIN = "https://test.salesforce.com/services/oauth2/"
+
+else:
+    print("Jobscience running in production")
+    CLIENT_ID = os.environ['JOBSCIENCE_CLIENT_ID']
+    CLIENT_SECRET = os.environ['JOBSCIENCE_CLIENT_SECRET']
+    BASE_URL = "https://prsjobs.cs83.my.salesforce.com/services/data/v46.0/"
+    BASE_URL_LOGIN = "https://login.salesforce.com/services/oauth2/"
 
 
 # TODO CHECKLIST:
+# [1] Add a update candidate function
 
-# [4] Filter by contract or perm
-# [4.5] Fix skills upload
-# [5] Clean & refactor []
 
-# [7] IMPROVE SUCH AS ADD FILE UPLOAD []
-
-# TODO: Sort out token persistance problems
 def testConnection(auth, companyID):
     try:
 
@@ -58,7 +62,7 @@ def testConnection(auth, companyID):
 
 
 def token_is_ok(auth, companyID):
-    url = "https://prsjobs.cs83.my.salesforce.com/services/data/v46.0/"
+    url = BASE_URL
     method = "GET"
     headers = {
         'Content-Type': 'application/json',
@@ -93,7 +97,7 @@ def refreshToken(auth, companyID):
         }
 
         resp = json.loads(
-            requests.request("POST", "https://login.salesforce.com/services/oauth2/token?", headers=headers,
+            requests.request("POST", (BASE_URL_LOGIN + "token?"), headers=headers,
                              data=body).text)
         print(resp)
         auth['access_token'] = resp.get('access_token')
@@ -122,7 +126,7 @@ def login(auth):
 
         headers = {'Content-Type': 'application/json'}
 
-        access_token_url = "https://login.salesforce.com/services/oauth2/token?" + \
+        access_token_url = (BASE_URL_LOGIN + "token?") + \
                            "&grant_type=authorization_code" + \
                            "&redirect_uri=" + helpers.getDomain(3000) + "/dashboard/marketplace/Jobscience" + \
                            "&client_id=" + CLIENT_ID + \
@@ -154,7 +158,7 @@ def login(auth):
 def logout(auth, companyID):  # QUESTION: Purpose of companyID param?
     try:
         # Attempt logout
-        logout_url = "https://login.salesforce.com/services/oauth2/revoke?token=" + auth.get("access_token")
+        logout_url = BASE_URL_LOGIN + "revoke?token=" + auth.get("access_token")
         headers = {
             'Content-Type': 'application/json',
             'Authorization': "Bearer " + auth.get("access_token"),
@@ -266,6 +270,62 @@ def insertCandidate(access_token, conversation: Conversation) -> Callback:
 
     except Exception as exc:
         helpers.logError("Marketplace.CRM.Jobscience.insertCandidate() ERROR: " + str(exc))
+        return Callback(False, str(exc))
+
+
+def updateCandidate(auth, conversation: Conversation, companyID) -> Callback:
+    # URL: https://prsjobs--jsfull.cs83.my.salesforce.com/services/data/v36.0/sobjects/Contact/0034E00000v8wbWQAQ
+    # Note: Dont want to replace data with nothing -> Only for fields that have answers
+    try:
+        print("Updating candidate")
+        print(conversation)
+
+        name = (conversation.get("name") or " ").split(" ")
+
+        # Compose body keywords:
+
+        body = {
+            "FirstName": helpers.getListValue(name, 0, "") or "FIRST_DEFAULT",
+            "LastName": helpers.getListValue(name, 1, "") or "LAST_DEFAULT",  # LastName is only required field
+            "Title": conversation.get("preferredJobTitle"),
+            "phone": conversation.get('mobile') or " ",
+            "MailingCity": conversation.get("city") or "",
+            "email": conversation.get("email") or " ",
+            "ts2__Date_Available__c": convertDate(conversation.get("availability")),  # TODO CHECK
+            "ts2__Education__c": "",  # Needs to be in a separate post request
+            "ts2__Desired_Salary__c": conversation.get("annualSalary"),
+            "ts2__Desired_Hourly__c": conversation.get("dayRate"),
+            "ts2__LinkedIn_Profile__c": conversation.get("CandidateLinkdinURL"),
+            "Attributes__c": conversation.get("skills"),
+            "ts2__Job_Type__c": conversation.get("preferredJobType"),
+            # "ts2__Text_Resume__c": "", # TODO: Link this with File upload
+            "Internal_Notes__c": crm_services.additionalCandidateNotesBuilder(
+                {
+                    "preferredJobTitle": conversation.get("preferredJobTitle"),
+                    "preferredJobType": conversation.get("preferredJobType"),
+                    "yearsExperience": conversation.get("yearsExperience"),
+                    "skills": conversation.get("skills")
+                }, conversation.get("selectedSolutions")
+            ),
+        }
+
+        # So that we dont replace existing data will nothing
+        filtered_body = {}
+        for propertyKey, propertyValue in body.items():
+            if propertyValue is not None:
+                filtered_body[propertyKey] = propertyValue
+
+        # send query
+        sendQuery_callback: Callback = sendQuery(auth, "patch", filtered_body,
+                                                 "sobjects/Contact/" + str(conversation.get("id")))
+
+        if not sendQuery_callback.Success:
+            raise Exception(sendQuery_callback.Message)
+
+        return Callback(True, sendQuery_callback.Data.text)
+
+    except Exception as exc:
+        helpers.logError("Marketplace.CRM.Jobscience.updateCandidate() ERROR: " + str(exc))
         return Callback(False, str(exc))
 
 
@@ -742,7 +802,9 @@ def sendQuery(auth, method, body, query):
         print(url)
         print("HEADERS OF SEND QUERY")
         print(headers)
+
         response = marketplace_helpers.sendRequest(url, method, headers, json.dumps(body))
+
 
         if response.status_code == 401:  # wrong rest token
 
@@ -763,11 +825,13 @@ def sendQuery(auth, method, body, query):
 
 
 def buildUrl(query, method):
-    url = "https://prsjobs.cs83.my.salesforce.com/services/data/v46.0/"
+    url = BASE_URL
     if method == "post":
         url = url + query  # Append object to be edited
     elif method == "get":
         url = url + "query/?q=" + query  # Append SOQL query
+    elif method == 'patch':
+        url = url + query
     return url
 
 

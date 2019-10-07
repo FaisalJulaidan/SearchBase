@@ -50,7 +50,7 @@ class DatePicker extends Component {
             const flowOptions = this.props.options.flow;
             let options = {
                 Type: 'Date Picker',
-                StoreInDB: values.storeInDB,
+                StoreInDB: true,
 
                 Skippable: values.isSkippable || false,
                 SkipText: values.SkipText || 'Skip!',

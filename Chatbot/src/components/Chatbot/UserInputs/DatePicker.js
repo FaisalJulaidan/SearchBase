@@ -40,7 +40,7 @@ const DatePicker = ({message, submitMessage}) => {
 
     return (
         <React.Fragment>
-            <div className={'InputContainer'}>
+            <div className={'DatePickerContainer'}>
                 <AntdDatePicker getCalendarContainer={() => getContainerElement()}
                                 className={'Datepicker'} suffixIcon={<div/>}
                                 dropdownClassName={'DatepickerCalendar'}

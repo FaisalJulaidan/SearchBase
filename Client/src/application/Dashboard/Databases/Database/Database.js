@@ -153,6 +153,11 @@ const CandidateColumns = [{
     dataIndex: 'CandidateAvailability',
     render: (text, record, index) => (<p>{record.CandidateAvailability}</p>),
 }, {
+    title: 'Consultant Name',
+    key: 'CandidateConsultantName',
+    dataIndex: 'CandidateConsultantName',
+    render: (text, record, index) => (<p>{record.CandidateConsultantName}</p>),
+},{
     title: 'Job Title',
     key: 'CandidateJobTitle',
     dataIndex: 'CandidateJobTitle',

@@ -7,22 +7,19 @@ import {Router} from 'react-router-dom';
 import {Provider} from 'react-redux';
 import {history} from './helpers'
 
-import {StripeProvider} from 'react-stripe-elements';
-
 import {store, persistor} from './store/store'
 import {PersistGate} from 'redux-persist/integration/react'
 
 
 const app = (
-    <StripeProvider apiKey="pk_test_12345">
-        <Provider store={store}>
-            <PersistGate loading={null} persistor={persistor}>
-                <Router history={history}>
-                    <App/>
-                </Router>
-            </PersistGate>
-        </Provider>
-    </StripeProvider>
+
+    <Provider store={store}>
+        <PersistGate loading={null} persistor={persistor}>
+            <Router history={history}>
+                <App/>
+            </Router>
+        </PersistGate>
+    </Provider>
 );
 
 ReactDOM.render(app, document.getElementById('root'));

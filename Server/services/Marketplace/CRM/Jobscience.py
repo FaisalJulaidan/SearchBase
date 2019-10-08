@@ -15,19 +15,19 @@ from utilities.enums import CRM
 
 # USE Jobscience SANDBOX or PROD environment:
 
-if os.environ['FLASK_ENV'] == 'development':
-    print("Jobscience running in development")
-    CLIENT_ID = os.environ['JOBSCIENCE_SANDBOX_CLIENT_ID']
-    CLIENT_SECRET = os.environ['JOBSCIENCE_SANDBOX_CLIENT_SECRET']
-    BASE_URL = "https://prsjobs--jsfull.cs83.my.salesforce.com/services/data/v46.0/"
-    BASE_URL_LOGIN = "https://test.salesforce.com/services/oauth2/"
+# if os.environ['FLASK_ENV'] == 'development':
+#     print("Jobscience running in development")
+#     CLIENT_ID = os.environ['JOBSCIENCE_SANDBOX_CLIENT_ID']
+#     CLIENT_SECRET = os.environ['JOBSCIENCE_SANDBOX_CLIENT_SECRET']
+#     BASE_URL = "https://prsjobs--jsfull.cs83.my.salesforce.com/services/data/v46.0/"
+#     BASE_URL_LOGIN = "https://test.salesforce.com/services/oauth2/"
 
-else:
-    print("Jobscience running in production")
-    CLIENT_ID = os.environ['JOBSCIENCE_CLIENT_ID']
-    CLIENT_SECRET = os.environ['JOBSCIENCE_CLIENT_SECRET']
-    BASE_URL = "https://prsjobs.cs83.my.salesforce.com/services/data/v46.0/"
-    BASE_URL_LOGIN = "https://login.salesforce.com/services/oauth2/"
+# else:
+# print("Jobscience running in production")
+CLIENT_ID = os.environ['JOBSCIENCE_CLIENT_ID']
+CLIENT_SECRET = os.environ['JOBSCIENCE_CLIENT_SECRET']
+BASE_URL = "https://prsjobs.cs83.my.salesforce.com/services/data/v46.0/"
+BASE_URL_LOGIN = "https://login.salesforce.com/services/oauth2/"
 
 
 # TODO CHECKLIST:

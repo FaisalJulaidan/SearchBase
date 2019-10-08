@@ -3,15 +3,18 @@ import ReactDOM from 'react-dom';
 import './index.less';
 import App from './App';
 import * as serviceWorker from './serviceWorker';
-import { Router } from 'react-router-dom';
-import { Provider } from 'react-redux';
+import {Router} from 'react-router-dom';
+import {Provider} from 'react-redux';
 import {history} from './helpers'
 
-import { store, persistor} from './store/store'
-import { PersistGate } from 'redux-persist/integration/react'
+import {StripeProvider} from 'react-stripe-elements';
+
+import {store, persistor} from './store/store'
+import {PersistGate} from 'redux-persist/integration/react'
 
 
 const app = (
+    <StripeProvider apiKey="pk_test_12345">
         <Provider store={store}>
             <PersistGate loading={null} persistor={persistor}>
                 <Router history={history}>
@@ -19,6 +22,7 @@ const app = (
                 </Router>
             </PersistGate>
         </Provider>
+    </StripeProvider>
 );
 
 ReactDOM.render(app, document.getElementById('root'));

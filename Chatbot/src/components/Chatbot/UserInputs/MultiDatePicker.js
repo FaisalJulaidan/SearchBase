@@ -5,43 +5,38 @@ import * as flowAttributes from '../../../constants/FlowAttributes';
 // Styles
 import './styles/Inputs.css';
 // Components
-import { DatePicker as AntdDatePicker } from 'antd';
+import { DatePicker as AntdDatePicker, Tooltip } from 'antd';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTelegramPlane } from '@fortawesome/free-brands-svg-icons';
 import { getContainerElement } from '../../helpers';
 
-
-const addClasses = (date, start, end) => {
-    let startCheck = date.isSame(start, 'date');
-    let endCheck = date.isSame(end, 'date');
-    let firstRangeItem = date.isSame(start.clone().add(1, 'days'), 'date');
-    let lastRangeItem = date.isSame(end.clone().subtract(1, 'days'), 'date');
-
-    let className = '';
-    className += startCheck ? ' start' : ''; // start of range
-    className += endCheck ? ' end' : '';  // end of range
-    className += firstRangeItem ? ' range-start' : ''; // start of range
-    className += lastRangeItem ? ' range-end' : '';  // end of range
-    className += (date.isBetween(start, end) || date.isBetween(end, start)) && !endCheck && !startCheck ? ' range' : ''; // in range
-
-    return className;
-};
-
 const MultiDatePicker = ({ message, submitMessage }) => {
+
+    const addClasses = (date, start, end, temp) => {
+        let startCheck = date.isSame(start, 'date');
+        let endCheck = date.isSame(end, 'date');
+        let firstRangeItem = date.isSame(start.clone().add(1, 'days'), 'date');
+        let lastRangeItem = date.isSame(end.clone().subtract(1, 'days'), 'date');
+
+        let className = '';
+        className += startCheck ? ' begin' : ''; // start of range
+        className += endCheck ? ' finish' : '';  // end of range
+        className += firstRangeItem ? ' range-start' : ''; // start of range
+        className += lastRangeItem ? ' range-end' : '';  // end of range
+        className += temp ? ' temp' : '';
+        className += (date.isBetween(start, end) || date.isBetween(end, start)) && !endCheck && !startCheck ? ' range' : ''; // in range
+
+        return className;
+    };
 
     let [selectedDates, setSelectedDates] = useState({ individual: [], range: [] });
     let [temporaryRange, setTemporaryRange] = useState({ start: null, end: null, reverse: false });
     let [mouseDown, setMouseDown] = useState(null);
     let [open, setOpen] = useState(false);
-    const { block } = message;
-    const { Content } = block;
 
     useEffect(() => {
-        console.log(Content);
-
         function checkValidParent(e) {
             let valid = false;
-
             e.path.forEach(node => {
                 if (node.classList) {
                     if (node.classList.contains('DatepickerCalendar')) {
@@ -49,18 +44,104 @@ const MultiDatePicker = ({ message, submitMessage }) => {
                     }
                 }
             });
-
             if (!valid && open) {
                 setOpen(false);
             }
         }
 
         if (open) {
+            console.log('called');
             window.addEventListener('click', checkValidParent);
         }
 
         return () => window.removeEventListener('click', checkValidParent);
-    }, [setOpen, open]);
+
+    }, [open]);
+
+    const renderDate = (curDate, today) => {
+        const dateMouseOver = (e, date) => {
+            if (temporaryRange.start) {
+                if (!temporaryRange.start.isAfter(date) && !temporaryRange.reverse) {
+                    setTemporaryRange(obj => ({ ...obj, end: date, reverse: false }));
+                } else if (!temporaryRange.reverse) {
+                    setTemporaryRange(obj => ({ end: obj.start, start: date, reverse: true }));
+                } else {
+                    setTemporaryRange(obj => ({ ...obj, start: date, reverse: true }));
+                }
+            }
+        };
+
+        const dateMouseDown = (e, date) => {
+            setMouseDown(date);
+
+            if (e.target.classList.contains('delete-range'))
+                return false;
+
+            if (temporaryRange.start) {
+                // click same day
+                let dates = Object.assign({}, selectedDates);
+                let first = temporaryRange.start.isAfter(temporaryRange.end); // start is after date
+                let compare = temporaryRange.reverse ? temporaryRange.end : temporaryRange.start;
+                if (Math.abs(date.diff(compare, 'hours')) < 24) {
+                    dates.individual = individualCheck(date) ? [...dates.individual, date] : dates.individual;
+                } else {
+                    let range = first ? [temporaryRange.end, temporaryRange.start] : [temporaryRange.start, temporaryRange.end];
+                    dates.range = rangeCheck(range) ? [...dates.range, range] : dates.range;
+                }
+                setSelectedDates(dates);
+                setTemporaryRange({ start: null, end: null, reverse: false });
+            } else {
+                setTemporaryRange({ start: date, end: null, reverse: false });
+            }
+            setOpen(true);
+        };
+
+        let className = 'antd-date-multi';
+        className += curDate.isSame(today, 'month') ? '' : ' fade';
+
+        if (temporaryRange.start && temporaryRange.end)
+            className += addClasses(curDate, temporaryRange.start, temporaryRange.end, true);
+
+        if (selectedDates.range.length !== 0)
+            for (let dateRange in selectedDates.range) {
+                className += addClasses(curDate, selectedDates.range[dateRange][0], selectedDates.range[dateRange][1], false);
+            }
+
+        for (let date in selectedDates.individual)
+            if (Math.abs(selectedDates.individual[date].diff(curDate, 'hours')) < 23) {
+                className += ' selected individual finish';
+            }
+
+        let closeIcon = className.indexOf('finish') !== -1 && className.indexOf('temp') === -1;
+        let element = (<div className={className}><span>{curDate.format('D')}</span>{closeIcon ?
+            <span className="delete-range" onClick={() => deleteRange(curDate)}></span> : null}</div>);
+
+        return (
+            React.cloneElement(element, {
+                onMouseDown: e => dateMouseDown(e, curDate),
+                onMouseOver: e => dateMouseOver(e, curDate),
+                onMouseUp: () => {
+                    if (mouseDown)
+                        setMouseDown(null);
+                }
+            })
+        );
+    };
+
+    const deleteRange = (startDate) => {
+        let dates = Object.assign({}, selectedDates);
+        for (let date in selectedDates.range) {
+            if (startDate.isSame(selectedDates.range[date][1], 'date')) {
+                dates.range.splice(date, 1);
+            }
+        }
+        for (let date in selectedDates.individual) {
+            if (startDate.isSame(selectedDates.individual[date], 'date')) {
+                dates.individual.splice(date, 1);
+            }
+        }
+        setSelectedDates(dates);
+    };
 
     const individualCheck = date => {
         let valid = true;
@@ -79,7 +160,6 @@ const MultiDatePicker = ({ message, submitMessage }) => {
 
     const rangeCheck = rangeIn => {
         let valid = true;
-
         selectedDates.range.forEach(range => {
             // shorten this maybe lol
             if (rangeIn[0].isBetween(range[0], range[1]) || rangeIn[0].isSame(range[0], 'date') || rangeIn[0].isSame(range[1], 'date')
@@ -89,34 +169,27 @@ const MultiDatePicker = ({ message, submitMessage }) => {
                 valid = false;
             }
         });
-
         selectedDates.individual.forEach(ind => {
-            if (ind.isBetween(rangeIn[0], rangeIn[1]) ||
-                ind.isSame(rangeIn[0], 'date') ||
-                ind.isSame(rangeIn[1], 'date')) {
+            if (ind.isBetween(rangeIn[0], rangeIn[1]) || ind.isSame(rangeIn[0], 'date') || ind.isSame(rangeIn[1], 'date')) {
                 valid = false;
             }
         });
-
         return valid;
     };
 
-    const selectedDatesToString = () => {
-        let str = '';
-
-        selectedDates.individual.forEach(ind => {
-            str += `${ind.format('L')}, `;
-        });
-
-        selectedDates.range.forEach(range => {
-            str += `${range[0].format('L')}-${range[1].format('L')}, `;
-        });
-
-        return str.substr(0, str.length - 1);
-    };
-
-    const inputOnChangeHandler = () => {
+    const submitDates = () => {
         let text;
+        const selectedDatesToString = () => {
+            let str = '';
+            selectedDates.individual.forEach(ind => {
+                str += `[${ind.format('L')}], `;
+            });
+            selectedDates.range.forEach(range => {
+                str += `[${range[0].format('L')}->${range[1].format('L')}], `;
+            });
+            return str.substr(0, str.length - 1);
+        };
+
         if (selectedDates)
             text = selectedDatesToString();
 
@@ -137,93 +210,23 @@ const MultiDatePicker = ({ message, submitMessage }) => {
 
     };
 
-    const renderDate = (curDate, today) => {
-        const addEventHandlers = (element, date) => {
-            const dateMouseUp = () => {
-                if (mouseDown) {
-                    setMouseDown(null);
-                    // setOpen(false)
-                }
-            };
-            const dateMouseOver = (e, date) => {
-                if (temporaryRange.start) {
-                    if (!temporaryRange.start.isAfter(date) && !temporaryRange.reverse) {
-                        setTemporaryRange(obj => ({ ...obj, end: date, reverse: false }));
-                    } else if (!temporaryRange.reverse) {
-                        setTemporaryRange(obj => ({ end: obj.start, start: date, reverse: true }));
-                    } else {
-                        setTemporaryRange(obj => ({ ...obj, start: date, reverse: true }));
-                    }
-                }
-            };
-            const dateMouseDown = (e, date) => {
-                setMouseDown(date);
-                if (temporaryRange.start) {
-                    // click same day
-                    let dates = Object.assign({}, selectedDates);
-                    let first = temporaryRange.start.isAfter(temporaryRange.end); // start is after date
-                    let compare = temporaryRange.reverse ? temporaryRange.end : temporaryRange.start;
-
-                    if (Math.abs(date.diff(compare, 'hours')) < 24) {
-                        dates.individual = individualCheck(date) ? [...dates.individual, date] : dates.individual;
-                    } else {
-                        let range = first ? [temporaryRange.end, temporaryRange.start] : [temporaryRange.start, temporaryRange.end];
-                        dates.range = rangeCheck(range) ? [...dates.range, range] : dates.range;
-                    }
-
-                    setSelectedDates(dates);
-                    setTemporaryRange({ start: null, end: null, reverse: false });
-                } else {
-                    setTemporaryRange({ start: date, end: null, reverse: false });
-                }
-                setOpen(true);
-            };
-
-            return React.cloneElement(element, {
-                onMouseDown: e => dateMouseDown(e, date),
-                onMouseOver: e => dateMouseOver(e, date),
-                onMouseUp: e => dateMouseUp(e, date)
-            });
-        };
-
-        let className = 'antd-date-multi';
-        className += curDate.isSame(today, 'month') ? '' : ' fade';
-        let element;
-        if (temporaryRange.start && temporaryRange.end) {
-            className += addClasses(curDate, temporaryRange.start, temporaryRange.end);
-        }
-
-        if (selectedDates.range.length !== 0) {
-            for (let dateRange in selectedDates.range) {
-                className += addClasses(curDate, selectedDates.range[dateRange][0], selectedDates.range[dateRange][1]);
-            }
-        }
-
-        for (let date in selectedDates.individual) {
-            if (Math.abs(selectedDates.individual[date].diff(curDate, 'hours')) < 23) {
-                className += ' selected';
-            }
-        }
-
-        element = (<div className={className}><span>{curDate.format('D')}</span></div>);
-        return addEventHandlers(element, curDate);
-    };
-
     return (
         <React.Fragment>
 
             <div className={'DatePickerContainer'} onClick={() => setOpen(true)}>
-                <AntdDatePicker getCalendarContainer={() => getContainerElement()}
-                                className={'Datepicker'}
-                                suffixIcon={<div/>}
-                                dropdownClassName={'DatepickerCalendar'}
-                                showToday={false}
-                                dateRender={renderDate}
-                                open={open}/>
+                <Tooltip title={'lofl'} visible={open}
+                         getTooltipContainer={() => getContainerElement()}>
+                    <AntdDatePicker className={'Datepicker'} suffixIcon={<div/>}
+                                    getCalendarContainer={() => getContainerElement()}
+                                    dropdownClassName={'DatepickerCalendar'}
+                                    showToday={false}
+                                    dateRender={renderDate}
+                                    open={open}/>
+                </Tooltip>
             </div>
 
             <div className={'Submit'}>
-                <i className={'SendIconActive'} onClick={inputOnChangeHandler}>
+                <i className={'SendIconActive'} onClick={submitDates}>
                     <FontAwesomeIcon size="2x" icon={faTelegramPlane}/>
                 </i>
             </div>

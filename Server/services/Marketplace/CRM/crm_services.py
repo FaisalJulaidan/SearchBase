@@ -8,6 +8,7 @@ from utilities.enums import CRM, UserType, DataType, Period, DataType as DT
 
 
 def processConversation(assistant: Assistant, conversation: Conversation) -> Callback:
+    print("Should be processing the conversation")
     # Insert base on userType
     if conversation.UserType is UserType.Candidate:
         return insertCandidate(assistant, conversation)
@@ -111,12 +112,15 @@ def insertClient(assistant: Assistant, conversation: Conversation):
 
 def updateCandidate(details, conversation, companyID):
     crm_callback: Callback = getByID(details["source_id"], companyID)
+
     if not crm_callback.Success:
+
         return crm_callback
 
     crm_type = crm_callback.Data.Type
 
-    if crm_type is not CRM.Bullhorn:
+    if crm_type not in [CRM.Bullhorn, CRM.Jobscience]:
+
         return Callback(False, "CRM " + crm_type.value + " is not allowed for updating")
 
     name = (conversation.Name or " ").split(" ")
@@ -171,7 +175,7 @@ def updateCandidate(details, conversation, companyID):
 
 
 def uploadFile(assistant: Assistant, storedFile: StoredFile):
-    print("IN CRM_SERVICES...")
+
     crm_type = assistant.CRM.Type
     if CRM.has_value(crm_type.value):
         if crm_type is CRM.Jobscience or crm_type is CRM.Mercury:
@@ -237,7 +241,6 @@ def searchCandidatesCustom(crm, companyID, candidate_data, perfect=False):
 
 
 def searchJobs(assistant: Assistant, session):
-    print("NOW WE ARE HERE:")
     data = {
         "jobTitle": __checkFilter(session['keywordsByDataType'], DT.JobTitle) or
                     __checkFilter(session['keywordsByDataType'], DT.CandidateJobTitle),
@@ -250,8 +253,6 @@ def searchJobs(assistant: Assistant, session):
         # "endDate": checkFilter(session['keywordsByDataType'], DT.JobEndDate),
         "yearsRequired": __checkFilter(session['keywordsByDataType'], DT.JobYearsRequired),
     }
-
-    print("WE GOT TO HERE:")
 
     crm_type = assistant.CRM.Type
     if CRM.has_value(crm_type.value):
@@ -269,7 +270,7 @@ def searchJobs(assistant: Assistant, session):
 
 # private helper function
 def __checkFilter(keywords, dataType: DT):
-    print("FILTERING...")
+
     if keywords.get(dataType.value["name"]):
         return " ".join(keywords[dataType.value["name"]])
     return None
@@ -372,8 +373,13 @@ def disconnectByID(crmID, companyID) -> Callback:
 
 def logoutOfCRM(auth, crm_type, companyID) -> Callback:
     try:
-        if crm_type == CRM.Bullhorn:
+
+        if crm_type == CRM.Bullhorn: # Need to change this?
             return Bullhorn.logout(auth, companyID)
+
+        elif crm_type == "Jobscience":
+            return Jobscience.logout(auth, companyID)
+
 
         return Callback(False, 'Logout failed')
 

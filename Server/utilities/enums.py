@@ -196,22 +196,14 @@ class DataType(Enum):
         [UserType.Unknown],
         [BlockType.UserInput, BlockType.Question, BlockType.FileUpload, BlockType.UserType])
 
-    AvailabilityDate = dataTypeCreator(
-        'User Availability Date',
-        'UserAvailabilityDate',
-        ValidationType.DateTime,
-        DataTypeSection.NoType,
-        [UserType.Candidate, UserType.Client],
-        [BlockType.DatePicker])
-
-    # TODO DELETE MIGRATE FIND_USAGES => NO NEED, USE (UserAvailabilityDate)
+    # TODO  MIGRATE
     CandidateAvailability =  dataTypeCreator(
         'Candidate Availability',
         'CandidateAvailability',
         ValidationType.DateTime,
         DataTypeSection.Candidate,
         [UserType.Candidate, UserType.Client],
-        [BlockType.UserInput])
+        [BlockType.DatePicker])
 
     # Candidate
     CandidateName = dataTypeCreator(
@@ -447,6 +439,14 @@ class DataType(Enum):
         [UserType.Client] * 6,
         [BlockType.UserInput])
 
+    ClientAvailability =  dataTypeCreator(
+        'Client Availability',
+        'ClientAvailability',
+        ValidationType.DateTime,
+        DataTypeSection.Client,
+        [UserType.Client],
+        [BlockType.DatePicker])
+
     # ======================================================================
     # Job
 
@@ -466,6 +466,7 @@ class DataType(Enum):
         [UserType.Candidate, UserType.Client],
         [BlockType.UserInput, BlockType.Question])
 
+    # TODO MIGRATE
     JobType = dataTypeCreator(
         'Job Type',
         'JobType',
@@ -482,6 +483,7 @@ class DataType(Enum):
         [UserType.Candidate, UserType.Client],
         [BlockType.UserInput, BlockType.Question])
 
+    # TODO MIGRATE
     JobSalary = dataTypeCreator(
         'Job Salary',
         'JobSalary',

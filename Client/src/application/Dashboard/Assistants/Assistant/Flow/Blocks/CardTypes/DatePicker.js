@@ -113,8 +113,7 @@ class DatePicker extends Component {
                         })(
                             <Radio.Group>
                                 <Radio value="Exact">Exact</Radio>
-                                <Radio value="Range">Range</Radio>
-                                <Radio value="Both">Both</Radio>
+                                <Radio value="Multiple">Multiple</Radio>
                             </Radio.Group>
                         )}
                     </FormItem>

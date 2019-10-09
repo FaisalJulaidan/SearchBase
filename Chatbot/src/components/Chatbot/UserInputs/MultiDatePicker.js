@@ -8,33 +8,74 @@ import './styles/Inputs.css';
 import { DatePicker as AntdDatePicker } from 'antd';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTelegramPlane } from '@fortawesome/free-brands-svg-icons';
+import { ETIME } from 'constants';
+
 import { getContainerElement } from '../../helpers';
 
 
-const addClasses = (date, start, end) => {
+const addClasses = (date, start, end, temp) => {
     let startCheck = date.isSame(start, 'date');
     let endCheck = date.isSame(end, 'date');
     let firstRangeItem = date.isSame(start.clone().add(1, 'days'), 'date');
     let lastRangeItem = date.isSame(end.clone().subtract(1, 'days'), 'date');
 
     let className = '';
-    className += startCheck ? ' start' : ''; // start of range
-    className += endCheck ? ' end' : '';  // end of range
+    className += startCheck ? ' begin' : ''; // start of range
+    className += endCheck ? ' finish' : '';  // end of range
     className += firstRangeItem ? ' range-start' : ''; // start of range
     className += lastRangeItem ? ' range-end' : '';  // end of range
+        className += temp ? ' temp' : '';
     className += (date.isBetween(start, end) || date.isBetween(end, start)) && !endCheck && !startCheck ? ' range' : ''; // in range
 
     return className;
 };
 
-const MultiDatePicker = ({ message, submitMessage }) => {
+    const renderDate = (curDate, today) => {
+        let className = 'antd-date-multi';
+        className += curDate.isSame(today, 'month') ? '' : ' fade';
+        let element;
+        if (temporaryRange.start && temporaryRange.end) {
+            className += addClasses(curDate, temporaryRange.start, temporaryRange.end, true);
+        }
 
-    let [selectedDates, setSelectedDates] = useState({ individual: [], range: [] });
-    let [temporaryRange, setTemporaryRange] = useState({ start: null, end: null, reverse: false });
-    let [mouseDown, setMouseDown] = useState(null);
-    let [open, setOpen] = useState(false);
-    const { block } = message;
-    const { Content } = block;
+        if (selectedDates.range.length !== 0) {
+            for (let dateRange in selectedDates.range) {
+                className += addClasses(curDate, selectedDates.range[dateRange][0], selectedDates.range[dateRange][1], false);
+            }
+        }
+
+        for (let date in selectedDates.individual) {
+            if (Math.abs(selectedDates.individual[date].diff(curDate, 'hours')) < 23) {
+                className += ' selected individual finish';
+            }
+        }
+        let closeIcon = className.indexOf("finish") !== -1 && className.indexOf("temp") === -1 ? true : false
+        element = (<div className={className}><span>{curDate.format('D')}</span>{closeIcon ? <span className="delete-range" onClick={() => deleteRange(curDate)}></span> : null}</div>);
+        return addEventHandlers(element, curDate);
+    };
+
+    const deleteRange = (startDate) => {
+      let dates = Object.assign({}, selectedDates)
+      for(let date in selectedDates.range){
+        if(startDate.isSame(selectedDates.range[date][1], 'date')){
+          dates.range.splice(date, 1)
+        }
+      }
+      for(let date in selectedDates.individual){
+        if(startDate.isSame(selectedDates.individual[date], 'date')){
+          dates.individual.splice(date, 1)
+        }
+      }
+      setSelectedDates(dates)
+    }
+
+    const addEventHandlers = (element, date) => {
+        return React.cloneElement(element, {
+            onMouseDown: e => dateMouseDown(e, date),
+            onMouseOver: e => dateMouseOver(e, date),
+            onMouseUp: e => dateMouseUp(e, date)
+        });
+    };
 
     useEffect(() => {
         console.log(Content);
@@ -61,6 +102,31 @@ const MultiDatePicker = ({ message, submitMessage }) => {
 
         return () => window.removeEventListener('click', checkValidParent);
     }, [setOpen, open]);
+
+
+    const dateMouseDown = (e, date) => {
+        setMouseDown(date);
+        if(e.target.classList.contains("delete-range")){
+          return false;
+        }
+        if (temporaryRange.start) {
+            // click same day
+            let dates = Object.assign({}, selectedDates);
+            let first = temporaryRange.start.isAfter(temporaryRange.end); // start is after date
+            let compare = temporaryRange.reverse ? temporaryRange.end : temporaryRange.start;
+            if (Math.abs(date.diff(compare, 'hours')) < 24) {
+                dates.individual = individualCheck(date) ? [...dates.individual, date] : dates.individual;
+            } else {
+                let range = first ? [temporaryRange.end, temporaryRange.start] : [temporaryRange.start, temporaryRange.end];
+                dates.range = rangeCheck(range) ? [...dates.range, range] : dates.range;
+            }
+            setSelectedDates(dates);
+            setTemporaryRange({ start: null, end: null, reverse: false });
+        } else {
+            setTemporaryRange({ start: date, end: null, reverse: false });
+        }
+        setOpen(true);
+    };
 
     const individualCheck = date => {
         let valid = true;
@@ -213,6 +279,12 @@ const MultiDatePicker = ({ message, submitMessage }) => {
         <React.Fragment>
 
             <div className={'DatePickerContainer'} onClick={() => setOpen(true)}>
+                <Tooltip title={'lofl'} visible={open} getTooltipContainer={() => {
+                        if (document.getElementById('TheSearchBase_Chatbot_Input'))
+                            return document.getElementById('TheSearchBase_Chatbot_Input');
+                        else
+                            return document.getElementById('TheSearchBase_Chatbot');
+                    }}>
                 <AntdDatePicker getCalendarContainer={() => getContainerElement()}
                                 className={'Datepicker'}
                                 suffixIcon={<div/>}
@@ -220,6 +292,7 @@ const MultiDatePicker = ({ message, submitMessage }) => {
                                 showToday={false}
                                 dateRender={renderDate}
                                 open={open}/>
+                </Tooltip>
             </div>
 
             <div className={'Submit'}>

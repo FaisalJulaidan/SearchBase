@@ -5,15 +5,15 @@ from datetime import datetime
 from typing import List
 
 import pandas
+from sqlalchemy import and_
+from sqlalchemy_utils import Currency
 
-from services.Marketplace.marketplace_helpers import convertSkillsToString
-from utilities.enums import DatabaseType, DataType as DT
 from models import db, Callback, Database, Candidate, Assistant, Job
 from services import assistant_services
 from services.Marketplace.CRM import crm_services
-from sqlalchemy import and_
-from sqlalchemy_utils import Currency
+from services.Marketplace.marketplace_helpers import convertSkillsToString
 from utilities import helpers
+from utilities.enums import DatabaseType, DataType as DT
 
 
 def fetchDatabase(id, companyID: int, pageNumber: int) -> Callback:
@@ -172,6 +172,68 @@ def getJob(jobID):
         return Callback(False, 'Could not retrieve the job.')
 
 
+def updateCandidate(candidateID, conversation) -> Callback:
+    try:
+        candidate = db.session.query(Candidate) \
+            .filter(Candidate.ID == candidateID).first()
+        if not candidate: raise Exception
+
+        data = {
+            "name": conversation.Name or " ",
+            "firstName": helpers.getListValue(conversation.Name, 0, " "),
+            "lastName": helpers.getListValue(conversation.Name, 1, " "),
+            "mobile": conversation.PhoneNumber or " ",
+            "city": ", ".join(
+                conversation.Data.get('keywordsByDataType').get(DT.CandidateLocation.value['name']) or
+                conversation.Data.get('keywordsByDataType').get(DT.JobLocation.value['name'], [])),
+            "email": conversation.Email or " ",
+
+            "skills": ", ".join(
+                conversation.Data.get('keywordsByDataType').get(DT.CandidateSkills.value['name'], ) or
+                conversation.Data.get('keywordsByDataType').get(DT.JobEssentialSkills.value['name'], [])) or None,
+            "yearsExperience": ", ".join(
+                conversation.Data.get('keywordsByDataType').get(DT.CandidateYearsExperience.value['name']) or
+                conversation.Data.get('keywordsByDataType').get(DT.JobYearsRequired.value['name'], [])) or None,
+            "preferredJobTitle": ", ".join(
+                conversation.Data.get('keywordsByDataType').get(DT.JobTitle.value['name'], [])) or None,
+
+            "educations": ", ".join(conversation.Data.get('keywordsByDataType').get(DT.CandidateEducation.value['name'],
+                                                                                    [])) or None,
+            "availability": ", ".join(
+                conversation.Data.get('keywordsByDataType').get(DT.CandidateAvailability.value['name'], [])) or None,
+
+            "annualSalary": crm_services.getSalary(conversation, DT.CandidateAnnualDesiredSalary, "Min") or
+                            crm_services.getSalary(conversation, DT.JobAnnualSalary, "Min"),
+            "dayRate": crm_services.getSalary(conversation, DT.CandidateDailyDesiredSalary, "Min") or
+                       crm_services.getSalary(conversation, DT.JobDayRate, "Min")
+        }
+
+        for key, value in data.items():
+            if type(value) is str:
+                data[key] = value.strip()
+
+        candidate.CandidateName = data.get("name") or candidate.CandidateName
+        candidate.CandidateMobile = data.get("mobile") or candidate.CandidateMobile
+        candidate.CandidateLocation = data.get("city") or candidate.CandidateLocation
+        candidate.CandidateEmail = data.get("email") or candidate.CandidateEmail
+        candidate.CandidateSkills = data.get("skills") or candidate.CandidateSkills
+        candidate.CandidateYearsExperience = data.get("yearsExperience") or candidate.CandidateYearsExperience
+        candidate.CandidateJobTitle = data.get("preferredJobTitle") or candidate.CandidateJobTitle
+        candidate.CandidateEducation = data.get("educations") or candidate.CandidateEducation
+        candidate.CandidateAvailability = data.get("availability") or candidate.CandidateAvailability
+        candidate.CandidateDesiredSalary = data.get("annualSalary") or data.get("dayRate") \
+                                           or candidate.CandidateDesiredSalary
+
+        db.session.commit()
+
+        return Callback(True, "Candidate has been updated")
+
+    except Exception as exc:
+        db.session.rollback()
+        helpers.logError(exc)
+        return Callback(False, "Candidate could not be updated")
+
+
 # Get All
 def getAllCandidates(dbID, page) -> dict:
     try:
@@ -296,7 +358,8 @@ def scanCandidates(session, dbIDs, extraCandidates=None, campaign=False):
             return Callback(True, '', [])
 
         # Fill None values with 0 for numeric columns and with empty string for string columns
-        df = df.fillna({Candidate.CandidateDesiredSalary.name: 0, Candidate.CandidateYearsExperience.name: 0}).fillna('')
+        df = df.fillna({Candidate.CandidateDesiredSalary.name: 0, Candidate.CandidateYearsExperience.name: 0}).fillna(
+            '')
 
         # Salary comparision for JobSalary (LessThan is forced)
         salaryInputs: list = keywords.get(DT.JobAnnualSalary.value['name'], keywords.get(DT.JobDayRate.value['name']))
@@ -414,7 +477,6 @@ def scanJobs(session, dbIDs, extraJobs=None):
         if not len(df):
             return Callback(True, '', [])
 
-
         # Fill None values with 0 for numeric columns and with empty string for string columns
         df = df.fillna({Job.JobSalary.name: 0, Job.JobYearsRequired.name: 0}).fillna('')
 
@@ -422,8 +484,8 @@ def scanJobs(session, dbIDs, extraJobs=None):
         salaryInputs: list = \
             keywords.get(DT.JobAnnualSalary.value['name'],
                          keywords.get(DT.JobDayRate.value['name'],
-                            keywords.get(DT.CandidateAnnualDesiredSalary.value['name'],
-                                keywords.get(DT.CandidateDailyDesiredSalary.value['name']))))
+                                      keywords.get(DT.CandidateAnnualDesiredSalary.value['name'],
+                                                   keywords.get(DT.CandidateDailyDesiredSalary.value['name']))))
 
         if salaryInputs:
             df[['Score', Job.JobSalary.name, Job.Currency.name]] = \
@@ -548,7 +610,6 @@ def __salary(row, dbSalaryColumn, dbCurrencyColumn, salaryInput: str, plus=4, fo
     # Convert db salary currency if did not match with user's entered currency
     dbSalary = row[dbSalaryColumn.name] or 0
     if (row[dbCurrencyColumn.name] != userSalary[1]) and dbSalary > 0:
-
         dbSalary = helpers.currencyConverter.convert(row[dbCurrencyColumn.name], userSalary[1], dbSalary)
         row[dbSalaryColumn.name] = dbSalary
 

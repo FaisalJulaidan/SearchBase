@@ -251,8 +251,28 @@ class DataType(Enum):
         'CandidateCV',
         ValidationType.Ignore,
         DataTypeSection.Candidate,
-        [UserType.Candidate],
-        [BlockType.FileUpload])
+        [UserType.Candidate])
+
+    CandidateAvailability = dataTypeCreator(
+        'Candidate Availability',
+        'CandidateAvailability',
+        ValidationType.String,
+        DataTypeSection.Candidate,
+        [UserType.Candidate])
+
+    CandidateAvailableFrom = dataTypeCreator(
+        'Candidate Available From',
+        'CandidateAvailableFrom',
+        ValidationType.DateTime,
+        DataTypeSection.Candidate,
+        [UserType.Candidate])
+
+    CandidateAvailableTo = dataTypeCreator(
+        'Candidate Available To',
+        'CandidateAvailableTo',
+        ValidationType.DateTime,
+        DataTypeSection.Candidate,
+        [UserType.Candidate])
 
     CandidateLocation = dataTypeCreator(
         'Candidate Location',

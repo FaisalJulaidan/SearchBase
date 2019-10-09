@@ -14,6 +14,44 @@ from typing import List
 import boto3
 from botocore.exceptions import ClientError
 
+salaryPicker = {
+    "min": 100,
+    "max": 200,
+    "period": "Annually",
+    "currency": "GBP",
+}
+
+jobType = {
+    "types": [
+        {
+            "value": "Permanent",
+            "text": "Permanent",
+        },
+        {
+            "value": "Contract",
+            "text": "Contract",
+        }
+    ]
+}
+
+datePicker = {
+    "type": "Range",
+}
+
+userType = {
+    "text": "User Type",
+    "types": [
+        {
+            "value": "Candidate",
+            "text": "Candidate",
+        },
+        {
+            "value": "Client",
+            "text": "Client",
+        }
+    ]
+}
+
 
 # NOTE: Make sure to take a backup of the database before running these functions
 # =============================================================================
@@ -52,12 +90,13 @@ def cleanStoredFiles():
 
 def migrateConversations():
     try:
-        for conversation in db.session.query(Conversation).options(joinedload('StoredFile').joinedload("StoredFileInfo")).all():
+        for conversation in db.session.query(Conversation).options(
+                joinedload('StoredFile').joinedload("StoredFileInfo")).all():
             counter = 0
             storedFile = conversation.StoredFile
             if storedFile:
                 # print(storedFile.StoredFileInfo)
-                newData = copy.deepcopy(conversation.Data) # deep clone is IMPORTANT
+                newData = copy.deepcopy(conversation.Data)  # deep clone is IMPORTANT
                 for cd in newData['collectedData']:
                     if cd['input'] == "&FILE_UPLOAD&":
                         cd["fileName"] = storedFile.StoredFileInfo[counter].FilePath
@@ -101,9 +140,9 @@ def migrateFlowTemplates():
         directory = join(BaseConfig.APP_ROOT, 'static/assistant_templates')
         for filename in os.listdir(directory):
             if filename.endswith(".json"):
-                jsonFile = open(directory+'/'+filename, 'r') # Open the JSON file for reading
-                flow = json.load(jsonFile) # Read the JSON into the buffer
-                jsonFile.close() # Close the JSON file
+                jsonFile = open(directory + '/' + filename, 'r')  # Open the JSON file for reading
+                flow = json.load(jsonFile)  # Read the JSON into the buffer
+                jsonFile.close()  # Close the JSON file
 
                 # Migrate
                 newFlow = __migrateFlow(flow)
@@ -111,7 +150,7 @@ def migrateFlowTemplates():
                     raise Exception(filename + ' failed')
 
                 ## Save our changes to JSON file
-                jsonFile = open(directory+'/'+filename, "w+")
+                jsonFile = open(directory + '/' + filename, "w+")
                 jsonFile.write(json.dumps(newFlow))
                 jsonFile.close()
                 continue
@@ -127,12 +166,12 @@ def migrateFlowTemplates():
 
 def __migrateFlow(flow):
     try:
-        newFlow = copy.deepcopy(flow) # deep clone is IMPORTANT
-        for group in newFlow['groups']: # loop groups
-            for block in group['blocks']: # loop blocks
+        newFlow = copy.deepcopy(flow)  # deep clone is IMPORTANT
+        for group in newFlow['groups']:  # loop groups
+            for block in group['blocks']:  # loop blocks
 
-                if block['DataType'] == "JobDesiredSkills":
-                    block['DataType'] = enums.DataType.JobEssentialSkills.name
+                if block['DataType'] in ["CandidateAvailableFrom", "CandidateAvailableTo"]:
+                    pass
 
                 if block['Type'] == enums.BlockType.Question.value:
                     pass
@@ -157,6 +196,6 @@ def __migrateFlow(flow):
         return newFlow
 
     except Exception as exc:
-        # print(exc.args)
+        print(exc.args)
         print("Flow migration failed :(")
         return None

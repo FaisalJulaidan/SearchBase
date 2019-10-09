@@ -170,7 +170,7 @@ SalaryPicker = {
         "action": {"enum": [e.value for e in enums.BlockAction]},
         "afterMessage": {"type": "string"},
     },
-    "required": ["text", "min", "max", "period", "currency", "action", "blockToGoID", "afterMessage", ],
+    "required": ["text", "min", "max", "period", "currency", "blockToGoID", "action", "afterMessage",],
     "additionalProperties": False
 }
 
@@ -190,7 +190,7 @@ UserType = {
                     "score": {"type": "integer"},
                     "afterMessage": {"type": "string"},
                 },
-                "required": ["text", "value", "blockToGoID", "action", "afterMessage"],
+                "required": ["text", "value", "blockToGoID", "action", "score", "afterMessage"],
                 "additionalProperties": False
             }
         }
@@ -228,11 +228,11 @@ DatePicker = {
     "type": "object",
     "properties": {
         "text": {"type": "string"},
-        "type": {"enum": ["Range", "Exact", "Both"]},
+        "type": {"enum": ["Exact", "Multiple"]},
         "blockToGoID": {"type": ["string", "null"]},
         "action": {"enum": [e.value for e in enums.BlockAction]},
         "afterMessage": {"type": "string"},
     },
-    "required": ["text", "action", "blockToGoID", "afterMessage"],
+    "required": ["text", "type", "action", "blockToGoID", "afterMessage"],
     "additionalProperties": False
 }

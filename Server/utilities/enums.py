@@ -226,7 +226,7 @@ class DataType(Enum):
     CandidateAvailability = dataTypeCreator(
         'Candidate Availability',
         'CandidateAvailability',
-        ValidationType.String,
+        ValidationType.DateTime,
         DataTypeSection.Candidate,
         [UserType.Candidate])
 

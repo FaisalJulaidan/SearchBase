@@ -143,8 +143,8 @@ def sendQuery(auth, query, method, body, companyID, optionalParams=None):
             if not r.ok:
                 raise Exception(r.text + ". Query could not be sent")
 
-        elif str(r.status_code)[:1] != "2":  # check if error code is in the 200s
-            raise Exception("Rest url for query is incorrect")
+        elif not r.ok:
+            raise Exception("Query failed with error code " + str(r.status_code))
 
         return Callback(True, "Query was successful", r)
 
@@ -306,23 +306,27 @@ def insertCompany(auth, data, companyID) -> Callback:
 
 def searchCandidates(auth, companyID, data) -> Callback:
     try:
-        query = "query="
+        query = "q="
+
+        fields = "fields=id,name,primary_email,mobile,current_address,skill,text,current_salary"
 
         # populate filter
-        query += populateFilter(data.get("location"), "address.city")
+        query += populateFilter(data.get("location"), "current_address")
 
         # if keywords[DT.CandidateSkills.value["name"]]:
-        #     query += "primarySkills.data:" + keywords[DT.CandidateSkills.name] + "&"
+        #     query += "primarySkills.data:" + keywords[DT.CandidateSkills.name] + " or"
 
         query = query[:-3]
 
         # check if no conditions submitted
         if len(query) < 6:
-            query = "query=*:*"
+            query = "query=status:Available"
+        else:
+            query += "&status:Available"
 
         # send query
-        sendQuery_callback: Callback = sendQuery(auth, "search/Candidate", "get", {}, companyID,
-                                                 ["fields=*", query, "count=9999"])
+        sendQuery_callback: Callback = sendQuery(auth, "candidate/search/fl=" + fields, "get", {}, companyID,
+                                                 [])
         if not sendQuery_callback.Success:
             raise Exception(sendQuery_callback.Message)
 

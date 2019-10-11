@@ -3,6 +3,7 @@ version: '3'
 
 volumes:
   prod-data:
+      external: true
 
 services:
   mysql:

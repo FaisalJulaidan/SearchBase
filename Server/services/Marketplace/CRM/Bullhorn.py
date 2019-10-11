@@ -184,7 +184,7 @@ def sendQuery(auth, query, method, body, companyID, optionalParams=None):
                 raise Exception(r.text + ". Query could not be sent")
 
         elif not r.ok:
-            raise Exception("send query failed: ", r.text)
+            raise Exception("Query failed with error code " + str(r.status_code))
 
         return Callback(True, "Query was successful", r)
 

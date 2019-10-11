@@ -212,6 +212,8 @@ def sendCampaign(campaign_details, companyID):
 
             if campaign_details.get("outreach_type") == "sms":
                 messenger_servicess.sendMessage(messenger.Type, candidate_phone, text, messenger.Auth)
+            elif campaign_details.get("outreach_type") == "whatsapp":
+                messenger_servicess.sendMessage(messenger.Type, candidate_phone, text, messenger.Auth, True)
             elif campaign_details.get("outreach_type") == "email":
                 mail_services.simpleSend(candidate_email, campaign_details.get("email_title"), text)
 
@@ -219,4 +221,4 @@ def sendCampaign(campaign_details, companyID):
 
     except Exception as exc:
         helpers.logError("campaign_services.sendCampaign(): " + str(exc))
-        return Callback(False, 'Error while search the database for matches!')
+        return Callback(False, 'Error while sending campaign!')

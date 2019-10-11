@@ -154,7 +154,7 @@
 }
 
 .Input > .InputContainer {
-    width: calc(100% - 80px);
+    width: calc(100% - 60px);
     flex-shrink: 0;
     justify-content: center;
     align-items: center;
@@ -176,6 +176,11 @@
 .SendIconActive {
     color: #1890ff;
     cursor: pointer;
+}
+
+.Input > .Actions {
+    padding-top: 18px;
+    margin-right: 5px;
 }
 
 .Input > .Actions > i.ClipIconActive {

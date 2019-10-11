@@ -165,7 +165,7 @@ SalaryPicker = {
         "min": {"type": "integer", "minimum": 0},
         "max": {"type": "integer", "minimum": 1},
         "period": {"enum": ["Annually", "Daily"]},
-        "currency": {"enum": ['GBP', 'USD', 'EUR', 'CAD']},
+        "currency": {"enum": ['GBP', 'USD', 'EUR', 'CAD', 'AUD']},
         "blockToGoID": {"type": ["string", "null"]},
         "action": {"enum": [e.value for e in enums.BlockAction]},
         "afterMessage": {"type": "string"},
@@ -228,7 +228,7 @@ DatePicker = {
     "type": "object",
     "properties": {
         "text": {"type": "string"},
-        "type": {"enum": ["Exact", "Multiple"]},
+        "type": {"enum": ["Exact", "Range"]},
         "blockToGoID": {"type": ["string", "null"]},
         "action": {"enum": [e.value for e in enums.BlockAction]},
         "afterMessage": {"type": "string"},

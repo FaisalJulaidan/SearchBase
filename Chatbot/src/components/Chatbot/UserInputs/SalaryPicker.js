@@ -11,15 +11,21 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTelegramPlane } from '@fortawesome/free-brands-svg-icons';
 import { getContainerElement } from '../../helpers';
 
-const currencySymbols = { 'GBP': '£', 'USD': '$', 'EUR': '€' };
+const currencySymbols = { 'GBP': '£', 'USD': '$', 'EUR': '€', 'AUD': '$AUD' };
 
-const getDotNotation = (salary, currency) => {
-    return new Intl.NumberFormat('en-GB', { style: 'currency', currency, minimumFractionDigits: 0 }).format(salary);
-};
+const getDotNotation = (salary, currency) => `${currencySymbols[currency]}${new Intl.NumberFormat().format(salary)}`;
 
 const SalaryPicker = ({ message, submitMessage, block_min, block_max, period, currency }) => {
 
-    let [salary, setSalary] = useState([0.3 * block_max, 0.7 * block_max]);
+
+    // initiate salary as:
+    // min: 30% of the total salary
+    // max: 70% of the total salary
+    // so initial salary is between 30% and 70% of the selected salary bar
+    let [salary, setSalary] = useState([
+        block_min + (block_max - block_min) * 0.3,
+        block_min + (block_max - block_min) * 0.7
+    ]);
 
     const submitSalary = () => {
         let afterMessage = message.block[flowAttributes.CONTENT][flowAttributes.CONTENT_AFTER_MESSAGE];
@@ -46,7 +52,7 @@ const SalaryPicker = ({ message, submitMessage, block_min, block_max, period, cu
         setSalary([roundTo25(val[0]), roundTo25(val[1])]);
     };
 
-    const tipFormatter = (val) => `${getDotNotation(val, currency)}`;
+    const tipFormatter = (val) => getDotNotation(val, currency);
 
     return (
         <React.Fragment>

@@ -158,6 +158,7 @@ def sendQuery(auth, query, method, body, companyID, optionalParams=None):
 def buildUrl(rest_data, query, optionalParams=None):
     # set up initial url
     url = "https://" + rest_data.get("domain", "") + ".vincere.io/api/v2/" + query
+
     # add additional params
     if optionalParams:
         url = url + "?"

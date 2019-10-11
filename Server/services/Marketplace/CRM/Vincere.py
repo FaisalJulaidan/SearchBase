@@ -77,42 +77,42 @@ def testConnection(auth, companyID):
 # get auth code, use it to get access token, refresh token and id token
 def retrieveRestToken(auth, companyID):
     try:
-        # authCopy = dict(auth)
-        # headers = {'Content-Type': 'application/x-www-form-urlencoded'}
-        # # check if refresh_token exists
-        # # if it does use it to generate access_token and refresh_token
-        # if authCopy.get("refresh_token"):
-        #     url = "https://id.vincere.io/oauth2/token?"
-        #     body = {
-        #         "grant_type": "refresh_token",
-        #         "refresh_token": authCopy.get("refresh_token"),
-        #         "client_id": client_id
-        #     }
-        #
-        #     get_tokens = requests.post(url, headers=headers, data=body)
-        #
-        #     if get_tokens.ok:
-        #         result_body = json.loads(get_tokens.text)
-        #         authCopy["access_token"] = result_body["access_token"]
-        #         authCopy["id_token"] = result_body["id_token"]
-        #     else:
-        #         raise Exception("CRM not set up properly")
-        # # else if not go through login again with the saved auth
-        # else:
-        #     login_callback: Callback = login(authCopy)
-        #     if not login_callback.Success:
-        #         raise Exception(login_callback.Message)
-        #     authCopy = dict(login_callback.Data)
-        #
-        # saveAuth_callback: Callback = crm_services.updateByType(CRM.Vincere, authCopy, companyID)
-        #
-        # if not saveAuth_callback.Success:
-        #     raise Exception(saveAuth_callback.Message)
-        #
-        # helpers.logError("new id_token: " + str(authCopy.get("id_token")))
+        authCopy = dict(auth)
+        headers = {'Content-Type': 'application/x-www-form-urlencoded'}
+        # check if refresh_token exists
+        # if it does use it to generate access_token and refresh_token
+        if authCopy.get("refresh_token"):
+            url = "https://id.vincere.io/oauth2/token?"
+            body = {
+                "grant_type": "refresh_token",
+                "refresh_token": authCopy.get("refresh_token"),
+                "client_id": client_id
+            }
+
+            get_tokens = requests.post(url, headers=headers, data=body)
+
+            if get_tokens.ok:
+                result_body = json.loads(get_tokens.text)
+                authCopy["access_token"] = result_body["access_token"]
+                authCopy["id_token"] = result_body["id_token"]
+            else:
+                raise Exception("CRM not set up properly")
+        # else if not go through login again with the saved auth
+        else:
+            login_callback: Callback = login(authCopy)
+            if not login_callback.Success:
+                raise Exception(login_callback.Message)
+            authCopy = dict(login_callback.Data)
+
+        saveAuth_callback: Callback = crm_services.updateByType(CRM.Vincere, authCopy, companyID)
+
+        if not saveAuth_callback.Success:
+            raise Exception(saveAuth_callback.Message)
+
+        helpers.logError("new id_token: " + str(authCopy.get("id_token")))
 
         return Callback(True, 'Id Token Retrieved', {
-            "id_token": auth.get("id_token") # CHANGE ME TODO
+            "id_token": authCopy.get("id_token")
         })
 
     except Exception as exc:

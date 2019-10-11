@@ -103,6 +103,7 @@ def disconnect(type, companyID):
 
 # send request with dynamic method
 def sendRequest(url, method, headers, data=None):
+    helpers.logError("method: " + str(method))
     data = helpers.cleanDict(data)
     request = None
     if method.lower() == "put":
@@ -110,6 +111,7 @@ def sendRequest(url, method, headers, data=None):
     elif method.lower() == "post":
         request = requests.post(url, headers=headers, data=data)
     elif method.lower() == "get":
+        helpers.logError("get method fired")
         request = requests.get(url, headers=headers)
     elif method.lower() == 'patch':
         request = requests.patch(url, headers=headers, data=data)

@@ -41,6 +41,7 @@ def login(auth):
             raise Exception(access_token_request.text)
 
         result_body = json.loads(access_token_request.text)
+        helpers.logError("result_body in login: " + str(result_body))
 
         # Logged in successfully
         return Callback(True, 'Logged in successfully',
@@ -108,6 +109,8 @@ def retrieveRestToken(auth, companyID):
         if not saveAuth_callback.Success:
             raise Exception(saveAuth_callback.Message)
 
+        helpers.logError("new id_token: " + str(authCopy.get("id_token")))
+
         return Callback(True, 'Id Token Retrieved', {
             "id_token": authCopy.get("id_token")
         })
@@ -124,16 +127,15 @@ def sendQuery(auth, query, method, body, companyID, optionalParams=None):
         # get url
         url = buildUrl(auth, query, optionalParams)
 
-        helpers.logError(url)
-        helpers.logError(url)
+        helpers.logError("URL: " + str(url))
         # set headers
         headers = {'Content-Type': 'application/json', "x-api-key": api_key, "id-token": auth.get("id_token", "none")}
-        helpers.logError(str(headers))
-        helpers.logError(str(body))
+        helpers.logError("headers: " + str(headers))
+        helpers.logError("body: " + str(body))
         # test the Token (id_token)
         r = marketplace_helpers.sendRequest(url, method, headers, json.dumps(body))
-        helpers.logError(str(r.status_code))
-        helpers.logError(r.text)
+        helpers.logError("response status code: " + str(r.status_code))
+        helpers.logError("response text: " + r.text)
         if r.status_code == 401:  # wrong rest token
             callback: Callback = retrieveRestToken(auth, companyID)
             if not callback.Success:

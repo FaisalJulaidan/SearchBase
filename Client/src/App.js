@@ -5,6 +5,8 @@ import {PrivateRoute} from './hoc';
 import SentryBoundary from 'components/SentryBoundary/SentryBoundary';
 import styles from './components/LoadingSpinner/LoadingSpinner.module.less';
 
+import {StripeProvider} from 'react-stripe-elements';
+
 import {TimezoneContext, getTimezone} from 'contexts/timezone';
 
 
@@ -23,9 +25,15 @@ const AppointmentStatus = lazy(() => import('./application/Public/AppointmentSta
 class App extends Component {
     constructor(props) {
         super(props);
+        this.state = {stripe: null};
         // Clear recent notifications boxes when route changes
         // history.listen(() => destroyMessage());
     }
+
+    state = {
+        timezone: null,
+        stripe: null
+    };
 
     // setTimezone = async () => {
     //     let tz = await getTimezone();
@@ -42,35 +50,41 @@ class App extends Component {
     //     }, 5000);
     // };
     //
-    // componentDidMount() {
-    //     this.setTimezone();
-    // }
-
-    state = {
-        timezone: null
-    };
+    componentDidMount() {
+        if (window.Stripe) {
+            this.setState({stripe: window.Stripe('pk_test_12345')});
+        } else {
+            document.querySelector('#stripe-js').addEventListener('load', () => {
+                // Create Stripe instance once Stripe.js loads
+                this.setState({stripe: window.Stripe('pk_test_12345')});
+            });
+        }
+        // this.setTimezone();
+    }
 
     render() {
         return (
-            <SentryBoundary>
-                <Suspense fallback={<div className={styles.Loader}> Loading...</div>}>
-                    <TimezoneContext.Provider value={this.state.timezone}>
-                        <Switch>
-                            {/*<Route path="/login" component={Login}/>*/}
-                            {/*<Route path="/signup" component={Signup}/>*/}
-                            <Route path="/forget_password" component={ForgetPassword}/>
-                            <Route path="/reset_password/" component={NewResetPassword}/>
-                            <Route path="/verify_account/" component={AccountVerification}/>
-                            <Route path="/appointments_picker/" component={AppointmentsPicker}/>
-                            <Route path="/appointment_status/" component={AppointmentStatus}/>
-                            <Route path="/chatbot_direct_link/" component={ChatbotDirectLink}/>
-                            <PrivateRoute path="/dashboard" component={Dashboard}/>
-                            <Route path="/" component={Home}/>
-                            {/* <Redirect to={{pathname: '/'}}/> */}
-                        </Switch>
-                    </TimezoneContext.Provider>
-                </Suspense>
-            </SentryBoundary>
+            <StripeProvider stripe={this.state.stripe}>
+                <SentryBoundary>
+                    <Suspense fallback={<div className={styles.Loader}> Loading...</div>}>
+                        <TimezoneContext.Provider value={this.state.timezone}>
+                            <Switch>
+                                {/*<Route path="/login" component={Login}/>*/}
+                                {/*<Route path="/signup" component={Signup}/>*/}
+                                <Route path="/forget_password" component={ForgetPassword}/>
+                                <Route path="/reset_password/" component={NewResetPassword}/>
+                                <Route path="/verify_account/" component={AccountVerification}/>
+                                <Route path="/appointments_picker/" component={AppointmentsPicker}/>
+                                <Route path="/appointment_status/" component={AppointmentStatus}/>
+                                <Route path="/chatbot_direct_link/" component={ChatbotDirectLink}/>
+                                <PrivateRoute path="/dashboard" component={Dashboard}/>
+                                <Route path="/" component={Home}/>
+                                {/* <Redirect to={{pathname: '/'}}/> */}
+                            </Switch>
+                        </TimezoneContext.Provider>
+                    </Suspense>
+                </SentryBoundary>
+            </StripeProvider>
         );
     }
 }

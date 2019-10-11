@@ -4,7 +4,7 @@ import {connect} from 'react-redux';
 import momenttz from 'moment-timezone'
 import {authActions} from '../../store/actions/index';
 import styles from './Signup.module.less';
-import {Link} from 'react-router-dom';
+import {Link,withRouter} from 'react-router-dom';
 import {Form, Input, Icon, Select, Row, Col, Checkbox, Button, Spin} from 'antd';
 
 const FormItem = Form.Item;
@@ -25,12 +25,19 @@ class Signup extends React.Component {
         confirmDirty: false,
     };
 
+    componentDidUpdate(prevProps, prevState, snapshot) {
+        if (prevProps.isSigningUp && (this.props.errorMsg === null)) {
+            // Redirect to login ans ask user to verify account
+            this.props.history.push('/login');
+        }
+    }
+
     handleSubmit = (e) => {
         e.preventDefault();
         this.props.form.validateFields((err, values) => {
             if (!err) {
                 values.timeZone = momenttz.tz.guess();
-                console.log('Received values of form: ', values);
+                // console.log('Received values of form: ', values);
                 this.props.dispatch(authActions.signup(values));
             }
         });
@@ -235,8 +242,9 @@ class Signup extends React.Component {
 function mapStateToProps(state) {
     return {
         isSigningUp: state.auth.isSigningUp,
+        errorMsg: state.auth.errorMsg,
     };
 }
 
 const signupForm = Form.create()(Signup);
-export default connect(mapStateToProps)(signupForm);
+export default connect(mapStateToProps)(withRouter(signupForm));

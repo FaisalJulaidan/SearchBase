@@ -1,10 +1,17 @@
 .card {
     height: 100%;
     line-height: normal;
-    color: #726a84;
+    color: #767676;
     box-shadow: 0 3px 4px rgba(0, 0, 0, 0.10), 0 1px 2px rgba(0, 0, 0, 0.18);
     transition: all 0.3s cubic-bezier(.25, .8, .25, 1);
-    /*border-color: #008FC2;*/
+    text-align: center;
+
+}
+
+.card .body {
+    display: flex;
+    flex-flow: column;
+    align-items: center;
 }
 
 .card:hover {
@@ -15,15 +22,74 @@
     color: #9254de;
 }
 
-.card .header {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    font-size: 20px;
-    color: #9254de;
+.title {
+    color: #444444;
+    font-weight: bolder;
+    font-size: 1.5em;
+    margin-top: 1em;
 }
 
-.card .header h1 {
-    padding: 0;
-    margin: 0 10px;
+.body hr {
+    background-color: #9254de;
+    min-width: 45px;
+    margin: .75em 0;
+    height: 3px;
+}
+
+.subtitle {
+    font-size: .8em;
+    color: #848484;
+}
+
+.price {
+    color: #9254de;
+    font-size: 1.4em;
+    font-weight: bold;
+    margin: 1.2em 0;
+}
+
+.list {
+    flex-grow: 1;
+}
+
+.list li {
+    margin: .75em 0;
+}
+
+.list li:first-child {
+    margin-top: 0;
+}
+
+.list li:last-child {
+    margin-bottom: 0;
+}
+
+/**** Primary Button ****/
+.button {
+    text-decoration: none;
+    margin-top: 2em;
+    color: #9254de;
+    border-color: #9254de;
+    transition: all 0.4s ease 0s, background-color 0.4s ease 0s;
+}
+
+.button:hover {
+    color: white;
+    background: #9254de;
+    border-color: #9254de;
+}
+
+.button:not(:disabled):not(.disabled):active {
+    color: white;
+    background: #9254de;
+    border-color: #9254de;
+}
+
+.button:focus {
+    box-shadow: 0 0 0 0.2rem rgba(138, 107, 219, .5);
+}
+
+.button a {
+    text-decoration: none;
+    color: #9254de;
 }

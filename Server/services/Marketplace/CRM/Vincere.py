@@ -12,7 +12,7 @@ from services.Marketplace import marketplace_helpers
 from services.Marketplace.CRM import crm_services
 
 # Vincere Notes:
-# access_token (used to generate rest_token) lasts 10 minutes, needs to be requested by using the auth from the client
+# access_token (used to generate id_token) lasts 10 minutes, needs to be requested by using the auth from the client
 # refresh_token (can be used to generate access_token) - generated with access_token on auth, ...
 #       ... expires after 1 use (new one comes in), no time limit
 # id_token (used to verify users when making queries), expires in 10 minutes(unconfirmed)
@@ -109,7 +109,7 @@ def retrieveRestToken(auth, companyID):
             raise Exception(saveAuth_callback.Message)
 
         return Callback(True, 'Id Token Retrieved', {
-            "id_token": authCopy.get("rest_token")
+            "id_token": authCopy.get("id_token")
         })
 
     except Exception as exc:
@@ -130,7 +130,7 @@ def sendQuery(auth, query, method, body, companyID, optionalParams=None):
         headers = {'Content-Type': 'application/json', "x-api-key": api_key, "id-token": auth.get("id_token", "none")}
         helpers.logError(str(headers))
         helpers.logError(str(body))
-        # test the BhRestToken (rest_token)
+        # test the Token (id_token)
         r = marketplace_helpers.sendRequest(url, method, headers, json.dumps(body))
         helpers.logError(str(r.status_code))
         helpers.logError(r.text)

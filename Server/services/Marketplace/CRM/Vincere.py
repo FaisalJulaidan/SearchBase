@@ -129,6 +129,7 @@ def sendQuery(auth, query, method, body, companyID, optionalParams=None):
         # set headers
         headers = {'Content-Type': 'application/json', "x-api-key": api_key, "id-token": auth.get("id_token", "none")}
         helpers.logError(str(headers))
+        helpers.logError(str(body))
         # test the BhRestToken (rest_token)
         r = marketplace_helpers.sendRequest(url, method, headers, json.dumps(body))
         helpers.logError(str(r.status_code))
@@ -309,7 +310,7 @@ def searchCandidates(auth, companyID, data) -> Callback:
     try:
         query = "q="
 
-        fields = "fields=id,name,primary_email,mobile,current_address,skill,text,current_salary"
+        fields = "fl=id,name,primary_email,mobile,current_address,skill,text,current_salary"
 
         # populate filter
         query += populateFilter(data.get("location"), "current_address")
@@ -326,7 +327,7 @@ def searchCandidates(auth, companyID, data) -> Callback:
             query += "&status:Available"
 
         # send query
-        sendQuery_callback: Callback = sendQuery(auth, "candidate/search/fl=" + fields, "get", {}, companyID,
+        sendQuery_callback: Callback = sendQuery(auth, "candidate/search/" + fields, "get", {}, companyID,
                                                  [])
         if not sendQuery_callback.Success:
             raise Exception(sendQuery_callback.Message)

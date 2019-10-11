@@ -47,7 +47,7 @@ def login(auth):
                         {
                             "access_token": result_body.get("access_token"),
                             "refresh_token": result_body.get("refresh_token"),
-                            "rest_token": result_body.get("id_token"),
+                            "id_token": result_body.get("id_token"),
                             "domain": auth.get("state")
                         })
 
@@ -139,7 +139,7 @@ def sendQuery(auth, query, method, body, companyID, optionalParams=None):
             if not callback.Success:
                 raise Exception("Rest token could not be retrieved")
 
-            headers["id-token"] = callback.Data.get("rest_token", "none")
+            headers["id-token"] = callback.Data.get("id_token", "none")
 
             r = marketplace_helpers.sendRequest(url, method, headers, json.dumps(body))
             if not r.ok:

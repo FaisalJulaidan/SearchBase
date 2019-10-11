@@ -157,9 +157,10 @@ def sendQuery(auth, query, method, body, companyID, optionalParams=None):
 
 def buildUrl(rest_data, query, optionalParams=None):
     # set up initial url
-    url = "https://" + rest_data.get("domain", "") + ".vincere.io/api/v2/" + query + "?"
+    url = "https://" + rest_data.get("domain", "") + ".vincere.io/api/v2/" + query
     # add additional params
     if optionalParams:
+        url = url + "?"
         for param in optionalParams:
             url += "&" + param.strip()
     # return the url
@@ -382,8 +383,7 @@ def searchJobs(auth, companyID, data) -> Callback:
             query = "query=*:*"
 
         # send query
-        sendQuery_callback: Callback = sendQuery(auth, "search/JobOrder", "get", {}, companyID,
-                                                 ["fields=*", query, "count=9999"])
+        sendQuery_callback: Callback = sendQuery(auth, "job/search/fl=*", "get", {}, companyID, [])
         if not sendQuery_callback.Success:
             raise Exception(sendQuery_callback.Message)
 
@@ -422,7 +422,7 @@ def populateFilter(value, string):
 def getAllCandidates(auth, companyID) -> Callback:
     try:
         # send query
-        sendQuery_callback: Callback = sendQuery(auth, "departmentCandidates", "get", {}, companyID, ["fields=*"])
+        sendQuery_callback: Callback = sendQuery(auth, "departmentCandidates", "get", {}, companyID, [])
         if not sendQuery_callback.Success:
             raise Exception(sendQuery_callback.Message)
 
@@ -438,7 +438,7 @@ def getAllCandidates(auth, companyID) -> Callback:
 def getAllJobs(auth, companyID) -> Callback:
     try:
         # send query
-        sendQuery_callback: Callback = sendQuery(auth, "departmentJobOrders", "get", {}, companyID, ["fields=*"])
+        sendQuery_callback: Callback = sendQuery(auth, "departmentJobOrders", "get", {}, companyID, [])
         if not sendQuery_callback.Success:
             raise Exception(sendQuery_callback.Message)
 

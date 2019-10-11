@@ -112,7 +112,7 @@ def retrieveRestToken(auth, companyID):
         helpers.logError("new id_token: " + str(authCopy.get("id_token")))
 
         return Callback(True, 'Id Token Retrieved', {
-            "id_token": authCopy.get("id_token")
+            "id_token": auth.get("id_token") # CHANGE ME TODO
         })
 
     except Exception as exc:

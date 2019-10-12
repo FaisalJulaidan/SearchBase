@@ -60,7 +60,7 @@ class Payment extends React.Component {
                                             <h1 className={styles.text1}>You're just few minutes away from using our
                                                 ChatBot!</h1>
                                             <h4 className={styles.text2}>You need to register your account to complete
-                                                your purchase process.</h4>
+                                                your payment process.</h4>
                                         </Fade>
                                     </Col>
                                     <Col sm={6} md xl={4}>

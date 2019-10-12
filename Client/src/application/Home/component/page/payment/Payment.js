@@ -10,7 +10,7 @@ import Layout from "../../../hoc/layout/Layout";
 import pricingJSON from "../pricing/pricing";
 
 import {Elements} from 'react-stripe-elements';
-import PaymnetForm from "./PaymentForm";
+import PaymentForm from "./PaymentForm";
 
 const {Step} = Steps;
 
@@ -85,7 +85,7 @@ class Payment extends React.Component {
                                             <div className={styles.form_wrapper}>
                                                 <Card className={styles.card}>
                                                     <Card.Body>
-                                                        <PaymnetForm email={this.state.email}/>
+                                                        <PaymentForm email={this.state.email}/>
                                                     </Card.Body>
                                                 </Card>
                                             </div>

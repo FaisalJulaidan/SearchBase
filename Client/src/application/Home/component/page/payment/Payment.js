@@ -17,16 +17,26 @@ const {Step} = Steps;
 class Payment extends React.Component {
 
     state = {
-        currentStep: 1,
-        plan: pricingJSON[pricingJSON.length - 1].id
+        currentStep: 0,
+        plan: pricingJSON[pricingJSON.length - 1].id,
+        email: "", //This Will be filled through SignUp form Callback
+        firstName: "", //This Will be filled through SignUp form Callback
+        lastName: "" //This Will be filled through SignUp form Callback
     };
 
     componentDidMount() {
         document.title = "Payment | " + WEBSITE_TITLE;
     }
 
-    onSignupSuccessful = (plan) => {
-        this.setState({currentStep: 1, plan: plan})
+    onSignupSuccessful = (plan, email, firstName, lastName) => {
+        this.setState({
+                currentStep: 1,
+                plan: plan,
+                email: email,
+                firstName: firstName,
+                lastName: lastName
+            }
+        )
     };
 
     render() {
@@ -75,7 +85,7 @@ class Payment extends React.Component {
                                             <div className={styles.form_wrapper}>
                                                 <Card className={styles.card}>
                                                     <Card.Body>
-                                                        <PaymnetForm/>
+                                                        <PaymnetForm email={this.state.email}/>
                                                     </Card.Body>
                                                 </Card>
                                             </div>

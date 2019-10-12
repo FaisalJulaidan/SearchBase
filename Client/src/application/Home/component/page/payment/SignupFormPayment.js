@@ -38,7 +38,7 @@ class SignupFormPayment extends React.Component {
 
     componentDidUpdate(prevProps, prevState, snapshot) {
         if (prevProps.isSigningUp && (this.props.errorMsg === null)) {
-            this.props.onSignupSuccessful(this.state.plan);
+            this.props.onSignupSuccessful(this.state.plan,this.props.form.getFieldValue('email'));
         } else if (prevState.plan !== this.state.plan)
             this.props.history.push(`/order-plan?plan=${this.state.plan}`);
     }

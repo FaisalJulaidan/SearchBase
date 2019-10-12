@@ -3,7 +3,8 @@
     "id": "essential",
     "title": "Essential",
     "subtitle": "Suitable for teams of up to 3 members",
-    "price": "£99 / month",
+    "price_title": "£99 / month",
+    "price": "99",
     "icon": "home",
     "items": [
       "Website Chatbot",
@@ -15,7 +16,8 @@
     "id": "pro",
     "title": "Pro",
     "subtitle": "Suitable for teams of up to 10 members",
-    "price": "£249 / month",
+    "price_title": "£249 / month",
+    "price": "249",
     "icon": "building",
     "items": [
       "Website Chatbot",
@@ -31,7 +33,8 @@
     "id": "premium",
     "title": "Premium",
     "subtitle": "Suitable for teams of up to 50 members",
-    "price": "£1,150 / month",
+    "price_title": "£1,150 / month",
+    "price": "1150",
     "icon": "city",
     "items": [
       "Website Chatbot",

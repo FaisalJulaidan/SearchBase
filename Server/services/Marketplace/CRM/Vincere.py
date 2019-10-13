@@ -129,7 +129,7 @@ def sendQuery(auth, query, method, body, companyID, optionalParams=None):
 
         helpers.logError("URL: " + str(url))
         # set headers
-        headers = {"x-api-key": api_key, "id-token": auth.get("id_token", "none")}
+        headers = {'Content-Type': 'application/json', "x-api-key": api_key, "id-token": auth.get("id_token", "none")}
         helpers.logError("headers: " + str(headers))
         helpers.logError("body: " + str(body))
         # test the Token (id_token)

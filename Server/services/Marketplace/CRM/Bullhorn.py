@@ -161,9 +161,6 @@ def sendQuery(auth, query, method, body, companyID, optionalParams=None):
         if os.environ['FLASK_ENV'] != "production":
             url = url.replace("rest.", "rest9.")
 
-        # remove None values from body
-        body = {key: value for key, value in body.items() if value is not None}
-
         # set headers
         headers = {'Content-Type': 'application/json'}
 

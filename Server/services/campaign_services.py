@@ -155,10 +155,10 @@ def prepareCampaign(campaign_details, companyID):
             }
             candidates_callback: Callback = databases_services.scan(session, hashedAssistantID, True,
                                                                     campaign_details.get("database_id"))
-        print(candidates_callback.Message)
-        print(candidates_callback.Data)
+
         if not candidates_callback.Success:
             raise Exception(candidates_callback.Message)
+
         for candidate in candidates_callback.Data:
             if candidate.get("Currency"):
                 candidate["Currency"] = ""

@@ -129,7 +129,7 @@ def sendQuery(auth, query, method, body, companyID, optionalParams=None):
 
         helpers.logError("URL: " + str(url))
         # set headers
-        headers = {'Content-Type': 'application/json', "x-api-key": api_key, "id-token": auth.get("id_token", "none")}
+        headers = {"x-api-key": api_key, "id-token": auth.get("id_token", "none")}
         helpers.logError("headers: " + str(headers))
         helpers.logError("body: " + str(body))
         # test the Token (id_token)
@@ -361,6 +361,103 @@ def searchCandidates(auth, companyID, data) -> Callback:
 
     except Exception as exc:
         helpers.logError("CRM.Vincere.searchCandidates() ERROR: " + str(exc))
+        return Callback(False, str(exc))
+
+
+def searchPerfectCandidates(auth, companyID, data, fields=None) -> Callback:
+    try:
+        query = "query="
+
+        if not fields:
+            fields = "fl=id,name,primary_email,mobile,current_address,skill,text,current_salary"
+
+        # populate filter
+        query += populateFilter(data.get("preferredJotTitle"), "occupation")
+        query += populateFilter(data.get("location"), "address.city")
+        query += populateFilter(data.get("jobCategory"), "employmentPreference")
+        # query += populateFilter(data.get("skills"), "primarySkills")
+        query += populateFilter(data.get("yearsExperience"), "experience")
+        # query += populateFilter(data.get("education"), "educationDegree")
+
+        # if keywords[DT.CandidateSkills.value["name"]]:
+        #     query += "primarySkills.data:" + keywords[DT.CandidateSkills.name] + " or"
+
+        query = query[:-3]
+
+        # check if no conditions submitted
+        if len(query) < 6:
+            query = "query=status:Available"
+
+            # send query
+            sendQuery_callback: Callback = sendQuery(auth, "candidate/search/" + fields, "get", {}, companyID,
+                                                     [query, "limit=100"])
+            if not sendQuery_callback.Success:
+                raise Exception(sendQuery_callback.Message)
+
+            return_body = json.loads(sendQuery_callback.Data.text)
+
+            records = return_body["data"]
+
+        else:
+            records = []
+
+            while len(records) < 2000:
+                # send query
+                sendQuery_callback: Callback = sendQuery(auth, "candidate/search/" + fields, "get", {}, companyID,
+                                                         [query, "limit=100"])
+                if not sendQuery_callback.Success:
+                    raise Exception(sendQuery_callback.Message)
+
+                # get query result
+                return_body = json.loads(sendQuery_callback.Data.text)
+
+                if return_body["data"]:
+                    # add the candidates to the records
+                    records = records + list(return_body["data"])
+
+                    # remove duplicate records
+                    seen = set()
+                    new_l = []
+                    for d in records:
+                        t = tuple(d.items())
+                        if str(t) not in seen:
+                            seen.add(str(t))
+                            new_l.append(d)
+
+                    records = []
+                    for l in new_l:
+                        records.append(dict(l))
+
+                # remove the last (least important filter)
+                query = "and".join(query.split("and")[:-1])
+
+                # if no filters left - stop
+                if not query:
+                    break
+
+        result = []
+        # TODO educations uses ids - need to retrieve them
+        for record in records:
+            result.append(databases_services.createPandaCandidate(id=record.get("id", ""),
+                                                                  name=record.get("name"),
+                                                                  email=record.get("email"),
+                                                                  mobile=record.get("mobile"),
+                                                                  location=record.get("address", {}).get("city") or "",
+                                                                  skills=record.get("primarySkills", {}).get("data"),
+                                                                  linkdinURL=None,
+                                                                  availability=record.get("status"),
+                                                                  jobTitle=None,
+                                                                  education=None,
+                                                                  yearsExperience=0,
+                                                                  desiredSalary=record.get("salary") or
+                                                                                record.get("dayRate", 0),
+                                                                  currency=Currency("GBP"),
+                                                                  source="Bullhorn"))
+
+        return Callback(True, "Search has been successful", result)
+
+    except Exception as exc:
+        helpers.logError("Marketplace.CRM.Vincere.searchCandidates() ERROR: " + str(exc))
         return Callback(False, str(exc))
 
 

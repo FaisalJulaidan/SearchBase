@@ -185,7 +185,6 @@ def dataTypeCreator(name: str, enumName: str, validation: ValidationType, sectio
             'blockTypes': [bt.value for bt in blockTypes],
             }
 
-
 @unique
 class DataType(Enum):
     NoType = dataTypeCreator(
@@ -196,7 +195,6 @@ class DataType(Enum):
         [UserType.Unknown],
         [BlockType.UserInput, BlockType.Question, BlockType.FileUpload, BlockType.UserType])
 
-    # TODO  MIGRATE
     CandidateAvailability =  dataTypeCreator(
         'Candidate Availability',
         'CandidateAvailability',
@@ -262,15 +260,6 @@ class DataType(Enum):
         [UserType.Candidate],
         [BlockType.UserInput, BlockType.Question])
 
-    # TODO DELETE MIGRATE FIND_USAGES => NO NEED, USE (JobTitle)
-    CandidateJobTitle = dataTypeCreator(
-        'Candidate Job Title',
-        'CandidateJobTitle',
-        ValidationType.String,
-        DataTypeSection.Candidate,
-        [UserType.Candidate],
-        [BlockType.UserInput, BlockType.Question])
-
     CandidateEducation = dataTypeCreator(
         'Candidate Education',
         'CandidateEducation',
@@ -295,22 +284,6 @@ class DataType(Enum):
         DataTypeSection.Candidate,
         [UserType.Candidate],
         [BlockType.SalaryPicker])
-
-    # TODO DELETE MIGRATE TO SALARY_PICKER and CandidateDesiredSalary DATATYPE
-    # CandidateDailyDesiredSalary = dataTypeCreator(
-    #     'Candidate Daily Desired Salary',
-    #     'CandidateDailyDesiredSalary',
-    #     ValidationType.Salary,
-    #     DataTypeSection.Candidate,
-    #     [UserType.Candidate])
-
-    # TODO DELETE MIGRATE TO SALARY_PICKER and CandidateDesiredSalary DATATYPE
-    # CandidateAnnualDesiredSalary = dataTypeCreator(
-    #     'Candidate Annual Desired Salary',
-    #     'CandidateAnnualDesiredSalary',
-    #     ValidationType.Salary,
-    #     DataTypeSection.Candidate,
-    #     [UserType.Candidate])
 
     CandidateVisa = dataTypeCreator(
         'Candidate Visa',
@@ -466,7 +439,6 @@ class DataType(Enum):
         [UserType.Candidate, UserType.Client],
         [BlockType.UserInput, BlockType.Question])
 
-    # TODO MIGRATE
     JobType = dataTypeCreator(
         'Job Type',
         'JobType',
@@ -483,7 +455,6 @@ class DataType(Enum):
         [UserType.Candidate, UserType.Client],
         [BlockType.UserInput, BlockType.Question])
 
-    # TODO MIGRATE
     JobSalary = dataTypeCreator(
         'Job Salary',
         'JobSalary',
@@ -491,22 +462,6 @@ class DataType(Enum):
         DataTypeSection.Job,
         [UserType.Candidate, UserType.Client],
         [BlockType.SalaryPicker])
-
-    # TODO DELETE MIGRATE TO SALARY_PICKER and JobSalary DATATYPE
-    # JobAnnualSalary = dataTypeCreator(
-    #     'Job Annual Salary',
-    #     'JobAnnualSalary',
-    #     ValidationType.Salary,
-    #     DataTypeSection.Job,
-    #     [UserType.Candidate, UserType.Client])
-
-    # TODO DELETE MIGRATE TO SALARY_PICKER and JobSalary DATATYPE
-    # JobDayRate = dataTypeCreator(
-    #     'Job Day Rate',
-    #     'JobDayRate',
-    #     ValidationType.Salary,
-    #     DataTypeSection.Job,
-    #     [UserType.Candidate, UserType.Client])
 
     JobEssentialSkills = dataTypeCreator(
         'Job Essential Skills',
@@ -524,7 +479,6 @@ class DataType(Enum):
         [UserType.Candidate, UserType.Client],
         [BlockType.UserInput])
 
-    # TODO MIGRATE USER_INPUT BLOCKS TO DATEPICKER
     JobEndDate = dataTypeCreator(
         'Job End Date',
         'JobEndDate',
@@ -533,7 +487,6 @@ class DataType(Enum):
         [UserType.Candidate, UserType.Client],
         [BlockType.DatePicker])
 
-    # TODO MIGRATE USER_INPUT BLOCKS TO DATEPICKER
     JobStartDate = dataTypeCreator(
         'Job Start Date',
         'JobStartDate',

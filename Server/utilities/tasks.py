@@ -35,7 +35,7 @@ jobType = {
 }
 
 datePicker = {
-    "type": "Range",
+    "type": "Multiple",
 }
 
 userType = {
@@ -115,7 +115,7 @@ def migrateConversations():
 
 def migrateFlows():
     try:
-        for assistant in db.session.query(Assistant).all():
+        for assistant in [db.session.query(Assistant).first()]:
             if assistant.Flow:
                 # Update flow
                 newFlow = __migrateFlow(assistant.Flow)
@@ -139,6 +139,7 @@ def migrateFlowTemplates():
     try:
         directory = join(BaseConfig.APP_ROOT, 'static/assistant_templates')
         for filename in os.listdir(directory):
+            print("Start migrating: " + filename)
             if filename.endswith(".json"):
                 jsonFile = open(directory + '/' + filename, 'r')  # Open the JSON file for reading
                 flow = json.load(jsonFile)  # Read the JSON into the buffer
@@ -147,7 +148,8 @@ def migrateFlowTemplates():
                 # Migrate
                 newFlow = __migrateFlow(flow)
                 if not newFlow:
-                    raise Exception(filename + ' failed')
+                    print(filename + ' failed')
+                    raise Exception
 
                 ## Save our changes to JSON file
                 jsonFile = open(directory + '/' + filename, "w+")
@@ -160,7 +162,7 @@ def migrateFlowTemplates():
         print("Templates flow migration done successfully :)")
 
     except Exception as exc:
-        print(exc.args)
+        print(exc)
         print("migrateFlowTemplates failed :(")
 
 
@@ -170,16 +172,91 @@ def __migrateFlow(flow):
         for group in newFlow['groups']:  # loop groups
             for block in group['blocks']:  # loop blocks
 
-                if block['DataType'] in ["CandidateAvailableFrom", "CandidateAvailableTo"]:
-                    pass
+                if block['DataType'] in ["CandidateAvailableFrom", "CandidateAvailableTo", "CandidateAvailability"]:
+
+                    block['DataType'] = 'CandidateAvailability'
+                    block['Content'].pop('keywords', None)
+                    block['Content']["type"] = 'Multiple'
+
+                    block['Type'] = 'Date Picker'
+
+                if block['DataType'] in ["ClientAvailability"]:
+
+                    block['Content'].pop('keywords', None)
+                    block['Content']["type"] = 'Multiple'
+
+                    block['Type'] = 'Date Picker'
+
+
+                if block['DataType'] in ["JobStartDate", "JobEndDate"]:
+                    block['Content'].pop('keywords', None)
+                    block['Content']["type"] = 'Multiple'
+
+                    block['Type'] = 'Date Picker'
+
+
+                if block['DataType'] in ["CandidateAnnualDesiredSalary"]:
+                    block['DataType'] = 'CandidateDesiredSalary'
+                    block['Content'].pop('keywords', None)
+                    block['Content']["min"] = 15000
+                    block['Content']["max"] = 200000
+                    block['Content']["period"] = 'Annually'
+                    block['Content']["currency"] = 'GBP'
+
+                    block['Type'] = 'Salary Picker'
+
+
+                if block['DataType'] in ["CandidateDailyDesiredSalary"]:
+                    block['DataType'] = 'CandidateDesiredSalary'
+                    block['Content'].pop('keywords', None)
+                    block['Content']["min"] = 100
+                    block['Content']["max"] = 800
+                    block['Content']["period"] = 'Daily'
+                    block['Content']["currency"] = 'GBP'
+
+                    block['Type'] = 'Salary Picker'
+
+
+
+                if block['DataType'] in ["CandidateJobTitle"]:
+                    block['DataType'] = 'JobTitle'
+
+
+                if block['DataType'] in ["JobAnnualSalary"]:
+                    block['DataType'] = 'JobSalary'
+                    block['Content'].pop('keywords', None)
+                    block['Content']["min"] = 15000
+                    block['Content']["max"] = 200000
+                    block['Content']["period"] = 'Annually'
+                    block['Content']["currency"] = 'GBP'
+
+                    block['Type'] = 'Salary Picker'
+
+
+                if block['DataType'] in ["JobDayRate"]:
+                    block['DataType'] = 'JobSalary'
+                    block['Content'].pop('keywords', None)
+                    block['Content']["min"] = 100
+                    block['Content']["max"] = 800
+                    block['Content']["period"] = 'Daily'
+                    block['Content']["currency"] = 'GBP'
+
+                    block['Type'] = 'Salary Picker'
+
+
+                if block['DataType'] in ["JobType"]:
+                    block['DataType'] = 'NoType'
+
+
+                if block['DataType'] in ["UserType"]:
+                    block['DataType'] = 'NoType'
+
 
                 if block['Type'] == enums.BlockType.Question.value:
                     pass
-                    # for answer in block['Content']['answers']:
 
                 if block['Type'] == enums.BlockType.UserInput.value:
                     pass
-                    # block['Content']['keywords']= []
 
                 if block['Type'] == enums.BlockType.Solutions.value:
                     pass
@@ -188,14 +265,17 @@ def __migrateFlow(flow):
                     pass
 
                 # validate block content based on block type
+                print(block['ID'])
                 validate(block.get('Content'), getattr(json_schemas, str(enums.BlockType(block.get('Type')).name)))
 
+
+        print("FINISHHH !!! ?>M>>><?<?<?>?>?<?<?>?>?>?<?<?>?><><><><>")
         # validate whole flow then update
         validate(newFlow, json_schemas.flow)
 
         return newFlow
 
     except Exception as exc:
-        print(exc.args)
+        print(exc)
         print("Flow migration failed :(")
         return None

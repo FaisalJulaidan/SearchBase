@@ -204,18 +204,18 @@ def sendCampaign(campaign_details, companyID):
                 continue
 
             # insert candidate details in text
-            text = text.replace("{candidate.name}", candidate.get("CandidateName"))
+            tempText = text.replace("{candidate.name}", candidate.get("CandidateName"))
 
             # insert candidate id in link
-            text = text.split("&id")[0]
-            text += "&id=" + str(candidate.get("ID"))
+            tempText = tempText.split("&id")[0]
+            tempText += "&id=" + str(candidate.get("ID"))
 
             if campaign_details.get("outreach_type") == "sms":
-                messenger_servicess.sendMessage(messenger.Type, candidate_phone, text, messenger.Auth)
+                messenger_servicess.sendMessage(messenger.Type, candidate_phone, tempText, messenger.Auth)
             elif campaign_details.get("outreach_type") == "whatsapp":
-                messenger_servicess.sendMessage(messenger.Type, candidate_phone, text, messenger.Auth, True)
+                messenger_servicess.sendMessage(messenger.Type, candidate_phone, tempText, messenger.Auth, True)
             elif campaign_details.get("outreach_type") == "email":
-                mail_services.simpleSend(candidate_email, campaign_details.get("email_title"), text)
+                mail_services.simpleSend(candidate_email, campaign_details.get("email_title"), tempText)
 
         return Callback(True, '')
 

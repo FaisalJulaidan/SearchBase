@@ -115,7 +115,7 @@ def migrateConversations():
 
 def migrateFlows():
     try:
-        for assistant in [db.session.query(Assistant).first()]:
+        for assistant in db.session.query(Assistant).all():
             if assistant.Flow:
                 # Update flow
                 newFlow = __migrateFlow(assistant.Flow)
@@ -265,11 +265,8 @@ def __migrateFlow(flow):
                     pass
 
                 # validate block content based on block type
-                print(block['ID'])
                 validate(block.get('Content'), getattr(json_schemas, str(enums.BlockType(block.get('Type')).name)))
 
-
-        print("FINISHHH !!! ?>M>>><?<?<?>?>?<?<?>?>?>?<?<?>?><><><><>")
         # validate whole flow then update
         validate(newFlow, json_schemas.flow)
 

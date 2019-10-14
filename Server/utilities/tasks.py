@@ -155,9 +155,10 @@ def validateFlows():
                 if not newFlow:
                     raise Exception("Assistant Flows migration failed for assistant(" + assistant.Name + ")")
 
-        print("Flows are VALID:)")
+        print("Flows are VALID :)")
     except Exception as exc:
         print(exc)
+        print("Flows are INVALID :(")
 
 
 def __migrateFlow(flow):

@@ -127,9 +127,9 @@ def sendQuery(auth, query, method, body, companyID, optionalParams=None):
         # get url
         url = buildUrl(auth, query, optionalParams)
 
-        helpers.logError("URL: " + str(url))
         # set headers
         headers = {'Content-Type': 'application/json', "x-api-key": api_key, "id-token": auth.get("id_token", "none")}
+
         # test the Token (id_token)
         helpers.logError("url: " + url)
         helpers.logError("headers: " + str(headers))
@@ -322,7 +322,7 @@ def searchCandidates(auth, companyID, data) -> Callback:
         # if keywords[DT.CandidateSkills.value["name"]]:
         #     query += "primarySkills.data:" + keywords[DT.CandidateSkills.name] + " or"
 
-        query = query[:-3]
+        query = query[:-1]
 
         # check if no conditions submitted
         if len(query) < 6:
@@ -380,7 +380,7 @@ def searchPerfectCandidates(auth, companyID, data, fields=None) -> Callback:
         # if keywords[DT.CandidateSkills.value["name"]]:
         #     query += "primarySkills.data:" + keywords[DT.CandidateSkills.name] + " or"
 
-        query = query[:-3]
+        query = query[:-1]
 
         # check if no conditions submitted
         if len(query) < 6:
@@ -469,7 +469,7 @@ def searchJobs(auth, companyID, data) -> Callback:
 
         query += populateFilter(data.get("employmentType"), "employment_type")
 
-        query = query[:-3]
+        query = query[:-1]
 
         # check if no conditions submitted
         if len(query) < 4:

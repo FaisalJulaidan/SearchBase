@@ -322,13 +322,13 @@ def searchCandidates(auth, companyID, data) -> Callback:
         # if keywords[DT.CandidateSkills.value["name"]]:
         #     query += "primarySkills.data:" + keywords[DT.CandidateSkills.name] + " or"
 
-        query = query[:-1]
+        # query = query[:-1]
 
         # check if no conditions submitted
-        if len(query) < 6:
-            query = "q=status:Available"
+        if len(query) < 3:
+            query = ""
         else:
-            query += "&status:Available"
+            query += ""
 
         # send query
         sendQuery_callback: Callback = sendQuery(auth, "candidate/search/" + fields, "get", {}, companyID,
@@ -380,11 +380,11 @@ def searchPerfectCandidates(auth, companyID, data, fields=None) -> Callback:
         # if keywords[DT.CandidateSkills.value["name"]]:
         #     query += "primarySkills.data:" + keywords[DT.CandidateSkills.name] + " or"
 
-        query = query[:-1]
+        # query = query[:-1]
 
         # check if no conditions submitted
-        if len(query) < 6:
-            query = "query=status:Available"
+        if len(query) < 3:
+            query = ""
 
             # send query
             sendQuery_callback: Callback = sendQuery(auth, "candidate/search/" + fields, "get", {}, companyID,
@@ -427,7 +427,7 @@ def searchPerfectCandidates(auth, companyID, data, fields=None) -> Callback:
                         records.append(dict(l))
 
                 # remove the last (least important filter)
-                query = "and".join(query.split("and")[:-1])
+                query = "&".join(query.split("&")[:-1])
 
                 # if no filters left - stop
                 if not query:
@@ -469,7 +469,7 @@ def searchJobs(auth, companyID, data) -> Callback:
 
         query += populateFilter(data.get("employmentType"), "employment_type")
 
-        query = query[:-1]
+        # query = query[:-1]
 
         # check if no conditions submitted
         if len(query) < 4:

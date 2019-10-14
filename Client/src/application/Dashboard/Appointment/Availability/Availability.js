@@ -131,6 +131,9 @@ class Availability extends React.Component {
         })
         return aggr
       }
+      if(records.length === 0){
+        return {}
+      }
       let emptyAggregates = Object.keys(records[0]).reduce((prev, curr) => { prev[curr] = []; return prev}, {})
       return records.reduce((prev, curr) => returnNewAggregate(curr, prev), emptyAggregates);
     }

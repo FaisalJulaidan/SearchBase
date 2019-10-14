@@ -136,6 +136,7 @@ def sendQuery(auth, query, method, body, companyID, optionalParams=None):
         r = marketplace_helpers.sendRequest(url, method, headers, json.dumps(body))
         helpers.logError("response status code: " + str(r.status_code))
         helpers.logError("response text: " + r.text)
+
         if r.status_code == 401:  # wrong rest token
             callback: Callback = retrieveRestToken(auth, companyID)
             if not callback.Success:

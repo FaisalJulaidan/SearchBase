@@ -131,6 +131,8 @@ def sendQuery(auth, query, method, body, companyID, optionalParams=None):
         # set headers
         headers = {'Content-Type': 'application/json', "x-api-key": api_key, "id-token": auth.get("id_token", "none")}
         # test the Token (id_token)
+        helpers.logError("url: " + url)
+        helpers.logError("headers: " + str(headers))
         r = marketplace_helpers.sendRequest(url, method, headers, json.dumps(body))
         helpers.logError("response text: " + r.text)
 

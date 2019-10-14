@@ -116,7 +116,7 @@ UserInput = {
         "afterMessage": {"type": "string"},
         "keywords": {"type": "array", "items": {"type": "string"}},
     },
-    "required": ["text", "action", "afterMessage", "blockToGoID"],  # , "keywords"
+    "required": ["text", "action", "afterMessage", "blockToGoID", "keywords"],
     "additionalProperties": False
 }
 
@@ -228,7 +228,7 @@ DatePicker = {
     "type": "object",
     "properties": {
         "text": {"type": "string"},
-        "type": {"enum": ["Exact", "Range"]},
+        "type": {"enum": ["Exact", "Multiple"]},
         "blockToGoID": {"type": ["string", "null"]},
         "action": {"enum": [e.value for e in enums.BlockAction]},
         "afterMessage": {"type": "string"},

@@ -507,7 +507,7 @@ def searchJobs(auth, companyID, data) -> Callback:
 
 def populateFilter(value, string):
     if value:
-        return string + ":" + value + ","
+        return string + ":'" + value + "',"
     return ""
 
 

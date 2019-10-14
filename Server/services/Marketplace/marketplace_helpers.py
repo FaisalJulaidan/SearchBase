@@ -111,6 +111,8 @@ def sendRequest(url, method, headers, data=None):
         request = requests.post(url, headers=headers, data=data)
     elif method.lower() == "get":
         request = requests.get(url, headers=headers)
+    elif method.lower() == 'patch':
+        request = requests.patch(url, headers=headers, data=data)
     return request
 
 

@@ -155,10 +155,10 @@ def prepareCampaign(campaign_details, companyID):
             }
             candidates_callback: Callback = databases_services.scan(session, hashedAssistantID, True,
                                                                     campaign_details.get("database_id"))
-        print(candidates_callback.Message)
-        print(candidates_callback.Data)
+
         if not candidates_callback.Success:
             raise Exception(candidates_callback.Message)
+
         for candidate in candidates_callback.Data:
             if candidate.get("Currency"):
                 candidate["Currency"] = ""
@@ -204,19 +204,21 @@ def sendCampaign(campaign_details, companyID):
                 continue
 
             # insert candidate details in text
-            text = text.replace("{candidate.name}", candidate.get("CandidateName"))
+            tempText = text.replace("{candidate.name}", candidate.get("CandidateName"))
 
             # insert candidate id in link
-            text = text.split("&id")[0]
-            text += "&id=" + str(candidate.get("ID"))
+            tempText = tempText.split("&id")[0]
+            tempText += "&id=" + str(candidate.get("ID"))
 
             if campaign_details.get("outreach_type") == "sms":
-                messenger_servicess.sendMessage(messenger.Type, candidate_phone, text, messenger.Auth)
+                messenger_servicess.sendMessage(messenger.Type, candidate_phone, tempText, messenger.Auth)
+            elif campaign_details.get("outreach_type") == "whatsapp":
+                messenger_servicess.sendMessage(messenger.Type, candidate_phone, tempText, messenger.Auth, True)
             elif campaign_details.get("outreach_type") == "email":
-                mail_services.simpleSend(candidate_email, campaign_details.get("email_title"), text)
+                mail_services.simpleSend(candidate_email, campaign_details.get("email_title"), tempText)
 
         return Callback(True, '')
 
     except Exception as exc:
         helpers.logError("campaign_services.sendCampaign(): " + str(exc))
-        return Callback(False, 'Error while search the database for matches!')
+        return Callback(False, 'Error while sending campaign!')

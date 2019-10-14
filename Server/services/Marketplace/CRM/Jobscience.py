@@ -5,29 +5,51 @@ from datetime import datetime
 import requests
 from sqlalchemy_utils import Currency
 
-from models import Callback, Conversation, StoredFile, StoredFileInfo
-from services import databases_services, stored_file_services
+from models import Callback, Conversation, db, StoredFileInfo
+from services import databases_services
 from services.Marketplace import marketplace_helpers
-from utilities import helpers
 from services.Marketplace.CRM import crm_services
 
+from utilities import helpers
+from utilities.enums import CRM
+
+# USE Jobscience SANDBOX or PROD environment:
+
+# if os.environ['FLASK_ENV'] == 'development':
+#     print("Jobscience running in development")
+#     CLIENT_ID = os.environ['JOBSCIENCE_SANDBOX_CLIENT_ID']
+#     CLIENT_SECRET = os.environ['JOBSCIENCE_SANDBOX_CLIENT_SECRET']
+#     BASE_URL = "https://prsjobs--jsfull.cs83.my.salesforce.com/services/data/v46.0/"
+#     BASE_URL_LOGIN = "https://test.salesforce.com/services/oauth2/"
+
+# else:
+# print("Jobscience running in production")
 CLIENT_ID = os.environ['JOBSCIENCE_CLIENT_ID']
 CLIENT_SECRET = os.environ['JOBSCIENCE_CLIENT_SECRET']
+BASE_URL = "https://prsjobs.cs83.my.salesforce.com/services/data/v46.0/"
+BASE_URL_LOGIN = "https://login.salesforce.com/services/oauth2/"
 
-my_test_here = "hi"
 
 # TODO CHECKLIST:
-
-# [4] Filter by contract or perm
-# [4.5] Fix skills upload
-# [5] Clean & refactor []
-
-# [7] IMPROVE SUCH AS ADD FILE UPLOAD []
+# [1] Add a update candidate function
 
 
 def testConnection(auth, companyID):
     try:
-        callback: Callback = login(auth)
+
+        if auth.get("refresh_token"):
+
+            if token_is_ok(auth, companyID):
+                print("[1] Do nothing")
+                return Callback(True, 'Logged in successfully', auth)
+
+            else:
+                print("[2] Refresh expired token")
+                callback: Callback = refreshToken(auth, companyID)
+
+        else:
+            print("[3] Login")
+            callback: Callback = login(auth)
 
         if not callback.Success:
             raise Exception("Testing failed")
@@ -39,6 +61,62 @@ def testConnection(auth, companyID):
         return Callback(False, str(exc))
 
 
+def token_is_ok(auth, companyID):
+    url = BASE_URL
+    method = "GET"
+    headers = {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + auth.get('access_token'),
+        'cache-control': 'no-cache',
+        'Cookie': 'inst=APP_3X'
+    }
+    response = marketplace_helpers.sendRequest(url, method, headers, {})
+    if response.ok:
+        return True
+    else:
+        return False
+
+
+def refreshToken(auth, companyID):
+    # get new access token:
+    try:
+        print("Getting a new access token")
+
+        headers = {
+            'Content-Type': "application/x-www-form-urlencoded",
+            'Cache-Control': "no-cache",
+            'Cookie': "inst=APP_3X",
+            'cache-control': "no-cache"
+        }
+
+        body = {
+            'grant_type': "refresh_token",
+            'client_id': "3MVG9I5UQ_0k_hTlh64o5U2MnkGkPmYj_xkMpFkEi0tIJXl_CGhXpux_w5khN6pvnNd.IH6Yvo82ZAcRystWE",
+            'client_secret': "972A46C725406EE38D971409A1509EF164B100A9B8B42CA4C39AB3952B65A215",
+            'refresh_token': auth.get('refresh_token')
+        }
+
+        resp = json.loads(
+            requests.request("POST", (BASE_URL_LOGIN + "token?"), headers=headers,
+                             data=body).text)
+        print(resp)
+        auth['access_token'] = resp.get('access_token')
+
+        saveAuth_callback: Callback = crm_services.updateByType(CRM.Jobscience, auth, companyID)
+        if not saveAuth_callback.Success:
+            raise Exception(saveAuth_callback.Message)
+
+        return Callback(True, 'New access token', {
+            "access_token": auth.get("access_token"),
+            "refresh_token": auth.get("refresh_token")
+        })
+
+    except Exception as exc:
+        db.session.rollback()
+        helpers.logError("Marketplace.CRM.Bullhorn.retrieveRestToken() ERROR: " + str(exc))
+        return Callback(False, "Failed to retrieve CRM tokens. Please check login information")
+
+
 # NOTE: For production, we need to change the domain name (currently it is pointing to sandbox)
 
 def login(auth):
@@ -48,7 +126,7 @@ def login(auth):
 
         headers = {'Content-Type': 'application/json'}
 
-        access_token_url = "https://login.salesforce.com/services/oauth2/token?" + \
+        access_token_url = (BASE_URL_LOGIN + "token?") + \
                            "&grant_type=authorization_code" + \
                            "&redirect_uri=" + helpers.getDomain(3000) + "/dashboard/marketplace/Jobscience" + \
                            "&client_id=" + CLIENT_ID + \
@@ -56,37 +134,42 @@ def login(auth):
                            "&code=" + authCopy.get("code")
 
         # get the access token and refresh token
-        access_token_request = requests.post(access_token_url, headers=headers)
-        global my_test_here
+        response = requests.post(access_token_url, headers=headers)
 
-        #print(access_token_request.status_code)
-        if not access_token_request.ok:
-            raise Exception(access_token_request.text)
+        if response.status_code == 200:
+            print("Login to Jobscience Successful")
+        else:
+            print("Login to Jobscience Unsuccessful")
 
-        result_body = json.loads(access_token_request.text)
+        if not response.ok:
+            raise Exception(response.text)
+
+        result_body = json.loads(response.text)
         print(result_body)
 
-        print("Access token is: ")
-        print(result_body.get('access_token'))
-        my_test_here = result_body.get('refresh_token')
-        return Callback(True, 'Logged in successfully', result_body.get('access_token'))  # No refresh token currently
+        return Callback(True, 'Logged in successfully', {"access_token": result_body.get('access_token'),
+                                                         "refresh_token": result_body.get("refresh_token")})
 
     except Exception as exc:
         helpers.logError("Marketplace.CRM.Jobscience.login() ERROR: " + str(exc))
         return Callback(False, str(exc))
 
 
-def logout(access_token, companyID):  # QUESTION: Purpose of companyID param?
+def logout(auth, companyID):  # QUESTION: Purpose of companyID param?
     try:
         # Attempt logout
-        logout_url = "https://salesforce.com/services/oauth2/revoke?token=" + access_token
+        logout_url = BASE_URL_LOGIN + "revoke?token=" + auth.get("access_token")
         headers = {
             'Content-Type': 'application/json',
-            'Authorization': "Bearer " + access_token,
+            'Authorization': "Bearer " + auth.get("access_token"),
             'cache-control': "no-cache"
         }
 
         response = marketplace_helpers.sendRequest(logout_url, "get", headers, {})
+        if response.status_code == 200:
+            print("Disconnect from Jobscience Successful")
+        else:
+            print("Disconnect from Jobscience Unsuccessful")
 
     except Exception as exc:
         helpers.logError("Marketplace.CRM.Jobscience.logout() ERROR: " + str(exc))
@@ -136,7 +219,7 @@ def convertDate(date: str):
 
 def insertCandidate(access_token, conversation: Conversation) -> Callback:
     try:
-        #print("INSERTING CANDIDATE")
+        # print("INSERTING CANDIDATE")
         # NOTE: Should require on front-end that a full name is provided --> reduce data inconsistency
         name = (conversation.get("name") or " ").split(" ")
         body = {
@@ -190,8 +273,64 @@ def insertCandidate(access_token, conversation: Conversation) -> Callback:
         return Callback(False, str(exc))
 
 
-def uploadFile(auth, storedFile: StoredFile):  # ISSUE: NO CURRENT API OPTION FOR RESUME UPLOAD
-    print("UPLOAD FILE NOT SUPORTED")
+def updateCandidate(auth, conversation: Conversation, companyID) -> Callback:
+    # URL: https://prsjobs--jsfull.cs83.my.salesforce.com/services/data/v36.0/sobjects/Contact/0034E00000v8wbWQAQ
+    # Note: Dont want to replace data with nothing -> Only for fields that have answers
+    try:
+        print("Updating candidate")
+        print(conversation)
+
+        name = (conversation.get("name") or " ").split(" ")
+
+        # Compose body keywords:
+
+        body = {
+            "FirstName": helpers.getListValue(name, 0, "") or "FIRST_DEFAULT",
+            "LastName": helpers.getListValue(name, 1, "") or "LAST_DEFAULT",  # LastName is only required field
+            "Title": conversation.get("preferredJobTitle"),
+            "phone": conversation.get('mobile') or " ",
+            "MailingCity": conversation.get("city") or "",
+            "email": conversation.get("email") or " ",
+            "ts2__Date_Available__c": convertDate(conversation.get("availability")),  # TODO CHECK
+            "ts2__Education__c": "",  # Needs to be in a separate post request
+            "ts2__Desired_Salary__c": conversation.get("annualSalary"),
+            "ts2__Desired_Hourly__c": conversation.get("dayRate"),
+            "ts2__LinkedIn_Profile__c": conversation.get("CandidateLinkdinURL"),
+            "Attributes__c": conversation.get("skills"),
+            "ts2__Job_Type__c": conversation.get("preferredJobType"),
+            # "ts2__Text_Resume__c": "", # TODO: Link this with File upload
+            "Internal_Notes__c": crm_services.additionalCandidateNotesBuilder(
+                {
+                    "preferredJobTitle": conversation.get("preferredJobTitle"),
+                    "preferredJobType": conversation.get("preferredJobType"),
+                    "yearsExperience": conversation.get("yearsExperience"),
+                    "skills": conversation.get("skills")
+                }, conversation.get("selectedSolutions")
+            ),
+        }
+
+        # So that we dont replace existing data will nothing
+        filtered_body = {}
+        for propertyKey, propertyValue in body.items():
+            if propertyValue is not None:
+                filtered_body[propertyKey] = propertyValue
+
+        # send query
+        sendQuery_callback: Callback = sendQuery(auth, "patch", filtered_body,
+                                                 "sobjects/Contact/" + str(conversation.get("id")))
+
+        if not sendQuery_callback.Success:
+            raise Exception(sendQuery_callback.Message)
+
+        return Callback(True, sendQuery_callback.Data.text)
+
+    except Exception as exc:
+        helpers.logError("Marketplace.CRM.Jobscience.updateCandidate() ERROR: " + str(exc))
+        return Callback(False, str(exc))
+
+
+# def uploadFile(auth, storedFile: StoredFile):  # ISSUE: NO CURRENT API OPTION FOR RESUME UPLOAD
+#     print("UPLOAD FILE NOT SUPORTED")
 
 
 def insertClient(auth, conversation: Conversation) -> Callback:
@@ -297,10 +436,10 @@ def searchCandidates(access_token, conversation) -> Callback:
         query = "WHERE+RecordType.Name+IN+('Candidate')+AND+ts2__People_Status__c+IN+('Active', 'Live')+AND+"
 
         # Filter by job type:
-        #print("THE TYPE: ")
-        #print(conversation.get('JobType'))
-        #print(conversation)
-        #exit(0)
+        # print("THE TYPE: ")
+        # print(conversation.get('JobType'))
+        # print(conversation)
+        # exit(0)
 
         # Filter on location:
         if conversation.get('location') is not None:
@@ -312,7 +451,7 @@ def searchCandidates(access_token, conversation) -> Callback:
                                     SOQL_type="+LIKE+")
         else:
             # Set job title to skills value:
-            query += populateFilter("%" + conversation.get('skills').split(" ")[0]+ "%", "Title", quote_wrap=True,
+            query += populateFilter("%" + conversation.get('skills').split(" ")[0] + "%", "Title", quote_wrap=True,
                                     SOQL_type="+LIKE+")
 
         # Filter on desired salary:
@@ -321,8 +460,8 @@ def searchCandidates(access_token, conversation) -> Callback:
                                     SOQL_type="=")
         query = query[:-5]
 
-        #print("Query is:")
-        #print(query)
+        # print("Query is:")
+        # print(query)
 
         # TODO: Differentiate between hourly and salary
         sendQuery_callback: Callback = sendQuery(access_token, "get", {},
@@ -333,13 +472,13 @@ def searchCandidates(access_token, conversation) -> Callback:
 
         if not sendQuery_callback.Success:
             raise Exception(sendQuery_callback.Message)
-        #print("QUERY HAS BEEN SENT")
+        # print("QUERY HAS BEEN SENT")
         candidate_fetch = json.loads(sendQuery_callback.Data.text)
         records = candidate_fetch['records']
         # Iterate through candidates
         result = []
         # TODO: Fetch job title
-        #print("NUMBER OF RECORDS RETRIEVED: ", len(candidate_fetch['records']))
+        # print("NUMBER OF RECORDS RETRIEVED: ", len(candidate_fetch['records']))
 
         # <-- CALL SKILLS SEARCH -->
         # for record in candidate_fetch['records']:
@@ -387,7 +526,7 @@ def searchCandidates(access_token, conversation) -> Callback:
 
             # remove the last (least important filter)
             query = "AND".join(query.split("AND")[:-1])
-            #print("QUERY IS: ", query)
+            # print("QUERY IS: ", query)
 
             # if no filters left - stop
             if not query:
@@ -395,22 +534,27 @@ def searchCandidates(access_token, conversation) -> Callback:
 
         # <-- CALL SKILLS SEARCH -->
         for record in records:
-            #print(record.get("ts2__Desired_Hourly__c"))
-            #print(record.get("ts2__Desired_Salary__c"))
-            #print(record.get("Min_Basic__c"))
+            # print(record.get("ts2__Desired_Hourly__c"))
+            # print(record.get("ts2__Desired_Salary__c"))
+            # print(record.get("Min_Basic__c"))
             list_of_contactIDs.append("'" + record.get("Id") + "'")
 
         # Fetch associated candidate skills
         skills = conversation.get("skills")
-        #print("THE SKILLS ARE: ")
-        #print(skills)
+        print("THE SKILLS ARE: ")
+        print(skills)
+        if type(skills) == list:
+            print("Skills are a list...")
+        else:
+            skills = skills.split(" ")
+
         candidate_skills = []
         if len(candidate_fetch['records']) > 0:
-            candidate_skills = fetchSkillsForCandidateSearch(list_of_contactIDs, skills.split(" "), access_token)
+            candidate_skills = fetchSkillsForCandidateSearch(list_of_contactIDs, skills, access_token)
         # <-- CALL SKILLS SEARCH -->
 
-        for record in records:
-            #print("-- NEW RECORD --")
+        for record_num, record in enumerate(records):
+            # print("-- NEW RECORD --")
             skills_string = ""
             counter = 0
             for skill in candidate_skills:
@@ -418,8 +562,8 @@ def searchCandidates(access_token, conversation) -> Callback:
 
                 if skill.get("ts2__Contact__c") == record.get("Id") and counter < 5:
                     counter += 1
-                    #print(skill.get("ts2__Skill_Name__c"))
-                    #print(skill.get("ts2__Last_Used__c"))
+                    # print(skill.get("ts2__Skill_Name__c"))
+                    # print(skill.get("ts2__Last_Used__c"))
 
                     skills_string += skill.get("ts2__Skill_Name__c")
                     if skill.get("ts2__Last_Used__c") is not None:
@@ -428,7 +572,7 @@ def searchCandidates(access_token, conversation) -> Callback:
                         skills_string += ""
             # skills_string += (record.get("Attributes__c", "") or "")  # Merging skills and job title together...
 
-            result.append(databases_services.createPandaCandidate(id=record.get("id", ""),
+            result.append(databases_services.createPandaCandidate(id=record.get("X18_Digit_ID__c", str(record_num)),
                                                                   name=record.get("Name"),
                                                                   email=record.get("Email"),
                                                                   mobile=record.get("Phone"),
@@ -446,7 +590,7 @@ def searchCandidates(access_token, conversation) -> Callback:
                                                                                 record.get('Min_Basic__c', 0),
                                                                   currency=Currency("GBP"),
                                                                   source="Jobscience"))
-        #print("RETURNING RECORDS ...")
+        # print("RETURNING RECORDS ...")
         return Callback(True, sendQuery_callback.Message, result)
     except Exception as exc:
         helpers.logError("Marketplace.CRM.Jobscience.searchCandidates() ERROR: " + str(exc))
@@ -490,14 +634,15 @@ def searchJobs(access_token, conversation) -> Callback:
         # query += populateFilter(DT.JobEndDate, "ts2__Estimated_End_Date__c", quote_wrap=False)
 
         query = query[:-5]  # To remove final +AND
-        #print("QUERY IS: ", query)
+        # print("QUERY IS: ", query)
 
         # NOTE: Properties to return must be stated, no [*] operator
         sendQuery_callback: Callback = sendQuery(
-            access_token, "get", {}, "SELECT+Name,ts2__Employment_Type__c,RecordType.Name,Rate_Type__c,ts2__Text_Description__c," +
-                                     "ts2__Max_Salary__c,ts2__Max_Pay_Rate__c,ts2__Min_Pay_Rate__c,ts2__Location__c,ts2__Job_Tag__c," +
-                                     "ts2__Estimated_Start_Date__c,ts2__Estimated_End_Date__c+from+ts2__Job__c+" +
-                                     query + "+LIMIT+500")  # Return 500 records at most
+            access_token, "get", {},
+            "SELECT+Name,ts2__Employment_Type__c,RecordType.Name,Rate_Type__c,ts2__Text_Description__c," +
+            "ts2__Max_Salary__c,ts2__Max_Pay_Rate__c,ts2__Min_Pay_Rate__c,ts2__Location__c,ts2__Job_Tag__c," +
+            "ts2__Estimated_Start_Date__c,ts2__Estimated_End_Date__c+from+ts2__Job__c+" +
+            query + "+LIMIT+500")  # Return 500 records at most
         if not sendQuery_callback.Success:
             raise Exception(sendQuery_callback.Message)
 
@@ -507,10 +652,11 @@ def searchJobs(access_token, conversation) -> Callback:
         while len(job_fetch['records']) < 200:
             # send query
             sendQuery_callback: Callback = sendQuery(
-                access_token, "get", {}, "SELECT+Name,ts2__Employment_Type__c,RecordType.Name,Rate_Type__c,ts2__Text_Description__c," +
-                                         "ts2__Max_Salary__c,ts2__Max_Pay_Rate__c,ts2__Min_Pay_Rate__c,ts2__Location__c,ts2__Job_Tag__c," +
-                                         "ts2__Estimated_Start_Date__c,ts2__Estimated_End_Date__c+from+ts2__Job__c+" +
-                                         query + "+LIMIT+100")  # Return 500 records at most
+                access_token, "get", {},
+                "SELECT+Name,ts2__Employment_Type__c,RecordType.Name,Rate_Type__c,ts2__Text_Description__c," +
+                "ts2__Max_Salary__c,ts2__Max_Pay_Rate__c,ts2__Min_Pay_Rate__c,ts2__Location__c,ts2__Job_Tag__c," +
+                "ts2__Estimated_Start_Date__c,ts2__Estimated_End_Date__c+from+ts2__Job__c+" +
+                query + "+LIMIT+100")  # Return 500 records at most
             if not sendQuery_callback.Success:
                 raise Exception(sendQuery_callback.Message)
 
@@ -519,7 +665,7 @@ def searchJobs(access_token, conversation) -> Callback:
 
             # TODO: Call skills fetch here
             if return_body["records"]:
-                #print("Records length:", str(len(records)))
+                # print("Records length:", str(len(records)))
                 # add the candidates to the records
                 records = records + list(return_body["records"])
 
@@ -538,7 +684,7 @@ def searchJobs(access_token, conversation) -> Callback:
 
             # remove the last (least important filter)
             query = "AND".join(query.split("AND")[:-1])
-            #print("QUERY IS: ", query)
+            # print("QUERY IS: ", query)
 
             # if no filters left - stop
             if not query:
@@ -570,7 +716,7 @@ def searchJobs(access_token, conversation) -> Callback:
                                                             linkURL=None,
                                                             currency=Currency("GBP"),
                                                             source="Jobscience"))
-        #print("FINISHED")
+        # print("FINISHED")
 
         return Callback(True, sendQuery_callback.Message, result)
 
@@ -639,58 +785,37 @@ def getAllJobs(access_token, companyID, fields=None) -> Callback:  # TODO: See t
         return Callback(False, str(exc))
 
 
-def sendQuery(access_token, method, body, query):
+# TODO: Clean up this sendquery and enacpsulate refresh token logic:
+def sendQuery(auth, method, body, query):
     try:
-        print("-----------------")
-        print(my_test_here)
-        print("------------------")
+
         url = buildUrl(query, method)
 
         # set headers
         headers = {
             'Content-Type': 'application/json',
-            'Authorization': "Bearer " + access_token,
-            'cache-control': "no-cache",
+            'Authorization': 'Bearer ' + auth.get('access_token'),
+            'cache-control': 'no-cache',
             'Cookie': 'inst=APP_3X'
         }
         print("URL OF THE SEND QUERY")
         print(url)
         print("HEADERS OF SEND QUERY")
         print(headers)
+
         response = marketplace_helpers.sendRequest(url, method, headers, json.dumps(body))
+
 
         if response.status_code == 401:  # wrong rest token
 
-            # get new access token:
-
-            print("Getting a new access token")
-            headers_refresh = {
-                'Content-Type': "application/x-www-form-urlencoded",
-                'Cache-Control': "no-cache",
-                'Cookie': "inst=APP_3X",
-                'cache-control': "no-cache"
-            }
-
-            body_refresh = {
-                'grant_type': "refresh_token",
-                'client_id': "3MVG9I5UQ_0k_hTlh64o5U2MnkGkPmYj_xkMpFkEi0tIJXl_CGhXpux_w5khN6pvnNd.IH6Yvo82ZAcRystWE",
-                'client_secret': "972A46C725406EE38D971409A1509EF164B100A9B8B42CA4C39AB3952B65A215",
-                'refresh_token': my_test_here
-            }
-
-            resp = json.loads(requests.request("POST", "https://login.salesforce.com/services/oauth2/token?", headers=headers_refresh, data=body_refresh).text)
-            print(resp)
-            headers['Authorization'] = "Bearer " + resp.get('access_token')
+            refreshToken(auth, None)
+            headers['Authorization'] = "Bearer " + auth.get('access_token')
 
             # Try again
             response = marketplace_helpers.sendRequest(url, method, headers, json.dumps(body))
 
-
         if not response.ok:
             raise Exception(response.text + ". Query could not be sent")
-
-        elif not response.ok:
-            raise Exception("Rest url for query is incorrect")
 
         return Callback(True, "Query was successful", response)
 
@@ -700,12 +825,13 @@ def sendQuery(access_token, method, body, query):
 
 
 def buildUrl(query, method):
-
-    url = "https://prsjobs.cs83.my.salesforce.com/services/data/v46.0/"
+    url = BASE_URL
     if method == "post":
         url = url + query  # Append object to be edited
     elif method == "get":
         url = url + "query/?q=" + query  # Append SOQL query
+    elif method == 'patch':
+        url = url + query
     return url
 
 

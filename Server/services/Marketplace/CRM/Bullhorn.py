@@ -161,9 +161,6 @@ def sendQuery(auth, query, method, body, companyID, optionalParams=None):
         if os.environ['FLASK_ENV'] != "production":
             url = url.replace("rest.", "rest9.")
 
-        # remove None values from body
-        body = {key: value for key, value in body.items() if value is not None}
-
         # set headers
         headers = {'Content-Type': 'application/json'}
 
@@ -184,7 +181,7 @@ def sendQuery(auth, query, method, body, companyID, optionalParams=None):
                 raise Exception(r.text + ". Query could not be sent")
 
         elif not r.ok:
-            raise Exception("send query failed: ", r.text)
+            raise Exception("Query failed with error code " + str(r.status_code))
 
         return Callback(True, "Query was successful", r)
 

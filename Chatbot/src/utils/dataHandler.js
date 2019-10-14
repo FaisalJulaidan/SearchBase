@@ -130,12 +130,12 @@ export const dataHandler = (() => {
         };
 
         const processMessages = (completed) => {
+            let userType = "Unknown";
             let collectedData = [];
             let collectedKeywords = [];
             let keywordsByDataType = {};
             let submittedFiles = [];
             let selectedSolutions = [];
-            let recordedUserTypes = [];
             let _curScore = 0;
             let _totalScore = 0;
             const personalData = {
@@ -174,36 +174,9 @@ export const dataHandler = (() => {
                 });
             };
 
-            const __detectUserType = () => {
-                let userType = 'Unknown'; // default
-                recordedUserTypes = recordedUserTypes.filter(t => t !== userType);
-                if (recordedUserTypes.length === 0)
-                    return userType;
-
-                let types = {};
-                let maxCount = 1;
-                for (let type of recordedUserTypes) {
-                    let key = type;
-                    if (types[key] == null)
-                        types[key] = 1;
-                    else
-                        types[key]++;
-                    if (types[key] > maxCount)
-                        maxCount = types[key];
-                }
-                types = Object.keys(types).filter(key => types[key] === maxCount);
-                if (types.length === 1)
-                    userType = types[0];
-                return userType;
-            };
-
             const __accumulateScore = (earnedScore, total) => {
                 _curScore += earnedScore;
                 _totalScore += total;
-            };
-
-            const __recordUserTypes = (types) => {
-                recordedUserTypes = recordedUserTypes.concat(types);
             };
 
             const __processQuestion = (message) => {
@@ -237,6 +210,11 @@ export const dataHandler = (() => {
                 let keywords = content.selectedAnswer ? [content.selectedAnswer.value] : [];
                 let score = content.selectedAnswer ? content.selectedAnswer.score : 0;
                 let answer = content.skipped ? text : content.selectedAnswer.value;
+
+                // if the question type is UserType and not skipped, set the UserType
+                if (blockRef[flowAttributes.TYPE] === messageTypes.USER_TYPE && !content.skipped) {
+                    userType = answer
+                }
 
                 // Adds the answer text as part of the keywords list
                 let modifiedKeywords = [];
@@ -315,14 +293,12 @@ export const dataHandler = (() => {
                     [],
                     content.skipped);
                 if (solutions.length) {
-                    __recordUserTypes(solutions[0][solutionAttributes.DATABASE_TYPE][solutionAttributes.DATABASE_TYPE_USER_TYPES]);
                     selectedSolutions = selectedSolutions.concat(solutions);
                 }
             };
 
             const __getResult = () => {
 
-                const userType = __detectUserType();
                 let name, email, phone;
                 if (userType === 'Candidate') {
                     name = personalData.CandidateName;
@@ -358,8 +334,6 @@ export const dataHandler = (() => {
                 if (message.sender === 'USER') {
                     const { blockRef } = message;
                     // const storeInDB = blockRef[flowAttributes.STORE_IN_DB];
-                    __recordUserTypes(blockRef[flowAttributes.DATA_TYPE][flowAttributes.DATA_TYPE_USER_TYPES]);
-
                     switch (blockRef[flowAttributes.TYPE]) {
                         case messageTypes.QUESTION:
                             __processQuestion(message);

@@ -317,7 +317,7 @@ def searchCandidates(auth, companyID, data) -> Callback:
         fields = "fl=id,name,primary_email,mobile,current_location,skill,desired_salary,currency,deleted,last_update,met_status"
 
         # populate filter
-        query += populateFilter(data.get("location"), "current_address")
+        query += populateFilter(data.get("location"), "current_city")
 
         # if keywords[DT.CandidateSkills.value["name"]]:
         #     query += "primarySkills.data:" + keywords[DT.CandidateSkills.name] + " or"
@@ -328,8 +328,8 @@ def searchCandidates(auth, companyID, data) -> Callback:
         if len(query) < 3:
             query = ""
         else:
-            query += ""
-        query += "%23"
+            query += "%23"
+
         # send query
         sendQuery_callback: Callback = sendQuery(auth, "candidate/search/" + fields, "get", {}, companyID,
                                                  [query])
@@ -507,7 +507,7 @@ def searchJobs(auth, companyID, data) -> Callback:
 
 def populateFilter(value, string):
     if value:
-        return string + ":" + value + "&"
+        return string + ":" + value + ","
     return ""
 
 

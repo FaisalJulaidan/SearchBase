@@ -14,44 +14,6 @@ from typing import List
 import boto3
 from botocore.exceptions import ClientError
 
-salaryPicker = {
-    "min": 100,
-    "max": 200,
-    "period": "Annually",
-    "currency": "GBP",
-}
-
-jobType = {
-    "types": [
-        {
-            "value": "Permanent",
-            "text": "Permanent",
-        },
-        {
-            "value": "Contract",
-            "text": "Contract",
-        }
-    ]
-}
-
-datePicker = {
-    "type": "Multiple",
-}
-
-userType = {
-    "text": "User Type",
-    "types": [
-        {
-            "value": "Candidate",
-            "text": "Candidate",
-        },
-        {
-            "value": "Client",
-            "text": "Client",
-        }
-    ]
-}
-
 
 # NOTE: Make sure to take a backup of the database before running these functions
 # =============================================================================
@@ -80,12 +42,13 @@ def cleanStoredFiles():
 
                 db.session.delete(file)
             except ClientError as e:
-                raise Exception("DigitalOcean Error")
+                raise Exception(e)
 
         db.session.commit()
-        print("Files found to delete")
-    except Exception as exc:
-        return print("Couldn't find files to delete")
+        print("Files cleaned successfully")
+    except Exception as e:
+        print(e)
+        return print("Failed to clean stored files")
 
 
 def migrateConversations():
@@ -166,6 +129,38 @@ def migrateFlowTemplates():
         print("migrateFlowTemplates failed :(")
 
 
+def validateFlows():
+    try:
+        # Validate assistant flows from templates
+        directory = join(BaseConfig.APP_ROOT, 'static/assistant_templates')
+        for filename in os.listdir(directory):
+            if filename.endswith(".json"):
+                jsonFile = open(directory + '/' + filename, 'r')  # Open the JSON file for reading
+                flow = json.load(jsonFile)  # Read the JSON into the buffer
+                jsonFile.close()  # Close the JSON file
+
+                # Migrate
+                newFlow = __migrateFlow(flow)
+                if not newFlow:
+                    raise Exception("Templates migration failed for (" + filename + ")")
+                continue
+            else:
+                continue
+
+        # Validate assistant flows from db
+        for assistant in db.session.query(Assistant).all():
+            if assistant.Flow:
+                # Update flow
+                newFlow = __migrateFlow(assistant.Flow)
+                if not newFlow:
+                    raise Exception("Assistant Flows migration failed for assistant(" + assistant.Name + ")")
+
+        print("Flows are VALID :)")
+    except Exception as exc:
+        print(exc)
+        print("Flows are INVALID :(")
+
+
 def __migrateFlow(flow):
     try:
         newFlow = copy.deepcopy(flow)  # deep clone is IMPORTANT
@@ -215,7 +210,6 @@ def __migrateFlow(flow):
                     block['Content']["currency"] = 'GBP'
 
                     block['Type'] = 'Salary Picker'
-
 
 
                 if block['DataType'] in ["CandidateJobTitle"]:

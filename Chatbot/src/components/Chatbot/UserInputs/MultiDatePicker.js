@@ -20,7 +20,6 @@ const MultiDatePicker = ({ message, submitMessage }) => {
     const renderDate = (curDate, today) => {
         let className = 'antd-date-multi';
         className += curDate.isSame(today, 'month') ? '' : ' fade';
-        let element;
 
         for (let date in selectedDates.individual) {
             if (Math.abs(selectedDates.individual[date].diff(curDate, 'hours')) < 23) {
@@ -30,15 +29,16 @@ const MultiDatePicker = ({ message, submitMessage }) => {
         if (curDate.isBefore(moment().startOf('week'))) {
             className += ' disabled';
         }
-        element = (<div className={className}><span>{curDate.format('D')}</span></div>);
-        return addEventHandlers(element, curDate);
+
+        const element = (
+            <div className={className}>
+                <span>{curDate.format('D')}</span>
+            </div>
+        );
+
+        return React.cloneElement(element, { onMouseDown: e => dateMouseDown(e, curDate) });
     };
 
-    const addEventHandlers = (element, date) => {
-        return React.cloneElement(element, {
-            onMouseDown: e => dateMouseDown(e, date)
-        });
-    };
 
     useEffect(() => {
         function checkValidParent(e) {

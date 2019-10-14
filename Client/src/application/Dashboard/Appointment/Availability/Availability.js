@@ -10,6 +10,8 @@ import { assistantActions, databaseActions } from 'store/actions';
 
 const { Option, OptGroup } = AutoComplete;
 
+const momentFormat = 'DD/MM/YYYY'
+
 
 class Availability extends React.Component {
 
@@ -72,10 +74,10 @@ class Availability extends React.Component {
             dates.forEach(date => {
                 let range = date.split('-');
                 if (range.length > 1) { // range handlers
-                    let startDate = moment(range[0], 'L');
+                    let startDate = moment(range[0], momentFormat);
                     let rangeArr = [startDate];
                     let moveDate = startDate.clone();
-                    let endDate = moment(range[1], 'L');
+                    let endDate = moment(range[1], momentFormat);
                     while (rangeArr.length !== Math.abs(startDate.diff(endDate, 'days'))) {
                         rangeArr.push(moveDate.add(1, 'days').clone());
                     }
@@ -91,7 +93,7 @@ class Availability extends React.Component {
                         }
                     });
                 } else { // individual staggered dates
-                    let realDate = moment(date, 'L');
+                    let realDate = moment(date, momentFormat);
                     if (realDate.isBetween(start, end) || realDate.isSame(start, 'date') || realDate.isSame(end, 'date')) {
                         let key = searchArray(record.ID); // key exists?
                         if (key) {
@@ -310,7 +312,7 @@ class Availability extends React.Component {
                 <Button onClick={() => this.moveWeek(-1)}>
                     <Icon type="left"/>
                 </Button>
-                {this.state.start.format('L')}
+                {this.state.start.format(momentFormat)}
                 <Button onClick={() => this.moveWeek(1)} style={{ marginLeft: 6 }}>
                     <Icon type="right"/>
                 </Button>

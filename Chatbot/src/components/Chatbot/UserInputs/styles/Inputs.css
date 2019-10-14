@@ -70,6 +70,10 @@
   color: rgba(0,0,0,0.25);
 }
 
+.antd-date-multi.disabled  {
+  background-color: rgb(224, 224, 224)
+}
+
 .antd-date-multi.range {
   background:rgba(186, 231, 255, 0.47)
 }

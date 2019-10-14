@@ -2,14 +2,15 @@ import React, { useState, useEffect } from 'react';
 // Constants
 import * as messageTypes from '../../../constants/MessageType';
 import * as flowAttributes from '../../../constants/FlowAttributes';
+import * as constants from '../../../constants/Constants';
 // Styles
 import './styles/Inputs.css';
 // Components
 import { DatePicker as AntdDatePicker, Icon, Tooltip } from 'antd';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTelegramPlane } from '@fortawesome/free-brands-svg-icons';
-import { ETIME } from 'constants';
 
+import moment from 'moment'
 
 const MultiDatePicker = ({ message, submitMessage }) => {
 
@@ -26,6 +27,9 @@ const MultiDatePicker = ({ message, submitMessage }) => {
             if (Math.abs(selectedDates.individual[date].diff(curDate, 'hours')) < 23) {
                 className += ' selected individual finish';
             }
+        }
+        if(curDate.isBefore(moment().startOf('week'))){
+          className += ' disabled'
         }
         element = (<div className={className}><span>{curDate.format('D')}</span></div>);
         return addEventHandlers(element, curDate);
@@ -62,6 +66,9 @@ const MultiDatePicker = ({ message, submitMessage }) => {
 
     const dateMouseDown = (e, date) => {
         let dates = Object.assign({}, selectedDates);
+        if(date.isBefore(moment().startOf('week'), 'week')){
+          return
+        }
         for(let ind in dates.individual){
           if(dates.individual[ind].isSame(date, 'date')){
             dates.individual.splice(ind, 1)
@@ -87,10 +94,10 @@ const MultiDatePicker = ({ message, submitMessage }) => {
     const selectedDatesToString = () => {
         let str = '';
         selectedDates.individual.forEach(ind => {
-            str += `${ind.format('L')},`;
+            str += `${ind.format(constants.MOMENT_FORMAT)},`;
         });
         selectedDates.range.forEach(range => {
-            str += `${range[0].format('L')}-${range[1].format('L')},`;
+            str += `${range[0].format(constants.MOMENT_FORMAT)}-${range[1].format(constants.MOMENT_FORMAT)},`;
         });
         return str.substr(0, str.length - 1);
     };

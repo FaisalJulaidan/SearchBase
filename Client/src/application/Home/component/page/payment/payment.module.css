@@ -1,7 +1,7 @@
 .wrapper {
     padding: 1em 1em;
     min-height: 100vh;
-    color: #726a84;
+    color: #848484;
 }
 
 .row_steps{
@@ -11,21 +11,42 @@
 
 .col_desc {
     align-self: center;
-    color: white;
+    color: #848484;
 }
 
-.col_desc .text1 {
-    text-align: left;
+.col_desc .title{
+    text-align: center;
     color: #444444;
+    font-weight: bolder;
+    font-size: 1.5em;
+    padding-bottom: 0;
+}
+
+.col_desc hr {
+    text-align: center;
+    background-color: #9254de;
+    max-width: 45px;
+    margin: .75em auto;
+    height: 3px;
+}
+
+.col_desc .list {
+    text-align: center;
+    color: #848484;
     font-weight: bold;
-    padding: 0 0 .5em 0;
-    font-size: 2em;
+    flex-grow: 1;
 }
 
-.col_desc .text2 {
-    text-align: left;
-    color: #444444;
-    font-size: 1em;
+.col_desc .list li {
+    margin: .5em 0;
+}
+
+.col_desc .list li:first-child {
+    margin-top: 0;
+}
+
+.col_desc .list li:last-child {
+    margin-bottom: 0;
 }
 
 .card {
@@ -35,10 +56,10 @@
 
 .title {
     color: #444444;
-    font-size: 2em;
+    font-size: 1.2em;
     font-weight: bold;
-    text-align: center;
     padding-bottom: 1em;
+    text-align: center;
 }
 
 .input {
@@ -85,16 +106,17 @@
 
 .sign_up {
     margin-top: 1em;
-    font-size: .85em;
+    font-size: .8em;
     text-align: center;
-    color: #726a84;
+    color: #909090;
 }
 
 .sign_up a {
-    font-size: .96em;
+    font-size: 1em;
     margin: 0 .2em;
     text-decoration: none;
-    color: #9254de;
+    font-weight: bold;
+    color: #B2B2B2;
 }
 
 .navigation {

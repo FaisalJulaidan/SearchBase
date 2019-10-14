@@ -23,11 +23,11 @@ const selectBeforeURL = (
 class SignupFormPayment extends React.Component {
 
     componentDidMount() {
-        const found = pricingJSON.some(item => item.id === this.props?.plan);
+        const found = pricingJSON.some(plan => plan.id === this.props.planID);
         if (!found) {
-            this.setState({plan: pricingJSON[0].id})
+            this.setState({planID: pricingJSON[0].id})
         } else {
-            this.setState({plan: this.props.plan})
+            this.setState({planID: this.props.planID})
         }
     }
 
@@ -39,9 +39,9 @@ class SignupFormPayment extends React.Component {
 
     componentDidUpdate(prevProps, prevState, snapshot) {
         if (prevProps.isSigningUp && (this.props.errorMsg === null)) {
-            this.props.onSignupSuccessful(this.state.plan, this.props.form.getFieldValue('email'));
-        } else if (prevState.plan !== this.state.plan)
-            this.props.history.push(`/order-plan?plan=${this.state.plan}`);
+            this.props.onSignupSuccessful(this.state.planID, this.props.form.getFieldValue('email'));
+        } else if (prevState.planID !== this.state.planID)
+            this.props.history.push(`/order-plan?plan=${this.state.planID}`);
     }
 
     handleSubmit = (e) => {
@@ -175,13 +175,13 @@ class SignupFormPayment extends React.Component {
 
                 <FormItem className={styles.form_item}>
                     {getFieldDecorator('plan', {
-                        initialValue: this.state.plan,
+                        initialValue: this.state.planID,
                         rules: [
                             {required: true, message: 'Please select a plan'},
                         ],
                     })(
                         <Select onSelect={(value) => {
-                            this.setState({plan: value})
+                            this.setState({planID: value})
                         }}>
                             {
                                 pricingJSON.map((plan) => {
@@ -220,7 +220,7 @@ class SignupFormPayment extends React.Component {
                     )}
                 </Form.Item>
                 <Form.Item className={styles.form_item}>
-                    <Button type="primary" htmlType="submit" block>Submit</Button>
+                    <Button loading={this.state.isSigningUp} type="primary" htmlType="submit" block>Submit</Button>
                 </Form.Item>
             </Form>
         );
@@ -228,7 +228,7 @@ class SignupFormPayment extends React.Component {
 }
 
 SignupFormPayment.propTypes = {
-    plan: PropTypes.string,
+    planID: PropTypes.string.isRequired,
     onSignupSuccessful: PropTypes.func.isRequired
 };
 

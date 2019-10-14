@@ -1,17 +1,16 @@
 .form_item {
     transition: all .5s;
-    font-weight: bold;
+    margin-bottom: 14px;
 }
 
 .form_item div {
-    line-height: 2em;
+    line-height: 1.5em;
 }
 
 .form_item label {
-    font-size: 1.1em;
-    font-weight: bold;
+    line-height: 2em;
+    font-size: .9em;
     color: #444444;
-
 }
 
 .card_input{
@@ -38,4 +37,8 @@
     border-right-width: 1px !important;
     outline: 0;
     box-shadow: 0 0 0 2px rgba(146, 84, 222, 0.2);
+}
+
+.button{
+    margin-top: 8px;
 }

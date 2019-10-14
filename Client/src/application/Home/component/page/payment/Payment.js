@@ -17,8 +17,8 @@ const {Step} = Steps;
 class Payment extends React.Component {
 
     state = {
-        currentStep: 0,
-        plan: pricingJSON[pricingJSON.length - 1].id,
+        planID: queryString.parse(this.props.location.search)?.plan,
+        currentStep: 1,
         email: "", //This Will be filled through SignUp form Callback
         firstName: "", //This Will be filled through SignUp form Callback
         lastName: "" //This Will be filled through SignUp form Callback
@@ -28,10 +28,9 @@ class Payment extends React.Component {
         document.title = "Payment | " + WEBSITE_TITLE;
     }
 
-    onSignupSuccessful = (plan, email, firstName, lastName) => {
+    onSignupSuccessful = (email, firstName, lastName) => {
         this.setState({
                 currentStep: 1,
-                plan: plan,
                 email: email,
                 firstName: firstName,
                 lastName: lastName
@@ -40,6 +39,12 @@ class Payment extends React.Component {
     };
 
     render() {
+
+        const plan = pricingJSON.find(plan => {
+            if (plan.id === this.state.planID)
+                return plan;
+        });
+
         return (
             <Layout>
                 <div className={styles.wrapper}>
@@ -70,7 +75,7 @@ class Payment extends React.Component {
                                                     <Card.Body>
                                                         {/*<h1 className={styles.title}>Sign up</h1>*/}
                                                         <SignupFormPayment
-                                                            plan={queryString.parse(this.props.location.search)?.plan}
+                                                            planID={this.state.planID}
                                                             onSignupSuccessful={this.onSignupSuccessful}/>
                                                     </Card.Body>
                                                 </Card>
@@ -81,11 +86,26 @@ class Payment extends React.Component {
                             ) : (
                                 <Elements>
                                     <Row>
-                                        <Col sm={6} md xl={4}>
+                                        <Col sm={6} md={6} lg={{span: 6}} className={styles.col_desc}>
+                                            <h1 className={styles.title}>{plan.title}</h1>
+                                            <hr/>
+                                            <ul className={styles.list}>
+                                                {plan.items?.map((item, key) => {
+                                                    return <li key={key}>{item}</li>
+                                                })}
+                                            </ul>
+                                        </Col>
+                                        <Col sm={6} md lg={{offset: 1}} xl={4}>
                                             <div className={styles.form_wrapper}>
                                                 <Card className={styles.card}>
                                                     <Card.Body>
-                                                        <PaymentForm email={this.state.email}/>
+                                                        <h1 className={styles.title}>Pay with card</h1>
+                                                        <PaymentForm
+                                                            planID={this.state.planID}
+                                                            email={this.state.email}/>
+                                                        <h6 className={styles.sign_up}>Powered by
+                                                            <a href="https://stripe.com">Stripe</a>
+                                                        </h6>
                                                     </Card.Body>
                                                 </Card>
                                             </div>

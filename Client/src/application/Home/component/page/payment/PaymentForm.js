@@ -1,14 +1,28 @@
 import React, {Component} from 'react';
 import PropTypes from 'prop-types';
 import {CardElement, injectStripe} from 'react-stripe-elements';
-import {Form, Icon, Input,Button} from 'antd';
+import {Form, Icon, Input, Button} from 'antd';
 import styles from "./payment-form.module.css";
+import pricingJSON from "../pricing/pricing";
 
 const FormItem = Form.Item;
 
 class PaymentForm extends Component {
 
-    stripeCardElementStyle= {
+    componentDidMount() {
+        const found = pricingJSON.some(plan => plan.id === this.props.planID);
+        if (!found) {
+            this.setState({planID: pricingJSON[0].id})
+        } else {
+            this.setState({planID: this.props.planID})
+        }
+    }
+
+    state={
+        planID: pricingJSON[0].id,
+    };
+
+    stripeCardElementStyle = {
         base: {
             fontSize: '15px',
             color: 'rgba(0, 0, 0, 0.65)',
@@ -25,6 +39,12 @@ class PaymentForm extends Component {
 
     render() {
         const {getFieldDecorator} = this.props.form;
+
+        const plan = pricingJSON.find(plan => {
+            if (plan.id === this.state.planID)
+                return plan;
+        });
+
         return (
             <Form onSubmit={this.handleSubmit} layout={'horizontal'}>
                 <FormItem label="Email" className={styles.form_item}>
@@ -42,33 +62,28 @@ class PaymentForm extends Component {
                     )}
                 </FormItem>
                 <FormItem label={'Card information'} className={styles.form_item}>
-                    {getFieldDecorator('card', {})(
+                    {getFieldDecorator('card')(
                         <CardElement className={styles.card_input} style={this.stripeCardElementStyle}/>
                     )}
                 </FormItem>
-                <FormItem  label={'Name on card'} className={styles.form_item}>
-                    {getFieldDecorator('card_owner', {})(
+                <FormItem label={'Name on card'} className={styles.form_item}>
+                    {getFieldDecorator('card_owner', {
+                        rules: [{required: true, message: 'Please input card owner\'s name!'}],
+                    })(
                         <Input prefix={<Icon type="user" style={{color: 'rgba(0,0,0,.25)'}}/>}
                                placeholder="Name on card"/>
                     )}
                 </FormItem>
-                <FormItem  label={'country or region'} className={styles.form_item}>
-                    {getFieldDecorator('country', {})(
-                        <Input prefix={<Icon type="user" style={{color: 'rgba(0,0,0,.25)'}}/>}
-                               placeholder="Country or region"/>
-                    )}
-                </FormItem>
-                <Form.Item>
-                    <Button loading={this.props.isRequestingDemo} type="primary" htmlType="submit" block>
-                        Subscribe
-                    </Button>
-                </Form.Item>
+                <Button className={styles.button} loading={this.props.isRequestingDemo} type="primary" htmlType="submit" block>
+                    Pay £{plan.price}
+                </Button>
             </Form>
         );
     }
 }
 
 PaymentForm.propTypes = {
+    planID: PropTypes.string.isRequired,
     email: PropTypes.string,
 };
 

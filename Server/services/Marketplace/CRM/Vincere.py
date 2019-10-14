@@ -329,7 +329,7 @@ def searchCandidates(auth, companyID, data) -> Callback:
             query = ""
         else:
             query += ""
-        query += "&start=0&language=ja "
+
         # send query
         sendQuery_callback: Callback = sendQuery(auth, "candidate/search/" + fields, "get", {}, companyID,
                                                  [query])
@@ -507,7 +507,7 @@ def searchJobs(auth, companyID, data) -> Callback:
 
 def populateFilter(value, string):
     if value:
-        return string + ":" + value + "&"
+        return string + ":" + value + " & "
     return ""
 
 

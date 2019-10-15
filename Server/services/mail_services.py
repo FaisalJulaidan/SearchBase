@@ -410,6 +410,14 @@ def __sendEmail(to, subject, template, files=None, **kwargs) -> Callback:
                 with app.app_context():
                     msg.html = render_template(template, **kwargs)
         else:
+            try:
+                # get app context / if it fails assume its working outside the app
+                app = current_app._get_current_object()
+
+            except Exception as exc:  # TODO check error code raise exception
+                # import app. importing it in the beginning of the file will raise an error as it is still not created
+                from app import app
+                
             msg.html = template
 
         if files:

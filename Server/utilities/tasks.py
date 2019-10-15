@@ -42,22 +42,24 @@ def cleanStoredFiles():
 
                 db.session.delete(file)
             except ClientError as e:
-                raise Exception("DigitalOcean Error")
+                raise Exception(e)
 
         db.session.commit()
-        print("Files found to delete")
-    except Exception as exc:
-        return print("Couldn't find files to delete")
+        print("Files cleaned successfully")
+    except Exception as e:
+        print(e)
+        return print("Failed to clean stored files")
 
 
 def migrateConversations():
     try:
-        for conversation in db.session.query(Conversation).options(joinedload('StoredFile').joinedload("StoredFileInfo")).all():
+        for conversation in db.session.query(Conversation).options(
+                joinedload('StoredFile').joinedload("StoredFileInfo")).all():
             counter = 0
             storedFile = conversation.StoredFile
             if storedFile:
                 # print(storedFile.StoredFileInfo)
-                newData = copy.deepcopy(conversation.Data) # deep clone is IMPORTANT
+                newData = copy.deepcopy(conversation.Data)  # deep clone is IMPORTANT
                 for cd in newData['collectedData']:
                     if cd['input'] == "&FILE_UPLOAD&":
                         cd["fileName"] = storedFile.StoredFileInfo[counter].FilePath
@@ -100,18 +102,20 @@ def migrateFlowTemplates():
     try:
         directory = join(BaseConfig.APP_ROOT, 'static/assistant_templates')
         for filename in os.listdir(directory):
+            print("Start migrating: " + filename)
             if filename.endswith(".json"):
-                jsonFile = open(directory+'/'+filename, 'r') # Open the JSON file for reading
-                flow = json.load(jsonFile) # Read the JSON into the buffer
-                jsonFile.close() # Close the JSON file
+                jsonFile = open(directory + '/' + filename, 'r')  # Open the JSON file for reading
+                flow = json.load(jsonFile)  # Read the JSON into the buffer
+                jsonFile.close()  # Close the JSON file
 
                 # Migrate
                 newFlow = __migrateFlow(flow)
                 if not newFlow:
-                    raise Exception(filename + ' failed')
+                    print(filename + ' failed')
+                    raise Exception
 
                 ## Save our changes to JSON file
-                jsonFile = open(directory+'/'+filename, "w+")
+                jsonFile = open(directory + '/' + filename, "w+")
                 jsonFile.write(json.dumps(newFlow))
                 jsonFile.close()
                 continue
@@ -121,26 +125,132 @@ def migrateFlowTemplates():
         print("Templates flow migration done successfully :)")
 
     except Exception as exc:
-        print(exc.args)
+        print(exc)
         print("migrateFlowTemplates failed :(")
+
+
+def validateFlows():
+    try:
+        # Validate assistant flows from templates
+        directory = join(BaseConfig.APP_ROOT, 'static/assistant_templates')
+        for filename in os.listdir(directory):
+            if filename.endswith(".json"):
+                jsonFile = open(directory + '/' + filename, 'r')  # Open the JSON file for reading
+                flow = json.load(jsonFile)  # Read the JSON into the buffer
+                jsonFile.close()  # Close the JSON file
+
+                # Migrate
+                newFlow = __migrateFlow(flow)
+                if not newFlow:
+                    raise Exception("Templates migration failed for (" + filename + ")")
+                continue
+            else:
+                continue
+
+        # Validate assistant flows from db
+        for assistant in db.session.query(Assistant).all():
+            if assistant.Flow:
+                # Update flow
+                newFlow = __migrateFlow(assistant.Flow)
+                if not newFlow:
+                    raise Exception("Assistant Flows migration failed for assistant(" + assistant.Name + ")")
+
+        print("Flows are VALID :)")
+    except Exception as exc:
+        print(exc)
+        print("Flows are INVALID :(")
 
 
 def __migrateFlow(flow):
     try:
-        newFlow = copy.deepcopy(flow) # deep clone is IMPORTANT
-        for group in newFlow['groups']: # loop groups
-            for block in group['blocks']: # loop blocks
+        newFlow = copy.deepcopy(flow)  # deep clone is IMPORTANT
+        for group in newFlow['groups']:  # loop groups
+            for block in group['blocks']:  # loop blocks
 
-                if block['DataType'] == "JobDesiredSkills":
-                    block['DataType'] = enums.DataType.JobEssentialSkills.name
+                if block['DataType'] in ["CandidateAvailableFrom", "CandidateAvailableTo", "CandidateAvailability"]:
+
+                    block['DataType'] = 'CandidateAvailability'
+                    block['Content'].pop('keywords', None)
+                    block['Content']["type"] = 'Multiple'
+
+                    block['Type'] = 'Date Picker'
+
+                if block['DataType'] in ["ClientAvailability"]:
+
+                    block['Content'].pop('keywords', None)
+                    block['Content']["type"] = 'Multiple'
+
+                    block['Type'] = 'Date Picker'
+
+
+                if block['DataType'] in ["JobStartDate", "JobEndDate"]:
+                    block['Content'].pop('keywords', None)
+                    block['Content']["type"] = 'Multiple'
+
+                    block['Type'] = 'Date Picker'
+
+
+                if block['DataType'] in ["CandidateAnnualDesiredSalary"]:
+                    block['DataType'] = 'CandidateDesiredSalary'
+                    block['Content'].pop('keywords', None)
+                    block['Content']["min"] = 15000
+                    block['Content']["max"] = 200000
+                    block['Content']["period"] = 'Annually'
+                    block['Content']["currency"] = 'GBP'
+
+                    block['Type'] = 'Salary Picker'
+
+
+                if block['DataType'] in ["CandidateDailyDesiredSalary"]:
+                    block['DataType'] = 'CandidateDesiredSalary'
+                    block['Content'].pop('keywords', None)
+                    block['Content']["min"] = 100
+                    block['Content']["max"] = 800
+                    block['Content']["period"] = 'Daily'
+                    block['Content']["currency"] = 'GBP'
+
+                    block['Type'] = 'Salary Picker'
+
+
+                if block['DataType'] in ["CandidateJobTitle"]:
+                    block['DataType'] = 'JobTitle'
+
+
+                if block['DataType'] in ["JobAnnualSalary"]:
+                    block['DataType'] = 'JobSalary'
+                    block['Content'].pop('keywords', None)
+                    block['Content']["min"] = 15000
+                    block['Content']["max"] = 200000
+                    block['Content']["period"] = 'Annually'
+                    block['Content']["currency"] = 'GBP'
+
+                    block['Type'] = 'Salary Picker'
+
+
+                if block['DataType'] in ["JobDayRate"]:
+                    block['DataType'] = 'JobSalary'
+                    block['Content'].pop('keywords', None)
+                    block['Content']["min"] = 100
+                    block['Content']["max"] = 800
+                    block['Content']["period"] = 'Daily'
+                    block['Content']["currency"] = 'GBP'
+
+                    block['Type'] = 'Salary Picker'
+
+
+                if block['DataType'] in ["JobType"]:
+                    block['DataType'] = 'NoType'
+
+
+                if block['DataType'] in ["UserType"]:
+                    block['DataType'] = 'NoType'
+
 
                 if block['Type'] == enums.BlockType.Question.value:
                     pass
-                    # for answer in block['Content']['answers']:
 
                 if block['Type'] == enums.BlockType.UserInput.value:
                     pass
-                    # block['Content']['keywords']= []
 
                 if block['Type'] == enums.BlockType.Solutions.value:
                     pass
@@ -157,6 +267,6 @@ def __migrateFlow(flow):
         return newFlow
 
     except Exception as exc:
-        # print(exc.args)
+        print(exc)
         print("Flow migration failed :(")
         return None

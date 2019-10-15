@@ -46,24 +46,22 @@
         },
         {
           "Content": {
-            "answers": [
+            "types": [
               {
                 "action": "Go To Next Block",
                 "afterMessage": "",
                 "blockToGoID": "hMRf-kH94",
-                "id": "e57qWjFR8",
-                "keywords": [],
                 "score": 1,
-                "text": "Permanent "
+                "text": "Permanent",
+                "value": "Permanent"
               },
               {
                 "action": "Go To Next Block",
                 "afterMessage": "",
                 "blockToGoID": "hMRf-kH94",
-                "id": "gQUSFPc8W",
-                "keywords": [],
                 "score": 1,
-                "text": "Contract"
+                "text": "Contract",
+                "value": "Contract"
               }
             ],
             "text": "What type of work are you looking for?"
@@ -75,7 +73,7 @@
           "SkipText": "Skip!",
           "Skippable": false,
           "StoreInDB": true,
-          "Type": "Question"
+          "Type": "Job Type"
         },
         {
           "Content": {
@@ -289,8 +287,8 @@
             "action": "End Chat",
             "afterMessage": "Great, thank you for all of the information. We will be in touch as soon as possible.",
             "blockToGoID": null,
-            "keywords": [],
-            "text": "Do you have a preference as to when we should contact you?"
+            "text": "Do you have a preference as to when we should contact you?",
+            "type": "Multiple"
           },
           "DataType": "ClientAvailability",
           "ID": "lbEdJtlIT",
@@ -299,7 +297,7 @@
           "SkipText": "Skip Question",
           "Skippable": true,
           "StoreInDB": true,
-          "Type": "User Input"
+          "Type": "Date Picker"
         },
         {
           "Content": {

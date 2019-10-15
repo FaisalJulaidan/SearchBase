@@ -13,7 +13,7 @@ from services import assistant_services
 from services.Marketplace.CRM import crm_services
 from services.Marketplace.marketplace_helpers import convertSkillsToString
 from utilities import helpers
-from utilities.enums import DatabaseType, DataType as DT
+from utilities.enums import DatabaseType, Period, DataType as DT
 
 
 def fetchDatabase(id, companyID: int, pageNumber: int) -> Callback:
@@ -202,10 +202,10 @@ def updateCandidate(candidateID, conversation) -> Callback:
             "availability": ", ".join(
                 conversation.Data.get('keywordsByDataType').get(DT.CandidateAvailability.value['name'], [])) or None,
 
-            "annualSalary": crm_services.getSalary(conversation, DT.CandidateAnnualDesiredSalary, "Min") or
-                            crm_services.getSalary(conversation, DT.JobAnnualSalary, "Min"),
-            "dayRate": crm_services.getSalary(conversation, DT.CandidateDailyDesiredSalary, "Min") or
-                       crm_services.getSalary(conversation, DT.JobDayRate, "Min")
+            "annualSalary": crm_services.getSalary(conversation, DT.CandidateDesiredSalary, "Min", Period.Annually) or
+                            crm_services.getSalary(conversation, DT.JobSalary, "Min", Period.Annually),
+            "dayRate": crm_services.getSalary(conversation, DT.CandidateDesiredSalary, "Min", Period.Daily) or
+                       crm_services.getSalary(conversation, DT.JobSalary, "Min", Period.Daily)
         }
 
         for key, value in data.items():
@@ -362,7 +362,7 @@ def scanCandidates(session, dbIDs, extraCandidates=None, campaign=False):
             '')
 
         # Salary comparision for JobSalary (LessThan is forced)
-        salaryInputs: list = keywords.get(DT.JobAnnualSalary.value['name'], keywords.get(DT.JobDayRate.value['name']))
+        salaryInputs: list = keywords.get(DT.JobSalary.value['name'])
         if salaryInputs and len(salaryInputs):
             df[['Score', Candidate.CandidateDesiredSalary.name, Candidate.Currency.name]] = \
                 df.apply(lambda row: __salary(row, Candidate.CandidateDesiredSalary, Candidate.Currency,
@@ -370,8 +370,7 @@ def scanCandidates(session, dbIDs, extraCandidates=None, campaign=False):
                          result_type='expand')
 
         # Salary comparision for CandidateDesiredSalary
-        salaryInputs: list = keywords.get(DT.CandidateAnnualDesiredSalary.value['name'],
-                                          keywords.get(DT.CandidateDailyDesiredSalary.value['name']))
+        salaryInputs: list = keywords.get(DT.CandidateDesiredSalary.value['name'])
         if salaryInputs and len(salaryInputs):
             df[['Score', Candidate.CandidateDesiredSalary.name, Candidate.Currency.name]] = \
                 df.apply(lambda row: __salary(row, Candidate.CandidateDesiredSalary, Candidate.Currency,
@@ -390,15 +389,12 @@ def scanCandidates(session, dbIDs, extraCandidates=None, campaign=False):
         __wordsCounter(DT.CandidateLocation, Candidate.CandidateLocation, keywords, df, 6)
 
         # JobTitle
-        __wordsCounter(DT.CandidateJobTitle, Candidate.CandidateJobTitle, keywords, df, 1)
         __wordsCounter(DT.JobTitle, Candidate.CandidateJobTitle, keywords, df, 1)
 
         # Skills
         __wordsCounter(DT.CandidateSkills, Candidate.CandidateSkills, keywords, df, 2)
         __wordsCounter(DT.JobEssentialSkills, Candidate.CandidateSkills, keywords, df, 2)
 
-        # Availability
-        __wordsCounter(DT.CandidateAvailability, Candidate.CandidateAvailability, keywords, df, 1)
 
         topResults = json.loads(df[df['Score'] > 0].nlargest(session.get('showTop', 2), 'Score')
                                 .to_json(orient='records'))
@@ -484,10 +480,7 @@ def scanJobs(session, dbIDs, extraJobs=None):
 
         # Salary comparision
         salaryInputs: list = \
-            keywords.get(DT.JobAnnualSalary.value['name'],
-                         keywords.get(DT.JobDayRate.value['name'],
-                                      keywords.get(DT.CandidateAnnualDesiredSalary.value['name'],
-                                                   keywords.get(DT.CandidateDailyDesiredSalary.value['name']))))
+            keywords.get(DT.JobSalary.value['name'], keywords.get(DT.CandidateDesiredSalary.value['name']))
 
         if salaryInputs:
             df[['Score', Job.JobSalary.name, Job.Currency.name]] = \

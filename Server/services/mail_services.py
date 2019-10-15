@@ -306,7 +306,7 @@ def notifyNewConversation(assistant: Assistant, conversation: Conversation):
                                                    subject='New ' + conversation.UserType.name
                                                           + " has engaged with "
                                                           + assistant.Name + " assistant",
-                                                   template='emails/new_conversations_notification.html',
+                                                   template='/emails/new_conversations_notification.html',
                                                    assistantName = assistant.Name,
                                                    assistantID = assistant.ID,
                                                    conversations = conversations,
@@ -366,7 +366,7 @@ def notifyNewConversations(assistant: Assistant, conversations, lastNotification
             email_callback: Callback = __sendEmail(to=user.Email,
                                                    subject="New users has engaged with your "
                                                           + assistant["Name"] + " assistant",
-                                                   template='emails/new_conversations_notification.html',
+                                                   template='/emails/new_conversations_notification.html',
                                                    assistantName = assistant.Name,
                                                    assistantID = assistant.ID,
                                                    conversations = conversationsList,
@@ -394,7 +394,6 @@ def __sendEmail(to, subject, template, files=None, **kwargs) -> Callback:
     try:
         # create Message with the Email: title, recipients and sender
         msg = Message(subject, recipients=[to], sender=tsbEmail)
-
         if template[0] == "/":
             try:
                 # get app context / if it fails assume its working outside the app
@@ -410,6 +409,7 @@ def __sendEmail(to, subject, template, files=None, **kwargs) -> Callback:
                 with app.app_context():
                     msg.html = render_template(template, **kwargs)
         else:
+            app = current_app._get_current_object()
             msg.html = template
 
         if files:

@@ -62,7 +62,7 @@ const Header = ({ title, logoPath, isDirectLink, resetChatbot, closeWindow }) =>
                 }
 
                 <Col span={!isDirectLink || isDirectLink && isMobile ? 15 : 18}>
-                    <div className={'H3'}>{title}dddddddddd</div>
+                    <div className={'H3'}>{title}</div>
                 </Col>
                 <Col span={6} style={{ textAlign: 'right', position: 'relative' }}>
                     <Tooltip title="View our privacy policy"

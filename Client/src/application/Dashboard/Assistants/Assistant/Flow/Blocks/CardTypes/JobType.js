@@ -70,7 +70,7 @@ class JobType extends Component {
         });
     }
 
-    validateCustomFormItmes = () => {
+    validateCustomFormItems = () => {
         // prepare the types objects to be sent to the server
         const jobTypesState = { ...this.state.jobTypesState };
 
@@ -97,7 +97,7 @@ class JobType extends Component {
         // prepare the types objects to be sent to the server
         const jobTypesState = { ...this.state.jobTypesState };
 
-        this.validateCustomFormItmes();
+        this.validateCustomFormItems();
 
         let jobTypesErrors = { ...this.state.errors };
         jobTypesErrors = Object.keys(jobTypesErrors).reduce((r, k) => r.concat(jobTypesErrors[k]), []);
@@ -165,12 +165,13 @@ class JobType extends Component {
     getJobType = (type, attr) => {
         const { modalState, options } = this.props;
         const { block } = getInitialVariables(options.flow, modalState, 'Job Type');
-        return (
-            block.Content.types &&
+        let value = block.Content.types &&
             block.Content.types.find(x => x.value === type) &&
-            block.Content.types.find(x => x.value === type)[attr]
-            || undefined
-        );
+            block.Content.types.find(x => x.value === type)[attr];
+        if (value === 0 || value)
+            return value;
+        else
+            return undefined;
     };
 
 
@@ -254,7 +255,7 @@ class JobType extends Component {
                                                                    state.jobTypesState[type].text = val;
                                                                    return state;
                                                                },
-                                                               () => this.validateCustomFormItmes());
+                                                               () => this.validateCustomFormItems());
                                                        }}
                                                        defaultValue={block.Content.types && block.Content.types.find(x => x.value === type)?.text || undefined}
                                                        placeholder={type}/>
@@ -271,13 +272,14 @@ class JobType extends Component {
                                                         defaultValue={this.getJobType(type, 'score')}
                                                         onChange={value => {
                                                             this.setState(state => state.jobTypesState[type].score = value,
-                                                                () => this.validateCustomFormItmes());
+                                                                () => this.validateCustomFormItems());
                                                         }}>
                                                     <Option value={5}>5</Option>
                                                     <Option value={4}>4</Option>
                                                     <Option value={3}>3</Option>
                                                     <Option value={2}>2</Option>
                                                     <Option value={1}>1</Option>
+                                                    <Option value={0}>0</Option>
                                                     <Option value={-999}>Disqualify Immediately</Option>
                                                 </Select>
                                                 {

@@ -13,6 +13,7 @@ from sqlalchemy.orm import joinedload
 from typing import List
 import boto3
 from botocore.exceptions import ClientError
+import math
 
 
 # NOTE: Make sure to take a backup of the database before running these functions
@@ -67,7 +68,7 @@ def migrateConversations():
                 conversation.Data = newData
 
         # Save all changes
-        db.session.commit()
+        # db.session.commit()
         print("Conversation migration done successfully :)")
 
     except Exception as exc:
@@ -81,7 +82,7 @@ def migrateFlows():
         for assistant in db.session.query(Assistant).all():
             if assistant.Flow:
                 # Update flow
-                newFlow = __migrateFlow(assistant.Flow)
+                newFlow = __migrateFlow(assistant.Flow, assistant.ID)
                 if not newFlow:
                     raise Exception(assistant.ID + ' failed')
 
@@ -132,45 +133,55 @@ def migrateFlowTemplates():
 def validateFlows():
     try:
         # Validate assistant flows from templates
-        directory = join(BaseConfig.APP_ROOT, 'static/assistant_templates')
-        for filename in os.listdir(directory):
-            if filename.endswith(".json"):
-                jsonFile = open(directory + '/' + filename, 'r')  # Open the JSON file for reading
-                flow = json.load(jsonFile)  # Read the JSON into the buffer
-                jsonFile.close()  # Close the JSON file
-
-                # Migrate
-                newFlow = __migrateFlow(flow)
-                if not newFlow:
-                    raise Exception("Templates migration failed for (" + filename + ")")
-                continue
-            else:
-                continue
+        # directory = join(BaseConfig.APP_ROOT, 'static/assistant_templates')
+        # for filename in os.listdir(directory):
+        #     if filename.endswith(".json"):
+        #         jsonFile = open(directory + '/' + filename, 'r')  # Open the JSON file for reading
+        #         flow = json.load(jsonFile)  # Read the JSON into the buffer
+        #         jsonFile.close()  # Close the JSON file
+        #
+        #         # Migrate
+        #         newFlow = __migrateFlow(flow)
+        #         if not newFlow:
+        #             raise Exception("Templates migration failed for (" + filename + ")")
+        #         continue
+        #     else:
+        #         continue
 
         # Validate assistant flows from db
         for assistant in db.session.query(Assistant).all():
             if assistant.Flow:
                 # Update flow
-                newFlow = __migrateFlow(assistant.Flow)
+                newFlow = __migrateFlow(assistant.Flow, assistant.ID)
                 if not newFlow:
-                    raise Exception("Assistant Flows migration failed for assistant(" + assistant.Name + ")")
+                    raise Exception("Assistant Flows migration failed for assistant(" + str(assistant.ID) + ")")
 
         print("Flows are VALID :)")
+        return True
     except Exception as exc:
         print(exc)
         print("Flows are INVALID :(")
+        return False
 
 
-def __migrateFlow(flow):
+def __migrateFlow(flow, assistantID=None):
     try:
         newFlow = copy.deepcopy(flow)  # deep clone is IMPORTANT
         for group in newFlow['groups']:  # loop groups
-            for block in group['blocks']:  # loop blocks
+            for i, block in enumerate(group['blocks']):  # loop blocks
+
+                if block['DataType'] in ["CandidateAnnualDesiredSalary", "CandidateDailyDesiredSalary", "JobAnnualSalary",
+                                         "JobDayRate", "CandidateAvailableFrom", "CandidateAvailableTo", "CandidateAvailability"
+                                         , "ClientAvailability", "JobStartDate", "JobEndDate" ] \
+                        and block['Type'] == enums.BlockType.Question.value:
+                    block['DataType'] = 'NoType'
+
 
                 if block['DataType'] in ["CandidateAvailableFrom", "CandidateAvailableTo", "CandidateAvailability"]:
 
                     block['DataType'] = 'CandidateAvailability'
                     block['Content'].pop('keywords', None)
+                    block['Content'].pop('answers', None)
                     block['Content']["type"] = 'Multiple'
 
                     block['Type'] = 'Date Picker'
@@ -178,6 +189,7 @@ def __migrateFlow(flow):
                 if block['DataType'] in ["ClientAvailability"]:
 
                     block['Content'].pop('keywords', None)
+                    block['Content'].pop('answers', None)
                     block['Content']["type"] = 'Multiple'
 
                     block['Type'] = 'Date Picker'
@@ -185,6 +197,7 @@ def __migrateFlow(flow):
 
                 if block['DataType'] in ["JobStartDate", "JobEndDate"]:
                     block['Content'].pop('keywords', None)
+                    block['Content'].pop('answers', None)
                     block['Content']["type"] = 'Multiple'
 
                     block['Type'] = 'Date Picker'
@@ -193,6 +206,7 @@ def __migrateFlow(flow):
                 if block['DataType'] in ["CandidateAnnualDesiredSalary"]:
                     block['DataType'] = 'CandidateDesiredSalary'
                     block['Content'].pop('keywords', None)
+                    block['Content'].pop('answers', None)
                     block['Content']["min"] = 15000
                     block['Content']["max"] = 200000
                     block['Content']["period"] = 'Annually'
@@ -204,6 +218,7 @@ def __migrateFlow(flow):
                 if block['DataType'] in ["CandidateDailyDesiredSalary"]:
                     block['DataType'] = 'CandidateDesiredSalary'
                     block['Content'].pop('keywords', None)
+                    block['Content'].pop('answers', None)
                     block['Content']["min"] = 100
                     block['Content']["max"] = 800
                     block['Content']["period"] = 'Daily'
@@ -219,6 +234,7 @@ def __migrateFlow(flow):
                 if block['DataType'] in ["JobAnnualSalary"]:
                     block['DataType'] = 'JobSalary'
                     block['Content'].pop('keywords', None)
+                    block['Content'].pop('answers', None)
                     block['Content']["min"] = 15000
                     block['Content']["max"] = 200000
                     block['Content']["period"] = 'Annually'
@@ -230,6 +246,7 @@ def __migrateFlow(flow):
                 if block['DataType'] in ["JobDayRate"]:
                     block['DataType'] = 'JobSalary'
                     block['Content'].pop('keywords', None)
+                    block['Content'].pop('answers', None)
                     block['Content']["min"] = 100
                     block['Content']["max"] = 800
                     block['Content']["period"] = 'Daily'
@@ -238,19 +255,89 @@ def __migrateFlow(flow):
                     block['Type'] = 'Salary Picker'
 
 
-                if block['DataType'] in ["JobType"]:
-                    block['DataType'] = 'NoType'
 
 
-                if block['DataType'] in ["UserType"]:
-                    block['DataType'] = 'NoType'
+                if block['Type'] == enums.BlockType.Question.value:
+                    for answer in block['Content']['answers']:
+                        answer['score'] = math.floor(answer['score'] / 2) if answer['score'] > 5  else answer['score']
+
+
+                if block['DataType'] in ["JobType"] and block['Type'] == enums.BlockType.Question.value:
+
+                    newBlock = {
+                        "Type": "Job Type",
+                        "StoreInDB": block['StoreInDB'],
+                        "DataType": "JobType",
+                        "Skippable": block['Skippable'],
+                        "SkipText": block['SkipText'],
+                        "SkipAction": block['SkipAction'],
+                        "SkipBlockToGoID": block['SkipBlockToGoID'],
+                        "Content": {
+                            "text": block['Content']['text'],
+                            "types": []
+                        },
+                        "ID": block['ID']
+                    }
+
+                    for answer in block['Content']['answers']:
+                        value = enums.JobType.Permanent.value
+                        value = enums.JobType.Contract.value if answer['text'].strip().lower() in ['contract'] else value
+                        value = enums.JobType.Temporary.value if answer['text'].strip().lower() in ['temporary', 'temp'] else value
+
+                        newBlock['Content']['types'].append(
+                            {
+                                "value": value,
+                                "text": answer['text'],
+                                "score": math.floor(answer['score'] / 2) if answer['score'] > 5  else answer['score'],
+                                "blockToGoID": answer['blockToGoID'],
+                                "action": answer['action'],
+                                "afterMessage": answer['afterMessage']
+                            }
+                        )
+
+                    group['blocks'][i] = newBlock
+
+
+                if block['Type'] == enums.BlockType.Question.value and block['Content']['text'].strip().lower() == 'what best describes you?':
+
+                    newBlock = {
+                        "Type": "User Type",
+                        "StoreInDB": block['StoreInDB'],
+                        "DataType": "UserType",
+                        "Skippable": block['Skippable'],
+                        "SkipText": block['SkipText'],
+                        "SkipAction": block['SkipAction'],
+                        "SkipBlockToGoID": block['SkipBlockToGoID'],
+                        "Content": {
+                            "text": block['Content']['text'],
+                            "types": []
+                        },
+                        "ID": block['ID']
+                    }
+
+                    for answer in block['Content']['answers']:
+                        value = enums.UserType.Candidate.value
+                        value = enums.UserType.Client.value if answer['text'].strip().lower() in ['client', 'employer', 'looking for staff', 'looking to hire top talent'] else value
+
+                        newBlock['Content']['types'].append(
+                            {
+                                "value": value,
+                                "text": answer['text'],
+                                "score": math.floor(answer['score'] / 2) if answer['score'] > 5  else answer['score'],
+                                "blockToGoID": answer['blockToGoID'],
+                                "action": answer['action'],
+                                "afterMessage": answer['afterMessage']
+                            }
+                        )
+                    group['blocks'][i] = newBlock
 
 
                 if block['Type'] == enums.BlockType.Question.value:
                     pass
 
                 if block['Type'] == enums.BlockType.UserInput.value:
-                    pass
+                    if not 'keywords' in block['Content']:
+                        block['Content']['keywords'] = []
 
                 if block['Type'] == enums.BlockType.Solutions.value:
                     pass
@@ -263,6 +350,10 @@ def __migrateFlow(flow):
 
         # validate whole flow then update
         validate(newFlow, json_schemas.flow)
+
+        if(assistantID == 51):
+            # print(newFlow)
+            pass
 
         return newFlow
 

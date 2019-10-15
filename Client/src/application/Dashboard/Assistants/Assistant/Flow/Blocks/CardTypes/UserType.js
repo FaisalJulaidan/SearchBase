@@ -66,7 +66,7 @@ class UserType extends Component {
         });
     }
 
-    validateCustomFormItmes = () => {
+    validateCustomFormItems = () => {
         // prepare the types objects to be sent to the server
         const UserTypesState = { ...this.state.UserTypesState };
 
@@ -93,7 +93,7 @@ class UserType extends Component {
         // prepare the types objects to be sent to the server
         const UserTypesState = { ...this.state.UserTypesState };
 
-        this.validateCustomFormItmes();
+        this.validateCustomFormItems();
 
         let UserTypesErrors = { ...this.state.errors };
         UserTypesErrors = Object.keys(UserTypesErrors).reduce((r, k) => r.concat(UserTypesErrors[k]), []);
@@ -160,12 +160,13 @@ class UserType extends Component {
     getUserType = (type, attr) => {
         const { modalState, options } = this.props;
         const { block } = getInitialVariables(options.flow, modalState, 'User Type');
-        return (
-            block.Content.types &&
+        let value = block.Content.types &&
             block.Content.types.find(x => x.value === type) &&
-            block.Content.types.find(x => x.value === type)[attr]
-            || undefined
-        );
+            block.Content.types.find(x => x.value === type)[attr];
+        if (value === 0 || value)
+            return value;
+        else
+            return undefined;
     };
 
 
@@ -184,7 +185,7 @@ class UserType extends Component {
         const { showSkip, UserTypesState } = this.state;
 
         const buttons = ButtonsForm(handleNewBlock, handleEditBlock, handleDeleteBlock, this.onSubmit, block);
-
+        console.log(this.getUserType('Client', 'score'));
         return (
             <Card style={{ width: '100%' }} actions={buttons}>
                 <Form layout='horizontal'>
@@ -250,7 +251,7 @@ class UserType extends Component {
                                                                    state.UserTypesState[type].text = val;
                                                                    return state;
                                                                },
-                                                               () => this.validateCustomFormItmes());
+                                                               () => this.validateCustomFormItems());
                                                        }}
                                                        defaultValue={block.Content.types && block.Content.types.find(x => x.value === type)?.text || undefined}
                                                        placeholder={type}/>
@@ -267,13 +268,14 @@ class UserType extends Component {
                                                         defaultValue={this.getUserType(type, 'score')}
                                                         onChange={value => {
                                                             this.setState(state => state.UserTypesState[type].score = value,
-                                                                () => this.validateCustomFormItmes());
+                                                                () => this.validateCustomFormItems());
                                                         }}>
                                                     <Option value={5}>5</Option>
                                                     <Option value={4}>4</Option>
                                                     <Option value={3}>3</Option>
                                                     <Option value={2}>2</Option>
                                                     <Option value={1}>1</Option>
+                                                    <Option value={0}>0</Option>
                                                     <Option value={-999}>Disqualify Immediately</Option>
                                                 </Select>
                                                 {

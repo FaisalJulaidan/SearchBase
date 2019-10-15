@@ -340,13 +340,16 @@ def searchCandidates(auth, companyID, data) -> Callback:
         helpers.logError(str(return_body))
         result = []
         for record in return_body["result"]["items"]:
+            skills = record.get("skill", "").split("Skill Name: :")
+            for skill in skills:
+                skills[skills.index(skill)] = skill.split("\\r\\")[0]
             result.append(databases_services.createPandaCandidate(id=record.get("id", ""),
                                                                   name=record.get("name"),
                                                                   email=record.get("primary_email"),
                                                                   mobile=record.get("mobile"),
                                                                   location=
                                                                   record.get("current_location", {}).get("city", ""),
-                                                                  skills=record.get("skill", ""),  # stringified json
+                                                                  skills=skills,  # stringified json
                                                                   linkdinURL=None,
                                                                   availability=record.get("status"),
                                                                   jobTitle=None,

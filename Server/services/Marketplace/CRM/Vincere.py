@@ -403,6 +403,7 @@ def searchPerfectCandidates(auth, companyID, data, fields=None) -> Callback:
             records = return_body["result"]["items"]
 
         else:
+            query += "%23"
             records = []
 
             while len(records) < 2000:
@@ -482,8 +483,10 @@ def searchJobs(auth, companyID, data) -> Callback:
         # query = query[:-1]
 
         # check if no conditions submitted
-        if len(query) < 4:
-            query = "query=*:*"
+        if len(query) < 3:
+            query = ""
+        else:
+            query += "%23"
 
         # send query
         sendQuery_callback: Callback = sendQuery(auth, "job/search/fl=*", "get", {}, companyID, [query])

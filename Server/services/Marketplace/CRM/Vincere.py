@@ -342,6 +342,7 @@ def searchCandidates(auth, companyID, data) -> Callback:
         for record in return_body["result"]["items"]:
             skills = record.get("skill", "").split("Skill Name: :")
             for skill in skills:
+                helpers.logError(str(skill))
                 skills[skills.index(skill)] = skill.split("\\r\\")[0]
             result.append(databases_services.createPandaCandidate(id=record.get("id", ""),
                                                                   name=record.get("name"),

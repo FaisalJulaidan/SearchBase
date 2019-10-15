@@ -344,7 +344,8 @@ def searchCandidates(auth, companyID, data) -> Callback:
                                                                   name=record.get("name"),
                                                                   email=record.get("primary_email"),
                                                                   mobile=record.get("mobile"),
-                                                                  location=record.get("current_location", ""),
+                                                                  location=
+                                                                  record.get("current_location", {}).get("city", ""),
                                                                   skills=record.get("skill", ""),  # stringified json
                                                                   linkdinURL=None,
                                                                   availability=record.get("status"),

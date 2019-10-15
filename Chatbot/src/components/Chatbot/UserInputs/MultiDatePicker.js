@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 // Constants
 import * as messageTypes from '../../../constants/MessageType';
 import * as flowAttributes from '../../../constants/FlowAttributes';
@@ -6,40 +6,39 @@ import * as constants from '../../../constants/Constants';
 // Styles
 import './styles/Inputs.css';
 // Components
-import { DatePicker as AntdDatePicker, Icon, Tooltip } from 'antd';
+import { DatePicker as AntdDatePicker } from 'antd';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTelegramPlane } from '@fortawesome/free-brands-svg-icons';
-
-import moment from 'moment'
+import { getContainerElement } from '../../helpers';
+import moment from 'moment';
 
 const MultiDatePicker = ({ message, submitMessage }) => {
 
     let [selectedDates, setSelectedDates] = useState({ individual: [], range: [] });
     let [open, setOpen] = useState(false);
 
-
     const renderDate = (curDate, today) => {
         let className = 'antd-date-multi';
         className += curDate.isSame(today, 'month') ? '' : ' fade';
-        let element;
 
         for (let date in selectedDates.individual) {
             if (Math.abs(selectedDates.individual[date].diff(curDate, 'hours')) < 23) {
                 className += ' selected individual finish';
             }
         }
-        if(curDate.isBefore(moment().startOf('week'))){
-          className += ' disabled'
+        if (curDate.isBefore(moment().startOf('week'))) {
+            className += ' disabled';
         }
-        element = (<div className={className}><span>{curDate.format('D')}</span></div>);
-        return addEventHandlers(element, curDate);
+
+        const element = (
+            <div className={className}>
+                <span>{curDate.format('D')}</span>
+            </div>
+        );
+
+        return React.cloneElement(element, { onMouseDown: e => dateMouseDown(e, curDate) });
     };
 
-    const addEventHandlers = (element, date) => {
-        return React.cloneElement(element, {
-            onMouseDown: e => dateMouseDown(e, date)
-        });
-    };
 
     useEffect(() => {
         function checkValidParent(e) {
@@ -57,24 +56,24 @@ const MultiDatePicker = ({ message, submitMessage }) => {
         }
 
         if (open) {
-            console.log('ree');
             window.addEventListener('click', checkValidParent);
         }
+
         return () => window.removeEventListener('click', checkValidParent);
     }, [setOpen, open]);
 
 
     const dateMouseDown = (e, date) => {
         let dates = Object.assign({}, selectedDates);
-        if(date.isBefore(moment().startOf('week'), 'week')){
-          return
+        if (date.isBefore(moment().startOf('week'), 'week')) {
+            return;
         }
-        for(let ind in dates.individual){
-          if(dates.individual[ind].isSame(date, 'date')){
-            dates.individual.splice(ind, 1)
-            setSelectedDates(dates)
-            return
-          }
+        for (let ind in dates.individual) {
+            if (dates.individual[ind].isSame(date, 'date')) {
+                dates.individual.splice(ind, 1);
+                setSelectedDates(dates);
+                return;
+            }
         }
         dates.individual = individualCheck(date) ? [...dates.individual, date] : dates.individual;
         setSelectedDates(dates);
@@ -101,8 +100,7 @@ const MultiDatePicker = ({ message, submitMessage }) => {
         });
         return str.substr(0, str.length - 1);
     };
-
-    const inputOnChangeHandler = () => {
+    const submitDates = () => {
         let text;
         if (selectedDates)
             text = selectedDatesToString();
@@ -126,33 +124,21 @@ const MultiDatePicker = ({ message, submitMessage }) => {
 
     return (
         <React.Fragment>
-            <div className={'InputContainer'} onClick={() => setOpen(true)}>
-                <AntdDatePicker getCalendarContainer={
-                    () => {
-                        if (document.getElementById('TheSearchBase_Chatbot_Input'))
-                            return document.getElementById('TheSearchBase_Chatbot_Input');
-                        else
-                            return document.getElementById('TheSearchBase_Chatbot');
-                    }}
+            <div className={'DatePickerContainer'} onClick={() => setOpen(true)}>
+                <AntdDatePicker getCalendarContainer={() => getContainerElement()}
                                 className={'Datepicker'} suffixIcon={<div/>}
                                 dropdownClassName={'DatepickerCalendar'}
                                 showToday={false}
                                 dateRender={renderDate}
-                                open={open}
-                    // onChange={(e) => {
-                    //     if (e)
-                    //         if (e._isAMomentObject)
-                    //             setSelectedDate(e.format('L'));
-                    //         else
-                    //             setSelectedDate(e.target.value);
-                    // }}
-                />
+                                open={open}/>
             </div>
+
             <div className={'Submit'}>
-                <i className={'SendIconActive'} onClick={inputOnChangeHandler}>
+                <i className={'SendIconActive'} onClick={submitDates}>
                     <FontAwesomeIcon size="2x" icon={faTelegramPlane}/>
                 </i>
             </div>
+
         </React.Fragment>
     );
 };

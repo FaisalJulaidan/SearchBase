@@ -42,6 +42,24 @@ def getOptions(industry=None) -> Callback:
                     'name': enums.BlockType.RawText.value,
                     'actions': [a.value for a in enums.BlockAction],
                 },
+                {
+                    'name': enums.BlockType.SalaryPicker.value,
+                    'periods': [enums.Period.Annually.name, enums.Period.Daily.name],
+                    'actions': [a.value for a in enums.BlockAction],
+                },
+                {
+                    'name': enums.BlockType.UserType.value,
+                    'types': [ut.name for ut in enums.UserType],
+                    'actions': [a.value for a in enums.BlockAction],
+                },{
+                    'name': enums.BlockType.JobType.value,
+                    'types': [jt.name for jt in enums.JobType],
+                    'actions': [a.value for a in enums.BlockAction],
+                },
+                {
+                    'name': enums.BlockType.DatePicker.value,
+                    'actions': [a.value for a in enums.BlockAction],
+                },
             ]
         },
         'databases': {
@@ -54,7 +72,7 @@ def getOptions(industry=None) -> Callback:
                                            for c in Job.__table__.columns
                                            if (c.key != 'ID' and c.key != 'DatabaseID')
                                            ],
-            'currencyCodes': ['GBP', 'USD', 'EUR', 'CAD'],
+            'currencyCodes': ['GBP', 'USD', 'EUR', 'CAD', 'AUD'],
             'periods': [p.name for p in enums.Period]
         },
         'assistantTemplates': [

@@ -22,9 +22,9 @@ const MultiDatePicker = ({ message, submitMessage }) => {
         className += curDate.isSame(today, 'month') ? '' : ' fade';
 
         for (let date in selectedDates.individual) {
-            if (Math.abs(selectedDates.individual[date].diff(curDate, 'hours')) < 23) {
-                className += ' selected individual finish';
-            }
+            if (selectedDates.individual[date].diff)
+                if (Math.abs(selectedDates.individual[date].diff(curDate, 'hours')) < 23)
+                    className += ' selected individual finish';
         }
         if (curDate.isBefore(moment().startOf('week'))) {
             className += ' disabled';
@@ -69,11 +69,12 @@ const MultiDatePicker = ({ message, submitMessage }) => {
             return;
         }
         for (let ind in dates.individual) {
-            if (dates.individual[ind].isSame(date, 'date')) {
-                dates.individual.splice(ind, 1);
-                setSelectedDates(dates);
-                return;
-            }
+            if (dates.individual[ind].isSame)
+                if (dates.individual[ind].isSame(date, 'date')) {
+                    dates.individual.splice(ind, 1);
+                    setSelectedDates(dates);
+                    return;
+                }
         }
         dates.individual = individualCheck(date) ? [...dates.individual, date] : dates.individual;
         setSelectedDates(dates);

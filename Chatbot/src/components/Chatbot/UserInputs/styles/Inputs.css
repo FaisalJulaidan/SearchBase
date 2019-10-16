@@ -154,7 +154,7 @@
 }
 
 .ant-calendar {
-    width: 320px !important;
+    width: calc(100vw - 71px) !important;
 }
 
 .Input > .InputContainer {

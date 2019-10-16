@@ -49,7 +49,18 @@ const Header = ({ title, logoPath, isDirectLink, resetChatbot, closeWindow }) =>
         <div className={'Header'} id={'Chatbot_Header'}>
             <Row style={{ width: '100%' }}>
                 {
-                    !isDirectLink ||
+                    !isDirectLink &&
+                    <Col span={3}>
+                        {
+                            logoPath ?
+                                <img alt="header" width={30}
+                                     src={`${logoPath}?timestamp=${new Date().getTime()}`}/> :
+                                <FontAwesomeIcon size="2x" icon={faCloud} style={{ color: '#673AB7' }}/>
+                        }
+                    </Col>
+                }
+
+                {
                     isDirectLink && isMobile &&
                     <Col span={3}>
                         {
@@ -61,10 +72,11 @@ const Header = ({ title, logoPath, isDirectLink, resetChatbot, closeWindow }) =>
                     </Col>
                 }
 
-                <Col span={!isDirectLink || isDirectLink && isMobile ? 15 : 18}>
-                    <div className={'H3'}>{title}dddddddddd</div>
+                <Col span={!isDirectLink || isDirectLink && isMobile ? 14 : 17}>
+                    <div className={'H3'}>{title}</div>
                 </Col>
-                <Col span={6} style={{ textAlign: 'right', position: 'relative' }}>
+
+                <Col span={7} style={{ textAlign: 'right', position: 'relative' }}>
                     <Tooltip title="View our privacy policy"
                              getPopupContainer={() => document.getElementById('TheSearchBase_Chatbot')}>
                         <Button className={'Button'} onClick={privacyPolicy}

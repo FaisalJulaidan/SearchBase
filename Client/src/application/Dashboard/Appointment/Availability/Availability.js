@@ -10,7 +10,7 @@ import { assistantActions, databaseActions } from 'store/actions';
 
 const { Option, OptGroup } = AutoComplete;
 
-const momentFormat = 'DD/MM/YYYY'
+let momentFormat = 'MM/DD/YYYY';
 
 
 class Availability extends React.Component {
@@ -22,7 +22,7 @@ class Availability extends React.Component {
             database: null,
             start: moment().startOf('week'),
             end: moment().endOf('week'),
-            searches: {},
+            searches: {}
         };
     }
 
@@ -37,18 +37,18 @@ class Availability extends React.Component {
     };
 
     filterSearches = (records) => {
-      const { searches } = this.state
-      return records.filter(record => {
-        let matches = Object.keys(searches).length
-        let catches = 0
-        Object.keys(searches).map(search => {
-          if(record[search].indexOf(searches[search]) !== -1){
-            catches++
-          }
-        })
-        return catches === matches
-      })
-    }
+        const { searches } = this.state;
+        return records.filter(record => {
+            let matches = Object.keys(searches).length;
+            let catches = 0;
+            Object.keys(searches).map(search => {
+                if (record[search].indexOf(searches[search]) !== -1) {
+                    catches++;
+                }
+            });
+            return catches === matches;
+        });
+    };
 
     filterThisWeek = (records) => {
         const searchArray = (convID) => {
@@ -61,10 +61,11 @@ class Availability extends React.Component {
         };
         let availability = [];
         const { start, end } = this.state;
-
+        console.log(records)
+        debugger
         records.filter(record => record.CandidateAvailability).filter(record => {
             let dates = record.CandidateAvailability.split(',');
-            console.log(record)
+
             let data = {
                 name: record.CandidateName,
                 skills: record.CandidateSkills,
@@ -72,13 +73,23 @@ class Availability extends React.Component {
                 consultant: record.CandidateConsultantName,
                 jobTitle: record.CandidateJobTitle
             };
+
             dates.forEach(date => {
+                let dynamicFormat = 'DD/MM/YYYY';
                 let range = date.split('-');
                 if (range.length > 1) { // range handlers
-                    let startDate = moment(range[0], momentFormat);
+
+                    // Check if date conforms with the correct date format
+                    let test = moment(range[0], dynamicFormat).format();
+                    if (test === 'Invalid date'){dynamicFormat = 'MM/DD/YYYY';}
+                    test = moment(range[0], dynamicFormat).format();
+                    if (test === 'Invalid date'){return;}
+
+                    let startDate = moment(range[0], dynamicFormat);
                     let rangeArr = [startDate];
                     let moveDate = startDate.clone();
-                    let endDate = moment(range[1], momentFormat);
+                    let endDate = moment(range[1], dynamicFormat);
+
                     while (rangeArr.length !== Math.abs(startDate.diff(endDate, 'days'))) {
                         rangeArr.push(moveDate.add(1, 'days').clone());
                     }
@@ -94,7 +105,7 @@ class Availability extends React.Component {
                         }
                     });
                 } else { // individual staggered dates
-                    let realDate = moment(date, momentFormat);
+                    let realDate = moment(date, dynamicFormat);
                     if (realDate.isBetween(start, end) || realDate.isSame(start, 'date') || realDate.isSame(end, 'date')) {
                         let key = searchArray(record.ID); // key exists?
                         if (key) {
@@ -115,39 +126,42 @@ class Availability extends React.Component {
     };
 
     getSearchAggregates = records => {
-      const returnNewAggregate = (record, aggr) => {
-        Object.keys(record).map(key => {
-          let add
-          if(key === "skills") {
-            record[key].split(",").forEach(skill => {
-              if(!aggr[key].includes(skill)){
-                aggr[key].push(skill)
-              }
-            })
-          } else {
-            if(!aggr[key].includes(record[key]) && record[key] !== null){
-              aggr[key].push(record[key])
-            }
-          }
-        })
-        return aggr
-      }
-      if(records.length === 0){
-        return {}
-      }
-      let emptyAggregates = Object.keys(records[0]).reduce((prev, curr) => { prev[curr] = []; return prev}, {})
-      return records.reduce((prev, curr) => returnNewAggregate(curr, prev), emptyAggregates);
-    }
-    
+        const returnNewAggregate = (record, aggr) => {
+            Object.keys(record).map(key => {
+                let add;
+                if (key === 'skills') {
+                    record[key].split(',').forEach(skill => {
+                        if (!aggr[key].includes(skill)) {
+                            aggr[key].push(skill);
+                        }
+                    });
+                } else {
+                    if (!aggr[key].includes(record[key]) && record[key] !== null) {
+                        aggr[key].push(record[key]);
+                    }
+                }
+            });
+            return aggr;
+        };
+        if (records.length === 0) {
+            return {};
+        }
+        let emptyAggregates = Object.keys(records[0]).reduce((prev, curr) => {
+            prev[curr] = [];
+            return prev;
+        }, {});
+        return records.reduce((prev, curr) => returnNewAggregate(curr, prev), emptyAggregates);
+    };
+
     setSearch = (type, val) => {
-      let searches = Object.assign({}, this.state.searches)
-      if(val === ""){
-        delete searches[type]
-      } else {
-        searches[type] = val
-      }
-      this.setState({searches: searches})
-    }
+        let searches = Object.assign({}, this.state.searches);
+        if (val === '') {
+            delete searches[type];
+        } else {
+            searches[type] = val;
+        }
+        this.setState({ searches: searches });
+    };
 
     render() {
         const columns = [
@@ -210,7 +224,7 @@ class Availability extends React.Component {
                 title: 'Saturday',
                 dataIndex: 'saturday',
                 key: 'saturday'
-            },
+            }
         ];
         const menu = (
             <Menu onClick={this.handleMenuClick}>
@@ -242,14 +256,14 @@ class Availability extends React.Component {
                 wednesday: item.dates.find(date => date.day() === 3) !== undefined ? availableText : '',
                 thursday: item.dates.find(date => date.day() === 4) !== undefined ? availableText : '',
                 friday: item.dates.find(date => date.day() === 5) !== undefined ? availableText : '',
-                saturday: item.dates.find(date => date.day() === 6) !== undefined ? availableText : '',
+                saturday: item.dates.find(date => date.day() === 6) !== undefined ? availableText : ''
             }));
             // availability = this.searc
-            aggregates = this.getSearchAggregates(availability)
-            availability = this.filterSearches(availability)
+            aggregates = this.getSearchAggregates(availability);
+            availability = this.filterSearches(availability);
         }
 
-        console.log(aggregates)
+        console.log(aggregates);
 
         return (
             <div>
@@ -268,7 +282,7 @@ class Availability extends React.Component {
                             onChange={val => this.setSearch('skills', val)}
                             optionLabelProp="value"
                         >
-                            <Input suffix={<Icon type="search" className="certain-category-icon" />}/>
+                            <Input suffix={<Icon type="search" className="certain-category-icon"/>}/>
                         </AutoComplete>
                     </div>
 
@@ -278,13 +292,13 @@ class Availability extends React.Component {
                             dropdownClassName="certain-category-search-dropdown"
                             dropdownMatchSelectWidth={false}
                             dropdownStyle={{ width: 300 }}
-                            dataSource={aggregates.location  || []}
+                            dataSource={aggregates.location || []}
                             size="large"
                             style={{ width: '100%' }}
-                            placeholder="Location"onChange={val => this.setSearch('location', val)}
+                            placeholder="Location" onChange={val => this.setSearch('location', val)}
                             optionLabelProp="value"
                         >
-                            <Input suffix={<Icon type="search" className="certain-category-icon"/>} />
+                            <Input suffix={<Icon type="search" className="certain-category-icon"/>}/>
                         </AutoComplete>
                     </div>
 

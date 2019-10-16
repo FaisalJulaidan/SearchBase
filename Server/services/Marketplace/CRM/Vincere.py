@@ -472,13 +472,13 @@ def searchJobs(auth, companyID, data) -> Callback:
         fields = "fl=id,job_title,public_description,owners,open_date,salary_to,employment_type,location,currency"
 
         # populate filter
-        query += populateFilter(data.get("jobTitle"), "job_title")
-
-        query += populateFilter(data.get("city"), "address")
+        # query += populateFilter(data.get("jobTitle"), "job_title")
+        #
+        # query += populateFilter(data.get("city"), "address")
 
         query += populateFilter(data.get("city"), "city")
 
-        query += populateFilter(data.get("employmentType"), "employment_type")
+        # query += populateFilter(data.get("employmentType"), "employment_type")
 
         # query = query[:-1]
 

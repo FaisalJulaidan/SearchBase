@@ -10,41 +10,26 @@ import Layout from "../../../hoc/layout/Layout";
 import pricingJSON from "../pricing/pricing";
 
 import {Elements} from 'react-stripe-elements';
-import PaymentForm from "./PaymentForm";
+import PaymnetForm from "./PaymentForm";
 
 const {Step} = Steps;
 
 class Payment extends React.Component {
 
     state = {
-        planID: queryString.parse(this.props.location.search)?.plan,
         currentStep: 1,
-        email: "", //This Will be filled through SignUp form Callback
-        firstName: "", //This Will be filled through SignUp form Callback
-        lastName: "" //This Will be filled through SignUp form Callback
+        plan: pricingJSON[pricingJSON.length - 1].id
     };
 
     componentDidMount() {
         document.title = "Payment | " + WEBSITE_TITLE;
     }
 
-    onSignupSuccessful = (email, firstName, lastName) => {
-        this.setState({
-                currentStep: 1,
-                email: email,
-                firstName: firstName,
-                lastName: lastName
-            }
-        )
+    onSignupSuccessful = (plan) => {
+        this.setState({currentStep: 1, plan: plan})
     };
 
     render() {
-
-        const plan = pricingJSON.find(plan => {
-            if (plan.id === this.state.planID)
-                return plan;
-        });
-
         return (
             <Layout>
                 <div className={styles.wrapper}>
@@ -65,7 +50,7 @@ class Payment extends React.Component {
                                             <h1 className={styles.text1}>You're just few minutes away from using our
                                                 ChatBot!</h1>
                                             <h4 className={styles.text2}>You need to register your account to complete
-                                                your payment process.</h4>
+                                                your purchase process.</h4>
                                         </Fade>
                                     </Col>
                                     <Col sm={6} md xl={4}>
@@ -75,7 +60,7 @@ class Payment extends React.Component {
                                                     <Card.Body>
                                                         {/*<h1 className={styles.title}>Sign up</h1>*/}
                                                         <SignupFormPayment
-                                                            planID={this.state.planID}
+                                                            plan={queryString.parse(this.props.location.search)?.plan}
                                                             onSignupSuccessful={this.onSignupSuccessful}/>
                                                     </Card.Body>
                                                 </Card>
@@ -86,26 +71,11 @@ class Payment extends React.Component {
                             ) : (
                                 <Elements>
                                     <Row>
-                                        <Col sm={6} md={6} lg={{span: 6}} className={styles.col_desc}>
-                                            <h1 className={styles.title}>{plan.title}</h1>
-                                            <hr/>
-                                            <ul className={styles.list}>
-                                                {plan.items?.map((item, key) => {
-                                                    return <li key={key}>{item}</li>
-                                                })}
-                                            </ul>
-                                        </Col>
-                                        <Col sm={6} md lg={{offset: 1}} xl={4}>
+                                        <Col sm={6} md xl={4}>
                                             <div className={styles.form_wrapper}>
                                                 <Card className={styles.card}>
                                                     <Card.Body>
-                                                        <h1 className={styles.title}>Pay with card</h1>
-                                                        <PaymentForm
-                                                            planID={this.state.planID}
-                                                            email={this.state.email}/>
-                                                        <h6 className={styles.sign_up}>Powered by
-                                                            <a href="https://stripe.com">Stripe</a>
-                                                        </h6>
+                                                        <PaymnetForm/>
                                                     </Card.Body>
                                                 </Card>
                                             </div>

@@ -60,7 +60,7 @@ class SignupForm extends React.Component {
         return (
             <Form onSubmit={this.handleSubmit} layout={'horizontal'}>
 
-                <FormItem className={styles.form_item}>
+                <FormItem className={styles.SignupFormItem}>
                     {getFieldDecorator('companyName', {
                         rules: [{whitespace: true, required: true, message: 'Please input your company name!'}],
                     })(
@@ -70,7 +70,7 @@ class SignupForm extends React.Component {
                 </FormItem>
 
 
-                <FormItem className={styles.form_item}>
+                <FormItem className={styles.SignupFormItem}>
                     {getFieldDecorator('websiteURL', {
                         rules: [{whitespace: true, required: true, message: 'Please input company website URL!'},
                             {
@@ -83,7 +83,7 @@ class SignupForm extends React.Component {
                     )}
                 </FormItem>
 
-                <FormItem className={styles.form_item}>
+                <FormItem className={styles.SignupFormItem}>
                     {getFieldDecorator('firstName', {
                         rules: [{whitespace: true, required: true, message: 'Please input your first name!'}],
                     })(
@@ -92,7 +92,7 @@ class SignupForm extends React.Component {
                     )}
                 </FormItem>
 
-                <FormItem className={styles.form_item}>
+                <FormItem className={styles.SignupFormItem}>
                     {getFieldDecorator('lastName', {
                         rules: [{whitespace: true, required: true, message: 'Please input your last name!'}],
                     })(
@@ -101,7 +101,7 @@ class SignupForm extends React.Component {
                     )}
                 </FormItem>
 
-                <FormItem className={styles.form_item}>
+                <FormItem className={styles.SignupFormItem}>
                     {getFieldDecorator('telephone', {
                         rules: [
                             {
@@ -117,7 +117,7 @@ class SignupForm extends React.Component {
                 </FormItem>
 
 
-                <FormItem className={styles.form_item}>
+                <FormItem className={styles.SignupFormItem}>
                     {getFieldDecorator('email', {
                         rules: [
                             {whitespace: true, required: true, message: 'Please input your email!'},
@@ -133,7 +133,7 @@ class SignupForm extends React.Component {
                 </FormItem>
 
 
-                <FormItem className={styles.form_item}>
+                <FormItem className={styles.SignupFormItem}>
                     {getFieldDecorator('password', {
                         rules: [
                             {whitespace: true, required: true, message: 'Please input your Password!'},
@@ -147,7 +147,7 @@ class SignupForm extends React.Component {
                     )}
                 </FormItem>
 
-                <FormItem className={styles.form_item}>
+                <FormItem className={styles.SignupFormItem}>
                     {getFieldDecorator('confirm', {
                         rules: [
                             {whitespace: true, required: true, message: 'Please confirm your Password!'},
@@ -170,7 +170,7 @@ class SignupForm extends React.Component {
                             policy</Link></Checkbox>
                     )}
                 </Form.Item>
-                <Form.Item className={styles.form_item}>
+                <Form.Item className={styles.SignupFormItem}>
                     <Button type="primary" htmlType="submit" block>
                         Sign up
                     </Button>

@@ -21,7 +21,7 @@ const PricingCard = (props) => {
                     <h1 className={styles.title}>{props.title}</h1>
                     <hr/>
                     <h1 className={styles.subtitle}>{props.subtitle}</h1>
-                    <h4 className={styles.price}>{props.price_title}</h4>
+                    <h4 className={styles.price}>{props.price}</h4>
                     <ul className={styles.list}>
                         {items}
                     </ul>
@@ -36,7 +36,7 @@ const PricingCard = (props) => {
 PricingCard.propTypes = {
     title: PropTypes.string.isRequired,
     subtitle: PropTypes.string.isRequired,
-    price_title: PropTypes.string.isRequired,
+    price: PropTypes.string.isRequired,
     icon: PropTypes.string,
     items: PropTypes.arrayOf(PropTypes.string)
 };

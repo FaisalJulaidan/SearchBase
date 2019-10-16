@@ -23,25 +23,24 @@ const selectBeforeURL = (
 class SignupFormPayment extends React.Component {
 
     componentDidMount() {
-        const found = pricingJSON.some(plan => plan.id === this.props.planID);
+        const found = pricingJSON.some(item => item.id === this.props?.plan);
         if (!found) {
-            this.setState({planID: pricingJSON[0].id})
+            this.setState({plan: pricingJSON[0].id})
         } else {
-            this.setState({planID: this.props.planID})
+            this.setState({plan: this.props.plan})
         }
     }
 
 
     state = {
         confirmDirty: false,
-        billingMethod: 'monthly',
     };
 
     componentDidUpdate(prevProps, prevState, snapshot) {
         if (prevProps.isSigningUp && (this.props.errorMsg === null)) {
-            this.props.onSignupSuccessful(this.state.planID, this.props.form.getFieldValue('email'));
-        } else if (prevState.planID !== this.state.planID)
-            this.props.history.push(`/order-plan?plan=${this.state.planID}`);
+            this.props.onSignupSuccessful(this.state.plan);
+        } else if (prevState.plan !== this.state.plan)
+            this.props.history.push(`/order-plan?plan=${this.state.plan}`);
     }
 
     handleSubmit = (e) => {
@@ -73,7 +72,7 @@ class SignupFormPayment extends React.Component {
         return (
             <Form onSubmit={this.handleSubmit} layout={'horizontal'}>
 
-                <FormItem className={styles.form_item}>
+                <FormItem className={styles.SignupFormItem}>
                     {getFieldDecorator('companyName', {
                         rules: [{required: true, message: 'Please input your company name!'}],
                     })(
@@ -83,7 +82,7 @@ class SignupFormPayment extends React.Component {
                 </FormItem>
 
 
-                <FormItem className={styles.form_item}>
+                <FormItem className={styles.SignupFormItem}>
                     {getFieldDecorator('websiteURL', {
                         rules: [{required: true, message: 'Please input company website URL!'},
                             {
@@ -96,7 +95,7 @@ class SignupFormPayment extends React.Component {
                     )}
                 </FormItem>
 
-                <FormItem className={styles.form_item}>
+                <FormItem className={styles.SignupFormItem}>
                     {getFieldDecorator('firstName', {
                         rules: [{required: true, message: 'Please input your first name!'}],
                     })(
@@ -105,7 +104,7 @@ class SignupFormPayment extends React.Component {
                     )}
                 </FormItem>
 
-                <FormItem className={styles.form_item}>
+                <FormItem className={styles.SignupFormItem}>
                     {getFieldDecorator('lastName', {
                         rules: [{required: true, message: 'Please input your last name!'}],
                     })(
@@ -114,7 +113,7 @@ class SignupFormPayment extends React.Component {
                     )}
                 </FormItem>
 
-                <FormItem className={styles.form_item}>
+                <FormItem className={styles.SignupFormItem}>
                     {getFieldDecorator('telephone', {
                         rules: [
                             {
@@ -129,7 +128,7 @@ class SignupFormPayment extends React.Component {
                 </FormItem>
 
 
-                <FormItem className={styles.form_item}>
+                <FormItem className={styles.SignupFormItem}>
                     {getFieldDecorator('email', {
                         rules: [
                             {required: true, message: 'Please input your email!'},
@@ -145,7 +144,7 @@ class SignupFormPayment extends React.Component {
                 </FormItem>
 
 
-                <FormItem className={styles.form_item}>
+                <FormItem className={styles.SignupFormItem}>
                     {getFieldDecorator('password', {
                         rules: [
                             {required: true, message: 'Please input your Password!'},
@@ -159,7 +158,7 @@ class SignupFormPayment extends React.Component {
                     )}
                 </FormItem>
 
-                <FormItem className={styles.form_item}>
+                <FormItem className={styles.SignupFormItem}>
                     {getFieldDecorator('confirm', {
                         rules: [
                             {required: true, message: 'Please confirm your Password!'},
@@ -173,38 +172,23 @@ class SignupFormPayment extends React.Component {
                     )}
                 </FormItem>
 
-                <FormItem className={styles.form_item}>
+                <FormItem className={styles.SignupFormItem}>
                     {getFieldDecorator('plan', {
-                        initialValue: this.state.planID,
+                        initialValue: this.state.plan,
                         rules: [
                             {required: true, message: 'Please select a plan'},
                         ],
                     })(
                         <Select onSelect={(value) => {
-                            this.setState({planID: value})
+                            this.setState({plan: value})
                         }}>
                             {
                                 pricingJSON.map((plan) => {
                                     return (
-                                        <Select.Option key={plan.id}>{plan.title + ` (${plan.price_title})`}</Select.Option>
+                                        <Select.Option key={plan.id}>{plan.title}</Select.Option>
                                     );
                                 })
                             }
-                        </Select>
-                    )}
-                </FormItem>
-                <FormItem className={styles.form_item}>
-                    {getFieldDecorator('billingMethod', {
-                        initialValue: this.state.billingMethod,
-                        rules: [
-                            {required: true, message: 'Please select a billing method'},
-                        ],
-                    })(
-                        <Select onSelect={(value) => {
-                            this.setState({billingMethod: value})
-                        }}>
-                            <Select.Option key="monthly">Monthly</Select.Option>
-                            <Select.Option key="annually">Annually</Select.Option>
                         </Select>
                     )}
                 </FormItem>
@@ -219,8 +203,8 @@ class SignupFormPayment extends React.Component {
                             policy</Link></Checkbox>
                     )}
                 </Form.Item>
-                <Form.Item className={styles.form_item}>
-                    <Button loading={this.state.isSigningUp} type="primary" htmlType="submit" block>Submit</Button>
+                <Form.Item className={styles.SignupFormItem}>
+                    <Button type="primary" htmlType="submit" block>Submit</Button>
                 </Form.Item>
             </Form>
         );
@@ -228,7 +212,7 @@ class SignupFormPayment extends React.Component {
 }
 
 SignupFormPayment.propTypes = {
-    planID: PropTypes.string.isRequired,
+    plan: PropTypes.string,
     onSignupSuccessful: PropTypes.func.isRequired
 };
 

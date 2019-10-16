@@ -94,7 +94,6 @@ def processConversation(conversation: Conversation, autoPilot: AutoPilot, assist
                 # Send Acceptance Letters
                 if status is Status.Accepted and autoPilot.SendAcceptanceSMS:
                     # Process candidates Acceptance sms
-
                     SMSBody = autoPilot.AcceptanceSMSBody \
                         .replace("${candidateName}$", userName) \
                         .replace("${candidateEmail}$", email or "${candidateEmail}$") \

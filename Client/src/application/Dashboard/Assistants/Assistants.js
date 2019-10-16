@@ -96,6 +96,7 @@ class Assistants extends Component {
 
                 <div className={styles.Body}>
                     <CreateNewBox text={'Add Assistant'} onClick={this.showNewAssistantModal}/>
+                    <CreateNewBox text={'Quick Build'}/>
                     {
                         this.props.isLoading ? <LoadingViewBox/>
                         :

@@ -511,7 +511,7 @@ def searchCandidates(access_token, conversation) -> Callback:
         # <-- CALL SKILLS SEARCH -->
 
         #  Iterative generalisation:
-        while len(records) < 20:
+        while len(records) < 50:
             # send query
             sendQuery_callback: Callback = sendQuery(access_token, "get", {},
                                                      "SELECT+X18_Digit_ID__c,ID,Name,Title,email,phone,MailingCity," +

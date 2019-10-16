@@ -64,11 +64,12 @@ class Availability extends React.Component {
 
         records.filter(record => record.CandidateAvailability).filter(record => {
             let dates = record.CandidateAvailability.split(',');
+            console.log(record)
             let data = {
                 name: record.CandidateName,
                 skills: record.CandidateSkills,
                 location: record.CandidateLocation,
-                consultant: 'Unknown',
+                consultant: record.CandidateConsultantName,
                 jobTitle: record.CandidateJobTitle
             };
             dates.forEach(date => {

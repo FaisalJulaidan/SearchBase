@@ -153,6 +153,13 @@
     padding-top: 15px;
 }
 
+/* Smart phones (portrait and landscape) ----------- */
+@media only screen and (min-device-width: 320px) and (max-device-width: 480px) {
+    .ant-calendar-picker-container.DatepickerCalendar > .ant-calendar {
+        width: calc(100vw - 71px) !important;
+    }
+}
+
 .ant-calendar {
     width: 320px !important;
 }

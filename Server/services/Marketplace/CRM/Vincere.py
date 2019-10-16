@@ -469,6 +469,8 @@ def searchJobs(auth, companyID, data) -> Callback:
     try:
         query = "q="
 
+        fields = "fl=id,job_title,public_description,owners,open_date,salary_from,salary_to,employment_type"
+
         # populate filter
         # query += populateFilter(data.get("jobTitle"), "job_title")
         #
@@ -487,7 +489,7 @@ def searchJobs(auth, companyID, data) -> Callback:
             query += "%23"
 
         # send query
-        sendQuery_callback: Callback = sendQuery(auth, "job/search/fl=*", "get", {}, companyID, [query])
+        sendQuery_callback: Callback = sendQuery(auth, "job/search/" + fields, "get", {}, companyID, [query])
         if not sendQuery_callback.Success:
             raise Exception(sendQuery_callback.Message)
 

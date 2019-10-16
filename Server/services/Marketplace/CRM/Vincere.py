@@ -41,7 +41,6 @@ def login(auth):
             raise Exception(access_token_request.text)
 
         result_body = json.loads(access_token_request.text)
-        helpers.logError("result_body in login: " + str(result_body))
 
         # Logged in successfully
         return Callback(True, 'Logged in successfully',
@@ -108,8 +107,6 @@ def retrieveRestToken(auth, companyID):
 
         if not saveAuth_callback.Success:
             raise Exception(saveAuth_callback.Message)
-
-        helpers.logError("new id_token: " + str(authCopy.get("id_token")))
 
         return Callback(True, 'Id Token Retrieved', {
             "id_token": authCopy.get("id_token")
@@ -337,7 +334,7 @@ def searchCandidates(auth, companyID, data) -> Callback:
             raise Exception(sendQuery_callback.Message)
 
         return_body = json.loads(sendQuery_callback.Data.text)
-        helpers.logError(str(return_body))
+
         result = []
         for record in return_body["result"]["items"]:
             skills = record.get("skill", "").split("Skill Name: :")
@@ -345,14 +342,11 @@ def searchCandidates(auth, companyID, data) -> Callback:
             for i in range(len(skills)):
                 skills[i] = skills[i].split("Description")[0]
 
-            helpers.logError("1: " + str(record.get("currency")))
             currency = record.get("currency", "gbp").lower()
             if currency == "pound":
-                helpers.logError("CONVERT")
                 currency = "GBP"
             else:
                 currency = record.get("currency", "GBP")
-            helpers.logError("2: " + str(record.get("currency")))
 
             result.append(databases_services.createPandaCandidate(id=record.get("id", ""),
                                                                   name=record.get("name"),

@@ -41,7 +41,6 @@ def login(auth):
             raise Exception(access_token_request.text)
 
         result_body = json.loads(access_token_request.text)
-        helpers.logError("result_body in login: " + str(result_body))
 
         # Logged in successfully
         return Callback(True, 'Logged in successfully',
@@ -108,8 +107,6 @@ def retrieveRestToken(auth, companyID):
 
         if not saveAuth_callback.Success:
             raise Exception(saveAuth_callback.Message)
-
-        helpers.logError("new id_token: " + str(authCopy.get("id_token")))
 
         return Callback(True, 'Id Token Retrieved', {
             "id_token": authCopy.get("id_token")
@@ -337,22 +334,34 @@ def searchCandidates(auth, companyID, data) -> Callback:
             raise Exception(sendQuery_callback.Message)
 
         return_body = json.loads(sendQuery_callback.Data.text)
-        helpers.logError(str(return_body))
+
         result = []
         for record in return_body["result"]["items"]:
+            skills = record.get("skill", "").split("Skill Name: :")
+            skills.pop(0)
+            for i in range(len(skills)):
+                skills[i] = skills[i].split("Description")[0]
+
+            currency = record.get("currency", "gbp").lower()
+            if currency == "pound":
+                currency = "GBP"
+            else:
+                currency = record.get("currency", "GBP")
+
             result.append(databases_services.createPandaCandidate(id=record.get("id", ""),
                                                                   name=record.get("name"),
                                                                   email=record.get("primary_email"),
                                                                   mobile=record.get("mobile"),
-                                                                  location=record.get("current_location", ""),
-                                                                  skills=record.get("skill", ""),  # stringified json
+                                                                  location=
+                                                                  record.get("current_location", {}).get("city", ""),
+                                                                  skills=skills,  # stringified json
                                                                   linkdinURL=None,
                                                                   availability=record.get("status"),
                                                                   jobTitle=None,
                                                                   education=None,
                                                                   yearsExperience=0,
-                                                                  desiredSalary=record.get("desired_salary", 0),
-                                                                  currency=Currency(record.get("currency").upper()),
+                                                                  desiredSalary=float(record.get("desired_salary", 0)),
+                                                                  currency=Currency(currency.upper()),
                                                                   source="Vincere"))
 
         return Callback(True, sendQuery_callback.Message, result)
@@ -397,6 +406,7 @@ def searchPerfectCandidates(auth, companyID, data, fields=None) -> Callback:
             records = return_body["result"]["items"]
 
         else:
+            query += "%23"
             records = []
 
             while len(records) < 2000:
@@ -462,21 +472,27 @@ def searchJobs(auth, companyID, data) -> Callback:
     try:
         query = "q="
 
+        fields = "fl=id,job_title,public_description,owners,open_date,salary_to,employment_type,location,currency"
+
         # populate filter
-        query += populateFilter(data.get("jobTitle"), "job_title")
+        # query += populateFilter(data.get("jobTitle"), "job_title")
+        #
+        # query += populateFilter(data.get("city"), "address")
 
-        query += populateFilter(data.get("city"), "address")
+        query += populateFilter(data.get("city"), "city")
 
-        query += populateFilter(data.get("employmentType"), "employment_type")
+        # query += populateFilter(data.get("employmentType"), "employment_type")
 
         # query = query[:-1]
 
         # check if no conditions submitted
-        if len(query) < 4:
-            query = "query=*:*"
+        if len(query) < 3:
+            query = ""
+        else:
+            query += "%23"
 
         # send query
-        sendQuery_callback: Callback = sendQuery(auth, "job/search/fl=*", "get", {}, companyID, [query])
+        sendQuery_callback: Callback = sendQuery(auth, "job/search/" + fields, "get", {}, companyID, [query])
         if not sendQuery_callback.Success:
             raise Exception(sendQuery_callback.Message)
 
@@ -487,7 +503,7 @@ def searchJobs(auth, companyID, data) -> Callback:
             result.append(databases_services.createPandaJob(id=record.get("id"),
                                                             title=record.get("job_title"),
                                                             desc=record.get("public_description", ""),
-                                                            location=record.get("location"),
+                                                            location=record.get("location", {}).get("city"),
                                                             type=record.get("employment_type"),
                                                             salary=record.get("salary_to"),
                                                             essentialSkills=None,
@@ -495,7 +511,7 @@ def searchJobs(auth, companyID, data) -> Callback:
                                                             startDate=record.get("open_date"),
                                                             endDate=record.get("closed_date"),
                                                             linkURL=None,
-                                                            currency=Currency(data.get("currency").upper()),
+                                                            currency=Currency(record.get("currency", "").upper()),
                                                             source="Vincere"))
 
         return Callback(True, sendQuery_callback.Message, result)

@@ -49,7 +49,18 @@ const Header = ({ title, logoPath, isDirectLink, resetChatbot, closeWindow }) =>
         <div className={'Header'} id={'Chatbot_Header'}>
             <Row style={{ width: '100%' }}>
                 {
-                    !isDirectLink ||
+                    !isDirectLink &&
+                    <Col span={3}>
+                        {
+                            logoPath ?
+                                <img alt="header" width={30}
+                                     src={`${logoPath}?timestamp=${new Date().getTime()}`}/> :
+                                <FontAwesomeIcon size="2x" icon={faCloud} style={{ color: '#673AB7' }}/>
+                        }
+                    </Col>
+                }
+
+                {
                     isDirectLink && isMobile &&
                     <Col span={3}>
                         {

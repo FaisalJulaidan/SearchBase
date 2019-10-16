@@ -124,7 +124,7 @@ class Availability extends React.Component {
               }
             })
           } else {
-            if(!aggr[key].includes(record[key])){
+            if(!aggr[key].includes(record[key]) && record[key] !== null){
               aggr[key].push(record[key])
             }
           }
@@ -247,6 +247,8 @@ class Availability extends React.Component {
             aggregates = this.getSearchAggregates(availability)
             availability = this.filterSearches(availability)
         }
+
+        console.log(aggregates)
 
         return (
             <div>

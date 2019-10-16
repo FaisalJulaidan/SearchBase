@@ -344,8 +344,9 @@ def searchCandidates(auth, companyID, data) -> Callback:
             skills.pop(0)
             for i in range(len(skills)):
                 skills[i] = skills[i].split("Description")[0]
-            helpers.logError("1: " + record.get("currency"))
+            helpers.logError("1: " + str(record.get("currency")))
             if record.get("currency") == "POUND":
+                helpers.logError("CONVERT")
                 currency = "GBP"
             else:
                 currency = record.get("currency", "GBP")

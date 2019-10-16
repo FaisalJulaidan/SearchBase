@@ -10,7 +10,8 @@ from sqlalchemy.orm import joinedload
 
 from utilities.enums import UserType, Status, Webhooks, FileAssetType
 from models import db, Callback, Conversation, Assistant, StoredFile, StoredFileInfo
-from services import assistant_services, stored_file_services, auto_pilot_services, mail_services, webhook_services
+from services import assistant_services, stored_file_services, auto_pilot_services, mail_services, webhook_services, \
+    databases_services
 from services.Marketplace.CRM import crm_services
 from utilities import json_schemas, helpers, enums
 import json
@@ -68,7 +69,7 @@ def processConversation(assistantHashID, data: dict) -> Callback:
         }
 
         webhook_services.fireRequests(webhookData, callback.Data.CompanyID, Webhooks.Conversations)
-        print("crmInformation: ", data.get("crmInformation"))
+
         if not data.get("crmInformation"):
             # AutoPilot Operations
             if assistant.AutoPilot and conversation.Completed:
@@ -90,14 +91,14 @@ def processConversation(assistantHashID, data: dict) -> Callback:
                     conversation.CRMSynced = True
                 conversation.CRMResponse = crm_callback.Message
         else:
-            print("STARTING")
             crmInformation = data["crmInformation"]
-            print(crmInformation.get("source"))
             if crmInformation.get("source") == "crm":
                 crm_callback: Callback = crm_services.updateCandidate(crmInformation, conversation, assistant.CompanyID)
                 if crm_callback.Success:
                     conversation.CRMSynced = True
                 conversation.CRMResponse = crm_callback.Message
+            elif crmInformation.get("source") == "database":
+                database_callback: Callback = databases_services.updateCandidate(crmInformation.get("id"), conversation)
 
         # Notify company about the new chatbot session only if set as immediate -> NotifyEvery=0
         # Note: if there is a file upload the /file route in chatbot.py will handle the notification instead
@@ -111,13 +112,13 @@ def processConversation(assistantHashID, data: dict) -> Callback:
         db.session.add(conversation)
         db.session.commit()
 
-
         return Callback(True, 'Chatbot data has been processed successfully!', (conversation, data,))
 
     except Exception as exc:
         helpers.logError("conversation_services.processConversation(): " + str(exc))
         db.session.rollback()
         return Callback(False, "An error occurred while processing chatbot data.")
+
 
 def getFileByConversationID(assistantID, conversationID, filePath):
     try:
@@ -139,6 +140,7 @@ def getFileByConversationID(assistantID, conversationID, filePath):
 
 def uploadFiles(files, conversation, data, keys):
     try:
+        print("SHOULD ATTEMPT TO UPLOAD FILES")
         sf : StoredFile = StoredFile()
 
         db.session.add(sf)
@@ -146,12 +148,15 @@ def uploadFiles(files, conversation, data, keys):
         uploadedFiles = []
         uploadedFilesCallbacks = []
         for item in data['collectedData']:
-            if item['input'] == "&FILE_UPLOAD&": # enum for this?
+            if item['input'] == "&FILE_UPLOAD&":  # enum for this?
                 for file in files:
                     if file.filename in uploadedFiles:
                         continue
                     for submittedFile in data['submittedFiles']:
                         if file.filename == submittedFile['uploadedFileName']:
+                            print("uploading file...")
+                            print(file.filename)
+                            print(conversation)
                             uploadedFiles.append(file.filename)
                             key = enums.FileAssetType.NoType # TODO once BlockType-Upgrade is done
                             upload_callback: Callback = stored_file_services.uploadFile(file, submittedFile['fileName'], True, model=Conversation,

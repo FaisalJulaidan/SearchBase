@@ -10,6 +10,7 @@ import './styles/Inputs.css';
 import { Icon, Tooltip } from 'antd';
 import { faTelegramPlane } from '@fortawesome/free-brands-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { getContainerElement } from '../../helpers';
 
 const Text = ({ message, submitMessage }) => {
     let [error, setError] = useState(null);
@@ -71,12 +72,7 @@ const Text = ({ message, submitMessage }) => {
                 <Tooltip
                     placement="top"
                     title={error}
-                    getPopupContainer={() => {
-                                            if (document.getElementById('TheSearchBase_Chatbot_Input'))
-                                                return document.getElementById('TheSearchBase_Chatbot_Input');
-                                            else
-                                                return document.getElementById('TheSearchBase_Chatbot')
-                                        }}
+                    getPopupContainer={() => getContainerElement()}
                     visible={!valid}>
                     <input
                         className={'Text'}

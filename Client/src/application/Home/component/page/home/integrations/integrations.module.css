@@ -34,6 +34,7 @@
     color: #444444;
     opacity: 0;
     transition: opacity 0.1s linear;
+    max-width: 120px;
 }
 
 .col_item:hover .image{

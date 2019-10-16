@@ -1,0 +1,16 @@
+.Input > .SubmitWrapper {
+    cursor: pointer;
+    text-align: center;
+    width: 100%;
+}
+
+.Input > .SubmitWrapper .Submit {
+    height: 50%;
+}
+
+.Input > .SubmitWrapper .Actions {
+    height: 50%;
+    padding-top: 3px;
+}
+
+

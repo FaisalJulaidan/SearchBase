@@ -39,7 +39,8 @@ class Campaign extends React.Component {
             skillInput: "",
             textMessage: "",
             isSaved: true, //check if the campaign is saved or not
-            campaignName: ""
+            campaignName: "",
+            outreach_type: ""
         };
     }
 
@@ -144,7 +145,9 @@ class Campaign extends React.Component {
                     values.jobTitle,
                     this.state.skills,
                     values.text,
-                    this.state.candidate_list
+                    this.state.candidate_list,
+                    values.outreach_type,
+                    values.email_title
                 ));
             }
         });
@@ -198,6 +201,8 @@ class Campaign extends React.Component {
                     values.jobTitle,
                     this.state.skills,
                     this.state.textMessage,
+                    values.outreach_type,
+                    values.email_title,
                 ));
             }
         });
@@ -481,6 +486,32 @@ class Campaign extends React.Component {
                                                   onChange={value => this.findLocation(value)}/>
                                 )}
                             </FormItem>
+
+                            <FormItem label={"Outreach Type "}>
+                                {getFieldDecorator("outreach_type", {initialValue: "sms"})(
+                                    <Select placeholder={"Please select the message delivery platform"}
+                                            onSelect={(value) => {this.setState({outreach_type: value})}}>
+                                        <Select.Option key="sms">SMS</Select.Option>
+                                        <Select.Option key="email">Email</Select.Option>
+                                    </Select>
+                                )}
+                            </FormItem>
+
+                            <FormItem label={"Email Title "}
+                                      style={this.state.outreach_type !== 'email' ? {display: 'none'} : {display: 'block'}}>
+                                {getFieldDecorator("email_title",{
+                                    rules: [{
+                                        whitespace:true,
+                                        required: this.state.outreach_type === 'email',
+                                        message: "Please enter a title for your outreach email"
+                                    }],
+                                })(
+                                    <Input placeholder="Please enter a title for your outreach email"
+                                           type="text"
+                                           onPressEnter={this.handleSkillSubmit}/>
+                                )}
+                            </FormItem>
+
                             <FormItem
                                 label={<span>Message
                                 <Button type="default" size="small" shape="round"
@@ -498,6 +529,8 @@ class Campaign extends React.Component {
                                     />
                                 )}
                             </FormItem>
+
+
                             <Button loading={this.props.isCandidatesLoading} icon="rocket" type="primary"
                                     onClick={this.handleSubmit}
                                     size={"large"}>

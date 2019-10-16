@@ -1,10 +1,9 @@
 from sqlalchemy import and_
 
 from models import Callback, db, Campaign
-from services import assistant_services, databases_services
+from services import assistant_services, databases_services, mail_services
 from services.Marketplace.CRM import crm_services
 from services.Marketplace.Messenger import messenger_servicess
-from services.Marketplace.Messenger.messenger_servicess import sendMessage
 from utilities import helpers
 from utilities.enums import CRM
 
@@ -159,6 +158,7 @@ def prepareCampaign(campaign_details, companyID):
 
         if not candidates_callback.Success:
             raise Exception(candidates_callback.Message)
+
         for candidate in candidates_callback.Data:
             if candidate.get("Currency"):
                 candidate["Currency"] = ""
@@ -193,25 +193,32 @@ def sendCampaign(campaign_details, companyID):
             if campaign_details.get("use_crm") and crm:
                 if crm.Type is CRM.Bullhorn:
                     candidate_phone = candidate.get("CandidateMobile")
+                    candidate_email = candidate.get("CandidateEmail")
                 else:
                     raise Exception("CRM is not supported for this operation")
             else:
                 candidate_phone = candidate.get("CandidateMobile")
+                candidate_email = candidate.get("CandidateEmail")
 
             if not candidate_phone:
                 continue
 
             # insert candidate details in text
-            text = text.replace("{candidate.name}", candidate.get("CandidateName"))
+            tempText = text.replace("{candidate.name}", candidate.get("CandidateName"))
 
             # insert candidate id in link
-            text = text.split("&id")[0]
-            text += "&id=" + str(candidate.get("ID"))
+            tempText = tempText.split("&id")[0]
+            tempText += "&id=" + str(candidate.get("ID"))
 
-            sendMessage(messenger.Type, candidate_phone, text, messenger.Auth)
+            if campaign_details.get("outreach_type") == "sms":
+                messenger_servicess.sendMessage(messenger.Type, candidate_phone, tempText, messenger.Auth)
+            elif campaign_details.get("outreach_type") == "whatsapp":
+                messenger_servicess.sendMessage(messenger.Type, candidate_phone, tempText, messenger.Auth, True)
+            elif campaign_details.get("outreach_type") == "email":
+                mail_services.simpleSend(candidate_email, campaign_details.get("email_title"), tempText)
 
         return Callback(True, '')
 
     except Exception as exc:
         helpers.logError("campaign_services.sendCampaign(): " + str(exc))
-        return Callback(False, 'Error while search the database for matches!')
+        return Callback(False, 'Error while sending campaign!')

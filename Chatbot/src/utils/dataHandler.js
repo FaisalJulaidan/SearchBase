@@ -136,6 +136,7 @@ export const dataHandler = (() => {
             let keywordsByDataType = {};
             let submittedFiles = [];
             let selectedSolutions = [];
+            let recordedUserTypes = [];
             let _curScore = 0;
             let _totalScore = 0;
             const personalData = {
@@ -172,6 +173,33 @@ export const dataHandler = (() => {
                     keywords,
                     ...extras
                 });
+            };
+
+            const __detectUserType = () => {
+                let userType = 'Unknown'; // default
+                recordedUserTypes = recordedUserTypes.filter(t => t !== userType);
+                if (recordedUserTypes.length === 0)
+                    return userType;
+
+                let types = {};
+                let maxCount = 1;
+                for (let type of recordedUserTypes) {
+                    let key = type;
+                    if (types[key] == null)
+                        types[key] = 1;
+                    else
+                        types[key]++;
+                    if (types[key] > maxCount)
+                        maxCount = types[key];
+                }
+                types = Object.keys(types).filter(key => types[key] === maxCount);
+                if (types.length === 1)
+                    userType = types[0];
+                return userType;
+            };
+
+            const __recordUserTypes = (types) => {
+                recordedUserTypes = recordedUserTypes.concat(types);
             };
 
             const __accumulateScore = (earnedScore, total) => {
@@ -293,6 +321,7 @@ export const dataHandler = (() => {
                     [],
                     content.skipped);
                 if (solutions.length) {
+                    __recordUserTypes(solutions[0][solutionAttributes.DATABASE_TYPE][solutionAttributes.DATABASE_TYPE_USER_TYPES]);
                     selectedSolutions = selectedSolutions.concat(solutions);
                 }
             };
@@ -324,7 +353,7 @@ export const dataHandler = (() => {
             };
 
             const __getResult = () => {
-
+                userType = userType === 'Unknown' ? __detectUserType() : userType;
                 let name, email, phone;
                 if (userType === 'Candidate') {
                     name = personalData.CandidateName;
@@ -360,6 +389,8 @@ export const dataHandler = (() => {
                 if (message.sender === 'USER') {
                     const { blockRef } = message;
                     // const storeInDB = blockRef[flowAttributes.STORE_IN_DB];
+                    __recordUserTypes(blockRef[flowAttributes.DATA_TYPE][flowAttributes.DATA_TYPE_USER_TYPES]);
+
                     switch (blockRef[flowAttributes.TYPE]) {
                         case messageTypes.QUESTION:
                             __processQuestion(message);

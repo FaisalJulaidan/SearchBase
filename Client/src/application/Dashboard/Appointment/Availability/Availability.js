@@ -61,8 +61,6 @@ class Availability extends React.Component {
         };
         let availability = [];
         const { start, end } = this.state;
-        console.log(records)
-        debugger
         records.filter(record => record.CandidateAvailability).filter(record => {
             let dates = record.CandidateAvailability.split(',');
 

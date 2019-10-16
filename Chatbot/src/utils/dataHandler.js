@@ -217,17 +217,17 @@ export const dataHandler = (() => {
                 }
 
                 // Adds the answer text as part of the keywords list
-                let modifiedKeywords = [];
-                if (!content.skipped) {
-                    modifiedKeywords = keywords.concat(text.trim().split(' ').filter(n => n));
-                }
+                // let modifiedKeywords = [];
+                // if (!content.skipped) {
+                //     modifiedKeywords = keywords.concat(text.trim().split(' ').filter(n => n));
+                // }
 
                 __collectData(
                     blockRef[flowAttributes.ID],
                     blockRef[flowAttributes.CONTENT][flowAttributes.CONTENT_TEXT],
                     answer,
                     blockRef[flowAttributes.DATA_TYPE],
-                    modifiedKeywords,
+                    keywords,
                     content.skipped);
                 __accumulateScore(score, Math.max(...answers.map(answer => answer.score)));
             };
@@ -297,6 +297,32 @@ export const dataHandler = (() => {
                 }
             };
 
+            const __processSalaryPicker = (message) => {
+                const { blockRef, content, text } = message;
+                const { input, skipped } = content;
+
+                __collectData(
+                    blockRef[flowAttributes.ID],
+                    blockRef[flowAttributes.CONTENT][flowAttributes.CONTENT_TEXT],
+                    input,
+                    blockRef[flowAttributes.DATA_TYPE],
+                    [input],
+                    skipped);
+            };
+
+            const __processDatePicker = (message) => {
+                const { blockRef, content, text } = message;
+                const { input, skipped } = content;
+
+                __collectData(
+                    blockRef[flowAttributes.ID],
+                    blockRef[flowAttributes.CONTENT][flowAttributes.CONTENT_TEXT],
+                    input,
+                    blockRef[flowAttributes.DATA_TYPE],
+                    input.split(','),
+                    skipped);
+            };
+
             const __getResult = () => {
 
                 let name, email, phone;
@@ -346,6 +372,12 @@ export const dataHandler = (() => {
                             break;
                         case messageTypes.SOLUTIONS:
                             __processSolutions(message);
+                            break;
+                        case messageTypes.SALARY_PICKER:
+                            __processSalaryPicker(message);
+                            break;
+                        case messageTypes.DATE_PICKER:
+                            __processDatePicker(message);
                             break;
 
                         case messageTypes.USER_TYPE:

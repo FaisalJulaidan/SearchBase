@@ -344,10 +344,12 @@ def searchCandidates(auth, companyID, data) -> Callback:
             skills.pop(0)
             for i in range(len(skills)):
                 skills[i] = skills[i].split("Description")[0]
+            helpers.logError("1: " + record.get("currency"))
             if record.get("currency") == "POUND":
                 currency = "GBP"
             else:
                 currency = record.get("currency", "GBP")
+            helpers.logError("2: " + record.get("currency"))
             result.append(databases_services.createPandaCandidate(id=record.get("id", ""),
                                                                   name=record.get("name"),
                                                                   email=record.get("primary_email"),

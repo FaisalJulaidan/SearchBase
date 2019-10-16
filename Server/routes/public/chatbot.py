@@ -8,16 +8,11 @@ from models import Callback, db, Conversation, Assistant, StoredFile, StoredFile
 from services import conversation_services, flow_services, databases_services, stored_file_services, mail_services
 from services.Marketplace.CRM import crm_services
 from utilities import helpers, enums, wrappers
-from utilities.helpers import logError, limiter
-
+from utilities.helpers import logError
 import json
 
 chatbot_router = Blueprint('chatbot_router', __name__, template_folder="../templates")
 CORS(chatbot_router)
-
-
-# Requests limiter:
-# TODO: Place this in helpers for request restrictions elsewhere
 
 
 @chatbot_router.after_request
@@ -80,7 +75,6 @@ def getSolutions_forChatbot(assistantHashID):
 
 
 @chatbot_router.route("/assistant/<string:assistantIDAsHash>/chatbot", methods=['GET', 'POST'])
-# @limiter.limit("2/3minutes", methods=['POST'])
 def chatbot(assistantIDAsHash):
     if request.method == "GET":
         # Get blocks for the chatbot to use
@@ -91,6 +85,7 @@ def chatbot(assistantIDAsHash):
 
     # Process sent data coming from the chatbot
     if request.method == "POST":
+
         # Chatbot collected information
         data = json.loads(request.form.get('conversation'))
         callback: Callback = conversation_services.processConversation(assistantIDAsHash, data)
@@ -98,7 +93,7 @@ def chatbot(assistantIDAsHash):
         file_callback: Callback = Callback(True, '')
         if request.files:
             file_callback = conversation_services.uploadFiles(request.files.getlist('file'), callback.Data[0], callback.Data[1], request.form.get('keys'))
-
+        
         if not (callback.Success and file_callback.Success):
             return helpers.jsonResponseFlask(False, 400, callback.Message, callback.Data)
 

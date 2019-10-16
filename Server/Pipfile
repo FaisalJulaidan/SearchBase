@@ -80,7 +80,6 @@ authlib = "*"
 twilio = "*"
 sqlalchemy-stubs = "*"
 grequests = "*"
-flask-limiter = "*"
 
 [requires]
 python_version = "3.7"

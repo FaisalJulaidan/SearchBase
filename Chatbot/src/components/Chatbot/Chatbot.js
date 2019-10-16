@@ -212,7 +212,6 @@ export const Chatbot = ({
                 return;
             }
             if (nextBlock.extra.end) {
-              console.log("end")
                 setChatbotStatus({ finished: true });
                 let { cancelled } = await dataHandler.sendData(nextBlock.extra.finished);
                 if (cancelled) return;

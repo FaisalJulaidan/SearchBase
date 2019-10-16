@@ -56,7 +56,7 @@ class SignupForm extends React.Component {
 
                 <FormItem className={styles.SignupFormItem}>
                     {getFieldDecorator('companyName', {
-                        rules: [{whitespace: true, required: true, message: 'Please input your company name!'}],
+                        rules: [{required: true, message: 'Please input your company name!'}],
                     })(
                         <Input prefix={<Icon type="home" style={{color: 'rgba(0,0,0,.25)'}}/>}
                                placeholder="Company Name"/>
@@ -66,7 +66,7 @@ class SignupForm extends React.Component {
 
                 <FormItem className={styles.SignupFormItem}>
                     {getFieldDecorator('websiteURL', {
-                        rules: [{whitespace: true, required: true, message: 'Please input company website URL!'},
+                        rules: [{required: true, message: 'Please input company website URL!'},
                             {
                                 pattern: /[-a-zA-Z0-9@:%_\+.~#?&//=]{2,256}\.[a-z]{2,16}\b(\/[-a-zA-Z0-9@:%_\+.~#?&//=]*)?/,
                                 message: 'Please, enter a valid URL'
@@ -79,7 +79,7 @@ class SignupForm extends React.Component {
 
                 <FormItem className={styles.SignupFormItem}>
                     {getFieldDecorator('firstName', {
-                        rules: [{whitespace: true, required: true, message: 'Please input your first name!'}],
+                        rules: [{required: true, message: 'Please input your first name!'}],
                     })(
                         <Input prefix={<Icon type="idcard" style={{color: 'rgba(0,0,0,.25)'}}/>}
                                placeholder="First Name "/>
@@ -88,7 +88,7 @@ class SignupForm extends React.Component {
 
                 <FormItem className={styles.SignupFormItem}>
                     {getFieldDecorator('lastName', {
-                        rules: [{whitespace: true, required: true, message: 'Please input your last name!'}],
+                        rules: [{required: true, message: 'Please input your last name!'}],
                     })(
                         <Input prefix={<Icon type="idcard" style={{color: 'rgba(0,0,0,.25)'}}/>}
                                placeholder="Last Name "/>
@@ -99,7 +99,6 @@ class SignupForm extends React.Component {
                     {getFieldDecorator('telephone', {
                         rules: [
                             {
-                                whitespace: true,
                                 pattern: /^((\+\d{1,3}(-| )?\(?\d\)?(-| )?\d{1,3})|(\(?\d{2,3}\)?))(-| )?(\d{3,4})(-| )?(\d{4})(( x| ext)\d{1,5}){0,1}$/,
                                 message: 'Sorry, use a valid number'
                             }
@@ -114,7 +113,7 @@ class SignupForm extends React.Component {
                 <FormItem className={styles.SignupFormItem}>
                     {getFieldDecorator('email', {
                         rules: [
-                            {whitespace: true, required: true, message: 'Please input your email!'},
+                            {required: true, message: 'Please input your email!'},
                             {
                                 pattern: /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,16})+$/,
                                 message: 'Sorry, use a valid email'
@@ -130,7 +129,7 @@ class SignupForm extends React.Component {
                 <FormItem className={styles.SignupFormItem}>
                     {getFieldDecorator('password', {
                         rules: [
-                            {whitespace: true, required: true, message: 'Please input your Password!'},
+                            {required: true, message: 'Please input your Password!'},
                             {validator: this.validateToNextPassword},
                             {pattern: /^.{6,}$/, message: 'Minimum is 6 characters'}
                         ],
@@ -144,7 +143,7 @@ class SignupForm extends React.Component {
                 <FormItem className={styles.SignupFormItem}>
                     {getFieldDecorator('confirm', {
                         rules: [
-                            {whitespace: true, required: true, message: 'Please confirm your Password!'},
+                            {required: true, message: 'Please confirm your Password!'},
                             {validator: this.compareToFirstPassword}
                         ],
                     })(
@@ -157,7 +156,7 @@ class SignupForm extends React.Component {
 
                 <Form.Item>
                     {getFieldDecorator('agreement', {
-                        rules: [{required: true, message: 'You must agree to the terms & privacy policy'}],
+                        rules: [{required: true, message: 'You must agree to terms & privacy policy'}],
                     })(
                         <Checkbox className={styles.checkbox}>I have read the <Link className={styles.link} to="/terms">terms</Link> & <Link
                             className={styles.link} to="/privacy">privacy

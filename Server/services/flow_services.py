@@ -26,7 +26,11 @@ def getChatbot(assistantHashID) -> Callback:
 
         # Check for restricted countries
         try:
-            ip = helpers.getRemoteAddress()
+            if os.environ['FLASK_ENV'] == 'development':
+                ip = request.remote_addr
+            else:
+                ip = request.headers['X-Real-IP']
+
             if ip != '127.0.0.1' and assistant.Config:
                 restrictedCountries = assistant.Config.get('restrictedCountries', [])
                 if len(restrictedCountries):

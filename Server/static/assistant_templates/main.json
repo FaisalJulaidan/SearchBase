@@ -3,31 +3,33 @@
     {
       "blocks": [
         {
-          "Type": "User Type",
+          "Type": "Question",
           "StoreInDB": true,
           "Skippable": false,
           "SkipText": "Skip!",
           "SkipAction": "End Chat",
           "SkipBlockToGoID": null,
-          "DataType": "UserType",
+          "DataType": "NoType",
           "Content": {
             "text": "What best describes you?",
-            "types": [
+            "answers": [
               {
                 "action": "Go To Specific Block",
                 "afterMessage": "",
                 "blockToGoID": "5hMpPvT9H",
+                "id": "PgSEIxqh9",
+                "keywords": [],
                 "score": 0,
-                "text": "Client",
-                "value": "Client"
+                "text": "Client"
               },
               {
                 "action": "Go To Specific Block",
                 "afterMessage": "",
                 "blockToGoID": "5eAd2vVgW",
+                "id": "gmaVu6YQ6",
+                "keywords": [],
                 "score": 10,
-                "text": "Candidate",
-                "value": "Candidate"
+                "text": "Candidate"
               }
             ]
           },
@@ -160,22 +162,24 @@
         },
         {
           "Content": {
-            "types": [
+            "answers": [
               {
                 "action": "Go To Specific Block",
                 "afterMessage": "",
                 "blockToGoID": "KODRc35r0",
+                "id": "VYnOtW6Eu",
+                "keywords": [],
                 "score": 0,
-                "text": "Permanent",
-                "value": "Permanent"
+                "text": "Permanent "
               },
               {
                 "action": "Go To Specific Block",
                 "afterMessage": "",
                 "blockToGoID": "KODRc35r0",
+                "id": "M3Yq9saPb",
+                "keywords": [],
                 "score": 0,
-                "text": "Contract",
-                "value": "Contract"
+                "text": "Contract"
               }
             ],
             "text": "What type of work are you looking for?"
@@ -187,26 +191,28 @@
           "SkipText": "Skip!",
           "Skippable": false,
           "StoreInDB": true,
-          "Type": "Job Type"
+          "Type": "Question"
         },
         {
           "Content": {
-            "types": [
+            "answers": [
               {
                 "action": "Go To Specific Block",
                 "afterMessage": "Great",
                 "blockToGoID": "p1Aco7UGA",
+                "id": "rcRwB0SnN",
+                "keywords": [],
                 "score": 0,
-                "text": "Permanent",
-                "value": "Permanent"
+                "text": "Permanent "
               },
               {
                 "action": "Go To Specific Block",
                 "afterMessage": "Cool",
                 "blockToGoID": "tWHxwIttj",
+                "id": "767S_Am3G",
+                "keywords": [],
                 "score": 0,
-                "text": "Contract",
-                "value": "Contract"
+                "text": "Contract"
               }
             ],
             "text": "Are you looking for a Permanent or a Contract role?"
@@ -218,47 +224,41 @@
           "SkipText": "Skip!",
           "Skippable": false,
           "StoreInDB": true,
-          "Type": "Job Type"
+          "Type": "Question"
         },
         {
           "Content": {
             "action": "Go To Specific Block",
             "afterMessage": "",
             "blockToGoID": "_RvKGKYem",
-            "text": "What is your desired daily salary? Enter a figure such as '350'",
-            "min": 100,
-            "max": 800,
-            "period": "Daily",
-            "currency": "GBP"
+            "keywords": [],
+            "text": "What is your desired daily salary? Enter a figure such as '350'"
           },
-          "DataType": "JobSalary",
+          "DataType": "JobDayRate",
           "ID": "tWHxwIttj",
           "SkipAction": "End Chat",
           "SkipBlockToGoID": null,
           "SkipText": "Skip!",
           "Skippable": false,
           "StoreInDB": true,
-          "Type": "Salary Picker"
+          "Type": "User Input"
         },
         {
           "Content": {
             "action": "Go To Next Block",
             "afterMessage": "",
             "blockToGoID": "_RvKGKYem",
-            "text": "What is your desired annual salary? Enter a figure such as '30000'",
-            "min": 15000,
-            "max": 200000,
-            "period": "Annually",
-            "currency": "GBP"
+            "keywords": [],
+            "text": "What is your desired annual salary? Enter a figure such as '30000'"
           },
-          "DataType": "JobSalary",
+          "DataType": "JobAnnualSalary",
           "ID": "p1Aco7UGA",
           "SkipAction": "End Chat",
           "SkipBlockToGoID": null,
           "SkipText": "Skip!",
           "Skippable": false,
           "StoreInDB": true,
-          "Type": "Salary Picker"
+          "Type": "User Input"
         },
         {
           "Content": {
@@ -437,74 +437,70 @@
         },
         {
           "Content": {
-            "types": [
+            "answers": [
               {
                 "action": "Go To Specific Block",
                 "afterMessage": "Ok",
                 "blockToGoID": "maHedoZSn",
+                "id": "fkHrnFQPf",
+                "keywords": [],
                 "score": 0,
-                "text": "Permanent",
-                "value": "Permanent"
+                "text": "Permanent "
               },
               {
                 "action": "Go To Specific Block",
                 "afterMessage": "",
                 "blockToGoID": "fXlAf5vXD",
+                "id": "2NwbuptrE",
+                "keywords": [],
                 "score": 0,
-                "text": "Contract",
-                "value": "Contract"
+                "text": "Contract"
               }
             ],
             "text": "Are you looking to recruit for a Permanent or a Contract candidate?"
           },
-          "DataType": "JobType",
+          "DataType": "NoType",
           "ID": "Z95cvxwBC",
           "SkipAction": "End Chat",
           "SkipBlockToGoID": null,
           "SkipText": "Skip!",
           "Skippable": false,
           "StoreInDB": true,
-          "Type": "Job Type"
+          "Type": "Question"
         },
         {
           "Content": {
             "action": "Go To Specific Block",
             "afterMessage": "",
             "blockToGoID": "2fbf_Mw0B",
-            "text": "How much are you looking to pay daily?",
-            "min": 100,
-            "max": 800,
-            "period": "Daily",
-            "currency": "GBP"
+            "keywords": [],
+            "text": "How much are you looking to pay daily?"
           },
-          "DataType": "JobSalary",
+          "DataType": "JobDayRate",
           "ID": "fXlAf5vXD",
           "SkipAction": "End Chat",
           "SkipBlockToGoID": null,
           "SkipText": "Skip!",
           "Skippable": false,
           "StoreInDB": true,
-          "Type": "Salary Picker"
+          "Type": "User Input"
         },
         {
           "Content": {
             "action": "Go To Next Block",
             "afterMessage": "",
             "blockToGoID": "2fbf_Mw0B",
-            "text": "How much are you looking to pay annually?",
-            "min": 15000,
-            "max": 200000,
-            "period": "Annually",
-            "currency": "GBP"
+            "keywords": [],
+            "text": "How much are you looking to pay annually?"
           },
-          "DataType": "JobSalary",
+          "DataType": "JobAnnualSalary",
           "ID": "maHedoZSn",
           "SkipAction": "End Chat",
           "SkipBlockToGoID": null,
           "SkipText": "Skip!",
           "Skippable": false,
           "StoreInDB": true,
-          "Type": "Salary Picker"
+          "Type": "User Input"
         },
         {
           "Content": {
@@ -666,7 +662,7 @@
             "keywords": [],
             "text": "For what role are you looking to recruit for?"
           },
-          "DataType": "JobTitle",
+          "DataType": "CandidateJobTitle",
           "ID": "zl1pQPS9y",
           "SkipAction": "End Chat",
           "SkipBlockToGoID": null,
@@ -677,22 +673,24 @@
         },
         {
           "Content": {
-            "types": [
+            "answers": [
               {
                 "action": "Go To Specific Block",
                 "afterMessage": "",
                 "blockToGoID": "X90w_ByqN",
+                "id": "ehhgrF1-t",
+                "keywords": [],
                 "score": 0,
-                "text": "Permanent",
-                "value": "Permanent"
+                "text": " Permanent"
               },
               {
                 "action": "Go To Specific Block",
                 "afterMessage": "",
                 "blockToGoID": "BgH4udu2H",
+                "id": "g7wQC-u6K",
+                "keywords": [],
                 "score": 0,
-                "text": "Contract",
-                "value": "Contract"
+                "text": "Contract"
               }
             ],
             "text": "Are you looking to recruit for a  permanent or contract position?"
@@ -704,47 +702,41 @@
           "SkipText": "Skip!",
           "Skippable": false,
           "StoreInDB": true,
-          "Type": "Job Type"
+          "Type": "Question"
         },
         {
           "Content": {
             "action": "Go To Specific Block",
             "afterMessage": "",
             "blockToGoID": "7qd9wHi8s",
-            "text": "How much are you looking to pay daily?",
-            "min": 100,
-            "max": 800,
-            "period": "Daily",
-            "currency": "GBP"
+            "keywords": [],
+            "text": "How much are you looking to pay daily?"
           },
-          "DataType": "JobSalary",
+          "DataType": "JobDayRate",
           "ID": "BgH4udu2H",
           "SkipAction": "Go To Specific Block",
           "SkipBlockToGoID": "7qd9wHi8s",
           "SkipText": "Competitive Rate ",
           "Skippable": true,
           "StoreInDB": true,
-          "Type": "Salary Picker"
+          "Type": "User Input"
         },
         {
           "Content": {
             "action": "Go To Specific Block",
             "afterMessage": "",
             "blockToGoID": "7qd9wHi8s",
-            "text": "How much salary are you looking to pay?",
-            "min": 15000,
-            "max": 200000,
-            "period": "Annually",
-            "currency": "GBP"
+            "keywords": [],
+            "text": "How much salary are you looking to pay?"
           },
-          "DataType": "JobSalary",
+          "DataType": "JobAnnualSalary",
           "ID": "X90w_ByqN",
           "SkipAction": "Go To Specific Block",
           "SkipBlockToGoID": "7qd9wHi8s",
           "SkipText": "Competitive Salary",
           "Skippable": true,
           "StoreInDB": true,
-          "Type": "Salary Picker"
+          "Type": "User Input"
         },
         {
           "Content": {

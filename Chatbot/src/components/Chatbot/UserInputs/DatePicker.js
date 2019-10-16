@@ -1,14 +1,13 @@
-import React, { useState } from 'react';
+import React, {useState} from 'react';
 // Constants
 import * as messageTypes from '../../../constants/MessageType';
 import * as flowAttributes from '../../../constants/FlowAttributes';
 // Styles
 import './styles/Inputs.css';
 // Components
-import { DatePicker as AntdDatePicker } from 'antd';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faTelegramPlane } from '@fortawesome/free-brands-svg-icons';
-import { getContainerElement } from '../../helpers';
+import {DatePicker as AntdDatePicker, Icon, Tooltip} from 'antd';
+import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
+import {faTelegramPlane} from '@fortawesome/free-brands-svg-icons';
 
 
 const DatePicker = ({message, submitMessage}) => {
@@ -40,11 +39,17 @@ const DatePicker = ({message, submitMessage}) => {
 
     return (
         <React.Fragment>
-            <div className={'DatePickerContainer'}>
-                <AntdDatePicker getCalendarContainer={() => getContainerElement()}
-                                className={'Datepicker'} suffixIcon={<div/>}
-                                dropdownClassName={'DatepickerCalendar'}
-                                onChange={(e) => {
+            <div className={'InputContainer'}>
+                <AntdDatePicker getCalendarContainer={
+                    () => {
+                        if (document.getElementById('TheSearchBase_Chatbot_Input'))
+                            return document.getElementById('TheSearchBase_Chatbot_Input');
+                        else
+                            return document.getElementById('TheSearchBase_Chatbot')
+                    }}
+                            className={'Datepicker'} suffixIcon={<div/>}
+                            dropdownClassName={'DatepickerCalendar'}
+                            onChange={(e) => {
                                 if (e)
                                     if (e._isAMomentObject)
                                         setSelectedDate(e.format('L'));

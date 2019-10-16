@@ -45,8 +45,6 @@ class FileAssetType(Enum):
     @classmethod
     def has_value(cls, value):
         return any(value == item.value for item in cls)
-
-
 @unique
 class Messenger(Enum):
     Twilio = 'Twilio'
@@ -76,7 +74,7 @@ class Period(Enum):
 
 
 @unique
-class JobType(Enum):
+class EmploymentType(Enum):
     Permanent = 'Permanent'
     Temporary = 'Temporary'
     Contract = 'Contract'
@@ -90,11 +88,6 @@ class BlockType(Enum):
     FileUpload = 'File Upload'
     Solutions = 'Solutions'
     RawText = 'Raw Text'
-    SalaryPicker = 'Salary Picker'
-    UserType = 'User Type'
-    JobType = 'Job Type'
-    DatePicker = 'Date Picker'
-    NoType = 'No Type'
 
     @classmethod
     def has_value(cls, value):
@@ -149,7 +142,6 @@ class DataTypeSection(Enum):
     Company = 'Company'
     Candidate = 'Candidate'
     Job = 'Job'
-    User = 'User'
 
     @classmethod
     def has_value(cls, value):
@@ -176,14 +168,15 @@ class ValidationType(Enum):
 
 # === Data Types Stuff === #
 def dataTypeCreator(name: str, enumName: str, validation: ValidationType, section: DataTypeSection,
-                    userTypes: List[UserType], blockTypes: List[BlockType]):
+                    userTypes: List[UserType]):
     return {'name': name,
             'enumName': enumName,
             'validation': validation.value,
             'dataTypeSection': section.value,
             'userTypes': [ut.value for ut in userTypes],
-            'blockTypes': [bt.value for bt in blockTypes],
+            # 'blockTypes': ,
             }
+
 
 @unique
 class DataType(Enum):
@@ -191,18 +184,8 @@ class DataType(Enum):
         'No Type',
         'NoType',
         ValidationType.Ignore,
-        DataTypeSection.NoType,
-        [UserType.Unknown],
-        [BlockType.UserInput, BlockType.Question, BlockType.FileUpload, BlockType.UserType])
-
-    CandidateAvailability =  dataTypeCreator(
-        'Candidate Availability',
-        'CandidateAvailability',
-        ValidationType.DateTime,
-        DataTypeSection.Candidate,
-        [UserType.Candidate, UserType.Client],
-        [BlockType.DatePicker])
-
+        DataTypeSection.NoType, [
+            UserType.Unknown])
 
     # Candidate
     CandidateName = dataTypeCreator(
@@ -210,153 +193,176 @@ class DataType(Enum):
         'CandidateName',
         ValidationType.String,
         DataTypeSection.Candidate,
-        [UserType.Candidate],
-        [BlockType.UserInput])
+        [UserType.Candidate])
 
     CandidateEmail = dataTypeCreator(
         'Candidate Email',
         'CandidateEmail',
         ValidationType.Email,
         DataTypeSection.Candidate,
-        [UserType.Candidate],
-        [BlockType.UserInput])
+        [UserType.Candidate])
 
     CandidateMobile = dataTypeCreator(
         'Candidate Mobile',
         'CandidateMobile',
         ValidationType.Telephone,
         DataTypeSection.Candidate,
-        [UserType.Candidate],
-        [BlockType.UserInput])
+        [UserType.Candidate])
 
     CandidateLinkdinURL = dataTypeCreator(
         'Candidate Linkdin URL',
         'CandidateLinkdinURL',
         ValidationType.URL,
         DataTypeSection.Candidate,
-        [UserType.Candidate],
-        [BlockType.UserInput])
+        [UserType.Candidate])
 
     CandidateCV = dataTypeCreator(
         'Candidate CV',
         'CandidateCV',
         ValidationType.Ignore,
         DataTypeSection.Candidate,
-        [UserType.Candidate],
-        [BlockType.FileUpload])
+        [UserType.Candidate])
+
+    CandidateAvailability = dataTypeCreator(
+        'Candidate Availability',
+        'CandidateAvailability',
+        ValidationType.DateTime,
+        DataTypeSection.Candidate,
+        [UserType.Candidate])
+
+    CandidateAvailableFrom = dataTypeCreator(
+        'Candidate Available From',
+        'CandidateAvailableFrom',
+        ValidationType.DateTime,
+        DataTypeSection.Candidate,
+        [UserType.Candidate])
+
+    CandidateAvailableTo = dataTypeCreator(
+        'Candidate Available To',
+        'CandidateAvailableTo',
+        ValidationType.DateTime,
+        DataTypeSection.Candidate,
+        [UserType.Candidate])
 
     CandidateLocation = dataTypeCreator(
         'Candidate Location',
         'CandidateLocation',
         ValidationType.String,
         DataTypeSection.Candidate,
-        [UserType.Candidate],
-        [BlockType.UserInput, BlockType.Question])
+        [UserType.Candidate])
 
     CandidateSkills = dataTypeCreator(
         'Candidate Skills',
         'CandidateSkills',
         ValidationType.String,
         DataTypeSection.Candidate,
-        [UserType.Candidate],
-        [BlockType.UserInput, BlockType.Question])
+        [UserType.Candidate])
+
+    CandidateJobTitle = dataTypeCreator(
+        'Candidate Job Title',
+        'CandidateJobTitle',
+        ValidationType.String,
+        DataTypeSection.Candidate,
+        [UserType.Candidate])
 
     CandidateEducation = dataTypeCreator(
         'Candidate Education',
         'CandidateEducation',
         ValidationType.String,
         DataTypeSection.Candidate,
-        [UserType.Candidate],
-        [BlockType.UserInput, BlockType.Question])
+        [UserType.Candidate])
 
     CandidateYearsExperience = dataTypeCreator(
         'Candidate Years Experience',
         'CandidateYearsExperience',
         ValidationType.Number,
         DataTypeSection.Candidate,
-        [UserType.Candidate],
-        [BlockType.UserInput])
+        [UserType.Candidate])
 
-    # Example: Less Than 5000 GBP Annually/Daily
-    CandidateDesiredSalary = dataTypeCreator(
-        'Candidate Desired Salary',
-        'CandidateDesiredSalary',
+    # CandidateEmploymentPreference = dataTypeCreator(
+    #     'Candidate Employment Preference',
+    #     'CandidateEmploymentPreference',
+    #     ValidationType.String,
+    #     DataTypeSection.Candidate,
+    #     [UserType.Candidate])
+
+    # Example: Less Than 5000 GBP Annually
+    CandidateDailyDesiredSalary = dataTypeCreator(
+        'Candidate Daily Desired Salary',
+        'CandidateDailyDesiredSalary',
         ValidationType.Salary,
         DataTypeSection.Candidate,
-        [UserType.Candidate],
-        [BlockType.SalaryPicker])
+        [UserType.Candidate])
+
+    CandidateAnnualDesiredSalary = dataTypeCreator(
+        'Candidate Annual Desired Salary',
+        'CandidateAnnualDesiredSalary',
+        ValidationType.Salary,
+        DataTypeSection.Candidate,
+        [UserType.Candidate])
 
     CandidateVisa = dataTypeCreator(
         'Candidate Visa',
         'CandidateVisa',
         ValidationType.String,
         DataTypeSection.Candidate,
-        [UserType.Candidate],
-        [BlockType.FileUpload])
+        [UserType.Candidate])
 
     CandidatePassport = dataTypeCreator(
         'Candidate Passport',
         'CandidatePassport',
         ValidationType.String,
         DataTypeSection.Candidate,
-        [UserType.Candidate],
-        [BlockType.FileUpload])
+        [UserType.Candidate])
 
     CandidateWorkEligibility = dataTypeCreator(
         'Candidate Work Eligibility',
         'CandidateWorkEligibility',
         ValidationType.String,
         DataTypeSection.Candidate,
-        [UserType.Candidate],
-        [BlockType.UserInput])
+        [UserType.Candidate])
 
     CandidateCriminalConvictions = dataTypeCreator(
         'Candidate Criminal Convictions',
         'CandidateCriminalConvictions',
         ValidationType.String,
         DataTypeSection.Candidate,
-        [UserType.Candidate],
-        [BlockType.UserInput])
+        [UserType.Candidate])
 
     CandidateDrivingLicense = dataTypeCreator(
         'Candidate Driving License',
         'CandidateDrivingLicense',
         ValidationType.String,
         DataTypeSection.Candidate,
-        [UserType.Candidate],
-        [BlockType.FileUpload])
+        [UserType.Candidate])
 
     CandidateDrugsTest = dataTypeCreator(
         'Candidate Drugs Test',
         'CandidateDrugsTest',
         ValidationType.String,
         DataTypeSection.Candidate,
-        [UserType.Candidate],
-        [BlockType.FileUpload])
+        [UserType.Candidate])
 
     CandidateOver18 = dataTypeCreator(
         'Candidate Over 18',
         'CandidateOver18',
         ValidationType.String,
         DataTypeSection.Candidate,
-        [UserType.Candidate],
-        [BlockType.NoType])
+        [UserType.Candidate])
+
+    CandidateJobCategory = dataTypeCreator(
+        'Candidate Job Category',
+        'CandidateJobCategory',
+        ValidationType.String,
+        DataTypeSection.Candidate,
+        [UserType.Candidate])
 
     CandidateOptIn = dataTypeCreator(
         'CandidateOptIn',
         'Candidate OptIn',
         ValidationType.String,
         DataTypeSection.Candidate,
-        [UserType.Candidate],
-        [BlockType.NoType])
-
-    CandidateConsultantName = dataTypeCreator(
-        'Candidate Consultant Name',
-        'CandidateConsultantName',
-        ValidationType.String,
-        DataTypeSection.Candidate,
-        [UserType.Candidate],
-        [BlockType.UserInput])
+        [UserType.Candidate])
 
     # Company
     CompanyName = dataTypeCreator(
@@ -364,8 +370,7 @@ class DataType(Enum):
         'CompanyName',
         ValidationType.String,
         DataTypeSection.Company,
-        [UserType.Client, UserType.Candidate],
-        [BlockType.UserInput])
+        [UserType.Client, UserType.Candidate])
 
     # ======================================================================
     # Client
@@ -378,49 +383,42 @@ class DataType(Enum):
         'ClientName',
         ValidationType.String,
         DataTypeSection.Client,
-        [UserType.Client] * 6,
-        [BlockType.UserInput])
+        [UserType.Client] * 6)
 
     ClientOptIn = dataTypeCreator(
         'ClientOptIn',
         'ClientOptIn',
         ValidationType.String,
         DataTypeSection.Client,
-        [UserType.Client] * 6,
-        [BlockType.NoType])
+        [UserType.Client] * 6)
 
     ClientEmail = dataTypeCreator(
         'Client Email',
         'ClientEmail',
         ValidationType.Email,
         DataTypeSection.Client,
-        [UserType.Client] * 6,
-        [BlockType.UserInput])
+        [UserType.Client] * 6)
 
     ClientTelephone = dataTypeCreator(
         'Client Telephone',
         'ClientTelephone',
         ValidationType.Telephone,
         DataTypeSection.Client,
-        [UserType.Client] * 6,
-        [BlockType.UserInput])
+        [UserType.Client] * 6)
 
     ClientLocation = dataTypeCreator(
         'Client Location',
         'ClientLocation',
         ValidationType.String,
         DataTypeSection.Client,
-        [UserType.Client] * 6,
-        [BlockType.UserInput])
+        [UserType.Client] * 6)
 
-    ClientAvailability =  dataTypeCreator(
+    ClientAvailability = dataTypeCreator(
         'Client Availability',
         'ClientAvailability',
         ValidationType.DateTime,
         DataTypeSection.Client,
-        [UserType.Client],
-        [BlockType.DatePicker])
-
+        [UserType.Client] * 6)
 
     # ======================================================================
     # Job
@@ -430,86 +428,67 @@ class DataType(Enum):
         'JobTitle',
         ValidationType.String,
         DataTypeSection.Job,
-        [UserType.Candidate, UserType.Client],
-        [BlockType.UserInput, BlockType.Question])
+        [UserType.Candidate, UserType.Client])
 
     JobLocation = dataTypeCreator(
         'Job Location',
         'JobLocation',
         ValidationType.String,
         DataTypeSection.Job,
-        [UserType.Candidate, UserType.Client],
-        [BlockType.UserInput, BlockType.Question])
+        [UserType.Candidate, UserType.Client])
 
     JobType = dataTypeCreator(
         'Job Type',
         'JobType',
         ValidationType.String,
         DataTypeSection.Job,
-        [UserType.Candidate, UserType.Client],
-        [BlockType.JobType])
+        [UserType.Candidate, UserType.Client])
 
-    JobCategory = dataTypeCreator(
-        'Job Category',
-        'JobCategory',
-        ValidationType.String,
-        DataTypeSection.Job,
-        [UserType.Candidate, UserType.Client],
-        [BlockType.UserInput, BlockType.Question])
-
-    JobSalary = dataTypeCreator(
-        'Job Salary',
-        'JobSalary',
+    JobAnnualSalary = dataTypeCreator(
+        'Job Annual Salary',
+        'JobAnnualSalary',
         ValidationType.Salary,
         DataTypeSection.Job,
-        [UserType.Candidate, UserType.Client],
-        [BlockType.SalaryPicker])
+        [UserType.Candidate, UserType.Client])
+
+    JobDayRate = dataTypeCreator(
+        'Job Day Rate',
+        'JobDayRate',
+        ValidationType.Salary,
+        DataTypeSection.Job,
+        [UserType.Candidate, UserType.Client])
 
     JobEssentialSkills = dataTypeCreator(
         'Job Essential Skills',
         'JobEssentialSkills',
         ValidationType.String,
         DataTypeSection.Job,
-        [UserType.Candidate, UserType.Client],
-        [BlockType.UserInput, BlockType.Question])
+        [UserType.Candidate, UserType.Client])
 
     JobLinkURL = dataTypeCreator(
         'Job Link URL',
         'JobLinkURL',
         ValidationType.URL,
         DataTypeSection.Job,
-        [UserType.Candidate, UserType.Client],
-        [BlockType.UserInput])
+        [UserType.Candidate, UserType.Client])
 
     JobEndDate = dataTypeCreator(
         'Job End Date',
         'JobEndDate',
         ValidationType.DateTime,
         DataTypeSection.Job,
-        [UserType.Candidate, UserType.Client],
-        [BlockType.DatePicker])
+        [UserType.Candidate, UserType.Client])
 
     JobStartDate = dataTypeCreator(
         'Job Start Date',
         'JobStartDate',
         ValidationType.DateTime,
         DataTypeSection.Job,
-        [UserType.Candidate, UserType.Client],
-        [BlockType.DatePicker])
+        [UserType.Candidate, UserType.Client])
 
     JobYearsRequired = dataTypeCreator(
         'Job Years Required',
         'JobYearsRequired',
         ValidationType.Number,
         DataTypeSection.Job,
-        [UserType.Candidate, UserType.Client],
-        [BlockType.UserInput])
-
-    # Warning: this should aways be the last dateType to avoid recursion with UserType Enum class
-    UserType = dataTypeCreator(
-        'User Type',
-        'UserType',
-        ValidationType.String,
-        DataTypeSection.User,
-        [UserType.Candidate, UserType.Client],
-        [BlockType.UserType])
+        [UserType.Candidate, UserType.Client])

@@ -64,11 +64,12 @@ class Availability extends React.Component {
 
         records.filter(record => record.CandidateAvailability).filter(record => {
             let dates = record.CandidateAvailability.split(',');
+            console.log(record)
             let data = {
                 name: record.CandidateName,
                 skills: record.CandidateSkills,
                 location: record.CandidateLocation,
-                consultant: 'Unknown',
+                consultant: record.CandidateConsultantName,
                 jobTitle: record.CandidateJobTitle
             };
             dates.forEach(date => {
@@ -124,7 +125,7 @@ class Availability extends React.Component {
               }
             })
           } else {
-            if(!aggr[key].includes(record[key])){
+            if(!aggr[key].includes(record[key]) && record[key] !== null){
               aggr[key].push(record[key])
             }
           }
@@ -247,6 +248,8 @@ class Availability extends React.Component {
             aggregates = this.getSearchAggregates(availability)
             availability = this.filterSearches(availability)
         }
+
+        console.log(aggregates)
 
         return (
             <div>

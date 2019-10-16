@@ -57,7 +57,7 @@ class NewBlockModal extends Component {
 
                     <Tabs type="card"
                           tabPosition={'right'}
-                          defaultActiveKey={'JobType'}
+                          defaultActiveKey={'Question'}
                           onChange={this.onChangeTab}>
 
                         <TabPane tab={<span><Icon type="question-circle"/>Pre-Selected Answers</span>}
@@ -67,32 +67,6 @@ class NewBlockModal extends Component {
                                       options={this.props.options}/>
                         </TabPane>
 
-                        <TabPane tab={<span><Icon type="dollar"/>Salary Picker</span>}
-                                 key="SalaryPicker">
-                            <SalaryPicker modalState={this.state}
-                                          handleNewBlock={this.handleNewBlock}
-                                          options={this.props.options}/>
-                        </TabPane>
-
-                        <TabPane tab={<span><Icon type="solution"/>Job Type</span>} key="JobType">
-                            <JobType modalState={this.state}
-                                     handleNewBlock={this.handleNewBlock}
-                                     options={this.props.options}/>
-                        </TabPane>
-
-                        <TabPane tab={<span><Icon type="calendar"/>Date Picker</span>} key="DatePicker">
-                            <DatePicker modalState={this.state}
-                                        handleNewBlock={this.handleNewBlock}
-                                        options={this.props.options}/>
-                        </TabPane>
-
-                        <TabPane tab={<span><Icon type="contacts"/>User Type</span>} key="UserType">
-                            <UserType modalState={this.state}
-                                      handleNewBlock={this.handleNewBlock}
-                                      options={this.props.options}/>
-                        </TabPane>
-
-
                         <TabPane tab={<span><Icon type="form"/>Open Answer</span>}
                                  key="UserInput">
                             <UserInput modalState={this.state}
@@ -101,6 +75,32 @@ class NewBlockModal extends Component {
                                        options={this.props.options}/>
                         </TabPane>
 
+                        <TabPane tab={<span><Icon type="contacts"/>User Type</span>} key="UserType">
+                            <UserType modalState={this.state}
+                                      handleNewBlock={this.handleNewBlock}
+                                      options={this.props.options}/>
+                        </TabPane>
+
+                        <TabPane tab={<span><Icon type="solution"/>Job Type</span>} key="JobType">
+                            <JobType modalState={this.state}
+                                     handleNewBlock={this.handleNewBlock}
+                                     options={this.props.options}/>
+                        </TabPane>
+
+                        <TabPane tab={<span><Icon type="dollar"/>Salary Picker</span>}
+                                 key="SalaryPicker">
+                            <SalaryPicker modalState={this.state}
+                                          handleNewBlock={this.handleNewBlock}
+                                          options={this.props.options}/>
+                        </TabPane>
+
+                        <TabPane tab={<span><Icon type="calendar"/>Date Picker</span>} key="DatePicker">
+                            <DatePicker modalState={this.state}
+                                        handleNewBlock={this.handleNewBlock}
+                                        options={this.props.options}/>
+                        </TabPane>
+
+
                         <TabPane tab={<span><Icon type="file-add"/>File Upload</span>}
                                  key="FileUpload">
                             <FileUpload modalState={this.state}
@@ -108,12 +108,6 @@ class NewBlockModal extends Component {
                                         options={this.props.options}/>
                         </TabPane>
 
-                        <TabPane tab={<span><Icon type="tag"/>Data Scan and Return</span>}
-                                 key="Solutions">
-                            <Solutions modalState={this.state}
-                                       handleNewBlock={this.handleNewBlock}
-                                       options={this.props.options}/>
-                        </TabPane>
 
                         <TabPane tab={<span><Icon type="font-size"/>Raw Text</span>}
                                  key="RawText">
@@ -122,6 +116,12 @@ class NewBlockModal extends Component {
                                      options={this.props.options}/>
                         </TabPane>
 
+                        <TabPane tab={<span><Icon type="tag"/>Data Scan and Return</span>}
+                                 key="Solutions">
+                            <Solutions modalState={this.state}
+                                       handleNewBlock={this.handleNewBlock}
+                                       options={this.props.options}/>
+                        </TabPane>
                     </Tabs>
                 </MyModal>
 

@@ -24,10 +24,6 @@ def generate():
     sabic: Company = Company.query.filter(Company.Name == "Sabic").first()
 
     # Create and validate a flow for an assistant
-
-    # job = scheduler_services.scheduler.add_job(func=scheduler_services.printSomething, trigger='interval', seconds=5, id="3559a1946b52419899e8841d4317d194", replace_existing=True)
-    # scheduler_services.scheduler.start()
-
     # Create Assistants for Aramco and Sabic companies
     reader_a = Assistant(Name="Reader", Message="Hey there",
                          TopBarText="Aramco Bot", SecondsUntilPopup=1,
@@ -308,7 +304,7 @@ def generate():
                     # # Candidate JOB TITLE
                     # {"Type": "User Input", "StoreInDB": True, "Skippable": False, "SkipText": "Skip!",
                     #  "SkipAction": "End Chat",
-                    #  "SkipBlockToGoID": 'None', "DataType": "CandidateJobTitle",
+                    #  "SkipBlockToGoID": 'None', "DataType": "JobTitle",
                     #  "Content": {"text": "What job title are you looking for?", "blockToGoID": "008",
                     #              "action": "Go To Next Block", "afterMessage": "Thank you for the title",
                     #              "keywords": []},
@@ -360,30 +356,14 @@ def generate():
                                  "action": "Go To Next Block", "afterMessage": "Thank you for the edcuation",
                                  "keywords": []},
                      "ID": "002"},
-                    # Candidate SALARY
-                    {"Type": "User Input", "StoreInDB": True, "Skippable": False, "SkipText": "Skip!",
-                     "SkipAction": "End Chat",
-                     "SkipBlockToGoID": 'None', "DataType": "CandidateDesiredSalary",
-                     "Content": {"text": "What is your annual desired salary?", "blockToGoID": "004",
-                                 "action": "Go To Next Block", "afterMessage": "Thank you for the salary",
-                                 "keywords": []},
-                     "ID": "003"},
                     # Candidate JOB TITLE
                     {"Type": "User Input", "StoreInDB": True, "Skippable": False, "SkipText": "Skip!",
                      "SkipAction": "End Chat",
-                     "SkipBlockToGoID": 'None', "DataType": "CandidateJobTitle",
+                     "SkipBlockToGoID": 'None', "DataType": "JobTitle",
                      "Content": {"text": "What job title are you looking for?", "blockToGoID": "005",
                                  "action": "Go To Next Block", "afterMessage": "Thank you for the title",
                                  "keywords": []},
                      "ID": "004"},
-                    # Candidate AVAILABILITY
-                    {"Type": "User Input", "StoreInDB": True, "Skippable": False, "SkipText": "Skip!",
-                     "SkipAction": "End Chat",
-                     "SkipBlockToGoID": 'None', "DataType": "AvailabilityDate",
-                     "Content": {"text": "Required availability of candidate?", "blockToGoID": "006",
-                                 "action": "Go To Next Block", "afterMessage": "Thank you for the availability",
-                                 "keywords": []},
-                     "ID": "005"},
                     # Candidate SKILLS
                     {"Type": "User Input", "StoreInDB": True, "Skippable": False, "SkipText": "Skip!",
                      "SkipAction": "End Chat",

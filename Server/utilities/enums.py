@@ -203,6 +203,7 @@ class DataType(Enum):
         [UserType.Candidate, UserType.Client],
         [BlockType.DatePicker])
 
+
     # Candidate
     CandidateName = dataTypeCreator(
         'Candidate Name',
@@ -420,6 +421,7 @@ class DataType(Enum):
         [UserType.Client],
         [BlockType.DatePicker])
 
+
     # ======================================================================
     # Job
 
@@ -508,6 +510,6 @@ class DataType(Enum):
         'User Type',
         'UserType',
         ValidationType.String,
-        DataTypeSection.User,
+        DataTypeSection.NoType,
         [UserType.Candidate, UserType.Client],
         [BlockType.UserType])

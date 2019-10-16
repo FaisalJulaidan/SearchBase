@@ -357,7 +357,7 @@ def searchCandidates(auth, companyID, data) -> Callback:
                                                                   education=None,
                                                                   yearsExperience=0,
                                                                   desiredSalary=float(record.get("desired_salary", 0)),
-                                                                  currency=Currency(record.get("currency").upper()),
+                                                                  currency=Currency(record.get("currency", "GBP").upper()),
                                                                   source="Vincere"))
 
         return Callback(True, sendQuery_callback.Message, result)

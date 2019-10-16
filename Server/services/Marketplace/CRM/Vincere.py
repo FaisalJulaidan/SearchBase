@@ -344,6 +344,10 @@ def searchCandidates(auth, companyID, data) -> Callback:
             skills.pop(0)
             for i in range(len(skills)):
                 skills[i] = skills[i].split("Description")[0]
+            if record.get("currency") == "POUND":
+                currency = "GBP"
+            else:
+                currency = record.get("currency", "GBP")
             result.append(databases_services.createPandaCandidate(id=record.get("id", ""),
                                                                   name=record.get("name"),
                                                                   email=record.get("primary_email"),
@@ -357,7 +361,7 @@ def searchCandidates(auth, companyID, data) -> Callback:
                                                                   education=None,
                                                                   yearsExperience=0,
                                                                   desiredSalary=float(record.get("desired_salary", 0)),
-                                                                  currency=Currency(record.get("currency", "GBP").upper()),
+                                                                  currency=Currency(currency.upper()),
                                                                   source="Vincere"))
 
         return Callback(True, sendQuery_callback.Message, result)

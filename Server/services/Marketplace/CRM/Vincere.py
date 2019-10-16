@@ -350,7 +350,7 @@ def searchCandidates(auth, companyID, data) -> Callback:
                 currency = "GBP"
             else:
                 currency = record.get("currency", "GBP")
-            helpers.logError("2: " + record.get("currency"))
+            helpers.logError("2: " + str(record.get("currency")))
             result.append(databases_services.createPandaCandidate(id=record.get("id", ""),
                                                                   name=record.get("name"),
                                                                   email=record.get("primary_email"),

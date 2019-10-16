@@ -500,7 +500,7 @@ def searchJobs(auth, companyID, data) -> Callback:
             result.append(databases_services.createPandaJob(id=record.get("id"),
                                                             title=record.get("job_title"),
                                                             desc=record.get("public_description", ""),
-                                                            location=record.get("location"),
+                                                            location=record.get("location", {}).get("city"),
                                                             type=record.get("employment_type"),
                                                             salary=record.get("salary_to"),
                                                             essentialSkills=None,

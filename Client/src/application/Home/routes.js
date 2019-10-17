@@ -1,5 +1,5 @@
 import React, {Component} from 'react'
-import {Route, Switch, Redirect} from 'react-router-dom'
+import {Route, Switch} from 'react-router-dom'
 
 import Home from './component/page/home/Home'
 import Terms from "./component/page/terms/Terms";
@@ -12,6 +12,7 @@ import Login from "./component/page/login/Login";
 import Signup from "./component/page/signup/Signup";
 import GDPR from "./component/page/gdpr/GDPR";
 import GetStarted from "./component/page/get-started/GetStarted";
+import SuccessfulLogin from "./component/util/SuccessfulLogin";
 
 class Routes extends Component {
     render() {
@@ -28,7 +29,8 @@ class Routes extends Component {
                 <Route path="/login" exact component={Login}/>
                 <Route path="/signup" exact component={Signup}/>
                 <Route path="/get-started" exact component={GetStarted}/>
-                <Route path='/dashboard' exact component={(() => <>{(()=>{window.location.reload()})()}</>)}/>
+                <Route path="/successful-login" exact component={SuccessfulLogin}/>
+                {/*<Route path='/dashboard' exact component={(() => <>{(()=>{window.location.reload()})()}</>)}/>*/}
                 <Route path="" exact component={NotFound404}/>
             </Switch>
         )

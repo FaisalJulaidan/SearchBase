@@ -186,6 +186,8 @@ def sendCampaign(campaign_details, companyID):
                hashedAssistantID + "?source=" + source + "&source_id=" + \
                str(campaign_details.get("crm_id", campaign_details.get("database_id")))
 
+
+
         if not text:
             raise Exception("Message text is missing")
 

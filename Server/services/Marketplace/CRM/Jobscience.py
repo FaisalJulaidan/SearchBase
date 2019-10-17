@@ -406,14 +406,33 @@ def insertCompany(auth, conversation: Conversation) -> Callback:
         return Callback(False, str(exc))
 
 
+# TODO: Improve search candidates by being stricter with skills search
+# We need to have a priority in place:
+# [1] Candidates with skills that MATCH query
+# [2] Candidate with skills that DONT Match query
+# [3] Candidates with NO skills
 def fetchSkillsForCandidateSearch(list_of_contactIDs: list, list_of_skills, access_token):
     # Need set of contact ID's returned from searchCandidates()
     query_segment = ",".join(list_of_contactIDs)
-    skills = str((', '.join("'" + skill + "'" for skill in list_of_skills)))
+    print("list of skills:")
+    print(list_of_skills)
 
+    # Add LIKE statements:
+    like_string = ""
+    for skill in list_of_skills:
+        like_string += "+AND+ts2__Skill_Name__c+LIKE+" + "'%" + skill + "%'"
+
+    print("Complete Query:")
+    print("SELECT+ts2__Skill_Name__c,ts2__Last_Used__c,ts2__Contact__c" +
+                                             "+FROM+ts2__Skill__c+WHERE+" +
+                                             "ts2__Contact__c+IN+(" + query_segment + ")" + like_string + "+LIMIT+1000")
+
+
+    # Note: This assumes at least one skill is given
     sendQuery_callback: Callback = sendQuery(access_token, "get", {},
-                                             "SELECT+ts2__Skill_Name__c,ts2__Last_Used__c,ts2__Contact__c+FROM+ts2__Skill__c+WHERE+" +
-                                             "ts2__Contact__c+IN+(" + query_segment + ")+LIMIT+500")
+                                             "SELECT+ts2__Skill_Name__c,ts2__Last_Used__c,ts2__Contact__c" +
+                                             "+FROM+ts2__Skill__c+WHERE+" +
+                                             "ts2__Contact__c+IN+(" + query_segment + ")" + like_string + "+LIMIT+1000")
 
     if not sendQuery_callback.Success:
         raise Exception(sendQuery_callback.Message)
@@ -492,7 +511,7 @@ def searchCandidates(access_token, conversation) -> Callback:
         # <-- CALL SKILLS SEARCH -->
 
         #  Iterative generalisation:
-        while len(records) < 20:
+        while len(records) < 50:
             # send query
             sendQuery_callback: Callback = sendQuery(access_token, "get", {},
                                                      "SELECT+X18_Digit_ID__c,ID,Name,Title,email,phone,MailingCity," +
@@ -554,7 +573,8 @@ def searchCandidates(access_token, conversation) -> Callback:
         # <-- CALL SKILLS SEARCH -->
 
         for record_num, record in enumerate(records):
-            # print("-- NEW RECORD --")
+            has_skills: bool = False
+
             skills_string = ""
             counter = 0
             for skill in candidate_skills:
@@ -562,34 +582,34 @@ def searchCandidates(access_token, conversation) -> Callback:
 
                 if skill.get("ts2__Contact__c") == record.get("Id") and counter < 5:
                     counter += 1
-                    # print(skill.get("ts2__Skill_Name__c"))
-                    # print(skill.get("ts2__Last_Used__c"))
+                    has_skills = True
 
                     skills_string += skill.get("ts2__Skill_Name__c")
                     if skill.get("ts2__Last_Used__c") is not None:
                         skills_string += "(" + skill.get("ts2__Last_Used__c") + "), "  # Display year of use
                     else:
                         skills_string += ""
-            # skills_string += (record.get("Attributes__c", "") or "")  # Merging skills and job title together...
 
-            result.append(databases_services.createPandaCandidate(id=record.get("X18_Digit_ID__c", str(record_num)),
-                                                                  name=record.get("Name"),
-                                                                  email=record.get("Email"),
-                                                                  mobile=record.get("Phone"),
-                                                                  location=record.get("MailingCity"),
-                                                                  skills=skills_string,
-                                                                  linkdinURL=None,
-                                                                  availability=record.get("ts2__Date_Available__c") or
-                                                                               "Not Specified",
-                                                                  jobTitle=record.get("Title"),
-                                                                  education=record.get('ts2__EduDegreeName1__c'),
-                                                                  yearsExperience=record.get(
-                                                                      'ts2__Years_of_Experience__c'),
-                                                                  desiredSalary=record.get('ts2__Desired_Salary__c') or
+            if has_skills:
+
+                result.append(databases_services.createPandaCandidate(id=record.get("X18_Digit_ID__c", str(record_num)),
+                                                                    name=record.get("Name"),
+                                                                    email=record.get("Email"),
+                                                                    mobile=record.get("Phone"),
+                                                                    location=record.get("MailingCity"),
+                                                                    skills=skills_string,
+                                                                    linkdinURL=None,
+                                                                    availability=record.get("ts2__Date_Available__c") or
+                                                                                 "Not Specified",
+                                                                    jobTitle=record.get("Title"),
+                                                                    education=record.get('ts2__EduDegreeName1__c'),
+                                                                    yearsExperience=record.get(
+                                                                        'ts2__Years_of_Experience__c'),
+                                                                    desiredSalary=record.get('ts2__Desired_Salary__c') or
                                                                                 record.get('ts2__Desired_Hourly__c') or
                                                                                 record.get('Min_Basic__c', 0),
-                                                                  currency=Currency("GBP"),
-                                                                  source="Jobscience"))
+                                                                    currency=Currency("GBP"),
+                                                                    source="Jobscience"))
         # print("RETURNING RECORDS ...")
         return Callback(True, sendQuery_callback.Message, result)
     except Exception as exc:

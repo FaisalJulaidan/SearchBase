@@ -510,6 +510,6 @@ class DataType(Enum):
         'User Type',
         'UserType',
         ValidationType.String,
-        DataTypeSection.User,
+        DataTypeSection.NoType,
         [UserType.Candidate, UserType.Client],
         [BlockType.UserType])

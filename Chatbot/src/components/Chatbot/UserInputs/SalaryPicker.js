@@ -40,7 +40,7 @@ const SalaryPicker = ({ message, submitMessage, block_min, block_max, period, cu
         };
         submitMessage(text, type, newState, afterMessage, block, {
             skipped: false,
-            input: `${salary[0]}-${salary[1]} ${currency} ${period}`
+            input: `${salaries[0]}-${salaries[1]} ${currency} ${period}`
         });
     };
 
@@ -49,7 +49,7 @@ const SalaryPicker = ({ message, submitMessage, block_min, block_max, period, cu
             let count = Math.round(num / 10);
             return count * 10;
         };
-        setSalary([roundTo25(val[0]), roundTo25(val[1])]);
+        setSalary([Math.floor(roundTo25(val[0])), Math.floor(roundTo25(val[1]))]);
     };
 
     const tipFormatter = (val) => getDotNotation(val, currency);

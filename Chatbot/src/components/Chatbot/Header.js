@@ -72,10 +72,11 @@ const Header = ({ title, logoPath, isDirectLink, resetChatbot, closeWindow }) =>
                     </Col>
                 }
 
-                <Col span={!isDirectLink || isDirectLink && isMobile ? 15 : 18}>
+                <Col span={!isDirectLink || isDirectLink && isMobile ? 14 : 17}>
                     <div className={'H3'}>{title}</div>
                 </Col>
-                <Col span={6} style={{ textAlign: 'right', position: 'relative' }}>
+
+                <Col span={7} style={{ textAlign: 'right', position: 'relative' }}>
                     <Tooltip title="View our privacy policy"
                              getPopupContainer={() => document.getElementById('TheSearchBase_Chatbot')}>
                         <Button className={'Button'} onClick={privacyPolicy}

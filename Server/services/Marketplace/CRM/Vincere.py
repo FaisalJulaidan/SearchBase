@@ -1,4 +1,5 @@
 import base64
+import datetime
 import json
 import os
 
@@ -174,9 +175,8 @@ def insertCandidate(auth, data, companyID) -> Callback:
             "first_name": data.get("firstName"),
             "last_name": data.get("lastName"),
             "mobile": data.get("mobile"),
-            "address": {
-                "city": data.get("city"),
-            },
+            "nearest_train_station": data.get("city"),
+            "registration_date": datetime.datetime.now().isoformat(),
             "email": data.get("email"),
             "skills": data.get("skills"),
             "education_summary": data.get("educations")

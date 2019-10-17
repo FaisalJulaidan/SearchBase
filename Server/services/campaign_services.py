@@ -174,6 +174,7 @@ def prepareCampaign(campaign_details, companyID):
 
 def sendCampaign(campaign_details, companyID):
     try:
+        helpers.logError("campaign_details: " + str(campaign_details))
         messenger_callback: Callback = messenger_servicess.getByID(campaign_details.get("messenger_id"), companyID)
         if not messenger_callback.Success:
             raise Exception("Messenger not found.")
@@ -190,6 +191,7 @@ def sendCampaign(campaign_details, companyID):
 
         if not text:
             raise Exception("Message text is missing")
+        helpers.logError("candidate_list: " + str(campaign_details.get("candidate_list")))
 
         for candidate in campaign_details.get("candidate_list"):
             if campaign_details.get("use_crm") and crm:
@@ -212,7 +214,9 @@ def sendCampaign(campaign_details, companyID):
             tempText = tempText.split("&id")[0]
             tempText += "&id=" + str(candidate.get("ID"))
 
+            helpers.logError("outreach_type: " + str(campaign_details.get("outreach_type")))
             if campaign_details.get("outreach_type") == "sms":
+                helpers.logError("TRYING TO SEND")
                 messenger_servicess.sendMessage(messenger.Type, candidate_phone, tempText, messenger.Auth)
             elif campaign_details.get("outreach_type") == "whatsapp":
                 messenger_servicess.sendMessage(messenger.Type, candidate_phone, tempText, messenger.Auth, True)

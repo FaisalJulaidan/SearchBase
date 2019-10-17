@@ -579,7 +579,7 @@ class AutoPilot extends React.Component {
                                 <Divider/>
                                 <h2>Referral</h2>
                                 <Collapse bordered={false}>
-                                    <Panel header={<h2>Automatically asks candidates for Referral after placement</h2>} key="3"
+                                    <Panel header={<h2>Automatically asks candidates for referral after placement</h2>} key="3"
                                            style={customPanelStyle}>
                                     </Panel>
                                 </Collapse>

@@ -10,8 +10,6 @@ import {TimezoneContext, getTimezone} from 'contexts/timezone';
 
 const Home = lazy(() => import('./application/Home/Home'));
 const Dashboard = lazy(() => import('./application/Dashboard/Dashboard'));
-const Login = lazy(() => import('./application/Login/Login'));
-const Signup = lazy(() => import('./application/Signup/Signup'));
 const ForgetPassword = lazy(() => import('./application/ForgetPassword/ForgetPassword'));
 const NewResetPassword = lazy(() => import('./application/ForgetPassword/NewResetPassword/NewResetPassword'));
 const AppointmentsPicker = lazy(() => import('./application/AppointmentsPicker/AppointmentsPicker'));
@@ -56,8 +54,6 @@ class App extends Component {
                 <Suspense fallback={<div className={styles.Loader}> Loading...</div>}>
                     <TimezoneContext.Provider value={this.state.timezone}>
                         <Switch>
-                            {/*<Route path="/login" component={Login}/>*/}
-                            {/*<Route path="/signup" component={Signup}/>*/}
                             <Route path="/forget_password" component={ForgetPassword}/>
                             <Route path="/reset_password/" component={NewResetPassword}/>
                             <Route path="/verify_account/" component={AccountVerification}/>

@@ -624,7 +624,9 @@ def __salary(row, dbSalaryColumn, dbCurrencyColumn, salaryInput: str, plus=4, fo
 
 def createPandaCandidate(id, name, email, mobile, location, skills,
                          linkdinURL, availability, jobTitle, education,
-                         yearsExperience: int, desiredSalary: float, currency: Currency, source):
+                         yearsExperience: int, desiredSalary, currency: Currency, source):
+    if type(desiredSalary) is str:
+        desiredSalary = float(re.sub("[^0-9]", "", desiredSalary))
     return {"ID": id,
             "CandidateName": name or '',
             "CandidateEmail": email or '',
@@ -643,8 +645,10 @@ def createPandaCandidate(id, name, email, mobile, location, skills,
             }
 
 
-def createPandaJob(id, title, desc, location, type, salary: float, essentialSkills, yearsRequired,
+def createPandaJob(id, title, desc, location, type, salary, essentialSkills, yearsRequired,
                    startDate, endDate, linkURL, currency: Currency, source):
+    if type(salary) is str:
+        salary = float(re.sub("[^0-9]", "", salary))
     return {"ID": id,
             "JobTitle": title or '',
             "JobDescription": desc or '',

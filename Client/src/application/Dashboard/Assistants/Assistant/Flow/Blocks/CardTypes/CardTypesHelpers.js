@@ -1,4 +1,6 @@
+
 export const onCancel = (handleNewBlock, handleEditBlock) => handleNewBlock ? handleNewBlock(false) : handleEditBlock(false);
+
 
 export const initActionType = (block, allGroups) => {
     if (block.Content.action === "Go To Specific Block")

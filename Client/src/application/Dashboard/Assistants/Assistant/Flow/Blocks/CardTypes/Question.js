@@ -17,7 +17,7 @@ import {
     SkippableFormItem,
     SkipTextFormItem,
     StoreInDBFormItem
-} from './FormItems'
+} from './CardTypesFormItems'
 import shortid from 'shortid';
 import './CardTypes.less'
 
@@ -137,6 +137,7 @@ class Question extends Component {
             answers: block.Content.answers || [],
             showSkip: block.Skippable || false
         });
+
     }
 
     render() {
@@ -160,8 +161,7 @@ class Question extends Component {
                     <DataTypeFormItem FormItem={FormItem} block={block}
                                       getFieldDecorator={getFieldDecorator}
                                       options={this.props.options}
-                                      layout={layout}
-                                      blockType={"Question"}/>
+                                      layout={layout}/>
 
                     <FormItem label="Answers"{...layout}>
                         <Button onClick={this.showAddAnswer} type="primary" icon="plus" size={"small"}>Add

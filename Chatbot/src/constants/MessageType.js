@@ -4,7 +4,3 @@ export const FILE_UPLOAD = 'File Upload';
 export const QUESTION = 'Question';
 export const USER_INPUT = 'User Input';
 export const SOLUTIONS = 'Solutions';
-export const SALARY_PICKER = 'Salary Picker';
-export const USER_TYPE = 'User Type';
-export const JOB_TYPE = 'Job Type';
-export const DATE_PICKER = 'Date Picker';

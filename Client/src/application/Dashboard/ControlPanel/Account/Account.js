@@ -1,7 +1,6 @@
 import React from 'react';
 import {Tabs, Typography, Spin} from "antd";
 import {connect} from 'react-redux';
-import queryString from 'query-string';
 
 import './Account.less';
 import styles from "./Account.module.less"
@@ -18,19 +17,6 @@ const {Title, Paragraph} = Typography;
 
 
 class Account extends React.Component {
-
-    state = {
-        key: null,
-        defaultTab: 'Conversations'
-    };
-
-    componentWillMount() {
-        this.props.dispatch(accountActions.getAccount());
-        // Set tab from url search params
-        let params = queryString.parse(this.props.location.search);
-        if (['Profile', 'Company', 'Development'].includes(params['tab']))
-            this.setState({ defaultTab: params['tab'] });
-    }
 
     saveProfileDetails = (values) => {
         this.props.dispatch(accountActions.saveProfileDetails(values));
@@ -50,6 +36,12 @@ class Account extends React.Component {
 
     deleteLogo = () => this.props.dispatch(accountActions.deleteLogo());
 
+
+    componentWillMount() {
+        this.props.dispatch(accountActions.getAccount());
+        // this.props.dispatch(developmentActions.fetch)
+    }
+
     render() {
         const {account} = this.props;
         return (
@@ -67,20 +59,20 @@ class Account extends React.Component {
                     <div className={[styles.Body, 'profileTabs'].join(' ')}>
                         {!account ? <Spin/> :
 
-                            <Tabs onChange={key => this.setState({ key: key })} defaultActiveKey={this.state.defaultTab} size={"large"} animated={false}>
-                                <TabPane tab={"Profile"} key={"Profile"}>
+                            <Tabs defaultActiveKey={'1'} size={"large"} animated={false}>
+                                <TabPane tab={"Profile"} key={"1"}>
                                     <ProfileDetails account={account}
                                                     saveProfileDetails={this.saveProfileDetails}
                                                     savePassword={this.savePassword}/>
                                 </TabPane>
 
-                                <TabPane tab={"Company"} key={"Company"}>
+                                <TabPane tab={"Company"} key={"2"}>
                                     <CompanyDetails account={account}
                                                     saveCompanyDetails={this.saveCompanyDetails}
                                                     uploadLogo={this.uploadLogo}
                                                     deleteLogo={this.deleteLogo}/>
                                 </TabPane>
-                                <TabPane tab={"Development"} key={"Development"}>
+                                <TabPane tab={"Development"} key={"3"}>
                                     <Development/>
                                 </TabPane>
                             </Tabs>

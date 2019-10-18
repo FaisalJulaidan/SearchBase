@@ -1,7 +1,9 @@
-import React, { Component } from 'react';
-import { Button, Checkbox, Col, Collapse, Divider, Row, Tag, Tooltip, Typography } from 'antd';
+import React, {Component} from 'react';
+import {Button, Card, Checkbox, Col, Collapse, Divider, Row, Tag, Typography} from "antd";
+import styles from "./Block.module.less";
 
 const Panel = Collapse.Panel;
+const {Meta} = Card;
 const {Paragraph} = Typography;
 
 
@@ -31,16 +33,6 @@ class Block extends Component {
                 return <Tag color="cyan">{type}</Tag>;
             case 'Raw Text':
                 return <Tag color="magenta">{type}</Tag>;
-            case 'Salary Picker':
-                return <Tag color="magenta">{type}</Tag>;
-            case 'Job Type':
-                return <Tag color="red">{type}</Tag>;
-            case 'User Type':
-                return <Tag color="orange">{type}</Tag>;
-            case 'Date Picker':
-                return <Tag color="green">{type}</Tag>;
-            default:
-                return <Tag>{type}</Tag>;
         }
     };
 
@@ -51,12 +43,7 @@ class Block extends Component {
             <Collapse bordered={true}>
                 <Panel header={(
                     <>
-
-                        <Tooltip title={'Block Type'} placement={'left'}>
-                            {this.switchBlockTypes(block.Type)}
-                        </Tooltip>
-
-                        <Divider type="vertical"/>
+                        {this.switchBlockTypes(block.Type)} <Divider type="vertical"/>
 
                         {block.Content.text?.substring(0, 90)}
                         {block.Content.text?.length > 90 ? '...' : null}

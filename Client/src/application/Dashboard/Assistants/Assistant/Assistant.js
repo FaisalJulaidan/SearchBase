@@ -30,7 +30,6 @@ class Assistant extends Component {
         selectAutoPilotModalVisible: false,
         isFlowSaved: true,
         defaultTab: 'Conversations'
-        // defaultTab: 'Script'
     };
 
     firstHead = null;

@@ -13,7 +13,6 @@ import { Icon, Progress, Tooltip } from 'antd';
 
 // Styles
 import './styles/Inputs.css';
-import { getContainerElement } from '../../helpers';
 
 // TO CHANGE
 /*
@@ -91,7 +90,12 @@ const FileUpload = ({ message, submitMessage }) => {
                 <div className={'InputContainer'}>
                     <div className={'Progress'}>
                         <Tooltip placement="top" title={file.name} visible
-                                 getPopupContainer={() => getContainerElement()}>
+                                 getPopupContainer={() => {
+                                            if (document.getElementById('TheSearchBase_Chatbot_Input'))
+                                                return document.getElementById('TheSearchBase_Chatbot_Input');
+                                            else
+                                                return document.getElementById('TheSearchBase_Chatbot')
+                                        }}>
                             <Progress percent={upload.progress} showInfo={false}/>
                         </Tooltip>
                     </div>
@@ -107,7 +111,12 @@ const FileUpload = ({ message, submitMessage }) => {
             <>
                 <div className={'Actions'}>
                     <Tooltip placement="topRight"
-                             getPopupContainer={() => getContainerElement()}
+                             getPopupContainer={() => {
+                                            if (document.getElementById('TheSearchBase_Chatbot_Input'))
+                                                return document.getElementById('TheSearchBase_Chatbot_Input');
+                                            else
+                                                return document.getElementById('TheSearchBase_Chatbot')
+                                        }}
                              title={error}
                              visible={!valid.fileExt}>
                         <i className={!upload.uploading ? 'ClipIconActive' : ''}

@@ -11,7 +11,6 @@ import queryString from 'query-string';
 // import {TimezoneContext} from "../../../contexts/timezone"
 
 import { TimezoneContext } from '../../../contexts/timezone';
-import Availability from './Availability/Availability';
 
 const { Title, Paragraph } = Typography;
 
@@ -53,9 +52,6 @@ class Appointment extends React.Component {
                     </Tabs.TabPane>
                     <Tabs.TabPane tab="Time Slots" key="TimeSlots">
                         <TimeSlots openTab={this.state.key !== 'TimeSlots'} tz={tz}/>
-                    </Tabs.TabPane>
-                    <Tabs.TabPane tab="Availability" key="Availability">
-                        <Availability tz={tz}/>
                     </Tabs.TabPane>
                 </Tabs>
             </NoHeaderPanel>

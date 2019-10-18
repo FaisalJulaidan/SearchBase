@@ -213,8 +213,11 @@ class Settings extends Component {
                                          min={1}
                                          style={{marginTop: 10, width: '30%'}}
                                          value={this.state.notifyEvery === 'null' ? 1 : this.state.notifyEvery}
-                                         formatter={value => `${value} hours`}
-                                         parser={value => value.replace('hours', '')}
+                                         formatter={value => value == '1' ? `${value} hour` : `${value} hours`}
+                                         parser={value => {
+                                             value.replace('hour', 'hours');
+                                             value.replace('hours', '');
+                                         }}
                                          onChange={(val) => {
                                              this.setState({notifyEvery: val});
                                          }}/>
@@ -262,8 +265,9 @@ class Settings extends Component {
                 <h2>Assistant Logo</h2>
                 <p>
                     your assistant logo will replace TheSearchBase logo in the
-                    chatbot and emails sent on behalf of your company by us.
-                    If you did not upload a logo specifically for this assistant, your company logo will be used instead
+                    chatbot. If you did not upload a logo specifically for this assistant, your company logo will be
+                    used instead. You can upload your company logo from
+                    <a onClick={() => history.push(`/dashboard/account?tab=Company`)}> <b>here</b></a>
                 </p>
                 <LogoUploader
                     logoPath={assistant.LogoPath}

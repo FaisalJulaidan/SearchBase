@@ -647,8 +647,11 @@ def createPandaCandidate(id, name, email, mobile, location, skills,
 
 def createPandaJob(id, title, desc, location, type, salary, essentialSkills, yearsRequired,
                    startDate, endDate, linkURL, currency: Currency, source):
+    helpers.logError("salary" + str(salary))
     if isinstance(salary, str):
+        helpers.logError("ITS IN")
         salary = float(re.sub("[^0-9]", "", salary))
+        helpers.logError("salary" + str(salary))
     return {"ID": id,
             "JobTitle": title or '',
             "JobDescription": desc or '',

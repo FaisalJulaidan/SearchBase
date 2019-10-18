@@ -31,7 +31,8 @@ def assistants():
                                                                                     'Description',
                                                                                     'Message',
                                                                                     'TopBarText',
-                                                                                    'Active'],
+                                                                                    'Active',
+                                                                                    'Owner'],
                                                                                    callback.Data)})
     if request.method == "POST":
         data = request.json

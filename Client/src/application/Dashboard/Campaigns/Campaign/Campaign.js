@@ -593,7 +593,7 @@ class Campaign extends React.Component {
                                     <InputNumber placeholder="Custom schedule, in days"
                                                  min={1}
                                                  style={{marginTop: 10, width: '30%'}}
-                                                 value={this.state.customSchedule ? this.state.customSchedule : 2}
+                                                 value={this.state.customSchedule ? this.state.customSchedule : 3}
                                                  formatter={value => value == '1' ? `${value} day` : `${value} days`}
                                                  parser={value => {
                                                      value.replace('day', 'days');

@@ -3,7 +3,7 @@ import {connect} from 'react-redux';
 import NoHeaderPanel from 'components/NoHeaderPanel/NoHeaderPanel'
 import {
     Typography, Form, Input, Icon, Divider, Button, Tag, AutoComplete, Select, Switch, Modal,
-    List, Checkbox, Spin, Radio, Slider
+    List, Checkbox, Spin, Radio, Slider, InputNumber
 } from 'antd';
 
 import {trimText} from "../../../../helpers";
@@ -577,18 +577,29 @@ class Campaign extends React.Component {
                             </FormItem>
 
                             <FormItem label={"Schedule for every:"}>
-                                {getFieldDecorator("schedule", {initialValue: "off"})(
+                                {getFieldDecorator("schedule", {initialValue: "never"})(
                                     <Radio.Group defaultValue="off" onChange={(e) => {
                                         this.setState({schedule: e.target.value})
                                     }}>
-                                        <Radio.Button value="off">Off</Radio.Button>
+                                        <Radio.Button value="never">Never</Radio.Button>
                                         <Radio.Button value="1">1 Day</Radio.Button>
                                         <Radio.Button value="2">7 Days</Radio.Button>
-                                        <Radio.Button value="3">14 Days</Radio.Button>
                                         <Radio.Button value="4">1 Month</Radio.Button>
                                         <Radio.Button value="5">3 Months</Radio.Button>
+                                        <Radio.Button value="custom">Custom</Radio.Button>
                                     </Radio.Group>
                                 )}
+                                {this.state.schedule === 'custom' ?
+                                    <InputNumber placeholder="Custom schedule, in days"
+                                                 min={1}
+                                                 style={{marginTop: 10, width: '30%'}}
+                                                 value={this.state.customSchedule ? this.state.customSchedule : 2}
+                                                 formatter={value => value === 1 ? `${value} day` : `${value} days`}
+                                                 parser={value => value.replace(['day', 'days'], '')}
+                                                 onChange={(value) => {
+                                                     this.setState({customSchedule: value});
+                                                 }}/>
+                                    : null}
                             </FormItem>
 
 

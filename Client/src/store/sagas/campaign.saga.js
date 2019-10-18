@@ -85,10 +85,22 @@ function* deleteCampaign({campaignID, meta}) {
 }
 
 //Fetch Candidates data
-function* fetchCampaignCandidatesData({assistant_id, use_crm, crm_id, database_id, messenger_id, location, jobTitle, skills, text}) {
+function* fetchCampaignCandidatesData({assistant_id, use_crm, crm_id, database_id, messenger_id, location, jobTitle, skills, text, outreach_type, email_title}) {
     try {
         const res = yield http.post('/campaign/action',
-            {assistant_id, use_crm, crm_id, database_id, messenger_id, location, jobTitle, skills, text}, {
+            {
+                assistant_id,
+                use_crm,
+                crm_id,
+                database_id,
+                messenger_id,
+                location,
+                jobTitle,
+                skills,
+                text,
+                outreach_type,
+                email_title
+            }, {
                 headers: {'Content-Type': 'application/json'},
             });
         yield put(campaignActions.fetchCampaignCandidatesDataSuccess(
@@ -102,7 +114,7 @@ function* fetchCampaignCandidatesData({assistant_id, use_crm, crm_id, database_i
 }
 
 //Launch Campaign
-function* launchCampaign({assistant_id, use_crm, crm_id, database_id, messenger_id, location, jobTitle, skills, text, candidate_list}) {
+function* launchCampaign({assistant_id, use_crm, crm_id, database_id, messenger_id, location, jobTitle, skills, text, candidate_list, outreach_type, email_title}) {
     try {
         loadingMessage('Launching the campaign...', 0);
         const res = yield http.put('/campaign/action',
@@ -116,7 +128,9 @@ function* launchCampaign({assistant_id, use_crm, crm_id, database_id, messenger_
                 jobTitle,
                 skills,
                 text,
-                candidate_list
+                candidate_list,
+                outreach_type,
+                email_title
             }, {
                 headers: {'Content-Type': 'application/json'},
             });

@@ -12,7 +12,6 @@ class LoginForm extends React.Component {
         if (e) e.preventDefault();
         this.props.form.validateFields((err, values) => {
             if (!err) {
-                console.log(this.props.history);
                 let from = this.props.history.location.state?.from || "";
                 let prevPath = from?.pathname || "";
                 if (prevPath) prevPath += from.search;
@@ -21,7 +20,7 @@ class LoginForm extends React.Component {
                 if (prevPath?.indexOf('/dashboard') < -1)
                     prevPath = null;
 
-                this.props.dispatch(authActions.login(values.email, values.password, prevPath));
+                this.props.dispatch(authActions.login(values.email, values.password, `successful-login?prevPath=${prevPath}`));
             }
         });
     };

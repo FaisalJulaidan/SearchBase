@@ -249,6 +249,22 @@ def sendSolutionAlert(record, solutions):
         return Callback(False, 'Could not send email')
 
 
+def simpleSend(to, title, text):
+    try:
+
+        callback: Callback = __sendEmail(to, title, text)
+
+        if not callback.Success:
+            raise Exception(callback.Message)
+
+        return Callback(True, 'Email sent is on its way to ' + to)
+
+    except Exception as exc:
+        helpers.logError("mail_service.sendSolutionAlert(): " + str(exc))
+        return Callback(False, 'Could not send email')
+
+
+
 # Notify company about new conversations
 def notifyNewConversation(assistant: Assistant, conversation: Conversation):
     try:
@@ -290,7 +306,7 @@ def notifyNewConversation(assistant: Assistant, conversation: Conversation):
                                                    subject='New ' + conversation.UserType.name
                                                           + " has engaged with "
                                                           + assistant.Name + " assistant",
-                                                   template='emails/new_conversations_notification.html',
+                                                   template='/emails/new_conversations_notification.html',
                                                    assistantName = assistant.Name,
                                                    assistantID = assistant.ID,
                                                    conversations = conversations,
@@ -343,20 +359,20 @@ def notifyNewConversations(assistant: Assistant, conversations, lastNotification
             return Callback(True, "No new conversation to send")
 
         # Get company logo
-        logoPath = helpers.keyFromStoredFile(Assistant.Company.StoredFile.StoredFile, enums.FileAssetType.Logo).AbsFilePath
+        logoPath = helpers.keyFromStoredFile(assistant.Company.StoredFile, enums.FileAssetType.Logo).AbsFilePath
 
         # send emails, jobs applied for
         for user in users_callback.Data:
             email_callback: Callback = __sendEmail(to=user.Email,
                                                    subject="New users has engaged with your "
                                                           + assistant["Name"] + " assistant",
-                                                   template='emails/new_conversations_notification.html',
-                                                   assistantName = assistant["Name"],
-                                                   assistantID = assistant["ID"],
+                                                   template='/emails/new_conversations_notification.html',
+                                                   assistantName = assistant.Name,
+                                                   assistantID = assistant.ID,
                                                    conversations = conversationsList,
                                                    logoPath = logoPath,
-                                                   companyName = assistant["CompanyName"],
-                                                   companyURL=assistant["CompanyURL"],
+                                                   companyName = assistant.Company.Name,
+                                                   companyURL=assistant.Company.URL,
                                                    )
             if not email_callback.Success:
                 raise Exception(email_callback.Message)
@@ -378,20 +394,30 @@ def __sendEmail(to, subject, template, files=None, **kwargs) -> Callback:
     try:
         # create Message with the Email: title, recipients and sender
         msg = Message(subject, recipients=[to], sender=tsbEmail)
+        if template[0] == "/":
+            try:
+                # get app context / if it fails assume its working outside the app
+                app = current_app._get_current_object()
 
-        try:
-            # get app context / if it fails assume its working outside the app
-            app = current_app._get_current_object()
-
-            # load the template which the email will use
-            msg.html = render_template(template, **kwargs)
-        except Exception as exc:  # TODO check error code raise exception
-            # import app. importing it in the beginning of the file will raise an error as it is still not created
-            from app import app
-
-            # use application context to load the template which the email will use
-            with app.app_context():
+                # load the template which the email will use
                 msg.html = render_template(template, **kwargs)
+            except Exception as exc:  # TODO check error code raise exception
+                # import app. importing it in the beginning of the file will raise an error as it is still not created
+                from app import app
+
+                # use application context to load the template which the email will use
+                with app.app_context():
+                    msg.html = render_template(template, **kwargs)
+        else:
+            try:
+                # get app context / if it fails assume its working outside the app
+                app = current_app._get_current_object()
+
+            except Exception as exc:  # TODO check error code raise exception
+                # import app. importing it in the beginning of the file will raise an error as it is still not created
+                from app import app
+                
+            msg.html = template
 
         if files:
             for file in files:

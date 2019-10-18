@@ -2,7 +2,8 @@ import React from 'react';
 import {connect} from 'react-redux';
 import NoHeaderPanel from 'components/NoHeaderPanel/NoHeaderPanel'
 import {
-    Typography, Form, Input, Icon, Divider, Button, Tag, AutoComplete, Select, Switch, Modal, List, Checkbox, Spin
+    Typography, Form, Input, Icon, Divider, Button, Tag, AutoComplete, Select, Switch, Modal,
+    List, Checkbox, Spin, Radio, Slider
 } from 'antd';
 
 import {trimText} from "../../../../helpers";
@@ -31,7 +32,9 @@ class Campaign extends React.Component {
         this.timer = React.createRef();
         this.state = {
             use_crm: true,
+            location: "",
             locations: [],
+            distance: 50,
             skills: [],
             candidate_list: [],
             candidatesModalVisibility: false,
@@ -39,7 +42,8 @@ class Campaign extends React.Component {
             skillInput: "",
             textMessage: "",
             isSaved: true, //check if the campaign is saved or not
-            campaignName: ""
+            campaignName: "",
+            outreach_type: ""
         };
     }
 
@@ -56,6 +60,7 @@ class Campaign extends React.Component {
                         skills: JSON.parse(campaign?.Skills.replace(/'/g, '"')), //Fix JSON with REGEXP
                         textMessage: campaign?.Message,
                         use_crm: campaign?.UseCRM,
+                        location: campaign?.Location,
                     });
                     this.props.form.setFieldsValue({
                         name: trimText.capitalize(trimText.trimDash(campaign?.Name)),
@@ -93,6 +98,7 @@ class Campaign extends React.Component {
     };
 
     findLocation = (value) => {
+        this.setState({location: value});
         clearTimeout(this.timer.current);
         this.timer.current = setTimeout(() => {
             google.geocode({
@@ -144,7 +150,9 @@ class Campaign extends React.Component {
                     values.jobTitle,
                     this.state.skills,
                     values.text,
-                    this.state.candidate_list
+                    this.state.candidate_list,
+                    values.outreach_type,
+                    values.email_title
                 ));
             }
         });
@@ -198,6 +206,8 @@ class Campaign extends React.Component {
                     values.jobTitle,
                     this.state.skills,
                     this.state.textMessage,
+                    values.outreach_type,
+                    values.email_title,
                 ));
             }
         });
@@ -454,6 +464,19 @@ class Campaign extends React.Component {
                                     <Input placeholder={"Please enter your job title"}/>
                                 )}
                             </FormItem>
+
+                            <FormItem label={"Job Type"}>
+                                {getFieldDecorator("jobType", {initialValue: "permanent"})(
+                                    <Radio.Group defaultValue="permanent" onChange={(e) => {
+                                        this.setState({jobType: e.target.value})
+                                    }}>
+                                        <Radio.Button value="permanent">Permanent</Radio.Button>
+                                        <Radio.Button value="temporary">Temporary</Radio.Button>
+                                        <Radio.Button value="contract">Contract</Radio.Button>
+                                    </Radio.Group>
+                                )}
+                            </FormItem>
+
                             <FormItem label={"Skills"}>
                                 {getFieldDecorator("skill")(
                                     <Input placeholder="Type in a skill and press enter to add to the list of skills"
@@ -476,11 +499,52 @@ class Campaign extends React.Component {
                                     }],
                                 })(
                                     <AutoComplete placeholder="Type in your location"
+                                                  value={this.state.location}
                                                   type="text"
                                                   dataSource={this.state.locations}
                                                   onChange={value => this.findLocation(value)}/>
                                 )}
                             </FormItem>
+
+                            <FormItem label={`Distance within ${this.state.distance} miles`}
+                                      style={{display: this.state.location ? 'block' : 'none'}}>
+                                {getFieldDecorator("distance")(
+                                    <Slider
+                                        step={5}
+                                        defaultValue={[this.state.distance]}
+                                        onChange={(value) => {
+                                            this.setState({distance: value})
+                                        }}
+                                    />
+                                )}
+                            </FormItem>
+
+                            <FormItem label={"Outreach Type "}>
+                                {getFieldDecorator("outreach_type", {initialValue: "sms"})(
+                                    <Radio.Group defaultValue="sms" onChange={(e) => {
+                                        this.setState({outreach_type: e.target.value})
+                                    }}>
+                                        <Radio.Button value="sms">SMS</Radio.Button>
+                                        <Radio.Button value="email">Email</Radio.Button>
+                                    </Radio.Group>
+                                )}
+                            </FormItem>
+
+                            <FormItem label={"Email Title "}
+                                      style={this.state.outreach_type !== 'email' ? {display: 'none'} : {display: 'block'}}>
+                                {getFieldDecorator("email_title", {
+                                    rules: [{
+                                        whitespace: true,
+                                        required: this.state.outreach_type === 'email',
+                                        message: "Please enter a title for your outreach email"
+                                    }],
+                                })(
+                                    <Input placeholder="Please enter a title for your outreach email"
+                                           type="text"
+                                           onPressEnter={this.handleSkillSubmit}/>
+                                )}
+                            </FormItem>
+
                             <FormItem
                                 label={<span>Message
                                 <Button type="default" size="small" shape="round"
@@ -498,6 +562,34 @@ class Campaign extends React.Component {
                                     />
                                 )}
                             </FormItem>
+
+                            <FormItem label={"Follow Up Every:"}>
+                                {getFieldDecorator("repeat", {initialValue: "3"})(
+                                    <Radio.Group defaultValue="3" onChange={(e) => {
+                                        this.setState({outreach_type: e.target.value})
+                                    }}>
+                                        <Radio.Button value="1">6 hours</Radio.Button>
+                                        <Radio.Button value="2">12 hours</Radio.Button>
+                                        <Radio.Button value="3">1 day</Radio.Button>
+                                        <Radio.Button value="4">3 days</Radio.Button>
+                                    </Radio.Group>
+                                )}
+                            </FormItem>
+
+                            {/*<FormItem label={"schedule this campaign for every'"}>*/}
+                            {/*    {getFieldDecorator("repeat", {initialValue: "3"})(*/}
+                            {/*        <Radio.Group defaultValue="3" onChange={(e) => {*/}
+                            {/*            this.setState({outreach_type: e.target.value})*/}
+                            {/*        }}>*/}
+                            {/*            <Radio.Button value="1">6 hours</Radio.Button>*/}
+                            {/*            <Radio.Button value="2">12 hours</Radio.Button>*/}
+                            {/*            <Radio.Button value="3">1 day</Radio.Button>*/}
+                            {/*            <Radio.Button value="4">3 days</Radio.Button>*/}
+                            {/*        </Radio.Group>*/}
+                            {/*    )}*/}
+                            {/*</FormItem>*/}
+
+
                             <Button loading={this.props.isCandidatesLoading} icon="rocket" type="primary"
                                     onClick={this.handleSubmit}
                                     size={"large"}>

@@ -5,7 +5,7 @@ from gevent import monkey
 monkey.patch_all()
 
 import os
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, jsonify
 from flask_api import status
 from flask_babel import Babel
 from flask_migrate import Migrate, MigrateCommand
@@ -24,6 +24,8 @@ from services import scheduler_services
 from services.auth_services import jwt
 from services.mail_services import mail
 from utilities import helpers, tasks, dummy_data
+
+from utilities.helpers import limiter
 
 app = Flask(__name__, static_folder='static')
 
@@ -64,6 +66,15 @@ def page_not_found(e):
     except:
         print("Error without description")
         return render_template('errors/404.html'), status.HTTP_404_NOT_FOUND
+
+
+# Requests limiter initialisation:
+limiter.init_app(app)
+
+# Custom limiter exceeded error response
+@app.errorhandler(429)
+def ratelimit_handler(e):
+    return helpers.jsonResponse(False, 429, "ratelimit exceeded %s" % e.description, None)
 
 
 @marketplace_router.route("/bullhorn_callback", methods=['GET', 'POST', 'PUT'])

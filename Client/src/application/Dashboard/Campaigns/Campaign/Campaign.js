@@ -594,8 +594,11 @@ class Campaign extends React.Component {
                                                  min={1}
                                                  style={{marginTop: 10, width: '30%'}}
                                                  value={this.state.customSchedule ? this.state.customSchedule : 2}
-                                                 formatter={value => value === 1 ? `${value} day` : `${value} days`}
-                                                 parser={value => value.replace(['day', 'days'], '')}
+                                                 formatter={value => value == '1' ? `${value} day` : `${value} days`}
+                                                 parser={value => {
+                                                     value.replace('day', 'days');
+                                                     value.replace('days', '');
+                                                 }}
                                                  onChange={(value) => {
                                                      this.setState({customSchedule: value});
                                                  }}/>

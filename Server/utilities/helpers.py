@@ -244,8 +244,6 @@ def getListFromLimitedQuery(columnsList, tupleList: List[tuple]) -> list:
     if not len(tupleList) > 0:
         return []
 
-    print("columnsList: ", columnsList)
-    print("tupleList[0]: ", tupleList)
     # When tupleList is not empty, then the number of items in each tuple must match the number of items in columnsList
     if len(columnsList) != len(tupleList[0]):
         raise Exception("List of indexes provided must match in length to the items in each of the tuples")

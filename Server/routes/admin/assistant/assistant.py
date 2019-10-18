@@ -3,10 +3,8 @@ from flask_jwt_extended import jwt_required, get_jwt_identity
 
 from models import Callback
 from services import assistant_services
+from services.user_services import getOwnersOfAssistants
 from utilities import helpers, wrappers
-
-
-import json
 
 assistant_router: Blueprint = Blueprint('assistant_router', __name__, template_folder="../../templates")
 
@@ -24,16 +22,21 @@ def assistants():
         callback: Callback = assistant_services.getAll(user['companyID'])
         if not callback.Success:
             return helpers.jsonResponse(False, 404, "Cannot fetch Assistants")
-        return helpers.jsonResponse(True, 200,
-                                    "Assistants Returned!",
-                                    {"assistants": helpers.getListFromLimitedQuery(['ID',
+
+        callback: Callback = getOwnersOfAssistants(helpers.getListFromLimitedQuery(['ID',
                                                                                     'Name',
                                                                                     'Description',
                                                                                     'Message',
                                                                                     'TopBarText',
                                                                                     'Active',
-                                                                                    'Owner'],
-                                                                                   callback.Data)})
+                                                                                    'OwnerID'],
+                                                                                   callback.Data))
+        if not callback.Success:
+            return helpers.jsonResponse(False, 404, "Cannot fetch Owners")
+
+        return helpers.jsonResponse(True, 200,
+                                    "Assistants Returned!",
+                                    {"assistants": callback.Data})
     if request.method == "POST":
         data = request.json
         callback: Callback = assistant_services.create(data.get('assistantName'),
@@ -67,7 +70,6 @@ def assistant(assistantID):
         return helpers.jsonResponse(True, 200,
                                     "Assistant fetched successfully",
                                     helpers.getDictFromSQLAlchemyObj(callback.Data, True))
-
 
     # Update assistant
     if request.method == "PUT":
@@ -184,7 +186,7 @@ def assistant_messenger_connect(assistantID):
     callback: Callback = Callback(False, 'Error!')
     if request.method == "POST":
         callback: Callback = assistant_services.connectToMessenger(assistantID, request.json.get('messengerID'),
-                                                                  user['companyID'])
+                                                                   user['companyID'])
 
     if request.method == "DELETE":
         callback: Callback = assistant_services.disconnectFromMessenger(assistantID, user['companyID'])
@@ -192,6 +194,7 @@ def assistant_messenger_connect(assistantID):
     if not callback.Success:
         return helpers.jsonResponse(False, 400, callback.Message, None)
     return helpers.jsonResponse(True, 200, callback.Message, None)
+
 
 # Connect assistant to AutoPilot
 @assistant_router.route("/assistant/<int:assistantID>/auto_pilot", methods=['POST', 'DELETE'])

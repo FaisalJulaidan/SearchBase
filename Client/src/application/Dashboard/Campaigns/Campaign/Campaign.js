@@ -564,14 +564,15 @@ class Campaign extends React.Component {
                             </FormItem>
 
                             <FormItem label={"Follow up every:"}>
-                                {getFieldDecorator("followUp", {initialValue: "3"})(
-                                    <Radio.Group defaultValue="3" onChange={(e) => {
+                                {getFieldDecorator("followUp", {initialValue: "never"})(
+                                    <Radio.Group defaultValue="never" onChange={(e) => {
                                         this.setState({followUp: e.target.value})
                                     }}>
-                                        <Radio.Button value="1">6 hours</Radio.Button>
-                                        <Radio.Button value="2">12 hours</Radio.Button>
-                                        <Radio.Button value="3">1 day</Radio.Button>
-                                        <Radio.Button value="4">3 days</Radio.Button>
+                                        <Radio.Button value="never">Never</Radio.Button>
+                                        <Radio.Button value="6">6 hours</Radio.Button>
+                                        <Radio.Button value="12">12 hours</Radio.Button>
+                                        <Radio.Button value="24">1 day</Radio.Button>
+                                        <Radio.Button value="71">3 days</Radio.Button>
                                     </Radio.Group>
                                 )}
                             </FormItem>
@@ -583,9 +584,9 @@ class Campaign extends React.Component {
                                     }}>
                                         <Radio.Button value="never">Never</Radio.Button>
                                         <Radio.Button value="1">1 Day</Radio.Button>
-                                        <Radio.Button value="2">7 Days</Radio.Button>
-                                        <Radio.Button value="4">1 Month</Radio.Button>
-                                        <Radio.Button value="5">3 Months</Radio.Button>
+                                        <Radio.Button value="7">7 Days</Radio.Button>
+                                        <Radio.Button value="30">1 Month</Radio.Button>
+                                        <Radio.Button value="90">3 Months</Radio.Button>
                                         <Radio.Button value="custom">Custom</Radio.Button>
                                     </Radio.Group>
                                 )}

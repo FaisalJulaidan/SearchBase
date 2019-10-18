@@ -563,10 +563,10 @@ class Campaign extends React.Component {
                                 )}
                             </FormItem>
 
-                            <FormItem label={"Follow Up Every:"}>
-                                {getFieldDecorator("repeat", {initialValue: "3"})(
+                            <FormItem label={"Follow up every:"}>
+                                {getFieldDecorator("followUp", {initialValue: "3"})(
                                     <Radio.Group defaultValue="3" onChange={(e) => {
-                                        this.setState({outreach_type: e.target.value})
+                                        this.setState({followUp: e.target.value})
                                     }}>
                                         <Radio.Button value="1">6 hours</Radio.Button>
                                         <Radio.Button value="2">12 hours</Radio.Button>
@@ -576,18 +576,20 @@ class Campaign extends React.Component {
                                 )}
                             </FormItem>
 
-                            {/*<FormItem label={"schedule this campaign for every'"}>*/}
-                            {/*    {getFieldDecorator("repeat", {initialValue: "3"})(*/}
-                            {/*        <Radio.Group defaultValue="3" onChange={(e) => {*/}
-                            {/*            this.setState({outreach_type: e.target.value})*/}
-                            {/*        }}>*/}
-                            {/*            <Radio.Button value="1">6 hours</Radio.Button>*/}
-                            {/*            <Radio.Button value="2">12 hours</Radio.Button>*/}
-                            {/*            <Radio.Button value="3">1 day</Radio.Button>*/}
-                            {/*            <Radio.Button value="4">3 days</Radio.Button>*/}
-                            {/*        </Radio.Group>*/}
-                            {/*    )}*/}
-                            {/*</FormItem>*/}
+                            <FormItem label={"Schedule for every:"}>
+                                {getFieldDecorator("schedule", {initialValue: "off"})(
+                                    <Radio.Group defaultValue="off" onChange={(e) => {
+                                        this.setState({schedule: e.target.value})
+                                    }}>
+                                        <Radio.Button value="off">Off</Radio.Button>
+                                        <Radio.Button value="1">1 Day</Radio.Button>
+                                        <Radio.Button value="2">7 Days</Radio.Button>
+                                        <Radio.Button value="3">14 Days</Radio.Button>
+                                        <Radio.Button value="4">1 Month</Radio.Button>
+                                        <Radio.Button value="5">3 Months</Radio.Button>
+                                    </Radio.Group>
+                                )}
+                            </FormItem>
 
 
                             <Button loading={this.props.isCandidatesLoading} icon="rocket" type="primary"

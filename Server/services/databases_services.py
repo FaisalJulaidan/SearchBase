@@ -599,8 +599,8 @@ def __salary(row, dbSalaryColumn, dbCurrencyColumn, salaryInput: str, plus=4, fo
     userSalary = salaryInput.split(' ')
 
     # Get user's min and max salary
-    userMin = userSalary[0].split("-")[0]
-    userMax = userSalary[0].split("-")[1]
+    userMin = float(re.sub("[^0-9]", "", userSalary[0].split("-")[0]))
+    userMax = float(re.sub("[^0-9]", "", userSalary[0].split("-")[1]))
 
     # Convert db salary currency if did not match with user's entered currency
     dbSalary = row[dbSalaryColumn.name] or 0
@@ -617,9 +617,9 @@ def __salary(row, dbSalaryColumn, dbCurrencyColumn, salaryInput: str, plus=4, fo
 
     # Compare salaries, if true then return 'plus' to be added to the score otherwise old score
     if not forceLessThan:
-        return (plus if (float(userMin) <= dbSalary <= float(userMax)) else row['Score']), dbSalary, userSalary[1]
+        return (plus if (userMin <= dbSalary <= userMax) else row['Score']), dbSalary, userSalary[1]
     else:  # Less
-        return (plus if dbSalary <= float(userMax) else row['Score']), dbSalary, userSalary[1]
+        return (plus if dbSalary <= userMax else row['Score']), dbSalary, userSalary[1]
 
 
 def createPandaCandidate(id, name, email, mobile, location, skills,
@@ -647,11 +647,8 @@ def createPandaCandidate(id, name, email, mobile, location, skills,
 
 def createPandaJob(id, title, desc, location, type, salary, essentialSkills, yearsRequired,
                    startDate, endDate, linkURL, currency: Currency, source):
-    helpers.logError("salary" + str(salary))
     if isinstance(salary, str):
-        helpers.logError("ITS IN")
         salary = float(re.sub("[^0-9]", "", salary))
-        helpers.logError("salary" + str(salary))
     return {"ID": id,
             "JobTitle": title or '',
             "JobDescription": desc or '',

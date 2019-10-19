@@ -34,11 +34,6 @@ Auth =
 CLIENT_ID = os.environ['BULLHORN_CLIENT_ID']
 CLIENT_SECRET = os.environ['BULLHORN_CLIENT_SECRET']
 
-INVALID_REFRESH_TOKEN_MESSAGE = "{\
-  \"error\" : \"invalid_grant\",\
-  \"error_description\" : \"Invalid, expired, or revoked refresh token.\"\
-}"
-
 
 def testConnection(auth, companyID):
     try:
@@ -63,28 +58,12 @@ def login(auth):
 
         headers = {'Content-Type': 'application/json'}
 
-        code_url = "https://auth-emea.bullhornstaffing.com/oauth/authorize?" + \
-                           "&response_type=code" + \
-                           "&redirect_uri=" + helpers.getDomain(3000) + "/dashboard/marketplace/Bullhorn" + \
-                           "&client_id=" + CLIENT_ID + \
-                           "&client_secret=" + CLIENT_SECRET + \
-                           "&code=" + authCopy.get("code") + \
-                           "&action=Login" + \
-                           "&username=" + authCopy.get("username") + \
-                           "&password=" + authCopy.get("password")
-
-        code_request = requests.post(code_url, headers=headers)
-        if not code_request.ok:
-            raise Exception(code_request.text)
-
-        code_result_body = json.loads(code_request.text)
-
         access_token_url = "https://auth-emea.bullhornstaffing.com/oauth/token?" + \
                            "&grant_type=authorization_code" + \
                            "&redirect_uri=" + helpers.getDomain(3000) + "/dashboard/marketplace/Bullhorn" + \
                            "&client_id=" + CLIENT_ID + \
                            "&client_secret=" + CLIENT_SECRET + \
-                           "&code=" + code_result_body.get("code")
+                           "&code=" + authCopy.get("code")
 
         # get the access token and refresh token
         access_token_request = requests.post(access_token_url, headers=headers)
@@ -94,10 +73,8 @@ def login(auth):
 
         result_body = json.loads(access_token_request.text)
 
-        authCopy["refresh_token"] = result_body.get("refresh_token")
-
         # Logged in successfully
-        return Callback(True, 'Logged in successfully', authCopy)
+        return Callback(True, 'Logged in successfully', {"refresh_token": result_body.get("refresh_token")})
 
     except Exception as exc:
         helpers.logError("Marketplace.CRM.Bullhorn.login() ERROR: " + str(exc))
@@ -125,8 +102,10 @@ def retrieveRestToken(auth, companyID):
         headers = {'Content-Type': 'application/json'}
 
         # use refresh_token to generate access_token and refresh_token
-        url = "https://auth-emea.bullhornstaffing.com/oauth/token?grant_type=refresh_token&client_id=" + CLIENT_ID + \
-              "&client_secret=" + CLIENT_SECRET + "&refresh_token=" + authCopy.get("refresh_token")
+        url = "https://auth-emea.bullhornstaffing.com/oauth/token?grant_type=refresh_token&refresh_token=" + \
+              authCopy.get("refresh_token") + \
+              "&client_id=" + CLIENT_ID + \
+              "&client_secret=" + CLIENT_SECRET
 
         if os.environ['FLASK_ENV'] != "production":
             url = url.replace("auth-emea.", "auth9.")
@@ -135,18 +114,9 @@ def retrieveRestToken(auth, companyID):
         helpers.logError("--------------------------------------------------------------------------------------------")
         helpers.logError("TESTING BUG " + str(companyID) + " REQUEST: " + url)
         get_access_token = requests.post(url, headers=headers)
-        helpers.logError("TESTING BUG " + str(companyID) + "CODE: " + get_access_token.status_code +
-                         " TEXT: " + get_access_token.text)
+        helpers.logError("TESTING BUG " + str(companyID) + " TEXT: " + get_access_token.text)
         helpers.logError("--------------------------------------------------------------------------------------------")
         helpers.logError("--------------------------------------------------------------------------------------------")
-
-        if get_access_token.text == INVALID_REFRESH_TOKEN_MESSAGE:
-            login_callback: Callback = login(authCopy)
-            if not login_callback.Success:
-                raise Exception(login_callback.Message)
-
-            url = url.split("&refresh_token=")[0] + "&refresh_token=" + login_callback.Data["refresh_token"]
-            get_access_token = requests.post(url, headers=headers)
 
         if get_access_token.ok:
             result_body = json.loads(get_access_token.text)

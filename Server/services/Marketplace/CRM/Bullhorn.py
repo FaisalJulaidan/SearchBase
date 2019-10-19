@@ -60,6 +60,7 @@ def testConnection(auth, companyID):
 def login(auth):
     try:
         authCopy = dict(auth)
+
         headers = {'Content-Type': 'application/json'}
 
         code_url = "https://auth-emea.bullhornstaffing.com/oauth/authorize?" + \
@@ -67,14 +68,12 @@ def login(auth):
                            "&redirect_uri=" + helpers.getDomain(3000) + "/dashboard/marketplace/Bullhorn" + \
                            "&client_id=" + CLIENT_ID + \
                            "&client_secret=" + CLIENT_SECRET + \
+                           "&code=" + authCopy.get("code") + \
                            "&action=Login" + \
                            "&username=" + authCopy.get("username") + \
                            "&password=" + authCopy.get("password")
 
         code_request = requests.post(code_url, headers=headers)
-        helpers.logError("code_request.ok: " + str(code_request.ok))
-        helpers.logError("code_request.ok: " + str(code_request.text))
-
         if not code_request.ok:
             raise Exception(code_request.text)
 

@@ -21,7 +21,6 @@ const timeFormats = [
 export const checkDate = (date, strict=false, timeformats=false) => {
   const validate = (date, format, strict) => {
     let momentObject = moment(date, format, strict)
-    console.log(momentObject)
     if(momentObject.isValid()){
       return momentObject
     }

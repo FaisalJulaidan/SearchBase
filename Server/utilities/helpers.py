@@ -88,10 +88,12 @@ hashids = Hashids(salt=BaseConfig.HASH_IDS_SALT, min_length=5)
 def encodeID(id):
     return hashids.encrypt(id)
 
-
 def decodeID(id):
     return hashids.decrypt(id)
 
+def encodeMultipleParams(*argv):
+    print(argv)
+    return hashids.encrypt(*argv)
 
 # Encryptors
 def encrypt(value, isDict=False):

@@ -110,8 +110,8 @@ def insertClient(assistant: Assistant, conversation: Conversation):
         return Callback(False, "CRM type did not match with those on the system")
 
 
-def updateCandidate(details, conversation, companyID):
-    crm_callback: Callback = getByID(details["source_id"], companyID)
+def updateCandidate(candidateID, conversation, companyID, sourceID):
+    crm_callback: Callback = getByID(sourceID, companyID)
 
     if not crm_callback.Success:
 
@@ -125,7 +125,7 @@ def updateCandidate(details, conversation, companyID):
 
     name = (conversation.Name or " ").split(" ")
     data = {
-        "id": details["id"],
+        "id": candidateID,
         "name": conversation.Name or " ",
         "firstName": helpers.getListValue(name, 0, " "),
         "lastName": helpers.getListValue(name, 1, " "),

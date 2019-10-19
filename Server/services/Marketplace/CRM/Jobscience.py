@@ -29,6 +29,8 @@ CLIENT_SECRET = os.environ['JOBSCIENCE_CLIENT_SECRET']
 BASE_URL = "https://prsjobs.cs83.my.salesforce.com/services/data/v46.0/"
 BASE_URL_LOGIN = "https://login.salesforce.com/services/oauth2/"
 
+# Load Synonyms:
+# SYNONYMS: dict = marketplace_helpers.loadSynonyms(construction=True)
 
 # TODO CHECKLIST:
 # [1] Add a update candidate function
@@ -420,7 +422,19 @@ def fetchSkillsForCandidateSearch(list_of_contactIDs: list, list_of_skills, acce
     # Add LIKE statements:
     like_string = ""
     for skill in list_of_skills:
-        like_string += "+AND+ts2__Skill_Name__c+LIKE+" + "'%" + skill + "%'"
+
+        like_string += "+AND+("
+
+        # TODO: Generate synonyms:
+        synonyms = (skill,)
+        for synonym in synonyms:
+            like_string += "ts2__Skill_Name__c+LIKE+" + "'%" + synonym + "%'+or+"
+
+        # Remove final or:
+        if len(synonyms) > 0:
+            like_string = like_string[:-4]
+
+        like_string += ")"
 
     print("Complete Query:")
     print("SELECT+ts2__Skill_Name__c,ts2__Last_Used__c,ts2__Contact__c" +
@@ -477,6 +491,16 @@ def searchCandidates(access_token, conversation) -> Callback:
         if conversation.get('desiredSalary') is not None:
             query += populateFilter(conversation.get("desiredSalary", 0), "ts2__Desired_Salary__c", quote_wrap=True,
                                     SOQL_type="=")
+
+        # Filter on Job Type:
+
+        # Employment_Type__c
+        print("The conversation")
+        print(conversation)
+        # if conversation.get('desiredSalary') is not None:
+        #     query += populateFilter(conversation.get("desiredSalary", 0), "ts2__Desired_Salary__c", quote_wrap=True,
+        #                             SOQL_type="=")
+
         query = query[:-5]
 
         # print("Query is:")
@@ -486,7 +510,7 @@ def searchCandidates(access_token, conversation) -> Callback:
         sendQuery_callback: Callback = sendQuery(access_token, "get", {},
                                                  "SELECT+X18_Digit_ID__c,ID,Name,Title,email,phone,MailingCity," +
                                                  "ts2__Desired_Salary__c,ts2__Date_Available__c,ts2__Years_of_Experience__c,ts2__Desired_Hourly__c,Min_Basic__c," +
-                                                 "ts2__EduDegreeName1__c,ts2__Education__c,Attributes__c+from+Contact+" + query +
+                                                 "ts2__EduDegreeName1__c,ts2__Education__c+from+Contact+" + query +
                                                  "+LIMIT+500")  # Limit set to 10 TODO: Customize
 
         if not sendQuery_callback.Success:
@@ -516,7 +540,7 @@ def searchCandidates(access_token, conversation) -> Callback:
             sendQuery_callback: Callback = sendQuery(access_token, "get", {},
                                                      "SELECT+X18_Digit_ID__c,ID,Name,Title,email,phone,MailingCity," +
                                                      "ts2__Desired_Salary__c,ts2__Date_Available__c,ts2__Years_of_Experience__c,ts2__Desired_Hourly__c,Min_Basic__c," +
-                                                     "ts2__EduDegreeName1__c,ts2__Education__c,Attributes__c+from+Contact+" + query +
+                                                     "ts2__EduDegreeName1__c,ts2__Education__c+from+Contact+" + query +
                                                      "+LIMIT+200")  # Limit set to 10 TODO: Customize
             if not sendQuery_callback.Success:
                 raise Exception(sendQuery_callback.Message)

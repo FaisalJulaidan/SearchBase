@@ -10,12 +10,15 @@ import { DatePicker as AntdDatePicker } from 'antd';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTelegramPlane } from '@fortawesome/free-brands-svg-icons';
 import { getContainerElement } from '../../helpers';
+import { Tooltip } from 'antd'
 import moment from 'moment';
 
 const MultiDatePicker = ({ message, submitMessage }) => {
 
     let [selectedDates, setSelectedDates] = useState({ individual: [], range: [] });
     let [open, setOpen] = useState(false);
+    let [valid, setValid] = useState(true);
+    let [error, setError] = useState(null);
 
     const renderDate = (curDate, today) => {
         let className = 'antd-date-multi';
@@ -101,8 +104,14 @@ const MultiDatePicker = ({ message, submitMessage }) => {
         });
         return str.substr(0, str.length - 1);
     };
+
     const submitDates = () => {
         let text;
+        if (selectedDates.individual.length === 0 && selectedDates.range.length === 0){
+          setValid(false)
+          setError('You must select at least one date')
+          return
+        }
         if (selectedDates)
             text = selectedDatesToString();
 
@@ -125,21 +134,25 @@ const MultiDatePicker = ({ message, submitMessage }) => {
 
     return (
         <React.Fragment>
-            <div className={'DatePickerContainer'} onClick={() => setOpen(true)}>
-                <AntdDatePicker getCalendarContainer={() => getContainerElement()}
-                                className={'Datepicker'} suffixIcon={<div/>}
-                                dropdownClassName={'DatepickerCalendar'}
-                                showToday={false}
-                                dateRender={renderDate}
-                                open={open}/>
-            </div>
-
+           <Tooltip
+              placement="top"
+              title={error}
+              getPopupContainer={() => getContainerElement()}
+              visible={!valid}>
+              <div className={'DatePickerContainer'} onClick={() => setOpen(true)}>
+                  <AntdDatePicker getCalendarContainer={() => getContainerElement()}
+                                  className={'Datepicker'} suffixIcon={<div/>}
+                                  dropdownClassName={'DatepickerCalendar'}
+                                  showToday={false}
+                                  dateRender={renderDate}
+                                  open={open}/>
+              </div>
+            </Tooltip>
             <div className={'Submit'}>
                 <i className={'SendIconActive'} onClick={submitDates}>
                     <FontAwesomeIcon size="2x" icon={faTelegramPlane}/>
                 </i>
             </div>
-
         </React.Fragment>
     );
 };

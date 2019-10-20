@@ -189,9 +189,7 @@ def sendCampaign(campaign_details, companyID):
         # VARIABLE ORDER MUST BE MAINTAINED SO THAT WHEN DECODING WE KNOW WHAT VARIABLES ARE WHAT
         # IF YOU INTEND TO CHANGE THEM, ALSO UPDATE THE ORDER HANDLED AT CONVERSATION SERVICES LINE # 98
         source = 2 if campaign_details.get("use_crm") else 1
-        # text = campaign_details.get("text") + "\n\n" + helpers.getDomain() + "/chatbot_direct_link/" + \
-        #        hashedAssistantID + "?source=" + source + "&source_id=" + \
-        #        str(campaign_details.get("crm_id", campaign_details.get("database_id")))
+
         crmID = campaign_details.get("crm_id") if source == 2 else campaign_details.get("database_id")
         text = campaign_details.get("text") 
 

@@ -44,13 +44,10 @@ const MultiDatePicker = ({ message, submitMessage }) => {
 
 
     useEffect(() => {
-      console.log(open)
         function checkValidParent(e) {
             if(!open){
               return
             }
-            console.log('lol')
-            console.log(open)
             let valid = false;
             e.path.forEach(node => {
                 if (node.classList) {

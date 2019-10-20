@@ -44,7 +44,13 @@ const MultiDatePicker = ({ message, submitMessage }) => {
 
 
     useEffect(() => {
+      console.log(open)
         function checkValidParent(e) {
+            if(!open){
+              return
+            }
+            console.log('lol')
+            console.log(open)
             let valid = false;
             e.path.forEach(node => {
                 if (node.classList) {
@@ -105,6 +111,12 @@ const MultiDatePicker = ({ message, submitMessage }) => {
         return str.substr(0, str.length - 1);
     };
 
+    const delayedOpen = () => {
+      setTimeout(() => {
+        setOpen(true)
+      }, 10);
+    }
+
     const submitDates = () => {
         let text;
         if (selectedDates.individual.length === 0 && selectedDates.range.length === 0){
@@ -139,18 +151,18 @@ const MultiDatePicker = ({ message, submitMessage }) => {
               title={error}
               getPopupContainer={() => getContainerElement()}
               visible={!valid}>
-              <div className={'DatePickerContainer'} onClick={() => setOpen(true)}>
+              <div className={'DatePickerContainer'} onClick={() => delayedOpen()}>
                   <AntdDatePicker getCalendarContainer={() => getContainerElement()}
                                   className={'Datepicker'} suffixIcon={<div/>}
                                   dropdownClassName={'DatepickerCalendar'}
                                   showToday={false}
                                   dateRender={renderDate}
-                                  open={open}/>
+                                   open={open}/>
               </div>
             </Tooltip>
             <div className={'Submit'}>
                 <i className={'SendIconActive'} onClick={submitDates}>
-                    <FontAwesomeIcon size="2x" icon={faTelegramPlane}/>
+                    <FontAwesomeIcon size="2x" icon={faTelegramPlane} color={valid ? '' : 'red'}/>
                 </i>
             </div>
         </React.Fragment>

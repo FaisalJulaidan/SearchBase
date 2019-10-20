@@ -70,7 +70,7 @@ const DatePicker = ({message, submitMessage}) => {
             </Tooltip>
             <div className={'Submit'}>
                 <i className={'SendIconActive'} onClick={inputOnChangeHandler}>
-                    <FontAwesomeIcon size="2x" icon={faTelegramPlane}/>
+                    <FontAwesomeIcon size="2x" icon={faTelegramPlane} color={valid ? '' : 'red'}/>
                 </i>
             </div>
         </React.Fragment>

@@ -7,7 +7,7 @@ from datetime import datetime, timedelta
 min_key_length = 5
 
 
-def create_shortened_url(url: str, length: int = min_key_length, expiry: int = None, key: str = None) -> Callback:
+def createShortenedURL(url: str, length: int = min_key_length, expiry: int = None, key: str = None) -> Callback:
     """
     Creates a shortened url that points to the one supplied
 
@@ -47,12 +47,12 @@ def create_shortened_url(url: str, length: int = min_key_length, expiry: int = N
         return Callback(True, "URL has been succesfully created", "{}/  u/{}".format(helpers.getDomain(), key))
 
     except IntegrityError as e:
-        helpers.logError("url_services.create_shortened_url(): " + str(e))
+        helpers.logError("url_services.createShortenedURL(): " + str(e))
         db.session.rollback()
         return Callback(False, "Integrity error, a key used in a different URL is being attempted to be used again")
 
     except Exception as e:
-        helpers.logError("url_services.create_shortened_url(): " + str(e))
+        helpers.logError("url_services.createShortenedURL(): " + str(e))
         db.session.rollback()
         return Callback(False, "Unknown error.")
 

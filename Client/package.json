@@ -79,6 +79,7 @@
     "react-email-share-link": "^1.0.3",
     "react-ga": "^2.6.0",
     "react-json-view": "^1.19.1",
+    "react-linkify": "^1.0.0-alpha",
     "react-odometerjs": "^2.1.1",
     "react-player": "^1.11.2",
     "react-redux": "^5.1.1",

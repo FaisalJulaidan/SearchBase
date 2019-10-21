@@ -17,6 +17,10 @@ const timeFormats = [
   "HH mm"
 ]
 
+const textFormats = {
+  immediate: ["now", "immediate"]
+}
+
 
 export const checkDate = (date, strict=false, timeformats=false) => {
   const validate = (date, format, strict) => {
@@ -42,5 +46,12 @@ export const checkDate = (date, strict=false, timeformats=false) => {
       return final
     }
   }
+  // // Immediate
+  // for(let type in textFormats.immediate){
+  //   if(date.toLowerCase() === type){
+  //     return moment()
+  //   }
+  // }
+  
   return null
 }

@@ -1,5 +1,5 @@
 from services import assistant_services, user_services
-from models import Callback, URLShortener, db
+from models import Callback, ShortenedURL, db
 from utilities import helpers
 from sqlalchemy.exc import IntegrityError
 from datetime import datetime, timedelta
@@ -40,21 +40,49 @@ def create_shortened_url(url: str, length: int = min_key_length, expiry: int = N
     try:
         key = key if key else helpers.randomAlphanumeric(length)
         expiryDate = datetime.now() + timedelta(seconds=expiry) if expiry else None
-        shortened_url : URLShortener = URLShortener(Key=key, URL=url, Expiry=expiryDate)
+        shortened_url : ShortenedURL = ShortenedURL(ID=key, URL=url, Expiry=expiryDate)
 
         db.session.add(shortened_url)
 
-        return Callback(True, "URL has been succesfully created", "{}/u/{}".format(helpers.getDomain(), key))
+        return Callback(True, "URL has been succesfully created", "{}/  u/{}".format(helpers.getDomain(), key))
 
     except IntegrityError as e:
-        helpers.logError("url_services.create_shortened_url(): " + str(exc))
+        helpers.logError("url_services.create_shortened_url(): " + str(e))
         db.session.rollback()
         return Callback(False, "Integrity error, a key used in a different URL is being attempted to be used again")
-        
+
     except Exception as e:
-        helpers.logError("url_services.create_shortened_url(): " + str(exc))
+        helpers.logError("url_services.create_shortened_url(): " + str(e))
         db.session.rollback()
         return Callback(False, "Unknown error.")
 
     # Check if key exists, query database to make sure its not a duplicate
 
+def getByKey(key: str) -> Callback:
+    """
+    Gets a shortened URL by key
+
+    Args:
+        key [str] -- Unique key for the shortened URL you would like
+
+    Returns:
+        Callback with either a success or failure status, with the data object pointing to the shortened URL
+
+    Raises:
+        TODO: Write exceptions
+    """
+
+    try:
+        urlshortener = db.session.query(ShortenedURL).filter(ShortenedURL.ID == key).first()
+        if urlshortener is None:
+            raise Exception('Key {} does not exist in our database'.format(key))
+
+        if(urlshortener.Expiry):
+            if(urlshortener.Expiry < datetime.now()):
+                raise Exception('Expiry date for key {} has passed'.format(key))
+
+        return Callback(True, "URL Found", urlshortener.URL)
+
+    except Exception as e:        
+        helpers.logError("url_services.getByKey(): " + str(e))
+        return Callback(False, "Unknown error.")

@@ -1,0 +1,60 @@
+from services import assistant_services, user_services
+from models import Callback, URLShortener, db
+from utilities import helpers
+from sqlalchemy.exc import IntegrityError
+from datetime import datetime, timedelta
+
+min_key_length = 5
+
+
+def create_shortened_url(url: str, length: int = min_key_length, expiry: int = None, key: str = None) -> Callback:
+    """
+    Creates a shortened url that points to the one supplied
+
+    Args:
+        url [str] -- The url the shortened URL will point to
+        length [int] [OPTIONAL] -- The length of the alphanumeric key at the end of the URL (min-5)
+        expiry [int] [OPTIONAL] -- The length of time in seconds after which the link will no longer redirect, None for no expiry (None is default)
+        key [str] [OPTIONAL] -- The key (overriding the random text) that will be at the end of the URL, the length parameter will be ignored if this is supplied
+
+    Returns:
+        Callback with either a success or failure status, with the data object pointing to the newly created URL
+
+    Raises:
+        TODO: Write exceptions
+    """
+
+    # IF length is supplied (Default 10), check if less than min_key_length
+    if(length < min_key_length):
+        raise Exception("The length supplied was less than the {} minimum".format(min_key_length))
+
+    # IF key is supplied, check if its less than min_key_length
+    if(key):
+        if(len(key) < min_key_length):
+            raise Exception("The length supplied was less than the {} minimum".format(min_key_length))
+
+    # Expiry parameter must be 0 at minimum
+    if(expiry < 0):
+        raise Exception("Expiry can not be less than 0")
+    
+    try:
+        key = key if key else helpers.randomAlphanumeric(length)
+        expiryDate = datetime.now() + timedelta(seconds=expiry) if expiry else None
+        shortened_url : URLShortener = URLShortener(Key=key, URL=url, Expiry=expiryDate)
+
+        db.session.add(shortened_url)
+
+        return Callback(True, "URL has been succesfully created", "{}/u/{}".format(helpers.getDomain(), key))
+
+    except IntegrityError as e:
+        helpers.logError("url_services.create_shortened_url(): " + str(exc))
+        db.session.rollback()
+        return Callback(False, "Integrity error, a key used in a different URL is being attempted to be used again")
+        
+    except Exception as e:
+        helpers.logError("url_services.create_shortened_url(): " + str(exc))
+        db.session.rollback()
+        return Callback(False, "Unknown error.")
+
+    # Check if key exists, query database to make sure its not a duplicate
+

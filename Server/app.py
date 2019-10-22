@@ -12,7 +12,7 @@ from flask_migrate import Migrate, MigrateCommand
 from flask_script import Manager
 from sqlalchemy_utils import create_database, database_exists
 import config
-from models import db
+from models import db, Callback
 # Import all routers to register them as blueprints
 from routes.admin.routers import account_router, analytics_router, sub_router, \
     conversation_router, users_router, flow_router, assistant_router, \
@@ -20,7 +20,7 @@ from routes.admin.routers import account_router, analytics_router, sub_router, \
     campaign_router
 from routes.public.routers import public_router, reset_password_router, chatbot_router, auth_router
 from routes.staff.routers import staff_router
-from services import scheduler_services
+from services import scheduler_services, user_services
 from services.auth_services import jwt
 from services.mail_services import mail
 from utilities import helpers, tasks, dummy_data
@@ -146,7 +146,10 @@ elif os.environ['FLASK_ENV'] == 'development':
         os.environ["scheduler_lock"] = "True"
 
     print('Development mode running...')
-    # appointment_services.setAppointmentStatus(1, "Faisal", "julaidan.faisal@gmail.com", "3202343", "Accepted", 1)
+
+    # users_callback: Callback = user_services.getAllByCompanyIDWithEnabledNotifications(1, True)
+    # print(users_callback.Data)
+    # print(helpers.getListFromSQLAlchemyList(users_callback.Data))
 
 
 else:

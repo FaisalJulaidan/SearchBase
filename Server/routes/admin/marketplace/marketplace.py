@@ -100,8 +100,7 @@ def calendar_auth(assistantID):
     return helpers.jsonResponse(True, 200, callback.Message)
 
 
-# @marketplace_router.route("/marketplace/simple_callback", methods=['GET', 'POST', 'PUT'])
-@marketplace_router.route("/bullhorn_callback", methods=['GET', 'POST', 'PUT'])
+@marketplace_router.route("/marketplace/simple_callback", methods=['GET', 'POST', 'PUT'])
 def simple_callback():
     return request.args()
 

@@ -50,7 +50,7 @@ def getRemoteAddress():
     else:
         return request.headers['X-Real-IP']
 limiter = Limiter(key_func=getRemoteAddress)
-limiter.enabled = os.environ['FLASK_ENV'] != 'development'
+limiter.enabled = os.environ['FLASK_ENV'] != 'development' # does not work
 
 
 # ======== Helper Functions ======== #

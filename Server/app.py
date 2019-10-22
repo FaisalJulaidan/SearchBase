@@ -5,14 +5,14 @@ from gevent import monkey
 monkey.patch_all()
 
 import os
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, render_template, request
 from flask_api import status
 from flask_babel import Babel
 from flask_migrate import Migrate, MigrateCommand
 from flask_script import Manager
 from sqlalchemy_utils import create_database, database_exists
 import config
-from models import db, Callback
+from models import db
 # Import all routers to register them as blueprints
 from routes.admin.routers import account_router, analytics_router, sub_router, \
     conversation_router, users_router, flow_router, assistant_router, \
@@ -20,7 +20,7 @@ from routes.admin.routers import account_router, analytics_router, sub_router, \
     campaign_router
 from routes.public.routers import public_router, reset_password_router, chatbot_router, auth_router
 from routes.staff.routers import staff_router
-from services import scheduler_services, user_services
+from services import scheduler_services
 from services.auth_services import jwt
 from services.mail_services import mail
 from utilities import helpers, tasks, dummy_data
@@ -87,7 +87,6 @@ def test_crm_123():
 migrate_var = Migrate(app, db)
 manager = Manager(app)
 babel = Babel(app)
-# scheduler = APScheduler()
 manager.add_command('db', MigrateCommand)
 app.jinja_env.add_extension('jinja2.ext.do')  # Add 'do' extension to Jinja engine
 
@@ -146,11 +145,6 @@ elif os.environ['FLASK_ENV'] == 'development':
         os.environ["scheduler_lock"] = "True"
 
     print('Development mode running...')
-
-    # users_callback: Callback = user_services.getAllByCompanyIDWithEnabledNotifications(1, True)
-    # print(users_callback.Data)
-    # print(helpers.getListFromSQLAlchemyList(users_callback.Data))
-
 
 else:
     raise Exception("Please set FLASK_ENV first to either 'production', 'development', or 'staging' in .env file")

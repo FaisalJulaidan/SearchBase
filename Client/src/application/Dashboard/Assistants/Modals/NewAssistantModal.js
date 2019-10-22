@@ -130,6 +130,7 @@ class NewAssistantModal extends Component {
                                 <Option key={4} value={'join-us'}>Join Us</Option>
                                 <Option key={5} value={'referral'}>Referral</Option>
                                 <Option key={6} value={'apply'}>Apply Chatbot</Option>
+                                <Option key={6} value={'client-chatbot'}>Client Chatbot</Option>
                                 <Option key={7} value={'pre-screen'}>Pre-Screen</Option>
                                 <Option key={8} value={'template-1'}>Template 1</Option>
                             </Select>

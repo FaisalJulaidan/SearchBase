@@ -5,7 +5,7 @@ from gevent import monkey
 monkey.patch_all()
 
 import os
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, render_template, request
 from flask_api import status
 from flask_babel import Babel
 from flask_migrate import Migrate, MigrateCommand
@@ -87,7 +87,6 @@ def test_crm_123():
 migrate_var = Migrate(app, db)
 manager = Manager(app)
 babel = Babel(app)
-# scheduler = APScheduler()
 manager.add_command('db', MigrateCommand)
 app.jinja_env.add_extension('jinja2.ext.do')  # Add 'do' extension to Jinja engine
 
@@ -146,8 +145,6 @@ elif os.environ['FLASK_ENV'] == 'development':
         os.environ["scheduler_lock"] = "True"
 
     print('Development mode running...')
-    # appointment_services.setAppointmentStatus(1, "Faisal", "julaidan.faisal@gmail.com", "3202343", "Accepted", 1)
-
 
 else:
     raise Exception("Please set FLASK_ENV first to either 'production', 'development', or 'staging' in .env file")

@@ -1,7 +1,7 @@
 from threading import Thread
-import os
 from flask import render_template, current_app
 from flask_mail import Mail, Message
+from typing import List
 
 from models import Callback, Assistant, Conversation, Company, StoredFileInfo
 from services import user_services, stored_file_services as sfs
@@ -264,80 +264,24 @@ def simpleSend(to, title, text):
         return Callback(False, 'Could not send email')
 
 
-
-# Notify company about new conversations
-def notifyNewConversation(assistant: Assistant, conversation: Conversation):
-    try:
-
-        users_callback: Callback = user_services.getAllByCompanyIDWithEnabledNotifications(assistant.CompanyID, True)
-        if not users_callback.Success:
-            return Callback(False, "Users not found!")
-
-        if len(users_callback.Data) == 0:
-            return Callback(True, "No user has notifications enabled")
-
-        # Get Company
-        company: Company = assistant.Company
-
-        # Get pre singed url to download the file if there are files
-        fileURLsSinged = []
-        if conversation.StoredFile:
-            if conversation.StoredFile.StoredFileInfo:
-                for file in conversation.StoredFile.StoredFileInfo:
-                    fileURLsSinged.append(sfs.genPresigendURL(file.FilePath, 2592000).Data) # Expires in a month
-
-
-        conversations = [{
-            'userType': conversation.UserType.name,
-            'data': conversation.Data,
-            'status': conversation.ApplicationStatus.name,
-            'fileURLsSinged': fileURLsSinged,
-            'completed': "Yes" if conversation.Completed else "No",
-            'dateTime': conversation.DateTime.strftime("%Y/%m/%d %H:%M"),
-            'link': helpers.getDomain() + "/dashboard/assistants/" +
-                               str(assistant.ID) + "?tab=Conversations&conversation_id=" + str(conversation.ID)
-
-        }]
-
-        logoPath = helpers.keyFromStoredFile(company.StoredFile, enums.FileAssetType.Logo).AbsFilePath
-        # send emails, jobs applied for
-        for user in users_callback.Data:
-            email_callback: Callback = __sendEmail(to=user.Email,
-                                                   subject='New ' + conversation.UserType.name
-                                                          + " has engaged with "
-                                                          + assistant.Name + " assistant",
-                                                   template='/emails/new_conversations_notification.html',
-                                                   assistantName = assistant.Name,
-                                                   assistantID = assistant.ID,
-                                                   conversations = conversations,
-                                                   logoPath= logoPath,
-                                                   companyName=company.Name,
-                                                   companyURL=company.URL,
-                                                   )
-            if not email_callback.Success:
-                raise Exception(email_callback.Message)
-
-        return Callback(True, "Emails have been sent")
-
-    except Exception as exc:
-        helpers.logError("mail_service.notifyNewChatbotSession(): " + str(exc))
-        return Callback(False, "Error in notifying companies for new conversations")
-
-
 # Notify company about a new conversation
-def notifyNewConversations(assistant: Assistant, conversations, lastNotificationDate):
+def notifyNewConversations(assistant: Assistant, conversations: List[Conversation], lastNotificationDate):
     try:
 
         users_callback: Callback = user_services.getAllByCompanyIDWithEnabledNotifications(assistant.CompanyID)
         if not users_callback.Success:
             return Callback(False, "Users not found!")
 
+
+        # Get Company
+        company: Company = assistant.Company
+
         if len(users_callback.Data) == 0:
             return Callback(True, "No user has notifications enabled")
 
         conversationsList = []
         for conversation in conversations:
-            # Get pre singed url to download the file if there are files
+            # Get pre singed url to download the file via links
             fileURLsSinged = []
             if conversation.StoredFile:
                 if conversation.StoredFile.StoredFileInfo:
@@ -359,20 +303,22 @@ def notifyNewConversations(assistant: Assistant, conversations, lastNotification
             return Callback(True, "No new conversation to send")
 
         # Get company logo
-        logoPath = helpers.keyFromStoredFile(assistant.Company.StoredFile, enums.FileAssetType.Logo).AbsFilePath
+        logoPath = helpers.keyFromStoredFile(company.StoredFile, enums.FileAssetType.Logo).AbsFilePath
 
         # send emails, jobs applied for
         for user in users_callback.Data:
+            print("SEND TO :")
+            print(user)
             email_callback: Callback = __sendEmail(to=user.Email,
                                                    subject="New users has engaged with your "
-                                                          + assistant["Name"] + " assistant",
+                                                          + assistant.Name + " assistant",
                                                    template='/emails/new_conversations_notification.html',
                                                    assistantName = assistant.Name,
                                                    assistantID = assistant.ID,
                                                    conversations = conversationsList,
                                                    logoPath = logoPath,
-                                                   companyName = assistant.Company.Name,
-                                                   companyURL=assistant.Company.URL,
+                                                   companyName = company.Name,
+                                                   companyURL=company.URL,
                                                    )
             if not email_callback.Success:
                 raise Exception(email_callback.Message)

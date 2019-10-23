@@ -142,6 +142,7 @@ def retrieveRestToken(auth, companyID):
                          " TEXT: " + get_access_token.text)
         helpers.logError("--------------------------------------------------------------------------------------------")
         helpers.logError("--------------------------------------------------------------------------------------------")
+        helpers.logError("get_access_token.text == INVALID_REFRESH_TOKEN_MESSAGE" + str(get_access_token.text == INVALID_REFRESH_TOKEN_MESSAGE))
 
         if get_access_token.text == INVALID_REFRESH_TOKEN_MESSAGE:
             login_callback: Callback = login(authCopy)

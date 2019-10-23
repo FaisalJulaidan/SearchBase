@@ -64,7 +64,7 @@ def login(auth):
 
         code_url = "https://auth-emea.bullhornstaffing.com/oauth/authorize?" + \
                            "&response_type=code" + \
-                           "&redirect_uri=" + helpers.getDomain(3000) + "/dashboard/marketplace/Bullhorn" + \
+                           "&redirect_uri=" + helpers.getDomain(5000) + "/api/bullhorn_callback" + \
                            "&client_id=" + CLIENT_ID + \
                            "&client_secret=" + CLIENT_SECRET + \
                            "&action=Login" + \
@@ -78,7 +78,7 @@ def login(auth):
         if not code_request.ok:
             raise Exception(code_request.text)
 
-        code_result_body = json.loads(code_request.text)
+        code_result_body = dict(code_request.text)
 
         access_token_url = "https://auth-emea.bullhornstaffing.com/oauth/token?" + \
                            "&grant_type=authorization_code" + \
@@ -89,6 +89,8 @@ def login(auth):
 
         # get the access token and refresh token
         access_token_request = requests.post(access_token_url, headers=headers)
+        helpers.logError("code_request.ok: " + str(access_token_request.ok))
+        helpers.logError("code_request.ok: " + str(access_token_request.text))
 
         if not access_token_request.ok:
             raise Exception(access_token_request.text)

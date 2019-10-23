@@ -106,7 +106,7 @@ def simple_callback():
 
 
 @marketplace_router.route("/bullhorn_callback", methods=['GET', 'POST', 'PUT'])
-def simple_callback():
+def bullhorn_callback():
     return str(request.args)
 
 # post method, only adds events

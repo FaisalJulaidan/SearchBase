@@ -61,12 +61,12 @@ def login(auth):
         helpers.logError(str(authCopy))
         # return Callback(False, str("Bullhorn temporary out of order"))
 
-        # "&redirect_uri=https://www.thesearchbase.com/api/marketplace/simple_callback" + \
         #                    "&redirect_uri=https://www.thesearchbase.com/api/marketplace/simple_callback" + \
         code_url = "https://auth-emea.bullhornstaffing.com/oauth/authorize?" + \
                            "&response_type=code" + \
                            "&client_id=" + CLIENT_ID + \
                            "&client_secret=" + CLIENT_SECRET + \
+                           "&redirect_uri=https://www.thesearchbase.com/api/marketplace/simple_callback" + \
                            "&action=Login" + \
                            "&username=" + authCopy.get("username") + \
                            "&password=" + authCopy.get("password")

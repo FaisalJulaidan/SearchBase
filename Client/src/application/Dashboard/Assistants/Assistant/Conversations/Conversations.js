@@ -144,18 +144,24 @@ class Conversations extends React.Component {
             }, {
                 title: 'Actions',
                 key: 'actions',
+                fixed: 'right',
                 render: (text, record, index) => (
                     <span>
-              <a onClick={() => this.showViewModal(record)}>
-                  View
-              </a>
-                    <Divider type="vertical"/>
-              <a onClick={() => {
-                  this.deleteConversation(record);
-              }}>
-                  Delete
-              </a>
-            </span>
+
+                         <Icon
+                             onClick={() => this.showViewModal(record)}
+                             type="message"
+                             theme="twoTone"
+                             twoToneColor="#9254de"/>
+
+                        <Divider type="vertical"/>
+
+                        <Icon
+                            onClick={() => {this.deleteConversation(record);}}
+                            type="delete"
+                            theme="twoTone"
+                            twoToneColor="#f5222d"/>
+                </span>
                 )
             }
         ];

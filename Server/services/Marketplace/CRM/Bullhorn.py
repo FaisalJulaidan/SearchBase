@@ -34,11 +34,6 @@ Auth =
 CLIENT_ID = os.environ['BULLHORN_CLIENT_ID']
 CLIENT_SECRET = os.environ['BULLHORN_CLIENT_SECRET']
 
-INVALID_REFRESH_TOKEN_MESSAGE = "{\
-  \"error\" : \"invalid_grant\",\
-  \"error_description\" : \"Invalid, expired, or revoked refresh token.\"\
-}"
-
 
 def testConnection(auth, companyID):
     try:
@@ -61,7 +56,7 @@ def login(auth):
     try:
         authCopy = dict(auth)
         headers = {'Content-Type': 'application/json'}
-
+        print(authCopy)
         code_url = "https://auth-emea.bullhornstaffing.com/oauth/authorize?" + \
                            "&response_type=code" + \
                            "&redirect_uri=https://www.thesearchbase.com/api/marketplace/simple_callback" + \

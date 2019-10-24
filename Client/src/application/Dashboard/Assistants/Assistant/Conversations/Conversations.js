@@ -31,27 +31,30 @@ class Conversations extends React.Component {
             {
                 title: '#',
                 key: '#',
-                render: (text, record) => (<p>{record.ID}</p>)
+                width: 1,
+                render: (text, record) => (<p align="center">{record.ID}</p>)
 
             }, {
                 title: 'User Type',
                 key: 'UserType',
+                width: 150,
                 filters: [
                     { text: 'Candidate', value: 'Candidate' },
                     { text: 'Client', value: 'Client' }
                 ],
                 onFilter: (value, record) => record.UserType.indexOf(value) === 0,
-                render: (text, record) => (<Tag key={record.UserType}>{record.UserType}</Tag>)
-
+                render: (text, record) => (<div align="center"><Tag key={record.UserType}>{record.UserType}</Tag></div>)
             }, {
                 title: 'Name',
                 key: 'Name',
+                width: 210,
                 render: (text, record) => (
                     <p style={{ textTransform: 'capitalize' }}>{record.Name}</p>)
 
             }, {
                 title: 'Duration',
                 key: 'TimeSpent',
+                width: 100,
                 sorter: (a, b) => a.TimeSpent - b.TimeSpent,
                 render: (_, record) => {
                     let date = new Date(null);
@@ -66,16 +69,18 @@ class Conversations extends React.Component {
             }, {
                 title: 'Date & Time',
                 key: 'DateTime',
+                width: 380,
                 sorter: (a, b) => new Date(a.DateTime).valueOf() - new Date(b.DateTime).valueOf(),
-                render: (text, record) => (<p>{convertTimezone(record.DateTime, 'ddd, DD MMM YYYY HH:mm:ss')}</p>)
+                render: (text, record) => (<p>{convertTimezone(record.DateTime, 'ddd, DD MMM YYYY HH:mm A')}</p>)
 
             }, {
                 title: 'Score',
                 key: 'Score',
+                width: 210,
                 sorter: (a, b) => a.Score - b.Score,
                 render: (text, record) => {
                     return (
-                        <div style={{ width: 100 }}>
+                        <div style={{ width: 120}}>
                             <Progress percent={Math.round(record.Score * 100)} size="small"
                                       status={record.Score < 0.1 ? 'exception' : 'active'}/>
                         </div>
@@ -85,7 +90,7 @@ class Conversations extends React.Component {
             }, {
                 title: 'Status',
                 key: 'ApplicationStatus',
-                width: '120px',
+                width: 180,
                 filters: [
                     { text: 'Accepted', value: 'Accepted' },
                     { text: 'Pending', value: 'Pending' },
@@ -126,9 +131,11 @@ class Conversations extends React.Component {
                     );
                 }
 
-            }, {
+            },
+            {
                 title: 'Conversation',
                 key: 'Completed',
+                width: 150,
                 filters: [
                     { text: 'Completed', value: 'Completed' },
                     { text: 'Incomplete', value: 'Incomplete' }
@@ -137,14 +144,39 @@ class Conversations extends React.Component {
                     return (record.Completed ? 'Completed' : 'Incomplete').indexOf(value) === 0;
                 },
                 render: (text, record) => (
-                    record.Completed ?
-                        <Tag color="#87d068">Completed</Tag> :
-                        <Tag color="red">Incomplete</Tag>)
+                    <div align="center">
+                        {record.Completed ?
+                            <Tag color="#87d068">Completed</Tag> :
+                            <Tag color="red">Incomplete</Tag>
+                        }
+                    </div>)
 
+            },
+            {
+                title: 'CRM Sync',
+                key: 'CRMResponse',
+                width: 150,
+                // filters: [
+                //     { text: 'Success', value: 'Completed' },
+                //     { text: 'Failure', value: 'Incomplete' }
+                // ],
+                // onFilter: (value, record) => record.ApplicationStatus.indexOf(value) === 0,
+                render: (text, record) =>
+                    (
+                        <div align="center">
+                            {!record.CRMResponse ?
+                                <Tag>Unsynced</Tag> :
+                                record.CRMSynced ?
+                                    <Tag color="#87d068">Success</Tag> :
+                                    <Tag color="red">Failure</Tag>
+                            }
+                        </div>
+                    )
             }, {
                 title: 'Actions',
                 key: 'actions',
                 fixed: 'right',
+                width: 55,
                 render: (text, record, index) => (
                     <span>
 
@@ -157,7 +189,9 @@ class Conversations extends React.Component {
                         <Divider type="vertical"/>
 
                         <Icon
-                            onClick={() => {this.deleteConversation(record);}}
+                            onClick={() => {
+                                this.deleteConversation(record);
+                            }}
                             type="delete"
                             theme="twoTone"
                             twoToneColor="#f5222d"/>
@@ -399,7 +433,7 @@ class Conversations extends React.Component {
                        bordered={true}
                        pagination={{ position: 'both', pageSize: 20 }}
                        size='default'
-                       scroll={{ x: 500 }}
+                       scroll={{ x: 1280 }}
                 />
 
                 {

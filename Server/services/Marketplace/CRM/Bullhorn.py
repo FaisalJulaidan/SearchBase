@@ -56,7 +56,7 @@ def login(auth):
     try:
         authCopy = dict(auth)
         headers = {'Content-Type': 'application/json'}
-        print(authCopy)
+        helpers.logError(str(authCopy))
         code_url = "https://auth-emea.bullhornstaffing.com/oauth/authorize?" + \
                            "&response_type=code" + \
                            "&redirect_uri=https://www.thesearchbase.com/api/marketplace/simple_callback" + \

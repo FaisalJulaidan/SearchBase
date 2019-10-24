@@ -59,7 +59,7 @@ def login(auth):
         headers = {'Content-Type': 'application/json'}
 
         helpers.logError(str(authCopy))
-        # return Callback(False, str("Bullhorn temporary out of order"))
+        return Callback(False, str("Bullhorn temporary out of order"))
 
         #                    "&redirect_uri=https://www.thesearchbase.com/api/marketplace/simple_callback" + \
         code_url = "https://auth-emea.bullhornstaffing.com/oauth/authorize?" + \

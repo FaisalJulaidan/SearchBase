@@ -67,6 +67,7 @@ def login(auth):
                            "&password=" + authCopy.get("password")
 
         code_request = requests.post(code_url, headers=headers)
+        helpers.logError(str(code_request.text))
 
         if not code_request.ok:
             raise Exception(code_request.text)
@@ -80,6 +81,7 @@ def login(auth):
 
         # get the access token and refresh token
         access_token_request = requests.post(access_token_url, headers=headers)
+        helpers.logError(str(access_token_request.text))
 
         if not access_token_request.ok:
             raise Exception(access_token_request.text)
@@ -87,6 +89,7 @@ def login(auth):
         result_body = json.loads(access_token_request.text)
 
         authCopy["refresh_token"] = result_body.get("refresh_token")
+        helpers.logError(str(authCopy))
 
         # Logged in successfully
         return Callback(True, 'Logged in successfully', authCopy)

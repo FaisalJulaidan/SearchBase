@@ -94,6 +94,13 @@ def pingDatabaseConnection():
         helpers.logError("Ping! Database Connection ERROR: " + str(e))
 
 
+def test():
+    try:
+        print("TEST!!!")
+    except Exception as e:
+        print("ERROOORRR")
+
 # Run scheduled tasks
 scheduler.add_job(sendConversationsNotifications, 'cron', hour='*/1', id='sendConversationsNotifications', replace_existing=True)
 scheduler.add_job(pingDatabaseConnection, 'cron', hour='*/5', id='pingDatabaseConnection', replace_existing=True)
+# scheduler.add_job(test, 'cron', second='*/3', id='test', replace_existing=True)

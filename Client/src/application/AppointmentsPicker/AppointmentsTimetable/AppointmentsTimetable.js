@@ -3,7 +3,6 @@ import React from 'react';
 import styles from '../AppointmentsPicker.module.less';
 
 import { Button, Popconfirm, Typography } from 'antd';
-import { TimezoneContext } from 'contexts/timezone';
 import momentTZ from 'moment-timezone';
 
 const { Title, Paragraph } = Typography;
@@ -37,7 +36,7 @@ class AppointmentsTimetable extends React.Component {
     }
 
     componentDidUpdate(prevProps, prevState) {
-        this.currentTimeZone = this.context ? this.context : momentTZ.tz.guess();
+        this.currentTimeZone = momentTZ.tz.guess();
 
         if (prevState.width !== this.state.width)
             this.createTimeTable();
@@ -51,7 +50,6 @@ class AppointmentsTimetable extends React.Component {
         this.setState({ width: window.innerWidth, height: window.innerHeight });
     }
 
-    static contextType = TimezoneContext;
 
     createTimeTable = (props = this.props, state = this.state) => {
 
@@ -278,7 +276,7 @@ class AppointmentsTimetable extends React.Component {
                             <div className={styles.TableContent}>
                                 <Button className={styles.NavigateButtons}
                                         onClick={() => this.lastWeek(range)}
-                                        icon={'left'} size={'large'}></Button>
+                                        icon={'left'} size={'large'}/>
 
                                 <div className={styles.Columns}>
                                     {
@@ -308,7 +306,7 @@ class AppointmentsTimetable extends React.Component {
 
                                 <Button className={styles.NavigateButtons}
                                         onClick={() => this.nextWeek(range)}
-                                        icon={'right'} size={'large'}></Button>
+                                        icon={'right'} size={'large'}/>
                             </div>
                         </div>
 

@@ -1854,5 +1854,5 @@
     "TopBarText": "CPS Bot"
   },
   "isDisabled": false,
-  "currencies": [ "GBP", "USD", "EUR", "CAD"]
+  "currencies": [ "GBP", "USD", "EUR", "CAD", "AUD"]
 }

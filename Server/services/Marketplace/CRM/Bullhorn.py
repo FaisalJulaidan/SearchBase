@@ -59,6 +59,7 @@ def login(auth):
         headers = {'Content-Type': 'application/json'}
 
         helpers.logError(str(authCopy))
+        return Callback(False, str("Bullhorn temporary out of order"))
 
         # "&redirect_uri=https://www.thesearchbase.com/api/marketplace/simple_callback" + \
         #                    "&redirect_uri=https://www.thesearchbase.com/api/marketplace/simple_callback" + \
@@ -71,10 +72,7 @@ def login(auth):
                            "&password=" + authCopy.get("password")
 
         helpers.logError("SENDING REQUEST " + code_url)
-        try:
-            code_request = requests.post(code_url, timeout=10)
-        except:
-            pass
+        code_request = requests.post(code_url)
         helpers.logError("text 1: " + str(code_request.text))
 
         if "code=" not in code_request.url:

@@ -59,14 +59,13 @@ def login(auth):
         headers = {'Content-Type': 'application/json'}
 
         helpers.logError(str(authCopy))
-        return Callback(False, str("Bullhorn temporary out of order"))
 
         #                    "&redirect_uri=https://www.thesearchbase.com/api/marketplace/simple_callback" + \
         code_url = "https://auth-emea.bullhornstaffing.com/oauth/authorize?" + \
                            "&response_type=code" + \
                            "&client_id=" + CLIENT_ID + \
                            "&client_secret=" + CLIENT_SECRET + \
-                           "&redirect_uri=https://www.thesearchbase.com/api/marketplace/simple_callback" + \
+                           "&redirect_uri=http://www.bullhorn.com" + \
                            "&action=Login" + \
                            "&username=" + authCopy.get("username") + \
                            "&password=" + authCopy.get("password")
@@ -80,6 +79,7 @@ def login(auth):
 
         access_token_url = "https://auth-emea.bullhornstaffing.com/oauth/token?" + \
                            "&grant_type=authorization_code" + \
+                           "&redirect_uri=http://www.bullhorn.com" + \
                            "&client_id=" + CLIENT_ID + \
                            "&client_secret=" + CLIENT_SECRET + \
                            "&code=" + code_request.url.split("code=")[1].split("&client_id")[0]

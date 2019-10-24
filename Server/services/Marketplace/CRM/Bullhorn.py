@@ -57,6 +57,12 @@ def login(auth):
         authCopy = dict(auth)
         headers = {'Content-Type': 'application/json'}
         helpers.logError(str(authCopy))
+        test_request = requests.get("https://www.thesearchbase.com/api/marketplace/simple_callback?test=yes")
+        helpers.logError(str(test_request.text))
+        test_request = requests.post("https://www.thesearchbase.com/api/marketplace/simple_callback?test=yes")
+        helpers.logError(str(test_request.text))
+        test_request = requests.put("https://www.thesearchbase.com/api/marketplace/simple_callback?test=yes")
+        helpers.logError(str(test_request.text))
         code_url = "https://auth-emea.bullhornstaffing.com/oauth/authorize?" + \
                            "&response_type=code" + \
                            "&redirect_uri=https://www.thesearchbase.com/api/marketplace/simple_callback" + \

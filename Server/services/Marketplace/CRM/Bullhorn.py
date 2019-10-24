@@ -64,7 +64,7 @@ def login(auth):
 
         code_url = "https://auth-emea.bullhornstaffing.com/oauth/authorize?" + \
                            "&response_type=code" + \
-                           "&redirect_uri=" + helpers.getDomain(5000) + "/api/bullhorn_callback" + \
+                           "&redirect_uri=https://www.thesearchbase.com/api/marketplace/simple_callback" + \
                            "&client_id=" + CLIENT_ID + \
                            "&client_secret=" + CLIENT_SECRET + \
                            "&action=Login" + \
@@ -72,25 +72,19 @@ def login(auth):
                            "&password=" + authCopy.get("password")
 
         code_request = requests.post(code_url, headers=headers)
-        helpers.logError("code_request.ok: " + str(code_request.ok))
-        helpers.logError("code_request.ok: " + str(code_request.text))
 
         if not code_request.ok:
             raise Exception(code_request.text)
 
-        code_result_body = dict(code_request.text)
-
         access_token_url = "https://auth-emea.bullhornstaffing.com/oauth/token?" + \
                            "&grant_type=authorization_code" + \
-                           "&redirect_uri=" + helpers.getDomain(3000) + "/dashboard/marketplace/Bullhorn" + \
+                           "&redirect_uri=https://www.thesearchbase.com/api/marketplace/simple_callback" + \
                            "&client_id=" + CLIENT_ID + \
                            "&client_secret=" + CLIENT_SECRET + \
-                           "&code=" + code_result_body.get("code")
+                           "&code=" + code_request.text.split("'code', '")[1].split("'), ('client_id'")[0]
 
         # get the access token and refresh token
         access_token_request = requests.post(access_token_url, headers=headers)
-        helpers.logError("code_request.ok: " + str(access_token_request.ok))
-        helpers.logError("code_request.ok: " + str(access_token_request.text))
 
         if not access_token_request.ok:
             raise Exception(access_token_request.text)
@@ -134,17 +128,11 @@ def retrieveRestToken(auth, companyID):
         if os.environ['FLASK_ENV'] != "production":
             url = url.replace("auth-emea.", "auth9.")
 
-        helpers.logError("--------------------------------------------------------------------------------------------")
-        helpers.logError("--------------------------------------------------------------------------------------------")
-        helpers.logError("TESTING BUG " + str(companyID) + " REQUEST: " + url)
         get_access_token = requests.post(url, headers=headers)
-        helpers.logError("TESTING BUG " + str(companyID) + "CODE: " + get_access_token.status_code +
-                         " TEXT: " + get_access_token.text)
-        helpers.logError("--------------------------------------------------------------------------------------------")
-        helpers.logError("--------------------------------------------------------------------------------------------")
-        helpers.logError("get_access_token.text == INVALID_REFRESH_TOKEN_MESSAGE" + str(get_access_token.text == INVALID_REFRESH_TOKEN_MESSAGE))
+        helpers.logError("BULLHORN TESTING BUG CompID" + str(companyID) + ", CODE: " + str(get_access_token.status_code) +
+                         ", TEXT: " + get_access_token.text)
 
-        if get_access_token.text == INVALID_REFRESH_TOKEN_MESSAGE:
+        if get_access_token.status_code == 400:
             login_callback: Callback = login(authCopy)
             if not login_callback.Success:
                 raise Exception(login_callback.Message)
@@ -200,9 +188,7 @@ def sendQuery(auth, query, method, body, companyID, optionalParams=None):
 
         # test the BhRestToken (rest_token)
         r = marketplace_helpers.sendRequest(url, method, headers, json.dumps(body))
-        # print(url)
-        # print(r.status_code)
-        # print(r.text)
+
         if r.status_code == 401:  # wrong rest token
             callback: Callback = retrieveRestToken(auth, companyID)
             if not callback.Success:

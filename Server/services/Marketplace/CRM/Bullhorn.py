@@ -66,7 +66,7 @@ def login(auth):
                            "&username=" + authCopy.get("username") + \
                            "&password=" + authCopy.get("password")
 
-        helpers.logError("SENDING REQUEST")
+        helpers.logError("SENDING REQUEST " + code_url)
         code_request = requests.post(code_url, headers=headers)
         helpers.logError("text 1: " + str(code_request.text))
 

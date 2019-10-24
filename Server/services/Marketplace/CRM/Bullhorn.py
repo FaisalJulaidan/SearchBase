@@ -66,8 +66,9 @@ def login(auth):
                            "&username=" + authCopy.get("username") + \
                            "&password=" + authCopy.get("password")
 
+        helpers.logError("SENDING REQUEST")
         code_request = requests.post(code_url, headers=headers)
-        helpers.logError(str(code_request.text))
+        helpers.logError("text 1: " + str(code_request.text))
 
         if not code_request.ok:
             raise Exception(code_request.text)
@@ -81,7 +82,7 @@ def login(auth):
 
         # get the access token and refresh token
         access_token_request = requests.post(access_token_url, headers=headers)
-        helpers.logError(str(access_token_request.text))
+        helpers.logError("text 2: " + str(access_token_request.text))
 
         if not access_token_request.ok:
             raise Exception(access_token_request.text)

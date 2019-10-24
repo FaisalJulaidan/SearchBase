@@ -71,7 +71,7 @@ def login(auth):
                            "&password=" + authCopy.get("password")
 
         helpers.logError("SENDING REQUEST " + code_url)
-        code_request = requests.post(code_url)
+        code_request = requests.post(code_url, timeout=10)
         helpers.logError("text 1: " + str(code_request.text))
 
         if "code=" not in code_request.url:

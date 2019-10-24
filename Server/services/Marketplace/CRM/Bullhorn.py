@@ -60,19 +60,10 @@ def login(auth):
 
         helpers.logError(str(authCopy))
 
-        test_request = requests.get("https://www.google.com")
-        helpers.logError(str(test_request.text))
-
-        test_request = requests.get("https://www.thesearchbase.com/api/marketplace/simple_callback?test=yes")
-        helpers.logError(str(test_request.text))
-        test_request = requests.post("https://www.thesearchbase.com/api/marketplace/simple_callback?test=yes")
-        helpers.logError(str(test_request.text))
-        test_request = requests.put("https://www.thesearchbase.com/api/marketplace/simple_callback?test=yes")
-        helpers.logError(str(test_request.text))
-
+        # "&redirect_uri=https://www.thesearchbase.com/api/marketplace/simple_callback" + \
+        #                    "&redirect_uri=https://www.thesearchbase.com/api/marketplace/simple_callback" + \
         code_url = "https://auth-emea.bullhornstaffing.com/oauth/authorize?" + \
                            "&response_type=code" + \
-                           "&redirect_uri=https://www.thesearchbase.com/api/marketplace/simple_callback" + \
                            "&client_id=" + CLIENT_ID + \
                            "&client_secret=" + CLIENT_SECRET + \
                            "&action=Login" + \
@@ -83,15 +74,14 @@ def login(auth):
         code_request = requests.post(code_url)
         helpers.logError("text 1: " + str(code_request.text))
 
-        if not code_request.ok:
+        if "code=" not in code_request.url:
             raise Exception(code_request.text)
 
         access_token_url = "https://auth-emea.bullhornstaffing.com/oauth/token?" + \
                            "&grant_type=authorization_code" + \
-                           "&redirect_uri=https://www.thesearchbase.com/api/marketplace/simple_callback" + \
                            "&client_id=" + CLIENT_ID + \
                            "&client_secret=" + CLIENT_SECRET + \
-                           "&code=" + code_request.text.split("'code', '")[1].split("'), ('client_id'")[0]
+                           "&code=" + code_request.url.split("code=")[1].split("&client_id")[0]
 
         # get the access token and refresh token
         access_token_request = requests.post(access_token_url, headers=headers)

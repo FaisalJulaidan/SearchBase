@@ -7,6 +7,7 @@ import { conversationActions } from 'store/actions';
 import connect from 'react-redux/es/connect/connect';
 import { CSVLink } from 'react-csv';
 import queryString from 'query-string';
+import { convertTimezone } from 'helpers';
 
 const confirm = Modal.confirm;
 
@@ -66,7 +67,7 @@ class Conversations extends React.Component {
                 title: 'Date & Time',
                 key: 'DateTime',
                 sorter: (a, b) => new Date(a.DateTime).valueOf() - new Date(b.DateTime).valueOf(),
-                render: (text, record) => (<p>{record.DateTime}</p>)
+                render: (text, record) => (<p>{convertTimezone(record.DateTime, 'ddd, DD MMM YYYY HH:mm:ss')}</p>)
 
             }, {
                 title: 'Score',

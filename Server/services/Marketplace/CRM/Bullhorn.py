@@ -34,6 +34,11 @@ Auth =
 CLIENT_ID = os.environ['BULLHORN_CLIENT_ID']
 CLIENT_SECRET = os.environ['BULLHORN_CLIENT_SECRET']
 
+INVALID_REFRESH_TOKEN_MESSAGE = "{\
+  \"error\" : \"invalid_grant\",\
+  \"error_description\" : \"Invalid, expired, or revoked refresh token.\"\
+}"
+
 
 def testConnection(auth, companyID):
     try:
@@ -55,15 +60,28 @@ def testConnection(auth, companyID):
 def login(auth):
     try:
         authCopy = dict(auth)
-
         headers = {'Content-Type': 'application/json'}
+
+        code_url = "https://auth-emea.bullhornstaffing.com/oauth/authorize?" + \
+                           "&response_type=code" + \
+                           "&redirect_uri=https://www.thesearchbase.com/api/marketplace/simple_callback" + \
+                           "&client_id=" + CLIENT_ID + \
+                           "&client_secret=" + CLIENT_SECRET + \
+                           "&action=Login" + \
+                           "&username=" + authCopy.get("username") + \
+                           "&password=" + authCopy.get("password")
+
+        code_request = requests.post(code_url, headers=headers)
+
+        if not code_request.ok:
+            raise Exception(code_request.text)
 
         access_token_url = "https://auth-emea.bullhornstaffing.com/oauth/token?" + \
                            "&grant_type=authorization_code" + \
-                           "&redirect_uri=" + helpers.getDomain(3000) + "/dashboard/marketplace/Bullhorn" + \
+                           "&redirect_uri=https://www.thesearchbase.com/api/marketplace/simple_callback" + \
                            "&client_id=" + CLIENT_ID + \
                            "&client_secret=" + CLIENT_SECRET + \
-                           "&code=" + authCopy.get("code")
+                           "&code=" + code_request.text.split("'code', '")[1].split("'), ('client_id'")[0]
 
         # get the access token and refresh token
         access_token_request = requests.post(access_token_url, headers=headers)
@@ -73,8 +91,10 @@ def login(auth):
 
         result_body = json.loads(access_token_request.text)
 
+        authCopy["refresh_token"] = result_body.get("refresh_token")
+
         # Logged in successfully
-        return Callback(True, 'Logged in successfully', {"refresh_token": result_body.get("refresh_token")})
+        return Callback(True, 'Logged in successfully', authCopy)
 
     except Exception as exc:
         helpers.logError("Marketplace.CRM.Bullhorn.login() ERROR: " + str(exc))
@@ -102,21 +122,23 @@ def retrieveRestToken(auth, companyID):
         headers = {'Content-Type': 'application/json'}
 
         # use refresh_token to generate access_token and refresh_token
-        url = "https://auth-emea.bullhornstaffing.com/oauth/token?grant_type=refresh_token&refresh_token=" + \
-              authCopy.get("refresh_token") + \
-              "&client_id=" + CLIENT_ID + \
-              "&client_secret=" + CLIENT_SECRET
+        url = "https://auth-emea.bullhornstaffing.com/oauth/token?grant_type=refresh_token&client_id=" + CLIENT_ID + \
+              "&client_secret=" + CLIENT_SECRET + "&refresh_token=" + authCopy.get("refresh_token")
 
         if os.environ['FLASK_ENV'] != "production":
             url = url.replace("auth-emea.", "auth9.")
 
-        helpers.logError("--------------------------------------------------------------------------------------------")
-        helpers.logError("--------------------------------------------------------------------------------------------")
-        helpers.logError("TESTING BUG " + str(companyID) + " REQUEST: " + url)
         get_access_token = requests.post(url, headers=headers)
-        helpers.logError("TESTING BUG " + str(companyID) + " TEXT: " + get_access_token.text)
-        helpers.logError("--------------------------------------------------------------------------------------------")
-        helpers.logError("--------------------------------------------------------------------------------------------")
+        helpers.logError("BULLHORN TESTING BUG CompID" + str(companyID) + ", CODE: " + str(get_access_token.status_code) +
+                         ", TEXT: " + get_access_token.text)
+
+        if get_access_token.status_code == 400:
+            login_callback: Callback = login(authCopy)
+            if not login_callback.Success:
+                raise Exception(login_callback.Message)
+
+            url = url.split("&refresh_token=")[0] + "&refresh_token=" + login_callback.Data["refresh_token"]
+            get_access_token = requests.post(url, headers=headers)
 
         if get_access_token.ok:
             result_body = json.loads(get_access_token.text)
@@ -166,9 +188,7 @@ def sendQuery(auth, query, method, body, companyID, optionalParams=None):
 
         # test the BhRestToken (rest_token)
         r = marketplace_helpers.sendRequest(url, method, headers, json.dumps(body))
-        # print(url)
-        # print(r.status_code)
-        # print(r.text)
+
         if r.status_code == 401:  # wrong rest token
             callback: Callback = retrieveRestToken(auth, companyID)
             if not callback.Success:

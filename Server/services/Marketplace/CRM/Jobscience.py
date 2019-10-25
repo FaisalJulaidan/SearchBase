@@ -32,6 +32,7 @@ else:
 
     logging.info("Using production Jobscience app instance")
 
+
 # Load Synonyms:
 # SYNONYMS: dict = marketplace_helpers.loadSynonyms(construction=True)
 
@@ -221,8 +222,7 @@ def convertDate(date: str):
 
 def insertCandidate(access_token, conversation: Conversation) -> Callback:
     try:
-        # print("INSERTING CANDIDATE")
-        # NOTE: Should require on front-end that a full name is provided --> reduce data inconsistency
+
         name = (conversation.get("name") or " ").split(" ")
         body = {
             "FirstName": helpers.getListValue(name, 0, "") or "FIRST_DEFAULT",
@@ -260,8 +260,6 @@ def insertCandidate(access_token, conversation: Conversation) -> Callback:
         return_body = json.loads(sendQuery_callback.Data.text)
 
         # Insert candidate skills
-        # print("THE CANDIDATE SKILLS:")
-        # print(conversation.get("skills"))
         if conversation.get("skills") is not None:
             insertCandidateSkills_callback: Callback = insertCandidateSkills(
                 access_token, conversation, return_body.get("id"))
@@ -329,10 +327,6 @@ def updateCandidate(auth, conversation: Conversation, companyID) -> Callback:
     except Exception as exc:
         helpers.logError("Marketplace.CRM.Jobscience.updateCandidate() ERROR: " + str(exc))
         return Callback(False, str(exc))
-
-
-# def uploadFile(auth, storedFile: StoredFile):  # ISSUE: NO CURRENT API OPTION FOR RESUME UPLOAD
-#     print("UPLOAD FILE NOT SUPORTED")
 
 
 def insertClient(auth, conversation: Conversation) -> Callback:
@@ -408,11 +402,6 @@ def insertCompany(auth, conversation: Conversation) -> Callback:
         return Callback(False, str(exc))
 
 
-# TODO: Improve search candidates by being stricter with skills search
-# We need to have a priority in place:
-# [1] Candidates with skills that MATCH query
-# [2] Candidate with skills that DONT Match query
-# [3] Candidates with NO skills
 def fetchSkillsForCandidateSearch(list_of_contactIDs: list, list_of_skills, access_token):
     # Need set of contact ID's returned from searchCandidates()
     query_segment = ",".join(list_of_contactIDs)
@@ -438,9 +427,8 @@ def fetchSkillsForCandidateSearch(list_of_contactIDs: list, list_of_skills, acce
 
     print("Complete Query:")
     print("SELECT+ts2__Skill_Name__c,ts2__Last_Used__c,ts2__Contact__c" +
-                                             "+FROM+ts2__Skill__c+WHERE+" +
-                                             "ts2__Contact__c+IN+(" + query_segment + ")" + like_string + "+LIMIT+1000")
-
+          "+FROM+ts2__Skill__c+WHERE+" +
+          "ts2__Contact__c+IN+(" + query_segment + ")" + like_string + "+LIMIT+1000")
 
     # Note: This assumes at least one skill is given
     sendQuery_callback: Callback = sendQuery(access_token, "get", {},
@@ -458,10 +446,6 @@ def fetchSkillsForCandidateSearch(list_of_contactIDs: list, list_of_skills, acce
 
 # Need to make it so that if only skill is provided, a search can still be done.
 def searchCandidates(access_token, conversation) -> Callback:
-    print("Conversation")
-    print("The conversation is {}".format(conversation))
-    # Should add employment type (permanent or temporary)
-    print("Job Type is: ", conversation.get('jobType'))
     list_of_contactIDs = []
 
     try:
@@ -470,12 +454,6 @@ def searchCandidates(access_token, conversation) -> Callback:
 
         # Fetch contacts who are candidates and are active"
         query = "WHERE+RecordType.Name+IN+('Candidate')+AND+ts2__People_Status__c+IN+('Active', 'Live')+AND+"
-
-        # Filter by job type:
-        # print("THE TYPE: ")
-        # print(conversation.get('JobType'))
-        # print(conversation)
-        # exit(0)
 
         # Filter on location:
         if conversation.get('location') is not None:
@@ -513,24 +491,12 @@ def searchCandidates(access_token, conversation) -> Callback:
 
         if not sendQuery_callback.Success:
             raise Exception(sendQuery_callback.Message)
-        # print("QUERY HAS BEEN SENT")
+
         candidate_fetch = json.loads(sendQuery_callback.Data.text)
         records = candidate_fetch['records']
+
         # Iterate through candidates
         result = []
-        # TODO: Fetch job title
-        # print("NUMBER OF RECORDS RETRIEVED: ", len(candidate_fetch['records']))
-
-        # <-- CALL SKILLS SEARCH -->
-        # for record in candidate_fetch['records']:
-        #     list_of_contactIDs.append("'" + record.get("Id") + "'")
-        #
-        # # Fetch associated candidate skills
-        # skills = conversation.get("skills")
-        # candidate_skills = []
-        # if len(candidate_fetch['records']) > 0:
-        #     candidate_skills = fetchSkillsForCandidateSearch(list_of_contactIDs, skills.split(","), access_token)
-        # <-- CALL SKILLS SEARCH -->
 
         #  Iterative generalisation:
         while len(records) < 50:
@@ -613,25 +579,27 @@ def searchCandidates(access_token, conversation) -> Callback:
                         skills_string += ""
 
             if has_skills:
-
                 result.append(databases_services.createPandaCandidate(id=record.get("X18_Digit_ID__c", str(record_num)),
-                                                                    name=record.get("Name"),
-                                                                    email=record.get("Email"),
-                                                                    mobile=record.get("Phone"),
-                                                                    location=record.get("MailingCity"),
-                                                                    skills=skills_string,
-                                                                    linkdinURL=None,
-                                                                    availability=record.get("ts2__Date_Available__c") or
-                                                                                 "Not Specified",
-                                                                    jobTitle=record.get("Title"),
-                                                                    education=record.get('ts2__EduDegreeName1__c'),
-                                                                    yearsExperience=record.get(
-                                                                        'ts2__Years_of_Experience__c'),
-                                                                    desiredSalary=record.get('ts2__Desired_Salary__c') or
-                                                                                record.get('ts2__Desired_Hourly__c') or
-                                                                                record.get('Min_Basic__c', 0),
-                                                                    currency=Currency("GBP"),
-                                                                    source="Jobscience"))
+                                                                      name=record.get("Name"),
+                                                                      email=record.get("Email"),
+                                                                      mobile=record.get("Phone"),
+                                                                      location=record.get("MailingCity"),
+                                                                      skills=skills_string,
+                                                                      linkdinURL=None,
+                                                                      availability=record.get(
+                                                                          "ts2__Date_Available__c") or
+                                                                                   "Not Specified",
+                                                                      jobTitle=record.get("Title"),
+                                                                      education=record.get('ts2__EduDegreeName1__c'),
+                                                                      yearsExperience=record.get(
+                                                                          'ts2__Years_of_Experience__c'),
+                                                                      desiredSalary=record.get(
+                                                                          'ts2__Desired_Salary__c') or
+                                                                                    record.get(
+                                                                                        'ts2__Desired_Hourly__c') or
+                                                                                    record.get('Min_Basic__c', 0),
+                                                                      currency=Currency("GBP"),
+                                                                      source="Jobscience"))
         # print("RETURNING RECORDS ...")
         return Callback(True, sendQuery_callback.Message, result)
     except Exception as exc:
@@ -735,13 +703,6 @@ def searchJobs(access_token, conversation) -> Callback:
         # Iterate through jobs
         result = []
         for record in records:
-            # print("NEW JOB RECORD")
-            # print(record.get('Name'))
-            # print(record.get('ts2__Max_Pay_Rate__c'))
-            # print(record.get('ts2__Min_Pay_Rate__c'))
-            # print(record.get('ts2__Employment_Type__c'))
-            # print(record.get('RecordType').get('Name'))
-            # print("----------------")
             # Add jobs to database
             result.append(databases_services.createPandaJob(id=record.get('id'),
                                                             title=record.get('Name'),
@@ -846,7 +807,6 @@ def sendQuery(auth, method, body, query):
         print(headers)
 
         response = marketplace_helpers.sendRequest(url, method, headers, json.dumps(body))
-
 
         if response.status_code == 401:  # wrong rest token
 

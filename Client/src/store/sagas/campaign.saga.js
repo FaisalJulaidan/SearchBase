@@ -85,7 +85,7 @@ function* deleteCampaign({campaignID, meta}) {
 }
 
 //Fetch Candidates data
-function* fetchCampaignCandidatesData({assistant_id, use_crm, crm_id, database_id, messenger_id, location, jobTitle, skills, text, outreach_type, email_title}) {
+function* fetchCampaignCandidatesData({assistant_id, use_crm, crm_id, database_id, messenger_id, location, jobTitle, jobType, skills, text, outreach_type, email_title}) {
     try {
         const res = yield http.post('/campaign/action',
             {
@@ -96,6 +96,7 @@ function* fetchCampaignCandidatesData({assistant_id, use_crm, crm_id, database_i
                 messenger_id,
                 location,
                 jobTitle,
+                jobType,
                 skills,
                 text,
                 outreach_type,

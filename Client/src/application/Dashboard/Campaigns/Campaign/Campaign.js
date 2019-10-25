@@ -205,6 +205,7 @@ class Campaign extends React.Component {
                     values.messenger_id,
                     values.location,
                     values.jobTitle,
+                    values.jobType,
                     this.state.skills,
                     this.state.textMessage,
                     values.outreach_type,

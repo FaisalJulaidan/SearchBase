@@ -1,4 +1,5 @@
 import json
+import logging
 import os
 from datetime import datetime
 
@@ -15,25 +16,24 @@ from utilities.enums import CRM
 
 # USE Jobscience SANDBOX or PROD environment:
 
-# if os.environ['FLASK_ENV'] == 'development':
-#     print("Jobscience running in development")
-#     CLIENT_ID = os.environ['JOBSCIENCE_SANDBOX_CLIENT_ID']
-#     CLIENT_SECRET = os.environ['JOBSCIENCE_SANDBOX_CLIENT_SECRET']
-#     BASE_URL = "https://prsjobs--jsfull.cs83.my.salesforce.com/services/data/v46.0/"
-#     BASE_URL_LOGIN = "https://test.salesforce.com/services/oauth2/"
+if os.environ['FLASK_ENV'] == 'development':
+    CLIENT_ID = os.environ['JOBSCIENCE_SANDBOX_CLIENT_ID']
+    CLIENT_SECRET = os.environ['JOBSCIENCE_SANDBOX_CLIENT_SECRET']
+    BASE_URL = "https://prsjobs--jsfull.cs83.my.salesforce.com/services/data/v46.0/"
+    BASE_URL_LOGIN = "https://test.salesforce.com/services/oauth2/"
 
-# else:
-# print("Jobscience running in production")
-CLIENT_ID = os.environ['JOBSCIENCE_CLIENT_ID']
-CLIENT_SECRET = os.environ['JOBSCIENCE_CLIENT_SECRET']
-BASE_URL = "https://prsjobs.cs83.my.salesforce.com/services/data/v46.0/"
-BASE_URL_LOGIN = "https://login.salesforce.com/services/oauth2/"
+    logging.info("Using sandbox Jobscience app instance")
+
+else:
+    CLIENT_ID = os.environ['JOBSCIENCE_CLIENT_ID']
+    CLIENT_SECRET = os.environ['JOBSCIENCE_CLIENT_SECRET']
+    BASE_URL = "https://prsjobs.cs83.my.salesforce.com/services/data/v46.0/"
+    BASE_URL_LOGIN = "https://login.salesforce.com/services/oauth2/"
+
+    logging.info("Using production Jobscience app instance")
 
 # Load Synonyms:
 # SYNONYMS: dict = marketplace_helpers.loadSynonyms(construction=True)
-
-# TODO CHECKLIST:
-# [1] Add a update candidate function
 
 
 def testConnection(auth, companyID):
@@ -458,7 +458,10 @@ def fetchSkillsForCandidateSearch(list_of_contactIDs: list, list_of_skills, acce
 
 # Need to make it so that if only skill is provided, a search can still be done.
 def searchCandidates(access_token, conversation) -> Callback:
+    print("Conversation")
+    print("The conversation is {}".format(conversation))
     # Should add employment type (permanent or temporary)
+    print("Job Type is: ", conversation.get('jobType'))
     list_of_contactIDs = []
 
     try:
@@ -493,18 +496,13 @@ def searchCandidates(access_token, conversation) -> Callback:
                                     SOQL_type="=")
 
         # Filter on Job Type:
-
-        # Employment_Type__c
-        print("The conversation")
-        print(conversation)
-        # if conversation.get('desiredSalary') is not None:
-        #     query += populateFilter(conversation.get("desiredSalary", 0), "ts2__Desired_Salary__c", quote_wrap=True,
-        #                             SOQL_type="=")
+        # Need to map permanent -> Perm and temporary -> Temp
+        if conversation.get('jobType'):
+            job_type = "Perm" if conversation.get("jobType") == "permanent" else "Temp"
+            query += populateFilter(job_type, "Employment_Type__c", quote_wrap=True,
+                                    SOQL_type="=")
 
         query = query[:-5]
-
-        # print("Query is:")
-        # print(query)
 
         # TODO: Differentiate between hourly and salary
         sendQuery_callback: Callback = sendQuery(access_token, "get", {},

@@ -5,7 +5,7 @@ import * as flowAttributes from '../../../constants/FlowAttributes';
 // Styles
 import './styles/Inputs.css';
 // Components
-import { DatePicker as AntdDatePicker } from 'antd';
+import { DatePicker as AntdDatePicker, Tooltip } from 'antd';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTelegramPlane } from '@fortawesome/free-brands-svg-icons';
 import { getContainerElement } from '../../helpers';
@@ -15,11 +15,19 @@ const DatePicker = ({message, submitMessage}) => {
 
     let [settings, setSettings] = useState(false);
     let [selectedDate, setSelectedDate] = useState(null);
+    let [valid, setValid] = useState(true);
+    let [error, setError] = useState(null);
 
     const inputOnChangeHandler = () => {
         let text;
-        if (selectedDate)
-            text = selectedDate;
+        console.log(selectedDate)
+        if (selectedDate){ 
+          text = selectedDate;
+        } else {
+          setValid(false)
+          setError("You must select a date")
+          return
+        }
 
         let afterMessage = message.block[flowAttributes.CONTENT][flowAttributes.CONTENT_AFTER_MESSAGE];
         let type = messageTypes.TEXT;
@@ -38,24 +46,31 @@ const DatePicker = ({message, submitMessage}) => {
 
     };
 
+
     return (
         <React.Fragment>
-            <div className={'DatePickerContainer'}>
-                <AntdDatePicker getCalendarContainer={() => getContainerElement()}
-                                className={'Datepicker'} suffixIcon={<div/>}
-                                dropdownClassName={'DatepickerCalendar'}
-                                onChange={(e) => {
-                                if (e)
-                                    if (e._isAMomentObject)
-                                        setSelectedDate(e.format('L'));
-                                    else
-                                        setSelectedDate(e.target.value);
-                            }}
-                />
-            </div>
+            <Tooltip
+              placement="top"
+              title={error}
+              getPopupContainer={() => getContainerElement()}
+              visible={!valid}>
+              <div className={'DatePickerContainer'}>
+                  <AntdDatePicker getCalendarContainer={() => getContainerElement()}
+                                  className={'Datepicker'} suffixIcon={<div/>}
+                                  dropdownClassName={'DatepickerCalendar'}
+                                  onChange={(e) => {
+                                  if (e)
+                                      if (e._isAMomentObject)
+                                          setSelectedDate(e.format('L'));
+                                      else
+                                          setSelectedDate(e.target.value);
+                              }}
+                  />
+              </div>
+            </Tooltip>
             <div className={'Submit'}>
                 <i className={'SendIconActive'} onClick={inputOnChangeHandler}>
-                    <FontAwesomeIcon size="2x" icon={faTelegramPlane}/>
+                    <FontAwesomeIcon size="2x" icon={faTelegramPlane} color={valid ? '' : 'red'}/>
                 </i>
             </div>
         </React.Fragment>

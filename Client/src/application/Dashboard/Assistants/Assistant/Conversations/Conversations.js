@@ -71,10 +71,11 @@ class Conversations extends React.Component {
             }, {
                 title: 'Score',
                 key: 'Score',
+                align: 'center',
                 sorter: (a, b) => a.Score - b.Score,
                 render: (text, record) => {
                     return (
-                        <div style={{ width: 120}}>
+                        <div style={{ width: 120, margin:'auto'}}>
                             <Progress percent={Math.round(record.Score * 100)} size="small"
                                       status={record.Score < 0.1 ? 'exception' : 'active'}/>
                         </div>
@@ -84,6 +85,7 @@ class Conversations extends React.Component {
             }, {
                 title: 'Status',
                 key: 'ApplicationStatus',
+                align: 'center',
                 filters: [
                     { text: 'Accepted', value: 'Accepted' },
                     { text: 'Pending', value: 'Pending' },
@@ -128,6 +130,7 @@ class Conversations extends React.Component {
             {
                 title: 'Conversation',
                 key: 'Completed',
+                align: 'center',
                 filters: [
                     { text: 'Completed', value: 'Completed' },
                     { text: 'Incomplete', value: 'Incomplete' }
@@ -146,6 +149,7 @@ class Conversations extends React.Component {
             }, {
                 title: 'Actions',
                 key: 'actions',
+                align: 'center',
                 render: (text, record, index) => (
                     <div align="center">
 
@@ -402,7 +406,7 @@ class Conversations extends React.Component {
                        bordered={true}
                        pagination={{ position: 'both', pageSize: 20 }}
                        size='default'
-                       scroll={{ x: 500 }}
+                       scroll={{ x: 'max-content' }}
                 />
 
                 {

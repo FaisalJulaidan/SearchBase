@@ -137,7 +137,7 @@ class Campaign extends React.Component {
         this.setState({skills: skills});
     };
 
-    handleModalOk = () => {
+    handleModalLaunch = () => {
         this.props.form.validateFields((err, values) => {
             if (!err) {
                 this.props.dispatch(campaignActions.launchCampaign(
@@ -148,6 +148,7 @@ class Campaign extends React.Component {
                     values.messenger_id,
                     values.location,
                     values.jobTitle,
+                    values.jobType,
                     this.state.skills,
                     values.text,
                     this.state.candidate_list,
@@ -192,7 +193,7 @@ class Campaign extends React.Component {
         });
     };
 
-    handleSubmit = (event) => {
+    handleLaunch = (event) => { //Handle Launch
         event.preventDefault();
         this.props.form.validateFields((err, values) => {
             if (!err) {
@@ -204,6 +205,7 @@ class Campaign extends React.Component {
                     values.messenger_id,
                     values.location,
                     values.jobTitle,
+                    values.jobType,
                     this.state.skills,
                     this.state.textMessage,
                     values.outreach_type,
@@ -296,7 +298,7 @@ class Campaign extends React.Component {
                         centered
                         visible={this.state.candidatesModalVisibility}
                         okText={"Launch"}
-                        onOk={this.handleModalOk}
+                        onOk={this.handleModalLaunch}
                         confirmLoading={this.props.isLaunchingCampaign}
                         okButtonProps={{icon: "rocket"}}
                         footer={<div>
@@ -305,7 +307,7 @@ class Campaign extends React.Component {
                                     disabled={this.props?.candidate_list?.length === 0}>
                                 {this.props?.candidate_list?.length === this.state.candidate_list.length ? 'Deselect all' : 'Select All'}
                             </Button>
-                            <Button onClick={this.handleModalOk}
+                            <Button onClick={this.handleModalLaunch}
                                     type="primary"
                                     loading={this.props.isLaunchingCampaign}
                                     icon="rocket">Launch</Button>
@@ -349,7 +351,7 @@ class Campaign extends React.Component {
                     </Modal>
 
                     <div className={styles.formContainer}>
-                        <Form layout='vertical' onSubmit={this.handleSubmit}>
+                        <Form layout='vertical' onSubmit={this.handleLaunch}>
                             <FormItem style={{display: this.state.isSaved ? 'block' : 'none'}} label={"Campaign Name"}>
                                 {getFieldDecorator("name")(
                                     <Input placeholder={"Please enter a name for your campaign"}/>
@@ -467,9 +469,7 @@ class Campaign extends React.Component {
 
                             <FormItem label={"Job Type"}>
                                 {getFieldDecorator("jobType", {initialValue: "permanent"})(
-                                    <Radio.Group defaultValue="permanent" onChange={(e) => {
-                                        this.setState({jobType: e.target.value})
-                                    }}>
+                                    <Radio.Group defaultValue="permanent">
                                         <Radio.Button value="permanent">Permanent</Radio.Button>
                                         <Radio.Button value="temporary">Temporary</Radio.Button>
                                         <Radio.Button value="contract">Contract</Radio.Button>
@@ -608,7 +608,7 @@ class Campaign extends React.Component {
 
 
                             <Button loading={this.props.isCandidatesLoading} icon="rocket" type="primary"
-                                    onClick={this.handleSubmit}
+                                    onClick={this.handleLaunch}
                                     size={"large"}>
                                 Launch
                             </Button>

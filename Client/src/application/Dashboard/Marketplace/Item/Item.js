@@ -7,9 +7,9 @@ import {marketplaceActions} from "store/actions";
 import styles from './Item.module.less'
 import {DefaultButton} from './Components/Common'
 import {AdaptFeatures, AdaptFormItems, AdaptHeader} from "./Components/Adapt";
-import {BullhornFeatures, BullhornHeader} from "./Components/Bullhorn";
+import {BullhornFeatures, BullhornFormItems, BullhornHeader} from "./Components/Bullhorn";
 import {JobscienceFeatures, JobscienceHeader} from "./Components/Jobscience";
-import {VincereFeatures, VincereHeader} from "./Components/Vincere";
+import {VincereFeatures, VincereFormItems, VincereHeader} from "./Components/Vincere";
 import {GreenhouseFeatures, GreenhouseFormItem, GreenhouseHeader} from "./Components/Greenhouse";
 import {GoogleFeatures, GoogleHeader} from './Components/Google'
 import {OutlookFeatures, OutlookHeader} from "./Components/Outlook";
@@ -136,13 +136,14 @@ class Item extends React.Component {
                     return <BullhornHeader/>;
                 if (place === 'features')
                     return <BullhornFeatures/>;
+                if (place === 'form')
+                    return <BullhornFormItems {...formOptions}/>;
                 if (place === 'button') {
-                    windowObject.url = "https://auth.bullhornstaffing.com/oauth/authorize?response_type=code" +
-                        "&client_id=7719607b-7fe7-4715-b723-809cc57e2714&redirect_uri=" +
-                        this.getWWWLink("/dashboard/marketplace/Bullhorn");
+                    // windowObject.url = "https://auth.bullhornstaffing.com/oauth/authorize?response_type=code" +
+                    //     "&client_id=7719607b-7fe7-4715-b723-809cc57e2714&redirect_uri=" +
+                    //     this.getWWWLink("/dashboard/marketplace/Bullhorn");
                     // return <a href={windowObject.url}>Click me</a>
                     return <DefaultButton buttonText={'Connect to Bullhorn'}
-                                          windowObject={windowObject}
                                           {...buttonsOptions}/>;
                 }
                 if (place === 'runExport') {
@@ -174,8 +175,8 @@ class Item extends React.Component {
                 if (place === 'features')
                     return <JobscienceFeatures/>;
                 if (place === 'button') {
-                    windowObject.url = "https://prsjobs--jsfull.cs83.my.salesforce.com/services/oauth2/authorize?" +
-                        "response_type=code&client_id=3MVG9w8uXui2aB_pIyoEOL_U6UgvUQqi5KNnTkD95XSD2NQjWfWakra7aHmltLO8e.xdwY.1WgkJAp7KUWsCN&" +
+                    windowObject.url = "https://login.salesforce.com/services/oauth2/authorize?" +
+                        "response_type=code&client_id=3MVG9I5UQ_0k_hTlh64o5U2MnkGkPmYj_xkMpFkEi0tIJXl_CGhXpux_w5khN6pvnNd.IH6Yvo82ZAcRystWE&" +
                         "redirect_uri=" + getLink("/dashboard/marketplace/Jobscience");
                     return <DefaultButton buttonText={'Connect to Jobscience Recruitment'}
                                           windowObject={windowObject}
@@ -188,10 +189,11 @@ class Item extends React.Component {
                     return <VincereHeader/>;
                 if (place === 'features')
                     return <VincereFeatures/>;
+                if (place === 'form')
+                    return <VincereFormItems {...formOptions}/>;
                 if (place === 'button') {
-                    windowObject.url = "https://id.vincere.io/oauth2/authorize?client_id=9829f4ad-3ff3-4d00-8ecf-e5d7fa2983d1&response_type=code&redirect_uri=" + ""+getLink("/dashboard/marketplace/Vincere");
                     return <DefaultButton buttonText={'Connect to Vincere'}
-                                          windowObject={windowObject}
+                                          // windowObject={windowObject}
                                           {...buttonsOptions}/>;
                 }
                 break;

@@ -30,6 +30,7 @@ class Assistant extends Component {
         selectAutoPilotModalVisible: false,
         isFlowSaved: true,
         defaultTab: 'Conversations'
+        // defaultTab: 'Script'
     };
 
     firstHead = null;
@@ -89,7 +90,7 @@ class Assistant extends Component {
             this.removeChatbot();
             this.onScriptTabChanges();
         }
-        if (key === 'Conversations'){
+        if (key === 'Conversations') {
             // Ensure moving to conversation tab refresh conversations list
             this.props.dispatch(conversationActions.fetchConversations(this.props.assistant.ID));
         }
@@ -117,8 +118,11 @@ class Assistant extends Component {
                     elements.push(element);
 
             // remove all new css
-            for (let i = 0; i < elements.length; i++)
-                elements[i].remove();
+            for (let i = 0; i < elements.length; i++) {
+                if (!elements[i].getAttributeNames()[1]?.includes('data-react-beautiful-dnd'))
+                    elements[i].remove();
+            }
+
         }
     };
 

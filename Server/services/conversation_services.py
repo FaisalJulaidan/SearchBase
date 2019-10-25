@@ -1,19 +1,17 @@
 from datetime import datetime, timedelta
 from typing import List
 
-# import joi from sqlalchemy_utils
-
 from jsonschema import validate
-from sqlalchemy.sql import and_
 from sqlalchemy.sql import desc
 from sqlalchemy.orm import joinedload
+from sqlalchemy import and_
 
-from utilities.enums import UserType, Status, Webhooks, FileAssetType
+from utilities.enums import UserType, Status, Webhooks
 from models import db, Callback, Conversation, Assistant, StoredFile, StoredFileInfo
-from services import assistant_services, stored_file_services, auto_pilot_services, mail_services, webhook_services
+from services import assistant_services, stored_file_services, auto_pilot_services, mail_services, webhook_services, \
+    databases_services
 from services.Marketplace.CRM import crm_services
 from utilities import json_schemas, helpers, enums
-import json
 
 
 # Process chatbot conversation data
@@ -68,7 +66,7 @@ def processConversation(assistantHashID, data: dict) -> Callback:
         }
 
         webhook_services.fireRequests(webhookData, callback.Data.CompanyID, Webhooks.Conversations)
-        print("crmInformation: ", data.get("crmInformation"))
+
         if not data.get("crmInformation"):
             # AutoPilot Operations
             if assistant.AutoPilot and conversation.Completed:
@@ -90,27 +88,25 @@ def processConversation(assistantHashID, data: dict) -> Callback:
                     conversation.CRMSynced = True
                 conversation.CRMResponse = crm_callback.Message
         else:
-            print("STARTING")
             crmInformation = data["crmInformation"]
-            print(crmInformation.get("source"))
             if crmInformation.get("source") == "crm":
                 crm_callback: Callback = crm_services.updateCandidate(crmInformation, conversation, assistant.CompanyID)
                 if crm_callback.Success:
                     conversation.CRMSynced = True
                 conversation.CRMResponse = crm_callback.Message
+            elif crmInformation.get("source") == "database":
+                database_callback: Callback = databases_services.updateCandidate(crmInformation.get("id"), conversation)
 
         # Notify company about the new chatbot session only if set as immediate -> NotifyEvery=0
         # Note: if there is a file upload the /file route in chatbot.py will handle the notification instead
         if assistant.NotifyEvery == 0:
-            if not data['hasFiles']:
-                callback_mail: Callback = mail_services.notifyNewConversation(assistant, conversation)
-                if callback_mail.Success:
-                    assistant.LastNotificationDate = datetime.now()
+            callback_mail: Callback = mail_services.notifyNewConversations(assistant, [conversation], None)
+            if callback_mail.Success:
+                assistant.LastNotificationDate = datetime.now()
 
         # Save conversation data
         db.session.add(conversation)
         db.session.commit()
-
 
         return Callback(True, 'Chatbot data has been processed successfully!', (conversation, data,))
 
@@ -119,13 +115,15 @@ def processConversation(assistantHashID, data: dict) -> Callback:
         db.session.rollback()
         return Callback(False, "An error occurred while processing chatbot data.")
 
+
 def getFileByConversationID(assistantID, conversationID, filePath):
     try:
         file: StoredFileInfo = db.session.query(StoredFileInfo)\
-            .filter(Assistant.ID == assistantID)\
-            .filter(Conversation.ID == conversationID)\
-            .filter(StoredFileInfo.FilePath == filePath)\
+            .filter(and_(Assistant.ID == assistantID,
+                         Conversation.ID == conversationID,
+                         StoredFileInfo.FilePath == filePath))\
             .first()
+
         if not file:
             return Callback(False, "Could not gather file.")
 
@@ -146,7 +144,7 @@ def uploadFiles(files, conversation, data, keys):
         uploadedFiles = []
         uploadedFilesCallbacks = []
         for item in data['collectedData']:
-            if item['input'] == "&FILE_UPLOAD&": # enum for this?
+            if item['input'] == "&FILE_UPLOAD&":  # enum for this?
                 for file in files:
                     if file.filename in uploadedFiles:
                         continue

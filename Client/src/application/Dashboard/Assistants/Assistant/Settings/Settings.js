@@ -1,12 +1,14 @@
-import React, { Component } from 'react';
-import { connect } from 'react-redux';
-import { store } from 'store/store';
+import React, {Component} from 'react';
+import {connect} from 'react-redux';
+import {store} from 'store/store';
 
-import { Button, Select, Form, Input, InputNumber, Divider, Switch, Modal, Radio } from 'antd';
-import { assistantActions, marketplaceActions } from 'store/actions';
-import { history } from 'helpers';
+import {Button, Select, Form, Input, InputNumber, Divider, Switch, Modal, Radio} from 'antd';
+import {assistantActions, marketplaceActions} from 'store/actions';
+import {history} from 'helpers';
 
 import countries from 'helpers/static_data/countries';
+import LogoUploader from 'components/LogoUploader/LogoUploader';
+
 
 const FormItem = Form.Item;
 const Option = Select.Option;
@@ -20,13 +22,13 @@ class Settings extends Component {
         isPopupDisabled: this.props.assistant.SecondsUntilPopup <= 0,
         isAlertsEnabled: this.props.assistant.MailEnabled,
         // alertOptions: {0: "Immediately", 4: "4 hours", 8: "8 hours", 12: "12 hours", 24: "24 hours"}
-        alertOptions: { 0: 'Immediately' },
+        alertOptions: {0: 'Immediately'},
         isManualNotify: false,
         notifyEvery: 'null'
     };
 
     componentDidMount() {
-        const { assistant } = this.props;
+        const {assistant} = this.props;
         this.setState({
             inputValue: this.props.assistant.SecondsUntilPopup,
             notifyEvery: assistant.NotifyEvery === null ? 'null' : assistant.NotifyEvery,
@@ -44,7 +46,7 @@ class Settings extends Component {
     };
 
     togglePopupSwitch = () => {
-        this.setState({ isPopupDisabled: !this.state.isPopupDisabled });
+        this.setState({isPopupDisabled: !this.state.isPopupDisabled});
     };
 
 
@@ -76,14 +78,23 @@ class Settings extends Component {
         });
     };
 
+    uploadLogo = async (file) => {
+        console.log('UPLOADDDD');
+        console.log(file);
+        this.props.dispatch(assistantActions.uploadLogo(this.props.assistant.ID, file));
+    };
+
+    deleteLogo = () => this.props.dispatch(assistantActions.deleteLogo(this.props.assistant.ID));
+
+
     render() {
-        const { getFieldDecorator } = this.props.form;
-        const { assistant } = this.props;
+        const {getFieldDecorator} = this.props.form;
+        const {assistant} = this.props;
         const countriesOptions = [...countries.map(country => <Option key={country.code}>{country.name}</Option>)];
 
         return (
             <>
-                <Form layout='vertical' wrapperCol={{ span: 10 }}>
+                <Form layout='vertical' wrapperCol={{span: 10}}>
 
                     <h2>Basic Settings</h2>
                     <FormItem
@@ -94,8 +105,8 @@ class Settings extends Component {
                             getFieldDecorator('assistantName', {
                                 initialValue: assistant.Name,
                                 rules: [
-                                    { required: true, message: 'Please input your assistant name' },
-                                    { validator: this.checkName }
+                                    {required: true, message: 'Please input your assistant name'},
+                                    {validator: this.checkName}
                                 ]
                             })
                             (<Input placeholder="Recruitment Chatbot"/>)
@@ -163,22 +174,22 @@ class Settings extends Component {
                         extra="This will make your chatbot pop up automatically on your website"
                     >
                         <Switch checked={!this.state.isPopupDisabled} onChange={this.togglePopupSwitch}
-                                style={{ marginRight: '15px' }}/>
-                        {getFieldDecorator('secondsUntilPopup', { initialValue: assistant.SecondsUntilPopup === 0 ? 1 : assistant.SecondsUntilPopup })(
+                                style={{marginRight: '15px'}}/>
+                        {getFieldDecorator('secondsUntilPopup', {initialValue: assistant.SecondsUntilPopup === 0 ? 1 : assistant.SecondsUntilPopup})(
                             <InputNumber disabled={this.state.isPopupDisabled} min={1}/>
                         )}
                         <span className="ant-form-text"> seconds</span>
                     </FormItem>
 
                     <Form.Item label="Notify Me Every:"
-                               wrapperCol={{ span: 20 }}
+                               wrapperCol={{span: 20}}
                                extra="Select how often you would like to be notified via email of new chats">
-                        <Radio.Group style={{ width: '100%' }}
+                        <Radio.Group style={{width: '100%'}}
                                      value={this.state.isManualNotify ? 'custom' : this.state.notifyEvery
                                      }
                                      onChange={(e) => {
                                          if (e.target.value !== 'custom') {
-                                             this.setState({ notifyEvery: e.target.value, isManualNotify: false });
+                                             this.setState({notifyEvery: e.target.value, isManualNotify: false});
                                          }
                                      }}>
                             <Radio.Button value={'null'}>Never</Radio.Button>
@@ -188,22 +199,26 @@ class Settings extends Component {
                             <Radio.Button value={168}>Weekly</Radio.Button>
                             <Radio.Button value={730}>Monthly</Radio.Button>
                             <Radio.Button value={'custom'} onClick={() => {
-                                this.setState({ isManualNotify: !this.state.isManualNotify });
+                                this.setState({isManualNotify: !this.state.isManualNotify});
                             }}>Custom</Radio.Button>
                         </Radio.Group>
 
                         {this.state.isManualNotify ?
                             <InputNumber placeholder="Amount of time between notifications, in hours"
                                          min={1}
-                                         style={{ marginTop: 10, width: '30%' }}
+                                         style={{marginTop: 10, width: '30%'}}
                                          value={this.state.notifyEvery === 'null' ? 1 : this.state.notifyEvery}
-                                         formatter={value => `${value} hours`}
-                                         parser={value => value.replace('hours', '')}
+                                         formatter={value => value == '1' ? `${value} hour` : `${value} hours`}
+                                         parser={value => {
+                                             value.replace('hour', 'hours');
+                                             value.replace('hours', '');
+                                         }}
                                          onChange={(val) => {
-                                             this.setState({ notifyEvery: val });
+                                             this.setState({notifyEvery: val});
                                          }}/>
                             : null}
                     </Form.Item>
+
                     <FormItem
                         label="Restricted Countries"
                         extra="Chatbot will be disabled for users who live in the selected countries"
@@ -212,7 +227,7 @@ class Settings extends Component {
                             getFieldDecorator('restrictedCountries', {
                                 initialValue: assistant.Config?.restrictedCountries
                             })(
-                                <Select mode="multiple" style={{ width: '100%' }}
+                                <Select mode="multiple" style={{width: '100%'}}
                                         filterOption={(inputValue, option) => option.props.children.toLowerCase().includes(inputValue.toLowerCase())}
                                         placeholder="Please select country or countries">
                                     {countriesOptions}
@@ -221,32 +236,24 @@ class Settings extends Component {
                         }
                     </FormItem>
 
-
-                    {/*<FormItem*/}
-                    {/*label="Records Notifications"*/}
-                    {/*extra="If you turn this on, we will notify you through your email"*/}
-                    {/*>*/}
-                    {/*<Switch checked={this.state.isAlertsEnabled} onChange={this.toggleAlertsSwitch}*/}
-                    {/*style={{marginRight: '5px'}}/>*/}
-                    {/*</FormItem>*/}
-
-                    {/*<FormItem*/}
-                    {/*label="Alert Me Every:"*/}
-                    {/*extra="Select how often you would like to be notified"*/}
-                    {/*>*/}
-                    {/*{getFieldDecorator('alertEveryy', {*/}
-                    {/*initialValue: this.props.assistant.MailPeriod*/}
-                    {/*})(*/}
-                    {/*<Slider*/}
-                    {/*max={maxAlertsLength}*/}
-                    {/*disabled={!this.state.isAlertsEnabled}*/}
-                    {/*marks={this.state.alertOptions} step={null}/>*/}
-                    {/*)}*/}
-                    {/*</FormItem>*/}
-
-
                     <Button type={'primary'} size={'large'} onClick={this.handleSave}>Save changes</Button>
                 </Form>
+
+
+                <br/>
+                <Divider/>
+                <h2>Assistant Logo</h2>
+                <p>
+                    your assistant logo will replace TheSearchBase logo in the
+                    chatbot. If you did not upload a logo specifically for this assistant, your company logo will be
+                    used instead. You can upload your company logo from
+                    <a onClick={() => history.push(`/dashboard/account?tab=Company`)}> <b>here</b></a>
+                </p>
+                <LogoUploader
+                    logoPath={assistant.LogoPath}
+                    uploadLogo={this.uploadLogo}
+                    deleteLogo={this.deleteLogo}/>
+
 
                 <br/>
                 <Divider/>

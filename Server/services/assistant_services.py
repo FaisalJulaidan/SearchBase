@@ -1,11 +1,13 @@
 from sqlalchemy import and_
 
-from models import db, Assistant, Callback, AutoPilot, AppointmentAllocationTime
-from services import auto_pilot_services, flow_services
+from werkzeug.utils import secure_filename
+from models import db, Assistant, Callback, AutoPilot, AppointmentAllocationTime, Company, StoredFileInfo, StoredFile
+from services import auto_pilot_services, flow_services, stored_file_services
 from services.Marketplace.CRM import crm_services
 from services.Marketplace.Calendar import calendar_services
 from services.Marketplace.Messenger import messenger_servicess
-from utilities import helpers, json_schemas
+from utilities import helpers, json_schemas, enums
+from sqlalchemy.orm import joinedload
 from os.path import join
 from config import BaseConfig
 from jsonschema import validate
@@ -63,11 +65,16 @@ def getByHashID(hashID):
         return Callback(False, "Assistant not found!")
 
 
-def getByID(id: int, companyID: int) -> Callback:
+def getByID(id: int, companyID: int, eager= False) -> Callback:
     try:
         # Get result and check if None then raise exception
-        result = db.session.query(Assistant)\
-            .filter(and_(Assistant.ID == id, Assistant.CompanyID == companyID)).first()
+        query = db.session.query(Assistant)
+
+        if eager:
+            query = query.options(joinedload('StoredFile').joinedload("StoredFileInfo"))
+
+        result = query.filter(and_(Assistant.ID == id, Assistant.CompanyID == companyID)).first()
+
         if not result: raise Exception
         return Callback(True, "Got assistant successfully.", result)
 
@@ -392,3 +399,63 @@ def disconnectFromAutoPilot(assistantID, companyID):
         helpers.logError("assistant_services.disconnectFromAutoPilot(): " + str(exc))
         db.session.rollback()
         return Callback(False, 'Error in disconnecting assistant from AutoPilot.')
+
+    # ----- Logo Operations ----- #
+def uploadLogo(file, assistantID, companyID):
+    try:
+
+        assistant: Assistant = getByID(assistantID, companyID, True).Data
+        if not assistant: raise Exception
+
+        # Delete old logo ref from DB. DigitalOcean will override the old logo since they have the same name
+        oldLogo: StoredFileInfo = helpers.keyFromStoredFile(assistant.StoredFile, enums.FileAssetType.Logo)
+        if oldLogo.AbsFilePath:
+            db.session.delete(oldLogo.StoredFile)
+            db.session.delete(oldLogo) # comment this if u want to use a unique filename for every new logo instead of company id encoded
+
+        # Generate unique name using assistant name encoded
+        filename = helpers.encodeID(assistantID) + "_AssistantLogo" + '.' + \
+                   secure_filename(file.filename).rsplit('.', 1)[1].lower()
+
+        sf = StoredFile()
+        db.session.add(sf)
+        db.session.flush()
+
+        upload_callback: Callback = stored_file_services.uploadFile(file, filename, True, model=Assistant,
+                                                                    identifier="ID",
+                                                                    identifier_value=assistant.ID,
+                                                                    stored_file_id=sf.ID,
+                                                                    key=enums.FileAssetType.Logo)
+
+        return Callback(True, 'Logo uploaded successfully.', upload_callback.Data)
+
+    except Exception as exc:
+        helpers.logError("assistant_service.uploadLogo(): " + str(exc))
+        db.session.rollback()
+        return Callback(False, 'Error in uploading assistant logo.')
+
+
+def deleteLogo(assistantID, companyID):
+    try:
+
+        assistant: Assistant = getByID(assistantID, companyID, True).Data
+        if not assistant: raise Exception
+
+
+        logo: StoredFile = assistant.StoredFile
+        if not logo: return Callback(False, 'No logo to delete')
+
+        # Delete file from cloud Space and reference from database
+        path = helpers.keyFromStoredFile(logo, enums.FileAssetType.Logo).FilePath
+
+        delete_callback : Callback = stored_file_services.deleteFile(path, logo)
+        if not delete_callback.Success:
+            raise Exception(delete_callback.Message)
+
+        db.session.commit()
+        return Callback(True, 'Logo deleted successfully.')
+
+    except Exception as exc:
+        helpers.logError("company_service.deleteLogo(): " + str(exc))
+        db.session.rollback()
+        return Callback(False, 'Error in deleting logo.')

@@ -175,7 +175,6 @@ def genPresigendURL(filename, expireIn=None):
                                                 'Key': UPLOAD_FOLDER + '/' + filename
                                             })
         except ClientError as e:
-            print('error')
             raise Exception("---> DigitalOcean Error" + str(e))
 
         return Callback(True, "File downloaded successfully", url)
@@ -185,7 +184,7 @@ def genPresigendURL(filename, expireIn=None):
         return Callback(False, "File is corrupted", None)
 
 
-def deleteFile(filename):
+def deleteFile(filename, storedFile: StoredFile):
     try:
         # Connect to DigitalOcean Space
         try:
@@ -199,6 +198,9 @@ def deleteFile(filename):
             s3.Object(BUCKET, UPLOAD_FOLDER + '/' + filename).delete()
         except ClientError as e:
             raise Exception("DigitalOcean Error")
+
+        db.session.delete(storedFile)
+        db.session.commit()
 
         return Callback(True, "File deleted successfully")
 

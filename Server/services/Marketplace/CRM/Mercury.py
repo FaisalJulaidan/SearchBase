@@ -16,8 +16,6 @@ CLIENT_ID = os.environ['MERCURY_CLIENT_ID']
 CLIENT_SECRET = os.environ['MERCURY_CLIENT_SECRET']
 DYNAMICS_VERSION = "v9.1"
 
-TEST_DOMAIN = "greenrecruitmentcompanysandbox.crm11"  # NEEDS TO BE TAKEN FROM THE LOGIN
-
 """
 requires domain name ex. greenrecruitmentcompanysandbox.crm11.dynamics.com
 """

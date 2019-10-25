@@ -5,6 +5,8 @@ const parseURL = (string) => {
     const hash = () => Math.random().toString(36).slice(2);
     let urlobj = [];
     let end = 0;
+    if(!string)
+      return null
     while (string.split('*&&').length > 1) {
         let len = '*&&TEXT:'.length;
         let endLen = '&&END*'.length;
@@ -43,6 +45,8 @@ const parseURL = (string) => {
 const URLParser = ({ children }) => {
     const url = parseURL(children);
     return (
+      <>
+        {url ? 
         <>
             {url.map((obj, i) => {
                 return (
@@ -52,6 +56,8 @@ const URLParser = ({ children }) => {
                 );
             })}
         </>
+        : <>No text found</>}
+      </>
     );
 };
 

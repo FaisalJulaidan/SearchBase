@@ -3,17 +3,15 @@ import React from 'react';
 import { connect } from 'react-redux';
 // Constants
 import * as messageTypes from '../../constants/MessageType';
-import * as flowAttributes from '../../constants/FlowAttributes';
-import * as constants from '../../constants/Constants';
 // Actions
 import { addBotMessage, addUserMessage, setChatbotAnimation, setChatbotStatus } from '../../store/actions';
 // Styles
 import './UserInputs/styles/Inputs.css';
 // Components
-import { DatePicker, FileUpload, SalaryPicker, Text } from './UserInputs';
+import { DatePicker, FileUpload, MultiDatePicker, SalaryPicker, Text } from './UserInputs';
 
 
-const Input = ({setChatbotStatus, hideSignature, addUserMessage, lastMessage, addBotMessage, setChatbotAnimation, visible}) => {
+const Input = ({ setChatbotStatus, hideSignature, addUserMessage, lastMessage, addBotMessage, setChatbotAnimation, visible }) => {
 
     const submitMessage = (text, type, newState, afterMessage, block, content) => {
         addUserMessage(text, type, block, content);
@@ -23,7 +21,7 @@ const Input = ({setChatbotStatus, hideSignature, addUserMessage, lastMessage, ad
 
     const _checkAfterMessage = (afterMessage, newState, type) => {
         if (afterMessage) {
-            setChatbotStatus({...newState, afterMessage})
+            setChatbotStatus({ ...newState, afterMessage });
         } else {
             setChatbotStatus(newState);
         }
@@ -36,20 +34,22 @@ const Input = ({setChatbotStatus, hideSignature, addUserMessage, lastMessage, ad
     const getInput = (message) => {
         switch (message.type) {
             case messageTypes.FILE_UPLOAD:
-                return (<FileUpload/>);
+                return <FileUpload/>;
+            case messageTypes.SALARY_PICKER:
+                return <SalaryPicker block_min={message.block.Content.min}
+                                     block_max={message.block.Content.max}
+                                     period={message.block.Content.period}
+                                     currency={message.block.Content.currency}
+                />;
+            case messageTypes.DATE_PICKER:
+                return message.block.Content.type === 'Exact' ? <DatePicker/> : <MultiDatePicker/>;
             case messageTypes.USER_INPUT:
-                switch (message.block[flowAttributes.DATA_TYPE][flowAttributes.DATA_TYPE_VALIDATION]) {
-                    case constants.SALARY:
-                        return (<SalaryPicker period={message.block[flowAttributes.DATA_TYPE][flowAttributes.DATA_TYPE_ENUM]}/>);
-                    case constants.DATEPICKER:
-                        return (<DatePicker/>);
-                    default:
-                        return (<Text/>);
-                }
+                return <Text/>;
             default:
                 return null;
         }
     };
+
     if (lastMessage) {
         const component = getInput(lastMessage);
         if (visible === false && component) {

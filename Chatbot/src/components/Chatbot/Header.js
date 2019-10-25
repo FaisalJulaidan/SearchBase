@@ -10,7 +10,7 @@ import { Button, Col, Row, Tooltip } from 'antd';
 const Header = ({ title, logoPath, isDirectLink, resetChatbot, closeWindow }) => {
 
     const privacyPolicy = () => {
-        let win = window.open("https://www.thesearchbase.com/privacy", '_blank');
+        let win = window.open('https://www.thesearchbase.com/privacy', '_blank');
         win.focus();
     };
 
@@ -44,30 +44,43 @@ const Header = ({ title, logoPath, isDirectLink, resetChatbot, closeWindow }) =>
 
         return windowSize;
     }
+
     return (
         <div className={'Header'} id={'Chatbot_Header'}>
             <Row style={{ width: '100%' }}>
                 {
-                    !isDirectLink ?
+                    !isDirectLink &&
                     <Col span={3}>
                         {
                             logoPath ?
                                 <img alt="header" width={30}
-                                        src={`${logoPath}`}/> :
+                                     src={`${logoPath}?timestamp=${new Date().getTime()}`}/> :
                                 <FontAwesomeIcon size="2x" icon={faCloud} style={{ color: '#673AB7' }}/>
                         }
                     </Col>
-                        : <Col span={3}/>
                 }
 
-                <Col span={13}>
+                {
+                    isDirectLink && isMobile &&
+                    <Col span={3}>
+                        {
+                            logoPath ?
+                                <img alt="header" width={30}
+                                     src={`${logoPath}?timestamp=${new Date().getTime()}`}/> :
+                                <FontAwesomeIcon size="2x" icon={faCloud} style={{ color: '#673AB7' }}/>
+                        }
+                    </Col>
+                }
+
+                <Col span={!isDirectLink || isDirectLink && isMobile ? 14 : 17}>
                     <div className={'H3'}>{title}</div>
                 </Col>
-                <Col span={8} style={{ textAlign: 'right', position: 'relative' }}>
+
+                <Col span={7} style={{ textAlign: 'right', position: 'relative' }}>
                     <Tooltip title="View our privacy policy"
                              getPopupContainer={() => document.getElementById('TheSearchBase_Chatbot')}>
                         <Button className={'Button'} onClick={privacyPolicy}
-                                type="default" shape="circle" icon="lock" size={'small'} />
+                                type="default" shape="circle" icon="lock" size={'small'}/>
                     </Tooltip>
 
                     <Tooltip title="Reset"

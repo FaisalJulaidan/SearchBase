@@ -3,7 +3,7 @@ from flask_jwt_extended import jwt_required, get_jwt_identity
 
 from models import Callback, Assistant, Conversation, Appointment, AppointmentAllocationTime, AppointmentAllocationTimeInfo
 from services import assistant_services, conversation_services, appointment_services, company_services
-from utilities import helpers, wrappers
+from utilities import helpers, wrappers, enums
 
 appointment_router: Blueprint = Blueprint('appointment_router', __name__, template_folder="../../templates")
 
@@ -95,7 +95,7 @@ def allocation_time(token):
 
         data = {
             "companyName": assistant.Company.Name,
-            "companyLogoURL": assistant.Company.LogoPath,
+            "logoPath": helpers.keyFromStoredFile(assistant.Company.StoredFile, enums.FileAssetType.Logo).AbsFilePath,
             "appointmentAllocationTime": helpers.getListFromSQLAlchemyList(times.Info if times else []),
             "takenTimeSlots": helpers.getListFromSQLAlchemyList(assistant.Appointments),
             "userName": data['userName']

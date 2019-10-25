@@ -132,6 +132,9 @@ class Analytics extends React.Component {
             clientCandidate = this.candidateClientSplit();
             // maybe move timeSpent to onload to save resources , no need to constantly recalculate? idk
         }
+
+        console.log("==========");
+        console.log(data);
         const cols = {
             chats: {
                 min: 0

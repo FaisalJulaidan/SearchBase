@@ -6,14 +6,13 @@ import traceback
 from datetime import time
 from enum import Enum
 from typing import List
-
+import app
 import geoip2.webservice
 import stripe
 from cryptography.fernet import Fernet
-from flask import json, after_this_request, request, Response
-from flask_jwt_extended import get_jwt_identity
+from flask import json, request, Response
 from forex_python.converter import CurrencyRates
-from flask_jwt_extended import get_jwt_identity
+from flask_limiter import Limiter
 from hashids import Hashids
 from itsdangerous import URLSafeTimedSerializer
 from sqlalchemy_utils import Currency
@@ -41,6 +40,17 @@ fernet = Fernet(os.environ['TEMP_SECRET_KEY'])
 
 # Currency converter by forex-python
 currencyConverter = CurrencyRates()
+
+
+
+# Crate request limiter
+def getRemoteAddress():
+    if os.environ['FLASK_ENV'] == 'development':
+        return request.remote_addr
+    else:
+        return request.headers['X-Real-IP']
+limiter = Limiter(key_func=getRemoteAddress)
+limiter.enabled = os.environ['FLASK_ENV'] != 'development' # does not work
 
 
 # ======== Helper Functions ======== #
@@ -341,7 +351,7 @@ def objectListContains(list, filter):
 def getListValue(list, idx, default=None):
     try:
         return list[idx]
-    except IndexError:
+    except:
         return default
 
 
@@ -355,4 +365,9 @@ def HPrint(message):
 
     print(message + " - (%s, line %s)" % (filename, info.lineno))
 
-# def csrf():
+
+# Sort out limiter here:
+def createLimiter():
+    return Limiter(app, key_func=getRemoteAddress, default_limits=["480 per day", "20 per hour"])
+
+# TODO: How to get this object from a helpers import?

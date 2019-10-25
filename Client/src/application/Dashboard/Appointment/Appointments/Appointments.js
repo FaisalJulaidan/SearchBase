@@ -2,9 +2,8 @@ import React from 'react';
 
 import { Table, Button, Spin, Icon, Modal, Popconfirm } from 'antd';
 import { appointmentActions } from 'store/actions';
-import moment from 'moment-timezone';
+import { convertTimezone } from 'helpers';
 
-import LoadingSpinner from 'components/LoadingSpinner/LoadingSpinner';
 
 import styles from './Appointments.module.less';
 
@@ -33,7 +32,7 @@ class Appointments extends React.Component {
     reject = (id, name, email, phone) => {
         confirm({
             title: `Reject appointment confirmation`,
-            content: `If you click Reject, this appointment will be deleted forever and you cannot undo that but it will make the appointment time slot available again for candidates to pick`,
+            content: `If you click Reject, this appointment will be deleted forever and you cannot undo that but it will make the appointment time slot available again for other new candidates to pick`,
             onOk: () => {this.props.dispatch(appointmentActions.setAppointmentStatusRequest(id, name, email, phone, 'Rejected'))},
             okText: "Reject",
         });
@@ -81,7 +80,7 @@ class Appointments extends React.Component {
     render() {
         const realList = this.props.appointments.map(item => ({
             key: item.ID,
-            time: moment.utc(item.DateTime).tz(this.props.tz).format('MMMM Do YYYY, h:mm:ss a'),
+            time: convertTimezone(item.DateTime, 'ddd, DD MMM YYYY h:mm a'),
             email: item.Conversation.Email,
             status: item.Status,
             approve: item,

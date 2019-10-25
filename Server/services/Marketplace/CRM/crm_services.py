@@ -1,13 +1,14 @@
 from sqlalchemy.sql import and_
 
 from models import db, Callback, Conversation, Assistant, CRM as CRM_Model, StoredFile
-from services.Marketplace.CRM import Greenhouse, Bullhorn, Mercury, Jobscience
+from services.Marketplace.CRM import Greenhouse, Bullhorn, Mercury, Jobscience, Vincere
 # Process chatbot session
 from utilities import helpers
 from utilities.enums import CRM, UserType, DataType, Period, DataType as DT
 
 
 def processConversation(assistant: Assistant, conversation: Conversation) -> Callback:
+    print("Should be processing the conversation")
     # Insert base on userType
     if conversation.UserType is UserType.Candidate:
         return insertCandidate(assistant, conversation)
@@ -50,10 +51,10 @@ def insertCandidate(assistant: Assistant, conversation: Conversation, update_id=
         "availability": ", ".join(
             conversation.Data.get('keywordsByDataType').get(DT.CandidateAvailability.value['name'], [])) or None,
 
-        "annualSalary": getSalary(conversation, DT.CandidateAnnualDesiredSalary, "Min") or
-                        getSalary(conversation, DT.JobAnnualSalary, "Min"),
-        "dayRate": getSalary(conversation, DT.CandidateDailyDesiredSalary, "Min") or
-                   getSalary(conversation, DT.JobDayRate, "Min"),
+        "annualSalary": getSalary(conversation, DT.CandidateDesiredSalary, "Min", Period.Annually) or
+                        getSalary(conversation, DT.JobSalary, "Min", Period.Annually),
+        "dayRate": getSalary(conversation, DT.CandidateDesiredSalary, "Min", Period.Daily) or
+                   getSalary(conversation, DT.JobSalary, "Min", Period.Daily),
 
         "selectedSolutions": conversation.Data.get("selectedSolutions")
     }
@@ -90,7 +91,7 @@ def insertClient(assistant: Assistant, conversation: Conversation):
         "email": emails[0],
         "emails": emails,
         "availability": " ".join(
-            conversation.Data.get('keywordsByDataType').get(DT.ClientAvailability.value['name'], [])),
+            conversation.Data.get('keywordsByDataType').get(DT.UserAvailabilityDate.value['name'], [])),
 
         "companyName": " ".join(
             conversation.Data.get('keywordsByDataType').get(DT.CompanyName.value['name'],
@@ -111,12 +112,15 @@ def insertClient(assistant: Assistant, conversation: Conversation):
 
 def updateCandidate(details, conversation, companyID):
     crm_callback: Callback = getByID(details["source_id"], companyID)
+
     if not crm_callback.Success:
+
         return crm_callback
 
     crm_type = crm_callback.Data.Type
 
-    if crm_type is not CRM.Bullhorn:
+    if crm_type not in [CRM.Bullhorn, CRM.Jobscience]:
+
         return Callback(False, "CRM " + crm_type.value + " is not allowed for updating")
 
     name = (conversation.Name or " ").split(" ")
@@ -151,10 +155,10 @@ def updateCandidate(details, conversation, companyID):
         "availability": ", ".join(
             conversation.Data.get('keywordsByDataType').get(DT.CandidateAvailability.value['name'], [])) or None,
 
-        "annualSalary": getSalary(conversation, DT.CandidateAnnualDesiredSalary, "Min") or
-                        getSalary(conversation, DT.JobAnnualSalary, "Min"),
-        "dayRate": getSalary(conversation, DT.CandidateDailyDesiredSalary, "Min") or
-                   getSalary(conversation, DT.JobDayRate, "Min"),
+        "annualSalary": getSalary(conversation, DT.CandidateDesiredSalary, "Min", Period.Annually) or
+                        getSalary(conversation, DT.JobSalary, "Min", Period.Annually),
+        "dayRate": getSalary(conversation, DT.CandidateDesiredSalary, "Min", Period.Daily) or
+                   getSalary(conversation, DT.JobSalary, "Min", Period.Daily),
 
         "selectedSolutions": conversation.Data.get("selectedSolutions")
     }
@@ -171,6 +175,7 @@ def updateCandidate(details, conversation, companyID):
 
 
 def uploadFile(assistant: Assistant, storedFile: StoredFile):
+
     crm_type = assistant.CRM.Type
     if CRM.has_value(crm_type.value):
         if crm_type is CRM.Jobscience or crm_type is CRM.Mercury:
@@ -183,12 +188,12 @@ def uploadFile(assistant: Assistant, storedFile: StoredFile):
 
 def searchCandidates(assistant: Assistant, session):
     data = {
-        "location": checkFilter(session['keywordsByDataType'], DT.CandidateLocation),
-        "preferredJotTitle": checkFilter(session['keywordsByDataType'], DT.CandidateJobTitle),
-        "yearsExperience": checkFilter(session['keywordsByDataType'], DT.CandidateYearsExperience),
-        "skills": checkFilter(session['keywordsByDataType'], DT.CandidateSkills),
-        "jobCategory": checkFilter(session['keywordsByDataType'], DT.CandidateJobCategory),
-        "education": checkFilter(session['keywordsByDataType'], DT.CandidateEducation)
+        "location": __checkFilter(session['keywordsByDataType'], DT.CandidateLocation),
+        "preferredJotTitle": __checkFilter(session['keywordsByDataType'], DT.JobTitle),
+        "yearsExperience": __checkFilter(session['keywordsByDataType'], DT.CandidateYearsExperience),
+        "skills": __checkFilter(session['keywordsByDataType'], DT.CandidateSkills),
+        "jobCategory": __checkFilter(session['keywordsByDataType'], DT.JobCategory),
+        "education": __checkFilter(session['keywordsByDataType'], DT.CandidateEducation)
     }
 
     crm_type = assistant.CRM.Type
@@ -217,7 +222,7 @@ def searchCandidatesCustom(crm, companyID, candidate_data, perfect=False):
 
     crm_type = crm.Type.value
 
-    if perfect:
+    if perfect and crm == "Bullhorn":
         searchFunc = "searchPerfectCandidates"
     else:
         searchFunc = "searchCandidates"
@@ -237,16 +242,15 @@ def searchCandidatesCustom(crm, companyID, candidate_data, perfect=False):
 
 def searchJobs(assistant: Assistant, session):
     data = {
-        "jobTitle": checkFilter(session['keywordsByDataType'], DT.JobTitle) or
-                    checkFilter(session['keywordsByDataType'], DT.CandidateJobTitle),
-        "city": checkFilter(session['keywordsByDataType'], DT.JobLocation) or
-                checkFilter(session['keywordsByDataType'], DT.CandidateLocation),
-        "employmentType": checkFilter(session['keywordsByDataType'], DT.JobType),
-        "skills": checkFilter(session['keywordsByDataType'], DT.JobEssentialSkills) or
-                  checkFilter(session['keywordsByDataType'], DT.CandidateSkills),
+        "jobTitle": __checkFilter(session['keywordsByDataType'], DT.JobTitle),
+        "city": __checkFilter(session['keywordsByDataType'], DT.JobLocation) or
+                __checkFilter(session['keywordsByDataType'], DT.CandidateLocation),
+        "employmentType": __checkFilter(session['keywordsByDataType'], DT.JobType),
+        "skills": __checkFilter(session['keywordsByDataType'], DT.JobEssentialSkills) or
+                  __checkFilter(session['keywordsByDataType'], DT.CandidateSkills),
         # "startDate": checkFilter(session['keywordsByDataType'], DT.JobStartDate),
         # "endDate": checkFilter(session['keywordsByDataType'], DT.JobEndDate),
-        "yearsRequired": checkFilter(session['keywordsByDataType'], DT.JobYearsRequired),
+        "yearsRequired": __checkFilter(session['keywordsByDataType'], DT.JobYearsRequired),
     }
 
     crm_type = assistant.CRM.Type
@@ -263,7 +267,9 @@ def searchJobs(assistant: Assistant, session):
         return Callback(False, "CRM type did not match with those on the system")
 
 
-def checkFilter(keywords, dataType: DT):
+# private helper function
+def __checkFilter(keywords, dataType: DT):
+
     if keywords.get(dataType.value["name"]):
         return " ".join(keywords[dataType.value["name"]])
     return None
@@ -366,8 +372,13 @@ def disconnectByID(crmID, companyID) -> Callback:
 
 def logoutOfCRM(auth, crm_type, companyID) -> Callback:
     try:
-        if crm_type == CRM.Bullhorn:
+
+        if crm_type == CRM.Bullhorn: # Need to change this?
             return Bullhorn.logout(auth, companyID)
+
+        elif crm_type == "Jobscience":
+            return Jobscience.logout(auth, companyID)
+
 
         return Callback(False, 'Logout failed')
 
@@ -429,29 +440,23 @@ def updateByType(crm_type, newAuth, companyID):
 
 
 # get min/max/average salary from the string and convert to specified period (daily, annually)
-def getSalary(conversation: Conversation, dataType: DataType, salaryType, toPeriod=None):  # type Period
-    # ex. 5000-20000 GBP Annual
+def getSalary(conversation: Conversation, dataType: DataType, salaryType, toPeriod:Period=None):  # type Period
+    # ex. 5000-20000 GBP Annually
     salary = conversation.Data.get('keywordsByDataType').get(dataType.value['name'], 0)
 
     if salary:
         salarySplitted = salary[0].split(" ")
         salaryAmmount = salarySplitted[0].split("-")
 
+        if salaryType == "Average":
+            salary = str(float(salaryAmmount[1]) - float(salaryAmmount[0]))
+        elif salaryType == "Min":
+            salary = salaryAmmount[0]
+        elif salaryType == "Max":
+            salary = salaryAmmount[1]
+
         if toPeriod:
-            if salaryType == "Average":
-                salary = helpers.convertSalaryPeriod(str(float(salaryAmmount[1]) - float(salaryAmmount[0])),
-                                                     Period[salarySplitted[2]], toPeriod)
-            elif salaryType == "Min":
-                salary = helpers.convertSalaryPeriod(salaryAmmount[0], Period[salarySplitted[2]], toPeriod)
-            elif salaryType == "Max":
-                salary = helpers.convertSalaryPeriod(salaryAmmount[1], Period[salarySplitted[2]], toPeriod)
-        else:
-            if salaryType == "Average":
-                salary = str(float(salaryAmmount[1]) - float(salaryAmmount[0]))
-            elif salaryType == "Min":
-                salary = salaryAmmount[0]
-            elif salaryType == "Max":
-                salary = salaryAmmount[1]
+            salary = helpers.convertSalaryPeriod(salary, Period[salarySplitted[2]], toPeriod)
 
     return salary
 

@@ -31,17 +31,19 @@ class Conversations extends React.Component {
             {
                 title: '#',
                 key: '#',
+                width: 1,
                 render: (text, record) => (<p>{record.ID}</p>)
 
             }, {
                 title: 'User Type',
                 key: 'UserType',
+                width: 1,
                 filters: [
                     { text: 'Candidate', value: 'Candidate' },
                     { text: 'Client', value: 'Client' }
                 ],
                 onFilter: (value, record) => record.UserType.indexOf(value) === 0,
-                render: (text, record) => (<div align="center"><Tag key={record.UserType}>{record.UserType}</Tag></div>)
+                render: (text, record) => (<Tag key={record.UserType}>{record.UserType}</Tag>)
             }, {
                 title: 'Name',
                 key: 'Name',
@@ -71,6 +73,7 @@ class Conversations extends React.Component {
             }, {
                 title: 'Score',
                 key: 'Score',
+                width: 1,
                 sorter: (a, b) => a.Score - b.Score,
                 render: (text, record) => {
                     return (
@@ -136,7 +139,7 @@ class Conversations extends React.Component {
                     return (record.Completed ? 'Completed' : 'Incomplete').indexOf(value) === 0;
                 },
                 render: (text, record) => (
-                    <div align="center">
+                    <div>
                         {record.Completed ?
                             <Tag color="#87d068">Completed</Tag> :
                             <Tag color="red">Incomplete</Tag>
@@ -146,6 +149,7 @@ class Conversations extends React.Component {
             }, {
                 title: 'Actions',
                 key: 'actions',
+                width: 1,
                 render: (text, record, index) => (
                     <div align="center">
 
@@ -402,7 +406,7 @@ class Conversations extends React.Component {
                        bordered={true}
                        pagination={{ position: 'both', pageSize: 20 }}
                        size='default'
-                       scroll={{ x: 1000 }}
+                       scroll={{ x: 700 }}
                 />
 
                 {

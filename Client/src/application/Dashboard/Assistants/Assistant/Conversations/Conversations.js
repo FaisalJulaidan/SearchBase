@@ -31,13 +31,11 @@ class Conversations extends React.Component {
             {
                 title: '#',
                 key: '#',
-                width: 1,
                 render: (text, record) => (<p>{record.ID}</p>)
 
             }, {
                 title: 'User Type',
                 key: 'UserType',
-                width: 1,
                 filters: [
                     { text: 'Candidate', value: 'Candidate' },
                     { text: 'Client', value: 'Client' }
@@ -73,7 +71,6 @@ class Conversations extends React.Component {
             }, {
                 title: 'Score',
                 key: 'Score',
-                width: 1,
                 sorter: (a, b) => a.Score - b.Score,
                 render: (text, record) => {
                     return (
@@ -131,7 +128,6 @@ class Conversations extends React.Component {
             {
                 title: 'Conversation',
                 key: 'Completed',
-                width: 1,
                 filters: [
                     { text: 'Completed', value: 'Completed' },
                     { text: 'Incomplete', value: 'Incomplete' }
@@ -150,7 +146,6 @@ class Conversations extends React.Component {
             }, {
                 title: 'Actions',
                 key: 'actions',
-                width: 1,
                 render: (text, record, index) => (
                     <div align="center">
 
@@ -407,7 +402,7 @@ class Conversations extends React.Component {
                        bordered={true}
                        pagination={{ position: 'both', pageSize: 20 }}
                        size='default'
-                       scroll={{ x: 900 }}
+                       scroll={{ x: 500 }}
                 />
 
                 {

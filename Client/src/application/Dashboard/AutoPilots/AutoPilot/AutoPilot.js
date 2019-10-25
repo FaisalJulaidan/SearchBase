@@ -587,7 +587,7 @@ class AutoPilot extends React.Component {
                                 <Divider/>
                                 <h2>Contract Follow Up</h2>
                                 <Collapse bordered={false}>
-                                    <Panel header={<h2>Automatically suggests contract rolls</h2>} key="3"
+                                    <Panel header={<h2>Automatically suggests contract roles</h2>} key="3"
                                            style={customPanelStyle}>
                                     </Panel>
                                 </Collapse>

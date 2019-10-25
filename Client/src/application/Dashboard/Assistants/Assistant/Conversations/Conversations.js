@@ -131,6 +131,7 @@ class Conversations extends React.Component {
             {
                 title: 'Conversation',
                 key: 'Completed',
+                width: 1,
                 filters: [
                     { text: 'Completed', value: 'Completed' },
                     { text: 'Incomplete', value: 'Incomplete' }
@@ -406,7 +407,7 @@ class Conversations extends React.Component {
                        bordered={true}
                        pagination={{ position: 'both', pageSize: 20 }}
                        size='default'
-                       scroll={{ x: 700 }}
+                       scroll={{ x: 900 }}
                 />
 
                 {

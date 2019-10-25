@@ -3,21 +3,8 @@ import {connect} from 'react-redux';
 import styles from './AutoPilot.module.less';
 import NoHeaderPanel from 'components/NoHeaderPanel/NoHeaderPanel';
 import {
-    Breadcrumb,
-    Button,
-    Col,
-    Collapse,
-    Divider,
-    Form,
-    Input,
-    InputNumber,
-    Modal,
-    Row,
-    Spin,
-    Switch,
-    Typography,
-    Select,
-    Icon,
+    Breadcrumb, Button, Col, Collapse, Divider, Form, Input, InputNumber, Modal, Row, Spin, Switch, Typography,
+    Select, Icon, Radio
 } from 'antd';
 import 'types/TimeSlots_Types';
 import './AutoPilot.less';
@@ -813,6 +800,19 @@ class AutoPilot extends React.Component {
                                 <Collapse bordered={false}>
                                     <Panel header={<h2>Automatically suggests contract roles</h2>} key="4"
                                            style={customPanelStyle}>
+
+                                        <FormItem label="Send job suggestion (before their role finishes)">
+                                            {getFieldDecorator("suggestionSchedule", {initialValue: "off"})(
+                                                <Radio.Group defaultValue="off" onChange={(e) => {
+                                                    this.setState({suggestionSchedule: e.target.value})
+                                                }}>
+                                                    <Radio.Button value="off">Off</Radio.Button>
+                                                    <Radio.Button value="1">1 Week</Radio.Button>
+                                                    <Radio.Button value="2">2 Weeks</Radio.Button>
+                                                    <Radio.Button value="3">3 Weeks</Radio.Button>
+                                                </Radio.Group>
+                                            )}
+                                        </FormItem>
                                     </Panel>
                                 </Collapse>
 

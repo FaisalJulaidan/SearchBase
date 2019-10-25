@@ -425,11 +425,6 @@ def fetchSkillsForCandidateSearch(list_of_contactIDs: list, list_of_skills, acce
 
         like_string += ")"
 
-    print("Complete Query:")
-    print("SELECT+ts2__Skill_Name__c,ts2__Last_Used__c,ts2__Contact__c" +
-          "+FROM+ts2__Skill__c+WHERE+" +
-          "ts2__Contact__c+IN+(" + query_segment + ")" + like_string + "+LIMIT+1000")
-
     # Note: This assumes at least one skill is given
     sendQuery_callback: Callback = sendQuery(access_token, "get", {},
                                              "SELECT+ts2__Skill_Name__c,ts2__Last_Used__c,ts2__Contact__c" +
@@ -440,7 +435,7 @@ def fetchSkillsForCandidateSearch(list_of_contactIDs: list, list_of_skills, acce
         raise Exception(sendQuery_callback.Message)
 
     candidate_skills_fetch = json.loads(sendQuery_callback.Data.text)
-    print(candidate_skills_fetch)
+
     return candidate_skills_fetch['records']
 
 
@@ -514,7 +509,7 @@ def searchCandidates(access_token, conversation) -> Callback:
 
             # TODO: Call skills fetch here
             if return_body["records"]:
-                print("Records length:", str(len(records)))
+
                 # add the candidates to the records
                 records = records + list(return_body["records"])
 
@@ -533,31 +528,26 @@ def searchCandidates(access_token, conversation) -> Callback:
 
             # remove the last (least important filter)
             query = "AND".join(query.split("AND")[:-1])
-            # print("QUERY IS: ", query)
 
-            # if no filters left - stop
+            # if no filters left then stop
             if not query:
                 break
 
         # <-- CALL SKILLS SEARCH -->
         for record in records:
-            # print(record.get("ts2__Desired_Hourly__c"))
-            # print(record.get("ts2__Desired_Salary__c"))
-            # print(record.get("Min_Basic__c"))
+
             list_of_contactIDs.append("'" + record.get("Id") + "'")
 
         # Fetch associated candidate skills
         skills = conversation.get("skills")
-        print("THE SKILLS ARE: ")
-        print(skills)
-        if type(skills) == list:
-            print("Skills are a list...")
-        else:
+
+        if type(skills) != list:
             skills = skills.split(" ")
 
         candidate_skills = []
         if len(candidate_fetch['records']) > 0:
             candidate_skills = fetchSkillsForCandidateSearch(list_of_contactIDs, skills, access_token)
+
         # <-- CALL SKILLS SEARCH -->
 
         for record_num, record in enumerate(records):
@@ -600,7 +590,7 @@ def searchCandidates(access_token, conversation) -> Callback:
                                                                                     record.get('Min_Basic__c', 0),
                                                                       currency=Currency("GBP"),
                                                                       source="Jobscience"))
-        # print("RETURNING RECORDS ...")
+
         return Callback(True, sendQuery_callback.Message, result)
     except Exception as exc:
         helpers.logError("Marketplace.CRM.Jobscience.searchCandidates() ERROR: " + str(exc))
@@ -644,7 +634,6 @@ def searchJobs(access_token, conversation) -> Callback:
         # query += populateFilter(DT.JobEndDate, "ts2__Estimated_End_Date__c", quote_wrap=False)
 
         query = query[:-5]  # To remove final +AND
-        # print("QUERY IS: ", query)
 
         # NOTE: Properties to return must be stated, no [*] operator
         sendQuery_callback: Callback = sendQuery(
@@ -675,8 +664,8 @@ def searchJobs(access_token, conversation) -> Callback:
 
             # TODO: Call skills fetch here
             if return_body["records"]:
-                # print("Records length:", str(len(records)))
-                # add the candidates to the records
+
+                # Add the candidates to the records
                 records = records + list(return_body["records"])
 
                 # remove duplicate records
@@ -694,7 +683,6 @@ def searchJobs(access_token, conversation) -> Callback:
 
             # remove the last (least important filter)
             query = "AND".join(query.split("AND")[:-1])
-            # print("QUERY IS: ", query)
 
             # if no filters left - stop
             if not query:
@@ -719,7 +707,6 @@ def searchJobs(access_token, conversation) -> Callback:
                                                             linkURL=None,
                                                             currency=Currency("GBP"),
                                                             source="Jobscience"))
-        # print("FINISHED")
 
         return Callback(True, sendQuery_callback.Message, result)
 
@@ -801,10 +788,6 @@ def sendQuery(auth, method, body, query):
             'cache-control': 'no-cache',
             'Cookie': 'inst=APP_3X'
         }
-        print("URL OF THE SEND QUERY")
-        print(url)
-        print("HEADERS OF SEND QUERY")
-        print(headers)
 
         response = marketplace_helpers.sendRequest(url, method, headers, json.dumps(body))
 
@@ -839,4 +822,4 @@ def buildUrl(query, method):
 
 # TODO
 def uploadFile(auth, storedFileInfo: StoredFileInfo):
-    print("ATTEMPT FILE UPLOAD")
+    pass

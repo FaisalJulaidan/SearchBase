@@ -6,15 +6,15 @@ import * as constants from '../../../constants/Constants';
 // Styles
 import './styles/Inputs.css';
 // Components
-import { DatePicker as AntdDatePicker } from 'antd';
+import { DatePicker as AntdDatePicker, Tooltip } from 'antd';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTelegramPlane } from '@fortawesome/free-brands-svg-icons';
 import { getContainerElement } from '../../helpers';
-import { Tooltip } from 'antd'
 import moment from 'moment';
 
 const MultiDatePicker = ({ message, submitMessage }) => {
 
+    moment.updateLocale('en', { week: { dow: 1 } });
     let [selectedDates, setSelectedDates] = useState({ individual: [], range: [] });
     let [open, setOpen] = useState(false);
     let [valid, setValid] = useState(true);
@@ -45,8 +45,8 @@ const MultiDatePicker = ({ message, submitMessage }) => {
 
     useEffect(() => {
         function checkValidParent(e) {
-            if(!open){
-              return
+            if (!open) {
+                return;
             }
             let valid = false;
             e.path.forEach(node => {
@@ -109,17 +109,17 @@ const MultiDatePicker = ({ message, submitMessage }) => {
     };
 
     const delayedOpen = () => {
-      setTimeout(() => {
-        setOpen(true)
-      }, 10);
-    }
+        setTimeout(() => {
+            setOpen(true);
+        }, 10);
+    };
 
     const submitDates = () => {
         let text;
-        if (selectedDates.individual.length === 0 && selectedDates.range.length === 0){
-          setValid(false)
-          setError('You must select at least one date')
-          return
+        if (selectedDates.individual.length === 0 && selectedDates.range.length === 0) {
+            setValid(false);
+            setError('You must select at least one date');
+            return;
         }
         if (selectedDates)
             text = selectedDatesToString();
@@ -143,19 +143,19 @@ const MultiDatePicker = ({ message, submitMessage }) => {
 
     return (
         <React.Fragment>
-           <Tooltip
-              placement="top"
-              title={error}
-              getPopupContainer={() => getContainerElement()}
-              visible={!valid}>
-              <div className={'DatePickerContainer'} onClick={() => delayedOpen()}>
-                  <AntdDatePicker getCalendarContainer={() => getContainerElement()}
-                                  className={'Datepicker'} suffixIcon={<div/>}
-                                  dropdownClassName={'DatepickerCalendar'}
-                                  showToday={false}
-                                  dateRender={renderDate}
-                                   open={open}/>
-              </div>
+            <Tooltip
+                placement="top"
+                title={error}
+                getPopupContainer={() => getContainerElement()}
+                visible={!valid}>
+                <div className={'DatePickerContainer'} onClick={() => delayedOpen()}>
+                    <AntdDatePicker getCalendarContainer={() => getContainerElement()}
+                                    className={'Datepicker'} suffixIcon={<div/>}
+                                    dropdownClassName={'DatepickerCalendar'}
+                                    showToday={false}
+                                    dateRender={renderDate}
+                                    open={open}/>
+                </div>
             </Tooltip>
             <div className={'Submit'}>
                 <i className={'SendIconActive'} onClick={submitDates}>

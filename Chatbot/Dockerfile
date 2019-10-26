@@ -14,6 +14,6 @@ ADD . .
 
 # Run the build script it will move it self from
 RUN npm run build
-RUN rm -rf -v !("build")
+RUN rm -rf node_modules
 
 CMD ["serve", "-l", "3001", "-s", "build"]

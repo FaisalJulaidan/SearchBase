@@ -15,7 +15,7 @@
             }
         ]
     },
-    "default": {
+    "default":  {
         "alembic": {
             "hashes": [
                 "sha256:52d73b1d750f1414fa90c25a08da47b87de1e4ad883935718a8f36396e19e78e",

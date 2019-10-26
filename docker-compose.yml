@@ -25,7 +25,7 @@ services:
     networks:
       - frontend
 
-  web:
+  server:
     container_name: searchbase_server
     build: .
     ports:

@@ -45,12 +45,15 @@ class AutoPilot extends React.Component {
         rejectApplications: false,
         acceptApplications: false,
         referApplications: false,
+        contractFollowUp: false,
         sendAcceptanceEmail: false,
         sendRejectionEmail: false,
         sendReferralEmail: false,
+        sendContractFollowUpEmail: false,
         sendAcceptanceSMS: false,
         sendRejectionSMS: false,
         sendReferralSMS: false,
+        sendContractFollowUpSMS: false,
         sendCandidatesAppointments: false,
 
         acceptanceScore: null,
@@ -61,17 +64,22 @@ class AutoPilot extends React.Component {
         rejectionEmailBody: '<p>Sorry you are not accepted.</p>',
         rejectionSMSBody: 'Sorry you are not accepted.',
 
-        referralScore: 100, //TODO: Change to null when server-side is done
         referralAssistant: null,
         referralEmailBody: '<p></p>',
         referralSMSBody: '',
+
+        contractFollowUpSchedule: null,
+        contractFollowUpEmailBody: '<p></p>',
+        contractFollowUpSMSBody: '',
 
         sendAcceptanceEmailErrors: false,
         sendAcceptanceSMSErrors: false,
         sendRejectionEmailErrors: false,
         sendRejectionSMSErrors: false,
         sendReferralEmailErrors: false,
-        sendReferralSMSErrors: false
+        sendReferralSMSErrors: false,
+        sendContractFollowUpEmailErrors: false,
+        sendContractFollowUpSMSErrors: false
 
     };
 
@@ -85,12 +93,15 @@ class AutoPilot extends React.Component {
                     rejectApplications: autoPilot.RejectApplications,
                     acceptApplications: autoPilot.AcceptApplications,
                     // referApplications: autoPilot.ReferApplications,
+                    // contractFollowUp: autoPilot.contractFollowUp,
                     sendAcceptanceEmail: autoPilot.SendAcceptanceEmail,
                     sendRejectionEmail: autoPilot.SendRejectionEmail,
                     // sendReferralEmail: autoPilot.SendReferralEmail,
+                    // sendContractFollowUpEmail: autoPilot.SendContractFollowUpEmail,
                     sendAcceptanceSMS: autoPilot.SendAcceptanceSMS,
                     sendRejectionSMS: autoPilot.SendRejectionSMS,
                     // sendReferralSMS: autoPilot.SendReferralSMS,
+                    // sendContractFollowUpSMS: autoPilot.SendContractFollowUpSMS,
                     sendCandidatesAppointments: autoPilot.SendCandidatesAppointments,
                     acceptanceScore: autoPilot.AcceptanceScore * 100,
                     acceptanceEmailBody: autoPilot.AcceptanceEmailBody,
@@ -98,9 +109,12 @@ class AutoPilot extends React.Component {
                     rejectionScore: autoPilot.RejectionScore * 100,
                     rejectionEmailBody: autoPilot.RejectionEmailBody,
                     rejectionSMSBody: autoPilot.RejectionSMSBody.split('\n').map(x => `<p>${x ? x : '&nbsp;'}</p>`).join(' '),
-                    // referralScore: autoPilot.ReferralScore * 100,
+                    // referralAssistant: autoPilot.ReferralAssistant,
                     // referralEmailBody: autoPilot.ReferralEmailBody,
                     // referralSMSBody: autoPilot.ReferralSMSBody.split('\n').map(x => `<p>${x ? x : '&nbsp;'}</p>`).join(' ')
+                    // contractFollowUpSchedule: autoPilot.ContractFollowUpSchedule,
+                    // contractFollowUpEmailBody: autoPilot.ContractFollowUpEmailBody,
+                    // contractFollowUpSMSBody: autoPilot.ContractFollowUpSMSBody.split('\n').map(x => `<p>${x ? x : '&nbsp;'}</p>`).join(' '),
                 });
             }).catch(() => history.push(`/dashboard/auto_pilots`));
     }
@@ -120,12 +134,19 @@ class AutoPilot extends React.Component {
         sendReferralEmail: checked ? this.state.sendReferralEmail : false,
         sendReferralSMS: checked ? this.state.sendReferralSMS : false
     });
+    onContractFollowUpChange = (checked) => this.setState({
+        contractFollowUp: checked,
+        sendContractFollowUpEmail: checked ? this.state.sendContractFollowUpEmail : false,
+        sendContractFollowUpSMS: checked ? this.state.sendContractFollowUpSMS : false
+    });
     onSendAcceptanceEmailChange = (checked) => this.setState({sendAcceptanceEmail: checked});
     onSendRejectionEmailChange = (checked) => this.setState({sendRejectionEmail: checked});
     onSendReferralEmailChange = (checked) => this.setState({sendReferralEmail: checked});
+    onSendContractFollowUpEmailChange = (checked) => this.setState({sendContractFollowUpEmail: checked});
     onSendAcceptanceSMSChange = (checked) => this.setState({sendAcceptanceSMS: checked});
     onSendRejectionSMSChange = (checked) => this.setState({sendRejectionSMS: checked});
     onSendReferralSMSChange = (checked) => this.setState({sendReferralSMS: checked});
+    onSendContractFollowUpSMSChange = (checked) => this.setState({sendContractFollowUpSMS: checked});
 
     handleDelete = () => {
         confirm({
@@ -152,11 +173,12 @@ class AutoPilot extends React.Component {
                 acceptApplications: state.acceptApplications,
                 rejectApplications: state.rejectApplications,
                 referApplications: state.referApplications,
+                contractFollowUp: state.contractFollowUp,
 
                 acceptanceScore: state.acceptanceScore / 100,
                 rejectionScore: state.rejectionScore / 100,
-                referralScore: state.referralScore / 100,
                 referralAssistant: state.referralAssistant,
+                contractFollowUpSchedule: state.contractFollowUpSchedule,
 
                 sendAcceptanceEmail: state.sendAcceptanceEmail,
                 acceptanceEmailTitle: values.acceptanceEmailTitle || autoPilot.AcceptanceEmailTitle,
@@ -178,6 +200,13 @@ class AutoPilot extends React.Component {
 
                 sendReferralSMS: state.sendReferralSMS,
                 referralSMSBody: state.referralSMSBody.replace(/<\/p>/g, '\n').replace(/<p>/g, '').replace(/&nbsp;/g, ''),
+
+                sendContractFollowUpEmail: state.sendContractFollowUpEmail,
+                sendContractFollowUpEmailTitle: values.contractFollowUpEmailTitle || autoPilot.ContractFollowUpEmailTitle,
+                contractFollowUpEmailBody: state.contractFollowUpEmailBody,
+
+                sendContractFollowUpSMS: state.sendContractFollowUpSMS,
+                contractFollowUpSMSBody: state.contractFollowUpSMSBody.replace(/<\/p>/g, '\n').replace(/<p>/g, '').replace(/&nbsp;/g, ''),
 
                 appointmentAllocationTimes: values.AppointmentAllocationTimes,
                 sendCandidatesAppointments: state.sendCandidatesAppointments
@@ -229,6 +258,22 @@ class AutoPilot extends React.Component {
                     this.setState({sendReferralSMSErrors: false});
             } else
                 this.setState({sendReferralSMSErrors: false});
+
+            if (payload.sendContractFollowUpEmail) {
+                if (!payload.contractFollowUpEmailTitle || !payload.contractFollowUpEmailBody)
+                    return this.setState({sendContractFollowUpEmailErrors: true});
+                else
+                    this.setState({sendContractFollowUpEmailErrors: false});
+            } else
+                this.setState({sendContractFollowUpEmailErrors: false});
+
+            if (payload.sendContractFollowUpSMS) {
+                if (!payload.contractFollowUpSMSBody)
+                    return this.setState({sendContractFollowUpSMSErrors: true});
+                else
+                    this.setState({sendContractFollowUpSMSErrors: false});
+            } else
+                this.setState({sendContractFollowUpSMSErrors: false});
 
 
             payload.appointmentAllocationTimes = payload.appointmentAllocationTimes === 'You have no timetables, please create one!' ? null : payload.appointmentAllocationTimes;
@@ -754,7 +799,7 @@ class AutoPilot extends React.Component {
                                         {
                                             this.state.sendReferralSMS &&
                                             <Row className={styles.CEKwrapper}>
-                                                <h4>Acceptance message</h4>
+                                                <h4>Referral message</h4>
                                                 {
                                                     this.state.sendReferralSMSErrors &&
                                                     <p style={{color: 'red'}}> * Body field is required</p>
@@ -802,17 +847,154 @@ class AutoPilot extends React.Component {
                                            style={customPanelStyle}>
 
                                         <FormItem label="Send job suggestion (before their role finishes)">
-                                            {getFieldDecorator("suggestionSchedule", {initialValue: "off"})(
-                                                <Radio.Group defaultValue="off" onChange={(e) => {
-                                                    this.setState({suggestionSchedule: e.target.value})
+                                            {getFieldDecorator('contractFollowUp', {
+                                                valuePropName: 'checked'
+                                            })(
+                                                <Switch onChange={this.onContractFollowUpChange}
+                                                        style={{marginRight: 15}}
+                                                        checked={this.state.contractFollowUp}
+                                                />
+                                            )}
+                                            {getFieldDecorator("contractFollowUpSchedule", {initialValue: "2"})(
+                                                <Radio.Group  disabled={!this.state.contractFollowUp}
+                                                              defaultValue="2" onChange={(e) => {
+                                                    this.setState({contractFollowUpSchedule: e.target.value})
                                                 }}>
-                                                    <Radio.Button value="off">Off</Radio.Button>
                                                     <Radio.Button value="1">1 Week</Radio.Button>
                                                     <Radio.Button value="2">2 Weeks</Radio.Button>
                                                     <Radio.Button value="3">3 Weeks</Radio.Button>
                                                 </Radio.Group>
                                             )}
                                         </FormItem>
+
+                                        <FormItem label="Auto send suggestion role emails"
+                                                  help="Applicants will be notified via email if email is provided in the chat  (candidates applications only)"
+                                        >
+                                            {getFieldDecorator('sendContractFollowUpEmail', {
+                                                initialValue: autoPilot?.SendContractFollowUpEmail,
+                                                rules: []
+                                            })(
+                                                <div style={{marginLeft: 3}}>
+                                                    <Switch onChange={this.onSendContractFollowUpEmailChange}
+                                                            checked={this.state.sendContractFollowUpEmail}
+                                                            disabled={!this.state.contractFollowUp}
+
+                                                    />
+                                                </div>
+                                            )}
+                                        </FormItem>
+
+                                        {
+                                            this.state.sendContractFollowUpEmail &&
+                                            <FormItem label="Role Suggestion Email Title" vi>
+                                                {getFieldDecorator('contractFollowUpEmailTitle', {
+                                                    initialValue: autoPilot?.ContractFollowUpEmailTitle,
+                                                    rules: [{required: true}]
+                                                })(
+                                                    <Input placeholder=""/>
+                                                )}
+                                            </FormItem>
+                                        }
+
+                                        {
+                                            this.state.sendContractFollowUpEmail &&
+                                            <Row className={styles.CEKwrapper}>
+                                                <h4>Role Suggestion letter</h4>
+
+                                                {
+                                                    this.state.sendContractFollowUpEmailErrors &&
+                                                    <p style={{color: 'red'}}> * Title and Body field are required</p>
+                                                }
+
+                                                <ButtonGroup style={{margin: '5px 0'}}>
+                                                    <Button
+                                                        onClick={() =>
+                                                            this.setState({
+                                                                contractFollowUpEmailBody: this.state.contractFollowUpEmailBody + ' ${candidateName}$'
+                                                            })
+                                                        }>
+                                                        Candidate Name
+                                                    </Button>
+                                                    <Button
+                                                        onClick={() =>
+                                                            this.setState({
+                                                                contractFollowUpEmailBody: this.state.contractFollowUpEmailBody + ' ${candidateEmail}$'
+                                                            })
+                                                        }>
+                                                        Candidate Email
+                                                    </Button>
+                                                </ButtonGroup>
+
+                                                <Row>
+                                                    <Col span={15}>
+                                                        <CKEditor
+                                                            editor={ClassicEditor}
+                                                            config={{toolbar: toolbar}}
+                                                            data={this.state.contractFollowUpEmailBody}
+                                                            onChange={(event, editor) => this.setState(state => state.contractFollowUpEmailBody = editor?.getData())}
+                                                            onInit={editor => this.setState(state => state.contractFollowUpEmailBody = editor?.getData())}
+                                                        />
+                                                    </Col>
+                                                </Row>
+                                            </Row>
+                                        }
+
+                                        <FormItem label="Auto send SMS"
+                                                  help="Applicants will be notified via SMS if telephone number is provided in the chat  (candidates applications only)">
+                                            {getFieldDecorator('sendContractFollowUpSMS', {
+                                                initialValue: autoPilot?.SendContractFollowUpSMS,
+                                                rules: []
+                                            })(
+                                                <div style={{marginLeft: 3}}>
+                                                    <Switch onChange={this.onSendContractFollowUpSMSChange}
+                                                            checked={this.state.sendContractFollowUpSMS}
+                                                            disabled={!this.state.contractFollowUp}/>
+
+                                                </div>
+                                            )}
+                                        </FormItem>
+
+                                        {
+                                            this.state.sendContractFollowUpSMS &&
+                                            <Row className={styles.CEKwrapper}>
+                                                <h4>Role suggestion message</h4>
+                                                {
+                                                    this.state.sendContractFollowUpSMSErrors &&
+                                                    <p style={{color: 'red'}}> * Body field is required</p>
+                                                }
+                                                <ButtonGroup style={{margin: '5px 0'}}>
+                                                    <Button
+                                                        onClick={() =>
+                                                            this.setState({
+                                                                contractFollowUpSMSBody: this.state.contractFollowUpSMSBody + ' ${candidateName}$'
+                                                            })
+                                                        }>
+                                                        Candidate Name
+                                                    </Button>
+                                                    <Button
+                                                        onClick={() =>
+                                                            this.setState({
+                                                                contractFollowUpSMSBody: this.state.contractFollowUpSMSBody + ' ${candidateEmail}$'
+                                                            })
+                                                        }>
+                                                        Candidate Email
+                                                    </Button>
+                                                </ButtonGroup>
+
+                                                <Row>
+                                                    <Col span={15}>
+                                                        <CKEditor
+                                                            editor={ClassicEditor}
+                                                            config={{toolbar: ['undo', 'redo']}}
+                                                            data={this.state.contractFollowUpSMSBody}
+                                                            onChange={(event, editor) => this.setState(state => state.contractFollowUpSMSBody = editor?.getData())}
+                                                            onInit={editor => this.setState(state => state.contractFollowUpSMSBody = editor?.getData())}
+                                                        />
+                                                    </Col>
+                                                </Row>
+                                            </Row>
+                                        }
+
                                     </Panel>
                                 </Collapse>
 

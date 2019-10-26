@@ -41,7 +41,7 @@ class Conversations extends React.Component {
                     { text: 'Client', value: 'Client' }
                 ],
                 onFilter: (value, record) => record.UserType.indexOf(value) === 0,
-                render: (text, record) => (<div align="center"><Tag key={record.UserType}>{record.UserType}</Tag></div>)
+                render: (text, record) => (<Tag key={record.UserType}>{record.UserType}</Tag>)
             }, {
                 title: 'Name',
                 key: 'Name',
@@ -71,10 +71,11 @@ class Conversations extends React.Component {
             }, {
                 title: 'Score',
                 key: 'Score',
+                align: 'center',
                 sorter: (a, b) => a.Score - b.Score,
                 render: (text, record) => {
                     return (
-                        <div style={{ width: 120}}>
+                        <div style={{ width: 120, margin:'auto'}}>
                             <Progress percent={Math.round(record.Score * 100)} size="small"
                                       status={record.Score < 0.1 ? 'exception' : 'active'}/>
                         </div>
@@ -84,6 +85,7 @@ class Conversations extends React.Component {
             }, {
                 title: 'Status',
                 key: 'ApplicationStatus',
+                align: 'center',
                 filters: [
                     { text: 'Accepted', value: 'Accepted' },
                     { text: 'Pending', value: 'Pending' },
@@ -128,6 +130,7 @@ class Conversations extends React.Component {
             {
                 title: 'Conversation',
                 key: 'Completed',
+                align: 'center',
                 filters: [
                     { text: 'Completed', value: 'Completed' },
                     { text: 'Incomplete', value: 'Incomplete' }
@@ -136,7 +139,7 @@ class Conversations extends React.Component {
                     return (record.Completed ? 'Completed' : 'Incomplete').indexOf(value) === 0;
                 },
                 render: (text, record) => (
-                    <div align="center">
+                    <div>
                         {record.Completed ?
                             <Tag color="#87d068">Completed</Tag> :
                             <Tag color="red">Incomplete</Tag>
@@ -146,6 +149,7 @@ class Conversations extends React.Component {
             }, {
                 title: 'Actions',
                 key: 'actions',
+                align: 'center',
                 render: (text, record, index) => (
                     <div align="center">
 
@@ -402,7 +406,7 @@ class Conversations extends React.Component {
                        bordered={true}
                        pagination={{ position: 'both', pageSize: 20 }}
                        size='default'
-                       scroll={{ x: 1000 }}
+                       scroll={{ x: 'max-content' }}
                 />
 
                 {

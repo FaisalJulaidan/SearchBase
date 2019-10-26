@@ -35,10 +35,18 @@ services:
     restart: always
 
   client:
-    container_name: search_base_client
+    container_name: searchbase_client
     build: ./Client
     ports:
-      - 3000
+      - 3000:3000
+    networks:
+      - frontend
+
+  chatbot:
+    container_name: searchbase_chatbot
+    build: ./Chatbot
+    ports:
+      - 3001:3001
     networks:
       - frontend
 

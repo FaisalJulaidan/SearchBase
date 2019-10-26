@@ -16,4 +16,4 @@ ADD . .
 RUN npm run build
 RUN rm -rf -v !("build")
 
-CMD ["serve", "-l", "3000", "-s", "build"]
+CMD ["serve", "-l", "3001", "-s", "build"]

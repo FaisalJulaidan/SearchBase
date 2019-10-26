@@ -1,21 +1,6 @@
 version: '3'
 
-
-volumes:
-  prod-data:
-
 services:
-  mysql:
-    image: mysql
-    ports:
-      - 3306:3306
-    restart: always
-    environment:
-      - MYSQL_ROOT_PASSWORD=#TheSearchBase_Secure_Password#
-    networks:
-      - frontend
-    volumes:
-      - prod-data:/var/lib/mysql
 
   nginx:
     image: nginx:1.15-alpine
@@ -30,7 +15,6 @@ services:
       - ./docker/certbot/www:/var/www/certbot
     networks:
       - frontend
-
 
   certbot:
     image: certbot/certbot
@@ -49,6 +33,14 @@ services:
     networks:
       - frontend
     restart: always
+
+  client:
+    container_name: search_base_client
+    build: ./Client
+    ports:
+      - 3000
+    networks:
+      - frontend
 
 networks:
   frontend:

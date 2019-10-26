@@ -14,7 +14,7 @@ const Steps = () => {
                             <div className={styles.arrow0}/>
                             <div className={styles.image_wrapper1}>
                                 <Image className={styles.image1}
-                                       src={getLink("/static/images/home/how-it-works/businessman.svg")}/>
+                                       src={"/images/home/how-it-works/businessman.svg"}/>
                             </div>
                         </Col>
                         <Col xs={9} sm={8} md={5}>
@@ -25,7 +25,7 @@ const Steps = () => {
                         <Col xs={12} sm={12} md={4}>
                             <div className={styles.image_wrapper2}>
                                 <Image className={styles.image2}
-                                       src={getLink("/static/images/home/how-it-works/process.svg")}/>
+                                       src={"/images/home/how-it-works/process.svg"}/>
                             </div>
                         </Col>
 
@@ -38,7 +38,7 @@ const Steps = () => {
                         <Col xs={3} sm={4} md={4}>
                             <div className={styles.image_wrapper1}>
                                 <Image className={styles.image1}
-                                       src={getLink("/static/images/home/how-it-works/personal-text.svg")}/>
+                                       src={"/images/home/how-it-works/personal-text.svg"}/>
                             </div>
                         </Col>
                         <Col xs={9} sm={8} md={5}>
@@ -49,7 +49,7 @@ const Steps = () => {
                         <Col xs={12} sm={12} md={2}>
                             <div className={styles.image_wrapper2}>
                                 <Image className={styles.image2}
-                                       src={getLink("/static/images/home/how-it-works/messages.svg")}/>
+                                       src={"/images/home/how-it-works/messages.svg"}/>
                             </div>
                         </Col>
                     </Row>
@@ -61,7 +61,7 @@ const Steps = () => {
                         <Col xs={3} sm={4} md={{span: 6, offset: 1}}>
                             <div className={styles.image_wrapper1}>
                                 <Image className={styles.image1}
-                                       src={getLink("/static/images/home/how-it-works/group-chat.svg")}/>
+                                       src={"/images/home/how-it-works/group-chat.svg"}/>
                             </div>
                         </Col>
                         <Col xs={9} sm={8} md={5}>
@@ -82,7 +82,7 @@ const Steps = () => {
                         <Col xs={{span: 3, order: 1}} sm={4} md={{span: 5, order: 2}}>
                             <div className={styles.image_wrapper1}>
                                 <Image className={styles.image1}
-                                       src={getLink("/static/images/home/how-it-works/analytics.svg")}/>
+                                       src={"/images/home/how-it-works/analytics.svg"}/>
                             </div>
                         </Col>
                     </Row>

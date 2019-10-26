@@ -3,7 +3,7 @@
     "id": "chatbot",
     "intro": "Chatbots",
     "title": "Improve Efficiency",
-    "image": "/static/images/home/how-it-works/chatting.svg",
+    "image": "/images/home/how-it-works/chatting.svg",
     "texts": [
       "Our chatbots help you spend less time screening and qualifying candidates, and more time building relationships. Our focus is to automate mundane tasks.",
       ""
@@ -13,7 +13,7 @@
     "id": "candidate",
     "intro": "Candidate Activation",
     "title": "Stay Connected",
-    "image": "/static/images/home/how-it-works/files.svg",
+    "image": "/images/home/how-it-works/files.svg",
     "texts": [
       "Every recruiter has a database or a CRM with over 60% filled with candidates that they have never engaged with or have simply lost communication with.",
       "With GDPR now in place, it can be very difficult to stay updated. Our chatbots help you stay connected and up to date."
@@ -23,7 +23,7 @@
     "id": "sms",
     "intro": "SMS outreach",
     "title": "We cover you, Offline and Online",
-    "image": "/static/images/home/how-it-works/opinion.svg",
+    "image": "/images/home/how-it-works/opinion.svg",
     "texts": [
       "Not all of your candidates may have access to the internet, so we have developed a solution that works both offline and online. ",
       "Our research has shown that SMS has had up to 90% more responses compared to Email and LinkedIn Messaging."
@@ -33,7 +33,7 @@
     "id": "engagement",
     "intro": "Automation",
     "title": "Make Your Workflow Great Again",
-    "image": "/static/images/home/how-it-works/sync.svg",
+    "image": "/images/home/how-it-works/sync.svg",
     "texts": [
       "All recruiters are different, that's why we give you the ability to tailor SearchBase to your specific needs and requirements.",
       "With Searchbase You set up tailored automation sequences that help you improve the efficiency of your workflow."

@@ -867,7 +867,7 @@ class AutoPilot extends React.Component {
                                             )}
                                         </FormItem>
 
-                                        <FormItem label="Auto send suggestion role emails"
+                                        <FormItem label="Auto Emails"
                                                   help="Applicants will be notified via email if email is provided in the chat  (candidates applications only)"
                                         >
                                             {getFieldDecorator('sendContractFollowUpEmail', {

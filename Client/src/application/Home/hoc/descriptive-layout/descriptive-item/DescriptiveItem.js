@@ -2,6 +2,7 @@ import React from 'react';
 import styles from "./descriptive-item.module.css";
 import PropTypes from "prop-types";
 import Table from "./table/Table";
+import Linkify from 'react-linkify';
 
 class DescriptiveItem extends React.Component {
     state = {
@@ -12,6 +13,12 @@ class DescriptiveItem extends React.Component {
         texts: this.props.texts || [],
         _table: this.props._table
     };
+
+    componentDecorator = (href, text, key) => (
+        <a href={href} key={key} target="_blank">
+            {text}
+        </a>
+    );
 
     render() {
 
@@ -34,19 +41,21 @@ class DescriptiveItem extends React.Component {
 
 
         return (
-            <div className={styles.item_wrapper}>
-                <br/>
-                <h2 style={{display: (typeof this.state.headline != "undefined") ? 'block' : 'none'}}
-                    className={styles.headline}>{this.state.headline}</h2>
-                <h5 className={styles.title}>{this.state.title}</h5>
-                <p>{this.state.subtitle}</p>
-                <ul style={{display: (this.state.items.length !== 0) ? 'block' : 'none'}}
-                    className={styles.items}>
-                    {items}
-                </ul>
-                {texts}
-                {table}
-            </div>
+            <Linkify componentDecorator={this.componentDecorator}>
+                <div className={styles.item_wrapper}>
+                    <br/>
+                    <h2 style={{display: (typeof this.state.headline != "undefined") ? 'block' : 'none'}}
+                        className={styles.headline}>{this.state.headline}</h2>
+                    <h5 className={styles.title}>{this.state.title}</h5>
+                    <p>{this.state.subtitle}</p>
+                    <ul style={{display: (this.state.items.length !== 0) ? 'block' : 'none'}}
+                        className={styles.items}>
+                        {items}
+                    </ul>
+                    {texts}
+                    {table}
+                </div>
+            </Linkify>
         )
     }
 }

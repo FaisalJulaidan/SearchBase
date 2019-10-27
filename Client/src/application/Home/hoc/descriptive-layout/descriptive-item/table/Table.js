@@ -14,8 +14,18 @@ const Table = (props) => {
         return <TableRow key={i} body row={row}/>
     });
 
+    const breakpoints = {
+        sm: 576.98
+    };
+
+    let sizeProp = {};
+    if (window.innerWidth < breakpoints.sm) {
+        sizeProp["size"] = "sm";
+        sizeProp["responsive"] = "sm";
+    }
+
     return (
-        <ReactTable className={styles.table} striped bordered hover>
+        <ReactTable className={styles.table} striped bordered hover {...sizeProp}>
             <thead>{headRows}</thead>
             <tbody>{bodyRows}</tbody>
         </ReactTable>

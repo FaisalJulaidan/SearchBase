@@ -1,5 +1,4 @@
 import React, {Component} from 'react'
-import '../../bootstrap.css'
 import './layout.css'
 import Header from "../../component/header/Header";
 import Footer from '../../component/footer/Footer'

@@ -7,7 +7,7 @@ import {marketplaceActions} from "store/actions";
 import styles from './Item.module.less'
 import {DefaultButton} from './Components/Common'
 import {AdaptFeatures, AdaptFormItems, AdaptHeader} from "./Components/Adapt";
-import {BullhornFeatures, BullhornHeader} from "./Components/Bullhorn";
+import {BullhornFeatures, BullhornFormItems, BullhornHeader} from "./Components/Bullhorn";
 import {JobscienceFeatures, JobscienceHeader} from "./Components/Jobscience";
 import {VincereFeatures, VincereFormItems, VincereHeader} from "./Components/Vincere";
 import {GreenhouseFeatures, GreenhouseFormItem, GreenhouseHeader} from "./Components/Greenhouse";
@@ -136,13 +136,14 @@ class Item extends React.Component {
                     return <BullhornHeader/>;
                 if (place === 'features')
                     return <BullhornFeatures/>;
+                if (place === 'form')
+                    return <BullhornFormItems {...formOptions}/>;
                 if (place === 'button') {
-                    windowObject.url = "https://auth.bullhornstaffing.com/oauth/authorize?response_type=code" +
-                        "&client_id=7719607b-7fe7-4715-b723-809cc57e2714&redirect_uri=" +
-                        this.getWWWLink("/dashboard/marketplace/Bullhorn");
+                    // windowObject.url = "https://auth.bullhornstaffing.com/oauth/authorize?response_type=code" +
+                    //     "&client_id=7719607b-7fe7-4715-b723-809cc57e2714&redirect_uri=" +
+                    //     this.getWWWLink("/dashboard/marketplace/Bullhorn");
                     // return <a href={windowObject.url}>Click me</a>
                     return <DefaultButton buttonText={'Connect to Bullhorn'}
-                                          windowObject={windowObject}
                                           {...buttonsOptions}/>;
                 }
                 if (place === 'runExport') {

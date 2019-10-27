@@ -23,8 +23,10 @@ import 'types/TimeSlots_Types';
 import './AutoPilot.less';
 import {history} from 'helpers';
 import {autoPilotActions, appointmentAllocationTimeActions} from 'store/actions';
+import {campaignActions} from "store/actions"; //TODO: To be removed (Fetching assistants for referral for now)
 import CKEditor from '@ckeditor/ckeditor5-react';
 import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
+import {trimText} from "../../../../helpers";
 
 const {Panel} = Collapse;
 const ButtonGroup = Button.Group;
@@ -55,11 +57,15 @@ class AutoPilot extends React.Component {
     state = {
         rejectApplications: false,
         acceptApplications: false,
+        referApplications: false,
         sendAcceptanceEmail: false,
         sendRejectionEmail: false,
+        sendReferralEmail: false,
         sendAcceptanceSMS: false,
         sendRejectionSMS: false,
+        sendReferralSMS: false,
         sendCandidatesAppointments: false,
+
         acceptanceScore: null,
         acceptanceEmailBody: '<p>Congrats you got accepted.</p>',
         acceptanceSMSBody: 'Congrats you got accepted.',
@@ -68,32 +74,46 @@ class AutoPilot extends React.Component {
         rejectionEmailBody: '<p>Sorry you are not accepted.</p>',
         rejectionSMSBody: 'Sorry you are not accepted.',
 
+        referralScore: 100, //TODO: Change to null when server-side is done
+        referralAssistant: null,
+        referralEmailBody: '<p></p>',
+        referralSMSBody: '',
+
         sendAcceptanceEmailErrors: false,
         sendAcceptanceSMSErrors: false,
         sendRejectionEmailErrors: false,
-        sendRejectionSMSErrors: false
+        sendRejectionSMSErrors: false,
+        sendReferralEmailErrors: false,
+        sendReferralSMSErrors: false
 
     };
 
     componentDidMount() {
         this.props.dispatch(appointmentAllocationTimeActions.fetchAAT());
+        this.props.dispatch(campaignActions.fetchCampaigns()); //TODO: To be removed (Fetching assistants for referral for now)
         this.props.dispatch(autoPilotActions.fetchAutoPilot(this.props.match.params.id))
             .then(() => {
                 const {autoPilot} = this.props;
-                this.setState({
+                this.setState({  //TODO:: Uncomment referral fields when server-side is done
                     rejectApplications: autoPilot.RejectApplications,
                     acceptApplications: autoPilot.AcceptApplications,
+                    // referApplications: autoPilot.ReferApplications,
                     sendAcceptanceEmail: autoPilot.SendAcceptanceEmail,
                     sendRejectionEmail: autoPilot.SendRejectionEmail,
+                    // sendReferralEmail: autoPilot.SendReferralEmail,
                     sendAcceptanceSMS: autoPilot.SendAcceptanceSMS,
                     sendRejectionSMS: autoPilot.SendRejectionSMS,
+                    // sendReferralSMS: autoPilot.SendReferralSMS,
                     sendCandidatesAppointments: autoPilot.SendCandidatesAppointments,
                     acceptanceScore: autoPilot.AcceptanceScore * 100,
                     acceptanceEmailBody: autoPilot.AcceptanceEmailBody,
                     acceptanceSMSBody: autoPilot.AcceptanceSMSBody.split('\n').map(x => `<p>${x ? x : '&nbsp;'}</p>`).join(' '),
                     rejectionScore: autoPilot.RejectionScore * 100,
                     rejectionEmailBody: autoPilot.RejectionEmailBody,
-                    rejectionSMSBody: autoPilot.RejectionSMSBody.split('\n').map(x => `<p>${x ? x : '&nbsp;'}</p>`).join(' ')
+                    rejectionSMSBody: autoPilot.RejectionSMSBody.split('\n').map(x => `<p>${x ? x : '&nbsp;'}</p>`).join(' '),
+                    // referralScore: autoPilot.ReferralScore * 100,
+                    // referralEmailBody: autoPilot.ReferralEmailBody,
+                    // referralSMSBody: autoPilot.ReferralSMSBody.split('\n').map(x => `<p>${x ? x : '&nbsp;'}</p>`).join(' ')
                 });
             }).catch(() => history.push(`/dashboard/auto_pilots`));
     }
@@ -108,10 +128,17 @@ class AutoPilot extends React.Component {
         sendAcceptanceEmail: checked ? this.state.sendAcceptanceEmail : false,
         sendAcceptanceSMS: checked ? this.state.sendAcceptanceSMS : false
     });
+    onReferChange = (checked) => this.setState({
+        referApplications: checked,
+        sendReferralEmail: checked ? this.state.sendReferralEmail : false,
+        sendReferralSMS: checked ? this.state.sendReferralSMS : false
+    });
     onSendAcceptanceEmailChange = (checked) => this.setState({sendAcceptanceEmail: checked});
     onSendRejectionEmailChange = (checked) => this.setState({sendRejectionEmail: checked});
+    onSendReferralEmailChange = (checked) => this.setState({sendReferralEmail: checked});
     onSendAcceptanceSMSChange = (checked) => this.setState({sendAcceptanceSMS: checked});
     onSendRejectionSMSChange = (checked) => this.setState({sendRejectionSMS: checked});
+    onSendReferralSMSChange = (checked) => this.setState({sendReferralSMS: checked});
 
     handleDelete = () => {
         confirm({
@@ -137,9 +164,12 @@ class AutoPilot extends React.Component {
 
                 acceptApplications: state.acceptApplications,
                 rejectApplications: state.rejectApplications,
+                referApplications: state.referApplications,
 
                 acceptanceScore: state.acceptanceScore / 100,
                 rejectionScore: state.rejectionScore / 100,
+                referralScore: state.referralScore / 100,
+                referralAssistant: state.referralAssistant,
 
                 sendAcceptanceEmail: state.sendAcceptanceEmail,
                 acceptanceEmailTitle: values.acceptanceEmailTitle || autoPilot.AcceptanceEmailTitle,
@@ -154,6 +184,13 @@ class AutoPilot extends React.Component {
 
                 sendRejectionSMS: state.sendRejectionSMS,
                 rejectionSMSBody: state.rejectionSMSBody.replace(/<\/p>/g, '\n').replace(/<p>/g, '').replace(/&nbsp;/g, ''),
+
+                sendReferralEmail: state.sendReferralEmail,
+                sendReferralEmailTitle: values.referralEmailTitle || autoPilot.ReferralEmailTitle,
+                referralEmailBody: state.referralEmailBody,
+
+                sendReferralSMS: state.sendReferralSMS,
+                referralSMSBody: state.referralSMSBody.replace(/<\/p>/g, '\n').replace(/<p>/g, '').replace(/&nbsp;/g, ''),
 
                 appointmentAllocationTimes: values.AppointmentAllocationTimes,
                 sendCandidatesAppointments: state.sendCandidatesAppointments
@@ -189,6 +226,23 @@ class AutoPilot extends React.Component {
                     this.setState({sendRejectionSMSErrors: false});
             } else
                 this.setState({sendRejectionSMSErrors: false});
+
+            if (payload.sendReferralEmail) {
+                if (!payload.referralEmailTitle || !payload.referralEmailBody)
+                    return this.setState({sendReferralEmailErrors: true});
+                else
+                    this.setState({sendReferralEmailErrors: false});
+            } else
+                this.setState({sendReferralEmailErrors: false});
+
+            if (payload.sendReferralSMS) {
+                if (!payload.referralSMSBody)
+                    return this.setState({sendReferralSMSErrors: true});
+                else
+                    this.setState({sendReferralSMSErrors: false});
+            } else
+                this.setState({sendReferralSMSErrors: false});
+
 
             payload.appointmentAllocationTimes = payload.appointmentAllocationTimes === 'You have no timetables, please create one!' ? null : payload.appointmentAllocationTimes;
             console.log(payload);
@@ -576,18 +630,188 @@ class AutoPilot extends React.Component {
                                     </Panel>
                                 </Collapse>
 
+
                                 <Divider/>
                                 <h2>Referral</h2>
                                 <Collapse bordered={false}>
-                                    <Panel header={<h2>Automatically asks candidates for referral after placement</h2>} key="3"
+                                    <Panel header={<h2>Automatically asks candidates for referral after placement</h2>}
+                                           key="3"
                                            style={customPanelStyle}>
+
+                                        <FormItem label="Auto refer applicants "
+                                                  help="Select an assistant to auto refer the applicants">
+                                            {getFieldDecorator('referApplications', {
+                                                valuePropName: 'checked'
+                                            })(
+                                                <Switch onChange={this.onReferChange}
+                                                        style={{marginRight: 15}}
+                                                        checked={this.state.referApplications}
+                                                />
+                                            )}
+                                        </FormItem>
+
+                                        {
+                                            this.state.referApplications &&
+                                            <FormItem label={"Assistant"}>
+                                                {getFieldDecorator("referralAssistant", {
+                                                    initialValue: this.state.referralAssistant,
+                                                    rules: [{
+                                                        required: true,
+                                                        message: "Please select the assistant"
+                                                    }],
+                                                })(
+                                                    <Select placeholder={"Please select an assistant"}
+                                                            loading={this.props.isLoading}
+                                                            disabled={!this.state.referApplications}>
+                                                        {(() => {
+                                                            return this.props.campaignOptions?.assistants?.map((item, key) => {
+                                                                return (
+                                                                    <Select.Option key={key} value={item.ID}>
+                                                                        {trimText.capitalize(trimText.trimDash(item.Name))}
+                                                                    </Select.Option>
+                                                                );
+                                                            });
+                                                        })()}
+                                                    </Select>
+                                                )}
+                                            </FormItem>
+                                        }
+
+                                        <FormItem label="Auto send referral emails"
+                                                  help="Referred applicants will be notified via email if email is provided in the chat  (candidates applications only)"
+                                        >
+                                            {getFieldDecorator('sendReferralEmail', {
+                                                initialValue: autoPilot?.SendReferralEmail,
+                                                rules: []
+                                            })(
+                                                <div style={{marginLeft: 3}}>
+                                                    <Switch onChange={this.onSendReferralEmailChange}
+                                                            checked={this.state.sendReferralEmail}
+                                                            disabled={!this.state.referApplications}
+
+                                                    />
+                                                </div>
+                                            )}
+                                        </FormItem>
+
+                                        {
+                                            this.state.sendReferralEmail &&
+                                            <FormItem label="Referral Email Title" vi>
+                                                {getFieldDecorator('referralEmailTitle', {
+                                                    initialValue: autoPilot?.ReferralEmailTitle,
+                                                    rules: [{required: true}]
+                                                })(
+                                                    <Input placeholder=""/>
+                                                )}
+                                            </FormItem>
+                                        }
+
+                                        {
+                                            this.state.sendReferralEmail &&
+                                            <Row className={styles.CEKwrapper}>
+                                                <h4>Referral letter</h4>
+
+                                                {
+                                                    this.state.sendReferralEmailErrors &&
+                                                    <p style={{color: 'red'}}> * Title and Body field are required</p>
+                                                }
+
+                                                <ButtonGroup style={{margin: '5px 0'}}>
+                                                    <Button
+                                                        onClick={() =>
+                                                            this.setState({
+                                                                referralEmailBody: this.state.referralEmailBody + ' ${candidateName}$'
+                                                            })
+                                                        }>
+                                                        Candidate Name
+                                                    </Button>
+                                                    <Button
+                                                        onClick={() =>
+                                                            this.setState({
+                                                                referralEmailBody: this.state.referralEmailBody + ' ${candidateEmail}$'
+                                                            })
+                                                        }>
+                                                        Candidate Email
+                                                    </Button>
+                                                </ButtonGroup>
+
+                                                <Row>
+                                                    <Col span={15}>
+                                                        <CKEditor
+                                                            editor={ClassicEditor}
+                                                            config={{toolbar: toolbar}}
+                                                            data={this.state.referralEmailBody}
+                                                            onChange={(event, editor) => this.setState(state => state.referralEmailBody = editor?.getData())}
+                                                            onInit={editor => this.setState(state => state.referralEmailBody = editor?.getData())}
+                                                        />
+                                                    </Col>
+                                                </Row>
+                                            </Row>
+                                        }
+
+                                        <FormItem label="Auto send SMS"
+                                                  help="Referred applicants will be notified via SMS if telephone number is provided in the chat  (candidates applications only)">
+                                            {getFieldDecorator('sendReferralSMS', {
+                                                initialValue: autoPilot?.SendReferralSMS,
+                                                rules: []
+                                            })(
+                                                <div style={{marginLeft: 3}}>
+                                                    <Switch onChange={this.onSendReferralSMSChange}
+                                                            checked={this.state.sendReferralSMS}
+                                                            disabled={!this.state.referApplications}/>
+
+                                                </div>
+                                            )}
+                                        </FormItem>
+
+                                        {
+                                            this.state.sendReferralSMS &&
+                                            <Row className={styles.CEKwrapper}>
+                                                <h4>Acceptance message</h4>
+                                                {
+                                                    this.state.sendReferralSMSErrors &&
+                                                    <p style={{color: 'red'}}> * Body field is required</p>
+                                                }
+                                                <ButtonGroup style={{margin: '5px 0'}}>
+                                                    <Button
+                                                        onClick={() =>
+                                                            this.setState({
+                                                                referralSMSBody: this.state.referralSMSBody + ' ${candidateName}$'
+                                                            })
+                                                        }>
+                                                        Candidate Name
+                                                    </Button>
+                                                    <Button
+                                                        onClick={() =>
+                                                            this.setState({
+                                                                referralSMSBody: this.state.referralSMSBody + ' ${candidateEmail}$'
+                                                            })
+                                                        }>
+                                                        Candidate Email
+                                                    </Button>
+                                                </ButtonGroup>
+
+                                                <Row>
+                                                    <Col span={15}>
+                                                        <CKEditor
+                                                            editor={ClassicEditor}
+                                                            config={{toolbar: ['undo', 'redo']}}
+                                                            data={this.state.referralSMSBody}
+                                                            onChange={(event, editor) => this.setState(state => state.referralSMSBody = editor?.getData())}
+                                                            onInit={editor => this.setState(state => state.referralSMSBody = editor?.getData())}
+                                                        />
+                                                    </Col>
+                                                </Row>
+                                            </Row>
+                                        }
+
                                     </Panel>
                                 </Collapse>
 
                                 <Divider/>
                                 <h2>Contract Follow Up</h2>
                                 <Collapse bordered={false}>
-                                    <Panel header={<h2>Automatically suggests contract rolls</h2>} key="3"
+                                    <Panel header={<h2>Automatically suggests contract roles</h2>} key="4"
                                            style={customPanelStyle}>
                                     </Panel>
                                 </Collapse>
@@ -678,7 +902,7 @@ function mapStateToProps(state) {
         isLoading: state.autoPilot.isLoading,
         appointmentAllocationTime: state.appointmentAllocationTime.allocationTimes,
         aatLoading: state.appointmentAllocationTime.isLoading,
-        assistantList: state.assistant.assistantList
+        campaignOptions: state.campaign.campaignOptions //TODO: To be removed (Fetching assistants for referral for now)
     };
 }
 

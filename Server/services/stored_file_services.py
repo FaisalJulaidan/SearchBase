@@ -175,7 +175,6 @@ def genPresigendURL(filename, expireIn=None):
                                                 'Key': UPLOAD_FOLDER + '/' + filename
                                             })
         except ClientError as e:
-            print('error')
             raise Exception("---> DigitalOcean Error" + str(e))
 
         return Callback(True, "File downloaded successfully", url)

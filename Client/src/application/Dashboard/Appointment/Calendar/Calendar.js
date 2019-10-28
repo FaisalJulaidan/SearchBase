@@ -14,7 +14,7 @@ class Calendar extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            value: momentTZ().tz(props.tz),
+            value: moment(),
             appointmentModalVisible: false,
             appointments: []
         };

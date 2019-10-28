@@ -223,6 +223,9 @@ def convertDate(date: str):
 def insertCandidate(access_token, conversation: Conversation) -> Callback:
     try:
 
+        print("Inserting candidate")
+        print(conversation)
+
         name = (conversation.get("name") or " ").split(" ")
         body = {
             "FirstName": helpers.getListValue(name, 0, "") or "FIRST_DEFAULT",
@@ -274,23 +277,15 @@ def insertCandidate(access_token, conversation: Conversation) -> Callback:
 
 
 def updateCandidate(auth, conversation: Conversation, companyID) -> Callback:
-    # URL: https://prsjobs--jsfull.cs83.my.salesforce.com/services/data/v36.0/sobjects/Contact/0034E00000v8wbWQAQ
-    # Note: Dont want to replace data with nothing -> Only for fields that have answers
     try:
-        print("Updating candidate")
-        print(conversation)
-
-        name = (conversation.get("name") or " ").split(" ")
 
         # Compose body keywords:
 
         body = {
-            "FirstName": helpers.getListValue(name, 0, "") or "FIRST_DEFAULT",
-            "LastName": helpers.getListValue(name, 1, "") or "LAST_DEFAULT",  # LastName is only required field
             "Title": conversation.get("preferredJobTitle"),
-            "phone": conversation.get('mobile') or " ",
-            "MailingCity": conversation.get("city") or "",
-            "email": conversation.get("email") or " ",
+            "phone": conversation.get('mobile'),
+            "MailingCity": conversation.get("city"),
+            "email": conversation.get("email"),
             "ts2__Date_Available__c": convertDate(conversation.get("availability")),  # TODO CHECK
             "ts2__Education__c": "",  # Needs to be in a separate post request
             "ts2__Desired_Salary__c": conversation.get("annualSalary"),
@@ -298,7 +293,6 @@ def updateCandidate(auth, conversation: Conversation, companyID) -> Callback:
             "ts2__LinkedIn_Profile__c": conversation.get("CandidateLinkdinURL"),
             "Attributes__c": conversation.get("skills"),
             "ts2__Job_Type__c": conversation.get("preferredJobType"),
-            # "ts2__Text_Resume__c": "", # TODO: Link this with File upload
             "Internal_Notes__c": crm_services.additionalCandidateNotesBuilder(
                 {
                     "preferredJobTitle": conversation.get("preferredJobTitle"),
@@ -309,11 +303,17 @@ def updateCandidate(auth, conversation: Conversation, companyID) -> Callback:
             ),
         }
 
-        # So that we dont replace existing data will nothing
+        # Note: So that we dont replace existing data will nothing
         filtered_body = {}
         for propertyKey, propertyValue in body.items():
             if propertyValue is not None:
-                filtered_body[propertyKey] = propertyValue
+                if type(propertyValue) is str and str(propertyValue).strip():
+                    filtered_body[propertyKey] = propertyValue
+                elif type(propertyValue) is int and propertyValue != 0:
+                    filtered_body[propertyKey] = propertyValue
+
+        print("Updating Candidate: {}".format(filtered_body))
+        logging.info("Updating Candidate: {}".format(filtered_body))
 
         # send query
         sendQuery_callback: Callback = sendQuery(auth, "patch", filtered_body,
@@ -357,7 +357,7 @@ def insertClientContact(access_token, conversation: Conversation, prsCompanyID) 
             conversation["firstName"] = "DEFAULT_FIRST"
         if conversation.get("lastName") == "":
             conversation["lastName"] = "DEFAULT_LAST"
-        print(conversation)
+
 
         body = {
             "FirstName": conversation.get("firstName"),  # TODO: Decide on default values
@@ -405,8 +405,6 @@ def insertCompany(auth, conversation: Conversation) -> Callback:
 def fetchSkillsForCandidateSearch(list_of_contactIDs: list, list_of_skills, access_token):
     # Need set of contact ID's returned from searchCandidates()
     query_segment = ",".join(list_of_contactIDs)
-    print("list of skills:")
-    print(list_of_skills)
 
     # Add LIKE statements:
     like_string = ""

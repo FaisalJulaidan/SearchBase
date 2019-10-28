@@ -470,16 +470,19 @@ def searchCandidates(auth, companyID, data, fields=None) -> Callback:
         # populate filter
         query += populateFilter(data.get("location"), "address.city")
 
+        for skill in data.get("skills"):
+            query += populateFilter(skill, "description")
+
         # if keywords[DT.CandidateSkills.value["name"]]:
         #     query += "primarySkills.data:" + keywords[DT.CandidateSkills.name] + " or"
 
-        query = query[:-3]
+        query = query[:-5]
 
         # check if no conditions submitted
         if len(query) < 6:
             query = "query=status:Available"
         else:
-            query += "&status:Available"
+            query += " and status:Available"
 
         # send query
         sendQuery_callback: Callback = sendQuery(auth, "search/Candidate", "get", {}, companyID,
@@ -524,18 +527,21 @@ def searchPerfectCandidates(auth, companyID, data, fields=None) -> Callback:
         if not fields:
             fields = "fields=id,name,email,mobile,address,primarySkills,status,educations,dayRate,salary"
 
-        # populate filter
+        print("skills: ", data.get("skills"))
+        # populate filter in order of importance
         query += populateFilter(data.get("preferredJotTitle"), "occupation")
         query += populateFilter(data.get("location"), "address.city")
         query += populateFilter(data.get("jobCategory"), "employmentPreference")
-        # query += populateFilter(data.get("skills"), "primarySkills")
+
+        for skill in data.get("skills"):
+            query += populateFilter(skill, "description")
+
         query += populateFilter(data.get("yearsExperience"), "experience")
         # query += populateFilter(data.get("education"), "educationDegree")
 
         # if keywords[DT.CandidateSkills.value["name"]]:
         #     query += "primarySkills.data:" + keywords[DT.CandidateSkills.name] + " or"
-
-        query = query[:-3]
+        query = query[:-5]
 
         # check if no conditions submitted
         if len(query) < 6:
@@ -554,6 +560,9 @@ def searchPerfectCandidates(auth, companyID, data, fields=None) -> Callback:
         else:
             records = []
 
+            query += " and status:Available"
+            print("query: ", query)
+
             while len(records) < 2000:
                 # send query
                 sendQuery_callback: Callback = sendQuery(auth, "search/Candidate", "get", {}, companyID,
@@ -563,7 +572,7 @@ def searchPerfectCandidates(auth, companyID, data, fields=None) -> Callback:
 
                 # get query result
                 return_body = json.loads(sendQuery_callback.Data.text)
-
+                print("temp data: ", return_body["data"])
                 if return_body["data"]:
                     # add the candidates to the records
                     records = records + list(return_body["data"])
@@ -587,7 +596,7 @@ def searchPerfectCandidates(auth, companyID, data, fields=None) -> Callback:
                 # if no filters left - stop
                 if not query:
                     break
-
+        print("final data: ", records)
         result = []
         # TODO educations uses ids - need to retrieve them
         for record in records:

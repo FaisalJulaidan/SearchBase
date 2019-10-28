@@ -44,9 +44,6 @@ def connect(type, auth, companyID) -> Callback:
     try:
         calendar_type: Calendar_Enum = Calendar_Enum[type]
         # test connection 
-        print(auth)
-        # if(type == "Google"):
-        #   auth = json.loads(auth)
         test_callback: Callback = testConnection(type, auth, companyID)
         if not test_callback.Success:
             return test_callback
@@ -82,7 +79,6 @@ def testConnection(type, auth, companyID) -> Callback:
         if calendar_type == Calendar_Enum.Outlook:
             return Outlook.testConnection(auth, companyID)
         elif calendar_type == Calendar_Enum.Google:
-            print(auth)
             return Google.testConnection(auth, companyID)
         else:
             return Callback(False, "Could not match Calendar's type")

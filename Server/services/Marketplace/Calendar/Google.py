@@ -23,7 +23,7 @@ hashids = Hashids(salt=BaseConfig.HASH_IDS_SALT, min_length=5)
 
 
 # Gets a new token, and refreshes it if the expiry has passed
-def getToken(type, companyID):
+def getToken(type, companyID, test=False):
     cal = db.session.query(Calendar) \
         .filter(Calendar.CompanyID == companyID) \
         .filter(Calendar.Type == type) \
@@ -33,7 +33,7 @@ def getToken(type, companyID):
         return None
     try:
         expiry = dateutil.parser.parse(cal.Auth['expiry'])
-        if expiry < datetime.now():
+        if expiry < datetime.now() or test==True:
             resp = requests.post("https://oauth2.googleapis.com/token",
                                  data={
                                      'refresh_token': cal.Auth['refresh'],
@@ -57,7 +57,7 @@ def getToken(type, companyID):
 def testConnection(auth, companyID: int):
     try:
         if 'refresh' in auth:
-          token = getToken(enums.Calendar.Google, companyID)
+          token = getToken(enums.Calendar.Google, companyID, True)
           return Callback(True, 'Succesfully connected') if token is not None else Callback(False, 'Connection test failed')
         elif 'code' in auth:
           return authorizeUser(auth['code'], companyID)
@@ -93,7 +93,6 @@ def authorizeUser(code, companyID: int):
         return Callback(False,
                         "You already have authorization data relating to your google calendar in the database, please remove these keys first.")
     except Exception as e:
-        print(resp.status_code)
         return Callback(False, str(e))
 
 def sync(companyID):

@@ -83,6 +83,7 @@ def getOptions(industry=None) -> Callback:
                     {'label': 'Appointment Scheduler', 'fileName': 'appointment'},
                     {'label': 'Join Us', 'fileName': 'join-us'},
                     {'label': 'Referral', 'fileName': 'referral'},
+                    {'label': 'Update Candidates', 'fileName': 'update-candidates'},
                     {'label': 'Client Chatbot', 'fileName': 'client-chatbot'},
                     {'label': 'Template 1', 'fileName': 'template-1'},
                 ]

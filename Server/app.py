@@ -70,8 +70,7 @@ def page_not_found(e):
 
 # Requests limiter initialisation:
 limiter.init_app(app)
-limiter.enabled = os.environ['FLASK_ENV'] != 'development'  # does not work
-print("The rate limiter is {}".format(limiter.enabled))
+limiter.enabled = os.environ['FLASK_ENV'] != 'development'
 
 # Custom limiter exceeded error response
 @app.errorhandler(429)

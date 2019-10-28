@@ -28,6 +28,7 @@ def getToken(type, companyID):
         .filter(Calendar.CompanyID == companyID) \
         .filter(Calendar.Type == type) \
         .first()
+
     if cal is None:
         return None
     try:
@@ -52,7 +53,17 @@ def getToken(type, companyID):
             return cal.Auth['access']
     except Exception as e:
         return None
-
+        
+def testConnection(auth, companyID: int):
+    try:
+        if 'refresh' in auth:
+          token = getToken(enums.Calendar.Google, companyID)
+          return Callback(True, 'Succesfully connected') if token is not None else Callback(False, 'Connection test failed')
+        elif 'code' in auth:
+          return authorizeUser(auth['code'], companyID)
+    except: 
+        helpers.logError("Google.testConnection(): " + str(exc))
+        return Callback(False, "Google test failed")
 
 def authorizeUser(code, companyID: int):
     try:
@@ -76,10 +87,7 @@ def authorizeUser(code, companyID: int):
             'access': resp.json()['access_token'],
             'refresh': resp.json()['refresh_token']
         }
-        cal = Calendar(Auth=tokenInfo, Type=enums.Calendar.Google, CompanyID=companyID)
-        db.session.add(cal)
-        db.session.commit()
-        return Callback(True, 'User authorized successfully')
+        return Callback(True, 'User authorized successfully', tokenInfo)
     except exc.IntegrityError as e:
         db.session.rollback()
         return Callback(False,
@@ -161,8 +169,7 @@ def syncAppointments(calendarID, token, companyID):
             eventID = None
             if appointment.ID in events:
                 eventID = events[appointment.ID]
-            
-            appointmentToken = appointment_services.generateEmailUrl(appointment.ID)
+            appointmentToken = appointment_services.generateEmailUrl(appointment.ID) if appointment.Status == enums.Status.Pending else None
             appointmentStatus = "Appointment pending approval " if appointment.Status.value == enums.Status.Pending.value else "Appointment "
             eventTitle = appointmentStatus + "with {}".format(appointment.Conversation.Name)
             

@@ -57,7 +57,6 @@ def testConnection(type, companyID):
             exist_callback: Callback = calendar_services.getCalendarByType(type, companyID)
             if not exist_callback.Success:
                 return Callback(True, "", {"Status": "NOT_CONNECTED"})
-
             # If yes test connection
             return Callback(True, "",
                             {"Status":

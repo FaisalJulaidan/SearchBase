@@ -128,3 +128,24 @@ def convertSkillsToString(skills):
                     temp += skill["name"] + ", "
                     skills = temp[:-2]
     return skills
+
+
+def loadSynonyms(construction: bool = False, hospitality: bool = False) -> dict:
+    print(construction)
+    print(hospitality)
+    """
+        Args:
+            construction (bool): Synonyms for industrial.
+            hospitality (bool): Synonyms for hospitality.
+
+        Returns:
+            dict: The value returned
+
+            """
+    # Default is False
+    # for category, isSelected in categories.items():
+    #     print("{} is {}".format(category, isSelected))
+    if construction:
+        return {
+          "chef": {"cook", "caterer", "catering", "food preparation"}
+        }

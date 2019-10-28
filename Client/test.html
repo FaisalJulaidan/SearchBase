@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+	<head>
+		<link href="https://d3oia8etllorh5.cloudfront.net/20190812214822/css/bootstrap.min.css" rel="stylesheet"
+			media="screen" />
+		<link href="https://d3oia8etllorh5.cloudfront.net/20190812214822/css/cognito-login.css" rel="stylesheet"
+			media="screen" />
+		<link href="https://d3oia8etllorh5.cloudfront.net/20180108075416/us-east-1_DFsQp7m7D/ALL/CSS/custom-css.css"
+			rel="stylesheet" media="screen" />
+		<title>Signin</title>
+
+		<script
+			src="https://d3oia8etllorh5.cloudfront.net/20190812214822/js/amazon-cognito-advanced-security-data.min.js">
+		</script>
+		<script>
+			function getAdvancedSecurityData(formReference) {
+        if (typeof AmazonCognitoAdvancedSecurityData === "undefined") {
+            return true;
+        }
+
+        // UserpoolId is not available on frontend for springboard. We do not use userPoolId
+        // anyway other than put in context data.
+        var userPoolId = "";
+        var clientId = getUrlParameter("client_id");
+
+        var username = "";
+        var usernameInput = document.getElementsByName("username")[0];
+        if (usernameInput && usernameInput.value) {
+            username = usernameInput.value;
+        }
+
+        var asfData = AmazonCognitoAdvancedSecurityData.getData(username, userPoolId, clientId);
+        if (typeof asfData === "undefined") {
+            return true;
+        }
+
+        if (formReference && formReference.cognitoAsfData) {
+            formReference.cognitoAsfData.value = asfData
+        }
+
+        return true;
+    }
+
+    function getUrlParameter(name) {
+        name = name.replace(/[\[]/, '\\[').replace(/[\]]/, '\\]');
+        var regex = new RegExp('[\\?&]' + name + '=([^&#]*)');
+        var results = regex.exec(location.search);
+        return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
+    }
+
+    function onSubmit(evt, formRef) {
+        formRef.querySelector('button[type="submit"]').disabled = true;
+        if (!!formRef.submitted) {
+            evt.preventDefault();
+            return false;
+        } else {
+            formRef.submitted = true;
+            return getAdvancedSecurityData(formRef);
+        }
+    }
+		</script>
+
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+	</head>
+</head>
+
+<body>
+	<div class="container">
+		<div class="modal-dialog">
+			<div class="modal-content background-customizable modal-content-mobile visible-xs visible-sm">
+				<div>
+					<div>
+						<div class="banner-customizable">
+							<center>
+								<img alt="logo" class="logo-customizable" src="https://d3oia8etllorh5.cloudfront.net/20180108075416/images/us-east-1_DFsQp7m7D/ALL/images/image.jpg" />
+                        </center>
+						</div>
+					</div>
+				</div>
+				<div class="modal-body">
+					<div>
+						<div>
+
+						</div>
+					</div>
+					<div>
+						<div>
+							<div>
+
+							</div>
+						</div>
+						<div>
+							<div>
+
+							</div>
+						</div>
+						<div>
+
+							<div>
+								<div>
+
+									<Span class="textDescription-customizable ">Sign in with your email and password</Span>
+									<form
+										action="/login?state=00a72bb4e1fe076638da6bc18ca6f6e6d0f09f977937067ca6ca4ed519f45fdff5895daefe0cc6acf15113d53dba1f2c33cfe3a3f8f98e4312a0583c295e0c4f0ed0730b2e751f435d96ccc5c6a7d2df9b84c8640fd3510f478d7f7501052015b5f97fdfe47424ec&amp;response_type=code&amp;client_id=7bs800cggbelc681uu5175okbo&amp;redirect_uri=https%3A%2F%2Fid.vincere.io%2Foauth2%2Fcallback"
+										method="POST" name="cognitoSignInForm" class="cognito-asf"
+										onsubmit="getAdvancedSecurityData(this);"><input type="hidden" name="_csrf" value="8504eb0a-98cc-4691-af3f-131584014e8b"/>
+
+
+
+
+										<label for="signInFormUsername" class="label-customizable">Email</label>
+										<div><input id="signInFormUsername" name="username" type="text" class="form-control inputField-customizable"
+                   placeholder="Email" autocapitalize="none" required></div>
+
+											<label for="signInFormPassword" class="label-customizable">Password</label>
+											<div><input id="signInFormPassword" name="password" type="password" class="form-control inputField-customizable"
+                   placeholder="Password"
+                   required></div>
+												<input type="hidden" class="form-control inputField-customizable" name="cognitoAsfData"/>
+												<a class="redirect-customizable"
+													href="/forgotPassword?state=00a72bb4e1fe076638da6bc18ca6f6e6d0f09f977937067ca6ca4ed519f45fdff5895daefe0cc6acf15113d53dba1f2c33cfe3a3f8f98e4312a0583c295e0c4f0ed0730b2e751f435d96ccc5c6a7d2df9b84c8640fd3510f478d7f7501052015b5f97fdfe47424ec&amp;response_type=code&amp;client_id=7bs800cggbelc681uu5175okbo&amp;redirect_uri=https%3A%2F%2Fid.vincere.io%2Foauth2%2Fcallback">Forgot
+													your password?</a>
+												<input name="signInSubmitButton" type="Submit" value="Sign in"
+                   class="btn btn-primary submitButton-customizable" aria-label="submit"/>
+												<br/>
+
+        </form>
+
+											</div>
+										</div>
+								</div>
+							</div>
+						</div>
+					</div>
+
+
+
+					<div class="modal-content background-customizable modal-content-mobile visible-md visible-lg">
+						<div>
+							<div>
+								<div class="banner-customizable">
+									<center>
+										<img alt="logo" class="logo-customizable" src="https://d3oia8etllorh5.cloudfront.net/20180108075416/images/us-east-1_DFsQp7m7D/ALL/images/image.jpg" />
+                        </center>
+								</div>
+							</div>
+						</div>
+						<div class="modal-body">
+							<div>
+								<div>
+
+								</div>
+							</div>
+							<div>
+								<div>
+									<div>
+										<div>
+
+										</div>
+									</div>
+									<div>
+										<div>
+
+										</div>
+									</div>
+								</div>
+								<div>
+									<div>
+										<div>
+
+											<Span class="textDescription-customizable ">Sign in with your email and password</Span>
+											<form
+												action="/login?state=00a72bb4e1fe076638da6bc18ca6f6e6d0f09f977937067ca6ca4ed519f45fdff5895daefe0cc6acf15113d53dba1f2c33cfe3a3f8f98e4312a0583c295e0c4f0ed0730b2e751f435d96ccc5c6a7d2df9b84c8640fd3510f478d7f7501052015b5f97fdfe47424ec&amp;response_type=code&amp;client_id=7bs800cggbelc681uu5175okbo&amp;redirect_uri=https%3A%2F%2Fid.vincere.io%2Foauth2%2Fcallback"
+												method="POST" name="cognitoSignInForm" class="cognito-asf"
+												onsubmit="getAdvancedSecurityData(this);"><input type="hidden" name="_csrf" value="8504eb0a-98cc-4691-af3f-131584014e8b"/>
+
+
+
+
+												<label for="signInFormUsername" class="label-customizable">Email</label>
+												<div><input id="signInFormUsername" name="username" type="text" class="form-control inputField-customizable"
+                   placeholder="Email" autocapitalize="none" required></div>
+
+													<label for="signInFormPassword" class="label-customizable">Password</label>
+													<div><input id="signInFormPassword" name="password" type="password" class="form-control inputField-customizable"
+                   placeholder="Password"
+                   required></div>
+														<input type="hidden" class="form-control inputField-customizable" name="cognitoAsfData"/>
+														<a class="redirect-customizable"
+															href="/forgotPassword?state=00a72bb4e1fe076638da6bc18ca6f6e6d0f09f977937067ca6ca4ed519f45fdff5895daefe0cc6acf15113d53dba1f2c33cfe3a3f8f98e4312a0583c295e0c4f0ed0730b2e751f435d96ccc5c6a7d2df9b84c8640fd3510f478d7f7501052015b5f97fdfe47424ec&amp;response_type=code&amp;client_id=7bs800cggbelc681uu5175okbo&amp;redirect_uri=https%3A%2F%2Fid.vincere.io%2Foauth2%2Fcallback">Forgot
+															your password?</a>
+														<input name="signInSubmitButton" type="Submit" value="Sign in"
+                   class="btn btn-primary submitButton-customizable" aria-label="submit"/>
+														<br/>
+
+        </form>
+
+													</div>
+												</div>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+					<script src="https://d3oia8etllorh5.cloudfront.net/20190812214822/js/jquery-3.4.1.min.js"></script>
+					<script>
+						var $inputs = $(":input");
+    $inputs.on('input',function() {
+        $('input[name="' + this.name + '"]').val($(this).val());
+    });
+					</script>
+</body>
+
+</html>

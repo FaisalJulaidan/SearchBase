@@ -42,15 +42,15 @@ fernet = Fernet(os.environ['TEMP_SECRET_KEY'])
 currencyConverter = CurrencyRates()
 
 
-
-# Crate request limiter
+# Create request limiter
 def getRemoteAddress():
     if os.environ['FLASK_ENV'] == 'development':
         return request.remote_addr
     else:
         return request.headers['X-Real-IP']
+
+
 limiter = Limiter(key_func=getRemoteAddress)
-limiter.enabled = os.environ['FLASK_ENV'] != 'development' # does not work
 
 
 # ======== Helper Functions ======== #

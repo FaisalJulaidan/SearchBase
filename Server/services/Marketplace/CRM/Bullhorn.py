@@ -84,7 +84,7 @@ def login(auth):
                            "&client_secret=" + CLIENT_SECRET + \
                            "&code=" + code_request.url.split("code=")[1].split("&client_id")[0]
 
-        # get the access token and refresh token
+        # get the access token AND refresh token
         access_token_request = requests.post(access_token_url, headers=headers)
         helpers.logError("text 2: " + str(access_token_request.text))
 
@@ -124,7 +124,7 @@ def retrieveRestToken(auth, companyID):
         authCopy = dict(auth)
         headers = {'Content-Type': 'application/json'}
 
-        # use refresh_token to generate access_token and refresh_token
+        # use refresh_token to generate access_token AND refresh_token
         url = "https://auth-emea.bullhornstaffing.com/oauth/token?grant_type=refresh_token&client_id=" + CLIENT_ID + \
               "&client_secret=" + CLIENT_SECRET + "&refresh_token=" + authCopy.get("refresh_token")
 
@@ -177,7 +177,7 @@ def retrieveRestToken(auth, companyID):
         return Callback(False, "Failed to retrieve CRM tokens. Please check login information")
 
 
-# create query url and also tests the BhRestToken to see if it still valid, if not it generates a new one and new url
+# create query url AND also tests the BhRestToken to see if it still valid, if not it generates a new one AND new url
 def sendQuery(auth, query, method, body, companyID, optionalParams=None):
     try:
         # get url
@@ -261,7 +261,7 @@ def insertCandidate(auth, data, companyID) -> Callback:
             )
         }
 
-        # Add additional emails to email2 and email3
+        # Add additional emails to email2 AND email3
         emails = data.get("emails")
         for email in emails:
             index = emails.index(email)
@@ -356,12 +356,12 @@ def insertClientContact(auth, data, companyID, bhCompanyID) -> Callback:
             "address": {
                 "city": data.get("city"),
             },
-            # check number of emails and submit them
+            # check number of emails AND submit them
             "email": data.get("email"),
             "clientCorporation": {"id": bhCompanyID}
         }
 
-        # add additional emails to email2 and email3
+        # add additional emails to email2 AND email3
         emails = data.get("name")
         for email in emails:
             index = emails.index(email)
@@ -438,7 +438,7 @@ def updateCandidate(auth, data, companyID) -> Callback:
             )
         }
 
-        # Add additional emails to email2 and email3
+        # Add additional emails to email2 AND email3
         emails = data.get("emails")
         for email in emails:
             index = emails.index(email)
@@ -470,13 +470,18 @@ def searchCandidates(auth, companyID, data, fields=None) -> Callback:
         # populate filter
         query += populateFilter(data.get("location"), "address.city")
 
-        query = query[:-5]
+        query += "("
+        for skill in data.get("skills"):
+            query += populateFilter(skill, "description", "OR")
+        query = query[:-4] + ")"
+
+        # query = query[:-5]
 
         # check if no conditions submitted
         if len(query) < 6:
             query = "query=status:Available"
         else:
-            query += " and status:Available"
+            query += " AND status:Available"
 
         # send query
         sendQuery_callback: Callback = sendQuery(auth, "search/Candidate", "get", {}, companyID,
@@ -553,7 +558,7 @@ def searchPerfectCandidates(auth, companyID, data, fields=None) -> Callback:
         else:
             records = []
 
-            query += " and status:Available"
+            query += " AND status:Available"
 
             while len(records) < 2000:
                 # send query
@@ -672,9 +677,9 @@ def searchJobs(auth, companyID, data, fields=None) -> Callback:
         return Callback(False, str(exc))
 
 
-def populateFilter(value, string):
+def populateFilter(value, string, joint="AND"):
     if value:
-        return string + ":" + value + " AND "
+        return string + ":" + value + " " + joint + " "
     return ""
 
 

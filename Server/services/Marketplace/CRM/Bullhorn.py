@@ -2,6 +2,7 @@ import base64
 import json
 import os
 from datetime import datetime
+import urllib.parse
 
 import requests
 from sqlalchemy_utils import Currency
@@ -58,8 +59,6 @@ def login(auth):
 
         headers = {'Content-Type': 'application/json'}
 
-        helpers.logError(str(authCopy))
-
         #                    "&redirect_uri=https://www.thesearchbase.com/api/marketplace/simple_callback" + \
         code_url = "https://auth-emea.bullhornstaffing.com/oauth/authorize?" + \
                            "&response_type=code" + \
@@ -68,14 +67,13 @@ def login(auth):
                            "&redirect_uri=http://www.bullhorn.com" + \
                            "&action=Login" + \
                            "&username=" + authCopy.get("username") + \
-                           "&password=" + authCopy.get("password")
+                           "&password=" + urllib.parse.quote(authCopy.get("password"))
 
-        helpers.logError("SENDING REQUEST " + code_url)
         code_request = requests.post(code_url)
-        helpers.logError("text 1: " + str(code_request.text))
+        helpers.logError("url 1: " + str(code_request.url))
 
         if "code=" not in code_request.url:
-            raise Exception(code_request.text)
+            raise Exception(code_request.url)
 
         access_token_url = "https://auth-emea.bullhornstaffing.com/oauth/token?" + \
                            "&grant_type=authorization_code" + \

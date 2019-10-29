@@ -23,8 +23,7 @@ export const BullhornFormItems = ({
                     {getFieldDecorator('username', {
                         rules: [{
                             required: true,
-                            max: 20,
-                            message: "API Username is required, and should be less than or 20 character",
+                            message: "API Username is required",
                         }],
                     })(
                         // To readOnly to avoid autocomplete

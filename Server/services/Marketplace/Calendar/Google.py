@@ -148,23 +148,34 @@ def syncAppointments(calendarID, token, companyID):
         for event in eventList.json()['items']:
             if event['description'].startswith("A_ID"):
                 desc = event['description'].split("<br>")
-                aid = hashids.decrypt(desc[0].replace("A_ID.", ""))[0]
-                events[aid] = event['id']
+                appointmentDetails = desc[0].split(".")
+                aid = hashids.decrypt(appointmentDetails[1])[0]
+                events[aid] = {'id': event['id'], 'status': appointmentDetails[2]}
 
         requestList = []
         removeList = []
+        ignoreList = []
 
         for key, val in events.items():
             valid = False
             for appointment in appointments:
+                if (appointment.Status == enums.Status.Accepted or appointment.Status == enums.Status.Rejected) and val['status'] == "1":
+                    ignoreList.append(key)
+                    continue
+                elif appointment.Status == enums.Status.Pending and val['status'] == "0":
+                    ignoreList.append(key)
+                    continue
                 if key == appointment.ID:
                     valid = True
                     continue
             if valid == False:
-                removeList.append(val)
+                removeList.append(val['id'])
 
 
         for appointment in appointments:
+            if appointment.ID in ignoreList:
+                print("ignore")
+                continue
             eventID = None
             if appointment.ID in events:
                 eventID = events[appointment.ID]
@@ -175,8 +186,15 @@ def syncAppointments(calendarID, token, companyID):
             id = hashids.encrypt(appointment.ID)
             #TODO: Needs to change to whatever environment is using
             appointmentURL = "http://localhost:3000/appointment_status?token={}".format(appointmentToken)
+            status = 0 if appointment.Status.value == enums.Status.Pending.value else 1
+            eventDetails = "A_ID.{}.{}".format(id, status)
 
-            eventDesc = "A_ID.{}<br><a href='{}'>Accept Appointment</a>".format(id, appointmentURL) if appointment.Status.value == enums.Status.Pending.value else "A_ID.{}<br>Appointment accepted".format(id)
+            if appointment.Status.value == enums.Status.Pending.value:
+              eventDesc = "{}<br><a href='{}'>Accept Appointment</a>".format(eventDetails, appointmentURL)
+            else:
+              eventDesc = "{}<br>Appointment accepted".format(eventDetails)
+            
+            
             data = { 
                 'summary': eventTitle,
                 'description': eventDesc,

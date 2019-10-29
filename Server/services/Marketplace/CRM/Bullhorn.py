@@ -470,9 +470,6 @@ def searchCandidates(auth, companyID, data, fields=None) -> Callback:
         # populate filter
         query += populateFilter(data.get("location"), "address.city")
 
-        for skill in data.get("skills"):
-            query += populateFilter(skill, "description")
-
         query = query[:-5]
 
         # check if no conditions submitted
@@ -557,7 +554,6 @@ def searchPerfectCandidates(auth, companyID, data, fields=None) -> Callback:
             records = []
 
             query += " and status:Available"
-            print("query: ", query)
 
             while len(records) < 2000:
                 # send query

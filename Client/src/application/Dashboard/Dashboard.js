@@ -48,6 +48,15 @@ class Dashboard extends Component {
         this.props.dispatch(optionsActions.getOptions());
     }
 
+    componentDidMount () {
+        const script = document.createElement("script");
+
+        script.src = "/static/js/walkme_dashboard.js";
+        script.async = true;
+
+        document.body.appendChild(script);
+    }
+
 
     toggle = () => {
         this.setState({

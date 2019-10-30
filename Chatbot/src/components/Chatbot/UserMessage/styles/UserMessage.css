@@ -14,15 +14,12 @@
   margin: 5px;
   max-width: 100%;
 }
-.User_Message > p {
-  margin: 0;
-  word-break: break-word;
-}
 
 .User_Message > p {
   margin: 0;
   word-break: break-word;
   color: white;
+  line-height: 21px;
 }
 
 .Rewind {

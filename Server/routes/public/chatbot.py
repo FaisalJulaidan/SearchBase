@@ -1,5 +1,5 @@
 import uuid
-
+import os
 from flask import Blueprint, request, send_from_directory
 from flask_cors import CORS
 from werkzeug.utils import secure_filename
@@ -19,6 +19,11 @@ CORS(chatbot_router)
 # Requests limiter:
 # TODO: Place this in helpers for request restrictions elsewhere
 
+
+@chatbot_router.route("/test", methods=['GET'])
+def testtt():
+    if request.method == "GET":
+        return os.environ['FLASK_ENV']
 
 @chatbot_router.after_request
 def add_header(r):

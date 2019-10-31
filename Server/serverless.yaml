@@ -10,9 +10,12 @@ plugins:
   - serverless-wsgi
   - serverless-python-requirements
 custom:
+  pythonRequirements:
+    usePipenv: false
   wsgi:
     app: thesearchbase.app
     packRequirements: false
+
 functions:
   app:
     handler: wsgi_handler.handler

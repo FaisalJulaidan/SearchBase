@@ -19,7 +19,7 @@ class Home extends React.Component {
 
                     <div className={styles.Panel_Body}>
                         <h1>Welcome!</h1>
-                        <img src={getLink('/static/images/undraw/hello.svg')}
+                        <img src={"/images/undraw/hello.svg"}
                              alt="welcome image"
                              width={300}/>
                         <h2>Here you can manage all your bots & see their usage analytics</h2>

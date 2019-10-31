@@ -1,10 +1,10 @@
-import React, { Component, lazy, Suspense } from 'react';
+import React, { Component, Suspense } from 'react';
 
 import { Avatar, Dropdown, Icon, Layout, Menu } from 'antd';
 import './Dashboard.less';
 import styles from './Dashboard.module.less';
 
-import { getUser, history, getCompany } from 'helpers';
+import { getCompany, getUser, history } from 'helpers';
 import { Route, Switch, withRouter } from 'react-router-dom';
 import { authActions, optionsActions } from 'store/actions';
 import { store } from 'store/store';

@@ -30,7 +30,7 @@ const KeyFeatures = (props) => {
                 <Col xs={{span:12,offset:0,order:1}} md={{span:7,offset:0,order:0}}>
                     <div className={styles.image_wrapper}>
                         <Image className={styles.image}
-                               src={getLink("/static/images/home/home/os.svg")}/>
+                               src={"/images/home/home/os.svg"}/>
                     </div>
                 </Col>
             </Row>

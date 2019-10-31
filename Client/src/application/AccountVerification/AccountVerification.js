@@ -55,7 +55,7 @@ class AccountVerification extends React.Component {
                         this.state.isSent &&
                         this.state.isVerified &&
                         <div style={{textAlign: 'center'}}>
-                            <img src={getLink('/static/images/undraw/success.svg')} alt="" height={300}/>
+                            <img src={"/images/undraw/success.svg"} alt="" height={300}/>
                             <Typography.Title>
                                 Your account is verified
                             </Typography.Title>
@@ -69,7 +69,7 @@ class AccountVerification extends React.Component {
                         this.state.isSent &&
                         !this.state.isVerified &&
                         <div style={{textAlign: 'center'}}>
-                            <img src={getLink('/static/images/undraw/failed.svg')} alt="" height={300}/>
+                            <img src={"/images/undraw/failed.svg"} alt="" height={300}/>
                             <Title>
                                 Account verification is failed
                             </Title>

@@ -4,20 +4,20 @@
     "name": "John Doe",
     "title": "CEO at Imaginary Co. Ltd.",
     "review": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore.",
-    "img": "/static/images/home/home/man.jpg"
+    "img": "/images/home/home/man.jpg"
   },
   {
     "background": "#a865e1",
     "name": "Aidan Hewitt",
     "title": "Chairperson of the board at The Sample",
     "review": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Posuere lorem ipsum dolor sit.",
-    "img": "/static/images/home/home/man3.jpg"
+    "img": "/images/home/home/man3.jpg"
   },
   {
     "background": "linear-gradient(to right, #a865e1, #9d69e5, #916ce8, #8570eb, #7773ed)",
     "name": "Jake Nelson",
     "title": "Business administrator at Foxmoor",
     "review": "Lorem ipsum dolor sit amet, consectetur adipiscing elit,",
-    "img": "/static/images/home/home/man2.jpg"
+    "img": "/images/home/home/man2.jpg"
   }
 ]

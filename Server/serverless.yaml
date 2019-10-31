@@ -12,6 +12,7 @@ plugins:
 custom:
   wsgi:
     app: thesearchbase.app
+    packRequirements: false
 functions:
   app:
     handler: wsgi_handler.handler

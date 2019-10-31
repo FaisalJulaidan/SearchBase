@@ -46,7 +46,7 @@ class Conversations extends React.Component {
                         <Col xs={{span: 8, offset: 2}} md={{span: 4, offset: 0}} xl={5}>
                             <div className={styles.image_wrapper}>
                                 <Image className={styles.image} fluid
-                                       src={getLink("/static/images/home/home/message.svg")}/>
+                                       src={"/images/home/home/message.svg"}/>
                             </div>
                         </Col>
                     </Row>

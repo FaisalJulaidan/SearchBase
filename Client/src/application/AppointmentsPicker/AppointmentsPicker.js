@@ -38,7 +38,7 @@ class AppointmentsPicker extends React.Component {
             this.props.isSuccess &&
             this.props.isSelected &&
             <div style={{textAlign: 'center'}}>
-                <img src={getLink('/static/images/undraw/success.svg')} alt="" height={300}/>
+                <img src={"/images/undraw/success.svg"} alt="" height={300}/>
                 <Typography.Title>
                     Thanks for your selection
                 </Typography.Title>

@@ -36,10 +36,10 @@ class App extends Component {
                         <Route path="/chatbot_direct_link/" component={ChatbotDirectLink}/>
 
                         {/*MAKE SURE THIS IS DELETED ON PRODUCTION*/}
-                        <Route path="/dashboard" component={Dashboard}/>
+                        <Route path="/" component={Dashboard}/>
                         {/*<PrivateRoute path="/dashboard" component={Dashboard}/>*/}
 
-                        <Route path="/" component={Home}/>
+                        {/*<Route path="/" component={Home}/>*/}
                         {/* <Redirect to={{pathname: '/'}}/> */}
                     </Switch>
                 </Suspense>

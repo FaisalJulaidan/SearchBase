@@ -14,7 +14,6 @@ custom:
     usePipenv: false
   wsgi:
     app: thesearchbase.app
-    pipArgs: --no-deps
 
 functions:
   app:

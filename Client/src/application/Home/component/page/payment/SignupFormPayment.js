@@ -7,7 +7,7 @@ import {Form, Icon, Input, Select, Checkbox, Button} from 'antd';
 import {Link, withRouter} from "react-router-dom";
 
 import {authActions} from '../../../../../store/actions/index';
-import pricingJSON from "../pricing/pricing";
+import pricingJSON from "../pricing/pricing.json";
 
 const FormItem = Form.Item;
 const {Option} = Select;

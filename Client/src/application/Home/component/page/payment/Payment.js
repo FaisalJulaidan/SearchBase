@@ -7,7 +7,7 @@ import {Steps} from 'antd';
 import SignupFormPayment from "./SignupFormPayment";
 import {WEBSITE_TITLE} from "../../../../../constants/config";
 import Layout from "../../../hoc/layout/Layout";
-import pricingJSON from "../pricing/pricing";
+import pricingJSON from "../pricing/pricing.json";
 
 import {Elements} from 'react-stripe-elements';
 import PaymnetForm from "./PaymentForm";

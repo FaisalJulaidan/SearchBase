@@ -5,19 +5,19 @@ import {Container, Row, Col, Card} from "react-bootstrap";
 import {Fade} from "react-reveal";
 import {Steps} from 'antd';
 import SignupFormPayment from "./SignupFormPayment";
-import {WEBSITE_TITLE} from "../../../../../constants/config";
+import {WEBSITE_TITLE, STRIPE_PK} from "../../../../../constants/config";
 import Layout from "../../../hoc/layout/Layout";
 import pricingJSON from "../pricing/pricing.json";
 
 import {Elements} from 'react-stripe-elements';
-import PaymnetForm from "./PaymentForm";
+import PaymentForm from "./PaymentForm";
 
 const {Step} = Steps;
 
 class Payment extends React.Component {
 
     state = {
-        currentStep: 1,
+        currentStep: 0,
         plan: pricingJSON[pricingJSON.length - 1].id
     };
 
@@ -26,6 +26,8 @@ class Payment extends React.Component {
     }
 
     onSignupSuccessful = (plan) => {
+
+        //TODO: Redirect to Stripe page from here and remove the below line
         this.setState({currentStep: 1, plan: plan})
     };
 
@@ -75,7 +77,7 @@ class Payment extends React.Component {
                                             <div className={styles.form_wrapper}>
                                                 <Card className={styles.card}>
                                                     <Card.Body>
-                                                        <PaymnetForm/>
+                                                        <PaymentForm/>
                                                     </Card.Body>
                                                 </Card>
                                             </div>

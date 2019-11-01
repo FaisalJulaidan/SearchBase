@@ -1,11 +1,9 @@
 import React, {Component, lazy, Suspense} from 'react';
-import {Redirect, Route, Switch, withRouter} from 'react-router-dom';
+import {Route, Switch, withRouter} from 'react-router-dom';
 import {connect} from 'react-redux';
 import {PrivateRoute} from './hoc';
 import SentryBoundary from 'components/SentryBoundary/SentryBoundary';
 import styles from './components/LoadingSpinner/LoadingSpinner.module.less';
-
-import {StripeProvider} from 'react-stripe-elements';
 
 import {TimezoneContext, getTimezone} from 'contexts/timezone';
 
@@ -51,20 +49,19 @@ class App extends Component {
     // };
     //
     componentDidMount() {
-        if (window.Stripe) {
-            this.setState({stripe: window.Stripe('pk_test_12345')});
-        } else {
-            document.querySelector('#stripe-js').addEventListener('load', () => {
-                // Create Stripe instance once Stripe.js loads
-                this.setState({stripe: window.Stripe('pk_test_12345')});
-            });
-        }
+        // if (window.Stripe) {
+        //     this.setState({stripe: window.Stripe('pk_test_e4Tq89P7ma1K8dAjdjQbGHmR')});
+        // } else {
+        //     document.querySelector('#stripe-js').addEventListener('load', () => {
+        //         // Create Stripe instance once Stripe.js loads
+        //         this.setState({stripe: window.Stripe('pk_test_e4Tq89P7ma1K8dAjdjQbGHmR')});
+        //     });
+        // }
         // this.setTimezone();
     }
 
     render() {
         return (
-            <StripeProvider stripe={this.state.stripe}>
                 <SentryBoundary>
                     <Suspense fallback={<div className={styles.Loader}> Loading...</div>}>
                         <TimezoneContext.Provider value={this.state.timezone}>
@@ -84,7 +81,6 @@ class App extends Component {
                         </TimezoneContext.Provider>
                     </Suspense>
                 </SentryBoundary>
-            </StripeProvider>
         );
     }
 }

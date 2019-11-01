@@ -1,8 +1,7 @@
 # serverless.yml
 
 service: flask-serverless
-package:
-  excludeDevDependencies: false
+
 provider:
   name: aws
   runtime: python 3.7

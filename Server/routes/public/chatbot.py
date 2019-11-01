@@ -8,7 +8,7 @@ from models import Callback, db, Conversation, Assistant, StoredFile, StoredFile
 from services import conversation_services, flow_services, databases_services, stored_file_services, mail_services
 from services.Marketplace.CRM import crm_services
 from utilities import helpers, enums, wrappers
-from utilities.helpers import logError, limiter
+from utilities.helpers import logError
 
 import json
 
@@ -85,7 +85,7 @@ def getSolutions_forChatbot(assistantHashID):
 
 
 @chatbot_router.route("/assistant/<string:assistantIDAsHash>/chatbot", methods=['GET', 'POST'])
-@limiter.limit("2/3minutes", methods=['POST'])
+# @limiter.limit("2/3minutes", methods=['POST'])
 def chatbot(assistantIDAsHash):
     if request.method == "GET":
         # Get blocks for the chatbot to use

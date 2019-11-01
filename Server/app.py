@@ -25,7 +25,7 @@ from services.auth_services import jwt
 from services.mail_services import mail
 from utilities import helpers, tasks, dummy_data
 
-from utilities.helpers import limiter
+# from utilities.helpers import limiter
 
 app = Flask(__name__, static_folder='static')
 
@@ -69,8 +69,8 @@ def page_not_found(e):
 
 
 # Requests limiter initialisation:
-limiter.init_app(app)
-limiter.enabled = os.environ['FLASK_ENV'] != 'development'
+# limiter.init_app(app)
+# limiter.enabled = os.environ['FLASK_ENV'] != 'development'
 
 # Custom limiter exceeded error response
 @app.errorhandler(429)

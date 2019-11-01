@@ -14,7 +14,7 @@ custom:
     usePipenv: false
   wsgi:
     app: thesearchbase.app
-    packRequirements: false
+    packRequirements: true
 
 functions:
   app:

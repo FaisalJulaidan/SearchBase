@@ -45,7 +45,7 @@ function* signup({signupDetails}) {
         const res = yield axios.post(`/api/signup`, {...signupDetails}, {
             headers: {'Content-Type': 'application/json'},
         });
-        yield put(authActions.signupSuccess());
+        yield put(authActions.signupSuccess(res.data?.data));
         successMessage('Account created');
 
 

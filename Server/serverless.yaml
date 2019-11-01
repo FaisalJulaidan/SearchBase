@@ -14,12 +14,12 @@ plugins:
 
 custom:
   pythonRequirements:
-    zip: false
+    zip: true
     slim: true
 
   wsgi:
     app: thesearchbase.app
-#    packRequirements: false
+    packRequirements: false
 
 functions:
   app:

@@ -19,7 +19,7 @@ custom:
 
   wsgi:
     app: thesearchbase.app
-    packRequirements: false
+#    packRequirements: false
 
 functions:
   app:

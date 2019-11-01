@@ -4,15 +4,15 @@ service: flask-serverless
 
 provider:
   name: aws
-  runtime: python 3.7
+  runtime: python3.7
   stage: dev
   region: eu-west-2
+
 plugins:
   - serverless-wsgi
   - serverless-python-requirements
+
 custom:
-#  pythonRequirements:
-#    usePipenv: false
   wsgi:
     app: thesearchbase.app
     packRequirements: false

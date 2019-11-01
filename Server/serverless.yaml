@@ -3,7 +3,7 @@
 service: flask-serverless
 provider:
   name: aws
-  runtime: python3.7.4
+  runtime: python3.7
   stage: dev
   region: eu-west-2
 plugins:

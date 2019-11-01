@@ -1,4 +1,4 @@
-const WEBSITE_TITLE = "SearchBase - Recruitment Automation";
+const WEBSITE_TITLE = "SearchBase - Recruitment Automation with Chatbots";
 const CURRENT_YEAR = (new Date()).getFullYear();
 
 export {

@@ -32,6 +32,7 @@ import AutoPilot from './AutoPilots/AutoPilot/AutoPilot';
 import Appointment from './Appointment/Appointment';
 import Marketplace from './Marketplace/Marketplace';
 import Item from './Marketplace/Item/Item';
+import {WEBSITE_TITLE} from "../../constants/config";
 
 
 const { SubMenu } = Menu;
@@ -49,6 +50,7 @@ class Dashboard extends Component {
     }
 
     componentDidMount() {
+        document.title = "Dashboard | " + WEBSITE_TITLE;
         // appending js file for customer helpers
         const script = document.createElement('script');
         script.async = true;

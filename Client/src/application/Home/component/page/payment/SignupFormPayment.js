@@ -38,7 +38,7 @@ class SignupFormPayment extends React.Component {
 
     componentDidUpdate(prevProps, prevState, snapshot) {
         if (prevProps.isSigningUp && (this.props.errorMsg === null)) {
-            this.props.onSignupSuccessful(this.state.plan);
+            this.props.onSignupSuccessful(this.props.companyID,this.state.plan);
         } else if (prevState.plan !== this.state.plan)
             this.props.history.push(`/order-plan?plan=${this.state.plan}`);
     }
@@ -219,6 +219,7 @@ SignupFormPayment.propTypes = {
 function mapStateToProps(state) {
     return {
         isSigningUp: state.auth.isSigningUp,
+        companyID: state.auth.companyID,
         errorMsg: state.auth.errorMsg
     };
 }

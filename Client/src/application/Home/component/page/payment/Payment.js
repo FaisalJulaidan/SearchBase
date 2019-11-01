@@ -25,7 +25,7 @@ class Payment extends React.Component {
         document.title = "Payment | " + WEBSITE_TITLE;
     }
 
-    onSignupSuccessful = (plan) => {
+    onSignupSuccessful = (companyID,plan) => {
         // TODO: Redirect to Stripe page from here and remove the below line
 
         // this.setState({currentStep: 0, plan: plan})

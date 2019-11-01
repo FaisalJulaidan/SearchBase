@@ -1,11 +1,14 @@
 import {all, put, takeEvery} from 'redux-saga/effects'
 import * as actionTypes from '../actions/actionTypes';
 import {paymentActions} from "../actions";
-import {errorMessage, http} from "helpers";
+import {errorMessage} from "helpers";
+import axios from 'axios';
 
-function* generateCheckoutSession({companyID,plan}) {
+function* generateCheckoutSession({companyID, plan}) {
     try {
-        const res = yield http.post(`/pricing/genCheckoutURL`, {companyID,plan});
+        const res = yield axios.post(`/pricing/genCheckoutURL`, {companyID, plan}, {
+            headers: {'Content-Type': 'application/json'},
+        });
         yield put(paymentActions.generateCheckoutSessionSuccess(res.data?.data));
     } catch (error) {
         const msg = error.response?.data?.msg || "Couldn't generate checkout";

@@ -1,6 +1,6 @@
 # serverless.yml
 
-service: flask-serverless
+service: flask-app-serverless
 
 provider:
   name: aws
@@ -13,6 +13,10 @@ plugins:
   - serverless-python-requirements
 
 custom:
+  pythonRequirements:
+    zip: true
+    slim: true
+
   wsgi:
     app: thesearchbase.app
     packRequirements: false

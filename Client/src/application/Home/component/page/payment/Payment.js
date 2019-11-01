@@ -26,9 +26,9 @@ class Payment extends React.Component {
     }
 
     onSignupSuccessful = (plan) => {
+        // TODO: Redirect to Stripe page from here and remove the below line
 
-        //TODO: Redirect to Stripe page from here and remove the below line
-        this.setState({currentStep: 1, plan: plan})
+        // this.setState({currentStep: 0, plan: plan})
     };
 
     render() {

@@ -107,8 +107,10 @@ def createAppointmentAllocationTime(companyID, name, times, duration):
 # Add new appointment selected through the appointment picker page
 def addNewAppointment(conversationID, dateTime, userTimezone: str):
     try:
+
+        conversation : Conversation = Conversation.query.get(conversationID)
         if not (datetime and userTimezone): raise Exception('Time picked and user timezone are required')
-        if not Conversation.query.get(conversationID): raise Exception("Conversation does not exist anymore")
+        if not conversation: raise Exception("Conversation does not exist anymore")
 
         db.session.add(
             Appointment(
@@ -120,7 +122,7 @@ def addNewAppointment(conversationID, dateTime, userTimezone: str):
         )
 
         db.session.commit()
-        marketplace_helpers.sync()
+        marketplace_helpers.sync(conversation.Assistant.CompanyID)
         return Callback(True, 'Appointment added successfully.')
 
     except Exception as exc:

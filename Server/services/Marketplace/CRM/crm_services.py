@@ -211,8 +211,6 @@ def searchCandidates(assistant: Assistant, session):
 
 
 def searchCandidatesCustom(crm, companyID, candidate_data, perfect=False):
-    print("Candidate Data:")
-    print(candidate_data)
     data = {
         "location": candidate_data.get("location"),
         "preferredJotTitle": candidate_data.get("jobTitle"),
@@ -224,8 +222,7 @@ def searchCandidatesCustom(crm, companyID, candidate_data, perfect=False):
     }
 
     crm_type = crm.Type.value
-
-    if perfect and crm == "Bullhorn":
+    if perfect and crm_type == "Bullhorn":
         searchFunc = "searchPerfectCandidates"
     else:
         searchFunc = "searchCandidates"

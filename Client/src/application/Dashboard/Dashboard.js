@@ -1,10 +1,10 @@
-import React, { Component, lazy, Suspense } from 'react';
+import React, { Component, Suspense } from 'react';
 
 import { Avatar, Dropdown, Icon, Layout, Menu } from 'antd';
 import './Dashboard.less';
 import styles from './Dashboard.module.less';
 
-import { getUser, history, getCompany } from 'helpers';
+import { getCompany, getUser, history } from 'helpers';
 import { Route, Switch, withRouter } from 'react-router-dom';
 import { authActions, optionsActions } from 'store/actions';
 import { store } from 'store/store';
@@ -32,6 +32,7 @@ import AutoPilot from './AutoPilots/AutoPilot/AutoPilot';
 import Appointment from './Appointment/Appointment';
 import Marketplace from './Marketplace/Marketplace';
 import Item from './Marketplace/Item/Item';
+import {WEBSITE_TITLE} from "../../constants/config";
 
 
 const { SubMenu } = Menu;
@@ -46,6 +47,15 @@ class Dashboard extends Component {
 
     componentWillMount() {
         this.props.dispatch(optionsActions.getOptions());
+    }
+
+    componentDidMount() {
+        document.title = "Dashboard | " + WEBSITE_TITLE;
+        // appending js file for customer helpers
+        const script = document.createElement('script');
+        script.async = true;
+        script.text = `(function() {var walkme = document.createElement('script'); walkme.type = 'text/javascript'; walkme.async = true; walkme.src = 'https://cdn.walkme.com/users/6f20ba1396c84695af1d50635299db80/walkme_6f20ba1396c84695af1d50635299db80_https.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(walkme, s); window._walkmeConfig = {smartLoad:true}; })();`;
+        document.body.appendChild(script);
     }
 
 

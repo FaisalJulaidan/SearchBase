@@ -14,6 +14,7 @@ import dateutil
 import grequests
 from hashids import Hashids
 from config import BaseConfig
+import time
 
 
 hashids = Hashids(salt=BaseConfig.HASH_IDS_SALT, min_length=5)
@@ -143,7 +144,6 @@ def syncAppointments(calendarID, token, companyID):
         user: User = db.session.query(User).join(Company).filter(Company.ID == companyID).first()
 
         #TODO: Encode
-
         events = {}
         for event in eventList.json()['items']:
             if event['description'].startswith("A_ID"):
@@ -155,44 +155,42 @@ def syncAppointments(calendarID, token, companyID):
         requestList = []
         removeList = []
         ignoreList = []
-
         for key, val in events.items():
             valid = False
             for appointment in appointments:
-                if (appointment.Status == enums.Status.Accepted or appointment.Status == enums.Status.Rejected) and val['status'] == "1":
-                    ignoreList.append(key)
+                if appointment.ID != key:
                     continue
-                elif appointment.Status == enums.Status.Pending and val['status'] == "0":
-                    ignoreList.append(key)
-                    continue
-                if key == appointment.ID:
-                    valid = True
-                    continue
+                valid = True
+                if ((appointment.Status == enums.Status.Accepted and val['status'] == "1") or \
+                      appointment.Status == enums.Status.Pending and val['status'] == "0") and \
+                      appointment.ID not in ignoreList:
+                    ignoreList.append(appointment.ID)
+                    break
+                elif(appointment.Status == enums.Status.Rejected):
+                    removeList.append(val['id'])
             if valid == False:
                 removeList.append(val['id'])
 
-
         for appointment in appointments:
-            if appointment.ID in ignoreList:
-                print("ignore")
+            if appointment.ID in ignoreList or appointment.Status == enums.Status.Rejected:
                 continue
             eventID = None
             if appointment.ID in events:
                 eventID = events[appointment.ID]
             appointmentToken = appointment_services.generateEmailUrl(appointment.ID) if appointment.Status == enums.Status.Pending else None
-            appointmentStatus = "Appointment pending approval " if appointment.Status.value == enums.Status.Pending.value else "Appointment "
-            eventTitle = appointmentStatus + "with {}".format(appointment.Conversation.Name)
+            appointmentStatus = "Appointment pending approval " if appointment.Status == enums.Status.Pending else "Appointment "
+            eventTitle = appointmentStatus + "with {}".format(appointment.Conversation.Name) if appointment.Conversation.Name is not None else appointmentStatus
             
             id = hashids.encrypt(appointment.ID)
             #TODO: Needs to change to whatever environment is using
             appointmentURL = "http://localhost:3000/appointment_status?token={}".format(appointmentToken)
-            status = 0 if appointment.Status.value == enums.Status.Pending.value else 1
+            status = 0 if appointment.Status == enums.Status.Pending else 1
             eventDetails = "A_ID.{}.{}".format(id, status)
 
-            if appointment.Status.value == enums.Status.Pending.value:
+            if appointment.Status == enums.Status.Pending:
               eventDesc = "{}<br><a href='{}'>Accept Appointment</a>".format(eventDetails, appointmentURL)
             else:
-              eventDesc = "{}<br>Appointment accepted".format(eventDetails)
+              eventDesc = "{}<br>Appointment {}".format(eventDetails, appointment.Status.value)
             
             
             data = { 
@@ -209,16 +207,21 @@ def syncAppointments(calendarID, token, companyID):
             }
 
             requestList.append({'data': data, 'eventID': eventID})
-
+        print(requestList)
         rs = []
         for request in requestList:
             if request['eventID'] is None:
                 rs.append(grequests.post(eventURL, headers=headers, json=request['data']))
             else:
-                rs.append(grequests.patch(eventURL+ "/" + request['eventID'], headers=headers, json=request['data']))
+                rs.append(grequests.patch(eventURL+ "/" + request['eventID']['id'], headers=headers, json=request['data']))
+
+        print(removeList)
 
         for request in removeList:
+
             rs.append(grequests.delete(eventURL + "/" + request, headers=headers))
+
+      
 
         grequests.map(rs)
 

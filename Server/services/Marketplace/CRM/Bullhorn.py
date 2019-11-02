@@ -461,33 +461,31 @@ def updateCandidate(auth, data, companyID) -> Callback:
 
 def searchCandidates(auth, companyID, data, fields=None) -> Callback:
     try:
-        query = "query="
+        query = "query=status:Available AND "
         if not fields:
             fields = "fields=id,name,email,mobile,address,primarySkills,status,educations,dayRate,salary"
 
         # populate filter
         query += populateFilter(data.get("location"), "address.city")
 
-        # query += "("
-        # for skill in data.get("skills"):
-        #     query += populateFilter(skill, "description", "OR")
-        # query = query[:-4] + ")"
+        for skill in data.get("skills"):
+            query += populateFilter(skill, "description", "AND")
 
         query = query[:-5]
 
-        # check if no conditions submitted
-        if len(query) < 6:
-            query = "query=status:Available"
-        else:
-            query += " AND status:Available"
-
         # send query
-        sendQuery_callback: Callback = sendQuery(auth, "search/Candidate", "get", {}, companyID,
-                                                 [fields, query, "count=500"])
-        if not sendQuery_callback.Success:
-            raise Exception(sendQuery_callback.Message)
+        while True:
+            sendQuery_callback: Callback = sendQuery(auth, "search/Candidate", "get", {}, companyID,
+                                                 [fields, query, "count=199"])
+            if not sendQuery_callback.Success:
+                raise Exception(sendQuery_callback.Message)
 
-        return_body = json.loads(sendQuery_callback.Data.text)
+            return_body = json.loads(sendQuery_callback.Data.text)
+            if return_body.get("total", 0) > 0:
+                break
+
+            query = "AND".join(query.split("AND")[:-1])
+
         result = []
         # TODO educations uses ids - need to retrieve them
         for record in return_body["data"]:
@@ -520,7 +518,7 @@ def searchCandidates(auth, companyID, data, fields=None) -> Callback:
 
 def searchPerfectCandidates(auth, companyID, data, fields=None) -> Callback:
     try:
-        query = "query="
+        query = "query=status:Available AND "
         if not fields:
             fields = "fields=id,name,email,mobile,address,primarySkills,status,educations,dayRate,salary"
 
@@ -540,12 +538,10 @@ def searchPerfectCandidates(auth, companyID, data, fields=None) -> Callback:
         query = query[:-5]
 
         # check if no conditions submitted
-        if len(query) < 6:
-            query = "query=status:Available"
-
+        if len(query) < 25:
             # send query
             sendQuery_callback: Callback = sendQuery(auth, "search/Candidate", "get", {}, companyID,
-                                                     [fields, query, "count=500"])
+                                                     [fields, query, "count=199"])
             if not sendQuery_callback.Success:
                 raise Exception(sendQuery_callback.Message)
 
@@ -556,12 +552,10 @@ def searchPerfectCandidates(auth, companyID, data, fields=None) -> Callback:
         else:
             records = []
 
-            query += " AND status:Available"
-
             while len(records) < 2000:
                 # send query
                 sendQuery_callback: Callback = sendQuery(auth, "search/Candidate", "get", {}, companyID,
-                                                         [fields, query, "count=500"])
+                                                         [fields, query, "count=199"])
                 if not sendQuery_callback.Success:
                     raise Exception(sendQuery_callback.Message)
 
@@ -646,7 +640,7 @@ def searchJobs(auth, companyID, data, fields=None) -> Callback:
 
         # send query
         sendQuery_callback: Callback = sendQuery(auth, "search/JobOrder", "get", {}, companyID,
-                                                 [fields, query, "count=500"])
+                                                 [fields, query, "count=199"])
         if not sendQuery_callback.Success:
             raise Exception(sendQuery_callback.Message)
 
@@ -689,7 +683,7 @@ def searchJobsCustomQuery(auth, companyID, query, fields=None) -> Callback:
 
         # send query
         sendQuery_callback: Callback = sendQuery(auth, "search/JobOrder", "get", {}, companyID,
-                                                 [fields, query, "count=500"])
+                                                 [fields, query, "count=199"])
         if not sendQuery_callback.Success:
             raise Exception(sendQuery_callback.Message)
 
@@ -730,7 +724,7 @@ def getAllJobs(auth, companyID, fields=None) -> Callback:
 
         # send query
         sendQuery_callback: Callback = sendQuery(auth, "search/JobOrder", "get", {}, companyID,
-                                                 [fields, "query=*:*", "count=500"])
+                                                 [fields, "query=*:*", "count=199"])
         if not sendQuery_callback.Success:
             raise Exception(sendQuery_callback.Message)
 

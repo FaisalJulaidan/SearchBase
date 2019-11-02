@@ -191,7 +191,7 @@ def searchCandidates(assistant: Assistant, session):
         "location": __checkFilter(session['keywordsByDataType'], DT.CandidateLocation),
         "preferredJotTitle": __checkFilter(session['keywordsByDataType'], DT.JobTitle),
         "yearsExperience": __checkFilter(session['keywordsByDataType'], DT.CandidateYearsExperience),
-        "skills": __checkFilter(session['keywordsByDataType'], DT.CandidateSkills),
+        "skills": __checkFilter(session['keywordsByDataType'], DT.CandidateSkills, True),
         "jobCategory": __checkFilter(session['keywordsByDataType'], DT.JobCategory),
         "education": __checkFilter(session['keywordsByDataType'], DT.CandidateEducation)
     }
@@ -268,10 +268,12 @@ def searchJobs(assistant: Assistant, session):
 
 
 # private helper function
-def __checkFilter(keywords, dataType: DT):
+def __checkFilter(keywords, dataType: DT, returnList=False):
 
-    if keywords.get(dataType.value["name"]):
+    if keywords.get(dataType.value["name"]) and not returnList:
         return " ".join(keywords[dataType.value["name"]])
+    elif keywords.get(dataType.value["name"]):
+        return keywords.get(dataType.value["name"])
     return None
 
 

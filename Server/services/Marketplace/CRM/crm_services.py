@@ -9,7 +9,6 @@ from datetime import date
 
 
 def processConversation(assistant: Assistant, conversation: Conversation) -> Callback:
-    print("Should be processing the conversation")
     # Insert base on userType
     if conversation.UserType is UserType.Candidate:
         return insertCandidate(assistant, conversation)

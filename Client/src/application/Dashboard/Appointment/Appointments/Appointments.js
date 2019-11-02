@@ -23,7 +23,7 @@ class Appointments extends React.Component {
         confirm({
             title: `Accept appointment confirmation`,
             content: `If you click Approve, this user will receive a confirmation email about this appointment and you cannot undo that`,
-            onOk: () => {this.props.dispatch(appointmentActions.setAppointmentStatusRequest(id, name, email, phone, 'Accepted'))},
+            onOk: () => {this.props.dispatch(appointmentActions.setAppointmentStatusRequest(id, 'Accepted'))},
             okText: "Approve",
         });
 
@@ -33,7 +33,7 @@ class Appointments extends React.Component {
         confirm({
             title: `Reject appointment confirmation`,
             content: `If you click Reject, this appointment will be deleted forever and you cannot undo that but it will make the appointment time slot available again for other new candidates to pick`,
-            onOk: () => {this.props.dispatch(appointmentActions.setAppointmentStatusRequest(id, name, email, phone, 'Rejected'))},
+            onOk: () => {this.props.dispatch(appointmentActions.setAppointmentStatusRequest(id, 'Rejected'))},
             okText: "Reject",
         });
     };

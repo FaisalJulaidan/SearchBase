@@ -207,16 +207,13 @@ def syncAppointments(calendarID, token, companyID):
             }
 
             requestList.append({'data': data, 'eventID': eventID})
-        print(requestList)
+            
         rs = []
         for request in requestList:
             if request['eventID'] is None:
                 rs.append(grequests.post(eventURL, headers=headers, json=request['data']))
             else:
                 rs.append(grequests.patch(eventURL+ "/" + request['eventID']['id'], headers=headers, json=request['data']))
-
-        print(removeList)
-
         for request in removeList:
 
             rs.append(grequests.delete(eventURL + "/" + request, headers=headers))

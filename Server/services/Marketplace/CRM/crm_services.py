@@ -5,6 +5,7 @@ from services.Marketplace.CRM import Greenhouse, Bullhorn, Mercury, Jobscience, 
 # Process chatbot session
 from utilities import helpers
 from utilities.enums import CRM, UserType, DataType, Period, DataType as DT
+from datetime import date
 
 
 def processConversation(assistant: Assistant, conversation: Conversation) -> Callback:
@@ -477,7 +478,8 @@ def additionalCandidateNotesBuilder(data, selectedSolutions=None):
         "educations": "For education they have provided \"[educations]\". "
     }
 
-    paragraph = "SearchBase has also collected the following information regarding this candidate: "
+    paragraph = "At " + str(date.today().strftime("%B %d, %Y")) + \
+                "SearchBase has also collected the following information regarding this candidate: "
     for key, value in data.items():
         paragraph += sentences[key].replace("[" + key + "]", value)
 

@@ -416,7 +416,6 @@ def scanCandidates(session, dbIDs, extraCandidates=None, campaign=False):
 
         indexes = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q']
         for i, record in enumerate(topResults):
-            print("BUILDING NEW CANDIDATE DESCRIPTION...")
             desc = []
             # Build random dynamic candidate description
             if record[Candidate.CandidateLocation.name]:

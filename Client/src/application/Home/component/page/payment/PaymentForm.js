@@ -1,7 +1,5 @@
 import React, {Component} from 'react';
-import PropTypes from 'prop-types';
 import {CardElement, injectStripe} from 'react-stripe-elements';
-import {Form} from 'antd';
 
 class PaymentForm extends Component {
 
@@ -16,7 +14,5 @@ class PaymentForm extends Component {
         );
     }
 }
-
-PaymentForm.propTypes = {};
 
 export default injectStripe(PaymentForm);

@@ -3,7 +3,8 @@ import * as actionTypes from './actionTypes';
 
 const generateCheckoutSession = (companyID, plan) => ({
     type: actionTypes.GENERATE_CHECKOUT_SESSION_REQUEST,
-    companyID, plan
+    companyID,
+    plan
 });
 
 const generateCheckoutSessionSuccess = (sessionID) => ({

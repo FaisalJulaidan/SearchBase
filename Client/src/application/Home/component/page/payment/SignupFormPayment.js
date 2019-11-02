@@ -6,8 +6,11 @@ import momenttz from 'moment-timezone'
 import {Form, Icon, Input, Select, Checkbox, Button} from 'antd';
 import {Link, withRouter} from "react-router-dom";
 
-import {authActions} from '../../../../../store/actions/index';
+import {authActions, paymentActions} from '../../../../../store/actions/index';
+import {injectStripe} from 'react-stripe-elements';
+import {errorMessage} from "helpers/alert";
 import pricingJSON from "../pricing/pricing.json";
+import {warningMessage} from "../../../../../helpers";
 
 const FormItem = Form.Item;
 const {Option} = Select;
@@ -38,19 +41,43 @@ class SignupFormPayment extends React.Component {
 
     componentDidUpdate(prevProps, prevState, snapshot) {
         if (prevProps.isSigningUp && (this.props.errorMsg === null)) {
-            this.props.onSignupSuccessful(this.props.companyID,this.state.plan);
+            this.onSignupSuccessful(this.props.companyID, this.state.plan);
         } else if (prevState.plan !== this.state.plan)
             this.props.history.push(`/order-plan?plan=${this.state.plan}`);
+        else if (prevProps.isLoading && this.props.errorMsg !== null) {
+            this.redirectToStripe(this.props.sessionID);
+        }
     }
+
+    onSignupSuccessful = (companyID, plan) => {
+        // this.props.dispatch(paymentActions.generateCheckoutSession(companyID, plan.id))
+        this.props.dispatch(paymentActions.generateCheckoutSession(1, "plan_D3lpeLZ3EV8IfA"));
+    };
+
+    redirectToStripe(sessionID) {
+        if (sessionID === null)
+            errorMessage("invalid sessionID",0);
+        else
+            this.props.stripe.redirectToCheckout({
+                sessionId: `${sessionID}`
+            }).then(function (result) {
+                errorMessage(result.error.message, 0);
+            });
+    };
 
     handleSubmit = (e) => {
         e.preventDefault();
-        this.props.form.validateFields((err, values) => {
-            if (!err) {
-                values.timeZone = momenttz.tz.guess();
-                this.props.dispatch(authActions.signup(values));
-            }
-        });
+
+        this.onSignupSuccessful(1, "");
+
+        //TODO:: Delete line above and uncomment lines below
+
+        // this.props.form.validateFields((err, values) => {
+        //     if (!err) {
+        //         values.timeZone = momenttz.tz.guess();
+        //         this.props.dispatch(authActions.signup(values));
+        //     }
+        // });
     };
 
     handleConfirmBlur = (e) => {
@@ -218,10 +245,16 @@ SignupFormPayment.propTypes = {
 
 function mapStateToProps(state) {
     return {
+        //SignUp
         isSigningUp: state.auth.isSigningUp,
         companyID: state.auth.companyID,
-        errorMsg: state.auth.errorMsg
+
+        //Generating Session ID
+        isLoading: state.payment.isLoading,
+        sessionID: state.payment.sessionID,
+
+        errorMsg: state.auth.errorMsg,
     };
 }
 
-export default connect(mapStateToProps)(Form.create()(withRouter(SignupFormPayment)));
+export default connect(mapStateToProps)(Form.create()(withRouter(injectStripe(SignupFormPayment))));

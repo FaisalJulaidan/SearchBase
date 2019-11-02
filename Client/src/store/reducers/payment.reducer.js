@@ -5,22 +5,22 @@ const initialState = {sessionID: null, isLoading: false, errorMsg: null};
 
 export const payment = (state = initialState, action) => {
     switch (action.type) {
-        case actionTypes.FETCH_ANALYTICS_REQUEST:
+        case actionTypes.GENERATE_CHECKOUT_SESSION_REQUEST:
             return updateObject(state, {
-                analytics: null,
                 isLoading: true,
+                sessionID: null,
                 errorMsg: null,
             });
-        case actionTypes.FETCH_ANALYTICS_SUCCESS:
+        case actionTypes.GENERATE_CHECKOUT_SESSION_SUCCESS:
             return updateObject(state, {
-                sessionID: action.sessionID,
                 isLoading: false,
+                sessionID: action.sessionID,
                 errorMsg: null
             });
-        case actionTypes.FETCH_ANALYTICS_FAILURE:
+        case actionTypes.GENERATE_CHECKOUT_SESSION_FAILURE:
             return updateObject(state, {
-                sessionID: null,
                 isLoading: false,
+                sessionID: null,
                 errorMsg: action.error
             });
         default:

@@ -1,6 +1,10 @@
 .wrapper {
     padding: 1em 1em;
     min-height: 100vh;
+    /*background-image: linear-gradient(to right top, #ffffff, #9d69e5, #916ce8, #8570eb, #ffffff);*/
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
     color: #726a84;
 }
 
@@ -99,7 +103,7 @@
 
 .navigation {
     margin-top: 1em;
-    color: white;
+    color: #848484;
     align-self: center;
     text-align: center;
 }
@@ -118,7 +122,7 @@
 
 .navigation a {
     text-decoration: none;
-    color: white;
+    color: #848484;
 }
 
 

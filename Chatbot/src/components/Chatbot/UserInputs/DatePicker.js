@@ -1,24 +1,33 @@
-import React, {useState} from 'react';
+import React, { useState } from 'react';
 // Constants
 import * as messageTypes from '../../../constants/MessageType';
 import * as flowAttributes from '../../../constants/FlowAttributes';
 // Styles
 import './styles/Inputs.css';
 // Components
-import {DatePicker as AntdDatePicker, Icon, Tooltip} from 'antd';
-import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
-import {faTelegramPlane} from '@fortawesome/free-brands-svg-icons';
+import { DatePicker as AntdDatePicker, Tooltip } from 'antd';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faTelegramPlane } from '@fortawesome/free-brands-svg-icons';
+import { getContainerElement } from '../../helpers';
+import moment from 'moment';
 
 
-const DatePicker = ({message, submitMessage}) => {
-
-    let [settings, setSettings] = useState(false);
+const DatePicker = ({ message, submitMessage }) => {
+    moment.updateLocale('en', { week: { dow: 1 } });
     let [selectedDate, setSelectedDate] = useState(null);
+    let [valid, setValid] = useState(true);
+    let [error, setError] = useState(null);
 
     const inputOnChangeHandler = () => {
         let text;
-        if (selectedDate)
+        console.log(selectedDate);
+        if (selectedDate) {
             text = selectedDate;
+        } else {
+            setValid(false);
+            setError('You must select a date');
+            return;
+        }
 
         let afterMessage = message.block[flowAttributes.CONTENT][flowAttributes.CONTENT_AFTER_MESSAGE];
         let type = messageTypes.TEXT;
@@ -37,30 +46,31 @@ const DatePicker = ({message, submitMessage}) => {
 
     };
 
+
     return (
         <React.Fragment>
-            <div className={'InputContainer'}>
-                <AntdDatePicker getCalendarContainer={
-                    () => {
-                        if (document.getElementById('TheSearchBase_Chatbot_Input'))
-                            return document.getElementById('TheSearchBase_Chatbot_Input');
-                        else
-                            return document.getElementById('TheSearchBase_Chatbot')
-                    }}
-                            className={'Datepicker'} suffixIcon={<div/>}
-                            dropdownClassName={'DatepickerCalendar'}
-                            onChange={(e) => {
-                                if (e)
-                                    if (e._isAMomentObject)
-                                        setSelectedDate(e.format('L'));
-                                    else
-                                        setSelectedDate(e.target.value);
-                            }}
-                />
-            </div>
+            <Tooltip
+                placement="top"
+                title={error}
+                getPopupContainer={() => getContainerElement()}
+                visible={!valid}>
+                <div className={'DatePickerContainer'}>
+                    <AntdDatePicker getCalendarContainer={() => getContainerElement()}
+                                    className={'Datepicker'} suffixIcon={<div/>}
+                                    dropdownClassName={'DatepickerCalendar'}
+                                    onChange={(e) => {
+                                        if (e)
+                                            if (e._isAMomentObject)
+                                                setSelectedDate(e.format('L'));
+                                            else
+                                                setSelectedDate(e.target.value);
+                                    }}
+                    />
+                </div>
+            </Tooltip>
             <div className={'Submit'}>
                 <i className={'SendIconActive'} onClick={inputOnChangeHandler}>
-                    <FontAwesomeIcon size="2x" icon={faTelegramPlane}/>
+                    <FontAwesomeIcon size="2x" icon={faTelegramPlane} color={valid ? '' : 'red'}/>
                 </i>
             </div>
         </React.Fragment>

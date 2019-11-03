@@ -155,10 +155,10 @@ def prepareCampaign(campaign_details, companyID):
             }
             candidates_callback: Callback = databases_services.scan(session, hashedAssistantID, True,
                                                                     campaign_details.get("database_id"))
-        print(candidates_callback.Message)
-        print(candidates_callback.Data)
+
         if not candidates_callback.Success:
             raise Exception(candidates_callback.Message)
+
         for candidate in candidates_callback.Data:
             if candidate.get("Currency"):
                 candidate["Currency"] = ""
@@ -174,6 +174,7 @@ def prepareCampaign(campaign_details, companyID):
 
 def sendCampaign(campaign_details, companyID):
     try:
+        helpers.logError("campaign_details: " + str(campaign_details))
         messenger_callback: Callback = messenger_servicess.getByID(campaign_details.get("messenger_id"), companyID)
         if not messenger_callback.Success:
             raise Exception("Messenger not found.")
@@ -186,8 +187,11 @@ def sendCampaign(campaign_details, companyID):
                hashedAssistantID + "?source=" + source + "&source_id=" + \
                str(campaign_details.get("crm_id", campaign_details.get("database_id")))
 
+
+
         if not text:
             raise Exception("Message text is missing")
+        helpers.logError("candidate_list: " + str(campaign_details.get("candidate_list")))
 
         for candidate in campaign_details.get("candidate_list"):
             if campaign_details.get("use_crm") and crm:
@@ -204,18 +208,20 @@ def sendCampaign(campaign_details, companyID):
                 continue
 
             # insert candidate details in text
-            text = text.replace("{candidate.name}", candidate.get("CandidateName"))
+            tempText = text.replace("{candidate.name}", candidate.get("CandidateName"))
 
             # insert candidate id in link
-            text = text.split("&id")[0]
-            text += "&id=" + str(candidate.get("ID"))
+            tempText = tempText.split("&id")[0]
+            tempText += "&id=" + str(candidate.get("ID"))
 
+            helpers.logError("outreach_type: " + str(campaign_details.get("outreach_type")))
             if campaign_details.get("outreach_type") == "sms":
-                messenger_servicess.sendMessage(messenger.Type, candidate_phone, text, messenger.Auth)
+                helpers.logError("TRYING TO SEND")
+                messenger_servicess.sendMessage(messenger.Type, candidate_phone, tempText, messenger.Auth)
             elif campaign_details.get("outreach_type") == "whatsapp":
-                messenger_servicess.sendMessage(messenger.Type, candidate_phone, text, messenger.Auth, True)
+                messenger_servicess.sendMessage(messenger.Type, candidate_phone, tempText, messenger.Auth, True)
             elif campaign_details.get("outreach_type") == "email":
-                mail_services.simpleSend(candidate_email, campaign_details.get("email_title"), text)
+                mail_services.simpleSend(candidate_email, campaign_details.get("email_title"), tempText)
 
         return Callback(True, '')
 

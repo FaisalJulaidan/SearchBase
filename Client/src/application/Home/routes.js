@@ -12,6 +12,7 @@ import Login from "./component/page/login/Login";
 import Signup from "./component/page/signup/Signup";
 import GDPR from "./component/page/gdpr/GDPR";
 import GetStarted from "./component/page/get-started/GetStarted";
+import SuccessfulLogin from "./component/util/SuccessfulLogin";
 import Pricing from "./component/page/pricing/Pricing";
 import Payment from "./component/page/payment/Payment";
 import SuccessPayment from "./component/page/payment/success/SuccessPayment";
@@ -34,7 +35,7 @@ class Routes extends Component {
                 <Route path="/login" exact component={Login}/>
                 <Route path="/signup" exact component={Signup}/>
                 <Route path="/get-started" exact component={GetStarted}/>
-                <Route path='/dashboard' exact component={(() => <>{(()=>{window.location.reload()})()}</>)}/>
+                <Route path="/successful-login" exact component={SuccessfulLogin}/>
                 <Route path="" exact component={NotFound404}/>
             </Switch>
         )

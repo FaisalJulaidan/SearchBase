@@ -51,10 +51,10 @@ def insertCandidate(assistant: Assistant, conversation: Conversation, update_id=
         "availability": ", ".join(
             conversation.Data.get('keywordsByDataType').get(DT.CandidateAvailability.value['name'], [])) or None,
 
-        "annualSalary": getSalary(conversation, DT.CandidateAnnualDesiredSalary, "Min") or
-                        getSalary(conversation, DT.JobAnnualSalary, "Min"),
-        "dayRate": getSalary(conversation, DT.CandidateDailyDesiredSalary, "Min") or
-                   getSalary(conversation, DT.JobDayRate, "Min"),
+        "annualSalary": getSalary(conversation, DT.CandidateDesiredSalary, "Min", Period.Annually) or
+                        getSalary(conversation, DT.JobSalary, "Min", Period.Annually),
+        "dayRate": getSalary(conversation, DT.CandidateDesiredSalary, "Min", Period.Daily) or
+                   getSalary(conversation, DT.JobSalary, "Min", Period.Daily),
 
         "selectedSolutions": conversation.Data.get("selectedSolutions")
     }
@@ -91,7 +91,7 @@ def insertClient(assistant: Assistant, conversation: Conversation):
         "email": emails[0],
         "emails": emails,
         "availability": " ".join(
-            conversation.Data.get('keywordsByDataType').get(DT.ClientAvailability.value['name'], [])),
+            conversation.Data.get('keywordsByDataType').get(DT.UserAvailabilityDate.value['name'], [])),
 
         "companyName": " ".join(
             conversation.Data.get('keywordsByDataType').get(DT.CompanyName.value['name'],
@@ -155,10 +155,10 @@ def updateCandidate(details, conversation, companyID):
         "availability": ", ".join(
             conversation.Data.get('keywordsByDataType').get(DT.CandidateAvailability.value['name'], [])) or None,
 
-        "annualSalary": getSalary(conversation, DT.CandidateAnnualDesiredSalary, "Min") or
-                        getSalary(conversation, DT.JobAnnualSalary, "Min"),
-        "dayRate": getSalary(conversation, DT.CandidateDailyDesiredSalary, "Min") or
-                   getSalary(conversation, DT.JobDayRate, "Min"),
+        "annualSalary": getSalary(conversation, DT.CandidateDesiredSalary, "Min", Period.Annually) or
+                        getSalary(conversation, DT.JobSalary, "Min", Period.Annually),
+        "dayRate": getSalary(conversation, DT.CandidateDesiredSalary, "Min", Period.Daily) or
+                   getSalary(conversation, DT.JobSalary, "Min", Period.Daily),
 
         "selectedSolutions": conversation.Data.get("selectedSolutions")
     }
@@ -189,10 +189,10 @@ def uploadFile(assistant: Assistant, storedFile: StoredFile):
 def searchCandidates(assistant: Assistant, session):
     data = {
         "location": __checkFilter(session['keywordsByDataType'], DT.CandidateLocation),
-        "preferredJotTitle": __checkFilter(session['keywordsByDataType'], DT.CandidateJobTitle),
+        "preferredJotTitle": __checkFilter(session['keywordsByDataType'], DT.JobTitle),
         "yearsExperience": __checkFilter(session['keywordsByDataType'], DT.CandidateYearsExperience),
         "skills": __checkFilter(session['keywordsByDataType'], DT.CandidateSkills),
-        "jobCategory": __checkFilter(session['keywordsByDataType'], DT.CandidateJobCategory),
+        "jobCategory": __checkFilter(session['keywordsByDataType'], DT.JobCategory),
         "education": __checkFilter(session['keywordsByDataType'], DT.CandidateEducation)
     }
 
@@ -215,14 +215,14 @@ def searchCandidatesCustom(crm, companyID, candidate_data, perfect=False):
         "location": candidate_data.get("location"),
         "preferredJotTitle": candidate_data.get("jobTitle"),
         "skills": candidate_data.get("skills"),
+        "jobType": candidate_data.get("jobType")
         # "yearsExperience": checkFilter(session['keywordsByDataType'], DT.CandidateYearsExperience),
         # "jobCategory": checkFilter(session['keywordsByDataType'], DT.CandidateJobCategory),
         # "education": checkFilter(session['keywordsByDataType'], DT.CandidateEducation)
     }
 
     crm_type = crm.Type.value
-
-    if perfect and crm == "Bullhorn":
+    if perfect and crm_type == "Bullhorn":
         searchFunc = "searchPerfectCandidates"
     else:
         searchFunc = "searchCandidates"
@@ -242,8 +242,7 @@ def searchCandidatesCustom(crm, companyID, candidate_data, perfect=False):
 
 def searchJobs(assistant: Assistant, session):
     data = {
-        "jobTitle": __checkFilter(session['keywordsByDataType'], DT.JobTitle) or
-                    __checkFilter(session['keywordsByDataType'], DT.CandidateJobTitle),
+        "jobTitle": __checkFilter(session['keywordsByDataType'], DT.JobTitle),
         "city": __checkFilter(session['keywordsByDataType'], DT.JobLocation) or
                 __checkFilter(session['keywordsByDataType'], DT.CandidateLocation),
         "employmentType": __checkFilter(session['keywordsByDataType'], DT.JobType),
@@ -441,29 +440,23 @@ def updateByType(crm_type, newAuth, companyID):
 
 
 # get min/max/average salary from the string and convert to specified period (daily, annually)
-def getSalary(conversation: Conversation, dataType: DataType, salaryType, toPeriod=None):  # type Period
-    # ex. 5000-20000 GBP Annual
+def getSalary(conversation: Conversation, dataType: DataType, salaryType, toPeriod:Period=None):  # type Period
+    # ex. 5000-20000 GBP Annually
     salary = conversation.Data.get('keywordsByDataType').get(dataType.value['name'], 0)
 
     if salary:
         salarySplitted = salary[0].split(" ")
         salaryAmmount = salarySplitted[0].split("-")
 
+        if salaryType == "Average":
+            salary = str(float(salaryAmmount[1]) - float(salaryAmmount[0]))
+        elif salaryType == "Min":
+            salary = salaryAmmount[0]
+        elif salaryType == "Max":
+            salary = salaryAmmount[1]
+
         if toPeriod:
-            if salaryType == "Average":
-                salary = helpers.convertSalaryPeriod(str(float(salaryAmmount[1]) - float(salaryAmmount[0])),
-                                                     Period[salarySplitted[2]], toPeriod)
-            elif salaryType == "Min":
-                salary = helpers.convertSalaryPeriod(salaryAmmount[0], Period[salarySplitted[2]], toPeriod)
-            elif salaryType == "Max":
-                salary = helpers.convertSalaryPeriod(salaryAmmount[1], Period[salarySplitted[2]], toPeriod)
-        else:
-            if salaryType == "Average":
-                salary = str(float(salaryAmmount[1]) - float(salaryAmmount[0]))
-            elif salaryType == "Min":
-                salary = salaryAmmount[0]
-            elif salaryType == "Max":
-                salary = salaryAmmount[1]
+            salary = helpers.convertSalaryPeriod(salary, Period[salarySplitted[2]], toPeriod)
 
     return salary
 

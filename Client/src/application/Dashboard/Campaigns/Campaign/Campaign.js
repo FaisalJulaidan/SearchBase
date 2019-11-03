@@ -2,7 +2,8 @@ import React from 'react';
 import {connect} from 'react-redux';
 import NoHeaderPanel from 'components/NoHeaderPanel/NoHeaderPanel'
 import {
-    Typography, Form, Input, Icon, Divider, Button, Tag, AutoComplete, Select, Switch, Modal, List, Checkbox, Spin
+    Typography, Form, Input, Icon, Divider, Button, Tag, AutoComplete, Select, Switch, Modal,
+    List, Checkbox, Spin, Radio, Slider, InputNumber
 } from 'antd';
 
 import {trimText} from "../../../../helpers";
@@ -31,7 +32,9 @@ class Campaign extends React.Component {
         this.timer = React.createRef();
         this.state = {
             use_crm: true,
+            location: "",
             locations: [],
+            distance: 50,
             skills: [],
             candidate_list: [],
             candidatesModalVisibility: false,
@@ -57,6 +60,7 @@ class Campaign extends React.Component {
                         skills: JSON.parse(campaign?.Skills.replace(/'/g, '"')), //Fix JSON with REGEXP
                         textMessage: campaign?.Message,
                         use_crm: campaign?.UseCRM,
+                        location: campaign?.Location,
                     });
                     this.props.form.setFieldsValue({
                         name: trimText.capitalize(trimText.trimDash(campaign?.Name)),
@@ -94,6 +98,7 @@ class Campaign extends React.Component {
     };
 
     findLocation = (value) => {
+        this.setState({location: value});
         clearTimeout(this.timer.current);
         this.timer.current = setTimeout(() => {
             google.geocode({
@@ -132,7 +137,7 @@ class Campaign extends React.Component {
         this.setState({skills: skills});
     };
 
-    handleModalOk = () => {
+    handleModalLaunch = () => {
         this.props.form.validateFields((err, values) => {
             if (!err) {
                 this.props.dispatch(campaignActions.launchCampaign(
@@ -143,6 +148,7 @@ class Campaign extends React.Component {
                     values.messenger_id,
                     values.location,
                     values.jobTitle,
+                    values.jobType,
                     this.state.skills,
                     values.text,
                     this.state.candidate_list,
@@ -187,7 +193,7 @@ class Campaign extends React.Component {
         });
     };
 
-    handleSubmit = (event) => {
+    handleLaunch = (event) => { //Handle Launch
         event.preventDefault();
         this.props.form.validateFields((err, values) => {
             if (!err) {
@@ -199,6 +205,7 @@ class Campaign extends React.Component {
                     values.messenger_id,
                     values.location,
                     values.jobTitle,
+                    values.jobType,
                     this.state.skills,
                     this.state.textMessage,
                     values.outreach_type,
@@ -291,7 +298,7 @@ class Campaign extends React.Component {
                         centered
                         visible={this.state.candidatesModalVisibility}
                         okText={"Launch"}
-                        onOk={this.handleModalOk}
+                        onOk={this.handleModalLaunch}
                         confirmLoading={this.props.isLaunchingCampaign}
                         okButtonProps={{icon: "rocket"}}
                         footer={<div>
@@ -300,7 +307,7 @@ class Campaign extends React.Component {
                                     disabled={this.props?.candidate_list?.length === 0}>
                                 {this.props?.candidate_list?.length === this.state.candidate_list.length ? 'Deselect all' : 'Select All'}
                             </Button>
-                            <Button onClick={this.handleModalOk}
+                            <Button onClick={this.handleModalLaunch}
                                     type="primary"
                                     loading={this.props.isLaunchingCampaign}
                                     icon="rocket">Launch</Button>
@@ -344,7 +351,7 @@ class Campaign extends React.Component {
                     </Modal>
 
                     <div className={styles.formContainer}>
-                        <Form layout='vertical' onSubmit={this.handleSubmit}>
+                        <Form layout='vertical' onSubmit={this.handleLaunch}>
                             <FormItem style={{display: this.state.isSaved ? 'block' : 'none'}} label={"Campaign Name"}>
                                 {getFieldDecorator("name")(
                                     <Input placeholder={"Please enter a name for your campaign"}/>
@@ -459,6 +466,17 @@ class Campaign extends React.Component {
                                     <Input placeholder={"Please enter your job title"}/>
                                 )}
                             </FormItem>
+
+                            <FormItem label={"Job Type"}>
+                                {getFieldDecorator("jobType", {initialValue: "permanent"})(
+                                    <Radio.Group defaultValue="permanent">
+                                        <Radio.Button value="permanent">Permanent</Radio.Button>
+                                        <Radio.Button value="temporary">Temporary</Radio.Button>
+                                        <Radio.Button value="contract">Contract</Radio.Button>
+                                    </Radio.Group>
+                                )}
+                            </FormItem>
+
                             <FormItem label={"Skills"}>
                                 {getFieldDecorator("skill")(
                                     <Input placeholder="Type in a skill and press enter to add to the list of skills"
@@ -481,27 +499,42 @@ class Campaign extends React.Component {
                                     }],
                                 })(
                                     <AutoComplete placeholder="Type in your location"
+                                                  value={this.state.location}
                                                   type="text"
                                                   dataSource={this.state.locations}
                                                   onChange={value => this.findLocation(value)}/>
                                 )}
                             </FormItem>
 
+                            <FormItem label={`Distance within ${this.state.distance} miles`}
+                                      style={{display: this.state.location ? 'block' : 'none'}}>
+                                {getFieldDecorator("distance")(
+                                    <Slider
+                                        step={5}
+                                        defaultValue={[this.state.distance]}
+                                        onChange={(value) => {
+                                            this.setState({distance: value})
+                                        }}
+                                    />
+                                )}
+                            </FormItem>
+
                             <FormItem label={"Outreach Type "}>
                                 {getFieldDecorator("outreach_type", {initialValue: "sms"})(
-                                    <Select placeholder={"Please select the message delivery platform"}
-                                            onSelect={(value) => {this.setState({outreach_type: value})}}>
-                                        <Select.Option key="sms">SMS</Select.Option>
-                                        <Select.Option key="email">Email</Select.Option>
-                                    </Select>
+                                    <Radio.Group defaultValue="sms" onChange={(e) => {
+                                        this.setState({outreach_type: e.target.value})
+                                    }}>
+                                        <Radio.Button value="sms">SMS</Radio.Button>
+                                        <Radio.Button value="email">Email</Radio.Button>
+                                    </Radio.Group>
                                 )}
                             </FormItem>
 
                             <FormItem label={"Email Title "}
                                       style={this.state.outreach_type !== 'email' ? {display: 'none'} : {display: 'block'}}>
-                                {getFieldDecorator("email_title",{
+                                {getFieldDecorator("email_title", {
                                     rules: [{
-                                        whitespace:true,
+                                        whitespace: true,
                                         required: this.state.outreach_type === 'email',
                                         message: "Please enter a title for your outreach email"
                                     }],
@@ -530,9 +563,52 @@ class Campaign extends React.Component {
                                 )}
                             </FormItem>
 
+                            <FormItem label={"Follow up every:"}>
+                                {getFieldDecorator("followUp", {initialValue: "never"})(
+                                    <Radio.Group defaultValue="never" onChange={(e) => {
+                                        this.setState({followUp: e.target.value})
+                                    }}>
+                                        <Radio.Button value="never">Never</Radio.Button>
+                                        <Radio.Button value="6">6 hours</Radio.Button>
+                                        <Radio.Button value="12">12 hours</Radio.Button>
+                                        <Radio.Button value="24">1 day</Radio.Button>
+                                        <Radio.Button value="71">3 days</Radio.Button>
+                                    </Radio.Group>
+                                )}
+                            </FormItem>
+
+                            <FormItem label={"Schedule for every:"}>
+                                {getFieldDecorator("schedule", {initialValue: "never"})(
+                                    <Radio.Group defaultValue="off" onChange={(e) => {
+                                        this.setState({schedule: e.target.value})
+                                    }}>
+                                        <Radio.Button value="never">Never</Radio.Button>
+                                        <Radio.Button value="1">1 Day</Radio.Button>
+                                        <Radio.Button value="7">7 Days</Radio.Button>
+                                        <Radio.Button value="30">1 Month</Radio.Button>
+                                        <Radio.Button value="90">3 Months</Radio.Button>
+                                        <Radio.Button value="custom">Custom</Radio.Button>
+                                    </Radio.Group>
+                                )}
+                                {this.state.schedule === 'custom' ?
+                                    <InputNumber placeholder="Custom schedule, in days"
+                                                 min={1}
+                                                 style={{marginTop: 10, width: '30%'}}
+                                                 value={this.state.customSchedule ? this.state.customSchedule : 3}
+                                                 formatter={value => value == '1' ? `${value} day` : `${value} days`}
+                                                 parser={value => {
+                                                     value.replace('day', 'days');
+                                                     value.replace('days', '');
+                                                 }}
+                                                 onChange={(value) => {
+                                                     this.setState({customSchedule: value});
+                                                 }}/>
+                                    : null}
+                            </FormItem>
+
 
                             <Button loading={this.props.isCandidatesLoading} icon="rocket" type="primary"
-                                    onClick={this.handleSubmit}
+                                    onClick={this.handleLaunch}
                                     size={"large"}>
                                 Launch
                             </Button>

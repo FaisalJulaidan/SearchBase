@@ -3,7 +3,6 @@ version: '3'
 
 volumes:
   prod-data:
-      external: true
 
 services:
   mysql:
@@ -12,7 +11,7 @@ services:
       - 3306:3306
     restart: always
     environment:
-      - MYSQL_ROOT_PASSWORD=#The$earchBase_$ecure_Password#
+      - MYSQL_ROOT_PASSWORD=#TheSearchBase_Secure_Password#
     networks:
       - frontend
     volumes:

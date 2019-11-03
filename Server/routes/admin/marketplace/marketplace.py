@@ -99,6 +99,11 @@ def calendar_auth(assistantID):
         return helpers.jsonResponse(False, 400, callback.Message)
     return helpers.jsonResponse(True, 200, callback.Message)
 
+
+@marketplace_router.route("/marketplace/simple_callback", methods=['GET', 'POST', 'PUT'])
+def simple_callback():
+    return str(request.url)
+
 # post method, only adds events
 # @marketplace_router.route("/calendar/<hashedAssistantID>/event", methods=['POST'])
 # def calendar_add_event(hashedAssistantID):

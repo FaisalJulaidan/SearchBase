@@ -42,13 +42,14 @@ fernet = Fernet(os.environ['TEMP_SECRET_KEY'])
 currencyConverter = CurrencyRates()
 
 
-
-# Crate request limiter
+# Create request limiter
 def getRemoteAddress():
     if os.environ['FLASK_ENV'] == 'development':
         return request.remote_addr
     else:
         return request.headers['X-Real-IP']
+
+
 limiter = Limiter(key_func=getRemoteAddress)
 
 
@@ -162,6 +163,8 @@ def jsonResponseFlask(success: bool, http_code: int, msg: str, data=None):
 
 # Note: Hourly is not supported because it varies and number of working hours is required
 def convertSalaryPeriod(salary, fromPeriod: Period, toPeriod: Period):
+
+    salary = int(salary[1:].replace(',', ''))  # Type error otherwise
 
     if fromPeriod == Period.Annually:
         if toPeriod == Period.Daily:

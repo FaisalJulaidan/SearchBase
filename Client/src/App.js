@@ -1,5 +1,5 @@
-import React, {Component, lazy, Suspense} from 'react';
-import {Route, Switch, withRouter} from 'react-router-dom';
+import React, { Component, lazy, Suspense } from 'react';
+import { Route, Switch, withRouter} from 'react-router-dom';
 import {connect} from 'react-redux';
 import {PrivateRoute} from './hoc';
 import SentryBoundary from 'components/SentryBoundary/SentryBoundary';
@@ -11,8 +11,6 @@ import {STRIPE_PK} from "./constants/config";
 
 const Home = lazy(() => import('./application/Home/Home'));
 const Dashboard = lazy(() => import('./application/Dashboard/Dashboard'));
-const Login = lazy(() => import('./application/Login/Login'));
-const Signup = lazy(() => import('./application/Signup/Signup'));
 const ForgetPassword = lazy(() => import('./application/ForgetPassword/ForgetPassword'));
 const NewResetPassword = lazy(() => import('./application/ForgetPassword/NewResetPassword/NewResetPassword'));
 const AppointmentsPicker = lazy(() => import('./application/AppointmentsPicker/AppointmentsPicker'));
@@ -66,11 +64,8 @@ class App extends Component {
             <StripeProvider stripe={this.state.stripe}>
                 <SentryBoundary>
                     <Suspense fallback={<div className={styles.Loader}> Loading...</div>}>
-                        <TimezoneContext.Provider value={this.state.timezone}>
-                            <Switch>
-                                {/*<Route path="/login" component={Login}/>*/}
-                                {/*<Route path="/signup" component={Signup}/>*/}
-                                <Route path="/forget_password" component={ForgetPassword}/>
+                        <Switch>
+                                <Route  path="/forget_password" component={ForgetPassword}/>
                                 <Route path="/reset_password/" component={NewResetPassword}/>
                                 <Route path="/verify_account/" component={AccountVerification}/>
                                 <Route path="/appointments_picker/" component={AppointmentsPicker}/>
@@ -80,7 +75,7 @@ class App extends Component {
                                 <Route path="/" component={Home}/>
                                 {/* <Redirect to={{pathname: '/'}}/> */}
                             </Switch>
-                        </TimezoneContext.Provider>
+
                     </Suspense>
                 </SentryBoundary>
             </StripeProvider>
@@ -89,7 +84,7 @@ class App extends Component {
 }
 
 const mapStateToProps = (state) => {
-    const {alert} = state;
+    const { alert } = state;
     return {
         alert
     };

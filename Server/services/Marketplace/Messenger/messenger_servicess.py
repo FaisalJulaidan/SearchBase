@@ -10,9 +10,12 @@ from utilities.enums import Messenger
 def sendMessage(type: Messenger, recipient, body, auth, whatsapp=False) -> Callback:
     try:
 
+        # Note: Dont actually send message while testing...
+
         # test connection
         if type is Messenger.Twilio:
             return Twilio.sendMessage(recipient, body, auth, whatsapp)  # oauth2
+            pass
 
         return Callback(False, 'Connection failure. Please check entered details')
 
@@ -131,7 +134,8 @@ def getAll(companyID) -> Callback:
 
 def updateByType(type, newAuth, companyID):
     try:
-        messenger = db.session.query(Messenger_Model).filter(and_(Messenger_Model.CompanyID == companyID, Messenger_Model.Type == type)).first()
+        messenger = db.session.query(Messenger_Model).filter(
+            and_(Messenger_Model.CompanyID == companyID, Messenger_Model.Type == type)).first()
         messenger.Auth = dict(newAuth)
         db.session.commit()
         return Callback(True, "New auth has been saved")

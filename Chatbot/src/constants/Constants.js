@@ -8,6 +8,7 @@ export const DATEPICKER = 'DateTime';
 export const URL = 'URL';
 export const FILE = 'File';
 export const IGNORE = 'Ignore';
+export const MOMENT_FORMAT = 'DD/MM/YYYY'
 
 
 

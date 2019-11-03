@@ -46,7 +46,7 @@ class OurFocus extends React.Component {
         return (
             <Container id={this.props.id}>
                 <Row>
-                    <Col xs="auto" className={styles.col_header}>
+                    <Col className={styles.col_header}>
                         <h1 className={styles.title}>Do More, With Less</h1>
                     </Col>
                 </Row>

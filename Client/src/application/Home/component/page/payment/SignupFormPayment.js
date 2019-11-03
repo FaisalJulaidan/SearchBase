@@ -1,11 +1,16 @@
 import React from 'react';
+import PropTypes from "prop-types";
 import {connect} from 'react-redux';
-import styles from './signup-form.module.css'
+import styles from './signup-form-payment.module.css'
 import momenttz from 'moment-timezone'
-import {Form, Icon, Input, Select, Checkbox,Button} from 'antd';
-import {Link,withRouter} from "react-router-dom";
+import {Form, Icon, Input, Select, Checkbox, Button} from 'antd';
+import {Link, withRouter} from "react-router-dom";
 
-import {authActions} from '../../../../../store/actions/index';
+import {authActions, paymentActions} from '../../../../../store/actions/index';
+import {injectStripe} from 'react-stripe-elements';
+import {errorMessage} from "helpers/alert";
+import pricingJSON from "../pricing/pricing.json";
+import {warningMessage} from "../../../../../helpers";
 
 const FormItem = Form.Item;
 const {Option} = Select;
@@ -18,7 +23,17 @@ const selectBeforeURL = (
     </Select>
 );
 
-class SignupForm extends React.Component {
+class SignupFormPayment extends React.Component {
+
+    componentDidMount() {
+        const found = pricingJSON.some(item => item.id === this.props?.plan);
+        if (!found) {
+            this.setState({plan: pricingJSON[0].id})
+        } else {
+            this.setState({plan: this.props.plan})
+        }
+    }
+
 
     state = {
         confirmDirty: false,
@@ -26,16 +41,35 @@ class SignupForm extends React.Component {
 
     componentDidUpdate(prevProps, prevState, snapshot) {
         if (prevProps.isSigningUp && (this.props.errorMsg === null)) {
-            this.props.history.push('/login');
-        }
+            this.onSignupSuccessful(this.props.companyID, this.state.plan);
+        } else if (prevProps.isLoading && this.props.errorMsg === null) {
+            this.redirectToStripe(this.props.sessionID);
+        } else if (prevState.plan !== this.state.plan)
+            this.props.history.push(`/order-plan?plan=${this.state.plan}`);
     }
+
+    onSignupSuccessful = (companyID, plan) => {
+        //TODO:: Update Plan
+        this.props.dispatch(paymentActions.generateCheckoutSession(companyID, "plan_D3lpeLZ3EV8IfA"));
+    };
+
+    redirectToStripe(sessionID) {
+        console.log(sessionID);
+        if (sessionID === null)
+            errorMessage("invalid sessionID", 0);
+        else
+            this.props.stripe.redirectToCheckout({
+                sessionId: `${sessionID}`
+            }).then(function (result) {
+                errorMessage(result.error.message, 0);
+            });
+    };
 
     handleSubmit = (e) => {
         e.preventDefault();
         this.props.form.validateFields((err, values) => {
             if (!err) {
                 values.timeZone = momenttz.tz.guess();
-                // console.log('Received values of form: ', values);
                 this.props.dispatch(authActions.signup(values));
             }
         });
@@ -62,7 +96,7 @@ class SignupForm extends React.Component {
 
                 <FormItem className={styles.SignupFormItem}>
                     {getFieldDecorator('companyName', {
-                        rules: [{whitespace: true, required: true, message: 'Please input your company name!'}],
+                        rules: [{required: true, message: 'Please input your company name!'}],
                     })(
                         <Input prefix={<Icon type="home" style={{color: 'rgba(0,0,0,.25)'}}/>}
                                placeholder="Company Name"/>
@@ -72,7 +106,7 @@ class SignupForm extends React.Component {
 
                 <FormItem className={styles.SignupFormItem}>
                     {getFieldDecorator('websiteURL', {
-                        rules: [{whitespace: true, required: true, message: 'Please input company website URL!'},
+                        rules: [{required: true, message: 'Please input company website URL!'},
                             {
                                 pattern: /[-a-zA-Z0-9@:%_\+.~#?&//=]{2,256}\.[a-z]{2,16}\b(\/[-a-zA-Z0-9@:%_\+.~#?&//=]*)?/,
                                 message: 'Please, enter a valid URL'
@@ -85,7 +119,7 @@ class SignupForm extends React.Component {
 
                 <FormItem className={styles.SignupFormItem}>
                     {getFieldDecorator('firstName', {
-                        rules: [{whitespace: true, required: true, message: 'Please input your first name!'}],
+                        rules: [{required: true, message: 'Please input your first name!'}],
                     })(
                         <Input prefix={<Icon type="idcard" style={{color: 'rgba(0,0,0,.25)'}}/>}
                                placeholder="First Name "/>
@@ -94,7 +128,7 @@ class SignupForm extends React.Component {
 
                 <FormItem className={styles.SignupFormItem}>
                     {getFieldDecorator('lastName', {
-                        rules: [{whitespace: true, required: true, message: 'Please input your last name!'}],
+                        rules: [{required: true, message: 'Please input your last name!'}],
                     })(
                         <Input prefix={<Icon type="idcard" style={{color: 'rgba(0,0,0,.25)'}}/>}
                                placeholder="Last Name "/>
@@ -105,7 +139,6 @@ class SignupForm extends React.Component {
                     {getFieldDecorator('telephone', {
                         rules: [
                             {
-                                whitespace: true,
                                 pattern: /^((\+\d{1,3}(-| )?\(?\d\)?(-| )?\d{1,3})|(\(?\d{2,3}\)?))(-| )?(\d{3,4})(-| )?(\d{4})(( x| ext)\d{1,5}){0,1}$/,
                                 message: 'Sorry, use a valid number'
                             }
@@ -120,7 +153,7 @@ class SignupForm extends React.Component {
                 <FormItem className={styles.SignupFormItem}>
                     {getFieldDecorator('email', {
                         rules: [
-                            {whitespace: true, required: true, message: 'Please input your email!'},
+                            {required: true, message: 'Please input your email!'},
                             {
                                 pattern: /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,16})+$/,
                                 message: 'Sorry, use a valid email'
@@ -136,7 +169,7 @@ class SignupForm extends React.Component {
                 <FormItem className={styles.SignupFormItem}>
                     {getFieldDecorator('password', {
                         rules: [
-                            {whitespace: true, required: true, message: 'Please input your Password!'},
+                            {required: true, message: 'Please input your Password!'},
                             {validator: this.validateToNextPassword},
                             {pattern: /^.{6,}$/, message: 'Minimum is 6 characters'}
                         ],
@@ -150,7 +183,7 @@ class SignupForm extends React.Component {
                 <FormItem className={styles.SignupFormItem}>
                     {getFieldDecorator('confirm', {
                         rules: [
-                            {whitespace: true, required: true, message: 'Please confirm your Password!'},
+                            {required: true, message: 'Please confirm your Password!'},
                             {validator: this.compareToFirstPassword}
                         ],
                     })(
@@ -161,32 +194,62 @@ class SignupForm extends React.Component {
                     )}
                 </FormItem>
 
+                <FormItem className={styles.SignupFormItem}>
+                    {getFieldDecorator('plan', {
+                        initialValue: this.state.plan,
+                        rules: [
+                            {required: true, message: 'Please select a plan'},
+                        ],
+                    })(
+                        <Select onSelect={(value) => {
+                            this.setState({plan: value})
+                        }}>
+                            {
+                                pricingJSON.map((plan) => {
+                                    return (
+                                        <Select.Option key={plan.id}>{plan.title}</Select.Option>
+                                    );
+                                })
+                            }
+                        </Select>
+                    )}
+                </FormItem>
+
                 <Form.Item>
                     {getFieldDecorator('agreement', {
-                        rules: [{required: true, message: 'You must agree to the terms & privacy policy'}],
+                        rules: [{required: true, message: 'You must agree to terms & privacy policy'}],
                     })(
-                        <Checkbox className={styles.checkbox}>I have read the <Link className={styles.link} to="/terms">terms</Link> & <Link
+                        <Checkbox className={styles.checkbox}>I have read the <Link className={styles.link}
+                                                                                    to="/terms">terms</Link> & <Link
                             className={styles.link} to="/privacy">privacy
                             policy</Link></Checkbox>
                     )}
                 </Form.Item>
                 <Form.Item className={styles.SignupFormItem}>
-                    <Button type="primary" htmlType="submit" block className={styles.submit}>
-                        Sign up
-                    </Button>
+                    <Button type="primary" htmlType="submit" block>Submit</Button>
                 </Form.Item>
-
-
             </Form>
         );
     }
 }
 
+SignupFormPayment.propTypes = {
+    plan: PropTypes.string,
+    // onSignupSuccessful: PropTypes.func.isRequired
+};
+
 function mapStateToProps(state) {
     return {
+        //SignUp
         isSigningUp: state.auth.isSigningUp,
-        errorMsg: state.auth.errorMsg
+        companyID: state.auth.companyID,
+
+        //Generating Session ID
+        isLoading: state.payment.isLoading,
+        sessionID: state.payment.sessionID,
+
+        errorMsg: state.auth.errorMsg,
     };
 }
 
-export default connect(mapStateToProps)(Form.create()(withRouter(SignupForm)));
+export default connect(mapStateToProps)(Form.create()(withRouter(injectStripe(SignupFormPayment))));

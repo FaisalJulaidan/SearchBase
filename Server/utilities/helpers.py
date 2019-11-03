@@ -306,6 +306,7 @@ def validateRequest(req, check: dict, throwIfNotValid: bool = True):
                 returnDict["missing"].append(item)
             elif check[item]['type']:
                 if not isinstance(req[item], check[item]['type']):
+                    print(req[item])
                     returnDict["errors"].append("Parameter {} is not of required type {}".format(item, str(check[item]['type'].__name__)))
         returnDict["inputs"][item] = req[item] if item in req and item is not None else None
     if len(returnDict["missing"]) != 0:

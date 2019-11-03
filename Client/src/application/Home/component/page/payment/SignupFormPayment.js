@@ -42,21 +42,21 @@ class SignupFormPayment extends React.Component {
     componentDidUpdate(prevProps, prevState, snapshot) {
         if (prevProps.isSigningUp && (this.props.errorMsg === null)) {
             this.onSignupSuccessful(this.props.companyID, this.state.plan);
+        } else if (prevProps.isLoading && this.props.errorMsg === null) {
+            this.redirectToStripe(this.props.sessionID);
         } else if (prevState.plan !== this.state.plan)
             this.props.history.push(`/order-plan?plan=${this.state.plan}`);
-        else if (prevProps.isLoading && this.props.errorMsg !== null) {
-            this.redirectToStripe(this.props.sessionID);
-        }
     }
 
     onSignupSuccessful = (companyID, plan) => {
-        // this.props.dispatch(paymentActions.generateCheckoutSession(companyID, plan.id))
-        this.props.dispatch(paymentActions.generateCheckoutSession(1, "plan_D3lpeLZ3EV8IfA"));
+        //TODO:: Update Plan
+        this.props.dispatch(paymentActions.generateCheckoutSession(companyID, "plan_D3lpeLZ3EV8IfA"));
     };
 
     redirectToStripe(sessionID) {
+        console.log(sessionID);
         if (sessionID === null)
-            errorMessage("invalid sessionID",0);
+            errorMessage("invalid sessionID", 0);
         else
             this.props.stripe.redirectToCheckout({
                 sessionId: `${sessionID}`
@@ -67,17 +67,12 @@ class SignupFormPayment extends React.Component {
 
     handleSubmit = (e) => {
         e.preventDefault();
-
-        this.onSignupSuccessful(1, "");
-
-        //TODO:: Delete line above and uncomment lines below
-
-        // this.props.form.validateFields((err, values) => {
-        //     if (!err) {
-        //         values.timeZone = momenttz.tz.guess();
-        //         this.props.dispatch(authActions.signup(values));
-        //     }
-        // });
+        this.props.form.validateFields((err, values) => {
+            if (!err) {
+                values.timeZone = momenttz.tz.guess();
+                this.props.dispatch(authActions.signup(values));
+            }
+        });
     };
 
     handleConfirmBlur = (e) => {
@@ -240,7 +235,7 @@ class SignupFormPayment extends React.Component {
 
 SignupFormPayment.propTypes = {
     plan: PropTypes.string,
-    onSignupSuccessful: PropTypes.func.isRequired
+    // onSignupSuccessful: PropTypes.func.isRequired
 };
 
 function mapStateToProps(state) {

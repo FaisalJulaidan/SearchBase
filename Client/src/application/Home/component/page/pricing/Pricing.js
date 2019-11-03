@@ -16,8 +16,7 @@ const Pricing = () => {
     let pricing = pricingJSON.map((plan, key) => {
         return (
             <Col key={key}>
-                <PricingCard id={plan.id} title={plan.title} subtitle={plan.subtitle} price={plan.price} items={plan.items}
-                icon={plan.icon}/>
+                <PricingCard id={plan.id} plan={plan}/>
             </Col>
         );
     });
@@ -29,9 +28,7 @@ const Pricing = () => {
                     <Container>
                         <Row>
                             <Col className={styles.text_wrapper}>
-                                <h1 className={styles.title}>Choose your plan</h1>
-                                <h1 className={styles.subtitle}>SearchBase is simply designed to
-                                    boost candidates interaction and revolutionise your business.</h1>
+                                <h1 className={styles.title}>Boost candidates interaction and automate every mundane task in your business.</h1>
                             </Col>
                         </Row>
                     </Container>

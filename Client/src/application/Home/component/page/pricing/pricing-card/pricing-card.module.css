@@ -4,14 +4,14 @@
     color: #767676;
     box-shadow: 0 3px 4px rgba(0, 0, 0, 0.10), 0 1px 2px rgba(0, 0, 0, 0.18);
     transition: all 0.3s cubic-bezier(.25, .8, .25, 1);
-    text-align: center;
+    /*text-align: center;*/
 
 }
 
 .card .body {
     display: flex;
     flex-flow: column;
-    align-items: center;
+    /*align-items: center;*/
 }
 
 .card:hover {
@@ -24,36 +24,47 @@
 
 .title {
     color: #444444;
-    font-weight: bolder;
-    font-size: 1.5em;
-    margin-top: 1em;
+    font-weight: 900;
+    font-size: 2em;
 }
 
 .body hr {
     background-color: #9254de;
-    min-width: 45px;
-    margin: .75em 0;
-    height: 3px;
+    min-width: 60px;
+    width: fit-content;
+    margin: .5em 0;
+    height: 2px;
 }
 
 .subtitle {
-    font-size: .8em;
-    color: #848484;
+    margin: 0 1.5em 0 0;
+    color: #726a84;
+    font-size: 1.1em;
 }
 
 .price {
     color: #9254de;
-    font-size: 1.4em;
+    font-size: 3em;
+    font-weight: 900;
+    margin-top: .4em;
+}
+
+.price_subtitle{
+    margin: 0.2em 0 1em 0;
+    font-size: 1.2em;
     font-weight: bold;
-    margin: 1.2em 0;
+    color: #9254de;
 }
 
 .list {
+    margin-top: .5em;
+    color: #767676;
+    font-size: 0.95em;
     flex-grow: 1;
 }
 
 .list li {
-    margin: .75em 0;
+    margin: .5em 0;
 }
 
 .list li:first-child {
@@ -66,8 +77,11 @@
 
 /**** Primary Button ****/
 .button {
+    margin: 0.85em 0;
+    font-size: 1.1em;
+    width: fit-content;
+    border-radius: 2px;
     text-decoration: none;
-    margin-top: 2em;
     color: #9254de;
     border-color: #9254de;
     transition: all 0.4s ease 0s, background-color 0.4s ease 0s;

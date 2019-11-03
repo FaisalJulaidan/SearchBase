@@ -18,19 +18,20 @@
 
 .hero .text_wrapper .title {
     color: #ffffff;
-    font-weight: bold;
-    font-size: 3.5em;
+    font-weight: 900;
+    font-size: 3.1em;
 }
 
-.hero .text_wrapper .subtitle {
-    margin-top: 1.2em;
-    font-weight: bold;
-    color: #ffffff;
-}
+/*.hero .text_wrapper .subtitle {*/
+/*    margin-top: 1.2em;*/
+/*    font-weight: bold;*/
+/*    color: #ffffff;*/
+/*    font-size: 1.5em;*/
+/*}*/
 
 .content{
-    margin-top: -10em;
-    margin-bottom: 3em;
+    margin-top: -9em;
+    margin-bottom: 5em;
 }
 
 .row_enterprise{
@@ -45,7 +46,9 @@
 .row_enterprise h1{
     text-align: center;
     color: #444444;
-    font-size: 2em;
+    font-size: 2.5em;
+    font-weight: 900;
+    text-transform: capitalize;
 }
 
 .row_enterprise .desc_col{
@@ -57,6 +60,7 @@
 }
 
 .demo_button {
+    border-radius: 2px;
     text-decoration: none;
     color: white !important;
     padding-top: 7px;
@@ -84,6 +88,7 @@
 
 
 .contact_button {
+    border-radius: 2px;
     color: #9254de;
     border-color: #9254de;
 }

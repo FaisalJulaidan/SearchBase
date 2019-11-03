@@ -39,8 +39,8 @@ def generateCheckoutURL(req) -> Callback:
                 }],
             },
             customer=company.Data.StripeID,
-            success_url='http://localhost:3000/success-payment?session_id={CHECKOUT_SESSION_ID}',
-            cancel_url='http://localhost:3000/order-plan',
+            success_url='https://www.thesearchbase.com/success-payment?session_id={CHECKOUT_SESSION_ID}',
+            cancel_url='https://www.thesearchbase.com/order-plan',
         )
         print(session['id'])
 

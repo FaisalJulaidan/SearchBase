@@ -15,7 +15,7 @@ class SuccessPayment extends Component {
                     <div className={styles.background2}/>
                     <div className={styles.background1}/>
                 </div>
-                <Container>
+                <Container className={styles.container}>
                     <Row className={styles.row}>
                         <Col sm={10} md={8} lg={6} xl={6}>
                             <Card className={styles.card}>

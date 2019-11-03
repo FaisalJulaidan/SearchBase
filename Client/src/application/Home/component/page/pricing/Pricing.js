@@ -22,7 +22,7 @@ const Pricing = () => {
     });
 
     return (
-        <Layout background={"linear-gradient(to bottom, #ffffff, #fdfdfd, #fbfbfb)"}>
+        <Layout>
             <div>
                 <div className={styles.hero}>
                     <Container>

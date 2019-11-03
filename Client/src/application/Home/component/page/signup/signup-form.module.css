@@ -2,6 +2,10 @@
     margin-bottom: 0 !important;
 }
 
+.submit{
+    border-radius: 3px;
+}
+
 .checkbox {
     color: #726a84;
     line-height: normal;

@@ -4,27 +4,24 @@ import PropTypes from "prop-types";
 import {Link} from "react-router-dom";
 import {Card} from "react-bootstrap";
 import Button from "react-bootstrap/Button";
-import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
-import {library} from '@fortawesome/fontawesome-svg-core';
-import {faHome, faBuilding, faCity} from "@fortawesome/free-solid-svg-icons";
-
-library.add(faHome, faBuilding, faCity);
+import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
+import {faCheck} from "@fortawesome/free-solid-svg-icons";
 const PricingCard = (props) => {
 
     let items = props.plan?.items?.map((item, key) => {
-        return <li key={key}>{item}</li>
+        return <li key={key}><FontAwesomeIcon color="#4CAF50" size="1x" icon={faCheck} className={styles.icon}/>{item}</li>
     });
 
     return (
         <Card className={styles.card}>
             <Card.Body className={styles.body}>
-                {/*<FontAwesomeIcon className={styles.icon} size="3x" icon={props.icon}/>*/}
                 <h1 className={styles.title}>{props.plan?.title}</h1>
                 <hr/>
                 <h1 className={styles.subtitle}>{props.plan?.subtitle}</h1>
                 <h4 className={styles.price}>{props.plan?.price}</h4>
                 <h4 className={styles.price_subtitle}>{props.plan?.price_subtitle}</h4>
-                <Button as={Link} to={`/order-plan?plan=${props.id}`} variant="outline-light" className={styles.button}>Order Now</Button>
+                <Button as={Link} to={`/order-plan?plan=${props.id}`} variant="outline-light" className={styles.button}>Order
+                    Now</Button>
                 <hr/>
                 <ul className={styles.list}>
                     {items}
@@ -35,7 +32,7 @@ const PricingCard = (props) => {
 };
 
 PricingCard.propTypes = {
-    plan : PropTypes.shape({
+    plan: PropTypes.shape({
         title: PropTypes.string.isRequired,
         subtitle: PropTypes.string.isRequired,
         price: PropTypes.string.isRequired,

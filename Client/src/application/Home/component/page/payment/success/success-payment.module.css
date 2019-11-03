@@ -1,15 +1,13 @@
 .wrapper {
     min-height: 100vh;
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    align-items: center;
     color: #726a84;
     background: #a865e111;
+    display: flex;
+    flex-wrap: wrap;
 }
 
 .background {
-    position: absolute;
+    position: fixed;
     overflow: hidden;
     width: 100%;
     height: 100%;
@@ -54,6 +52,12 @@
     width: 80%;
 }
 
+.container{
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+}
 
 .row {
     flex-flow: column;

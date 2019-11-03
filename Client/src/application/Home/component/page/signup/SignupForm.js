@@ -171,7 +171,7 @@ class SignupForm extends React.Component {
                     )}
                 </Form.Item>
                 <Form.Item className={styles.SignupFormItem}>
-                    <Button type="primary" htmlType="submit" block>
+                    <Button type="primary" htmlType="submit" block className={styles.submit}>
                         Sign up
                     </Button>
                 </Form.Item>

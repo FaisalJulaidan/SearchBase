@@ -15,6 +15,6 @@ plugins:
 custom:
     client:
         bucketName: client-bucket
-#        distributionFolder: build
+        distributionFolder: build
         indexDocument: index.html
         errorDocument: index.html

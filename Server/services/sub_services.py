@@ -28,22 +28,36 @@ def unsubscribe(company: Company) -> Callback:
         return Callback(False, 'An error occurred while trying to unsubscribe')
         
 def handleStripeWebhook(req) -> Callback:
-    # plans = {"plan_D3lpeLZ3EV8IfA": "1"}
+    # Plan structure
+    #  Assitants | Campaign | AutoPilot | DB | Appointments
+    #  1.0.0.0.0 - means only access to assistants 
+    
+    plans = {"plan_D3lp2yVtTotk2f": "1.0.0.1.0", "plan_D3lp9R7ombKmSO": "1.1.0.1.1", "plan_D3lpeLZ3EV8IfA": "1.1.1.1.1"}
+
+
     try:
         event = stripe.Event.construct_from(req, os.getenv("sk_test_Kwsicnv4HaXaKJI37XBjv1Od"))
         if event.type == 'checkout.session.completed':
             customer: Callback = company_services.getByStripeID(event['data']['object']['customer']) 
+            plan = plans[event['data']['object']['display_items'][0]['plan']['id']].split(".")
 
-            customer.Data.AccessAssistants = 1
+            customer.Data.AccessAssistants = plan[0]
+            customer.Data.AccessCampaigns = plan[1]
+            customer.Data.AccessAutoPilot = plan[2]
+            customer.Data.AccessDatabase = plan[3]
+            customer.Data.AccessAppointments = plan[4]
+
             db.session.commit()
 
+            return Callback(True)
             # if customer doesnt exist
             if not customer.Success:
                 raise Exception("No customer found with given ID")
         elif event.type == 'customer.subscription.deleted': 
-            print("test")
+            return Callback(True) #tell stripe webhook was handled succesfully
         elif event.type == 'customer.subscription.created':
-            print("test")
+            print("test")   #tell stripe webhook was handled succesfully
+            
 
     except Exception as e:
         helpers.logError("sub_services.handleStripeWebhook(): " + str(e))

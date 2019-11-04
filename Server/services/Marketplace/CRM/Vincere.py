@@ -360,7 +360,7 @@ def searchCandidates(auth, companyID, data) -> Callback:
                                                                   mobile=record.get("mobile"),
                                                                   location=
                                                                   record.get("current_location", {}).get("city", ""),
-                                                                  skills=record.get("skill").split(","),  # str list
+                                                                  skills=record.get("skill", "").split(","),  # str list
                                                                   linkdinURL=None,
                                                                   availability=record.get("status"),
                                                                   jobTitle=None,

@@ -27,8 +27,8 @@ custom:
 functions:
   app:
     handler: wsgi_handler.handler
-    layers:
-      - {Ref: PythonRequirementsLambdaLayer}
+#    layers:
+#      - {Ref: PythonRequirementsLambdaLayer}
     events:
       - http: ANY /
       - http: 'ANY {proxy+}'
@@ -36,7 +36,7 @@ functions:
 
   sendConversationsNotifications:
     handler: services/scheduler_services.sendConversationsNotifications
-    layers:
-        - {Ref: PythonRequirementsLambdaLayer}
+#    layers:
+#        - {Ref: PythonRequirementsLambdaLayer}
     events:
       - schedule: rate(1 hour)

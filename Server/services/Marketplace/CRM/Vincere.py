@@ -316,8 +316,8 @@ def searchCandidates(auth, companyID, data) -> Callback:
         # populate filter
         query += populateFilter(data.get("location"), "current_city")
 
-        # if keywords[DT.CandidateSkills.value["name"]]:
-        #     query += "primarySkills.data:" + keywords[DT.CandidateSkills.name] + " or"
+        for skill in data.get("skills"):
+            query += populateFilter(skill, "skill")
 
         # query = query[:-1]
 

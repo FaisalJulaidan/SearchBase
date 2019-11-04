@@ -27,8 +27,6 @@ def unsubscribe(company: Company) -> Callback:
         db.session.rollback()
         return Callback(False, 'An error occurred while trying to unsubscribe')
 
-def getPlanByCompany(company) -> str:
-
         
 def handleStripeWebhook(req) -> Callback:
     # Plan structure
@@ -39,7 +37,7 @@ def handleStripeWebhook(req) -> Callback:
       else {"plan_G7Sth78cbr8Pgl": "1.0.0.1.0", "plan_G7SuTtSoBxJ7aS": "1.1.0.1.1", "plan_G7SuT5aJA1OFJU": "1.1.1.1.1"}# testing env
 
     try:
-        event = stripe.Event.construct_from(req)
+        event = stripe.Event.construct_from(req, stripe.api_key)
         if event.type == 'checkout.session.completed':
             customer: Callback = company_services.getByStripeID(event['data']['object']['customer']) 
             plan = plans[event['data']['object']['display_items'][0]['plan']['id']].split(".")

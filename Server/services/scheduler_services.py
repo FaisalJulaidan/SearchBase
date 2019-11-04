@@ -36,8 +36,10 @@ Types:
 '''
 
 # If assistantID is supplied, it will only look for data relating to that assistant
-def sendConversationsNotifications(assistantID=None):
+def sendConversationsNotifications(event, context):
+    print(context)
     print("FASIAL FAISAL FIASLALS L FLSELFWLE")
+    print(event)
     # try:
     #     from app import app
     #     with app.app_context():

@@ -31,4 +31,4 @@ functions:
   sendConversationsNotifications:
     handler: services/scheduler_services.sendConversationsNotifications
     events:
-      - schedule: rate(1 hours)
+      - schedule: rate(1 hour)

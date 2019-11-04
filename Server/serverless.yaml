@@ -16,9 +16,9 @@ custom:
   pythonRequirements:
     zip: true
     slim: true
-    layer: true
-#    useDownloadCache: true
-#    useStaticCache: true
+#    layer: true
+    useDownloadCache: true
+    useStaticCache: true
 
   wsgi:
     app: thesearchbase.app

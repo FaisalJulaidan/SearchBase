@@ -25,7 +25,7 @@ from services.auth_services import jwt
 from services.mail_services import mail
 from utilities import helpers, tasks, dummy_data
 
-from utilities.helpers import limiter
+# from utilities.helpers import limiter
 
 app = Flask(__name__, static_folder='static')
 

@@ -40,6 +40,9 @@ def handleStripeWebhook(req) -> Callback:
             customer: Callback = company_services.getByStripeID(event['data']['object']['customer']) 
             plan = plans[event['data']['object']['display_items'][0]['plan']['id']].split(".")
 
+            if not customer.Success:
+                raise Exception("No customer found with given ID")
+
             customer.Data.AccessAssistants = int(plan[0])
             customer.Data.AccessCampaigns = int(plan[1])
             customer.Data.AccessAutoPilot = int(plan[2])
@@ -50,12 +53,23 @@ def handleStripeWebhook(req) -> Callback:
 
             return Callback(True, 'No Message')
             # if customer doesnt exist
+        elif event.type == 'customer.subscription.deleted': 
+            customer: Callback = company_services.getByStripeID(event['data']['object']['customer']) 
+
             if not customer.Success:
                 raise Exception("No customer found with given ID")
-        elif event.type == 'customer.subscription.deleted': 
+
+            customer.Data.AccessAssistants = 0
+            customer.Data.AccessCampaigns = 0
+            customer.Data.AccessAutoPilot = 0
+            customer.Data.AccessDatabases = 0
+            customer.Data.AccessAppointments = 0
+
+            db.session.commit()
+            # Until we figure out a wa
+
             return Callback(True, 'No Message') #tell stripe webhook was handled succesfully
         elif event.type == 'customer.subscription.created':
-            print("test")   #tell stripe webhook was handled succesfully
             return Callback(True, 'No Message') #tell stripe webhook was handled succesfully
             
 

@@ -14,8 +14,10 @@ plugins:
 
 custom:
   pythonRequirements:
-#    zip: true
+    zip: true
     slim: true
+    useDownloadCache: true
+    useStaticCache: true
 
   wsgi:
     app: thesearchbase.app

@@ -37,47 +37,48 @@ Types:
 
 # If assistantID is supplied, it will only look for data relating to that assistant
 def sendConversationsNotifications(assistantID=None):
-    try:
-        from app import app
-        with app.app_context():
-            #NEEDS STORED FILEREIMPLEMENTED
-            now = datetime.now()
-            assistantsQuery = db.session.query(Assistant).options(joinedload("Company").joinedload("StoredFile").joinedload("StoredFileInfo")) \
-                .filter(and_(Assistant.NotifyEvery))
-
-            if assistantID != None:
-                assistantsQuery.filter(Assistant.ID == assistantID)
-
-            assistants = assistantsQuery.all()
-
-            for assistant in assistants:
-                # Assistant will not get notified in the first passed hour after their notification set active
-                if not assistant.LastNotificationDate:
-                    db.session.query(Assistant).filter(Assistant.ID == assistant.ID)\
-                        .update({'LastNotificationDate': now})
-
-                # Check if NotifyEvery hours have passed
-                elif ((now - assistant.LastNotificationDate).total_seconds()/86400) > assistant.NotifyEvery :
-
-                    # Fetch conversation that happen after LastNotificationDate
-                    conversations = db.session.query(Conversation)\
-                        .filter(and_(Conversation.DateTime > assistant.LastNotificationDate,
-                                     Conversation.AssistantID == assistant.ID))\
-                        .all()
-
-                    if len(conversations) > 0:
-                        callback: Callback = mail_services.notifyNewConversations(assistant, conversations, assistant.LastNotificationDate)
-                        if not callback.Success:
-                            raise Exception(callback.Message)
-
-                    db.session.query(Assistant).filter(Assistant.ID == assistant.ID)\
-                        .update({'LastNotificationDate': now})
-
-            # Save changes to the db
-            db.session.commit()
-
-    except Exception as e:
-        helpers.logError(str(e))
+    print("FASIAL FAISAL FIASLALS L FLSELFWLE")
+    # try:
+    #     from app import app
+    #     with app.app_context():
+    #         #NEEDS STORED FILEREIMPLEMENTED
+    #         now = datetime.now()
+    #         assistantsQuery = db.session.query(Assistant).options(joinedload("Company").joinedload("StoredFile").joinedload("StoredFileInfo")) \
+    #             .filter(and_(Assistant.NotifyEvery))
+    #
+    #         if assistantID != None:
+    #             assistantsQuery.filter(Assistant.ID == assistantID)
+    #
+    #         assistants = assistantsQuery.all()
+    #
+    #         for assistant in assistants:
+    #             # Assistant will not get notified in the first passed hour after their notification set active
+    #             if not assistant.LastNotificationDate:
+    #                 db.session.query(Assistant).filter(Assistant.ID == assistant.ID)\
+    #                     .update({'LastNotificationDate': now})
+    #
+    #             # Check if NotifyEvery hours have passed
+    #             elif ((now - assistant.LastNotificationDate).total_seconds()/86400) > assistant.NotifyEvery :
+    #
+    #                 # Fetch conversation that happen after LastNotificationDate
+    #                 conversations = db.session.query(Conversation)\
+    #                     .filter(and_(Conversation.DateTime > assistant.LastNotificationDate,
+    #                                  Conversation.AssistantID == assistant.ID))\
+    #                     .all()
+    #
+    #                 if len(conversations) > 0:
+    #                     callback: Callback = mail_services.notifyNewConversations(assistant, conversations, assistant.LastNotificationDate)
+    #                     if not callback.Success:
+    #                         raise Exception(callback.Message)
+    #
+    #                 db.session.query(Assistant).filter(Assistant.ID == assistant.ID)\
+    #                     .update({'LastNotificationDate': now})
+    #
+    #         # Save changes to the db
+    #         db.session.commit()
+    #
+    # except Exception as e:
+    #     helpers.logError(str(e))
 
 
 ''' 

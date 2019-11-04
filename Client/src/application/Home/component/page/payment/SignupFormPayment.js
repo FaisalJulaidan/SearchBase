@@ -50,7 +50,8 @@ class SignupFormPayment extends React.Component {
 
     onSignupSuccessful = (companyID, plan) => {
         //TODO:: Update Plan
-        this.props.dispatch(paymentActions.generateCheckoutSession(companyID, "plan_D3lpeLZ3EV8IfA"));
+        const plans = {"essential": "plan_D3lp2yVtTotk2f", "pro": "plan_D3lp9R7ombKmSO", "premium": "plan_D3lpeLZ3EV8IfA"} // temp for testing change as you want
+        this.props.dispatch(paymentActions.generateCheckoutSession(companyID, plans[plan]));
     };
 
     redirectToStripe(sessionID) {

@@ -78,8 +78,8 @@ def stripe_webhook():
 
     # To tell stripe whether the request was succesful
     if not callback.Success:
-        return None, 400
-    return None, 200
+        return helpers.jsonResponse(False, 400, callback.Message)
+    return helpers.jsonResponse(True, 200, callback.Message)
 
 # Old website routes, To be deleted.
 #

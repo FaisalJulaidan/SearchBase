@@ -32,8 +32,7 @@ def handleStripeWebhook(req) -> Callback:
     #  Assitants | Campaign | AutoPilot | DB | Appointments
     #  1.0.0.0.0 - means only access to assistants 
     
-    plans = {"plan_D3lp2yVtTotk2f": "1.0.0.1.0", "plan_D3lp9R7ombKmSO": "1.1.0.1.1", "plan_D3lpeLZ3EV8IfA": "1.1.1.1.1"}
-
+    plans = {"plan_D3lp2yVtTotk2f": "1.0.0.1.0", "plan_D3lp9R7ombKmSO": "1.1.0.1.1", "plan_D3lpeLZ3EV8IfA": "1.1.1.1.1"} # testing env
 
     try:
         event = stripe.Event.construct_from(req, os.getenv("sk_test_Kwsicnv4HaXaKJI37XBjv1Od"))
@@ -41,27 +40,28 @@ def handleStripeWebhook(req) -> Callback:
             customer: Callback = company_services.getByStripeID(event['data']['object']['customer']) 
             plan = plans[event['data']['object']['display_items'][0]['plan']['id']].split(".")
 
-            customer.Data.AccessAssistants = plan[0]
-            customer.Data.AccessCampaigns = plan[1]
-            customer.Data.AccessAutoPilot = plan[2]
-            customer.Data.AccessDatabase = plan[3]
-            customer.Data.AccessAppointments = plan[4]
+            customer.Data.AccessAssistants = int(plan[0])
+            customer.Data.AccessCampaigns = int(plan[1])
+            customer.Data.AccessAutoPilot = int(plan[2])
+            customer.Data.AccessDatabases = int(plan[3])
+            customer.Data.AccessAppointments = int(plan[4])
 
             db.session.commit()
 
-            return Callback(True)
+            return Callback(True, 'No Message')
             # if customer doesnt exist
             if not customer.Success:
                 raise Exception("No customer found with given ID")
         elif event.type == 'customer.subscription.deleted': 
-            return Callback(True) #tell stripe webhook was handled succesfully
+            return Callback(True, 'No Message') #tell stripe webhook was handled succesfully
         elif event.type == 'customer.subscription.created':
             print("test")   #tell stripe webhook was handled succesfully
+            return Callback(True, 'No Message') #tell stripe webhook was handled succesfully
             
 
     except Exception as e:
         helpers.logError("sub_services.handleStripeWebhook(): " + str(e))
-        return Callback(False)
+        return Callback(False, 'No Message')
 
 def generateCheckoutURL(req) -> Callback:
     try:
@@ -72,7 +72,7 @@ def generateCheckoutURL(req) -> Callback:
             payment_method_types=['card'],
             subscription_data={
                 'items': [{
-                'plan': resp['inputs']['plan'],
+                  'plan': resp['inputs']['plan'],
                 }],
             },
             customer=company.Data.StripeID,

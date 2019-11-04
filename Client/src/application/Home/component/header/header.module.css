@@ -83,6 +83,7 @@
 
 /**** Primary Button ****/
 .button {
+    border-radius: 3px;
     text-decoration: none;
     min-width: 9em;
     color: white !important;

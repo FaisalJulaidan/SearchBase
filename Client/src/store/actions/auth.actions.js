@@ -24,8 +24,9 @@ const signup = (signupDetails) => ({
     signupDetails
 });
 
-const signupSuccess = () => ({
+const signupSuccess = (companyID) => ({
     type: actionTypes.SIGNUP_SUCCESS,
+    companyID
 });
 
 const signupFailure = (error) => ({

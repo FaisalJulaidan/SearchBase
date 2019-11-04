@@ -212,7 +212,6 @@ export const Chatbot = ({
                 return;
             }
             if (nextBlock.extra.end) {
-              console.log("end")
                 setChatbotStatus({ finished: true });
                 let { cancelled } = await dataHandler.sendData(nextBlock.extra.finished);
                 if (cancelled) return;
@@ -240,7 +239,7 @@ export const Chatbot = ({
                 return setChatbotStatus({ disabled: isDisabled, active: assistant.Active, loading: false });
 
             dataHandler.setAssistantID(assistantID);
-
+            console.log( [].concat(assistant.Flow.groups.map(group => group.blocks)).flat(1))
             initChatbot(
                 assistant,
                 [].concat(assistant.Flow.groups.map(group => group.blocks)).flat(1),

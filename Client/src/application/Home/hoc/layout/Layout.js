@@ -1,5 +1,4 @@
 import React, {Component} from 'react'
-import '../../bootstrap.css'
 import './layout.css'
 import Header from "../../component/header/Header";
 import Footer from '../../component/footer/Footer'
@@ -13,7 +12,7 @@ class Layout extends Component {
             <StickyContainer id="content-wrap" style={{background: this.props.background}}>
                 <Header id="header"/>
                 {this.props.children}
-                <Footer background={this.props.background} id="footer"/>
+                <Footer id="footer"/>
             </StickyContainer>
         )
     }

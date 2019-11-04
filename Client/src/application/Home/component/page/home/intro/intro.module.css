@@ -24,6 +24,7 @@
 }
 
 .text_col .button {
+    border-radius: 2px;
     color: #9254de;
     border-color: #9254de;
 }

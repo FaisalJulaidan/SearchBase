@@ -1,5 +1,6 @@
 from utilities import helpers
 from models import Callback, db, Company
+from services import company_services
 import stripe
 
 
@@ -25,7 +26,34 @@ def unsubscribe(company: Company) -> Callback:
         db.session.rollback()
         return Callback(False, 'An error occurred while trying to unsubscribe')
 
+def generateCheckoutURL(req) -> Callback:
+    try:
+        resp: dict = helpers.validateRequest(req, {"plan": {"type": str, "required": True}, "companyID": {"type": int, "required": False}})
+        company: Callback = company_services.getByCompanyID(resp['inputs']['companyID'])
 
+        session = stripe.checkout.Session.create(
+            payment_method_types=['card'],
+            subscription_data={
+                'items': [{
+                'plan': resp['inputs']['plan'],
+                }],
+            },
+            customer=company.Data.StripeID,
+            success_url='https://www.thesearchbase.com/success-payment?session_id={CHECKOUT_SESSION_ID}',
+            cancel_url='https://www.thesearchbase.com/order-plan',
+        )
+        print(session['id'])
+
+        return Callback(True, 'Checkout URL Succesfully created', session['id'])    
+    except helpers.requestException as e:
+        helpers.logError("sub_services.generateCheckoutURL(): " + str(e))
+        return Callback(False, str(e), None)
+    except Exception as e:
+        helpers.logError("sub_services.generateCheckoutURL(): " + str(e))
+        return Callback(False, "Failed to generate checkout URL", None)
+
+
+#
 def subscribe(company: Company, planID, trialDays=None, token=None, coupon='') -> Callback:
 
     # Get the Plan by ID

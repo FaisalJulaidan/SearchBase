@@ -5,7 +5,7 @@ from flask_cors import CORS
 from flask_mail import Message
 
 from models import Callback
-from services import mail_services, url_services
+from services import mail_services, url_services, sub_services
 from services.mail_services import mail
 from utilities import helpers
 
@@ -58,6 +58,14 @@ def register_interest():
 
         return helpers.jsonResponse(True, 200, callback.Message)
 
+@public_router.route("/pricing/genCheckoutURL", methods=['POST'])
+def generateCheckoutURL():
+  callback: Callback = sub_services.generateCheckoutURL(request.json)
+
+  if not callback.Success:
+      return helpers.jsonResponse(False, 400, callback.Message)
+
+  return helpers.jsonResponse(True, 200, callback.Message, callback.Data)
 
 @public_router.route("/mail/contact_us", methods=['POST'])
 def contact_us():

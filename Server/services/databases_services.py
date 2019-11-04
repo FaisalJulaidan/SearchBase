@@ -330,7 +330,6 @@ def getCRMData(assistant, databaseType, session):
     # check CRM
     if assistant.CRM:
         if databaseType is "Jobs":
-            print("WE ARE HERE:")
             return crm_services.searchJobs(assistant, session).Data
         elif databaseType is "Candidates":
             return crm_services.searchCandidates(assistant, session).Data
@@ -416,7 +415,6 @@ def scanCandidates(session, dbIDs, extraCandidates=None, campaign=False):
 
         indexes = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q']
         for i, record in enumerate(topResults):
-            print("BUILDING NEW CANDIDATE DESCRIPTION...")
             desc = []
             # Build random dynamic candidate description
             if record[Candidate.CandidateLocation.name]:
@@ -599,8 +597,8 @@ def __salary(row, dbSalaryColumn, dbCurrencyColumn, salaryInput: str, plus=4, fo
     userSalary = salaryInput.split(' ')
 
     # Get user's min and max salary
-    userMin = userSalary[0].split("-")[0]
-    userMax = userSalary[0].split("-")[1]
+    userMin = float(re.sub("[^0-9]", "", userSalary[0].split("-")[0]))
+    userMax = float(re.sub("[^0-9]", "", userSalary[0].split("-")[1]))
 
     # Convert db salary currency if did not match with user's entered currency
     dbSalary = row[dbSalaryColumn.name] or 0
@@ -617,15 +615,15 @@ def __salary(row, dbSalaryColumn, dbCurrencyColumn, salaryInput: str, plus=4, fo
 
     # Compare salaries, if true then return 'plus' to be added to the score otherwise old score
     if not forceLessThan:
-        return (plus if (float(userMin) <= dbSalary <= float(userMax)) else row['Score']), dbSalary, userSalary[1]
+        return (plus if (userMin <= dbSalary <= userMax) else row['Score']), dbSalary, userSalary[1]
     else:  # Less
-        return (plus if dbSalary <= float(userMax) else row['Score']), dbSalary, userSalary[1]
+        return (plus if dbSalary <= userMax else row['Score']), dbSalary, userSalary[1]
 
 
 def createPandaCandidate(id, name, email, mobile, location, skills,
                          linkdinURL, availability, jobTitle, education,
                          yearsExperience: int, desiredSalary, currency: Currency, source):
-    if type(desiredSalary) is str:
+    if isinstance(desiredSalary, str):
         desiredSalary = float(re.sub("[^0-9]", "", desiredSalary))
     return {"ID": id,
             "CandidateName": name or '',
@@ -647,7 +645,7 @@ def createPandaCandidate(id, name, email, mobile, location, skills,
 
 def createPandaJob(id, title, desc, location, type, salary, essentialSkills, yearsRequired,
                    startDate, endDate, linkURL, currency: Currency, source):
-    if type(salary) is str:
+    if isinstance(salary, str):
         salary = float(re.sub("[^0-9]", "", salary))
     return {"ID": id,
             "JobTitle": title or '',

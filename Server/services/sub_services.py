@@ -26,16 +26,20 @@ def unsubscribe(company: Company) -> Callback:
         helpers.logError("sub_services.unsubscribe(): SubID " + company.SubID + " / " + str(exc))
         db.session.rollback()
         return Callback(False, 'An error occurred while trying to unsubscribe')
+
+def getPlanByCompany(company) -> str:
+
         
 def handleStripeWebhook(req) -> Callback:
     # Plan structure
     #  Assitants | Campaign | AutoPilot | DB | Appointments
     #  1.0.0.0.0 - means only access to assistants 
     
-    plans = {"plan_D3lp2yVtTotk2f": "1.0.0.1.0", "plan_D3lp9R7ombKmSO": "1.1.0.1.1", "plan_D3lpeLZ3EV8IfA": "1.1.1.1.1"} # testing env
+    plans = {"plan_D3lp2yVtTotk2f": "1.0.0.1.0", "plan_D3lp9R7ombKmSO": "1.1.0.1.1", "plan_D3lpeLZ3EV8IfA": "1.1.1.1.1"} if os.environ['STRIPE_IS_TESTING'] == 'yes' \
+      else {"plan_G7Sth78cbr8Pgl": "1.0.0.1.0", "plan_G7SuTtSoBxJ7aS": "1.1.0.1.1", "plan_G7SuT5aJA1OFJU": "1.1.1.1.1"}# testing env
 
     try:
-        event = stripe.Event.construct_from(req, os.getenv("sk_test_Kwsicnv4HaXaKJI37XBjv1Od"))
+        event = stripe.Event.construct_from(req)
         if event.type == 'checkout.session.completed':
             customer: Callback = company_services.getByStripeID(event['data']['object']['customer']) 
             plan = plans[event['data']['object']['display_items'][0]['plan']['id']].split(".")

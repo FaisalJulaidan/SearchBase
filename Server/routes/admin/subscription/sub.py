@@ -9,8 +9,11 @@ from models import db, Callback, User, Company
 sub_router: Blueprint = Blueprint('sub_router', __name__, template_folder="../../templates")
 
 stripe_keys = {
-  'secret_key': os.environ['STRIPE_SECRET_KEY'],
-  'publishable_key': os.environ['STRIPE_PUBLISHABLE_KEY']
+  'secret_key': os.environ['STRIPE_SECRET_KEY_TEST'],
+  'publishable_key': os.environ['STRIPE_PUBLISHABLE_KEY_TEST']
+} if os.environ['STRIPE_IS_TESTING'] == "yes" else {
+  'secret_key': os.environ['STRIPE_SECRET_KEY_LIVE'],
+  'publishable_key': os.environ['STRIPE_PUBLISHABLE_KEY_LIVE']
 }
 
 stripe.api_key = stripe_keys['secret_key']

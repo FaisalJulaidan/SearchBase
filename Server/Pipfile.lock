@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "69719aa231224f3b966943c302e1421b726d91d5c5062183cb550a961eff0a55"
+            "sha256": "b0436f439097cf95967d7fa223516458d9909b62eecb24894dadf72e321f654e"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -666,7 +666,6 @@
                 "sha256:7458c48e3d15b8aaa7d575be60e1e4dd70348efcd9376656b72fecd55c59a4c3",
                 "sha256:78bf638993219311377ce9836b3dc05f627a666d0dbc8cec37c0ff3c9ada673b",
                 "sha256:8153705d6545fd9eb6dd2bc79301bff08825d2e2f716d5dced48daafc2d0b81f",
-                "sha256:89f8fdf8c0ff3ed1e2c6f5c8482cf64fcc9645afd49be0a872a22f46d0bee57b",
                 "sha256:975c461accd14e89d71772e89108a050fa824c0b87a67d34cedf245f6681fc17",
                 "sha256:9962957a27bfb70ab64103d0a7b42fa59c642fb4ed4cb75d0227b7bb9228535d",
                 "sha256:adc3d3a3f9e59a38d923e90e20c4922fc62d1e5a03d083440468c6d8f3f1ae0a",
@@ -869,11 +868,11 @@
         },
         "stripe": {
             "hashes": [
-                "sha256:1c36ef80962a2a60b9f7dbb647033551725272ea037f3b45676393cee1d62f78",
-                "sha256:a409264d37226829627fbfacaa61d58f7b15da4c2fc2b7f65fe59d8149c37ecf"
+                "sha256:b37bc34045b2becad6ce40a5ca0abd3c83ee2528e3dce0149026b29f30ac90a6",
+                "sha256:ea26abb9c4f6eea94dda630157a1f713e5925b9ccec0fbac5e53a9c6e4541bbd"
             ],
             "index": "pypi",
-            "version": "==2.34.0"
+            "version": "==2.38.0"
         },
         "twilio": {
             "hashes": [

@@ -474,12 +474,16 @@ def additionalCandidateNotesBuilder(data, selectedSolutions=None):
         "preferredJobTitle": "They have stated that their preferred jobs are connected with \"[preferredJobTitle]\". ",
         "preferredJobType": "They also prefer [preferredJobType] roles. ",
         "skills": "They are also well versed in [skills]. ",
+        "dateAvailable": "They are available from [dateAvailable]. ",
         "educations": "For education they have provided \"[educations]\". "
     }
 
     paragraph = "At " + str(date.today().strftime("%B %d, %Y")) + \
                 "SearchBase has also collected the following information regarding this candidate: "
     for key, value in data.items():
+        if not sentences.get(key):
+            helpers.logError(str(key) + " needs to be added to crm_services.additionalCandidateNotesBuilder.")
+            continue
         paragraph += sentences[key].replace("[" + key + "]", value)
 
     if selectedSolutions:

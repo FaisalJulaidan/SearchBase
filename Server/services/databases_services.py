@@ -330,7 +330,6 @@ def getCRMData(assistant, databaseType, session):
     # check CRM
     if assistant.CRM:
         if databaseType is "Jobs":
-            print("WE ARE HERE:")
             return crm_services.searchJobs(assistant, session).Data
         elif databaseType is "Candidates":
             return crm_services.searchCandidates(assistant, session).Data
@@ -416,7 +415,6 @@ def scanCandidates(session, dbIDs, extraCandidates=None, campaign=False):
 
         indexes = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q']
         for i, record in enumerate(topResults):
-            print("BUILDING NEW CANDIDATE DESCRIPTION...")
             desc = []
             # Build random dynamic candidate description
             if record[Candidate.CandidateLocation.name]:

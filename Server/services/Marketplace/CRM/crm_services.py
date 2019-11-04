@@ -5,10 +5,10 @@ from services.Marketplace.CRM import Greenhouse, Bullhorn, Mercury, Jobscience, 
 # Process chatbot session
 from utilities import helpers
 from utilities.enums import CRM, UserType, DataType, Period, DataType as DT
+from datetime import date
 
 
 def processConversation(assistant: Assistant, conversation: Conversation) -> Callback:
-    print("Should be processing the conversation")
     # Insert base on userType
     if conversation.UserType is UserType.Candidate:
         return insertCandidate(assistant, conversation)
@@ -191,7 +191,7 @@ def searchCandidates(assistant: Assistant, session):
         "location": __checkFilter(session['keywordsByDataType'], DT.CandidateLocation),
         "preferredJotTitle": __checkFilter(session['keywordsByDataType'], DT.JobTitle),
         "yearsExperience": __checkFilter(session['keywordsByDataType'], DT.CandidateYearsExperience),
-        "skills": __checkFilter(session['keywordsByDataType'], DT.CandidateSkills),
+        "skills": __checkFilter(session['keywordsByDataType'], DT.CandidateSkills, True),
         "jobCategory": __checkFilter(session['keywordsByDataType'], DT.JobCategory),
         "education": __checkFilter(session['keywordsByDataType'], DT.CandidateEducation)
     }
@@ -268,10 +268,12 @@ def searchJobs(assistant: Assistant, session):
 
 
 # private helper function
-def __checkFilter(keywords, dataType: DT):
+def __checkFilter(keywords, dataType: DT, returnList=False):
 
-    if keywords.get(dataType.value["name"]):
+    if keywords.get(dataType.value["name"]) and not returnList:
         return " ".join(keywords[dataType.value["name"]])
+    elif keywords.get(dataType.value["name"]):
+        return keywords.get(dataType.value["name"])
     return None
 
 
@@ -475,7 +477,8 @@ def additionalCandidateNotesBuilder(data, selectedSolutions=None):
         "educations": "For education they have provided \"[educations]\". "
     }
 
-    paragraph = "SearchBase has also collected the following information regarding this candidate: "
+    paragraph = "At " + str(date.today().strftime("%B %d, %Y")) + \
+                "SearchBase has also collected the following information regarding this candidate: "
     for key, value in data.items():
         paragraph += sentences[key].replace("[" + key + "]", value)
 

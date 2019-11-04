@@ -1,6 +1,7 @@
 from utilities import helpers
 from models import Callback, db, Company
 from services import company_services
+import os
 import stripe
 
 
@@ -25,6 +26,28 @@ def unsubscribe(company: Company) -> Callback:
         helpers.logError("sub_services.unsubscribe(): SubID " + company.SubID + " / " + str(exc))
         db.session.rollback()
         return Callback(False, 'An error occurred while trying to unsubscribe')
+        
+def handleStripeWebhook(req) -> Callback:
+    # plans = {"plan_D3lpeLZ3EV8IfA": "1"}
+    try:
+        event = stripe.Event.construct_from(req, os.getenv("sk_test_Kwsicnv4HaXaKJI37XBjv1Od"))
+        if event.type == 'checkout.session.completed':
+            customer: Callback = company_services.getByStripeID(event['data']['object']['customer']) 
+
+            customer.Data.AccessAssistants = 1
+            db.session.commit()
+
+            # if customer doesnt exist
+            if not customer.Success:
+                raise Exception("No customer found with given ID")
+        elif event.type == 'customer.subscription.deleted': 
+            print("kekistan")
+        elif event.type == 'customer.subscription.created':
+            print("kek")
+
+    except Exception as e:
+        helpers.logError("sub_services.handleStripeWebhook(): " + str(e))
+        return Callback(False)
 
 def generateCheckoutURL(req) -> Callback:
     try:

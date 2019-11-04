@@ -348,16 +348,11 @@ def searchCandidates(auth, companyID, data) -> Callback:
 
         result = []
         for record in return_body["result"]["items"]:
-            skills = record.get("skill", "").split("Skill Name: :")
-            skills.pop(0)
-            for i in range(len(skills)):
-                skills[i] = skills[i].split("Description")[0]
-
             currency = record.get("currency", "gbp").lower()
             if currency == "pound":
                 currency = "GBP"
             else:
-                currency = record.get("currency", "GBP")
+                currency = record.get("currency", "GBP").upper()
 
             result.append(databases_services.createPandaCandidate(id=record.get("id", ""),
                                                                   name=record.get("name"),
@@ -365,7 +360,7 @@ def searchCandidates(auth, companyID, data) -> Callback:
                                                                   mobile=record.get("mobile"),
                                                                   location=
                                                                   record.get("current_location", {}).get("city", ""),
-                                                                  skills=skills,  # stringified json
+                                                                  skills=record.get("skill").split(","),  # str list
                                                                   linkdinURL=None,
                                                                   availability=record.get("status"),
                                                                   jobTitle=None,

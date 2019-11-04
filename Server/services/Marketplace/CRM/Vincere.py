@@ -157,7 +157,17 @@ def sendQuery(auth, query, method, body, companyID, optionalParams=None):
 
 def buildUrl(rest_data, query, optionalParams=None):
     # set up initial url
-    url = "https://" + rest_data.get("domain", "") + ".vincere.io/api/v2/" + query
+    domain = rest_data.get("domain", "")
+
+    domainStart = "https://"
+    if "https://" in domain:
+        domainStart = ""
+
+    domainEnd = ".vincere.io"
+    if ".vincere.io" in domain:
+        domainEnd = ""
+
+    url = domainStart + rest_data.get("domain", "") + domainEnd + "/api/v2/" + query
 
     # add additional params
     if optionalParams:
@@ -165,6 +175,7 @@ def buildUrl(rest_data, query, optionalParams=None):
         for param in optionalParams:
             url += "&" + param.strip()
     # return the url
+    helpers.logError("URL 1: " + url)
     return url
 
 
@@ -337,16 +348,11 @@ def searchCandidates(auth, companyID, data) -> Callback:
 
         result = []
         for record in return_body["result"]["items"]:
-            skills = record.get("skill", "").split("Skill Name: :")
-            skills.pop(0)
-            for i in range(len(skills)):
-                skills[i] = skills[i].split("Description")[0]
-
             currency = record.get("currency", "gbp").lower()
             if currency == "pound":
                 currency = "GBP"
             else:
-                currency = record.get("currency", "GBP")
+                currency = record.get("currency", "GBP").upper()
 
             result.append(databases_services.createPandaCandidate(id=record.get("id", ""),
                                                                   name=record.get("name"),
@@ -354,7 +360,7 @@ def searchCandidates(auth, companyID, data) -> Callback:
                                                                   mobile=record.get("mobile"),
                                                                   location=
                                                                   record.get("current_location", {}).get("city", ""),
-                                                                  skills=skills,  # stringified json
+                                                                  skills=record.get("skill", "").split(","),  # str list
                                                                   linkdinURL=None,
                                                                   availability=record.get("status"),
                                                                   jobTitle=None,

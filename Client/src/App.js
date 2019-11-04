@@ -6,7 +6,6 @@ import SentryBoundary from 'components/SentryBoundary/SentryBoundary';
 import styles from './components/LoadingSpinner/LoadingSpinner.module.less';
 import {StripeProvider} from 'react-stripe-elements';
 
-// import {TimezoneContext} from 'contexts/timezone';
 import {STRIPE_PK} from "./constants/config";
 
 const Home = lazy(() => import('./application/Home/Home'));

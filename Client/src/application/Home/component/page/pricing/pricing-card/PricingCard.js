@@ -6,10 +6,12 @@ import {Card} from "react-bootstrap";
 import Button from "react-bootstrap/Button";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faCheck} from "@fortawesome/free-solid-svg-icons";
+
 const PricingCard = (props) => {
 
     let items = props.plan?.items?.map((item, key) => {
-        return <li key={key}><FontAwesomeIcon color="#4CAF50" size="1x" icon={faCheck} className={styles.icon}/>{item}</li>
+        return <li key={key}><FontAwesomeIcon color="#4CAF50" size="1x" icon={faCheck} className={styles.icon}/>{item}
+        </li>
     });
 
     return (
@@ -20,8 +22,9 @@ const PricingCard = (props) => {
                 <h1 className={styles.subtitle}>{props.plan?.subtitle}</h1>
                 <h4 className={styles.price}>{props.plan?.price}</h4>
                 <h4 className={styles.price_subtitle}>{props.plan?.price_subtitle}</h4>
-                <Button as={Link} to={`/order-plan?plan=${props.id}`} variant="outline-light" className={styles.button}>Order
-                    Now</Button>
+                <Link to={`/order-plan?plan=${props.id}`} style={{width:'fit-content'}}>
+                    <Button variant="outline-light" className={styles.button}>Order Now</Button>
+                </Link>
                 <hr/>
                 <ul className={styles.list}>
                     {items}

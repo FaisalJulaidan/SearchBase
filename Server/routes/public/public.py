@@ -15,16 +15,16 @@ CORS(public_router)
 
 # ======== Server React =========== #
 # Serve React App
-@public_router.route('/', defaults={'path': ''})
-@public_router.route('/<path:path>')
-def serve(path):
-    if os.environ['FLASK_ENV'] == 'development':
-        return redirect("http://localhost:3000/" + path, code=302)
-
-    if path != "" and os.path.exists("static/react_app/" + path):
-        return send_from_directory("static/react_app/", path)
-    else:
-        return send_from_directory("static/react_app/", 'index.html')
+# @public_router.route('/', defaults={'path': ''})
+# @public_router.route('/<path:path>')
+# def serve(path):
+#     if os.environ['FLASK_ENV'] == 'development':
+#         return redirect("http://localhost:3000/" + path, code=302)
+#
+#     if path != "" and os.path.exists("static/react_app/" + path):
+#         return send_from_directory("static/react_app/", path)
+#     else:
+#         return send_from_directory("static/react_app/", 'index.html')
 
 
 # LEGACY CODE

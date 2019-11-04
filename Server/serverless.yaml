@@ -14,7 +14,7 @@ plugins:
 
 custom:
   pythonRequirements:
-    zip: true
+#    zip: true
     slim: true
 #    layer: true
     useDownloadCache: true

@@ -158,11 +158,16 @@ def sendQuery(auth, query, method, body, companyID, optionalParams=None):
 def buildUrl(rest_data, query, optionalParams=None):
     # set up initial url
     domain = rest_data.get("domain", "")
-    domainExt = ".vincere.io"
-    if ".vincere.io" in domain:
-        domainExt = ""
 
-    url = "https://" + rest_data.get("domain", "") + domainExt + "/api/v2/" + query
+    domainStart = "https://"
+    if "https://" in domain:
+        domainStart = ""
+
+    domainEnd = ".vincere.io"
+    if ".vincere.io" in domain:
+        domainEnd = ""
+
+    url = domainStart + rest_data.get("domain", "") + domainEnd + "/api/v2/" + query
 
     # add additional params
     if optionalParams:
@@ -170,6 +175,7 @@ def buildUrl(rest_data, query, optionalParams=None):
         for param in optionalParams:
             url += "&" + param.strip()
     # return the url
+    helpers.logError("URL 1: " + url)
     return url
 
 

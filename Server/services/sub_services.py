@@ -41,9 +41,9 @@ def handleStripeWebhook(req) -> Callback:
             if not customer.Success:
                 raise Exception("No customer found with given ID")
         elif event.type == 'customer.subscription.deleted': 
-            print("kekistan")
+            print("test")
         elif event.type == 'customer.subscription.created':
-            print("kek")
+            print("test")
 
     except Exception as e:
         helpers.logError("sub_services.handleStripeWebhook(): " + str(e))

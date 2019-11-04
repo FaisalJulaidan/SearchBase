@@ -91,7 +91,7 @@ def randomAlphanumeric(length):
         TODO: Write exceptions
     """
     letters = string.ascii_letters
-    return ''.join(random.choice(letters) for i in range(stringLength))
+    return ''.join(random.choice(letters) for i in range(length))
 
 def logError(exception):
     if os.environ['FLASK_ENV'] == 'development':

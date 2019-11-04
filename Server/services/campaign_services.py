@@ -1,7 +1,7 @@
 from sqlalchemy import and_
 
 from models import Callback, db, Campaign
-from services import assistant_services, databases_services, mail_services
+from services import assistant_services, databases_services, mail_services, url_services
 from services.Marketplace.CRM import crm_services
 from services.Marketplace.Messenger import messenger_servicess
 from utilities import helpers
@@ -216,8 +216,16 @@ def sendCampaign(campaign_details, companyID):
             tempText = text.replace("{candidate.name}", candidate.get("CandidateName"))
 
             access = helpers.encodeMultipleParams(source, crmID, candidate.get("ID"))
-            tempText += "\n\n" + helpers.getDomain() + "/chatbot_direct_link/" + \
-               hashedAssistantID + "?source=" + str(access)
+
+            
+            url : Callback = url_services.createShortenedURL(helpers.getDomain(3000) + "/chatbot_direct_link/" + \
+               hashedAssistantID + "?source=" + str(access))
+            
+            if not url.Success:
+                raise Exception("Failed to create shortened URL")
+
+            tempText += "\n\n" + url.Data
+            
 
             helpers.logError("outreach_type: " + str(campaign_details.get("outreach_type")))
             if campaign_details.get("outreach_type") == "sms":

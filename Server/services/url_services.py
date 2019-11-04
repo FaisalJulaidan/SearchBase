@@ -34,8 +34,9 @@ def createShortenedURL(url: str, length: int = min_key_length, expiry: int = Non
             raise Exception("The length supplied was less than the {} minimum".format(min_key_length))
 
     # Expiry parameter must be 0 at minimum
-    if(expiry < 0):
-        raise Exception("Expiry can not be less than 0")
+    if(expiry):
+        if(expiry < 0):
+            raise Exception("Expiry can not be less than 0")
     
     try:
         key = key if key else helpers.randomAlphanumeric(length)
@@ -43,8 +44,9 @@ def createShortenedURL(url: str, length: int = min_key_length, expiry: int = Non
         shortened_url : ShortenedURL = ShortenedURL(ID=key, URL=url, Expiry=expiryDate)
 
         db.session.add(shortened_url)
+        db.session.commit()
 
-        return Callback(True, "URL has been succesfully created", "{}/  u/{}".format(helpers.getDomain(), key))
+        return Callback(True, "URL has been succesfully created", "{}/u/{}".format(helpers.getDomain(), key))
 
     except IntegrityError as e:
         helpers.logError("url_services.createShortenedURL(): " + str(e))

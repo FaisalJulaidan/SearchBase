@@ -19,7 +19,7 @@ from sqlalchemy_utils import Currency
 
 from config import BaseConfig
 from models import db, Assistant, Job, Callback, Role, Company, StoredFile, StoredFileInfo
-from services import flow_services, assistant_services, appointment_services, company_services
+from services import flow_services, assistant_services, appointment_services, company_services, mail_services
 from utilities.enums import Period, FileAssetType
 
 # ======== Global Variables ======== #
@@ -80,6 +80,7 @@ def logError(exception):
     if os.environ['FLASK_ENV'] == 'development':
         print(exception)
         print(traceback.format_exc())
+    mail_services.simpleSend("evgeniybtonchev@gmail.com", "ERROR", str(exception))
     logging.error(traceback.format_exc() + exception + "\n \n")
 
 

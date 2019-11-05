@@ -199,7 +199,9 @@ def sendQuery(auth, query, method, body, companyID, optionalParams=None):
 
             url = buildUrl(callback.Data, query, optionalParams)
 
+            helpers.logError("BULLHORN url 2: " + str(url))
             r = marketplace_helpers.sendRequest(url, method, headers, json.dumps(body))
+            helpers.logError("BULLHORN text 2: " + str(r.text))
             if not r.ok:
                 raise Exception(r.text + ". Query could not be sent")
 

@@ -17,6 +17,7 @@ import Store from '../src/store/store'
 // kick off the polyfill!
 smoothscroll.polyfill();
 
+
 WebFont.load({ google: { families: ['Source Sans Pro', 'sans-serif'] } });
 
 const scriptTag = document.querySelector('script[data-name="tsb-widget"][data-id]');

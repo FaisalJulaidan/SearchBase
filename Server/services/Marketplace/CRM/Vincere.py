@@ -190,7 +190,18 @@ def insertCandidate(auth, data, companyID) -> Callback:
             "registration_date": datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ"),
             "email": data.get("email"),
             "skills": data.get("skills"),
-            "education_summary": data.get("educations")
+            "education_summary": data.get("educations"),
+            "desired_salary": data.get("annualSalary"),
+            "desired_contract_rate": data.get("dayRate"),
+            "experience": str(data.get("yearsExperience")) + " years",
+            "note": crm_services.additionalCandidateNotesBuilder(
+                {
+                    "dateAvailable": data.get("availability"),
+                    "preferredJobTitle": data.get("preferredJobTitle"),
+                    "preferredJobType": data.get("preferredJobType")
+                },
+                data.get("selectedSolutions")
+            )
         }
 
         # send query
@@ -327,8 +338,8 @@ def searchCandidates(auth, companyID, data) -> Callback:
         # populate filter
         query += populateFilter(data.get("location"), "current_city")
 
-        # if keywords[DT.CandidateSkills.value["name"]]:
-        #     query += "primarySkills.data:" + keywords[DT.CandidateSkills.name] + " or"
+        for skill in data.get("skills"):
+            query += populateFilter(skill, "skill")
 
         # query = query[:-1]
 
@@ -339,12 +350,17 @@ def searchCandidates(auth, companyID, data) -> Callback:
             query += "%23"
 
         # send query
-        sendQuery_callback: Callback = sendQuery(auth, "candidate/search/" + fields, "get", {}, companyID,
+        while True:
+            sendQuery_callback: Callback = sendQuery(auth, "candidate/search/" + fields, "get", {}, companyID,
                                                  [query])
-        if not sendQuery_callback.Success:
-            raise Exception(sendQuery_callback.Message)
+            if not sendQuery_callback.Success:
+                raise Exception(sendQuery_callback.Message)
 
-        return_body = json.loads(sendQuery_callback.Data.text)
+            return_body = json.loads(sendQuery_callback.Data.text)
+            if return_body.get("result", {}).get("total", 0) > 0:
+                break
+
+            query = "AND".join(query.split("AND")[:-1])
 
         result = []
         for record in return_body["result"]["items"]:

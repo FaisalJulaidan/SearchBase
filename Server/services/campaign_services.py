@@ -182,8 +182,6 @@ def sendCampaign(campaign_details, companyID):
         company : Callback = company_services.getByCompanyID(companyID)
         companyName = company.Data.Name.replace(" ", "").lower() if company.Success else None
 
-        print(companyName)
-
         messenger = messenger_callback.Data
         crm = None
         hashedAssistantID = helpers.encodeID(campaign_details.get("assistant_id"))

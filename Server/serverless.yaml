@@ -1,6 +1,6 @@
 # serverless.yml
 
-service: flask-app-serverless-test-1
+service: flask-app-serverless
 
 provider:
   name: aws
@@ -8,15 +8,16 @@ provider:
   stage: dev
   region: eu-west-2
 
+
 plugins:
   - serverless-wsgi
   - serverless-python-requirements
 
+
 custom:
   pythonRequirements:
-#    zip: true
+    zip: true
     slim: true
-#    layer: true
     useDownloadCache: true
     useStaticCache: true
 
@@ -24,19 +25,30 @@ custom:
     app: thesearchbase.app
     packRequirements: false
 
+
+layers:
+  serverDeps:
+    path: s3://sb-dependencies/server.zip
+    description: Includes all the packages the server depends on
+    compatibleRuntimes:
+      - python3.7
+    allowedAccounts:
+      - '*'
+    retain: false
+
+
 functions:
   app:
     handler: wsgi_handler.handler
-#    layers:
-#      - {Ref: PythonRequirementsLambdaLayer}
+    layers:
+      - {Ref: ServerDepsLambdaLayer}
     events:
       - http: ANY /
       - http: 'ANY {proxy+}'
 
-
   sendConversationsNotifications:
     handler: services/scheduler_services.sendConversationsNotifications
-#    layers:
-#        - {Ref: PythonRequirementsLambdaLayer}
+    layers:
+        - {Ref: ServerDepsLambdaLayer}
     events:
       - schedule: rate(1 hour)

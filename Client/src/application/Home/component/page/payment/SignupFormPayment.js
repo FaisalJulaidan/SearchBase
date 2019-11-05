@@ -10,7 +10,6 @@ import {authActions, paymentActions} from '../../../../../store/actions/index';
 import {injectStripe} from 'react-stripe-elements';
 import {errorMessage} from "helpers/alert";
 import pricingJSON from "../pricing/pricing.json";
-import {warningMessage} from "../../../../../helpers";
 
 const FormItem = Form.Item;
 const {Option} = Select;
@@ -26,11 +25,11 @@ const selectBeforeURL = (
 class SignupFormPayment extends React.Component {
 
     componentDidMount() {
-        const found = pricingJSON.some(item => item.id === this.props?.plan);
+        const found = pricingJSON.some(item => item.id === this.props.planID);
         if (!found) {
-            this.setState({plan: pricingJSON[0].id})
+            this.setState({planID: pricingJSON[0].id})
         } else {
-            this.setState({plan: this.props.plan})
+            this.setState({planID: this.props.planID})
         }
     }
 
@@ -41,20 +40,20 @@ class SignupFormPayment extends React.Component {
 
     componentDidUpdate(prevProps, prevState, snapshot) {
         if (prevProps.isSigningUp && (this.props.errorMsg === null)) {
-            this.onSignupSuccessful(this.props.companyID, this.state.plan);
+            this.onSignupSuccessful(this.props.companyID, this.state.planID);
         } else if (prevProps.isLoading && this.props.errorMsg === null) {
             this.redirectToStripe(this.props.sessionID);
-        } else if (prevState.plan !== this.state.plan)
-            this.props.history.push(`/order-plan?plan=${this.state.plan}`);
+        } else if (prevState.planID !== this.state.planID)
+            this.props.history.push(`/order-plan?plan=${this.state.planID}`);
     }
 
-    onSignupSuccessful = (companyID, plan) => {
-        //TODO:: Update Plan
-        this.props.dispatch(paymentActions.generateCheckoutSession(companyID, "plan_D3lpeLZ3EV8IfA"));
+    onSignupSuccessful = (companyID, planID) => {
+        // const plans = {"essential": "plan_D3lp2yVtTotk2f", "pro": "plan_D3lp9R7ombKmSO", "premium": "plan_D3lpeLZ3EV8IfA"}; //Testing plans
+        let plan = pricingJSON.find(item => item.id === planID) || pricingJSON[0];
+        this.props.dispatch(paymentActions.generateCheckoutSession(companyID, plan?.stripe_key));
     };
 
     redirectToStripe(sessionID) {
-        console.log(sessionID);
         if (sessionID === null)
             errorMessage("invalid sessionID", 0);
         else
@@ -196,13 +195,13 @@ class SignupFormPayment extends React.Component {
 
                 <FormItem className={styles.SignupFormItem}>
                     {getFieldDecorator('plan', {
-                        initialValue: this.state.plan,
+                        initialValue: this.state.planID,
                         rules: [
                             {required: true, message: 'Please select a plan'},
                         ],
                     })(
                         <Select onSelect={(value) => {
-                            this.setState({plan: value})
+                            this.setState({planID: value})
                         }}>
                             {
                                 pricingJSON.map((plan) => {
@@ -226,7 +225,8 @@ class SignupFormPayment extends React.Component {
                     )}
                 </Form.Item>
                 <Form.Item className={styles.SignupFormItem}>
-                    <Button type="primary" htmlType="submit" block>Submit</Button>
+                    <Button type="primary" htmlType="submit" block
+                            loading={this.props.isSigningUp || this.props.isLoading}>Submit</Button>
                 </Form.Item>
             </Form>
         );
@@ -234,7 +234,7 @@ class SignupFormPayment extends React.Component {
 }
 
 SignupFormPayment.propTypes = {
-    plan: PropTypes.string,
+    planID: PropTypes.string,
     // onSignupSuccessful: PropTypes.func.isRequired
 };
 

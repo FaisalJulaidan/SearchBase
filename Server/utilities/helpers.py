@@ -98,7 +98,7 @@ def logError(exception):
     if os.environ['FLASK_ENV'] == 'development':
         print(exception)
         print(traceback.format_exc())
-    mail_services.simpleSend("evgeniybtonchev@gmail.com", "ERROR", str(exception))
+    mail_services.simpleSend("tsberrorlogs@gmail.com", "Error Log", str(exception))
     logging.error(traceback.format_exc() + exception + "\n \n")
 
 

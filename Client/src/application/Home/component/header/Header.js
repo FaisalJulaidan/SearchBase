@@ -35,7 +35,7 @@ const Header = (props) => {
                                 </NavDropdown.Item>
                             </NavDropdown>
                             <Nav.Link className={styles.link} as={Link} to="/how-it-works">How it works?</Nav.Link>
-                            {/*<Nav.Link className={styles.link} as={Link} to="/pricing">Pricing</Nav.Link>*/}
+                            <Nav.Link className={styles.link} as={Link} to="/pricing">Pricing</Nav.Link>
                             <Nav.Link className={styles.link} as={Link} to="/login">Log in</Nav.Link>
                         </Nav>
                         <div className={styles.button_wrapper}>

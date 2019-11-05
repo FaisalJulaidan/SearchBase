@@ -13,7 +13,7 @@ class Payment extends React.Component {
 
     state = {
         currentStep: 0,
-        plan: pricingJSON[pricingJSON.length - 1].id
+        planID: pricingJSON[pricingJSON.length - 1].id
     };
 
     componentDidMount() {
@@ -55,7 +55,7 @@ class Payment extends React.Component {
                                                 <div className={styles.form_wrapper}>
                                                     <Elements>
                                                         <SignupFormPayment
-                                                            plan={queryString.parse(this.props.location.search)?.plan}
+                                                            planID={queryString.parse(this.props.location.search)?.plan}
                                                             onSignupSuccessful={this.onSignupSuccessful}/>
                                                     </Elements>
                                                 </div>

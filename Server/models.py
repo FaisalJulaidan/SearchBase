@@ -110,6 +110,9 @@ Webhook: Webhook = Webhook
 from schemas.User import User
 User: User = User
 
+from schemas.ShortenedURL import ShortenedURL
+ShortenedURL: ShortenedURL = ShortenedURL
+
 # =================== Triggers ============================
 
 # Example of how triggers works

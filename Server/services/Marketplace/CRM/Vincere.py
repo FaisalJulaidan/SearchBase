@@ -342,7 +342,7 @@ def searchCandidates(auth, companyID, data) -> Callback:
         for skill in data.get("skills"):
             query += populateFilter(skill, "skill")
 
-        # query = query[:-1]
+        # query = query[:-5]
 
         # check if no conditions submitted
         if len(query) < 3:
@@ -353,8 +353,7 @@ def searchCandidates(auth, companyID, data) -> Callback:
         # send query
         while True:
             helpers.logError("query: " + str(query))
-            sendQuery_callback: Callback = sendQuery(auth, "candidate/search/" + fields, "get", {}, companyID,
-                                                 [query])
+            sendQuery_callback: Callback = sendQuery(auth, "candidate/search/" + fields, "get", {}, companyID, [query])
             if not sendQuery_callback.Success:
                 raise Exception(sendQuery_callback.Message)
 
@@ -363,7 +362,7 @@ def searchCandidates(auth, companyID, data) -> Callback:
             if return_body.get("result", {}).get("total", 0) > 0:
                 break
 
-            query = "AND".join(query.split("AND")[:-1])
+            query = "AND".join(query.split("AND")[:-5])
 
         result = []
         for record in return_body["result"]["items"]:
@@ -414,7 +413,7 @@ def searchPerfectCandidates(auth, companyID, data, fields=None) -> Callback:
         # if keywords[DT.CandidateSkills.value["name"]]:
         #     query += "primarySkills.data:" + keywords[DT.CandidateSkills.name] + " or"
 
-        # query = query[:-1]
+        # query = query[:-5]
 
         # check if no conditions submitted
         if len(query) < 3:
@@ -462,7 +461,7 @@ def searchPerfectCandidates(auth, companyID, data, fields=None) -> Callback:
                         records.append(dict(l))
 
                 # remove the last (least important filter)
-                query = "&".join(query.split("&")[:-1])
+                query = "&".join(query.split("&")[:-5])
 
                 # if no filters left - stop
                 if not query:
@@ -508,7 +507,7 @@ def searchJobs(auth, companyID, data) -> Callback:
 
         # query += populateFilter(data.get("employmentType"), "employment_type")
 
-        # query = query[:-1]
+        # query = query[:-5]
 
         # check if no conditions submitted
         if len(query) < 3:
@@ -548,7 +547,7 @@ def searchJobs(auth, companyID, data) -> Callback:
 
 def populateFilter(value, string):
     if value:
-        return string + ":" + value + ","
+        return string + ":" + value + " AND "
     return ""
 
 

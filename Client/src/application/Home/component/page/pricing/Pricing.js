@@ -1,6 +1,6 @@
 import React from 'react';
 import styles from './pricing.module.css';
-import {Col, Container, Row, Button, Tabs, Tab} from "react-bootstrap";
+import {Col, Container, Row, Button, Nav, Tab} from "react-bootstrap";
 import {Link} from "react-router-dom";
 import EmailShare from "react-email-share-link";
 import PricingCard from "./pricing-card/PricingCard";
@@ -36,25 +36,25 @@ const Pricing = () => {
             <Tab.Container id="left-tabs-example" defaultActiveKey="first">
             <Container className={styles.content}>
                 <Row>
-
                         <Row>
                             <Col sm={3}>
                                 <Nav variant="pills" className="flex-column">
                                     <Nav.Item>
-                                        <Nav.Link eventKey="first">Tab 1</Nav.Link>
+                                        <Nav.Link eventKey="agency">Agency</Nav.Link>
                                     </Nav.Item>
                                     <Nav.Item>
-                                        <Nav.Link eventKey="second">Tab 2</Nav.Link>
+                                        <Nav.Link eventKey="in-house">In House</Nav.Link>
+                                    </Nav.Item>
+                                    <Nav.Item>
+                                        <Nav.Link eventKey="enterprise">Enterprise</Nav.Link>
                                     </Nav.Item>
                                 </Nav>
                             </Col>
                             <Col sm={9}>
                                 <Tab.Content>
                                     <Tab.Pane eventKey="first">
-                                        <Sonnet />
                                     </Tab.Pane>
                                     <Tab.Pane eventKey="second">
-                                        <Sonnet />
                                     </Tab.Pane>
                                 </Tab.Content>
                             </Col>

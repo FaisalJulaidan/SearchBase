@@ -346,7 +346,7 @@ def searchCandidates(auth, companyID, data) -> Callback:
         if len(query) < 3:
             query = ""
         else:
-            query = query[:-5]
+            query = query[:-7]
             query += " # %23"
 
         # send query
@@ -361,7 +361,7 @@ def searchCandidates(auth, companyID, data) -> Callback:
             if return_body.get("result", {}).get("total", 0) > 0:
                 break
 
-            query = "AND".join(query.split("AND")[:-5])
+            query = "AND".join(query.split("AND")[:-7])
 
         result = []
         for record in return_body["result"]["items"]:
@@ -412,7 +412,7 @@ def searchPerfectCandidates(auth, companyID, data, fields=None) -> Callback:
         # if keywords[DT.CandidateSkills.value["name"]]:
         #     query += "primarySkills.data:" + keywords[DT.CandidateSkills.name] + " or"
 
-        # query = query[:-5]
+        # query = query[:-7]
 
         # check if no conditions submitted
         if len(query) < 3:
@@ -460,7 +460,7 @@ def searchPerfectCandidates(auth, companyID, data, fields=None) -> Callback:
                         records.append(dict(l))
 
                 # remove the last (least important filter)
-                query = "&".join(query.split("&")[:-5])
+                query = "&".join(query.split("&")[:-7])
 
                 # if no filters left - stop
                 if not query:
@@ -506,7 +506,7 @@ def searchJobs(auth, companyID, data) -> Callback:
 
         # query += populateFilter(data.get("employmentType"), "employment_type")
 
-        # query = query[:-5]
+        # query = query[:-7]
 
         # check if no conditions submitted
         if len(query) < 3:
@@ -546,7 +546,7 @@ def searchJobs(auth, companyID, data) -> Callback:
 
 def populateFilter(value, string):
     if value:
-        return string + ":" + value + " AND "
+        return string + ":" + value + " # AND "
     return ""
 
 

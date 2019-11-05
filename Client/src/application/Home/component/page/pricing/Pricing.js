@@ -34,70 +34,51 @@ const Pricing = () => {
                 </Container>
             </div>
             <Tab.Container id="left-tabs-example" defaultActiveKey="first">
-            <Container className={styles.content}>
-                <Row>
-                        <Row>
-                            <Col sm={3}>
-                                <Nav variant="pills" className="flex-column">
-                                    <Nav.Item>
-                                        <Nav.Link eventKey="agency">Agency</Nav.Link>
-                                    </Nav.Item>
-                                    <Nav.Item>
-                                        <Nav.Link eventKey="in-house">In House</Nav.Link>
-                                    </Nav.Item>
-                                    <Nav.Item>
-                                        <Nav.Link eventKey="enterprise">Enterprise</Nav.Link>
-                                    </Nav.Item>
-                                </Nav>
-                            </Col>
-                            <Col sm={9}>
-                                <Tab.Content>
-                                    <Tab.Pane eventKey="first">
-                                    </Tab.Pane>
-                                    <Tab.Pane eventKey="second">
-                                    </Tab.Pane>
-                                </Tab.Content>
-                            </Col>
-                        </Row>
-
-                    <Col>
-                        <Tabs id="pricing" className={styles.tabs}>
-                            <Tab eventKey="agency" title="Agency">
-                                test
-                            </Tab>
-                            <Tab eventKey="in-house" title="In House">
-                                test3
-                            </Tab>
-                            <Tab eventKey="enterprise" title="Enterprise">
-                                test2
-                            </Tab>
-                        </Tabs>
-                    </Col>
-                </Row>
-                <Row>
-                    {pricing}
-                </Row>
-                <Row className={styles.row_enterprise}>
-                    <Col md={10} lg={8}>
-                        <h1>Need more?</h1>
-                    </Col>
-                    <Col md={12} lg={10} className={styles.desc_col}>
-                        <span>We offer additional enterprise services — if you need features not available in the current plans to help your enterprise requirements get going, please let us know. If you are interested in partnering with us around technology, services, or go-to-market, we’d love to have a conversation!</span>
-                    </Col>
-                    <Col md={8}>
-                        <Link to="/get-started">
-                            <Button variant="light" className={styles.demo_button}>Request a demo</Button>
-                        </Link>
-                        <Button variant="outline-light" className={styles.contact_button}>
-                            <EmailShare email="info@SearchBase.com"
-                                        subject="Contact"
-                                        body="Hi, I would like to talk about...">
-                                {link => (<a href={link} data-rel="external">Contact us</a>)}
-                            </EmailShare>
-                        </Button>
-                    </Col>
-                </Row>
-            </Container>
+                <Container className={styles.content}>
+                    <Row>
+                        <Nav variant="tabs">
+                            <Nav.Item>
+                                <Nav.Link eventKey="agency">Agency</Nav.Link>
+                            </Nav.Item>
+                            <Nav.Item>
+                                <Nav.Link eventKey="in-house">In House</Nav.Link>
+                            </Nav.Item>
+                            <Nav.Item>
+                                <Nav.Link eventKey="enterprise">Enterprise</Nav.Link>
+                            </Nav.Item>
+                        </Nav>
+                    </Row>
+                    <Row>
+                        <Tab.Content>
+                            <Tab.Pane eventKey="agency"> agency</Tab.Pane>
+                            <Tab.Pane eventKey="in-house"> hourse</Tab.Pane>
+                            <Tab.Pane eventKey="enterprise"> enterprise</Tab.Pane>
+                        </Tab.Content>
+                    </Row>
+                    <Row>
+                        {pricing}
+                    </Row>
+                    <Row className={styles.row_enterprise}>
+                        <Col md={10} lg={8}>
+                            <h1>Need more?</h1>
+                        </Col>
+                        <Col md={12} lg={10} className={styles.desc_col}>
+                            <span>We offer additional enterprise services — if you need features not available in the current plans to help your enterprise requirements get going, please let us know. If you are interested in partnering with us around technology, services, or go-to-market, we’d love to have a conversation!</span>
+                        </Col>
+                        <Col md={8}>
+                            <Link to="/get-started">
+                                <Button variant="light" className={styles.demo_button}>Request a demo</Button>
+                            </Link>
+                            <Button variant="outline-light" className={styles.contact_button}>
+                                <EmailShare email="info@SearchBase.com"
+                                            subject="Contact"
+                                            body="Hi, I would like to talk about...">
+                                    {link => (<a href={link} data-rel="external">Contact us</a>)}
+                                </EmailShare>
+                            </Button>
+                        </Col>
+                    </Row>
+                </Container>
             </Tab.Container>
         </Layout>
     );

@@ -337,7 +337,7 @@ def searchCandidates(auth, companyID, data) -> Callback:
         query += populateFilter(data.get("location"), "current_city")
 
         for skill in data.get("skills"):
-            query += populateFilter(skill, "skill")
+            query += populateFilter(skill, "skills")
 
         query = query.replace("#", ".08")
 

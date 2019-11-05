@@ -358,7 +358,7 @@ def searchCandidates(auth, companyID, data) -> Callback:
             if return_body.get("result", {}).get("total", 0) > 0 or "," not in query:
                 break
 
-            query = ",".join(query.split(",")[:-1])
+            query = ",".join(query.split(",")[:-1]) + "%23"
 
         result = []
         for record in return_body["result"]["items"]:

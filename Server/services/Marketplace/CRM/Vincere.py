@@ -502,22 +502,33 @@ def searchJobs(auth, companyID, data) -> Callback:
 
         query += populateFilter(data.get("city"), "city")
 
+        for skill in data.get("skills"):
+            query += populateFilter(skill, "public_description")
+
         # query += populateFilter(data.get("employmentType"), "employment_type")
 
-        # query = query[:-1]
+        query = query.replace("#", ".08")
 
         # check if no conditions submitted
         if len(query) < 3:
             query = ""
         else:
+            query = query[:-1]
             query += "%23"
 
         # send query
-        sendQuery_callback: Callback = sendQuery(auth, "job/search/" + fields, "get", {}, companyID, [query])
-        if not sendQuery_callback.Success:
-            raise Exception(sendQuery_callback.Message)
+        while True:
+            sendQuery_callback: Callback = sendQuery(auth, "job/search/" + fields, "get", {}, companyID, [query])
+            helpers.logError("return_body: " + str(json.loads(sendQuery_callback.Data.text)))
+            if not sendQuery_callback.Success:
+                raise Exception(sendQuery_callback.Message)
 
-        return_body = json.loads(sendQuery_callback.Data.text)
+            return_body = json.loads(sendQuery_callback.Data.text)
+            if return_body.get("result", {}).get("total", 0) > 0 or "," not in query:
+                break
+
+            query = ",".join(query.split(",")[:-1]) + "%23"
+
         result = []
         # not found match for JobLinkURL
         for record in return_body["result"]["items"]:

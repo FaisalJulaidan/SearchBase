@@ -15,7 +15,7 @@ const Pricing = () => {
 
     let pricing = pricingJSON.map((plan, key) => {
         return (
-            <Col key={key}>
+            <Col className={styles.col_card} xs={{span:10,offset:1}} sm={{span:8,offset:2}} md={{span:4,offset:0}} key={key}>
                 <PricingCard id={plan.id} plan={plan}/>
             </Col>
         );
@@ -39,10 +39,10 @@ const Pricing = () => {
                         {pricing}
                     </Row>
                     <Row className={styles.row_enterprise}>
-                        <Col md={8}>
+                        <Col md={10} lg={8}>
                             <h1>Need more?</h1>
                         </Col>
-                        <Col md={10} className={styles.desc_col}>
+                        <Col md={12} lg={10} className={styles.desc_col}>
                             <span>We offer additional enterprise services — if you need features not available in the current plans to help your enterprise requirements get going, please let us know. If you are interested in partnering with us around technology, services, or go-to-market, we’d love to have a conversation!</span>
                         </Col>
                         <Col md={8}>

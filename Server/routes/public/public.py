@@ -58,14 +58,14 @@ def register_interest():
 
         return helpers.jsonResponse(True, 200, callback.Message)
 
-@public_router.route("/pricing/genCheckoutURL", methods=['POST'])
+@public_router.route("/pricing/gen_checkout_url", methods=['POST'])
 def generateCheckoutURL():
-  callback: Callback = sub_services.generateCheckoutURL(request.json)
+    callback: Callback = sub_services.generateCheckoutURL(request.json)
 
-  if not callback.Success:
-      return helpers.jsonResponse(False, 400, callback.Message)
+    if not callback.Success:
+        return helpers.jsonResponse(False, 400, callback.Message)
 
-  return helpers.jsonResponse(True, 200, callback.Message, callback.Data)
+    return helpers.jsonResponse(True, 200, callback.Message, callback.Data)
 
 @public_router.route("/mail/contact_us", methods=['POST'])
 def contact_us():
@@ -79,6 +79,17 @@ def contact_us():
 
         contactUs_callback: Callback = mail_services.contactUsIndex(name, email, message)
         return contactUs_callback.Message
+
+# Stripe webhook URLS
+@public_router.route("/stripe_webhook", methods=['POST'])
+def stripe_webhook():
+    print("lolol")
+    callback: Callback = sub_services.handleStripeWebhook(request.json)
+
+    # To tell stripe whether the request was succesful
+    if not callback.Success:
+        return helpers.jsonResponse(False, 400, callback.Message)
+    return helpers.jsonResponse(True, 200, callback.Message)
 
 # Old website routes, To be deleted.
 #

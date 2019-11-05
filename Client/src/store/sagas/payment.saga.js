@@ -7,7 +7,7 @@ import axios from 'axios';
 function* generateCheckoutSession({companyID, plan}) {
     try {
         loadingMessage('Redirecting to checkout page...', 0);
-        const res = yield axios.post(`/pricing/genCheckoutURL`, {companyID, plan}, {
+        const res = yield axios.post(`/pricing/gen_checkout_url`, {companyID, plan}, {
             headers: {'Content-Type': 'application/json'},
         });
         yield put(paymentActions.generateCheckoutSessionSuccess(res.data?.data));

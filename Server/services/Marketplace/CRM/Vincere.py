@@ -355,10 +355,10 @@ def searchCandidates(auth, companyID, data) -> Callback:
                 raise Exception(sendQuery_callback.Message)
 
             return_body = json.loads(sendQuery_callback.Data.text)
-            if return_body.get("result", {}).get("total", 0) > 0:
+            if return_body.get("result", {}).get("total", 0) > 0 or "," not in query:
                 break
 
-            query = "AND".join(query.split("AND")[:-1])
+            query = ",".join(query.split(",")[:-1])
 
         result = []
         for record in return_body["result"]["items"]:

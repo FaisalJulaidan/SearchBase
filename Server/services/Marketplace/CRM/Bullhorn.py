@@ -480,7 +480,7 @@ def searchCandidates(auth, companyID, data, fields=None) -> Callback:
                 raise Exception(sendQuery_callback.Message)
 
             return_body = json.loads(sendQuery_callback.Data.text)
-            if return_body.get("total", 0) > 0:
+            if return_body.get("total", 0) > 0 or "AND" not in query:
                 break
 
             query = "AND".join(query.split("AND")[:-1])

@@ -16,6 +16,9 @@ custom:
   pythonRequirements:
 #    zip: true
     slim: true
+#    layer: true
+    useDownloadCache: true
+    useStaticCache: true
 
   wsgi:
     app: thesearchbase.app
@@ -24,6 +27,16 @@ custom:
 functions:
   app:
     handler: wsgi_handler.handler
+#    layers:
+#      - {Ref: PythonRequirementsLambdaLayer}
     events:
       - http: ANY /
       - http: 'ANY {proxy+}'
+
+
+  sendConversationsNotifications:
+    handler: services/scheduler_services.sendConversationsNotifications
+#    layers:
+#        - {Ref: PythonRequirementsLambdaLayer}
+    events:
+      - schedule: rate(1 hour)

@@ -3,14 +3,13 @@ import { connect } from 'react-redux';
 
 import moment from 'moment';
 import { AutoComplete, Button, Dropdown, Icon, Input, Menu, Table } from 'antd';
+import {checkDate} from "helpers";
 import 'types/TimeSlots_Types';
 import 'types/AutoPilot_Types';
 import './Availabilty.less';
 import { assistantActions, databaseActions } from 'store/actions';
 
-const { Option, OptGroup } = AutoComplete;
-
-let momentFormat = 'MM/DD/YYYY';
+let momentFormat = 'DD/MM/YYYY';
 
 
 class Availability extends React.Component {
@@ -73,44 +72,14 @@ class Availability extends React.Component {
             };
 
             dates.forEach(date => {
-                let dynamicFormat = 'DD/MM/YYYY';
-                let range = date.split('-');
-                if (range.length > 1) { // range handlers
-
-                    // Check if date conforms with the correct date format
-                    let test = moment(range[0], dynamicFormat).format();
-                    if (test === 'Invalid date'){dynamicFormat = 'MM/DD/YYYY';}
-                    test = moment(range[0], dynamicFormat).format();
-                    if (test === 'Invalid date'){return;}
-
-                    let startDate = moment(range[0], dynamicFormat);
-                    let rangeArr = [startDate];
-                    let moveDate = startDate.clone();
-                    let endDate = moment(range[1], dynamicFormat);
-
-                    while (rangeArr.length !== Math.abs(startDate.diff(endDate, 'days'))) {
-                        rangeArr.push(moveDate.add(1, 'days').clone());
-                    }
-                    rangeArr.push(endDate);
-                    rangeArr.forEach(realDate => {
-                        if (realDate.isBetween(start, end) || realDate.isSame(start, 'date') || realDate.isSame(end, 'date')) {
-                            let key = searchArray(record.ID); // key exists?
-                            if (key) {
-                                availability[key].dates.push(realDate);
-                            } else {
-                                availability.push({ ID: record.ID, dates: [realDate], data: data });
-                            }
-                        }
-                    });
-                } else { // individual staggered dates
-                    let realDate = moment(date, dynamicFormat);
-                    if (realDate.isBetween(start, end) || realDate.isSame(start, 'date') || realDate.isSame(end, 'date')) {
-                        let key = searchArray(record.ID); // key exists?
-                        if (key) {
-                            availability[key].dates.push(realDate);
-                        } else {
-                            availability.push({ ID: record.ID, dates: [realDate], data: data });
-                        }
+                let realDate = checkDate(date, true, true);
+                if(!realDate) return
+                if (realDate.isBetween(start, end) || realDate.isSame(start, 'date') || realDate.isSame(end, 'date')) {
+                    let key = searchArray(record.ID); // key exists?
+                    if (key) {
+                        availability[key].dates.push(realDate);
+                    } else {
+                        availability.push({ ID: record.ID, dates: [realDate], data: data });
                     }
                 }
             });

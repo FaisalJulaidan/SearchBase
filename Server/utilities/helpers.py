@@ -1,7 +1,9 @@
 import inspect
 import logging
 import os
-import re
+import re  
+import random
+import string
 import traceback
 from datetime import time
 from enum import Enum
@@ -75,6 +77,21 @@ def cleanDict(target):
         return {k: v for k, v in target if v}
     return target
 
+def randomAlphanumeric(length):
+    """
+    Generate a random string with the combination of lowercase and uppercase letters
+
+    Args:
+        length [int] -- The length of the newly generated alphanumeric, defaults to 5
+
+    Returns:
+        Alphanumeric string
+
+    Raises:
+        TODO: Write exceptions
+    """
+    letters = string.ascii_letters
+    return ''.join(random.choice(letters) for i in range(length))
 
 def logError(exception):
     if os.environ['FLASK_ENV'] == 'development':
@@ -90,10 +107,12 @@ hashids = Hashids(salt=BaseConfig.HASH_IDS_SALT, min_length=5)
 def encodeID(id):
     return hashids.encrypt(id)
 
-
 def decodeID(id):
     return hashids.decrypt(id)
 
+def encodeMultipleParams(*argv):
+    print(argv)
+    return hashids.encrypt(*argv)
 
 # Encryptors
 def encrypt(value, isDict=False):

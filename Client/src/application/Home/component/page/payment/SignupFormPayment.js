@@ -10,7 +10,6 @@ import {authActions, paymentActions} from '../../../../../store/actions/index';
 import {injectStripe} from 'react-stripe-elements';
 import {errorMessage} from "helpers/alert";
 import pricingJSON from "../pricing/pricing.json";
-import {warningMessage} from "../../../../../helpers";
 
 const FormItem = Form.Item;
 const {Option} = Select;
@@ -49,7 +48,7 @@ class SignupFormPayment extends React.Component {
     }
 
     onSignupSuccessful = (companyID, planID) => {
-        // const plans = {"essential": "plan_D3lp2yVtTotk2f", "pro": "plan_D3lp9R7ombKmSO", "premium": "plan_D3lpeLZ3EV8IfA"} //Testing plans
+        // const plans = {"essential": "plan_D3lp2yVtTotk2f", "pro": "plan_D3lp9R7ombKmSO", "premium": "plan_D3lpeLZ3EV8IfA"}; //Testing plans
         let plan = pricingJSON.find(item => item.id === planID) || pricingJSON[0];
         this.props.dispatch(paymentActions.generateCheckoutSession(companyID, plan?.stripe_key));
     };

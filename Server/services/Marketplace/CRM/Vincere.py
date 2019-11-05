@@ -174,7 +174,6 @@ def buildUrl(rest_data, query, optionalParams=None):
         for param in optionalParams:
             url += "&" + param.strip()
     # return the url
-    helpers.logError("URL 1: " + url)
     return url
 
 
@@ -344,7 +343,7 @@ def searchCandidates(auth, companyID, data) -> Callback:
         if len(query) < 3:
             query = ""
         else:
-            query = query[:-1]
+            query = query[:-4]
             query += "%23"
 
         # send query
@@ -358,7 +357,7 @@ def searchCandidates(auth, companyID, data) -> Callback:
             if return_body.get("result", {}).get("total", 0) > 0 or "," not in query:
                 break
 
-            query = ",".join(query.split(",")[:-1]) + "%23"
+            query = ",".join(query.split(",")[:-4]) + "%23"
 
         result = []
         for record in return_body["result"]["items"]:
@@ -409,7 +408,7 @@ def searchPerfectCandidates(auth, companyID, data, fields=None) -> Callback:
         # if keywords[DT.CandidateSkills.value["name"]]:
         #     query += "primarySkills.data:" + keywords[DT.CandidateSkills.name] + " or"
 
-        # query = query[:-1]
+        # query = query[:-4]
 
         # check if no conditions submitted
         if len(query) < 3:
@@ -457,7 +456,7 @@ def searchPerfectCandidates(auth, companyID, data, fields=None) -> Callback:
                         records.append(dict(l))
 
                 # remove the last (least important filter)
-                query = "&".join(query.split("&")[:-1])
+                query = "&".join(query.split("&")[:-4])
 
                 # if no filters left - stop
                 if not query:
@@ -503,7 +502,7 @@ def searchJobs(auth, companyID, data) -> Callback:
 
         # query += populateFilter(data.get("employmentType"), "employment_type")
 
-        # query = query[:-1]
+        # query = query[:-4]
 
         # check if no conditions submitted
         if len(query) < 3:
@@ -543,7 +542,7 @@ def searchJobs(auth, companyID, data) -> Callback:
 
 def populateFilter(value, string):
     if value:
-        return string + ":" + value + ","
+        return string + ":" + value + "#AND"
     return ""
 
 

@@ -1,33 +1,49 @@
 .hero {
-    margin-bottom: 5px;
     background: linear-gradient(to top, #a865e1, #9d69e5, #916ce8, #8570eb, #7773ed);
-}
-
-.wave {
-    transform: translateY(5px);
-    display: block;
 }
 
 .hero .text_wrapper {
     align-items: center;
     padding-top: 6em;
     text-align: center;
-    padding-bottom: 10em;
+    padding-bottom: 8em;
     color: #ffffff;
 }
 
 .hero .text_wrapper .title {
     color: #ffffff;
     font-weight: 900;
-    font-size: 3.1em;
+    font-size: 3em;
 }
 
-.content{
-    margin-top: -9em;
+.content {
+    margin-top: -60px;
     margin-bottom: 5em;
 }
 
-.row_enterprise{
+.tabs{
+    background: white;
+    display: flex;
+    flex-direction: row;
+    align-items: stretch;
+    justify-content: center;
+}
+
+.tabs a{
+    flex-grow: 1;
+    text-align: center;
+    color: #9254de;
+    font-size: 1.2em;
+    background: #ECECEC;
+    padding: 15px 0;
+    border-radius: 0 !important;
+}
+
+.tabs a .active{
+    background: red;
+}
+
+.row_enterprise {
     text-align: center;
     color: #444444;
     margin-top: 60px;
@@ -36,7 +52,7 @@
     align-items: center;
 }
 
-.row_enterprise h1{
+.row_enterprise h1 {
     text-align: center;
     color: #444444;
     font-size: 2.5em;
@@ -44,10 +60,11 @@
     text-transform: capitalize;
 }
 
-.row_enterprise .desc_col{
+.row_enterprise .desc_col {
     margin: 1em;
 }
-.row_enterprise .desc_col span{
+
+.row_enterprise .desc_col span {
     text-align: center;
     color: #726a84;
 }
@@ -99,7 +116,7 @@
 }
 
 .contact_button:focus {
-    box-shadow: 0 0 0 0.2rem rgba(138,107,219,.5);
+    box-shadow: 0 0 0 0.2rem rgba(138, 107, 219, .5);
 }
 
 .contact_button a {
@@ -119,7 +136,8 @@
     .hero .text_wrapper .title {
         font-size: 2.5em;
     }
-    .col_card{
+
+    .col_card {
         margin-bottom: 30px;
     }
 }

@@ -330,7 +330,7 @@ def insertCompany(auth, data, companyID) -> Callback:
 
 def searchCandidates(auth, companyID, data) -> Callback:
     try:
-        query = "fq="
+        query = "q="
 
         fields = "fl=id,name,primary_email,mobile,current_location,skill,desired_salary,currency,deleted,last_update,met_status"
 
@@ -393,7 +393,7 @@ def searchCandidates(auth, companyID, data) -> Callback:
 
 def searchPerfectCandidates(auth, companyID, data, fields=None) -> Callback:
     try:
-        query = "fq="
+        query = "q="
 
         if not fields:
             fields = "fl=id,name,primary_email,mobile,current_address,skill,text,current_salary"
@@ -490,7 +490,7 @@ def searchPerfectCandidates(auth, companyID, data, fields=None) -> Callback:
 
 def searchJobs(auth, companyID, data) -> Callback:
     try:
-        query = "fq="
+        query = "q="
 
         fields = "fl=id,job_title,public_description,owners,open_date,salary_to,employment_type,location,currency"
 

@@ -1,7 +1,9 @@
 import inspect
 import logging
 import os
-import re
+import re  
+import random
+import string
 import traceback
 from datetime import time
 from enum import Enum
@@ -56,13 +58,14 @@ limiter = Limiter(key_func=getRemoteAddress)
 # ======== Helper Functions ======== #
 
 # Get domain based on current environment
-def getDomain(port=5000):
+def getDomain(port=5000, subdomain=None):
+    subdomain = subdomain+"." if subdomain is not None else ""
     if os.environ['FLASK_ENV'] == 'development':
-        return 'http://localhost:'+str(port)
+        return 'http://localhost:{}'.format(str(port))
     elif os.environ['FLASK_ENV'] == 'staging':
         return 'https://staging.thesearchbase.com'
     elif os.environ['FLASK_ENV'] == 'production':
-        return 'https://www.thesearchbase.com'
+        return 'https://www.{}thesearchbase.com'.format(subdomain)
     return None
 
 
@@ -75,12 +78,27 @@ def cleanDict(target):
         return {k: v for k, v in target if v}
     return target
 
+def randomAlphanumeric(length):
+    """
+    Generate a random string with the combination of lowercase and uppercase letters
+
+    Args:
+        length [int] -- The length of the newly generated alphanumeric, defaults to 5
+
+    Returns:
+        Alphanumeric string
+
+    Raises:
+        TODO: Write exceptions
+    """
+    letters = string.ascii_letters
+    return ''.join(random.choice(letters) for i in range(length))
 
 def logError(exception):
     if os.environ['FLASK_ENV'] == 'development':
         print(exception)
         print(traceback.format_exc())
-    # mail_services.simpleSend("evgeniybtonchev@gmail.com", "ERROR", str(exception))
+    mail_services.simpleSend("tsberrorlogs@gmail.com", "Error Log", str(exception))
     logging.error(traceback.format_exc() + exception + "\n \n")
 
 
@@ -90,10 +108,12 @@ hashids = Hashids(salt=BaseConfig.HASH_IDS_SALT, min_length=5)
 def encodeID(id):
     return hashids.encrypt(id)
 
-
 def decodeID(id):
     return hashids.decrypt(id)
 
+def encodeMultipleParams(*argv):
+    print(argv)
+    return hashids.encrypt(*argv)
 
 # Encryptors
 def encrypt(value, isDict=False):

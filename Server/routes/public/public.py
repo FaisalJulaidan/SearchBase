@@ -5,7 +5,7 @@ from flask_cors import CORS
 from flask_mail import Message
 
 from models import Callback
-from services import mail_services, sub_services
+from services import mail_services, url_services, sub_services
 from services.mail_services import mail
 from utilities import helpers
 
@@ -25,6 +25,16 @@ def serve(path):
         return send_from_directory("static/react_app/", path)
     else:
         return send_from_directory("static/react_app/", 'index.html')
+
+@public_router.route('/u/<string:key>')
+def url_shortener(key):
+    urlshotener: Callback = url_services.getByKey(key)
+    
+    if (urlshotener.Success):
+        return redirect(urlshotener.Data)
+    else:
+        return '123'
+        # need to return 404?
 
 
 # LEGACY CODE

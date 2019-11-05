@@ -17,8 +17,6 @@ import Store from '../src/store/store'
 // kick off the polyfill!
 smoothscroll.polyfill();
 
-//test
-
 
 WebFont.load({ google: { families: ['Source Sans Pro', 'sans-serif'] } });
 

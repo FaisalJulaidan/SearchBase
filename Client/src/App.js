@@ -18,7 +18,7 @@ const AppointmentStatus = lazy(() => import('./application/Public/AppointmentSta
 class App extends Component {
     constructor(props) {
         super(props);
-
+        //
         // Clear recent notifications boxes when route change
         // history.listen(() => destroyMessage());
     }

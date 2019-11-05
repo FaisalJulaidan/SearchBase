@@ -188,7 +188,9 @@ def sendQuery(auth, query, method, body, companyID, optionalParams=None):
         headers = {'Content-Type': 'application/json'}
 
         # test the BhRestToken (rest_token)
+        helpers.logError("BULLHORN url: " + str(url))
         r = marketplace_helpers.sendRequest(url, method, headers, json.dumps(body))
+        helpers.logError("BULLHORN text: " + str(r.text))
 
         if r.status_code == 401:  # wrong rest token
             callback: Callback = retrieveRestToken(auth, companyID)

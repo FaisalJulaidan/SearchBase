@@ -337,8 +337,8 @@ def searchCandidates(auth, companyID, data) -> Callback:
         # populate filter
         query += populateFilter(data.get("location"), "current_city")
 
-        for skill in data.get("skills"):
-            query += populateFilter(skill, "skill")
+        # for skill in data.get("skills"):
+        #     query += populateFilter(skill, "skill")
 
         # check if no conditions submitted
         if len(query) < 3:

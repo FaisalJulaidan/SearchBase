@@ -7,7 +7,7 @@ from datetime import datetime, timedelta
 min_key_length = 5
 
 
-def createShortenedURL(url: str, length: int = min_key_length, expiry: int = None, key: str = None) -> Callback:
+def createShortenedURL(url: str, length: int = min_key_length, expiry: int = None, key: str = None, subdomain: str = None) -> Callback:
     """
     Creates a shortened url that points to the one supplied
 
@@ -16,6 +16,7 @@ def createShortenedURL(url: str, length: int = min_key_length, expiry: int = Non
         length [int] [OPTIONAL] -- The length of the alphanumeric key at the end of the URL (min-5)
         expiry [int] [OPTIONAL] -- The length of time in seconds after which the link will no longer redirect, None for no expiry (None is default)
         key [str] [OPTIONAL] -- The key (overriding the random text) that will be at the end of the URL, the length parameter will be ignored if this is supplied
+        subdomain [str] [OPTIONAL] -- The subdomain to be supplied to the domain helper function
 
     Returns:
         Callback with either a success or failure status, with the data object pointing to the newly created URL
@@ -46,7 +47,7 @@ def createShortenedURL(url: str, length: int = min_key_length, expiry: int = Non
         db.session.add(shortened_url)
         db.session.commit()
 
-        return Callback(True, "URL has been succesfully created", "{}/u/{}".format(helpers.getDomain(), key))
+        return Callback(True, "URL has been succesfully created", "{}/u/{}".format(helpers.getDomain(subdomain=subdomain), key))
 
     except IntegrityError as e:
         helpers.logError("url_services.createShortenedURL(): " + str(e))

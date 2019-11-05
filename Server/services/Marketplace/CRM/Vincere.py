@@ -338,6 +338,7 @@ def searchCandidates(auth, companyID, data) -> Callback:
         # populate filter
         query += populateFilter(data.get("location"), "current_city")
 
+        helpers.logError("SKILLS: " + str(data.get("skills")))
         for skill in data.get("skills"):
             query += populateFilter(skill, "skill")
 

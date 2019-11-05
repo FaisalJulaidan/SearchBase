@@ -49,8 +49,9 @@ class SignupFormPayment extends React.Component {
     }
 
     onSignupSuccessful = (companyID, plan) => {
+      console.log(plan)
         // const plans = {"essential": "plan_D3lp2yVtTotk2f", "pro": "plan_D3lp9R7ombKmSO", "premium": "plan_D3lpeLZ3EV8IfA"} //Testing plans
-        this.props.dispatch(paymentActions.generateCheckoutSession(companyID, plan?.stripe_key));
+        this.props.dispatch(paymentActions.generateCheckoutSession(companyID,"plan_D3lp2yVtTotk2f"));
     };
 
     redirectToStripe(sessionID) {

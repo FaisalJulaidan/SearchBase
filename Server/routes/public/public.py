@@ -74,7 +74,7 @@ def contact_us():
 @public_router.route("/stripe_webhook", methods=['POST'])
 def stripe_webhook():
     print("lolol")
-    callback: Callback = sub_services.handleStripeWebhook(request.json)
+    callback: Callback = sub_services.handleStripeWebhook(request)
 
     # To tell stripe whether the request was succesful
     if not callback.Success:

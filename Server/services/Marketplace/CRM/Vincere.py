@@ -345,7 +345,7 @@ def searchCandidates(auth, companyID, data) -> Callback:
             query = ""
         else:
             query = query[:-1]
-            query += " # %23"
+            query += "%23"
 
         # send query
         while True:

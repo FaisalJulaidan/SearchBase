@@ -1,87 +1,77 @@
 import React from 'react';
 import styles from './pricing.module.css';
-import {Col, Container, Row, Button, Nav, Tab} from "react-bootstrap";
-import {Link} from "react-router-dom";
-import EmailShare from "react-email-share-link";
-import PricingCard from "./pricing-card/PricingCard";
+import {Col, Container, Row, Nav, Tab} from "react-bootstrap";
 import Layout from "../../../hoc/layout/Layout";
-import pricingJSON from './pricing.json';
 import {WEBSITE_TITLE} from "../../../../../constants/config";
+import AgencyPricingTab from "./tabs/AgencyPricingTab";
 
-const Pricing = () => {
+class Pricing extends React.Component {
 
-    document.title = "Pricing | " + WEBSITE_TITLE;
+    state = {
+        activeTab: 'agency'
+    };
 
-    let pricing = pricingJSON.map((plan, key) => {
+    componentDidMount() {
+        document.title = "Pricing | " + WEBSITE_TITLE;
+    }
+
+    render() {
         return (
-            <Col className={styles.col_card} xs={{span: 10, offset: 1}} sm={{span: 8, offset: 2}}
-                 md={{span: 4, offset: 0}} key={key}>
-                <PricingCard id={plan.id} plan={plan}/>
-            </Col>
-        );
-    });
-
-    return (
-        <Layout>
-            <div className={styles.hero}>
-                <Container>
-                    <Row>
-                        <Col className={styles.text_wrapper}>
-                            <h1 className={styles.title}>Boost candidates interaction and automate every mundane task in
-                                your business.</h1>
-                        </Col>
-                    </Row>
-                </Container>
-            </div>
-            <Tab.Container id="left-tabs-example" defaultActiveKey="first">
+            <Layout>
+                <div className={styles.hero}>
+                    <Container>
+                        <Row>
+                            <Col className={styles.text_wrapper}>
+                                <h1 className={styles.title}>Boost candidates interaction and automate every mundane
+                                    task in
+                                    your business.</h1>
+                            </Col>
+                        </Row>
+                    </Container>
+                </div>
                 <Container className={styles.content}>
-                    <Row>
-                        <Nav variant="tabs">
-                            <Nav.Item>
-                                <Nav.Link eventKey="agency">Agency</Nav.Link>
-                            </Nav.Item>
-                            <Nav.Item>
-                                <Nav.Link eventKey="in-house">In House</Nav.Link>
-                            </Nav.Item>
-                            <Nav.Item>
-                                <Nav.Link eventKey="enterprise">Enterprise</Nav.Link>
-                            </Nav.Item>
-                        </Nav>
-                    </Row>
-                    <Row>
-                        <Tab.Content>
-                            <Tab.Pane eventKey="agency"> agency</Tab.Pane>
-                            <Tab.Pane eventKey="in-house"> hourse</Tab.Pane>
-                            <Tab.Pane eventKey="enterprise"> enterprise</Tab.Pane>
-                        </Tab.Content>
-                    </Row>
-                    <Row>
-                        {pricing}
-                    </Row>
-                    <Row className={styles.row_enterprise}>
-                        <Col md={10} lg={8}>
-                            <h1>Need more?</h1>
-                        </Col>
-                        <Col md={12} lg={10} className={styles.desc_col}>
-                            <span>We offer additional enterprise services — if you need features not available in the current plans to help your enterprise requirements get going, please let us know. If you are interested in partnering with us around technology, services, or go-to-market, we’d love to have a conversation!</span>
-                        </Col>
-                        <Col md={8}>
-                            <Link to="/get-started">
-                                <Button variant="light" className={styles.demo_button}>Request a demo</Button>
-                            </Link>
-                            <Button variant="outline-light" className={styles.contact_button}>
-                                <EmailShare email="info@SearchBase.com"
-                                            subject="Contact"
-                                            body="Hi, I would like to talk about...">
-                                    {link => (<a href={link} data-rel="external">Contact us</a>)}
-                                </EmailShare>
-                            </Button>
-                        </Col>
-                    </Row>
+                    <Tab.Container activeKey={this.state.activeTab} onSelect={key => this.setState({activeTab: key})}>
+                        <Row>
+                            <Col>
+                                <Nav variant="tabs" fill className={styles.tabs} onSelect={() => {
+                                }}>
+                                    <Nav.Item className={styles.tab}>
+                                        <Nav.Link eventKey="agency"
+                                                  style={this.state.activeTab === 'agency' ? {fontWeight: '900'} : {}}>
+                                            Agency
+                                        </Nav.Link>
+                                    </Nav.Item>
+                                    <Nav.Item className={styles.tab}>
+                                        <Nav.Link eventKey="in-house"
+                                                  style={this.state.activeTab === 'in-house' ? {fontWeight: '900'} : {}}>
+                                            In House
+                                        </Nav.Link>
+                                    </Nav.Item>
+                                    <Nav.Item className={styles.tab}>
+                                        <Nav.Link eventKey="enterprise"
+                                                  style={this.state.activeTab === 'enterprise' ? {fontWeight: '900'} : {}}>
+                                            Enterprise
+                                        </Nav.Link>
+                                    </Nav.Item>
+                                </Nav>
+                            </Col>
+                        </Row>
+                        <Row>
+                            <Col>
+                                <Tab.Content>
+                                    <Tab.Pane eventKey="agency">
+                                        <AgencyPricingTab/>
+                                    </Tab.Pane>
+                                    <Tab.Pane eventKey="in-house">House</Tab.Pane>
+                                    <Tab.Pane eventKey="enterprise">Enterprise</Tab.Pane>
+                                </Tab.Content>
+                            </Col>
+                        </Row>
+                    </Tab.Container>
                 </Container>
-            </Tab.Container>
-        </Layout>
-    );
-};
+            </Layout>
+        );
+    }
+}
 
 export default Pricing;

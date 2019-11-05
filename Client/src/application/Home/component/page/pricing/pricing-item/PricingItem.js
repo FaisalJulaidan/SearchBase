@@ -1,13 +1,12 @@
 import React from 'react';
-import styles from './pricing-card.module.css';
+import styles from './pricing-item.module.css';
 import PropTypes from "prop-types";
 import {Link} from "react-router-dom";
-import {Card} from "react-bootstrap";
 import Button from "react-bootstrap/Button";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faCheck} from "@fortawesome/free-solid-svg-icons";
 
-const PricingCard = (props) => {
+const PricingItem = (props) => {
 
     let items = props.plan?.items?.map((item, key) => {
         return <li key={key}><FontAwesomeIcon color="#4CAF50" size="1x" icon={faCheck} className={styles.icon}/>{item}
@@ -15,8 +14,7 @@ const PricingCard = (props) => {
     });
 
     return (
-        <Card className={styles.card}>
-            <Card.Body className={styles.body}>
+        <div className={styles.wrapper}>
                 <h1 className={styles.title}>{props.plan?.title}</h1>
                 <hr/>
                 <h1 className={styles.subtitle}>{props.plan?.subtitle}</h1>
@@ -29,12 +27,11 @@ const PricingCard = (props) => {
                 <ul className={styles.list}>
                     {items}
                 </ul>
-            </Card.Body>
-        </Card>
+        </div>
     );
 };
 
-PricingCard.propTypes = {
+PricingItem.propTypes = {
     plan: PropTypes.shape({
         title: PropTypes.string.isRequired,
         subtitle: PropTypes.string.isRequired,
@@ -45,4 +42,4 @@ PricingCard.propTypes = {
     })
 };
 
-export default PricingCard;
+export default PricingItem;

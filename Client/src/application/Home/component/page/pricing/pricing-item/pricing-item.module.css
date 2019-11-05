@@ -1,21 +1,9 @@
-.card {
-    height: 100%;
-    line-height: normal;
-    color: #767676;
-    box-shadow: 0 3px 4px rgba(0, 0, 0, 0.10), 0 1px 2px rgba(0, 0, 0, 0.18);
-    transition: all 0.3s cubic-bezier(.25, .8, .25, 1);
-    /*text-align: center;*/
-
-}
-
-.card .body {
+.wrapper {
     display: flex;
     flex-flow: column;
+    height: 100%;
+    color: #767676;
     /*align-items: center;*/
-}
-
-.card:hover {
-    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23);
 }
 
 .title {
@@ -24,7 +12,7 @@
     font-size: 2em;
 }
 
-.body hr {
+.wrapper hr {
     background-color: #9254de;
     min-width: 60px;
     width: fit-content;

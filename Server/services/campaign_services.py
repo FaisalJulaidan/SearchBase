@@ -1,7 +1,7 @@
 from sqlalchemy import and_
 
 from models import Callback, db, Campaign
-from services import assistant_services, databases_services, mail_services, url_services
+from services import assistant_services, databases_services, mail_services, url_services, company_services
 from services.Marketplace.CRM import crm_services
 from services.Marketplace.Messenger import messenger_servicess
 from utilities import helpers
@@ -178,6 +178,9 @@ def sendCampaign(campaign_details, companyID):
         messenger_callback: Callback = messenger_servicess.getByID(campaign_details.get("messenger_id"), companyID)
         if not messenger_callback.Success:
             raise Exception("Messenger not found.")
+        
+        company : Callback = company_services.getByCompanyID(companyID)
+        companyName = company.Data.Name.replace(" ", "").lower() if company.Success else None
 
         messenger = messenger_callback.Data
         crm = None
@@ -188,9 +191,9 @@ def sendCampaign(campaign_details, companyID):
 
         # VARIABLE ORDER MUST BE MAINTAINED SO THAT WHEN DECODING WE KNOW WHAT VARIABLES ARE WHAT
         # IF YOU INTEND TO CHANGE THEM, ALSO UPDATE THE ORDER HANDLED AT CONVERSATION SERVICES LINE # 98
-        source = 2 if campaign_details.get("use_crm") else 1
+        source = 'crm' if campaign_details.get("use_crm") else 'db'
 
-        crmID = campaign_details.get("crm_id") if source == 2 else campaign_details.get("database_id")
+        crmID = campaign_details.get("crm_id") if source == 'crm' else campaign_details.get("database_id")
         text = campaign_details.get("text") 
 
 
@@ -215,11 +218,10 @@ def sendCampaign(campaign_details, companyID):
             # insert candidate details in text
             tempText = text.replace("{candidate.name}", candidate.get("CandidateName"))
 
-            access = helpers.encodeMultipleParams(source, crmID, candidate.get("ID"))
+            access = helpers.verificationSigner.dumps({"candidateID": candidate.get("ID"), "source": source, "crmID": crmID}, salt='crm-information')
 
-            
             url : Callback = url_services.createShortenedURL(helpers.getDomain(3000) + "/chatbot_direct_link/" + \
-               hashedAssistantID + "?source=" + str(access))
+               hashedAssistantID + "?source=" + str(access), subdomain=companyName)
             
             if not url.Success:
                 raise Exception("Failed to create shortened URL")

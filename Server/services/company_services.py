@@ -112,6 +112,7 @@ def getByStripeID(id) -> Callback:
         return Callback(False, 'Could not get the assistant by nickname.')
 
 
+
 def update(companyName, websiteURL, trackData: bool, techSupport: bool, accountSpecailst: bool, companyID):
     try:
 

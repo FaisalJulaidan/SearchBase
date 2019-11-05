@@ -1,6 +1,7 @@
 from utilities import helpers
 from models import Callback, db, Company
 from services import company_services
+import os
 import stripe
 
 
@@ -26,6 +27,58 @@ def unsubscribe(company: Company) -> Callback:
         db.session.rollback()
         return Callback(False, 'An error occurred while trying to unsubscribe')
 
+        
+def handleStripeWebhook(req) -> Callback:
+    # Plan structure
+    #  Assitants | Campaign | AutoPilot | DB | Appointments
+    #  1.0.0.0.0 - means only access to assistants 
+    
+    plans = {"plan_D3lp2yVtTotk2f": "1.0.0.1.0", "plan_D3lp9R7ombKmSO": "1.1.0.1.1", "plan_D3lpeLZ3EV8IfA": "1.1.1.1.1"} if os.environ['STRIPE_IS_TESTING'] == 'yes' \
+      else {"plan_G7Sth78cbr8Pgl": "1.0.0.1.0", "plan_G7SuTtSoBxJ7aS": "1.1.0.1.1", "plan_G7SuT5aJA1OFJU": "1.1.1.1.1"}# testing env
+
+    try:
+        event = stripe.Event.construct_from(req, stripe.api_key)
+        if event.type == 'checkout.session.completed':
+            customer: Callback = company_services.getByStripeID(event['data']['object']['customer']) 
+            plan = plans[event['data']['object']['display_items'][0]['plan']['id']].split(".")
+
+            if not customer.Success:
+                raise Exception("No customer found with given ID")
+
+            customer.Data.AccessAssistants = int(plan[0])
+            customer.Data.AccessCampaigns = int(plan[1])
+            customer.Data.AccessAutoPilot = int(plan[2])
+            customer.Data.AccessDatabases = int(plan[3])
+            customer.Data.AccessAppointments = int(plan[4])
+
+            db.session.commit()
+
+            return Callback(True, 'No Message')
+            # if customer doesnt exist
+        elif event.type == 'customer.subscription.deleted': 
+            customer: Callback = company_services.getByStripeID(event['data']['object']['customer']) 
+
+            if not customer.Success:
+                raise Exception("No customer found with given ID")
+
+            customer.Data.AccessAssistants = 0
+            customer.Data.AccessCampaigns = 0
+            customer.Data.AccessAutoPilot = 0
+            customer.Data.AccessDatabases = 0
+            customer.Data.AccessAppointments = 0
+
+            db.session.commit()
+            # Until we figure out a wa
+
+            return Callback(True, 'No Message') #tell stripe webhook was handled succesfully
+        elif event.type == 'customer.subscription.created':
+            return Callback(True, 'No Message') #tell stripe webhook was handled succesfully
+            
+
+    except Exception as e:
+        helpers.logError("sub_services.handleStripeWebhook(): " + str(e))
+        return Callback(False, 'No Message')
+
 def generateCheckoutURL(req) -> Callback:
     try:
         resp: dict = helpers.validateRequest(req, {"plan": {"type": str, "required": True}, "companyID": {"type": int, "required": False}})
@@ -35,7 +88,7 @@ def generateCheckoutURL(req) -> Callback:
             payment_method_types=['card'],
             subscription_data={
                 'items': [{
-                'plan': resp['inputs']['plan'],
+                  'plan': resp['inputs']['plan'],
                 }],
             },
             customer=company.Data.StripeID,

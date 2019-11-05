@@ -1,6 +1,7 @@
 [
   {
     "id": "essential",
+    "stripe_key": "plan_G7Sth78cbr8Pgl",
     "title": "Essential",
     "subtitle": "Suitable for teams of up to 3 members",
     "price": "£99",
@@ -13,6 +14,7 @@
   },
   {
     "id": "pro",
+    "stripe_key": "plan_G7SuTtSoBxJ7aS",
     "title": "Pro",
     "subtitle": "Suitable for teams of up to 10 members",
     "price": "£249",
@@ -29,6 +31,7 @@
   },
   {
     "id": "premium",
+    "stripe_key": "plan_G7SuT5aJA1OFJU",
     "title": "Premium",
     "subtitle": "Suitable for teams of up to 50 members",
     "price": "£1,150",

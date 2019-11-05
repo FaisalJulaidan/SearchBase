@@ -22,13 +22,6 @@
     font-size: 3.1em;
 }
 
-/*.hero .text_wrapper .subtitle {*/
-/*    margin-top: 1.2em;*/
-/*    font-weight: bold;*/
-/*    color: #ffffff;*/
-/*    font-size: 1.5em;*/
-/*}*/
-
 .content{
     margin-top: -9em;
     margin-bottom: 5em;
@@ -116,16 +109,17 @@
 
 @media (max-width: 575.98px) {
 
-    .hero .text_wrapper {
-        padding-top: 4em;
-        padding-bottom: 4em;
-    }
-
     .hero .text_wrapper .title {
-        font-size: 4em;
+        font-size: 2em;
     }
+}
 
-    .hero .text_wrapper .subtitle {
-        font-size: 1.5em;
+
+@media (max-width: 767.98px) {
+    .hero .text_wrapper .title {
+        font-size: 2.5em;
+    }
+    .col_card{
+        margin-bottom: 30px;
     }
 }

@@ -33,7 +33,7 @@ def url_shortener(key):
     if (urlshotener.Success):
         return redirect(urlshotener.Data)
     else:
-        return '123'
+        return helpers.jsonResponse(False, 400, "Failed to find a URL to point to")
         # need to return 404?
 
 

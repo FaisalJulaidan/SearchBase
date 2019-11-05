@@ -49,9 +49,8 @@ class SignupFormPayment extends React.Component {
     }
 
     onSignupSuccessful = (companyID, plan) => {
-        //TODO:: Update Plan
-        const plans = {"essential": "plan_D3lp2yVtTotk2f", "pro": "plan_D3lp9R7ombKmSO", "premium": "plan_D3lpeLZ3EV8IfA"} // temp for testing change as you want
-        this.props.dispatch(paymentActions.generateCheckoutSession(companyID, plans[plan]));
+        // const plans = {"essential": "plan_D3lp2yVtTotk2f", "pro": "plan_D3lp9R7ombKmSO", "premium": "plan_D3lpeLZ3EV8IfA"} //Testing plans
+        this.props.dispatch(paymentActions.generateCheckoutSession(companyID, plan?.stripe_key));
     };
 
     redirectToStripe(sessionID) {
@@ -227,7 +226,8 @@ class SignupFormPayment extends React.Component {
                     )}
                 </Form.Item>
                 <Form.Item className={styles.SignupFormItem}>
-                    <Button type="primary" htmlType="submit" block>Submit</Button>
+                    <Button type="primary" htmlType="submit" block
+                            loading={this.props.isSigningUp||this.props.isLoading}>Submit</Button>
                 </Form.Item>
             </Form>
         );

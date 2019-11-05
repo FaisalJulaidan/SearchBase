@@ -130,7 +130,6 @@ def sendQuery(auth, query, method, body, companyID, optionalParams=None):
 
         # test the Token (id_token)
         helpers.logError("url: " + url)
-        helpers.logError("headers: " + str(headers))
         r = marketplace_helpers.sendRequest(url, method, headers, json.dumps(body))
         helpers.logError("response text: " + r.text)
 
@@ -338,7 +337,6 @@ def searchCandidates(auth, companyID, data) -> Callback:
         # populate filter
         query += populateFilter(data.get("location"), "current_city")
 
-        helpers.logError("SKILLS: " + str(data.get("skills")))
         for skill in data.get("skills"):
             query += populateFilter(skill, "skill")
 
@@ -351,7 +349,6 @@ def searchCandidates(auth, companyID, data) -> Callback:
 
         # send query
         while True:
-            helpers.logError("query: " + str(query))
             sendQuery_callback: Callback = sendQuery(auth, "candidate/search/" + fields, "get", {}, companyID, [query])
             helpers.logError("return_body: " + str(json.loads(sendQuery_callback.Data.text)))
             if not sendQuery_callback.Success:

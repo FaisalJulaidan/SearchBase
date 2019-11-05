@@ -18,6 +18,9 @@ import Store from '../src/store/store'
 smoothscroll.polyfill();
 
 //test
+
+
+
 // this should make it running
 
 

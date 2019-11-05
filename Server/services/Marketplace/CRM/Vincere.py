@@ -352,12 +352,14 @@ def searchCandidates(auth, companyID, data) -> Callback:
 
         # send query
         while True:
+            helpers.logError("query: " + str(query))
             sendQuery_callback: Callback = sendQuery(auth, "candidate/search/" + fields, "get", {}, companyID,
                                                  [query])
             if not sendQuery_callback.Success:
                 raise Exception(sendQuery_callback.Message)
 
             return_body = json.loads(sendQuery_callback.Data.text)
+            helpers.logError("return_body: " + str(return_body))
             if return_body.get("result", {}).get("total", 0) > 0:
                 break
 

@@ -7,7 +7,7 @@ import axios from 'axios';
 
 function* fetchAppointment({token}) {
     try {
-        const res = yield axios.get(`${process.env.REACT_APP_ENV !== "development"? process.env.API_URL:''}/api/allocation_times/${token}`,
+        const res = yield axios.get(`${process.env.NODE_ENV!=='development'? process.env.REACT_APP_API_URL:''}/api/allocation_times/${token}`,
             {headers: {'Content-Type': 'application/json'}});
 
         yield put(appointmentsPickerActions.fetchAppointmentSuccess(res.data.data));
@@ -20,7 +20,7 @@ function* fetchAppointment({token}) {
 
 function* selectAppointmentTime({ token, pickedTimeSlot, userTimeZone }) {
     try {
-        const res = yield axios.post(`${process.env.REACT_APP_ENV !== "development"? process.env.API_URL:''}/api/allocation_times/${token}`,
+        const res = yield axios.post(`${process.env.NODE_ENV!=='development'? process.env.REACT_APP_API_URL:''}/api/allocation_times/${token}`,
             { pickedTimeSlot, userTimeZone },
             {headers: {'Content-Type': 'application/json'}});
         successMessage(res.data?.msg || 'Appointment selected successfully');

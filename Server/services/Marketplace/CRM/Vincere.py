@@ -336,7 +336,7 @@ def searchCandidates(auth, companyID, data) -> Callback:
         # populate filter
         query += populateFilter(data.get("location"), "current_city")
 
-        for skill in data.get("skills"):
+        for skill in data.get("skills", []):
             query += populateFilter(skill, "skill")
 
         query = query.replace("#", ".08")
@@ -502,7 +502,7 @@ def searchJobs(auth, companyID, data) -> Callback:
 
         query += populateFilter(data.get("city"), "city")
 
-        for skill in data.get("skills"):
+        for skill in data.get("skills", []):
             query += populateFilter(skill, "public_description")
 
         # query += populateFilter(data.get("employmentType"), "employment_type")

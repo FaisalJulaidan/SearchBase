@@ -58,14 +58,15 @@ limiter = Limiter(key_func=getRemoteAddress)
 # ======== Helper Functions ======== #
 
 # Get domain based on current environment
-def getDomain(port=5000, subdomain=None):
+def getDomain(port=5000, subdomain=None, domain=None):
     subdomain = subdomain+"." if subdomain is not None else ""
+    domain = domain if domain is not None else "thesearchbase"
     if os.environ['FLASK_ENV'] == 'development':
         return 'http://localhost:{}'.format(str(port))
     elif os.environ['FLASK_ENV'] == 'staging':
         return 'https://staging.thesearchbase.com'
     elif os.environ['FLASK_ENV'] == 'production':
-        return 'https://www.{}thesearchbase.com'.format(subdomain)
+        return 'https://www.{}{}.com'.format(subdomain, domain)
     return None
 
 

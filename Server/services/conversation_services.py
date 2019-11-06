@@ -88,14 +88,23 @@ def processConversation(assistantHashID, data: dict) -> Callback:
                     conversation.CRMSynced = True
                 conversation.CRMResponse = crm_callback.Message
         else:
-            crmInformation = data["crmInformation"]
-            if crmInformation.get("source") == "crm":
-                crm_callback: Callback = crm_services.updateCandidate(crmInformation, conversation, assistant.CompanyID)
+            crmInformation = helpers.decodeID(data["crmInformation"].get("source"))
+            
+            crmInformation = helpers.verificationSigner.loads(data["crmInformation"].get("source"), salt='crm-information')
+            print(crmInformation)
+            source = crmInformation["source"]
+            sourceID = crmInformation["crmID"]
+            candidateID = crmInformation["candidateID"]
+            # CAMPAIGN SOURCES - ID vs TEXT to make url shorter
+            # 1 - DATABASE
+            # 2 - CR
+            if source == "crm":
+                crm_callback: Callback = crm_services.updateCandidate(candidateID, conversation, assistant.CompanyID, sourceID)
                 if crm_callback.Success:
                     conversation.CRMSynced = True
                 conversation.CRMResponse = crm_callback.Message
-            elif crmInformation.get("source") == "database":
-                database_callback: Callback = databases_services.updateCandidate(crmInformation.get("id"), conversation)
+            elif source == "db":
+                database_callback: Callback = databases_services.updateCandidate(candidateID, conversation)
 
         # Notify company about the new chatbot session only if set as immediate -> NotifyEvery=0
         # Note: if there is a file upload the /file route in chatbot.py will handle the notification instead

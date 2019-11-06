@@ -1,4 +1,4 @@
-from utilities import helpers
+from utilities import helpers, enums
 from models import Callback, db, Company
 from services import company_services
 import os
@@ -29,27 +29,26 @@ def unsubscribe(company: Company) -> Callback:
 
         
 def handleStripeWebhook(req) -> Callback:
-    # Plan structure
-    #  Assitants | Campaign | AutoPilot | DB | Appointments
-    #  1.0.0.0.0 - means only access to assistants 
-    
-    plans = {"plan_D3lp2yVtTotk2f": "1.0.0.1.0", "plan_D3lp9R7ombKmSO": "1.1.0.1.1", "plan_D3lpeLZ3EV8IfA": "1.1.1.1.1"} if os.environ['STRIPE_IS_TESTING'] == 'yes' \
-      else {"plan_G7Sth78cbr8Pgl": "1.0.0.1.0", "plan_G7SuTtSoBxJ7aS": "1.1.0.1.1", "plan_G7SuT5aJA1OFJU": "1.1.1.1.1"}# testing env
-
     try:
-        event = stripe.Event.construct_from(req, stripe.api_key)
+        stripe_sig = req.headers.get("STRIPE_SIGNATURE")
+        event = stripe.Event.construct_from(req.json, stripe_sig, stripe.api_key)
         if event.type == 'checkout.session.completed':
             customer: Callback = company_services.getByStripeID(event['data']['object']['customer']) 
-            plan = plans[event['data']['object']['display_items'][0]['plan']['id']].split(".")
+            plan = event['data']['object']['display_items'][0]['plan']['id']
+            planEnum: enums.Plan = enums.Plan.get_plan(plan)
 
             if not customer.Success:
                 raise Exception("No customer found with given ID")
+            
+            if not planEnum:
+                raise Exception("Trying to subscribe with invalid plan ID")
 
-            customer.Data.AccessAssistants = int(plan[0])
-            customer.Data.AccessCampaigns = int(plan[1])
-            customer.Data.AccessAutoPilot = int(plan[2])
-            customer.Data.AccessDatabases = int(plan[3])
-            customer.Data.AccessAppointments = int(plan[4])
+            customer.Data.Plan = planEnum.name
+            customer.Data.AccessAssistants = planEnum.value['accessAssistants']
+            customer.Data.AccessCampaigns = planEnum.value['accessCampaigns']
+            customer.Data.AccessAutoPilot = planEnum.value['accessAutopilot']
+            customer.Data.AccessDatabases = planEnum.value['accessDatabases']
+            customer.Data.AccessAppointments = planEnum.value['accessAppointments']
 
             db.session.commit()
 
@@ -74,10 +73,12 @@ def handleStripeWebhook(req) -> Callback:
         elif event.type == 'customer.subscription.created':
             return Callback(True, 'No Message') #tell stripe webhook was handled succesfully
             
-
+    except stripe.error.SignatureVerificationError as e:
+        return Callback(False, 'No Message')
     except Exception as e:
         helpers.logError("sub_services.handleStripeWebhook(): " + str(e))
         return Callback(False, 'No Message')
+        
 
 def generateCheckoutURL(req) -> Callback:
     try:

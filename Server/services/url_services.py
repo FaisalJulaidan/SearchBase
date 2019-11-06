@@ -7,7 +7,7 @@ from datetime import datetime, timedelta
 min_key_length = 5
 
 
-def createShortenedURL(url: str, length: int = min_key_length, expiry: int = None, key: str = None, subdomain: str = None) -> Callback:
+def createShortenedURL(url: str, length: int = min_key_length, expiry: int = None, key: str = None, subdomain: str = None, domain: str = None) -> Callback:
     """
     Creates a shortened url that points to the one supplied
 
@@ -17,6 +17,7 @@ def createShortenedURL(url: str, length: int = min_key_length, expiry: int = Non
         expiry [int] [OPTIONAL] -- The length of time in seconds after which the link will no longer redirect, None for no expiry (None is default)
         key [str] [OPTIONAL] -- The key (overriding the random text) that will be at the end of the URL, the length parameter will be ignored if this is supplied
         subdomain [str] [OPTIONAL] -- The subdomain to be supplied to the domain helper function
+        domain [str] [OPTIONAL] -- The domain to be supplied to the domain helper function
 
     Returns:
         Callback with either a success or failure status, with the data object pointing to the newly created URL
@@ -47,7 +48,7 @@ def createShortenedURL(url: str, length: int = min_key_length, expiry: int = Non
         db.session.add(shortened_url)
         db.session.commit()
 
-        return Callback(True, "URL has been succesfully created", "{}/u/{}".format(helpers.getDomain(subdomain=subdomain), key))
+        return Callback(True, "URL has been succesfully created", "{}/u/{}".format(helpers.getDomain(subdomain=subdomain, domain=domain), key))
 
     except IntegrityError as e:
         helpers.logError("url_services.createShortenedURL(): " + str(e))
@@ -77,6 +78,10 @@ def getByKey(key: str) -> Callback:
 
     try:
         urlshortener = db.session.query(ShortenedURL).filter(ShortenedURL.ID == key).first()
+        test = db.session.query(ShortenedURL).all()
+
+        print(test)
+
         if urlshortener is None:
             raise Exception('Key {} does not exist in our database'.format(key))
 
@@ -84,7 +89,12 @@ def getByKey(key: str) -> Callback:
             if(urlshortener.Expiry < datetime.now()):
                 raise Exception('Expiry date for key {} has passed'.format(key))
 
-        return Callback(True, "URL Found", urlshortener.URL)
+        url = urlshortener.URL
+        # redirect to tsb url
+        if urlshortener.URL.startswith("/"):
+            url = helpers.getDomain() + urlshortener.URL
+
+        return Callback(True, "URL Found", url)
 
     except Exception as e:        
         helpers.logError("url_services.getByKey(): " + str(e))

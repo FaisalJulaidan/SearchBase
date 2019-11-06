@@ -30,8 +30,6 @@ def admin_pricing():
 def admin_pricing_adjust():
     return admin_services.render("admin/pricing-adjustments.html")
 
-
-
 # Stripe Webhooks
 @sub_router.route("/api/stripe/subscription-cancelled", methods=["POST"])
 def webhooks_subscription_cancelled():

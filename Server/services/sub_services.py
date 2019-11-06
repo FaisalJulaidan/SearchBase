@@ -69,10 +69,9 @@ def generateCheckoutURL(req) -> Callback:
                 }],
             },
             customer=company.Data.StripeID,
-            success_url='https://www.thesearchbase.com/success-payment?session_id={CHECKOUT_SESSION_ID}',
-            cancel_url='https://www.thesearchbase.com/order-plan',
+            success_url='{}/success-payment?session_id={CHECKOUT_SESSION_ID}'.format(helpers.getDomain(3000)),
+            cancel_url='{}/order-plan'.format(helpers.getDomain(3000)),
         )
-        print(session['id'])
 
         return Callback(True, 'Checkout URL Succesfully created', session['id'])    
     except helpers.requestException as e:

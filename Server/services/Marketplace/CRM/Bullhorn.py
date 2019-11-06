@@ -471,7 +471,7 @@ def searchCandidates(auth, companyID, data, fields=None) -> Callback:
         # populate filter
         query += populateFilter(data.get("location"), "address.city")
 
-        for skill in data.get("skills"):
+        for skill in data.get("skills", []):
             query += populateFilter(skill, "description", "AND")
 
         query = query[:-5]
@@ -530,7 +530,7 @@ def searchPerfectCandidates(auth, companyID, data, fields=None) -> Callback:
         query += populateFilter(data.get("location"), "address.city")
         query += populateFilter(data.get("jobCategory"), "employmentPreference")
 
-        for skill in data.get("skills"):
+        for skill in data.get("skills", []):
             query += populateFilter(skill, "description")
 
         query += populateFilter(data.get("yearsExperience"), "experience")

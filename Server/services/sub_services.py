@@ -33,6 +33,7 @@ def handleStripeWebhook(req) -> Callback:
                 raise Exception("No customer found with given ID")
 
             customer.Plan = None
+            customer.Data.Active = 0
 
             db.session.commit()
             # Until we figure out a wa

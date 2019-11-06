@@ -550,7 +550,7 @@ def searchJobs(auth, companyID, data) -> Callback:
                                                             startDate=record.get("open_date"),
                                                             endDate=record.get("closed_date"),
                                                             linkURL=None,
-                                                            currency=Currency(record.get("currency", "").upper()),
+                                                            currency=Currency(currency.upper()),
                                                             source="Vincere"))
 
         return Callback(True, sendQuery_callback.Message, result)

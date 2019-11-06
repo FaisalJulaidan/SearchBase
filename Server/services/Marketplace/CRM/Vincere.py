@@ -501,7 +501,8 @@ def searchJobs(auth, companyID, data) -> Callback:
         # query += populateFilter(data.get("city"), "address")
 
         query += populateFilter(data.get("city"), "city")
-
+        helpers.logError("VINCERE SKILLS 1: " + str(data.get("skills")))
+        helpers.logError("VINCERE SKILLS 2: " + str(data.get("skills", [])))
         for skill in data.get("skills", []):
             query += populateFilter(skill, "public_description")
 

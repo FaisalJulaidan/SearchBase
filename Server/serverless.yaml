@@ -44,7 +44,11 @@ functions:
       - {Ref: ServerDepsLambdaLayer}
     events:
       - http: ANY /
-      - http: 'ANY {proxy+}'
+      - http:
+         method: any
+         path: /{proxy+}
+         cors: true
+
 
   sendConversationsNotifications:
     handler: services/scheduler_services.sendConversationsNotifications

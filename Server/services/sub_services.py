@@ -54,6 +54,8 @@ def generateCheckoutURL(req) -> Callback:
         resp: dict = helpers.validateRequest(req, {"plan": {"type": str, "required": True}, "companyID": {"type": int, "required": False}})
         company: Callback = company_services.getByCompanyID(resp['inputs']['companyID'])
 
+        successURL = '{}/success-payment?session_id='.format(helpers.getDomain(3000))
+
         session = stripe.checkout.Session.create(
             payment_method_types=['card'],
             subscription_data={
@@ -62,7 +64,7 @@ def generateCheckoutURL(req) -> Callback:
                 }],
             },
             customer=company.Data.StripeID,
-            success_url='{}/success-payment?session_id={CHECKOUT_SESSION_ID}'.format(helpers.getDomain(3000)),
+            success_url=successURL+'{CHECKOUT_SESSION_ID}',
             cancel_url='{}/order-plan'.format(helpers.getDomain(3000)),
         )
 

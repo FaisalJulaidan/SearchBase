@@ -65,6 +65,31 @@ class Status(Enum):
     @classmethod
     def has_value(cls, value):
         return any(value == item.value for item in cls)
+<<<<<<< Updated upstream
+=======
+                
+def planCreator(planID: str, assistants: int = 0, campaigns: int = 0, autopilot: int = 0, databases: int = 0, appointments: int = 0):
+    return {
+      'planID': planID,
+      'accessAssistants': assistants,
+      'accessCampaigns': campaigns,
+      'accessAutopilot': autopilot,
+      'accessDatabases': databases,
+      'accessAppointments'  : appointments }
+
+@unique
+class Plan(Enum):
+    Essential = planCreator("plan_G7Sth78cbr8Pgl", 1, 0, 0, 1, 0)
+    Pro = planCreator("plan_G7SuTtSoBxJ7aS", 1, 1, 0, 1, 1)
+    Premium = planCreator("plan_G7SuT5aJA1OFJU", 1, 1, 1, 1, 1)
+
+    @classmethod
+    def get_plan(cls, value):
+        for item in cls:
+            if(value == item.value['planID']):
+                return item
+        return None
+>>>>>>> Stashed changes
 
 
 @unique

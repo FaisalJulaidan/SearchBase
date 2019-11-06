@@ -188,7 +188,9 @@ def sendQuery(auth, query, method, body, companyID, optionalParams=None):
         headers = {'Content-Type': 'application/json'}
 
         # test the BhRestToken (rest_token)
+        helpers.logError("BULLHORN url: " + str(url))
         r = marketplace_helpers.sendRequest(url, method, headers, json.dumps(body))
+        helpers.logError("BULLHORN text: " + str(r.text))
 
         if r.status_code == 401:  # wrong rest token
             callback: Callback = retrieveRestToken(auth, companyID)
@@ -197,7 +199,9 @@ def sendQuery(auth, query, method, body, companyID, optionalParams=None):
 
             url = buildUrl(callback.Data, query, optionalParams)
 
+            helpers.logError("BULLHORN url 2: " + str(url))
             r = marketplace_helpers.sendRequest(url, method, headers, json.dumps(body))
+            helpers.logError("BULLHORN text 2: " + str(r.text))
             if not r.ok:
                 raise Exception(r.text + ". Query could not be sent")
 
@@ -467,7 +471,7 @@ def searchCandidates(auth, companyID, data, fields=None) -> Callback:
         # populate filter
         query += populateFilter(data.get("location"), "address.city")
 
-        for skill in data.get("skills"):
+        for skill in data.get("skills", []):
             query += populateFilter(skill, "description", "AND")
 
         query = query[:-5]
@@ -526,7 +530,7 @@ def searchPerfectCandidates(auth, companyID, data, fields=None) -> Callback:
         query += populateFilter(data.get("location"), "address.city")
         query += populateFilter(data.get("jobCategory"), "employmentPreference")
 
-        for skill in data.get("skills"):
+        for skill in data.get("skills", []):
             query += populateFilter(skill, "description")
 
         query += populateFilter(data.get("yearsExperience"), "experience")

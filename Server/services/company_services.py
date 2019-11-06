@@ -18,7 +18,7 @@ def create(name, url, ownerEmail) -> Company or None:
         db.session.add(newCompany)
 
         db.session.commit()
-        return Callback(True, "Company uas been created successfully.", newCompany)
+        return Callback(True, "Company has been created successfully.", newCompany)
 
     except stripe.error as exc:
         helpers.logError("company_service.create() Stripe Issue: " + str(exc))

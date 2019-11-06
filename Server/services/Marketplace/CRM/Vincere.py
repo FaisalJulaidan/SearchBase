@@ -533,6 +533,12 @@ def searchJobs(auth, companyID, data) -> Callback:
         result = []
         # not found match for JobLinkURL
         for record in return_body["result"]["items"]:
+            currency = record.get("currency", "gbp").lower()
+            if currency == "pound":
+                currency = "GBP"
+            else:
+                currency = record.get("currency", "GBP").upper()
+
             result.append(databases_services.createPandaJob(id=record.get("id"),
                                                             title=record.get("job_title"),
                                                             desc=record.get("public_description", ""),

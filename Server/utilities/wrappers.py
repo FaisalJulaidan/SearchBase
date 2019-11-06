@@ -81,8 +81,7 @@ def AccessAssistantsRequired(func):
             return helpers.jsonResponse(False, 404, "Not found.", None)
 
         company: Company = callback.Data
-
-        if company.AccessAssistants:
+        if company.Plan.value['accessAssistants']:
             return func(*args, **kwargs)
         else:
             return helpers.jsonResponse(False, 401, "Assistants not included in plan", None)
@@ -102,7 +101,7 @@ def AccessCampaignsRequired(func):
 
         company: Company = callback.Data
 
-        if company.AccessAssistants:
+        if company.Plan.value['accessCampaigns']:
             return func(*args, **kwargs)
         else:
             return helpers.jsonResponse(False, 401, "Campaigns not included in plan", None)
@@ -122,7 +121,7 @@ def AccessAppointmentsRequired(func):
 
         company: Company = callback.Data
 
-        if company.AccessAppointments:
+        if company.Plan.value['accessAppointments']:
             return func(*args, **kwargs)
         else:
             return helpers.jsonResponse(False, 401, "Appointments not included in plan", None)
@@ -142,7 +141,7 @@ def AccessAutoPilotRequired(func):
 
         company: Company = callback.Data
 
-        if company.AccessAutoPilot:
+        if company.Plan.value['accessAutopilot']:
             return func(*args, **kwargs)
         else:
             return helpers.jsonResponse(False, 401, "Autopilot not included in plan", None)
@@ -154,7 +153,6 @@ def AccessAutoPilotRequired(func):
 # Check if the plan allows database access
 def AccessDatabasesRequired(func):
     def wrapper(*args, **kwargs):
-
         user = get_jwt_identity()['user']
         callback: Callback = company_services.getByID(user['companyID'])
         if not callback.Success:
@@ -162,7 +160,7 @@ def AccessDatabasesRequired(func):
 
         company: Company = callback.Data
 
-        if company.AccessDatabases:
+        if company.Plan.value['accessDatabases']:
             return func(*args,**kwargs)
         else:
             return helpers.jsonResponse(False, 401, "Databases not included in plan", None)

@@ -221,7 +221,7 @@ def sendCampaign(campaign_details, companyID):
             access = helpers.verificationSigner.dumps({"candidateID": candidate.get("ID"), "source": source, "crmID": crmID}, salt='crm-information')
 
             url : Callback = url_services.createShortenedURL(helpers.getDomain(3000) + "/chatbot_direct_link/" + \
-               hashedAssistantID + "?source=" + str(access), subdomain=companyName)
+               hashedAssistantID + "?source=" + str(access))
             
             if not url.Success:
                 raise Exception("Failed to create shortened URL")

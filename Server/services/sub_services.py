@@ -20,11 +20,7 @@ def handleStripeWebhook(req) -> Callback:
                 raise Exception("Trying to subscribe with invalid plan ID")
 
             customer.Data.Plan = planEnum.name
-            customer.Data.AccessAssistants = planEnum.value['accessAssistants']
-            customer.Data.AccessCampaigns = planEnum.value['accessCampaigns']
-            customer.Data.AccessAutoPilot = planEnum.value['accessAutopilot']
-            customer.Data.AccessDatabases = planEnum.value['accessDatabases']
-            customer.Data.AccessAppointments = planEnum.value['accessAppointments']
+            customer.Data.Active = 1
 
             db.session.commit()
 
@@ -36,11 +32,7 @@ def handleStripeWebhook(req) -> Callback:
             if not customer.Success:
                 raise Exception("No customer found with given ID")
 
-            customer.Data.AccessAssistants = 0
-            customer.Data.AccessCampaigns = 0
-            customer.Data.AccessAutoPilot = 0
-            customer.Data.AccessDatabases = 0
-            customer.Data.AccessAppointments = 0
+            customer.Plan = None
 
             db.session.commit()
             # Until we figure out a wa

@@ -26,15 +26,15 @@ custom:
     packRequirements: false
 
 
-layers:
-  serverDeps:
-    path: s3://sb-dependencies/server.zip
-    description: Includes all the packages the server depends on
-    compatibleRuntimes:
-      - python3.7
-    allowedAccounts:
-      - '*'
-    retain: false
+#layers:
+#  serverDeps:
+#    path: s3://sb-dependencies/server.zip
+#    description: Includes all the packages the server depends on
+#    compatibleRuntimes:
+#      - python3.7
+#    allowedAccounts:
+#      - '*'
+#    retain: false
 
 
 functions:

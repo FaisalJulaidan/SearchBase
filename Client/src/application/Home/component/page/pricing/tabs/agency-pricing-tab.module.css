@@ -1,5 +1,100 @@
+.wrapper {
+    padding: 4em 2em 0 2em;
+}
+
+.card {
+    box-shadow: 0 2px 20px 0 rgba(0, 0, 0, .1);
+    border: none;
+    border-radius: 3px;
+    padding-top: 1em;
+    padding-bottom: 1em;
+}
+
+.col_item {
+    border-right: #848484 1px dashed;
+}
+
+.col_item:last-child {
+    border: none;
+}
+
+.col_compare_button {
+    margin-top: 3em;
+    display: flex;
+    flex-flow: column;
+    align-items: center;
+}
+
+.button {
+    width: fit-content;
+    border-radius: 2px;
+    text-decoration: none;
+    color: #9254de;
+    border-color: #9254de;
+    padding: 8px 24px;
+    font-weight: bolder;
+    font-size: .9em;
+    transition: all 0.4s ease 0s, background-color 0.4s ease 0s;
+}
+
+.button:hover {
+    color: white;
+    background: #9254de;
+    border-color: #9254de;
+}
+
+.button:not(:disabled):not(.disabled):active {
+    color: white;
+    background: #9254de;
+    border-color: #9254de;
+}
+
+.button:focus {
+    box-shadow: 0 0 0 0.2rem rgba(138, 107, 219, .5);
+}
+
+.button a {
+    text-decoration: none;
+    color: #9254de;
+}
+
+
+.table_wrapper {
+    margin-top: 80px;
+    text-align: center;
+}
+
+.table_wrapper h1 {
+    font-size: 2.8em;
+    font-weight: 900;
+    color: #444444;
+}
+
+.table_wrapper hr {
+    background-color: #9254de;
+    max-width: 100px;
+    height: 3px;
+    margin: 15px auto;
+}
+
+.table_wrapper h4 {
+    font-size: 1.1em;
+    color: #444444;
+}
+
+.table_wrapper a{
+    margin-left: 5px;
+    margin-right: 5px;
+    color: #9254de;
+    text-decoration: none;
+}
+
+.table_wrapper a:hover{
+    color: #9C7DED;
+}
+
 @media (max-width: 767.98px) {
-    .col_card {
+    .col_item {
         margin-bottom: 30px;
     }
 }

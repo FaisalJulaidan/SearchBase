@@ -42,15 +42,15 @@ class Pricing extends React.Component {
                                         </Nav.Link>
                                     </Nav.Item>
                                     <Nav.Item className={styles.tab}>
-                                        <Nav.Link eventKey="in-house"
-                                                  style={this.state.activeTab === 'in-house' ? {fontWeight: '900'} : {}}>
-                                            In House
-                                        </Nav.Link>
-                                    </Nav.Item>
-                                    <Nav.Item className={styles.tab}>
                                         <Nav.Link eventKey="enterprise"
                                                   style={this.state.activeTab === 'enterprise' ? {fontWeight: '900'} : {}}>
                                             Enterprise
+                                        </Nav.Link>
+                                    </Nav.Item>
+                                    <Nav.Item className={styles.tab}>
+                                        <Nav.Link eventKey="in-house"
+                                                  style={this.state.activeTab === 'in-house' ? {fontWeight: '900'} : {}}>
+                                            In House
                                         </Nav.Link>
                                     </Nav.Item>
                                 </Nav>
@@ -62,8 +62,8 @@ class Pricing extends React.Component {
                                     <Tab.Pane eventKey="agency">
                                         <AgencyPricingTab/>
                                     </Tab.Pane>
-                                    <Tab.Pane eventKey="in-house">House</Tab.Pane>
                                     <Tab.Pane eventKey="enterprise">Enterprise</Tab.Pane>
+                                    <Tab.Pane eventKey="in-house">House</Tab.Pane>
                                 </Tab.Content>
                             </Col>
                         </Row>

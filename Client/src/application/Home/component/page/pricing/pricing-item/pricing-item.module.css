@@ -3,6 +3,7 @@
     flex-flow: column;
     height: 100%;
     color: #767676;
+    margin: 25px 10px;
     /*align-items: center;*/
 }
 
@@ -21,10 +22,8 @@
 }
 
 .subtitle {
-    margin: 0 1.5em 0 0;
     color: #726a84;
     font-size: .9em;
-    font-weight: bold;
 }
 
 .price {
@@ -66,8 +65,8 @@
 
 /**** Primary Button ****/
 .button {
+    text-transform: uppercase;
     margin: 0.85em 0;
-    font-size: 1.1em;
     width: fit-content;
     border-radius: 2px;
     text-decoration: none;

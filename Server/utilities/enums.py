@@ -79,10 +79,11 @@ def planCreator(planID: str, assistants: int = 0, campaigns: int = 0, autopilot:
 
 @unique
 class Plan(Enum):
-    Basic = planCreator(None, 0, 0, 0, 0, 0)
+    Basic = planCreator("", 0, 0, 0, 0, 0)
     Essential = planCreator("plan_G7Sth78cbr8Pgl", 1, 0, 0, 1, 0)
     Pro = planCreator("plan_G7SuTtSoBxJ7aS", 1, 1, 0, 1, 1)
     Premium = planCreator("plan_G7SuT5aJA1OFJU", 1, 1, 1, 1, 1)
+    Staff = planCreator("", 1, 1, 1, 1, 1)
 
     @classmethod
     def get_plan(cls, value):

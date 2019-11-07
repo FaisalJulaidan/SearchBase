@@ -26,7 +26,6 @@ class Company(db.Model):
 
     HideSignature = db.Column(db.Boolean, nullable=False, default=False)
     Active = db.Column(db.Boolean, nullable=False, default=False)
-    Plan = db.Column(Enum(enums.Plan), server_default=enums.Plan.Basic.name)
 
     # Relationships:
     Users = db.relationship('User', back_populates='Company')

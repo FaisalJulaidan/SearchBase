@@ -1,6 +1,6 @@
 # serverless.yml
 
-service: flask-app-serverless-test-1
+service: flask-app-serverless
 
 provider:
   name: aws
@@ -45,23 +45,7 @@ functions:
     events:
       - http:
           path: /
-          method: get
-          cors: true
-      - http:
-          path: /
-          method: post
-          cors: true
-      - http:
-          path: /
-          method: put
-          cors: true
-      - http:
-          path: /
-          method: options
-          cors: true
-      - http:
-          path: /
-          method: delete
+          method: any
           cors: true
 #      - http:
 #         method: any

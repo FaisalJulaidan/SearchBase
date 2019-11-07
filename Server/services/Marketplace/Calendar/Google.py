@@ -139,99 +139,92 @@ def syncAppointments(calendarID, token, companyID):
         eventURL = "https://www.googleapis.com/calendar/v3/calendars/{}/events".format(calendarID)
 
         eventList = requests.get(eventURL, headers=headers)
+        events = eventList.json()['items']
+        eventCount = len(events)
 
         appointments = db.session.query(Appointment).join(Conversation).join(Assistant).join(Company).filter(Company.ID == companyID).all()
         user: User = db.session.query(User).join(Company).filter(Company.ID == companyID).first()
 
-        #TODO: Encode
-        events = {}
-        for event in eventList.json()['items']:
-            if event['description'].startswith("A_ID"):
-                desc = event['description'].split("<br>")
-                appointmentDetails = desc[0].split(".")
-                aid = hashids.decrypt(appointmentDetails[1])[0]
-                events[aid] = {'id': event['id'], 'status': appointmentDetails[2]}
-
-        requestList = []
-        removeList = []
-        ignoreList = []
-        for key, val in events.items():
-            valid = False
-            for appointment in appointments:
-                if appointment.ID != key:
-                    continue
-                valid = True
-                if ((appointment.Status == enums.Status.Accepted and val['status'] == "1") or \
-                      appointment.Status == enums.Status.Pending and val['status'] == "0") and \
-                      appointment.ID not in ignoreList:
-                    ignoreList.append(appointment.ID)
-                    break
-                elif(appointment.Status == enums.Status.Rejected):
-                    removeList.append(val['id'])
-            if valid == False:
-                removeList.append(val['id'])
+        rs = []
 
         for appointment in appointments:
-            if appointment.ID in ignoreList or appointment.Status == enums.Status.Rejected:
+            event = None
+            for idx, item in enumerate(events):
+                # Invalid format, delete event
+                if 'description' not in item:
+                    rs.append(grequests.delete(eventURL + "/" + item['id'], headers=headers))
+                    continue
+                if not item['description'].startswith("A_ID"):
+                    rs.append(grequests.delete(eventURL + "/" + item['id'], headers=headers))
+                    continue
+                
+                desc = item['description'].split("<br>")
+                appointmentDetails = desc[0].split(".")
+                eventStatus = appointmentDetails[2]
+                aid = hashids.decrypt(appointmentDetails[1])[0]
+                
+                # event is not the current appointment we are looping through
+                if aid != appointment.ID:
+                    # Google has unknown event
+                    if idx == eventCount:
+                        rs.append(grequests.delete(eventURL + "/" + item['id'], headers=headers))
+                    continue          
+
+                event = {"data": item, "status": eventStatus, aid: aid}             
+
+            if event is None:
+                # Create new appointment
+                rs.append(grequests.post(eventURL, headers=headers, json=createEvent(appointment, user)))
                 continue
-            eventID = None
-            if appointment.ID in events:
-                eventID = events[appointment.ID]
-            appointmentToken = appointment_services.generateEmailUrl(appointment.ID) if appointment.Status == enums.Status.Pending else None
-            appointmentStatus = "Appointment pending approval " if appointment.Status == enums.Status.Pending else "Appointment "
-            eventTitle = appointmentStatus + "with {}".format(appointment.Conversation.Name) if appointment.Conversation.Name is not None else appointmentStatus
+
+            # Google Appointment matches but is rejected so needs to be removed
+            if appointment.Status == enums.Status.Rejected:
+              rs.append(grequests.delete(eventURL + "/" + event['data']['id'], headers=headers))
+              continue
+
+            # Google Appointment matches but status is same as one in our db so no change is necessary
+            if ((appointment.Status == enums.Status.Accepted and event['status'] == "1") or \
+                  appointment.Status == enums.Status.Pending and event['status'] == "0"):
+                continue
             
-            id = hashids.encrypt(appointment.ID)
-            #TODO: Needs to change to whatever environment is using
-            appointmentURL = "http://localhost:3000/appointment_status?token={}".format(appointmentToken)
-            status = 0 if appointment.Status == enums.Status.Pending else 1
-            eventDetails = "A_ID.{}.{}".format(id, status)
-
-            if appointment.Status == enums.Status.Pending:
-              eventDesc = "{}<br><a href='{}'>Accept Appointment</a>".format(eventDetails, appointmentURL)
-            else:
-              eventDesc = "{}<br>Appointment {}".format(eventDetails, appointment.Status.value)
+            # Update existing appointment     
+            rs.append(grequests.patch(eventURL+ "/" + event['data']['id'], headers=headers, json=createEvent(appointment, user)))
             
-            
-            data = { 
-                'summary': eventTitle,
-                'description': eventDesc,
-                'start': {
-                    'dateTime': appointment.DateTime.astimezone().isoformat(),
-                    'timeZone': user.TimeZone
-                },
-                'end': {
-                    'dateTime': appointment.DateTime.astimezone().isoformat(),
-                    'timeZone': user.TimeZone
-                }
-            }
-
-            requestList.append({'data': data, 'eventID': eventID})
-            
-        rs = []
-        for request in requestList:
-            if request['eventID'] is None:
-                rs.append(grequests.post(eventURL, headers=headers, json=request['data']))
-            else:
-                rs.append(grequests.patch(eventURL+ "/" + request['eventID']['id'], headers=headers, json=request['data']))
-        for request in removeList:
-
-            rs.append(grequests.delete(eventURL + "/" + request, headers=headers))
-
-      
-
         grequests.map(rs)
 
-        
         # GET https://www.googleapis.com/calendar/v3/calendars/calendarId/events
-
-        
-
-        # rs = (grequests.post(u, json=formattedData) for u in requestList)
-        # grequests.map(rs, exception_handler=handleExceptions)
     except Exception as exc:
         helpers.logError("Google.syncAppointments(): " + str(exc))
 
+
+def createEvent(appointment, user):
+  appointmentToken = appointment_services.generateEmailUrl(appointment.ID) if appointment.Status == enums.Status.Pending else None
+  appointmentStatus = "Appointment pending approval " if appointment.Status == enums.Status.Pending else "Appointment "
+  eventTitle = appointmentStatus + "with {}".format(appointment.Conversation.Name) if appointment.Conversation.Name is not None else appointmentStatus
+  
+  id = hashids.encrypt(appointment.ID)
+  #TODO: Needs to change to whatever environment is using
+  appointmentURL = "{}/appointment_status?token={}".format(helpers.getDomain(3000), appointmentToken)
+  status = 0 if appointment.Status == enums.Status.Pending else 1
+  eventDetails = "A_ID.{}.{}".format(id, status)
+
+  if appointment.Status == enums.Status.Pending:
+    eventDesc = "{}<br><a href='{}'>Accept Appointment</a>".format(eventDetails, appointmentURL)
+  else:
+    eventDesc = "{}<br>Appointment {}".format(eventDetails, appointment.Status.value)
+  
+  return { 
+      'summary': eventTitle,
+      'description': eventDesc,
+      'start': {
+          'dateTime': appointment.DateTime.astimezone().isoformat(),
+          'timeZone': user.TimeZone
+      },
+      'end': {
+          'dateTime': appointment.DateTime.astimezone().isoformat(),
+          'timeZone': user.TimeZone
+      }
+  }
 
 
 '''Add event function'''

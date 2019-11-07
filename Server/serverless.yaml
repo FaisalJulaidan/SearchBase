@@ -40,8 +40,8 @@ custom:
 functions:
   app:
     handler: wsgi_handler.handler
-    layers:
-      - {Ref: ServerDepsLambdaLayer}
+#    layers:
+#      - {Ref: ServerDepsLambdaLayer}
     events:
       - http:
          path: /
@@ -55,7 +55,7 @@ functions:
 
   sendConversationsNotifications:
     handler: services/scheduler_services.sendConversationsNotifications
-    layers:
-        - {Ref: ServerDepsLambdaLayer}
+#    layers:
+#        - {Ref: ServerDepsLambdaLayer}
     events:
       - schedule: rate(1 hour)

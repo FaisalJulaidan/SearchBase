@@ -27,7 +27,7 @@ const EnterprisePricingTab = () => {
         <div className={styles.wrapper}>
             <div>
                 <Card className={styles.card}>
-                    <Card.Body>
+                    <Card.Body className={styles.pricing_card_body}>
                         <Row>
                             {pricing}
                         </Row>
@@ -52,7 +52,7 @@ const EnterprisePricingTab = () => {
             </div>
             <div>
                 <Row>
-                    <Col xs={6}>
+                    <Col xs={6} className={styles.col_card}>
                         <Card className={styles.card}>
                             <Card.Body className={styles.product_card_body}>
                                 <div>
@@ -65,7 +65,7 @@ const EnterprisePricingTab = () => {
                             </Card.Body>
                         </Card>
                     </Col>
-                    <Col xs={6}>
+                    <Col xs={6} className={styles.col_card}>
                         <Card className={styles.card}>
                             <Card.Body className={styles.product_card_body}>
                                 <div>
@@ -78,7 +78,7 @@ const EnterprisePricingTab = () => {
                             </Card.Body>
                         </Card>
                     </Col>
-                    <Col xs={6}>
+                    <Col xs={6} className={styles.col_card}>
                         <Card className={styles.card}>
                             <Card.Body className={styles.product_card_body}>
                                 <div>
@@ -91,7 +91,7 @@ const EnterprisePricingTab = () => {
                             </Card.Body>
                         </Card>
                     </Col>
-                    <Col xs={6}>
+                    <Col xs={6} className={styles.col_card}>
                         <Card className={styles.card}>
                             <Card.Body className={styles.product_card_body}>
                                 <div>

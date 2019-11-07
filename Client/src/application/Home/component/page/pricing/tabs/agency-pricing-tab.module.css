@@ -6,13 +6,21 @@
     box-shadow: 0 2px 20px 0 rgba(0, 0, 0, .1);
     border: none;
     border-radius: 3px;
-    padding-top: 1em;
-    padding-bottom: 1em;
-    margin-top: 30px;
+    height: 100%;
+}
+
+.pricing_card_body{
+    padding-top: 2em;
+    padding-bottom: 2em;
+}
+
+.pricing_card_body{
+    padding-top: 2em;
+    padding-bottom: 2em;
 }
 
 .col_item {
-    border-right: #848484 1px dashed;
+    border-right: #bfbfbf 1px dashed;
 }
 
 .col_item:last-child {
@@ -96,10 +104,13 @@
     box-shadow: 0 0 0 0.2rem rgba(138, 107, 219, .5);
 }
 
+.col_card{
+    margin-top: 30px;
+}
+
 .product_card_body {
-    padding-top: 10px;
-    padding-bottom: 10px;
     display: flex;
+    align-items: center;
 }
 
 .product_card_body div {
@@ -124,7 +135,6 @@
     text-align: right;
     align-self: center;
     width: 25%;
-    height: 100%;
     font-size: .8em;
     font-weight: bold;
     text-decoration: none;

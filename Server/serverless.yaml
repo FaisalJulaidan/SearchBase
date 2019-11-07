@@ -43,7 +43,9 @@ functions:
     layers:
       - {Ref: ServerDepsLambdaLayer}
     events:
-      - http: ANY /
+      - http:
+         path: /
+         method: any
          cors: true
       - http:
          method: any

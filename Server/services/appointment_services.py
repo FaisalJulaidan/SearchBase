@@ -4,8 +4,11 @@ from pytz import timezone, utc
 from models import db, Callback, Appointment, Conversation, Assistant,\
     AppointmentAllocationTime, AppointmentAllocationTimeInfo, Company
 from sqlalchemy import and_
+from sqlalchemy.orm import joinedload, contains_eager
 from utilities import helpers, enums
 from services import mail_services, company_services
+from services.Marketplace import marketplace_helpers
+import json
 
 def dummyCreateAppointmentAllocationTime(name, companyID: int):
     try:
@@ -104,8 +107,10 @@ def createAppointmentAllocationTime(companyID, name, times, duration):
 # Add new appointment selected through the appointment picker page
 def addNewAppointment(conversationID, dateTime, userTimezone: str):
     try:
+
+        conversation : Conversation = Conversation.query.get(conversationID)
         if not (datetime and userTimezone): raise Exception('Time picked and user timezone are required')
-        if not Conversation.query.get(conversationID): raise Exception("Conversation does not exist anymore")
+        if not conversation: raise Exception("Conversation does not exist anymore")
 
         db.session.add(
             Appointment(
@@ -117,6 +122,7 @@ def addNewAppointment(conversationID, dateTime, userTimezone: str):
         )
 
         db.session.commit()
+        marketplace_helpers.sync(conversation.Assistant.CompanyID)
         return Callback(True, 'Appointment added successfully.')
 
     except Exception as exc:
@@ -151,58 +157,108 @@ def verifyRequest(token):
         helpers.logError("appointment_services.verifyRequest(): " + str(exc))
         return Callback(False, "Could not gather appointment")
 
-
 def setAppointmentStatusPublic(token, appointmentID, status):
     try:
         verificationLink = helpers.verificationSigner.loads(token, salt='verify-appointment')
-        appointment = db.session.query(Appointment).filter(Appointment.ID == appointmentID).first()
+        appointment = db.session.query(Appointment).join(Appointment.Conversation)\
+                                            .join(Conversation.Assistant)\
+                                            .join(Assistant.Company)\
+                                            .filter(Appointment.ID == appointmentID).first()
+        logoPath = helpers.keyFromStoredFile(appointment.Conversation.Assistant.Company.StoredFile, enums.FileAssetType.Logo).AbsFilePath
+
+        marketplace_helpers.sync(company.ID)
+        company: Company = appointment.Conversation.Assistant.Company
+        
         if appointment.Status != enums.Status.Pending:
-            return Callback(False, "Appointment status is {} and cannot be modified.".format(appointment.Status.value))
-        appointment.Status = status
+            return Callback(False, "Appointment status is {} and cannot be modified.".format(appointment.Status.value)) 
+
+        appointment.Status = enums.Status[status]
+
+        if status == enums.Status.Rejected.name:
+            db.session.delete(appointment)
+
         db.session.commit()
-        return Callback(True, "Appointment status has been set to {}.".format(appointment.Status.value))
-
-        # TODO send confirmation email when appointment Accepted
-
-    except Exception as exc:
-        helpers.logError("appointment_services.setAppointmentStatusPublic(): " + str(exc))
-        return Callback(False, 'Could not set appointment status.')
-
-
-def setAppointmentStatus(appointmentID, name, email, phone, status, companyID) -> Callback:
-    try:
-        company: Company = company_services.getByID(companyID).Data
-        logoPath = helpers.keyFromStoredFile(company.StoredFile, enums.FileAssetType.Logo).AbsFilePath
-        if not company: raise Exception("Company does not exist")
-
-        appointment = db.session.query(Appointment).filter(Appointment.ID == appointmentID).first()
-        if appointment.Status != enums.Status.Pending:
-            return Callback(False, "Appointment status is {} and cannot be modified.".format(appointment.Status.value))
-
-
-        appointment.Status = status
 
         # When appointment is accepted
-        if status == enums.Status.Accepted.name:
+        if status == enums.Status.Accepted.name and appointment.Conversation.Email:
             email_callback: Callback = mail_services.sendAppointmentConfirmationEmail(
-                name,
-                email,
+                appointment.Conversation.Name,
+                appointment.Conversation.Email,
                 utc.localize(appointment.DateTime).astimezone(timezone(appointment.UserTimeZone)),
                 appointment.UserTimeZone,
                 company.Name,
                 logoPath
             )
             if not email_callback.Success:
-                return email_callback
-            db.session.commit()
-            return Callback(True, "Appointment status has been set to {}.".format(appointment.Status.value))
+                  email_callback
+            return Callback(True, "The client has been informed about their application being {}.".format(appointment.Status.value))
 
         # When appointment is rejected
-        if status == enums.Status.Rejected.name:
-            db.session.delete(appointment)
-            db.session.commit()
-            return Callback(True, "Appointment status has been set to rejected.")
 
+
+        db.session.commit()
+        return Callback(True, "Appointment status has been set to {}.".format(appointment.Status.value))
+        # TODO send confirmation email when appointment Accepted
+
+    except Exception as exc:
+        helpers.logError("appointment_services.setAppointmentStatusPublic(): " + str(exc))
+        return Callback(False, 'Could not set appointment status.')
+
+#appointmentID: int, status: str, companyID: int, name: str = None, email: str = None, phone: str = None
+def setAppointmentStatus(req, companyID: int) -> Callback:
+    try:
+        resp: dict = helpers.validateRequest(req, {"appointmentID": {"type": int, "required": True},
+                                            "status": {"type": str, "required": True},})
+
+        company: Company = company_services.getByID(companyID).Data
+        logoPath = helpers.keyFromStoredFile(company.StoredFile, enums.FileAssetType.Logo).AbsFilePath
+        if not company: raise Exception("Company does not exist")
+                                    
+        appointment = db.session.query(Appointment).join(Appointment.Conversation)\
+                                                    .join(Conversation.Assistant)\
+                                                    .join(Assistant.Company)\
+                                                    .filter(and_(Appointment.ID == resp['inputs']['appointmentID'], Company.ID == companyID)).first()
+
+        marketplace_helpers.sync(company.ID)
+                     
+        if appointment is None:
+            return Callback(False, "Either you do not own this appointment, or it does not exist!")
+        
+        if appointment.Status != enums.Status.Pending:
+            return Callback(False, "Appointment status is {} and cannot be modified.".format(appointment.Status.value))
+
+
+        appointment.Status = resp['inputs']['status']
+
+        if resp['inputs']['status'] == enums.Status.Rejected.name:
+            db.session.delete(appointment)
+            
+        db.session.commit()        
+
+
+        # When appointment is accepted
+        if resp['inputs']['status'] == enums.Status.Accepted.name and appointment.Conversation.Email:
+            email_callback: Callback = mail_services.sendAppointmentConfirmationEmail(
+                appointment.Conversation.Name,
+                appointment.Conversation.Email,
+                utc.localize(appointment.DateTime).astimezone(timezone(appointment.UserTimeZone)),
+                appointment.UserTimeZone,
+                company.Name,
+                logoPath
+            )
+            if not email_callback.Success:
+                  email_callback
+            return Callback(True, "The client has been informed about their application being {}.".format(appointment.Status.value))
+
+        # When appointment is rejected
+
+
+        
+        db.session.commit()
+        return Callback(True, "Appointment status has been set to {}.".format(appointment.Status.value))
+    except helpers.requestException as exc:
+        helpers.logError("appointment_services.setAppointmentStatus(): " + str(exc))
+        return Callback(False, str(exc))
     except Exception as exc:
         helpers.logError("appointment_services.setAppointmentStatus(): " + str(exc))
         return Callback(False, 'Could not set appointment status.')

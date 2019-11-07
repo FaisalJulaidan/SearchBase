@@ -66,7 +66,7 @@ def processConversation(assistantHashID, data: dict) -> Callback:
         }
 
         webhook_services.fireRequests(webhookData, callback.Data.CompanyID, Webhooks.Conversations)
-
+      
         if not data.get("crmInformation"):
             # AutoPilot Operations
             if assistant.AutoPilot and conversation.Completed:

@@ -5,6 +5,7 @@ from models import db, Callback, Calendar as Calendar_Model
 from services import assistant_services
 from services.Marketplace.Calendar import Google, Outlook
 from utilities import helpers
+import json
 
 
 # Process chatbot session
@@ -42,7 +43,7 @@ def addEvent(eventDetails, assistant=None, assistantID=None):
 def connect(type, auth, companyID) -> Callback:
     try:
         calendar_type: Calendar_Enum = Calendar_Enum[type]
-        # test connection
+        # test connection 
         test_callback: Callback = testConnection(type, auth, companyID)
         if not test_callback.Success:
             return test_callback
@@ -60,6 +61,15 @@ def connect(type, auth, companyID) -> Callback:
         db.session.rollback()
         return Callback(False, "Calendar connection failed")
 
+def syncAll(companyID):
+    try:
+        # Outlook.sync() # TODO: IMplement
+        google_callback: Callback = Google.sync(companyID)
+        return Callback(True, 'Calendar has been synced successfully')
+    except Exception as exc:
+        helpers.logError("calendar_services.sync(): " + str(exc))
+        db.session.rollback()
+        return Callback(False, "Could not synchronize all calendars")
 
 # Test connection to a Calendar (details must include the auth)
 def testConnection(type, auth, companyID) -> Callback:
@@ -68,8 +78,8 @@ def testConnection(type, auth, companyID) -> Callback:
 
         if calendar_type == Calendar_Enum.Outlook:
             return Outlook.testConnection(auth, companyID)
-        # elif calendar_type == Calendar_Enum.Google:
-        #     return Google.authorizeUser()
+        elif calendar_type == Calendar_Enum.Google:
+            return Google.testConnection(auth, companyID)
         else:
             return Callback(False, "Could not match Calendar's type")
 

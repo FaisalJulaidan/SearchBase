@@ -166,6 +166,7 @@ def setAppointmentStatusPublic(token, appointmentID, status):
                                             .filter(Appointment.ID == appointmentID).first()
         logoPath = helpers.keyFromStoredFile(appointment.Conversation.Assistant.Company.StoredFile, enums.FileAssetType.Logo).AbsFilePath
 
+        marketplace_helpers.sync(company.ID)
         company: Company = appointment.Conversation.Assistant.Company
         
         if appointment.Status != enums.Status.Pending:
@@ -177,7 +178,6 @@ def setAppointmentStatusPublic(token, appointmentID, status):
             db.session.delete(appointment)
 
         db.session.commit()
-        marketplace_helpers.sync(company.ID)
 
         # When appointment is accepted
         if status == enums.Status.Accepted.name and appointment.Conversation.Email:
@@ -219,6 +219,7 @@ def setAppointmentStatus(req, companyID: int) -> Callback:
                                                     .join(Assistant.Company)\
                                                     .filter(and_(Appointment.ID == resp['inputs']['appointmentID'], Company.ID == companyID)).first()
 
+        marketplace_helpers.sync(company.ID)
                      
         if appointment is None:
             return Callback(False, "Either you do not own this appointment, or it does not exist!")
@@ -233,7 +234,6 @@ def setAppointmentStatus(req, companyID: int) -> Callback:
             db.session.delete(appointment)
             
         db.session.commit()        
-        marketplace_helpers.sync(company.ID)
 
 
         # When appointment is accepted

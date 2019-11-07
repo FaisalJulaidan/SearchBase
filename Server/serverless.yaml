@@ -44,13 +44,21 @@ functions:
 #      - {Ref: ServerDepsLambdaLayer}
     events:
       - http:
-         path: /
-         method:
-           - POST
-           - GET
-           - PUT
-           - DELETE
-         cors: true
+          path: /
+          method: get
+          cors: true
+      - http:
+          path: /
+          method: post
+          cors: true
+      - http:
+          path: /
+          method: put
+          cors: true
+      - http:
+          path: /
+          method: delete
+          cors: true
 #      - http:
 #         method: any
 #         path: /{proxy+}

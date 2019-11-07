@@ -45,12 +45,16 @@ functions:
     events:
       - http:
          path: /
-         method: any
+         method:
+           - POST
+           - GET
+           - PUT
+           - DELETE
          cors: true
-      - http:
-         method: any
-         path: /{proxy+}
-         cors: true
+#      - http:
+#         method: any
+#         path: /{proxy+}
+#         cors: true
 
 
   sendConversationsNotifications:

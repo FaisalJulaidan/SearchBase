@@ -40,7 +40,7 @@ PricingItem.propTypes = {
         icon: PropTypes.string,
         items: PropTypes.arrayOf(PropTypes.string)
     }),
-    hide_subtitle: PropTypes.bool
+    Subtitle: PropTypes.bool
 };
 
 export default PricingItem;

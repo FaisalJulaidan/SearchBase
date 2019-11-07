@@ -114,7 +114,7 @@ const EnterprisePricingTab = () => {
                 </Row>
                 <Row>
                     <Col className={styles.col_demo_button}>
-                        <Button as={Link} to={"/get-started"} variant="primary" className={styles.primary_button}>Get a
+                        <Button as={Link} to={"/get-started"} variant="primary" className={styles.demo_button}>Get a
                             demo</Button>
                     </Col>
                 </Row>

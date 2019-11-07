@@ -130,7 +130,6 @@ def sendQuery(auth, query, method, body, companyID, optionalParams=None):
 
         # test the Token (id_token)
         helpers.logError("url: " + url)
-        helpers.logError("headers: " + str(headers))
         r = marketplace_helpers.sendRequest(url, method, headers, json.dumps(body))
         helpers.logError("response text: " + r.text)
 
@@ -157,7 +156,17 @@ def sendQuery(auth, query, method, body, companyID, optionalParams=None):
 
 def buildUrl(rest_data, query, optionalParams=None):
     # set up initial url
-    url = "https://" + rest_data.get("domain", "") + ".vincere.io/api/v2/" + query
+    domain = rest_data.get("domain", "")
+
+    domainStart = "https://"
+    if "https://" in domain:
+        domainStart = ""
+
+    domainEnd = ".vincere.io"
+    if ".vincere.io" in domain:
+        domainEnd = ""
+
+    url = domainStart + rest_data.get("domain", "") + domainEnd + "/api/v2/" + query
 
     # add additional params
     if optionalParams:
@@ -179,7 +188,18 @@ def insertCandidate(auth, data, companyID) -> Callback:
             "registration_date": datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ"),
             "email": data.get("email"),
             "skills": data.get("skills"),
-            "education_summary": data.get("educations")
+            "education_summary": data.get("educations"),
+            "desired_salary": data.get("annualSalary"),
+            "desired_contract_rate": data.get("dayRate"),
+            "experience": str(data.get("yearsExperience")) + " years",
+            "note": crm_services.additionalCandidateNotesBuilder(
+                {
+                    "dateAvailable": data.get("availability"),
+                    "preferredJobTitle": data.get("preferredJobTitle"),
+                    "preferredJobType": data.get("preferredJobType")
+                },
+                data.get("selectedSolutions")
+            )
         }
 
         # send query
@@ -316,37 +336,38 @@ def searchCandidates(auth, companyID, data) -> Callback:
         # populate filter
         query += populateFilter(data.get("location"), "current_city")
 
-        # if keywords[DT.CandidateSkills.value["name"]]:
-        #     query += "primarySkills.data:" + keywords[DT.CandidateSkills.name] + " or"
+        for skill in data.get("skills", []):
+            query += populateFilter(skill, "skill")
 
-        # query = query[:-1]
+        query = query.replace("#", ".08")
 
         # check if no conditions submitted
         if len(query) < 3:
             query = ""
         else:
+            query = query[:-1]
             query += "%23"
 
         # send query
-        sendQuery_callback: Callback = sendQuery(auth, "candidate/search/" + fields, "get", {}, companyID,
-                                                 [query])
-        if not sendQuery_callback.Success:
-            raise Exception(sendQuery_callback.Message)
+        while True:
+            sendQuery_callback: Callback = sendQuery(auth, "candidate/search/" + fields, "get", {}, companyID, [query])
+            helpers.logError("return_body: " + str(json.loads(sendQuery_callback.Data.text)))
+            if not sendQuery_callback.Success:
+                raise Exception(sendQuery_callback.Message)
 
-        return_body = json.loads(sendQuery_callback.Data.text)
+            return_body = json.loads(sendQuery_callback.Data.text)
+            if return_body.get("result", {}).get("total", 0) > 0 or "," not in query:
+                break
+
+            query = ",".join(query.split(",")[:-1]) + "%23"
 
         result = []
         for record in return_body["result"]["items"]:
-            skills = record.get("skill", "").split("Skill Name: :")
-            skills.pop(0)
-            for i in range(len(skills)):
-                skills[i] = skills[i].split("Description")[0]
-
             currency = record.get("currency", "gbp").lower()
             if currency == "pound":
                 currency = "GBP"
             else:
-                currency = record.get("currency", "GBP")
+                currency = record.get("currency", "GBP").upper()
 
             result.append(databases_services.createPandaCandidate(id=record.get("id", ""),
                                                                   name=record.get("name"),
@@ -354,7 +375,7 @@ def searchCandidates(auth, companyID, data) -> Callback:
                                                                   mobile=record.get("mobile"),
                                                                   location=
                                                                   record.get("current_location", {}).get("city", ""),
-                                                                  skills=skills,  # stringified json
+                                                                  skills=record.get("skill", "").split(","),  # str list
                                                                   linkdinURL=None,
                                                                   availability=record.get("status"),
                                                                   jobTitle=None,
@@ -481,22 +502,33 @@ def searchJobs(auth, companyID, data) -> Callback:
 
         query += populateFilter(data.get("city"), "city")
 
+        for skill in data.get("skills", []):
+            query += populateFilter(skill, "public_description")
+
         # query += populateFilter(data.get("employmentType"), "employment_type")
 
-        # query = query[:-1]
+        query = query.replace("#", ".08")
 
         # check if no conditions submitted
         if len(query) < 3:
             query = ""
         else:
+            query = query[:-1]
             query += "%23"
 
         # send query
-        sendQuery_callback: Callback = sendQuery(auth, "job/search/" + fields, "get", {}, companyID, [query])
-        if not sendQuery_callback.Success:
-            raise Exception(sendQuery_callback.Message)
+        while True:
+            sendQuery_callback: Callback = sendQuery(auth, "job/search/" + fields, "get", {}, companyID, [query])
+            helpers.logError("return_body: " + str(json.loads(sendQuery_callback.Data.text)))
+            if not sendQuery_callback.Success:
+                raise Exception(sendQuery_callback.Message)
 
-        return_body = json.loads(sendQuery_callback.Data.text)
+            return_body = json.loads(sendQuery_callback.Data.text)
+            if return_body.get("result", {}).get("total", 0) > 0 or "," not in query:
+                break
+
+            query = ",".join(query.split(",")[:-1]) + "%23"
+
         result = []
         # not found match for JobLinkURL
         for record in return_body["result"]["items"]:

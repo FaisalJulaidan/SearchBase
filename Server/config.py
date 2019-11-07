@@ -79,8 +79,10 @@ class BaseConfig(object):
     MAIL_SERVER = 'smtp.office365.com'
     MAIL_PORT = 587
     MAIL_USE_TLS = True
-    MAIL_USERNAME = 'info@thesearchbase.com'
-    MAIL_PASSWORD = 'yyfcnddsbwhnqknj'
+    # MAIL_USERNAME = 'info@thesearchbase.com'
+    # MAIL_PASSWORD = 'yyfcnddsbwhnqknj'
+    MAIL_USERNAME = 'notifications@thesearchbase.com'
+    MAIL_PASSWORD = 'whllvfxnpdqkxjtg'
     MAIL_SUPPRESS_SEND = False
 
 

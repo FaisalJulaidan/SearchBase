@@ -9,7 +9,7 @@
 }
 
 .version {
-    color: #494949;
+    color: #444444;
     display: inline-block;
     font-size: 3em;
 }
@@ -17,7 +17,7 @@
 .tag{
     margin: .2em;
     font-size: 1.1em;
-    color: #494949;
+    color: #444444;
     display: inline-block;
 }
 

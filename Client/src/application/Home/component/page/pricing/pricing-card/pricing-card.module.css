@@ -1,29 +1,110 @@
 .card {
     height: 100%;
     line-height: normal;
-    color: #726a84;
+    color: #767676;
     box-shadow: 0 3px 4px rgba(0, 0, 0, 0.10), 0 1px 2px rgba(0, 0, 0, 0.18);
     transition: all 0.3s cubic-bezier(.25, .8, .25, 1);
-    /*border-color: #008FC2;*/
+    /*text-align: center;*/
+
+}
+
+.card .body {
+    display: flex;
+    flex-flow: column;
+    /*align-items: center;*/
 }
 
 .card:hover {
     box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23);
 }
 
-.card .icon {
+.title {
+    color: #444444;
+    font-weight: 900;
+    font-size: 2em;
+}
+
+.body hr {
+    background-color: #9254de;
+    min-width: 60px;
+    width: fit-content;
+    margin: .5em 0;
+    height: 2px;
+}
+
+.subtitle {
+    margin: 0 1.5em 0 0;
+    color: #726a84;
+    font-size: .9em;
+    font-weight: bold;
+}
+
+.price {
+    color: #9254de;
+    font-size: 3em;
+    font-weight: 900;
+    margin-top: .4em;
+}
+
+.price_subtitle{
+    margin: 0.2em 0 1em 0;
+    font-size: 1.1em;
+    font-weight: bold;
     color: #9254de;
 }
 
-.card .header {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    font-size: 20px;
-    color: #9254de;
+.list {
+    margin-top: .5em;
+    color: #767676;
+    font-size: 0.95em;
+    flex-grow: 1;
 }
 
-.card .header h1 {
-    padding: 0;
-    margin: 0 10px;
+.list li {
+    margin: .5em 0;
+}
+
+.list li .icon{
+    margin-right: 5px;
+}
+
+.list li:first-child {
+    margin-top: 0;
+}
+
+.list li:last-child {
+    margin-bottom: 0;
+}
+
+/**** Primary Button ****/
+.button {
+    margin: 0.85em 0;
+    font-size: 1.1em;
+    width: fit-content;
+    border-radius: 2px;
+    text-decoration: none;
+    color: #9254de;
+    border-color: #9254de;
+    transition: all 0.4s ease 0s, background-color 0.4s ease 0s;
+}
+
+.button:hover {
+    color: white;
+    background: #9254de;
+    border-color: #9254de;
+}
+
+.button:not(:disabled):not(.disabled):active {
+    color: white;
+    background: #9254de;
+    border-color: #9254de;
+}
+
+.button:focus {
+    box-shadow: 0 0 0 0.2rem rgba(138, 107, 219, .5);
+}
+
+.button a {
+    text-decoration: none;
+    color: #9254de;
 }

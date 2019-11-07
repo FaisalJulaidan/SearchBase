@@ -1,7 +1,7 @@
 from sqlalchemy import and_
 
 from models import Callback, db, Campaign
-from services import assistant_services, databases_services, mail_services
+from services import assistant_services, databases_services, mail_services, url_services, company_services
 from services.Marketplace.CRM import crm_services
 from services.Marketplace.Messenger import messenger_servicess
 from utilities import helpers
@@ -178,15 +178,23 @@ def sendCampaign(campaign_details, companyID):
         messenger_callback: Callback = messenger_servicess.getByID(campaign_details.get("messenger_id"), companyID)
         if not messenger_callback.Success:
             raise Exception("Messenger not found.")
+        
+        company : Callback = company_services.getByCompanyID(companyID)
+        companyName = company.Data.Name.replace(" ", "").lower() if company.Success else None
 
         messenger = messenger_callback.Data
         crm = None
         hashedAssistantID = helpers.encodeID(campaign_details.get("assistant_id"))
-        source = "crm" if campaign_details.get("use_crm") else "database"
-        text = campaign_details.get("text") + "\n\n" + helpers.getDomain() + "/chatbot_direct_link/" + \
-               hashedAssistantID + "?source=" + source + "&source_id=" + \
-               str(campaign_details.get("crm_id", campaign_details.get("database_id")))
+        # CAMPAIGN SOURCES - ID vs TEXT to make url shorter
+        # 1 - DATABASE
+        # 2 - CRM
 
+        # VARIABLE ORDER MUST BE MAINTAINED SO THAT WHEN DECODING WE KNOW WHAT VARIABLES ARE WHAT
+        # IF YOU INTEND TO CHANGE THEM, ALSO UPDATE THE ORDER HANDLED AT CONVERSATION SERVICES LINE # 98
+        source = 'crm' if campaign_details.get("use_crm") else 'db'
+
+        crmID = campaign_details.get("crm_id") if source == 'crm' else campaign_details.get("database_id")
+        text = campaign_details.get("text") 
 
 
         if not text:
@@ -204,15 +212,22 @@ def sendCampaign(campaign_details, companyID):
                 candidate_phone = candidate.get("CandidateMobile")
                 candidate_email = candidate.get("CandidateEmail")
 
-            if not candidate_phone:
+            if not candidate_phone:   
                 continue
 
             # insert candidate details in text
             tempText = text.replace("{candidate.name}", candidate.get("CandidateName"))
 
-            # insert candidate id in link
-            tempText = tempText.split("&id")[0]
-            tempText += "&id=" + str(candidate.get("ID"))
+            access = helpers.verificationSigner.dumps({"candidateID": candidate.get("ID"), "source": source, "crmID": crmID}, salt='crm-information')
+
+            url : Callback = url_services.createShortenedURL(helpers.getDomain(3000) + "/chatbot_direct_link/" + \
+               hashedAssistantID + "?source=" + str(access), domain="recruitbot.ai")
+            
+            if not url.Success:
+                raise Exception("Failed to create shortened URL")
+
+            tempText += "\n\n" + url.Data
+            
 
             helpers.logError("outreach_type: " + str(campaign_details.get("outreach_type")))
             if campaign_details.get("outreach_type") == "sms":

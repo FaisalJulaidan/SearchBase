@@ -5,7 +5,7 @@ import {animateScroll, scroller} from "react-scroll";
 class ScrollTo extends Component {
 
 
-    componentDidUpdate(prevProps) {
+    componentDidUpdate(prevProps, prevState, snapshot) {
         const breakpoints = {
             md: 767.98
         };

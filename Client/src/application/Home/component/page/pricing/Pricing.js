@@ -13,6 +13,16 @@ class Pricing extends React.Component {
 
     componentDidMount() {
         document.title = "Pricing | " + WEBSITE_TITLE;
+        if (["agency", "enterprise", "in-house"].includes(this.props.location.hash.replace("#", ""))) {
+            this.setState({activeTab: this.props.location.hash.replace("#", "")});
+        }
+    }
+
+    componentDidUpdate(prevProps, prevState, snapshot) {
+        if (this.props.location.hash !== prevProps.location.hash &&
+            ["agency", "enterprise", "in-house"].includes(this.props.location.hash.replace("#", ""))) {
+            this.setState({activeTab: this.props.location.hash.replace("#", "")});
+        }
     }
 
     render() {
@@ -30,26 +40,35 @@ class Pricing extends React.Component {
                     </Container>
                 </div>
                 <Container className={styles.content}>
-                    <Tab.Container activeKey={this.state.activeTab} onSelect={key => this.setState({activeTab: key})}>
+                    <Tab.Container activeKey={this.state.activeTab} onSelect={key => this.props.history.push(`/pricing#${key}`)}>
                         <Row>
                             <Col>
                                 <Nav variant="tabs" fill className={styles.tabs} onSelect={() => {
                                 }}>
                                     <Nav.Item className={styles.tab}>
                                         <Nav.Link eventKey="agency"
-                                                  style={this.state.activeTab === 'agency' ? {fontWeight: '900'} : {}}>
+                                                  style={this.state.activeTab === 'agency' ? {
+                                                      fontWeight: '900',
+                                                      color: "#9254de"
+                                                  } : {}}>
                                             Agency
                                         </Nav.Link>
                                     </Nav.Item>
                                     <Nav.Item className={styles.tab}>
                                         <Nav.Link eventKey="enterprise"
-                                                  style={this.state.activeTab === 'enterprise' ? {fontWeight: '900'} : {}}>
+                                                  style={this.state.activeTab === 'enterprise' ? {
+                                                      fontWeight: '900',
+                                                      color: "#9254de"
+                                                  } : {}}>
                                             Enterprise
                                         </Nav.Link>
                                     </Nav.Item>
                                     <Nav.Item className={styles.tab}>
                                         <Nav.Link eventKey="in-house"
-                                                  style={this.state.activeTab === 'in-house' ? {fontWeight: '900'} : {}}>
+                                                  style={this.state.activeTab === 'in-house' ? {
+                                                      fontWeight: '900',
+                                                      color: "#9254de"
+                                                  } : {}}>
                                             In House
                                         </Nav.Link>
                                     </Nav.Item>

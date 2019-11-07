@@ -501,8 +501,9 @@ def searchJobs(auth, companyID, data) -> Callback:
         # query += populateFilter(data.get("city"), "address")
 
         query += populateFilter(data.get("city"), "city")
-
-        for skill in data.get("skills", []):
+        helpers.logError("VINCERE SKILLS 1: " + str(data.get("skills")))
+        helpers.logError("VINCERE SKILLS 2: " + str((data.get("skills") or [])))
+        for skill in (data.get("skills") or []):
             query += populateFilter(skill, "public_description")
 
         # query += populateFilter(data.get("employmentType"), "employment_type")
@@ -532,6 +533,12 @@ def searchJobs(auth, companyID, data) -> Callback:
         result = []
         # not found match for JobLinkURL
         for record in return_body["result"]["items"]:
+            currency = record.get("currency", "gbp").lower()
+            if currency == "pound":
+                currency = "GBP"
+            else:
+                currency = record.get("currency", "GBP").upper()
+
             result.append(databases_services.createPandaJob(id=record.get("id"),
                                                             title=record.get("job_title"),
                                                             desc=record.get("public_description", ""),
@@ -543,7 +550,7 @@ def searchJobs(auth, companyID, data) -> Callback:
                                                             startDate=record.get("open_date"),
                                                             endDate=record.get("closed_date"),
                                                             linkURL=None,
-                                                            currency=Currency(record.get("currency", "").upper()),
+                                                            currency=Currency(currency.upper()),
                                                             source="Vincere"))
 
         return Callback(True, sendQuery_callback.Message, result)

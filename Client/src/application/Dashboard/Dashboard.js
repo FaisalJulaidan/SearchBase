@@ -86,7 +86,6 @@ class Dashboard extends Component {
         const user = getUser();
         const company = getCompany();
         const {accessAppointments, accessAssistants, accessAutopilot, accessCampaigns, accessDatabases} = company.Plan;
-        console.log(company)
         let userInfo = null;
         // User Information at the top
         if (!user) {

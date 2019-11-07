@@ -1,0 +1,22 @@
+{
+  "Essential": {
+    "Platform Fee": "99",
+    "Chat Seats Included": 1,
+    "Additional Chat Seats": "Not applicable",
+    "Widgets": 1
+  },
+  "Pro": {
+    "Platform Fee": "249",
+    "Chat Seats Included": 1,
+    "Additional Chat Seats": "$20 / month",
+    "Widgets": 1,
+    "Role Based Access Control": true
+  },
+  "Premium": {
+    "Platform Fee": "1150",
+    "Chat Seats Included": 1,
+    "Additional Chat Seats": "$40 / month",
+    "Widgets": 1,
+    "Role Based Access Control": true
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "Plan": [
+    "Platform Fee",
+    "Chat Seats Included",
+    "Additional Chat Seats",
+    "Additional Calendar-Only Seats",
+    "Contacts"
+  ],
+  "Instances": [
+    "Widgets"
+  ],
+  "Users": [
+    "Role Based Access Control",
+    "Multiple Teams",
+    "Single Sign On"
+  ]
+}

@@ -9,7 +9,7 @@
     background-color: #9254de;
     max-width: 100px;
     height: 3px;
-    margin-bottom: 40px;
+    margin-bottom: 20px;
 }
 
 .col_item {
@@ -19,8 +19,8 @@
 }
 
 .col_item .image {
-    height: 150px;
-    width: 150px;
+    height: 140px;
+    width: 140px;
     /*padding: 5px;*/
     /*background: #6c63ff0F;*/
     /*border-radius: 25%;*/
@@ -49,9 +49,6 @@
 /*}*/
 
 @media (max-width: 991.98px) {
-    .col_text hr {
-        margin-bottom: 40px;
-    }
 
     .col_item .image {
         height: 110px;

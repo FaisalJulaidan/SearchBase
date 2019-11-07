@@ -19,7 +19,7 @@
     border: none;
 }
 
-.row_buttons {
+.row_buttons{
     align-items: center;
 }
 
@@ -64,62 +64,31 @@
     color: #9254de;
 }
 
-.enterprise_button {
-    width: 100%;
-    text-transform: uppercase;
-    border-radius: 2px;
-    text-decoration: none;
-    color: white !important;
-    border: solid transparent 0;
-    padding: 8px 20px;
-    font-weight: bolder;
-    font-size: .9em;
-    background-color: #9254de;
-    transition: border-color 0.4s ease 0s, background-color 0.4s ease 0s;
-}
 
-.enterprise_button:hover {
-    background-color: #9C7DED;
-    transition: border-color 0.4s ease 0s, background-color 0.4s ease 0s;
-}
-
-.enterprise_button:not(:disabled):not(.disabled):active {
-    background-color: #9C7DED;
-    transition: border-color 0.4s ease 0s, background-color 0.4s ease 0s;
-}
-
-.enterprise_button:focus {
-    box-shadow: 0 0 0 0.2rem rgba(138, 107, 219, .5);
-}
-
-.enterprise_button:not(:disabled):not(.disabled):active:focus {
-    box-shadow: 0 0 0 0.2rem rgba(138, 107, 219, .5);
-}
-
-.product_card_body {
+.product_card_body{
     padding-top: 10px;
     padding-bottom: 10px;
     display: flex;
 }
 
-.product_card_body div {
+.product_card_body div{
     width: 75%;
 }
 
-.product_card_body div h1 {
+.product_card_body div h1{
     text-transform: uppercase;
     color: #444444;
     font-weight: 900;
     font-size: 1.1em;
 }
 
-.product_card_body div p {
+.product_card_body div p{
     font-size: .9em;
     margin-top: .5em;
     color: #767676;
 }
 
-.product_card_body a {
+.product_card_body a{
     text-transform: uppercase;
     text-align: right;
     align-self: center;
@@ -131,22 +100,22 @@
     color: #9254de;
 }
 
-.product_card_body a:hover {
+.product_card_body a:hover{
     color: #9C7DED;
 }
 
-.product_card_body a .icon {
+.product_card_body a .icon{
     transition: all 0.3s ease 50ms;
     margin-left: 5px;
     margin-right: 5px;
 }
 
-.product_card_body a:hover .icon {
+.product_card_body a:hover .icon{
     margin-left: 10px;
     margin-right: 0;
 }
 
-.partners_wrapper {
+.partners_wrapper{
     margin-top: 100px;
 }
 
@@ -224,18 +193,18 @@
     color: #726a84;
 }
 
-.table_wrapper a {
+.table_wrapper a{
     margin-left: 4px;
     margin-right: 4px;
     color: #9254de;
     text-decoration: none;
 }
 
-.table_wrapper a:hover {
+.table_wrapper a:hover{
     color: #9C7DED;
 }
 
-.plans_table {
+.plans_table{
     margin-top: 40px;
 }
 

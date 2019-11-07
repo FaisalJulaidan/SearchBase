@@ -4,6 +4,8 @@ import {Col, Container, Row, Nav, Tab} from "react-bootstrap";
 import Layout from "../../../hoc/layout/Layout";
 import {WEBSITE_TITLE} from "../../../../../constants/config";
 import AgencyPricingTab from "./tabs/AgencyPricingTab";
+import EnterprisePricingTab from "./tabs/EnterprisePricingTab";
+import InHousePricingTab from "./tabs/InHousePricingTab";
 
 class Pricing extends React.Component {
 
@@ -81,8 +83,12 @@ class Pricing extends React.Component {
                                     <Tab.Pane eventKey="agency">
                                         <AgencyPricingTab/>
                                     </Tab.Pane>
-                                    <Tab.Pane eventKey="enterprise">Enterprise</Tab.Pane>
-                                    <Tab.Pane eventKey="in-house">House</Tab.Pane>
+                                    <Tab.Pane eventKey="enterprise">
+                                        <EnterprisePricingTab/>
+                                    </Tab.Pane>
+                                    <Tab.Pane eventKey="in-house">
+                                        <InHousePricingTab/>
+                                    </Tab.Pane>
                                 </Tab.Content>
                             </Col>
                         </Row>

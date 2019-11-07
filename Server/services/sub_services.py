@@ -3,30 +3,6 @@ from models import Callback, db, Company
 from services import company_services
 import os
 import stripe
-
-
-def unsubscribe(company: Company) -> Callback:
-
-    try:
-        # If user has no sub. already
-        if not company.SubID:
-            return Callback(False, 'This account has no active subscription to unsubscribe')
-
-        # Unsubscribe
-        stripeSub = stripe.Subscription.retrieve(company.SubID)
-        stripeSub.delete()
-        company.SubID = None
-
-        # Save db changes
-        db.session.commit()
-
-        return Callback(True, 'You have unsubscribe successfully!')
-
-    except Exception as exc:
-        helpers.logError("sub_services.unsubscribe(): SubID " + company.SubID + " / " + str(exc))
-        db.session.rollback()
-        return Callback(False, 'An error occurred while trying to unsubscribe')
-
         
 def handleStripeWebhook(req) -> Callback:
     try:
@@ -44,11 +20,7 @@ def handleStripeWebhook(req) -> Callback:
                 raise Exception("Trying to subscribe with invalid plan ID")
 
             customer.Data.Plan = planEnum.name
-            customer.Data.AccessAssistants = planEnum.value['accessAssistants']
-            customer.Data.AccessCampaigns = planEnum.value['accessCampaigns']
-            customer.Data.AccessAutoPilot = planEnum.value['accessAutopilot']
-            customer.Data.AccessDatabases = planEnum.value['accessDatabases']
-            customer.Data.AccessAppointments = planEnum.value['accessAppointments']
+            customer.Data.Active = 1
 
             db.session.commit()
 
@@ -60,11 +32,8 @@ def handleStripeWebhook(req) -> Callback:
             if not customer.Success:
                 raise Exception("No customer found with given ID")
 
-            customer.Data.AccessAssistants = 0
-            customer.Data.AccessCampaigns = 0
-            customer.Data.AccessAutoPilot = 0
-            customer.Data.AccessDatabases = 0
-            customer.Data.AccessAppointments = 0
+            customer.Plan = None
+            customer.Data.Active = 0
 
             db.session.commit()
             # Until we figure out a wa
@@ -85,6 +54,8 @@ def generateCheckoutURL(req) -> Callback:
         resp: dict = helpers.validateRequest(req, {"plan": {"type": str, "required": True}, "companyID": {"type": int, "required": False}})
         company: Callback = company_services.getByCompanyID(resp['inputs']['companyID'])
 
+        successURL = '{}/success-payment?session_id='.format(helpers.getDomain(3000))
+
         session = stripe.checkout.Session.create(
             payment_method_types=['card'],
             subscription_data={
@@ -93,10 +64,9 @@ def generateCheckoutURL(req) -> Callback:
                 }],
             },
             customer=company.Data.StripeID,
-            success_url='https://www.thesearchbase.com/success-payment?session_id={CHECKOUT_SESSION_ID}',
-            cancel_url='https://www.thesearchbase.com/order-plan',
+            success_url=successURL+'{CHECKOUT_SESSION_ID}',
+            cancel_url='{}/order-plan'.format(helpers.getDomain(3000)),
         )
-        print(session['id'])
 
         return Callback(True, 'Checkout URL Succesfully created', session['id'])    
     except helpers.requestException as e:
@@ -105,125 +75,6 @@ def generateCheckoutURL(req) -> Callback:
     except Exception as e:
         helpers.logError("sub_services.generateCheckoutURL(): " + str(e))
         return Callback(False, "Failed to generate checkout URL", None)
-
-
-#
-def subscribe(company: Company, planID, trialDays=None, token=None, coupon='') -> Callback:
-
-    # Get the Plan by ID
-    plan_callback: Callback = getPlanByID(planID)
-    if not plan_callback.Success:
-        return Callback(False, 'Plan does not exist')
-
-    # Validate Coupon
-    if len(coupon.strip()) == 0: coupon = None
-    if coupon:
-        coupon_callback: Callback = isCouponValid(coupon.strip())
-        if not coupon_callback.Success:
-            return coupon_callback
-
-    # Set the Plan
-    plan: Plan = plan_callback.Data
-
-    try:
-        # Check user if already has a StripeID
-        stripeID = company.StripeID
-        if not stripeID:
-            return Callback(False, "Sorry, your company doesn't have a Stripe ID to subscribe to a plan")
-
-        customer = stripe.Customer.retrieve(stripeID)
-        if token:
-            customer.source = token
-            customer.save()
-
-        # Subscribe to the  plan
-        subscription = stripe.Subscription.create(
-            customer=customer['id'],
-            items=[{'plan': plan.ID}],
-            trial_period_days=trialDays,
-            coupon=coupon
-        )
-
-        # Get all company's assistants for activation
-
-        # If everything is OK, activate company's assistants
-        assistants = company.Assistants
-
-        if assistants != 0:
-            for assistant in assistants:
-                assistant.Active = True
-
-        # Update user's StripeID & SubID
-        company.StripeID = customer['id']
-        company.SubID = subscription['id']
-
-        # Save db changes
-        db.session.commit()
-
-        return Callback(True, 'Subscribed successfully', {'stripeID': customer['id'],
-                                                      'subID': subscription['id'],
-                                                      'planNickname': plan.Nickname})
-
-    except Exception as exc:
-        helpers.logError("sub_services.subscribe(): " + str(exc))
-        db.session.rollback()
-        return Callback(False, 'An error occurred while subscribing with Stripe')
-
-
-
-def getPlanByID(planID) -> Callback:
-    try:
-        # Get result and check if None then raise exception
-        result = db.session.query(Plan).filter(Plan.ID == planID).first()
-        if not result: raise Exception
-
-        return Callback(True, 'Plan found.', result)
-    except Exception as exc:
-        helpers.logError("sub_services.getPlanByID(): " + str(exc))
-        return Callback(False, 'Could not find a plan with ID ' + planID)
-
-
-def getPlanByNickname(nickname) -> Callback:
-    try:
-        # Get result and check if None then raise exception
-        result = db.session.query(Plan).filter(Plan.Nickname == nickname).first()
-        if not result: raise Exception
-
-        return Callback(True, 'No message.',
-                        result)
-    except Exception as exc:
-        helpers.logError("sub_services.getPlanByNickname(): " + str(exc))
-        return Callback(False, 'Could not find a plan with ' + nickname + ' nickname')
-
-
-def getStripePlan(planID) -> Callback:
-    try:
-        # Get result and check if None then raise exception
-        result = stripe.Plan.retrieve(planID)
-        if not result: raise Exception
-
-        return Callback(True, 'No message.', result)
-    except Exception as exc:
-        helpers.logError("sub_services.getPlanByNickname(): " + str(exc))
-        return Callback(False, "This plan doesn't exist! Make sure the plan ID is correct.")
-
-
-def getStripePlanNicknameBySubID(SubID):
-    try:
-        # Get result and check if None then raise exception
-        result = stripe.Subscription.retrieve(SubID)["items"]["data"][0]["plan"]["nickname"]
-        if not result: raise Exception
-
-        # Get subscription object from Stripe API
-
-        # Return the subscription item's plan nickname e.g (Basic, Ultimate...)
-        return Callback(True, 'No message.', result)
-
-    except Exception as exc:
-        helpers.logError("sub_services.getStripePlanNicknameBySubID(): " + str(exc))
-        db.session.rollback()
-        return Callback(False, 'Could not find plan nickname form Stripe')
-
 
 def isCouponValid(coupon) -> Callback:
     try:

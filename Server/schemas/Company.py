@@ -24,13 +24,7 @@ class Company(db.Model):
 
     HideSignature = db.Column(db.Boolean, nullable=False, default=False)
     Active = db.Column(db.Boolean, nullable=False, default=False)
-
-
-    AccessAssistants = db.Column(db.Boolean(), nullable=False, default=False)
-    AccessCampaigns = db.Column(db.Boolean(), nullable=False, default=False)
-    AccessAutoPilot = db.Column(db.Boolean(), nullable=False, default=False)
-    AccessDatabases = db.Column(db.Boolean(), nullable=False, default=False)
-    AccessAppointments = db.Column(db.Boolean(), nullable=False, default=False)
+    
     Plan = db.Column(db.Enum(enums.Plan), default=None)
 
     # Relationships:

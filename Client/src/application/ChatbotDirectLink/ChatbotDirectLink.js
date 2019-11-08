@@ -25,18 +25,31 @@ class ChatbotDirectLink extends React.Component {
                 s.src = "http://localhost:3001/vendor/js/bundle.js";
             else
                 s.src = getLink("/api/widgets/chatbot");
-
             document.body.appendChild(s);
 
             axios.get(`/api/assistant/${assistantID}/chatbot`)
                 .then(res => {
                     const data = res.data.data;
+                    if(data.companyName){
+                        document.title = `${data.companyName} Chatbot` 
+                    }
+                    // if(data.assistant.LogoPath){
+                    //     this.setFavicon(data.assistant.LogoPath)
+                    // }
                     this.setState({
                         LogoPath: data.assistant.LogoPath,
-                        CompanyName: data.assistant.CompanyName,
+                        CompanyName: data.CompanyName,
                     });
                 })
         }
+    }
+
+    setFavicon = (href) => {
+      let link = document.querySelector("link[rel*='icon']") || document.createElement('link');
+      link.type = 'image/x-icon';
+      link.rel = 'shortcut icon';
+      link.href = href;
+      document.getElementsByTagName('head')[0].appendChild(link);
     }
 
     render() {

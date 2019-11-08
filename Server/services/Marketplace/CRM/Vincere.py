@@ -130,6 +130,7 @@ def sendQuery(auth, query, method, body, companyID, optionalParams=None):
 
         # test the Token (id_token)
         helpers.logError("url: " + url)
+        helpers.logError("headers: " + str(headers))
         r = marketplace_helpers.sendRequest(url, method, headers, json.dumps(body))
         helpers.logError("response text: " + r.text)
 

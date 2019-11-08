@@ -2,7 +2,7 @@ import React from 'react';
 import styles from './pricing.module.css';
 import {Col, Container, Row, Nav, Tab} from "react-bootstrap";
 import Layout from "../../../hoc/layout/Layout";
-import {WEBSITE_TITLE} from "../../../../../constants/config";
+import {BREAKPOINTS, WEBSITE_TITLE} from "../../../../../constants/config";
 import AgencyPricingTab from "./tabs/AgencyPricingTab";
 import EnterprisePricingTab from "./tabs/EnterprisePricingTab";
 import InHousePricingTab from "./tabs/InHousePricingTab";
@@ -42,11 +42,14 @@ class Pricing extends React.Component {
                     </Container>
                 </div>
                 <Container className={styles.content}>
-                    <Tab.Container activeKey={this.state.activeTab} onSelect={key => this.props.history.push(`/pricing#${key}`)}>
+                    <Tab.Container activeKey={this.state.activeTab}
+                                   onSelect={key => this.props.history.push(`/pricing#${key}`)}>
                         <Row>
                             <Col>
-                                <Nav variant="tabs" fill className={styles.tabs} onSelect={() => {
-                                }}>
+                                <Nav variant="tabs" fill justify
+                                     className={`${styles.tabs} ${(window.innerWidth < BREAKPOINTS.sm) ? 'flex-column' : ''}`}
+                                     onSelect={() => {
+                                     }}>
                                     <Nav.Item className={styles.tab}>
                                         <Nav.Link eventKey="agency"
                                                   style={this.state.activeTab === 'agency' ? {

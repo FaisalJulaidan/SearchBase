@@ -186,7 +186,7 @@ def insertCandidate(auth, data, companyID) -> Callback:
             "mobile": data.get("mobile"),
             "nearest_train_station": data.get("city"),
             # "registration_date": datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ"),
-            "registration_date": datetime.datetime.now().isoformat()[18] + "Z",
+            "registration_date": datetime.datetime.now().isoformat()[:18] + "Z",
             "email": data.get("email"),
             "skills": data.get("skills"),
             "education_summary": data.get("educations"),

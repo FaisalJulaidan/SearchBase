@@ -70,7 +70,7 @@ def testConnection(auth, companyID):
         return Callback(True, 'Logged in successfully', callback.Data)
 
     except Exception as exc:
-        helpers.logError("CRM.Bullhorn.testConnection() ERROR: " + str(exc))
+        helpers.logError("CRM.Vincere.testConnection() ERROR: " + str(exc))
         return Callback(False, str(exc))
 
 
@@ -185,7 +185,8 @@ def insertCandidate(auth, data, companyID) -> Callback:
             "last_name": data.get("lastName"),
             "mobile": data.get("mobile"),
             "nearest_train_station": data.get("city"),
-            "registration_date": datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ"),
+            # "registration_date": datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ"),
+            "registration_date": datetime.datetime.now().isoformat()[:23] + "Z",
             "email": data.get("email"),
             "skills": data.get("skills"),
             "education_summary": data.get("educations"),
@@ -538,6 +539,7 @@ def searchJobs(auth, companyID, data) -> Callback:
                 currency = "GBP"
             else:
                 currency = record.get("currency", "GBP").upper()
+            helpers.logError("Currency: " + str(currency) + ", is it pound: " + str(currency == "pound"))
 
             result.append(databases_services.createPandaJob(id=record.get("id"),
                                                             title=record.get("job_title"),

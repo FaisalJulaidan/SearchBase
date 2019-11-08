@@ -2,6 +2,8 @@ from models import db
 from schemas import Assistant, Conversation
 from utilities import enums
 
+from sqlalchemy import Enum
+
 class Company(db.Model):
 
     # @property
@@ -24,14 +26,7 @@ class Company(db.Model):
 
     HideSignature = db.Column(db.Boolean, nullable=False, default=False)
     Active = db.Column(db.Boolean, nullable=False, default=False)
-
-
-    AccessAssistants = db.Column(db.Boolean(), nullable=False, default=False)
-    AccessCampaigns = db.Column(db.Boolean(), nullable=False, default=False)
-    AccessAutoPilot = db.Column(db.Boolean(), nullable=False, default=False)
-    AccessDatabases = db.Column(db.Boolean(), nullable=False, default=False)
-    AccessAppointments = db.Column(db.Boolean(), nullable=False, default=False)
-    Plan = db.Column(db.Enum(enums.Plan), default=None)
+    Plan = db.Column(Enum(enums.Plan), server_default=enums.Plan.Basic.name)
 
     # Relationships:
     Users = db.relationship('User', back_populates='Company')

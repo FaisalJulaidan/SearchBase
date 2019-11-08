@@ -65,6 +65,8 @@ class Status(Enum):
     @classmethod
     def has_value(cls, value):
         return any(value == item.value for item in cls)
+
+
                 
 def planCreator(planID: str, assistants: int = 0, campaigns: int = 0, autopilot: int = 0, databases: int = 0, appointments: int = 0):
     return {
@@ -77,9 +79,11 @@ def planCreator(planID: str, assistants: int = 0, campaigns: int = 0, autopilot:
 
 @unique
 class Plan(Enum):
-    Essential = planCreator("plan_D3lp2yVtTotk2f", 1, 0, 0, 1, 0)
-    Pro = planCreator("plan_G7SuTtSoBxJ7aS", 1, 1, 0, 1, 1)
+    Basic = planCreator("", 0, 0, 0, 0, 0)
+    Essential = planCreator("plan_G7Sth78cbr8Pgl", 1, 0, 0, 1, 0)
+    Pro = planCreator("plan_G7SuTtSoBxJ7aS", 1, 1, 0, 1, 0)
     Premium = planCreator("plan_G7SuT5aJA1OFJU", 1, 1, 1, 1, 1)
+    Staff = planCreator("", 1, 1, 1, 1, 1)
 
     @classmethod
     def get_plan(cls, value):

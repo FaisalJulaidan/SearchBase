@@ -241,7 +241,7 @@ def insertCandidate(auth, data, companyID) -> Callback:
             "email": data.get("email"),
 
             # "primarySkills": data.get("skills"),
-            "experience": int(float(data.get("yearsExperience", 0))),
+            "experience": int(float(data.get("yearsExperience") or 0)),
 
             "secondaryAddress": {
                 "city": data.get("preferredWorkCity"),

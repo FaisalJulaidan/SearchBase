@@ -31,7 +31,7 @@ const AgencyPricingTab = () => {
                             {pricing}
                         </Row>
                         <Row className={styles.row_buttons}>
-                            <Col xs={{span: 8, offset: 2}} md={{span:6,offset:0}} lg={{span: 4, offset: 2}} className={styles.col_button}>
+                            <Col xs={{span: 10, offset: 1}} md={{span:6,offset:0}} lg={{span: 4, offset: 2}} className={styles.col_button}>
                                 <Button variant="outline-light" className={styles.compare_button}
                                         onClick={() => {
                                             scroller.scrollTo("plans-table", {
@@ -42,7 +42,7 @@ const AgencyPricingTab = () => {
                                     see full plan comparison 👀
                                 </Button>
                             </Col>
-                            <Col xs={{span: 8, offset: 2}} md={{span:6,offset:0}} lg={4} className={styles.col_button}>
+                            <Col xs={{span: 10, offset: 1}} md={{span:6,offset:0}} lg={4} className={styles.col_button}>
                                 <Button as={Link} to="#enterprise" onClick={() => window.scrollTo(0, 250)}
                                         variant="primary" className={styles.enterprise_button}>see our enterprise
                                     solution</Button>

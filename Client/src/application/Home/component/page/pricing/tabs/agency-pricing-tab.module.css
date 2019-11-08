@@ -156,10 +156,6 @@
     margin-right: 0;
 }
 
-.partners_wrapper {
-    margin-top: 100px;
-}
-
 .col_demo_text {
     margin-top: 100px;
     text-align: center;
@@ -250,7 +246,12 @@
 }
 
 @media (max-width: 767.98px) {
+
+    .col_button {
+        margin-top: 1em;
+    }
     .col_item {
-        margin-bottom: 30px;
+        border-bottom: #bfbfbf 1px dashed;
+        border-right: none;
     }
 }

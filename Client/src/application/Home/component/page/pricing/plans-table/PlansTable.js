@@ -11,7 +11,7 @@ const PlansTable = (props) => {
         )
     });
     return (
-        <Table hover className={`${styles.table} ${props?.className}`}>
+        <Table responsive hover className={`${styles.table} ${props?.className}`}>
             {tables}
         </Table>
     );

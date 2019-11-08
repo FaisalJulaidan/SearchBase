@@ -2,7 +2,6 @@ import React from 'react';
 import styles from './in-house-pricing-tab.module.css';
 import {Link} from "react-router-dom";
 import {Button, Col, Row, Card} from "react-bootstrap";
-import Partners from "../../home/partners/Partners";
 import EmailShare from "react-email-share-link";
 
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
@@ -33,9 +32,6 @@ const InHousePricingTab = () => {
                         <Link to="/how-it-works" className={styles.learn}>Learn How it works ></Link>
                     </Col>
                 </Row>
-            </div>
-            <div className={styles.partners_wrapper}>
-                <Partners/>
             </div>
             <div>
                 <Row>

@@ -5,7 +5,6 @@ import {Button, Col, Row, Card} from "react-bootstrap";
 import pricingJSON from "../pricing.json";
 import PricingItem from "../pricing-item/PricingItem";
 import PlansTable from "../plans-table/PlansTable";
-import Partners from "../../home/partners/Partners";
 
 import {scroller} from "react-scroll";
 
@@ -32,7 +31,7 @@ const AgencyPricingTab = () => {
                             {pricing}
                         </Row>
                         <Row className={styles.row_buttons}>
-                            <Col md={6} lg={{span: 4, offset: 2}} className={styles.col_button}>
+                            <Col xs={{span: 8, offset: 2}} md={{span:6,offset:0}} lg={{span: 4, offset: 2}} className={styles.col_button}>
                                 <Button variant="outline-light" className={styles.compare_button}
                                         onClick={() => {
                                             scroller.scrollTo("plans-table", {
@@ -43,7 +42,7 @@ const AgencyPricingTab = () => {
                                     see full plan comparison 👀
                                 </Button>
                             </Col>
-                            <Col md={6} lg={4} className={styles.col_button}>
+                            <Col xs={{span: 8, offset: 2}} md={{span:6,offset:0}} lg={4} className={styles.col_button}>
                                 <Button as={Link} to="#enterprise" onClick={() => window.scrollTo(0, 250)}
                                         variant="primary" className={styles.enterprise_button}>see our enterprise
                                     solution</Button>
@@ -52,12 +51,9 @@ const AgencyPricingTab = () => {
                     </Card.Body>
                 </Card>
             </div>
-            <div className={styles.partners_wrapper}>
-                <Partners/>
-            </div>
             <div>
                 <Row>
-                    <Col md={{span:10,offset:1}} lg={{span:6,offset:0}} className={styles.col_card}>
+                    <Col xs={12} lg={6} className={styles.col_card}>
                         <Card className={styles.card}>
                             <Card.Body className={styles.product_card_body}>
                                 <div>
@@ -70,7 +66,7 @@ const AgencyPricingTab = () => {
                             </Card.Body>
                         </Card>
                     </Col>
-                    <Col md={{span:10,offset:1}} lg={{span:6,offset:0}} className={styles.col_card}>
+                    <Col xs={12} lg={6} className={styles.col_card}>
                         <Card className={styles.card}>
                             <Card.Body className={styles.product_card_body}>
                                 <div>
@@ -87,7 +83,7 @@ const AgencyPricingTab = () => {
             </div>
             <div>
                 <Row>
-                    <Col xs={{span: 10, offset: 1}} className={styles.col_demo_text}>
+                    <Col md={{span: 10, offset: 1}} className={styles.col_demo_text}>
                         <h1>Join the 100+ businesses which are using SearchBase to connect with their customers.</h1>
                     </Col>
                 </Row>

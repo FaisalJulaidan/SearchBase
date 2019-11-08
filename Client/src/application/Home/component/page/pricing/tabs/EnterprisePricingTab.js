@@ -5,7 +5,6 @@ import {Button, Col, Row, Card} from "react-bootstrap";
 import pricingJSON from "../pricing.json";
 import PricingItem from "../pricing-item/PricingItem";
 import PlansTable from "../plans-table/PlansTable";
-import Partners from "../../home/partners/Partners";
 
 import {scroller} from "react-scroll";
 
@@ -46,9 +45,6 @@ const EnterprisePricingTab = () => {
                         </Row>
                     </Card.Body>
                 </Card>
-            </div>
-            <div className={styles.partners_wrapper}>
-                <Partners/>
             </div>
             <div>
                 <Row>

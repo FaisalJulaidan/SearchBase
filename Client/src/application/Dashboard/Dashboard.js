@@ -85,7 +85,7 @@ class Dashboard extends Component {
         const { match, location } = this.props;
         const user = getUser();
         const company = getCompany();
-        const {accessAppointments, accessAssistants, accessAutopilot, accessCampaigns, accessDatabases} = company.Plan;
+
         let userInfo = null;
         // User Information at the top
         if (!user) {
@@ -178,28 +178,28 @@ class Dashboard extends Component {
                             <Icon type="home"/>
                             <span>Home</span>
                         </Menu.Item>
-                        {accessAssistants ?
+                        {company.AccessAssistants ?
                             <Menu.Item key="assistants">
                                 <Icon type="robot"/>
                                 <span>Assistants</span>
                             </Menu.Item> : null}
 
-                        {accessCampaigns ?
+                        {company.AccessCampaigns ?
                             <Menu.Item key="campaigns">
                                 <Icon type="rocket"/>
                                 <span>Campaigns</span>
                             </Menu.Item> : null}
-                        {accessAutopilot ?
+                        {company.AccessAutoPilot ?
                             <Menu.Item key="auto_pilots">
                                 <Icon type="clock-circle"/>
                                 <span>Auto Pilot</span>
                             </Menu.Item> : null}
-                        {accessDatabases ?
+                        {company.AccessDatabases ?
                             <Menu.Item key="databases">
                                 <Icon type="database"/>
                                 <span>Database</span>
                             </Menu.Item> : null}
-                        {accessAppointments ?
+                        {company.AccessAppointments ?
                             <Menu.Item key="appointments">
                                 <Icon type="calendar"/>
                                 <span>Appointments (beta)</span>

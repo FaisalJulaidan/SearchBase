@@ -15,14 +15,14 @@
 }
 
 .col_item {
-    border-right: #848484 1px dashed;
+    border-right: #e1e1e1 2px dashed;
 }
 
 .col_item:last-child {
     border: none;
 }
 
-.row_buttons{
+.row_buttons {
     align-items: center;
 }
 
@@ -209,7 +209,12 @@
 }
 
 @media (max-width: 767.98px) {
+
+    .col_button {
+        margin-top: 1em;
+    }
     .col_item {
-        margin-bottom: 30px;
+        border-bottom: #e1e1e1 2px dashed;
+        border-right: none;
     }
 }

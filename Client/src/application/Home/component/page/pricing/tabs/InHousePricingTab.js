@@ -12,7 +12,7 @@ const InHousePricingTab = () => {
         <div className={styles.wrapper}>
             <div className={styles.desc_wrapper}>
                 <Row>
-                    <Col xs={{span: 8, offset: 2}}>
+                    <Col md={{span: 10, offset: 1}} lg={{span: 8, offset: 2}}>
                         <h1>In-House</h1>
                         <p>At SearchBase, our customers tell us they want us to be a strategic partner, not a
                             transactional vendor. They want us to apply our fully specialised solutions to help them
@@ -35,7 +35,7 @@ const InHousePricingTab = () => {
             </div>
             <div>
                 <Row>
-                    <Col xs={{span: 8, offset: 2}} className={styles.col_card}>
+                    <Col md={{span: 10, offset: 1}} lg={{span: 8, offset: 2}} className={styles.col_card}>
                         <Card className={styles.card}>
                             <Card.Body className={styles.product_card_body}>
                                 <div>
@@ -48,7 +48,7 @@ const InHousePricingTab = () => {
                             </Card.Body>
                         </Card>
                     </Col>
-                    <Col xs={{span: 8, offset: 2}} className={styles.col_card}>
+                    <Col md={{span: 10, offset: 1}} lg={{span: 8, offset: 2}} className={styles.col_card}>
                         <Card className={styles.card}>
                             <Card.Body className={styles.product_card_body}>
                                 <div>
@@ -62,7 +62,7 @@ const InHousePricingTab = () => {
                             </Card.Body>
                         </Card>
                     </Col>
-                    <Col xs={{span: 8, offset: 2}} className={styles.col_card}>
+                    <Col md={{span: 10, offset: 1}} lg={{span: 8, offset: 2}} className={styles.col_card}>
                         <Card className={styles.card}>
                             <Card.Body className={styles.product_card_body}>
                                 <div>
@@ -76,7 +76,7 @@ const InHousePricingTab = () => {
                             </Card.Body>
                         </Card>
                     </Col>
-                    <Col xs={{span: 8, offset: 2}} className={styles.col_card}>
+                    <Col md={{span: 10, offset: 1}} lg={{span: 8, offset: 2}} className={styles.col_card}>
                         <Card className={styles.card}>
                             <Card.Body className={styles.product_card_body}>
                                 <div>
@@ -93,7 +93,7 @@ const InHousePricingTab = () => {
             </div>
             <div>
                 <Row>
-                    <Col xs={{span: 10, offset: 1}} className={styles.col_demo_text}>
+                    <Col md={{span: 10, offset: 1}} lg={{span: 8, offset: 2}}  className={styles.col_demo_text}>
                         <h1>Join the 100+ businesses which are using SearchBase to connect with their customers.</h1>
                     </Col>
                 </Row>

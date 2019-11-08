@@ -20,7 +20,7 @@
 }
 
 .col_item {
-    border-right: #bfbfbf 1px dashed;
+    border-right: #e1e1e1 2px dashed;
 }
 
 .col_item:last-child {
@@ -251,7 +251,7 @@
         margin-top: 1em;
     }
     .col_item {
-        border-bottom: #bfbfbf 1px dashed;
+        border-bottom: #e1e1e1 2px dashed;
         border-right: none;
     }
 }

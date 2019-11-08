@@ -31,7 +31,7 @@ const EnterprisePricingTab = () => {
                             {pricing}
                         </Row>
                         <Row className={styles.row_buttons}>
-                            <Col xs={{span: 4, offset: 4}} className={styles.col_button}>
+                            <Col xs={{span:10,offset:1}} sm={{span:8,offset:2}} md={{span:6,offset:3}} lg={{span: 4, offset: 4}} className={styles.col_button}>
                                 <Button variant="outline-light" className={styles.compare_button}
                                         onClick={() => {
                                             scroller.scrollTo("plans-table-enterprise", {
@@ -48,7 +48,7 @@ const EnterprisePricingTab = () => {
             </div>
             <div>
                 <Row>
-                    <Col xs={6} className={styles.col_card}>
+                    <Col xs={12} lg={6} className={styles.col_card}>
                         <Card className={styles.card}>
                             <Card.Body className={styles.product_card_body}>
                                 <div>
@@ -61,7 +61,7 @@ const EnterprisePricingTab = () => {
                             </Card.Body>
                         </Card>
                     </Col>
-                    <Col xs={6} className={styles.col_card}>
+                    <Col xs={12} lg={6} className={styles.col_card}>
                         <Card className={styles.card}>
                             <Card.Body className={styles.product_card_body}>
                                 <div>
@@ -74,7 +74,7 @@ const EnterprisePricingTab = () => {
                             </Card.Body>
                         </Card>
                     </Col>
-                    <Col xs={6} className={styles.col_card}>
+                    <Col xs={12} lg={6} className={styles.col_card}>
                         <Card className={styles.card}>
                             <Card.Body className={styles.product_card_body}>
                                 <div>
@@ -87,7 +87,7 @@ const EnterprisePricingTab = () => {
                             </Card.Body>
                         </Card>
                     </Col>
-                    <Col xs={6} className={styles.col_card}>
+                    <Col xs={12} lg={6} className={styles.col_card}>
                         <Card className={styles.card}>
                             <Card.Body className={styles.product_card_body}>
                                 <div>

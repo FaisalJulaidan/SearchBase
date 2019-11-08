@@ -4,7 +4,7 @@ from flask import request
 from jsonschema import validate
 
 from sqlalchemy.orm import joinedload
-from models import db, Callback, Assistant, Company, StoredFile
+from models import db, Callback, Assistant
 from services import options_services
 from utilities import json_schemas, helpers, enums
 import json
@@ -18,8 +18,9 @@ def getChatbot(assistantHashID) -> Callback:
         if not assistantID:
             return Callback(False, "Assistant not found!", None)
 
-        assistant: Assistant = db.session.query(Assistant).options(joinedload(Assistant.Company).joinedload(Company.StoredFile).joinedload(StoredFile.StoredFileInfo))\
+        assistant: Assistant = db.session.query(Assistant).options(joinedload("Company").joinedload("StoredFile").joinedload("StoredFileInfo"))\
                                      .filter(Assistant.ID == assistantID[0]).first()
+        
         if not assistant:
             return Callback(False, '')
 

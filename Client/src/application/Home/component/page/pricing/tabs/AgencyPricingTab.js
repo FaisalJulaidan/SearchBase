@@ -98,7 +98,7 @@ const AgencyPricingTab = () => {
                 <h1>Full Plan Comparison</h1>
                 <hr/>
                 <h4>Interested in a strategic partner to help you roll out automatic recruitment? Check out our
-                    <Link to="#in-house" onClick={() => window.scrollTo(0, 250)}>In-House</Link>solution</h4>
+                    <Link to="#enterprise" onClick={() => window.scrollTo(0, 250)}>Enterprise</Link>solution</h4>
                 <PlansTable className={styles.plans_table}/>
             </div>
         </div>

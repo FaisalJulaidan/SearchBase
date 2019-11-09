@@ -4,8 +4,8 @@ import {Col, Container, Row, Nav, Tab} from "react-bootstrap";
 import Layout from "../../../hoc/layout/Layout";
 import {BREAKPOINTS, WEBSITE_TITLE} from "../../../../../constants/config";
 import AgencyPricingTab from "./tabs/AgencyPricingTab";
-import EnterprisePricingTab from "./tabs/EnterprisePricingTab";
 import InHousePricingTab from "./tabs/InHousePricingTab";
+import EnterprisePricingTab from "./tabs/EnterprisePricingTab";
 
 class Pricing extends React.Component {
 

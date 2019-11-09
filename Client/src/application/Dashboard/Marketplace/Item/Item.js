@@ -45,11 +45,9 @@ class Item extends React.Component {
         const {location, dispatch} = this.props;
         let type = location.pathname.split('/').slice(-1)[0]; // ex. Bullhorn, Adapt...
         let params = queryString.parse(location.search);
-        console.log(type)
         if( (type === "Bullhorn" || type === "Vincere" || type === "Outlook" || type === "Jobscience" || type === "Mercury" || type === "Twilio" || type === "Google") && params['code']){
             dispatch(marketplaceActions.connectMarketplace(type, {...params})); // connect
             this.props.history.replace("/dashboard/marketplace/" + type) // clean the url from args
-            console.log('lol')
         }
 
     }
@@ -215,7 +213,7 @@ class Item extends React.Component {
                 if (place === 'features')
                     return <GoogleFeatures/>;
                 if (place === 'button') {
-                    const clientID = "623652835897-tj9rf1v6hd1tak5bv5hr4bq9hrvjns95.apps.googleusercontent.com";
+                    const clientID = "289239166387-6v2oeucersssq7akl9a9j5ukduqudva7.apps.googleusercontent.com";
                     const responseType = "code";
                     const scope = "https://www.googleapis.com/auth/calendar";
                     const redirectURI = getLink("/dashboard/marketplace/Google");

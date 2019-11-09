@@ -91,7 +91,7 @@ const InHousePricingTab = () => {
                         <Card className={styles.card}>
                             <Card.Body className={styles.product_card_body}>
                                 <div>
-                                    <h1>Automation & Engamenet</h1>
+                                    <h1>Automation & Engagement</h1>
                                     <p>Set up a tailored automation sequences that help you improve the efficiency of your workflow.</p>
                                 </div>
                                 <Link to="/how-it-works#engagement">learn more<FontAwesomeIcon className={styles.icon}

@@ -241,7 +241,7 @@ def insertCandidate(auth, data, companyID) -> Callback:
             "email": data.get("email"),
 
             # "primarySkills": data.get("skills"),
-            "experience": int(float(data.get("yearsExperience", 0))),
+            "experience": int(float(data.get("yearsExperience") or 0)),
 
             "secondaryAddress": {
                 "city": data.get("preferredWorkCity"),
@@ -782,8 +782,8 @@ def produceRecruiterValueReport(crm: CRM_Model, companyID) -> Callback:
                 record["title"],
                 record["clientCorporation"].get("name"),
                 record["salary"],
-                str(float(record["feeArrangement"]) * 100) + "%",
-                float(record["salary"]) * float(record["feeArrangement"])
+                str(float(record.get("feeArrangement") or 0) * 100) + "%",
+                float(record.get("salary") or 0) * float(record.get("feeArrangement") or 0)
             ])
             previousUser = record["owner"]["firstName"] + " " + record["owner"]["lastName"]
 

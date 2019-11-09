@@ -47,6 +47,7 @@ class Assistant(db.Model):
 
     # Constraints:
     # cannot have two assistants with the same name under one company
+    
     __table_args__ = (db.UniqueConstraint('CompanyID', 'Name', name='uix1_assistant'),)
 
     def __repr__(self):

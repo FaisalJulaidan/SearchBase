@@ -54,8 +54,8 @@
 }
 
 .footer .nav li:first-child {
-    font-size: 1.1em;
-    font-weight: bold;
+    font-weight: 900;
+    text-transform: uppercase;
 }
 
 .navigation_bottom {

@@ -1,11 +1,11 @@
 .col_intro{
     text-align: center;
-    color: #444444;
 }
 
 .col_intro h1{
     font-weight: bold;
     font-size: 2em;
+    color: #444444;
 }
 
 .col_intro hr{
@@ -15,6 +15,7 @@
 }
 
 .col_intro h2{
+    color: #444444;
     font-size: 1.1em;
 }
 

@@ -1,67 +1,105 @@
 import React from 'react';
 import styles from './pricing.module.css';
-import {Col, Container, Row, Button} from "react-bootstrap";
-import {Link} from "react-router-dom";
-import EmailShare from "react-email-share-link";
-import PricingCard from "./pricing-card/PricingCard";
+import {Col, Container, Row, Nav, Tab} from "react-bootstrap";
 import Layout from "../../../hoc/layout/Layout";
-import {ReactComponent as Wave} from "../../../hoc/hero-layout/wave.svg";
-import pricingJSON from './pricing.json';
-import {WEBSITE_TITLE} from "../../../../../constants/config";
+import {BREAKPOINTS, WEBSITE_TITLE} from "../../../../../constants/config";
+import AgencyPricingTab from "./tabs/AgencyPricingTab";
+import InHousePricingTab from "./tabs/InHousePricingTab";
+import EnterprisePricingTab from "./tabs/EnterprisePricingTab";
 
-const Pricing = () => {
+class Pricing extends React.Component {
 
-    document.title = "Pricing | " + WEBSITE_TITLE;
+    state = {
+        activeTab: 'agency'
+    };
 
-    let pricing = pricingJSON.map((plan, key) => {
+    componentDidMount() {
+        document.title = "Pricing | " + WEBSITE_TITLE;
+        if (["agency", "enterprise", "in-house"].includes(this.props.location.hash.replace("#", ""))) {
+            this.setState({activeTab: this.props.location.hash.replace("#", "")});
+        }
+    }
+
+    componentDidUpdate(prevProps, prevState, snapshot) {
+        if (this.props.location.hash !== prevProps.location.hash &&
+            ["agency", "enterprise", "in-house"].includes(this.props.location.hash.replace("#", ""))) {
+            this.setState({activeTab: this.props.location.hash.replace("#", "")});
+        }
+    }
+
+    render() {
         return (
-            <Col className={styles.col_card} xs={{span:10,offset:1}} sm={{span:8,offset:2}} md={{span:4,offset:0}} key={key}>
-                <PricingCard id={plan.id} plan={plan}/>
-            </Col>
-        );
-    });
-
-    return (
-        <Layout>
-            <div>
+            <Layout>
                 <div className={styles.hero}>
                     <Container>
                         <Row>
                             <Col className={styles.text_wrapper}>
-                                <h1 className={styles.title}>Boost candidates interaction and automate every mundane task in your business.</h1>
+                                <h1 className={styles.title}>Boost candidates interaction and automate every mundane
+                                    task in
+                                    your business.</h1>
                             </Col>
                         </Row>
                     </Container>
-                    <Wave className={styles.wave}/>
                 </div>
                 <Container className={styles.content}>
-                    <Row>
-                        {pricing}
-                    </Row>
-                    <Row className={styles.row_enterprise}>
-                        <Col md={10} lg={8}>
-                            <h1>Need more?</h1>
-                        </Col>
-                        <Col md={12} lg={10} className={styles.desc_col}>
-                            <span>We offer additional enterprise services — if you need features not available in the current plans to help your enterprise requirements get going, please let us know. If you are interested in partnering with us around technology, services, or go-to-market, we’d love to have a conversation!</span>
-                        </Col>
-                        <Col md={8}>
-                            <Link to="/get-started">
-                                <Button variant="light" className={styles.demo_button}>Request a demo</Button>
-                            </Link>
-                            <Button variant="outline-light" className={styles.contact_button}>
-                                <EmailShare email="info@SearchBase.com"
-                                            subject="Contact"
-                                            body="Hi, I would like to talk about...">
-                                    {link => (<a href={link} data-rel="external">Contact us</a>)}
-                                </EmailShare>
-                            </Button>
-                        </Col>
-                    </Row>
+                    <Tab.Container activeKey={this.state.activeTab}
+                                   onSelect={key => this.props.history.push(`/pricing#${key}`)}>
+                        <Row>
+                            <Col>
+                                <Nav variant="tabs" fill justify
+                                     className={`${styles.tabs} ${(window.innerWidth < BREAKPOINTS.sm) ? 'flex-column' : ''}`}
+                                     onSelect={() => {
+                                     }}>
+                                    <Nav.Item className={styles.tab}>
+                                        <Nav.Link eventKey="agency"
+                                                  style={this.state.activeTab === 'agency' ? {
+                                                      fontWeight: '900',
+                                                      color: "#9254de"
+                                                  } : {}}>
+                                            Agency
+                                        </Nav.Link>
+                                    </Nav.Item>
+                                    <Nav.Item className={styles.tab}>
+                                        <Nav.Link eventKey="enterprise"
+                                                  style={this.state.activeTab === 'enterprise' ? {
+                                                      fontWeight: '900',
+                                                      color: "#9254de"
+                                                  } : {}}>
+                                            Enterprise
+                                        </Nav.Link>
+                                    </Nav.Item>
+                                    <Nav.Item className={styles.tab}>
+                                        <Nav.Link eventKey="in-house"
+                                                  style={this.state.activeTab === 'in-house' ? {
+                                                      fontWeight: '900',
+                                                      color: "#9254de"
+                                                  } : {}}>
+                                            In House
+                                        </Nav.Link>
+                                    </Nav.Item>
+                                </Nav>
+                            </Col>
+                        </Row>
+                        <Row>
+                            <Col>
+                                <Tab.Content>
+                                    <Tab.Pane eventKey="agency">
+                                        <AgencyPricingTab/>
+                                    </Tab.Pane>
+                                    <Tab.Pane eventKey="enterprise">
+                                        <EnterprisePricingTab/>
+                                    </Tab.Pane>
+                                    <Tab.Pane eventKey="in-house">
+                                        <InHousePricingTab/>
+                                    </Tab.Pane>
+                                </Tab.Content>
+                            </Col>
+                        </Row>
+                    </Tab.Container>
                 </Container>
-            </div>
-        </Layout>
-    );
-};
+            </Layout>
+        );
+    }
+}
 
 export default Pricing;

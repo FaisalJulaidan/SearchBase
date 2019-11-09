@@ -3,6 +3,7 @@ import styles from './table.module.css';
 import {Table as ReactTable} from "react-bootstrap";
 import PropTypes from "prop-types";
 import TableRow from "./table-row/TableRow";
+import {BREAKPOINTS} from "../../../../../../constants/config";
 
 const Table = (props) => {
 
@@ -14,12 +15,8 @@ const Table = (props) => {
         return <TableRow key={i} body row={row}/>
     });
 
-    const breakpoints = {
-        sm: 576.98
-    };
-
     let sizeProp = {};
-    if (window.innerWidth < breakpoints.sm) {
+    if (window.innerWidth < BREAKPOINTS.sm) {
         sizeProp["size"] = "sm";
         sizeProp["responsive"] = "sm";
     }

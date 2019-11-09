@@ -1,0 +1,18 @@
+.thead{
+    background-color: #F4F4F4;
+    box-shadow: 0 2px 4px 0 rgba(155,155,155,.4);
+    font-weight: 900;
+    color: #111;
+    text-transform: capitalize;
+}
+
+.th{
+    padding-left: 30px !important;
+    text-align: left;
+    border-top: none !important;
+}
+
+.th_plan{
+    border-top: none !important;
+    text-align: center;
+}

@@ -18,7 +18,7 @@ const AgencyPricingTab = () => {
             <Col className={styles.col_item} xs={{span: 10, offset: 1}} sm={{span: 8, offset: 2}}
                  md={{span: 4, offset: 0}}
                  key={key}>
-                <PricingItem id={plan.id} plan={plan}/>
+                <PricingItem id={plan.id} plan={plan} hide_subtitle={true}/>
             </Col>
         );
     });

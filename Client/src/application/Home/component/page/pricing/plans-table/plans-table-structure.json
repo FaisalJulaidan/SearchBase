@@ -1,0 +1,46 @@
+{
+  "Full Feature Breakdown": [
+    "Dedicated Account Manager",
+    "Website ChatBot",
+    "CRM Integration",
+    "Facebook",
+    "Outbound SMS",
+    "Pre-Screen Candidates",
+    "Qualify Candidates",
+    "Re-engage Passive Candidates",
+    "Automated Decision Making",
+    "Automated Scheduling",
+    "Candidate Availability Scheduling",
+    "Job Board Integration",
+    "Analytics",
+    "ChatBot Templates",
+    "Web Hooks",
+    "API",
+    "On-boarding"
+  ],
+  "CRM Integrations": [
+    "Bullhorn",
+    "Adapt (Erecruit)",
+    "RDB Pro Net (Access Group)",
+    "JobScience",
+    "Vincere",
+    "Mercury Xrm"
+  ],
+  "ATS": [
+    "Greenhouse"
+  ],
+  "Calender": [
+    "Outlook",
+    "Gmail"
+  ],
+  "SMS": [
+    "Twilio",
+    "WhatsApp",
+    "Voodoo SMS",
+    "8x8",
+    "CloudCall"
+  ],
+  "Recruiter Tools": [
+    "LinkedIn"
+  ]
+}

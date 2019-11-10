@@ -1,0 +1,19 @@
+.td {
+    border-right: 1px solid #dee2e6;
+    padding-left: 30px !important;
+    font-size: 14px;
+}
+
+.td_plan{
+    border-right: 1px solid #dee2e6;
+    text-align: center;
+    font-size: 14px;
+}
+
+td:last-child {
+    border-right: none;
+}
+
+tr:last-child{
+    border-bottom: 1px solid #dee2e6;
+}

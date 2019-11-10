@@ -4,17 +4,14 @@ import {Col, Container, Row} from "react-bootstrap";
 import CustomerCard from "./customer-card/CustomerCard";
 import {Fade} from "react-reveal";
 import reviewsJson from './reviews.json'
+import {BREAKPOINTS} from "../../../../../../constants/config";
 
 const Customers = (props) => {
 
     let reviews = reviewsJson.map((review, i) => {
 
-        const breakpoints = {
-            md: 767.98
-        };
-
         let fadeAnim = {};
-        if (window.innerWidth > breakpoints.md) {
+        if (window.innerWidth > BREAKPOINTS.md) {
             switch (i % 3) {
                 case 0:
                     fadeAnim["left"] = true;

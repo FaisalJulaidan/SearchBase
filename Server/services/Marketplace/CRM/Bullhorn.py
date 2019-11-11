@@ -218,7 +218,7 @@ def sendQuery(auth, query, method, body, companyID, optionalParams=None):
 def buildUrl(rest_data, query, optionalParams=None):
     # set up initial url
     url = rest_data.get("rest_url", "https://rest.bullhornstaffing.com/rest-services/5i3n9d/") + query + \
-          "?BhRestToken=" + rest_data.get("rest_token", "none")
+          "?BhRestToken=" + rest_data.get("rest_token", "46c0tkvo-bdf9-4491-8402-66d4f2837fb5")
     # add additional params
     if optionalParams:
         for param in optionalParams:

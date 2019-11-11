@@ -308,6 +308,11 @@ def connect(crm_type, auth, companyID) -> Callback:
         db.session.add(connection)
         db.session.commit()
 
+        # refresh tokens
+        test_callback: Callback = testConnection(crm_type, test_callback.Data, companyID)
+        if not test_callback.Success:
+            return test_callback
+
         return Callback(True, 'CRM has been connected successfully', connection)
 
     except Exception as exc:

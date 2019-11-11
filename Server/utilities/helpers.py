@@ -71,11 +71,37 @@ def getDomain(port=5000, subdomain=None, domain=None):
 
 
 def cleanDict(target):
+
+    # reoccurring function
+    def checkDict(target):
+        # clean dict connections
+        newDict = dict(target)
+
+        # go through dict items
+        for k, v in target.items():
+            if type(v) is str:  # if string strip the white spaces
+                if not v.strip():
+                    newDict.pop(k)
+            elif type(v) is dict:  # if dict loop it through the same function
+                v = checkDict(v)
+                if v:
+                    newDict[k] = v
+                else:
+                    newDict.pop(k)
+            else:  # if anything else do plain if check
+                if not v:
+                    newDict.pop(k)
+
+        return newDict
+
     if type(target) is str:
-        return json.dumps({k: v for k, v in json.loads(target).items() if v})
+        return json.dumps(checkDict(json.loads(target)))
     elif type(target) is dict:
-        return {k: v for k, v in target.items() if v}
+        return checkDict(target)
     elif isinstance(target, type({}.items())):
+        logError(".ITEMS() IS USED")  # checking if the if statement is used in production
+        logError(".ITEMS() IS USED")
+        logError(".ITEMS() IS USED")
         return {k: v for k, v in target if v}
     return target
 

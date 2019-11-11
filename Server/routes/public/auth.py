@@ -23,8 +23,9 @@ def add_header(r):
     return r
 
 
-@auth_router.route("/auth", methods=['POST', 'OPTIONS'])
+@auth_router.route("/auth", methods=['POST'])
 def authenticate():
+    print('in Auth')
     if request.method == "POST":
 
         data = request.json
@@ -34,8 +35,6 @@ def authenticate():
             return helpers.jsonResponse(False, 401, callback.Message, callback.Data)
         return helpers.jsonResponse(True, 200, "Authorised!", callback.Data)
 
-    if request.method == "POST":
-        return helpers.jsonResponse(True, 200, "OOOOOOO!")
 
 
 # Refresh token endpoint

@@ -26,8 +26,9 @@ from services.mail_services import mail
 from utilities import helpers, tasks, dummy_data
 
 # from utilities.helpers import limiter
-
+# from flask_cors import CORS
 app = Flask(__name__, static_folder='static')
+# cors = CORS(app, resources={r"/api/*": {"origins": "*"}})
 
 # Register Routes:
 app.register_blueprint(assistant_router, url_prefix='/api')

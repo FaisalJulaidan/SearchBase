@@ -12,9 +12,12 @@ provider:
 plugins:
   - serverless-wsgi
   - serverless-python-requirements
+  - serverless-offline-python
 
 
 custom:
+  serverless-offline:
+    port: 5000
   pythonRequirements:
     zip: true
     slim: true
@@ -40,6 +43,45 @@ custom:
 functions:
   app:
     handler: wsgi_handler.handler
+    environment:
+      FLASK_ENV: 'development'
+      MIGRATION: 'no'
+      REFRESH_DB_IN_DEV: 'no'
+      SQLALCHEMY_DATABASE_URI: 'mysql+pymysql://root:root@localhost:3306/tsb?charset=utf8mb4&binary_prefix=true'
+      STRIPE_SECRET_KEY: 'sk_test_Kwsicnv4HaXaKJI37XBjv1Od'
+      STRIPE_PUBLISHABLE_KEY: 'pk_test_e4Tq89P7ma1K8dAjdjQbGHmR'
+      DB_SECRET_KEY: 'kuhkuh' # keep it save
+      TEMP_SECRET_KEY: '9999dKpyq-68j5sz5_FAKE-KEY_hUgtHZVFd-m0oEmI='
+
+      SPACES_SERVER_URI : 'https://ams3.digitaloceanspaces.com'
+      SPACES_PUBLIC_KEY : 'OH53IID7SGTR7FO2RVVI'
+      SPACES_SECRET_KEY : 'ecMMB6PX7klejQHnUhTUtpL/BAUaRgvS1Rotm0xyRks'
+
+      # GeoIP Keys
+      GEOIP_USER_ID : 140914
+      GEOIP_KEY : 'cKrqAZ675SPb'
+
+      # Marketplace Keys
+      BULLHORN_CLIENT_ID: '7719607b-7fe7-4715-b723-809cc57e2714'
+      BULLHORN_CLIENT_SECRET: '0ZiVSILQ7CY0bf054LPiX4kN'
+
+      MERCURY_CLIENT_ID : 'b49f9e03-5586-4248-8585-8640c4b2539c'
+      MERCURY_CLIENT_SECRET : 'kZoJ/5w..uMT1Os_fAuhvlk9BHpuSKU7'
+
+      OUTLOOK_CLIENT_ID : '0978960c-c837-479f-97ef-a75be4bbacd4'
+      OUTLOOK_CLIENT_SECRET : 'P:*/M:jyjUAfRKPJAyyeM9aYkRDAU382'
+
+      VINCERE_CLIENT_ID : '14e3d987-7f09-4aa0-af7c-9192f02d545f'
+      VINCERE_API_KEY : 'c0f1b3fbb7az1de57932c0af2d8c8abc'
+
+      JOBSCIENCE_CLIENT_ID : '3MVG9I5UQ_0k_hTlh64o5U2MnkGkPmYj_xkMpFkEi0tIJXl_CGhXpux_w5khN6pvnNd.IH6Yvo82ZAcRystWE'
+      JOBSCIENCE_CLIENT_SECRET : '972A46C725406EE38D971409A1509EF164B100A9B8B42CA4C39AB3952B65A215'
+      JOBSCIENCE_SANDBOX_CLIENT_ID : '3MVG9w8uXui2aB_pIyoEOL_U6UgvUQqi5KNnTkD95XSD2NQjWfWakra7aHmltLO8e.xdwY.1WgkJAp7KUWsCN'
+      JOBSCIENCE_SANDBOX_CLIENT_SECRET : '9EC5582C0B345C2ADDE5DC01BF9068631FCD5DAC47067313C844A61530F13BF3'
+
+      GOOGLE_CALENDAR_REDIRECT_URI: 'http://localhost:3000/dashboard/marketplace?googleVerification=true'
+      GOOGLE_CALENDAR_CLIENT_SECRET: ''
+      GOOGLE_CALENDAR_CLIENT_ID: ''
 #    layers:
 #      - {Ref: ServerDepsLambdaLayer}
     events:
@@ -47,10 +89,10 @@ functions:
           path: /
           method: any
           cors: true
-#      - http:
-#         method: any
-#         path: /{proxy+}
-#         cors: true
+      - http:
+         method: any
+         path: /{proxy+}
+         cors: true
 
 
   sendConversationsNotifications:

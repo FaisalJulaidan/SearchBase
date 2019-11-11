@@ -1,26 +1,27 @@
 from flask import Blueprint, request, redirect
 from flask_jwt_extended import jwt_refresh_token_required
 from models import Callback
+from flask_cors import CORS
 from services import user_services, auth_services
 from utilities import helpers
 
 auth_router = Blueprint('auth_router', __name__)
+CORS(auth_router)
 
-
-@auth_router.after_request
-def add_header(r):
-    #     """
-    #     Add headers to both force latest IE rendering engine or Chrome Frame,
-    #     and also to cache the rendered page for 10 minutes.
-    #     """
-    # r.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
-    #     r.headers["Pragma"] = "no-cache"
-    #     r.headers["Expires"] = "0"
-    # r.headers['Cache-Control'] = 'public, max-age=0'
-    r.headers['Access-Control-Allow-Origin'] = '*'
-    r.headers['Access-Control-Allow-Headers'] = '*'
-    r.headers['Access-Control-Allow-Methods'] = '*'
-    return r
+# @auth_router.after_request
+# def add_header(r):
+#     #     """
+#     #     Add headers to both force latest IE rendering engine or Chrome Frame,
+#     #     and also to cache the rendered page for 10 minutes.
+#     #     """
+#     # r.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
+#     #     r.headers["Pragma"] = "no-cache"
+#     #     r.headers["Expires"] = "0"
+#     # r.headers['Cache-Control'] = 'public, max-age=0'
+#     r.headers['Access-Control-Allow-Origin'] = '*'
+#     r.headers['Access-Control-Allow-Headers'] = '*'
+#     r.headers['Access-Control-Allow-Methods'] = '*'
+#     return r
 
 
 @auth_router.route("/auth", methods=['POST'])

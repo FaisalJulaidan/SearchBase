@@ -25,10 +25,9 @@ from services.auth_services import jwt
 from services.mail_services import mail
 from utilities import helpers, tasks, dummy_data
 
+
 # from utilities.helpers import limiter
-# from flask_cors import CORS
 app = Flask(__name__, static_folder='static')
-# cors = CORS(app, resources={r"/api/*": {"origins": "*"}})
 
 # Register Routes:
 app.register_blueprint(assistant_router, url_prefix='/api')
@@ -53,7 +52,10 @@ app.register_blueprint(staff_router, url_prefix='/api/staff')
 
 
 @app.after_request
-def apply_caching(response):
+def after_request(response):
+    response.headers['Access-Control-Allow-Origin'] = '*'
+    response.headers['Access-Control-Allow-Headers'] = '*'
+    response.headers['Access-Control-Allow-Methods'] = '*'
     response.headers["X-Frame-Options"] = "DENY"
     return response
 

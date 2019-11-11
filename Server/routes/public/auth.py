@@ -1,12 +1,10 @@
 from flask import Blueprint, request, redirect
 from flask_jwt_extended import jwt_refresh_token_required
 from models import Callback
-from flask_cors import CORS
 from services import user_services, auth_services
 from utilities import helpers
 
 auth_router = Blueprint('auth_router', __name__)
-CORS(auth_router)
 
 # @auth_router.after_request
 # def add_header(r):

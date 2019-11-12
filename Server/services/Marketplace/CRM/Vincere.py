@@ -428,6 +428,7 @@ def searchPerfectCandidates(auth, companyID, data) -> Callback:
 
             while len(records) < 2000:
                 # send query
+                helpers.logError("NEW QUERY: " + query)
                 sendQuery_callback: Callback = sendQuery(auth, "candidate/search/" + fields, "get", {}, companyID,
                                                          [query])
                 if not sendQuery_callback.Success:
@@ -455,11 +456,11 @@ def searchPerfectCandidates(auth, companyID, data) -> Callback:
 
                 # remove the last (least important filter)
                 query = ",".join(query.split(",")[:-1])
-
                 # if no filters left - stop
                 if not query:
                     break
 
+        helpers.logError("STOP QUERY AT : " + query)
         result = []
         # TODO educations uses ids - need to retrieve them
         for record in records:

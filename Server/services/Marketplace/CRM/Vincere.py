@@ -398,7 +398,7 @@ def searchPerfectCandidates(auth, companyID, data) -> Callback:
     try:
         query = "q="
 
-        fields = "fl=id,name,primary_email,mobile,current_location,skill,desired_salary,currency,deleted,last_update,met_status"
+        fields = "fl=id,name,primary_email,phone,current_location,skill,desired_salary,currency,deleted,last_update,met_status"
 
         # populate filter
         query += populateFilter(data.get("location"), "current_city")

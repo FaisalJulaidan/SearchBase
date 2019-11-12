@@ -398,7 +398,7 @@ def searchPerfectCandidates(auth, companyID, data) -> Callback:
     try:
         query = "q="
 
-        fields = "fl=id,name,primary_email,phone,current_location,skill,desired_salary,currency,deleted,last_update,met_status"
+        fields = "fl=id,name,primary_email,mobile,phone,current_location,skill,desired_salary,currency,deleted,last_update,met_status"
 
         # populate filter
         query += populateFilter(data.get("location"), "current_city")
@@ -428,7 +428,6 @@ def searchPerfectCandidates(auth, companyID, data) -> Callback:
 
             while len(records) < 2000:
                 # send query
-                helpers.logError("NEW QUERY: " + query)
                 sendQuery_callback: Callback = sendQuery(auth, "candidate/search/" + fields, "get", {}, companyID,
                                                          [query])
                 if not sendQuery_callback.Success:
@@ -460,14 +459,14 @@ def searchPerfectCandidates(auth, companyID, data) -> Callback:
                 if not query:
                     break
 
-        helpers.logError("STOP QUERY AT : " + query)
         result = []
+        helpers.logError("VINCERE RECORDS : " + str(records))
         # TODO educations uses ids - need to retrieve them
         for record in records:
             result.append(databases_services.createPandaCandidate(id=record.get("id", ""),
                                                                   name=record.get("name"),
                                                                   email=record.get("primary_email"),
-                                                                  mobile=record.get("phone"),
+                                                                  mobile=record.get("mobile", record.get("phone")),
                                                                   location=record.get("current_location", ""),
                                                                   skills=record.get("skill", ""),  # stringified json
                                                                   linkdinURL=None,

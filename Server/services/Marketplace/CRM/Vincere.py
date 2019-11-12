@@ -463,6 +463,11 @@ def searchPerfectCandidates(auth, companyID, data) -> Callback:
         helpers.logError("VINCERE RECORDS : " + str(records))
         # TODO educations uses ids - need to retrieve them
         for record in records:
+            currency = record.get("currency", "gbp").lower()
+            if currency == "pound":
+                currency = "GBP"
+            else:
+                currency = record.get("currency", "GBP").upper()
             result.append(databases_services.createPandaCandidate(id=record.get("id", ""),
                                                                   name=record.get("name"),
                                                                   email=record.get("primary_email"),

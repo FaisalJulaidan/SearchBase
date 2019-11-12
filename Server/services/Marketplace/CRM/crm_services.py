@@ -222,7 +222,8 @@ def searchCandidatesCustom(crm, companyID, candidate_data, perfect=False):
     }
 
     crm_type = crm.Type.value
-    if perfect and crm_type == "Bullhorn":
+    campaignCRMs = ["Bullhorn", "Vincere"]
+    if perfect and crm_type in campaignCRMs:
         searchFunc = "searchPerfectCandidates"
     else:
         searchFunc = "searchCandidates"

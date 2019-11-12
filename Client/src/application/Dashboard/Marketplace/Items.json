@@ -53,7 +53,7 @@
       "desc": "Outlook is the Microsoft Email Service provider. You can easily integrate your Outlook into SearchBase and if you have scheduled any appointments or calendar events, we will automatically create the events in your calendar.",
       "image": "/static/images/CRM/outlook.svg",
       "type": "Outlook",
-      "disabled": false,
+      "disabled": true,
       "status": "NOT_CONNECTED"
     },
     {
@@ -69,7 +69,7 @@
       "desc": "Google Calendar is a time-management and scheduling calendar service lets you keep track of important events, share your schedule.",
       "image": "/static/images/CRM/gmail.svg",
       "type": "Google",
-      "disabled": false,
+      "disabled": true,
       "status": "NOT_CONNECTED"
     }
   ]

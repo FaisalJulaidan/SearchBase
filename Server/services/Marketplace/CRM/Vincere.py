@@ -480,7 +480,7 @@ def searchPerfectCandidates(auth, companyID, data) -> Callback:
                                                                   education=None,
                                                                   yearsExperience=0,
                                                                   desiredSalary=record.get("desired_salary", 0),
-                                                                  currency=Currency(record.get("currency").upper()),
+                                                                  currency=Currency(currency.upper()),
                                                                   source="Vincere"))
 
         return Callback(True, "Search has been successful", result)

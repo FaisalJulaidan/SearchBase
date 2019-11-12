@@ -467,7 +467,7 @@ def searchPerfectCandidates(auth, companyID, data) -> Callback:
             result.append(databases_services.createPandaCandidate(id=record.get("id", ""),
                                                                   name=record.get("name"),
                                                                   email=record.get("primary_email"),
-                                                                  mobile=record.get("mobile"),
+                                                                  mobile=record.get("phone"),
                                                                   location=record.get("current_location", ""),
                                                                   skills=record.get("skill", ""),  # stringified json
                                                                   linkdinURL=None,

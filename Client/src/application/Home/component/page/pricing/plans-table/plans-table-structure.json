@@ -1,22 +1,21 @@
 {
   "Full Feature Breakdown": [
-    "Dedicated Account Manager",
     "Website ChatBot",
     "CRM Integration",
-    "Facebook",
-    "Outbound SMS",
     "Pre-Screen Candidates",
+    "Analytics",
+    "Candidate lead Generation",
+    "Client Lead Generation",
+    "ChatBot Templates",
     "Qualify Candidates",
     "Re-engage Passive Candidates",
+    "Automated Job Hunting",
+    "Outbound SMS",
     "Automated Decision Making",
     "Automated Scheduling",
-    "Candidate Availability Scheduling",
-    "Job Board Integration",
-    "Analytics",
-    "ChatBot Templates",
     "Web Hooks",
-    "API",
-    "On-boarding"
+    "On-boarding",
+    "Dedicated Account Manager"
   ],
   "CRM Integrations": [
     "Bullhorn",

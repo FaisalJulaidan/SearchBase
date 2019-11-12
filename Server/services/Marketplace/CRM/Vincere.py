@@ -333,7 +333,7 @@ def searchCandidates(auth, companyID, data) -> Callback:
     try:
         query = "q="
 
-        fields = "fl=id,name,primary_email,mobile,current_location,skill,desired_salary,currency,deleted,last_update,met_status"
+        fields = "fl=id,name,primary_email,mobile,phone,current_location,skill,desired_salary,currency,deleted,last_update,met_status"
 
         # populate filter
         query += populateFilter(data.get("location"), "current_city")
@@ -374,7 +374,7 @@ def searchCandidates(auth, companyID, data) -> Callback:
             result.append(databases_services.createPandaCandidate(id=record.get("id", ""),
                                                                   name=record.get("name"),
                                                                   email=record.get("primary_email"),
-                                                                  mobile=record.get("mobile"),
+                                                                  mobile=record.get("mobile", record.get("phone")),
                                                                   location=
                                                                   record.get("current_location", {}).get("city", ""),
                                                                   skills=record.get("skill", "").split(","),  # str list

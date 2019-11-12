@@ -1,7 +1,7 @@
 from sqlalchemy.sql import and_
 
 from models import db, Callback, Conversation, Assistant, CRM as CRM_Model, StoredFile
-from services.Marketplace.CRM import Greenhouse, Bullhorn, Mercury, Jobscience, Vincere
+from services.Marketplace.CRM import Greenhouse, Bullhorn, Mercury, Jobscience, Vincere, Adapt
 # Process chatbot session
 from utilities import helpers
 from utilities.enums import CRM, UserType, DataType, Period, DataType as DT
@@ -503,5 +503,5 @@ def additionalCandidateNotesBuilder(data, selectedSolutions=None):
 
 # prevents IDEA from automatically removing dependencies that are used in eval
 def ideaCalmer():
-    print(Jobscience, Mercury, Greenhouse)
+    print(Jobscience, Mercury, Greenhouse, Vincere, Adapt)
 

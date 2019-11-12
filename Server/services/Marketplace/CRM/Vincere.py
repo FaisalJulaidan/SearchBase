@@ -394,33 +394,26 @@ def searchCandidates(auth, companyID, data) -> Callback:
         return Callback(False, str(exc))
 
 
-def searchPerfectCandidates(auth, companyID, data, fields=None) -> Callback:
+def searchPerfectCandidates(auth, companyID, data) -> Callback:
     try:
         query = "q="
 
-        if not fields:
-            fields = "fl=id,name,primary_email,mobile,current_address,skill,text,current_salary"
+        fields = "fl=id,name,primary_email,mobile,current_location,skill,desired_salary,currency,deleted,last_update,met_status"
 
         # populate filter
-        query += populateFilter(data.get("preferredJotTitle"), "occupation")
-        query += populateFilter(data.get("location"), "address.city")
-        query += populateFilter(data.get("jobCategory"), "employmentPreference")
-        # query += populateFilter(data.get("skills"), "primarySkills")
-        query += populateFilter(data.get("yearsExperience"), "experience")
-        # query += populateFilter(data.get("education"), "educationDegree")
+        query += populateFilter(data.get("location"), "current_city")
 
-        # if keywords[DT.CandidateSkills.value["name"]]:
-        #     query += "primarySkills.data:" + keywords[DT.CandidateSkills.name] + " or"
+        for skill in data.get("skills", []):
+            query += populateFilter(skill, "skill")
 
-        # query = query[:-1]
+        query = query.replace("#", ".08")
 
         # check if no conditions submitted
         if len(query) < 3:
             query = ""
 
             # send query
-            sendQuery_callback: Callback = sendQuery(auth, "candidate/search/" + fields, "get", {}, companyID,
-                                                     [query, "limit=100"])
+            sendQuery_callback: Callback = sendQuery(auth, "candidate/search/" + fields, "get", {}, companyID, [query])
             if not sendQuery_callback.Success:
                 raise Exception(sendQuery_callback.Message)
 
@@ -429,13 +422,14 @@ def searchPerfectCandidates(auth, companyID, data, fields=None) -> Callback:
             records = return_body["result"]["items"]
 
         else:
+            query = query[:-1]
             query += "%23"
             records = []
 
             while len(records) < 2000:
                 # send query
                 sendQuery_callback: Callback = sendQuery(auth, "candidate/search/" + fields, "get", {}, companyID,
-                                                         [query, "limit=100"])
+                                                         [query])
                 if not sendQuery_callback.Success:
                     raise Exception(sendQuery_callback.Message)
 
@@ -460,7 +454,7 @@ def searchPerfectCandidates(auth, companyID, data, fields=None) -> Callback:
                         records.append(dict(l))
 
                 # remove the last (least important filter)
-                query = "&".join(query.split("&")[:-1])
+                query = ",".join(query.split(",")[:-1])
 
                 # if no filters left - stop
                 if not query:

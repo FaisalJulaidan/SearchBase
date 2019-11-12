@@ -350,6 +350,7 @@ class Conversations extends React.Component {
                 dataRecord.push(selectedSolutionsData);
 
                 data.push(dataRecord);
+                this.setState({downloadData: data})
             });
         }
     };

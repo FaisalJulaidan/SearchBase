@@ -129,10 +129,10 @@ def sendQuery(auth, query, method, body, companyID, optionalParams=None):
         headers = {'Content-Type': 'application/json', "x-api-key": api_key, "id-token": auth.get("id_token", "none")}
 
         # test the Token (id_token)
-        helpers.logError("url: " + url)
-        helpers.logError("headers: " + str(headers))
+        helpers.logError("Vincere url: " + url)
+        helpers.logError("Vincere headers: " + str(headers))
         r = marketplace_helpers.sendRequest(url, method, headers, json.dumps(body))
-        helpers.logError("response text: " + r.text)
+        helpers.logError("Vincere response text: " + r.text)
 
         if r.status_code == 401:  # wrong rest token
             callback: Callback = retrieveRestToken(auth, companyID)
@@ -460,7 +460,6 @@ def searchPerfectCandidates(auth, companyID, data) -> Callback:
                     break
 
         result = []
-        helpers.logError("VINCERE RECORDS : " + str(records))
         # TODO educations uses ids - need to retrieve them
         for record in records:
             currency = record.get("currency", "gbp").lower()

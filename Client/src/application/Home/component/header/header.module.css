@@ -44,19 +44,29 @@
 }
 
 .nav_buttons .link {
+    text-transform: uppercase;
+    font-weight: bold;
     text-decoration: none;
     transition: color 0.4s ease 0s;
-    font-size: .96em;
+    font-size: .85em;
     cursor: pointer;
-    color: #929292 !important;
+    text-align: center;
+    margin-top: auto;
+    margin-bottom: auto;
+    color: #949494 !important;
 }
 
 .nav_buttons .link_dropdown a {
+    text-transform: uppercase;
+    font-weight: bold;
     text-decoration: none;
     transition: color 0.4s ease 0s;
-    font-size: .96em;
+    font-size: .85em;
     cursor: pointer;
-    color: #929292 !important;
+    text-align: center;
+    margin-top: auto;
+    margin-bottom: auto;
+    color: #949494 !important;
 }
 
 .nav_buttons .link_dropdown a:after {
@@ -83,11 +93,16 @@
 
 /**** Primary Button ****/
 .button {
+    border-radius: 3px;
     text-decoration: none;
-    min-width: 9em;
+    min-width: 10em;
+    text-transform: uppercase;
     color: white !important;
     border: solid transparent 0;
-    padding: 8px 20px;
+    padding-top: 8px;
+    padding-bottom: 8px;
+    font-weight: bold;
+    font-size: .9em;
     background-color: #9254de;
     transition: border-color 0.4s ease 0s, background-color 0.4s ease 0s;
 }

@@ -11,6 +11,7 @@ from sqlalchemy.orm import joinedload
 from os.path import join
 from config import BaseConfig
 from jsonschema import validate
+from datetime import datetime
 import json
 
 
@@ -220,6 +221,10 @@ def updateConfigs(id, name, desc, message, topBarText, secondsUntilPopup, notify
         assistant.SecondsUntilPopup = secondsUntilPopup
         assistant.NotifyEvery = None if notifyEvery == "null" else int(notifyEvery)
         assistant.Config = config
+
+        if not assistant.LastNotificationDate and notifyEvery != "null":
+            assistant.LastNotificationDate = datetime.now()
+
 
         db.session.commit()
         return Callback(True, name + ' Updated Successfully', assistant)

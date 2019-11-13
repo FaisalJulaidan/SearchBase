@@ -7,6 +7,7 @@ import { conversationActions } from 'store/actions';
 import connect from 'react-redux/es/connect/connect';
 import { CSVLink } from 'react-csv';
 import queryString from 'query-string';
+import { convertTimezone } from 'helpers';
 
 const confirm = Modal.confirm;
 
@@ -41,7 +42,6 @@ class Conversations extends React.Component {
                 ],
                 onFilter: (value, record) => record.UserType.indexOf(value) === 0,
                 render: (text, record) => (<Tag key={record.UserType}>{record.UserType}</Tag>)
-
             }, {
                 title: 'Name',
                 key: 'Name',
@@ -66,15 +66,16 @@ class Conversations extends React.Component {
                 title: 'Date & Time',
                 key: 'DateTime',
                 sorter: (a, b) => new Date(a.DateTime).valueOf() - new Date(b.DateTime).valueOf(),
-                render: (text, record) => (<p>{record.DateTime}</p>)
+                render: (text, record) => (<p>{convertTimezone(record.DateTime, 'ddd, DD MMM YYYY HH:mm A')}</p>)
 
             }, {
                 title: 'Score',
                 key: 'Score',
+                align: 'center',
                 sorter: (a, b) => a.Score - b.Score,
                 render: (text, record) => {
                     return (
-                        <div style={{ width: 100 }}>
+                        <div style={{ width: 120, margin:'auto'}}>
                             <Progress percent={Math.round(record.Score * 100)} size="small"
                                       status={record.Score < 0.1 ? 'exception' : 'active'}/>
                         </div>
@@ -84,7 +85,7 @@ class Conversations extends React.Component {
             }, {
                 title: 'Status',
                 key: 'ApplicationStatus',
-                width: '120px',
+                align: 'center',
                 filters: [
                     { text: 'Accepted', value: 'Accepted' },
                     { text: 'Pending', value: 'Pending' },
@@ -125,9 +126,11 @@ class Conversations extends React.Component {
                     );
                 }
 
-            }, {
+            },
+            {
                 title: 'Conversation',
                 key: 'Completed',
+                align: 'center',
                 filters: [
                     { text: 'Completed', value: 'Completed' },
                     { text: 'Incomplete', value: 'Incomplete' }
@@ -136,25 +139,36 @@ class Conversations extends React.Component {
                     return (record.Completed ? 'Completed' : 'Incomplete').indexOf(value) === 0;
                 },
                 render: (text, record) => (
-                    record.Completed ?
-                        <Tag color="#87d068">Completed</Tag> :
-                        <Tag color="red">Incomplete</Tag>)
+                    <div>
+                        {record.Completed ?
+                            <Tag color="#87d068">Completed</Tag> :
+                            <Tag color="red">Incomplete</Tag>
+                        }
+                    </div>)
 
             }, {
                 title: 'Actions',
                 key: 'actions',
+                align: 'center',
                 render: (text, record, index) => (
-                    <span>
-              <a onClick={() => this.showViewModal(record)}>
-                  View
-              </a>
-                    <Divider type="vertical"/>
-              <a onClick={() => {
-                  this.deleteConversation(record);
-              }}>
-                  Delete
-              </a>
-            </span>
+                    <div align="center">
+
+                         <Icon
+                             onClick={() => this.showViewModal(record)}
+                             type="message"
+                             theme="twoTone"
+                             twoToneColor="#9254de"/>
+
+                        <Divider type="vertical"/>
+
+                        <Icon
+                            onClick={() => {
+                                this.deleteConversation(record);
+                            }}
+                            type="delete"
+                            theme="twoTone"
+                            twoToneColor="#f5222d"/>
+                </div>
                 )
             }
         ];
@@ -336,6 +350,7 @@ class Conversations extends React.Component {
                 dataRecord.push(selectedSolutionsData);
 
                 data.push(dataRecord);
+                this.setState({downloadData: data})
             });
         }
     };
@@ -392,7 +407,7 @@ class Conversations extends React.Component {
                        bordered={true}
                        pagination={{ position: 'both', pageSize: 20 }}
                        size='default'
-                       scroll={{ x: 500 }}
+                       scroll={{ x: 'max-content' }}
                 />
 
                 {

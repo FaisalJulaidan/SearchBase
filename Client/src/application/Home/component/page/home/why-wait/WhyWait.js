@@ -4,7 +4,7 @@ import styles from "./why-wait.module.css";
 import {Link} from "react-router-dom";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faCloud} from "@fortawesome/free-solid-svg-icons";
-import Tada from 'react-reveal/Tada';
+import Fade from 'react-reveal/Fade';
 import {animateScroll as scroll} from "react-scroll";
 
 const WhyWait = (props) => {
@@ -25,11 +25,11 @@ const WhyWait = (props) => {
                             <h1>with</h1>
                             <h1 style={{color: '#9254de'}}><b>SearchBase</b></h1>
                         </div>
-                        <Tada fraction={1}>
+                        <Fade duration={1500} fraction={1}>
                             <Link to="/get-started">
                                 <Button className={styles.button} variant="outline-light">Book a demo</Button>
                             </Link>
-                        </Tada>
+                        </Fade>
                     </div>
                 </Col>
             </Row>

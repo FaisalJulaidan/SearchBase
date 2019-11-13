@@ -10,7 +10,7 @@
     },
     {
       "title": "Bullhorn",
-      "desc": "Bullhorn provides customer relationship management, applicant tracking system and operations software for the staffing industry.",
+      "desc": "Bullhorn provides customer relationship mantagement, applicant tracking system and operations software for the staffing industry.",
       "image": "/static/images/CRM/bullhorn.svg",
       "type": "Bullhorn",
       "disabled": false,

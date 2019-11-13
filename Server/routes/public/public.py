@@ -5,7 +5,7 @@ from flask_cors import CORS
 from flask_mail import Message
 
 from models import Callback
-from services import mail_services
+from services import mail_services, url_services, sub_services
 from services.mail_services import mail
 from utilities import helpers
 
@@ -25,6 +25,16 @@ def serve(path):
         return send_from_directory("static/react_app/", path)
     else:
         return send_from_directory("static/react_app/", 'index.html')
+
+@public_router.route('/u/<string:key>')
+def url_shortener(key):
+    urlshotener: Callback = url_services.getByKey(key)
+    
+    if (urlshotener.Success):
+        return redirect(urlshotener.Data)
+    else:
+        return helpers.jsonResponse(False, 400, "Failed to find a URL to point to")
+        # need to return 404?
 
 
 # LEGACY CODE
@@ -48,6 +58,14 @@ def register_interest():
 
         return helpers.jsonResponse(True, 200, callback.Message)
 
+@public_router.route("/pricing/gen_checkout_url", methods=['POST'])
+def generateCheckoutURL():
+    callback: Callback = sub_services.generateCheckoutURL(request.json)
+
+    if not callback.Success:
+        return helpers.jsonResponse(False, 400, callback.Message)
+
+    return helpers.jsonResponse(True, 200, callback.Message, callback.Data)
 
 @public_router.route("/mail/contact_us", methods=['POST'])
 def contact_us():
@@ -61,6 +79,17 @@ def contact_us():
 
         contactUs_callback: Callback = mail_services.contactUsIndex(name, email, message)
         return contactUs_callback.Message
+
+# Stripe webhook URLS
+@public_router.route("/stripe_webhook", methods=['POST'])
+def stripe_webhook():
+    print("lolol")
+    callback: Callback = sub_services.handleStripeWebhook(request)
+
+    # To tell stripe whether the request was succesful
+    if not callback.Success:
+        return helpers.jsonResponse(False, 400, callback.Message)
+    return helpers.jsonResponse(True, 200, callback.Message)
 
 # Old website routes, To be deleted.
 #

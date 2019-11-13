@@ -42,7 +42,7 @@ class LoginForm extends React.Component {
                 </Form.Item>
                 <Form.Item className={styles.form_item}>
                     <h1 className={styles.forgot_pass}>Forgot your <a href="/forget_password">password</a>?</h1>
-                    <Button type="primary" htmlType="submit" block>
+                    <Button type="primary" htmlType="submit" block className={styles.submit}>
                         Log in
                     </Button>
                 </Form.Item>

@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <!--suppress ALL -->
 <html lang="en">
-  <head>
+<head>
     <meta charset="utf-8">
-      <link rel="shortcut icon" href="%PUBLIC_URL%/icon.png">
+    <link rel="shortcut icon" href="%PUBLIC_URL%/icon.png">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <meta name="theme-color" content="#FFFFFF"/>
     <!--
@@ -12,7 +12,9 @@
     -->
     <link rel="manifest" href="%PUBLIC_URL%/manifest.json">
 
-    <link href="https://fonts.googleapis.com/css?family=Noto+Sans+TC:300,400,700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Noto+Sans+TC:300,400,700,900&display=swap" rel="stylesheet">
+
+    <script id="stripe-js" src="https://js.stripe.com/v3/" async></script>
 
     <!--
       Notice the use of %PUBLIC_URL% in the tags above.
@@ -23,22 +25,45 @@
       work correctly both with client-side routing and a non-root public URL.
       Learn how to configure a non-root public URL by running `npm run build`.
     -->
-      <title>TSB - Dashboard</title>
-  </head>
-  <body>
-    <noscript>
-      You need to enable JavaScript to run this app.
-    </noscript>
-    <div id="root"></div>
-    <!--
-      This HTML file is a template.
-      If you open it directly in the browser, you will see an empty page.
 
-      You can add webfonts, meta tags, or analytics to this file.
-      The build step will place the bundled scripts into the <body> tag.
+    <!-- HTML Meta Tags -->
+    <title>SearchBase - Recruitment Automation with Chatbots</title>
+    <meta name="description" content="SearchBase is recruitment automation platform using chatbots which provides constant intraction with candidates and organise their information">
+    <!-- Google / Search Engine Tags -->
+    <meta itemprop="name" content="SearchBase - Recruitment Automation with Chatbots">
+    <meta itemprop="description" content="SearchBase is recruitment automation platform using chatbots which provides constant intraction with candidates and organise their information">
+    <meta itemprop="image" content="static/images/home/logo.png">
+    <!-- Facebook Meta Tags -->
+    <meta property="og:url" content="https://www.thesearchbase.com">
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="SearchBase - Recruitment Automation with Chatbots">
+    <meta property="og:description" content="SearchBase is recruitment automation platform using chatbots which provides constant intraction with candidates and organise their information">
+    <meta property="og:image" content="static/images/home/logo.png">
+    <!-- Twitter Meta Tags -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="SearchBase - Recruitment Automation with Chatbots">
+    <meta name="twitter:description" content="SearchBase is recruitment automation platform using chatbots which provides constant intraction with candidates and organise their information">
+    <meta name="twitter:image" content="static/images/home/logo.png">
 
-      To begin the development, run `npm start` or `yarn start`.
-      To create a production bundle, use `npm run build` or `yarn build`.
-    -->
-  </body>
+    <!-- Start of HubSpot Embed Code -->
+    <script type="text/javascript" id="hs-script-loader" async defer src="//js.hs-scripts.com/6637626.js"></script>
+    <!-- End of HubSpot Embed Code -->
+
+</head>
+<body>
+<noscript>
+    You need to enable JavaScript to run this app.
+</noscript>
+<div id="root"></div>
+<!--
+  This HTML file is a template.
+  If you open it directly in the browser, you will see an empty page.
+
+  You can add webfonts, meta tags, or analytics to this file.
+  The build step will place the bundled scripts into the <body> tag.
+
+  To begin the development, run `npm start` or `yarn start`.
+  To create a production bundle, use `npm run build` or `yarn build`.
+-->
+</body>
 </html>

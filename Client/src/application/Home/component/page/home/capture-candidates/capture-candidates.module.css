@@ -38,20 +38,18 @@
 .button {
     display: inline-block;
     text-decoration: none;
+    text-transform: uppercase;
+    font-size: .9em;
+    letter-spacing: 4px;
+    font-weight: bold;
     color: #9254de;
-    font-size: 1.1em;
     -webkit-transition: color 0.4s ease 0s;
     -moz-transition: color 0.4s ease 0s;
     -o-transition: color 0.4s ease 0s;
     transition: color 0.4s ease 0s;
 }
 
-.button .icon {
-    margin-left: 5px;
-}
-
 .button:hover {
-    text-decoration: none;
     color: #9C7DED;
 }
 

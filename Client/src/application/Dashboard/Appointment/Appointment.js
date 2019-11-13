@@ -1,16 +1,14 @@
 import React from 'react';
 
-import { Icon, Input, Modal, Typography, Tabs } from 'antd';
+import { Icon, Typography, Tabs } from 'antd';
 import NoHeaderPanel from 'components/NoHeaderPanel/NoHeaderPanel';
 import Calendar from './Calendar/Calendar';
 import TimeSlots from './TimeSlots/TimeSlots';
-import momenttz from 'moment-timezone';
 import Appointments from './Appointments/Appointments';
 import styles from './Calendar/Calendar.module.less';
 import queryString from 'query-string';
-// import {TimezoneContext} from "../../../contexts/timezone"
 
-import { TimezoneContext } from '../../../contexts/timezone';
+import Availability from './Availability/Availability';
 
 const { Title, Paragraph } = Typography;
 
@@ -29,10 +27,7 @@ class Appointment extends React.Component {
     }
 
 
-    static contextType = TimezoneContext;
-
     render() {
-        let tz = this.context ? this.context : momenttz.tz.guess();
         return (
             <NoHeaderPanel>
                 <div className={styles.Header}>
@@ -45,13 +40,16 @@ class Appointment extends React.Component {
                 </div>
                 <Tabs onChange={key => this.setState({ key: key })} defaultActiveKey={this.state.defaultTab}>
                     <Tabs.TabPane tab="Appointments" key="Appointments">
-                        <Appointments tz={tz}/>
+                        <Appointments/>
                     </Tabs.TabPane>
                     <Tabs.TabPane disabled={true} tab="Calendar (coming soon)" key="Calendar">
-                        <Calendar tz={tz}/>
+                        <Calendar/>
                     </Tabs.TabPane>
                     <Tabs.TabPane tab="Time Slots" key="TimeSlots">
-                        <TimeSlots openTab={this.state.key !== 'TimeSlots'} tz={tz}/>
+                        <TimeSlots openTab={this.state.key !== 'TimeSlots'}/>
+                    </Tabs.TabPane>
+                    <Tabs.TabPane tab="Availability" key="Availability">
+                        <Availability/>
                     </Tabs.TabPane>
                 </Tabs>
             </NoHeaderPanel>

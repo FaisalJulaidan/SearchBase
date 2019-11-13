@@ -1,3 +1,12 @@
+.head{
+    color: #444444;
+}
+
+.body{
+    color: #767676;
+    font-size: .9em;
+}
+
 .li{
     list-style: lower-alpha inside;
 }

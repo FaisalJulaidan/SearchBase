@@ -1,0 +1,21 @@
+.SignupFormItem {
+    margin-bottom: 0 !important;
+}
+
+.checkbox {
+    color: #726a84;
+    line-height: normal;
+}
+
+.link {
+    font-size: .96em;
+    margin: 0 .2em;
+    text-decoration: none;
+    color: #9254de;
+}
+
+.link:hover {
+    font-size: .96em;
+    margin: 0 .2em;
+    color: #9254de;
+}

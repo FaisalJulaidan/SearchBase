@@ -34,7 +34,8 @@ const Header = (props) => {
                                                   to={{pathname: "/how-it-works", hash: "#engagement",}}>Engagement
                                 </NavDropdown.Item>
                             </NavDropdown>
-                            <Nav.Link className={styles.link} as={Link} to="/how-it-works">How it works?</Nav.Link>
+                            <Nav.Link className={styles.link} as={Link} to="/how-it-works">How it works</Nav.Link>
+                            <Nav.Link className={styles.link} as={Link} to="/pricing">Pricing</Nav.Link>
                             <Nav.Link className={styles.link} as={Link} to="/login">Log in</Nav.Link>
                         </Nav>
                         <div className={styles.button_wrapper}>

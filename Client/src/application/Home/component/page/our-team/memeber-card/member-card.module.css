@@ -38,21 +38,21 @@
 
 .card .name {
     font-size: 1.3em;
-    color: #494949;
-    font-weight: bold;
+    color: #444444;
+    font-weight: 900;
 }
 
 .card .title {
     color: #9254de;
-    margin-top: 0.75em;
+    margin-top: 0.5em;
     font-weight: bold;
-
+    font-size: 1.1em;
 }
 
 .card .description {
-    padding-top: 0.75em;
-    font-weight: lighter;
-    font-size: .85em;
+    padding-top: 1em;
+    font-size: .9em;
+    color: #726a84;
 }
 
 .card .icon_wrapper {

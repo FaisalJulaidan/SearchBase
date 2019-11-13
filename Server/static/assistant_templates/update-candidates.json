@@ -1,0 +1,258 @@
+{
+  "groups": [
+    {
+      "blocks": [
+        {
+          "Type": "Raw Text",
+          "StoreInDB": false,
+          "Skippable": false,
+          "SkipText": "Skip!",
+          "SkipAction": "End Chat",
+          "SkipBlockToGoID": null,
+          "DataType": "NoType",
+          "Content": {
+            "text": "Just so we can update your records on our system, please provide us with as much information as possible.",
+            "action": "Go To Next Block",
+            "blockToGoID": "i67IZg7n"
+          },
+          "ID": "hAJFjzDb"
+        },
+        {
+          "Type": "User Input",
+          "StoreInDB": true,
+          "Skippable": false,
+          "SkipText": "Skip!",
+          "SkipAction": "End Chat",
+          "SkipBlockToGoID": null,
+          "DataType": "CandidateLocation",
+          "Content": {
+            "text": "Can you tell us where you are currently located?",
+            "blockToGoID": "kPEyN9uM",
+            "action": "Go To Next Block",
+            "afterMessage": "Cool",
+            "keywords": []
+          },
+          "ID": "i67IZg7n"
+        },
+        {
+          "Type": "Question",
+          "StoreInDB": true,
+          "Skippable": false,
+          "SkipText": "Skip!",
+          "SkipAction": "End Chat",
+          "SkipBlockToGoID": null,
+          "DataType": "NoType",
+          "Content": {
+            "text": "Has your mobile number changes since we last spoke?",
+            "answers": [
+              {
+                "id": "4c-C_OXB",
+                "text": "Yes ",
+                "keywords": [],
+                "blockToGoID": "t5sRQCJF",
+                "action": "Go To Next Block",
+                "afterMessage": "Sure, let's update that",
+                "score": 5
+              },
+              {
+                "id": "4jzS8FCS",
+                "text": "No",
+                "keywords": [],
+                "blockToGoID": "z9pfmY8y",
+                "action": "Go To Specific Block",
+                "afterMessage": "Good",
+                "score": 5
+              }
+            ]
+          },
+          "ID": "kPEyN9uM"
+        },
+        {
+          "Type": "User Input",
+          "StoreInDB": true,
+          "Skippable": false,
+          "SkipText": "Skip!",
+          "SkipAction": "End Chat",
+          "SkipBlockToGoID": null,
+          "DataType": "CandidateMobile",
+          "Content": {
+            "text": "What is your new mobile number?",
+            "blockToGoID": "NJRPSyJE",
+            "action": "Go To Next Block",
+            "afterMessage": "Great thanks",
+            "keywords": []
+          },
+          "ID": "t5sRQCJF"
+        },
+        {
+          "Type": "Question",
+          "StoreInDB": true,
+          "Skippable": false,
+          "SkipText": "Skip!",
+          "SkipAction": "End Chat",
+          "SkipBlockToGoID": null,
+          "DataType": "NoType",
+          "Content": {
+            "text": "Has your email address changed since we last spoke?",
+            "answers": [
+              {
+                "id": "V8CaO723",
+                "text": "Yes",
+                "keywords": [],
+                "blockToGoID": "_aLn56Uw",
+                "action": "Go To Next Block",
+                "afterMessage": "OK, let us know so we can updates our records",
+                "score": 5
+              },
+              {
+                "id": "rYhk588j",
+                "text": "No",
+                "keywords": [],
+                "blockToGoID": "z9pfmY8y",
+                "action": "Go To Specific Block",
+                "afterMessage": "OK good, next question...",
+                "score": 5
+              }
+            ]
+          },
+          "ID": "NJRPSyJE"
+        },
+        {
+          "Type": "User Input",
+          "StoreInDB": true,
+          "Skippable": false,
+          "SkipText": "Skip!",
+          "SkipAction": "End Chat",
+          "SkipBlockToGoID": null,
+          "DataType": "CandidateEmail",
+          "Content": {
+            "text": "What us your new email address? ",
+            "blockToGoID": "z9pfmY8y",
+            "action": "Go To Next Block",
+            "afterMessage": "Thanks for your information",
+            "keywords": []
+          },
+          "ID": "_aLn56Uw"
+        },
+        {
+          "Type": "Question",
+          "StoreInDB": true,
+          "Skippable": false,
+          "SkipText": "Skip!",
+          "SkipAction": "End Chat",
+          "SkipBlockToGoID": null,
+          "DataType": "NoType",
+          "Content": {
+            "text": "Have you learned any new skills since we last spoke?",
+            "answers": [
+              {
+                "id": "Ya5YDfXm",
+                "text": "Yes",
+                "keywords": [],
+                "blockToGoID": "7S6vpMsl",
+                "action": "Go To Next Block",
+                "afterMessage": "Fantastic",
+                "score": 5
+              },
+              {
+                "id": "g9bvUPbj",
+                "text": "No",
+                "keywords": [],
+                "blockToGoID": "Z1zmlly4",
+                "action": "Go To Specific Block",
+                "afterMessage": "OK, last question ",
+                "score": 5
+              }
+            ]
+          },
+          "ID": "z9pfmY8y"
+        },
+        {
+          "Type": "User Input",
+          "StoreInDB": true,
+          "Skippable": false,
+          "SkipText": "Skip!",
+          "SkipAction": "End Chat",
+          "SkipBlockToGoID": null,
+          "DataType": "CandidateSkills",
+          "Content": {
+            "text": "What new skill(s) have you learned?",
+            "blockToGoID": "Z1zmlly4",
+            "action": "Go To Next Block",
+            "afterMessage": "Great to hear",
+            "keywords": []
+          },
+          "ID": "7S6vpMsl"
+        },
+        {
+          "Type": "Question",
+          "StoreInDB": true,
+          "Skippable": false,
+          "SkipText": "Skip!",
+          "SkipAction": "End Chat",
+          "SkipBlockToGoID": null,
+          "DataType": "NoType",
+          "Content": {
+            "text": "Since we last spoke, have you acquired any new education or attended any formal education?",
+            "answers": [
+              {
+                "id": "edj9w6nL",
+                "text": "Yes",
+                "keywords": [],
+                "blockToGoID": "BAGtI2a7",
+                "action": "Go To Next Block",
+                "afterMessage": "Awesome. Let's update our records",
+                "score": 5
+              },
+              {
+                "id": "W_tNHnmm",
+                "text": "No",
+                "keywords": [],
+                "blockToGoID": "Hp-Yx-wj",
+                "action": "Go To Specific Block",
+                "afterMessage": "OK, thanks for letting me know",
+                "score": 5
+              }
+            ]
+          },
+          "ID": "Z1zmlly4"
+        },
+        {
+          "Type": "User Input",
+          "StoreInDB": true,
+          "Skippable": false,
+          "SkipText": "Skip!",
+          "SkipAction": "End Chat",
+          "SkipBlockToGoID": null,
+          "DataType": "CandidateEducation",
+          "Content": {
+            "text": "Please describe the education that you acquired ",
+            "blockToGoID": "Hp-Yx-wj",
+            "action": "Go To Next Block",
+            "afterMessage": "",
+            "keywords": []
+          },
+          "ID": "BAGtI2a7"
+        },
+        {
+          "Type": "Raw Text",
+          "StoreInDB": false,
+          "Skippable": false,
+          "SkipText": "Skip!",
+          "SkipAction": "End Chat",
+          "SkipBlockToGoID": null,
+          "DataType": "NoType",
+          "Content": {
+            "text": "Well, thank you for your information. We have now updated our systems. If we find any relevant jobs, we will be in touch.",
+            "action": "End Chat",
+            "blockToGoID": null
+          },
+          "ID": "Hp-Yx-wj"
+        }
+      ],
+      "description": "Main Flow",
+      "id": "viqDo7OA",
+      "name": "Main"
+    }
+  ]
+}

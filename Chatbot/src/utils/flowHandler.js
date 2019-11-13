@@ -100,6 +100,7 @@ const getCurBlock = (action, assistant, chatbot) => {
             return createBlock({ text: Message }, messageTypes.TEXT, delayMessageLength(Message), null, null, loadFirstBlock(blocks).ID);
         case 'Go To Next Block':
         case 'Go To Specific Block':
+        case 'Go To Group':
             return loadNextBlock(chatbot);
         case 'Early End Chat':
             return endBlock(false);

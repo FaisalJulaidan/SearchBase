@@ -1,19 +1,20 @@
 .wrapper {
     background: #F6F6F6;
-    padding: 80px 0;
     position: relative;
+    overflow: hidden;
+    padding: 40px 0 80px;
 }
 
 .intro {
     display: block;
     text-transform: uppercase;
     color: #848484;
-    font-weight: bolder;
-    font-size: 1.1em;
+    font-weight: 900;
+    font-size: 1.4em;
     margin-bottom: 35px;
     letter-spacing: .5px;
     position: relative;
-    padding: 0 0 20px;
+    padding: 0 0 10px;
 }
 
 .intro:after {
@@ -27,15 +28,13 @@
 }
 
 .title {
-    font-size: 2.2em;
-    line-height: 48px;
-    margin: 0 0 25px;
+    font-size: 2.5em;
     color: #444444;
     font-weight: lighter;
 }
 
 .text {
-    color: #848484;
+    color: #767676;
 }
 
 .image_wrapper {

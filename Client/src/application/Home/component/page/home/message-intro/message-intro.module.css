@@ -15,16 +15,18 @@
 
 .intro {
     font-size: 1.2em;
-    color: #444444;
-    border-bottom: 2px #444444 solid;
+    color: #726a84;
+    text-transform: uppercase;
+    border-bottom: 2px #726a84 solid;
     padding-bottom: 6px;
     display: inline-block;
 }
 
 .title {
     margin-top: .2em;
-    margin-bottom: 1em;
-    font-size: 2em;
+    margin-bottom: .3em;
+    font-size: 1.8em;
+    font-weight: bold;
     color: #9254de;
 }
 
@@ -34,9 +36,12 @@
 
 .button {
     display: inline-block;
-    text-decoration: none;
-    margin-top: 1em;
+    text-transform: uppercase;
+    font-size: .85em;
+    letter-spacing: 5px;
+    margin-top: 1.5em;
     color: #9254de;
+    font-weight: bold;
     -webkit-transition: color 0.4s ease 0s;
     -moz-transition: color 0.4s ease 0s;
     -o-transition: color 0.4s ease 0s;
@@ -48,7 +53,6 @@
 }
 
 .button:hover {
-    text-decoration: none;
     color: #9C7DED;
 }
 

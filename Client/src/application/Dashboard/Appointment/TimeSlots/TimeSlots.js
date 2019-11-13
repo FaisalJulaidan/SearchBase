@@ -142,9 +142,8 @@ class TimeSlots extends React.Component {
                           onEdit={this.onEdit}>
                         {tabList.map((timeSlot, i) => {
                             return (<TabPane tab={tab(timeSlot.Name, timeSlot.isLoading)} key={`${timeSlot.ID}`}
-                                             closable={timeSlot.ID === 'new' ? false : true}>
+                                             closable={timeSlot.ID !== 'new'}>
                                 <TimeSlot
-                                    tz={this.props.tz}
                                     info={timeSlot.Info}
                                     id={timeSlot.ID}
                                     name={timeSlot.Name}

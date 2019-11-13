@@ -3,7 +3,7 @@ import {connect} from 'react-redux';
 import styles from './signup-form.module.css'
 import momenttz from 'moment-timezone'
 import {Form, Icon, Input, Select, Checkbox,Button} from 'antd';
-import {Link} from "react-router-dom";
+import {Link,withRouter} from "react-router-dom";
 
 import {authActions} from '../../../../../store/actions/index';
 
@@ -24,12 +24,18 @@ class SignupForm extends React.Component {
         confirmDirty: false,
     };
 
+    componentDidUpdate(prevProps, prevState, snapshot) {
+        if (prevProps.isSigningUp && (this.props.errorMsg === null)) {
+            this.props.history.push('/login');
+        }
+    }
+
     handleSubmit = (e) => {
         e.preventDefault();
         this.props.form.validateFields((err, values) => {
             if (!err) {
                 values.timeZone = momenttz.tz.guess();
-                console.log('Received values of form: ', values);
+                // console.log('Received values of form: ', values);
                 this.props.dispatch(authActions.signup(values));
             }
         });
@@ -164,7 +170,7 @@ class SignupForm extends React.Component {
                     )}
                 </Form.Item>
                 <Form.Item className={styles.SignupFormItem}>
-                    <Button type="primary" htmlType="submit" block>
+                    <Button type="primary" htmlType="submit" block className={styles.submit}>
                         Sign up
                     </Button>
                 </Form.Item>
@@ -177,8 +183,9 @@ class SignupForm extends React.Component {
 
 function mapStateToProps(state) {
     return {
-        isSigningUp: state.auth.isSigningUp
+        isSigningUp: state.auth.isSigningUp,
+        errorMsg: state.auth.errorMsg
     };
 }
 
-export default connect(mapStateToProps)(Form.create()(SignupForm));
+export default connect(mapStateToProps)(Form.create()(withRouter(SignupForm)));

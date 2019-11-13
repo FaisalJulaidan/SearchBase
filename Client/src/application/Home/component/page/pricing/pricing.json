@@ -1,1 +1,51 @@
-[]
+[
+  {
+    "id": "essential",
+    "stripe_key": "plan_G7Sth78cbr8Pgl",
+    "title": "Essential",
+    "subtitle": "Suitable for teams of up to 3 members",
+    "price": "£99",
+    "price_subtitle": "per month billed annually",
+    "items": [
+      "Website Chatbot",
+      "CRM Integration",
+      "Outbound Messages"
+    ]
+  },
+  {
+    "id": "pro",
+    "stripe_key": "plan_G7SuTtSoBxJ7aS",
+    "title": "Pro",
+    "subtitle": "Suitable for teams of up to 10 members",
+    "price": "£249",
+    "price_subtitle": "per month billed annually",
+    "items": [
+      "Website Chatbot",
+      "CRM Integration",
+      "Outbound Messages",
+      "Pre-screen Candidates",
+      "Qualify Candidates",
+      "Automated Decision Making",
+      "Automated Engagement"
+    ]
+  },
+  {
+    "id": "premium",
+    "stripe_key": "plan_G7SuT5aJA1OFJU",
+    "title": "Premium",
+    "subtitle": "Suitable for teams of up to 50 members",
+    "price": "£1,150",
+    "price_subtitle": "per month billed annually",
+    "items": [
+      "Website Chatbot",
+      "CRM Integration",
+      "Outbound Messages",
+      "Pre-screen Candidates",
+      "Qualify Candidates",
+      "Automated Decision Making",
+      "Automated Engagement",
+      "Automated Scheduling",
+      "Re-engage Passive Candidates"
+    ]
+  }
+]

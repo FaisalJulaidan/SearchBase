@@ -36,7 +36,7 @@
 }
 
 .card {
-    border-radius: 10px;
+    border-radius: 4px;
     box-shadow: 0 5px 10px 0 rgba(0, 0, 0, 0.1);
 }
 
@@ -45,49 +45,7 @@
     font-size: 2em;
     font-weight: bold;
     text-align: center;
-    padding-bottom: 1em;
-}
-
-.input {
-    border: none;
-    border-radius: 0;
-    border-bottom: 2px solid #adadad;
-}
-
-.input:focus {
-    box-shadow: none;
-    border-color: #9254de;
-}
-
-.has_val {
-    border-color: #9254de;
-}
-
-.submit {
-    margin-top: 3em;
-    border: solid transparent 0;
-    border-radius: 7px;
-    padding: 8px 20px;
-    background-color: #9254de;
-    transition: border-color 0.4s ease 0s, background-color 0.4s ease 0s;
-}
-
-.submit:hover {
-    background-color: #9C7DED;
-    transition: border-color 0.4s ease 0s, background-color 0.4s ease 0s;
-}
-
-.submit:not(:disabled):not(.disabled):active {
-    background-color: #9C7DED;
-    transition: border-color 0.4s ease 0s, background-color 0.4s ease 0s;
-}
-
-.submit:focus {
-    box-shadow: 0 0 0 0.2rem rgba(138, 107, 219, .5);
-}
-
-.submit:not(:disabled):not(.disabled):active:focus {
-    box-shadow: 0 0 0 0.2rem rgba(138, 107, 219, .5);
+    padding-bottom: .5em;
 }
 
 .sign_up {
@@ -141,10 +99,10 @@
     }
 }
 
-@media (max-width: 575.98px) {
+@media (max-width: 768.98px) {
     .col_desc{
         margin-top: 1em;
-        margin-bottom: 1em;
+        margin-bottom: 2em;
     }
     .col_desc .text1 {
         text-align: center;

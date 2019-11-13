@@ -17,14 +17,18 @@ const MemberCard = (props) => {
                 <h4 className={styles.name}>{props.name}</h4>
                 <h1 className={styles.title}>{props.title}</h1>
                 <p className={styles.description}>{props.desc}</p>
-                <div className={styles.icon_wrapper}>
+                <div className={styles.icon_wrapper}
+                     style={{
+                         display: (typeof props.linkedin != "undefined") && (typeof props.facebook != "undefined")
+                         && (typeof props.twitter != "undefined") && (typeof props.github != "undefined") ? 'block' : 'none'
+                     }}>
                     <a style={{display: (typeof props.linkedin != "undefined") ? 'block' : 'none'}}
                        target="_blank"
                        rel="noopener noreferrer"
                        href={"https://www.linkedin.com/in/" + props.linkedin}>
                         <FontAwesomeIcon className={styles.icon} color="#0177B5" icon={faLinkedin}/>
                     </a>
-                    <a style={{display: (typeof props.twitter != "undefined") ? 'block' : 'none'}} target="_blank"
+                    <a style={{display: (typeof props.facebook != "undefined") ? 'block' : 'none'}} target="_blank"
                        rel="noopener noreferrer" href={"https://www.facecbook.com/" + props.facebook}>
                         <FontAwesomeIcon className={styles.icon} color="#3A5CA0" icon={faFacebook}/>
                     </a>
@@ -32,7 +36,7 @@ const MemberCard = (props) => {
                        rel="noopener noreferrer" href={"https://twitter.com/" + props.twitter}>
                         <FontAwesomeIcon className={styles.icon} color="#1DA1F2" icon={faTwitter}/>
                     </a>
-                    <a style={{display: (typeof props.twitter != "undefined") ? 'block' : 'none'}} target="_blank"
+                    <a style={{display: (typeof props.github != "undefined") ? 'block' : 'none'}} target="_blank"
                        rel="noopener noreferrer" href={"https://github.com/" + props.github}>
                         <FontAwesomeIcon className={styles.icon} color="#24292E" icon={faGithub}/>
                     </a>

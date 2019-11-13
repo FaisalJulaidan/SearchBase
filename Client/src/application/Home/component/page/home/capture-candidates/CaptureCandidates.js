@@ -22,7 +22,7 @@ const CaptureCandidates = (props) => {
                     <h1 className={styles.text}>With direct communication between you and candidates, your business can
                         collect a wealth of highly descriptive candidate profiles in seconds.</h1>
                     <Link to="/how-it-works" className={styles.button}>
-                        Tell me more <FontAwesomeIcon className={styles.icon} icon={faArrowCircleRight}/>
+                        Tell me more <FontAwesomeIcon icon={faArrowCircleRight}/>
                     </Link>
                 </Col>
             </Row>

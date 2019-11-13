@@ -11,22 +11,22 @@ const TableItem = (props) => {
         let listItems = props.column.items.map((item, i) => {
             return <li className={styles.li} key={i}>{item}</li>
         });
-        item = <ol >{listItems}</ol>
+        item = <ol>{listItems}</ol>
     } else {
         item = <></>;
     }
 
     if (props.head)
         return (
-            <th>{item}</th>
+            <th className={styles.head}>{item}</th>
         );
     else if (props.body)
         return (
-            <td>{item}</td>
+            <td className={styles.body}>{item}</td>
         );
     else
         return (
-            <td>{item}</td>
+            <td className={styles.body}>{item}</td>
         );
 };
 

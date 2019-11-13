@@ -1,7 +1,88 @@
 import React from 'react';
-import {Typography} from "antd";
+import {Typography, Input, Icon, Button} from "antd";
+import {getLink} from "../../../../../helpers";
 
 const {Title, Paragraph, Text} = Typography;
+
+export const BullhornFormItems = ({
+                                   FormItem,
+                                   layout,
+                                   getFieldDecorator,
+                                   marketplace,
+                                   connectMarketplace,
+                                   isConnecting,
+                                   isTesting,
+                               }) =>
+    <>
+        {
+            marketplace.status !== "CONNECTED" &&
+            marketplace.status !== "FAILED" &&
+            <div>
+                <FormItem label="API Username"
+                          {...layout}>
+                    {getFieldDecorator('username', {
+                        rules: [{
+                            required: true,
+                            message: "API Username is required",
+                        }],
+                    })(
+                        // To readOnly to avoid autocomplete
+                        <Input readOnly
+                               onFocus={elem => elem.target.removeAttribute('readonly')}
+                               placeholder={'Login of user to use for authentication'}/>
+                    )}
+                </FormItem>
+
+                <FormItem label="API Password"
+                          {...layout}>
+                    {getFieldDecorator('password', {
+
+                        rules: [{
+                            required: true,
+                            max: 32,
+                            message: "API Password is required, and should be less than or 32 character",
+                        }],
+                    })(
+                        // To readOnly to avoid autocomplete
+                        <Input readOnly
+                               onFocus={elem => elem.target.removeAttribute('readonly')}
+                               prefix={<Icon type="lock" style={{color: 'rgba(0,0,0,.25)'}}/>}
+                               placeholder={"User's password"} type="password"/>
+                    )}
+                </FormItem>
+
+                {
+                    marketplace.status === "NOT_CONNECTED" &&
+                    <Button type="primary" disabled={isConnecting || isTesting}
+                            onClick={connectMarketplace}>Connect</Button>
+                }
+            </div>
+        }
+
+        {
+            marketplace.status === "CONNECTED" &&
+            <div style={{textAlign: 'center'}}>
+                <img src={getLink('/static/images/undraw/success.svg')} alt="" height={300}/>
+                <Typography.Title>
+                    {marketplace.type} is connected
+                </Typography.Title>
+            </div>
+        }
+
+        {
+            marketplace.status === "FAILED" &&
+            <div style={{textAlign: 'center'}}>
+                <img src={getLink('/static/images/undraw/failed.svg')} alt="" height={300}/>
+                <Title>
+                    {marketplace.type} is failed
+                </Title>
+                <Paragraph type="secondary">
+                    {marketplace.type} is failing this is usually not from us, please contact the marketplace
+                    provider
+                </Paragraph>
+            </div>
+        }
+    </>;
 
 export const BullhornFeatures = () =>
     <Typography style={{padding: '0 60px'}}>

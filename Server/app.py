@@ -25,6 +25,8 @@ from services.auth_services import jwt
 from services.mail_services import mail
 from utilities import helpers, tasks, dummy_data
 
+from utilities.helpers import limiter
+
 app = Flask(__name__, static_folder='static')
 
 # Register Routes:
@@ -66,6 +68,16 @@ def page_not_found(e):
         return render_template('errors/404.html'), status.HTTP_404_NOT_FOUND
 
 
+# Requests limiter initialisation:
+limiter.init_app(app)
+limiter.enabled = os.environ['FLASK_ENV'] != 'development'
+
+# Custom limiter exceeded error response
+@app.errorhandler(429)
+def ratelimit_handler(e):
+    return helpers.jsonResponse(False, 429, "ratelimit exceeded %s" % e.description, None)
+
+
 @marketplace_router.route("/bullhorn_callback", methods=['GET', 'POST', 'PUT'])
 def test_crm_123():
     print("got something here", request)
@@ -76,7 +88,6 @@ def test_crm_123():
 migrate_var = Migrate(app, db)
 manager = Manager(app)
 babel = Babel(app)
-# scheduler = APScheduler()
 manager.add_command('db', MigrateCommand)
 app.jinja_env.add_extension('jinja2.ext.do')  # Add 'do' extension to Jinja engine
 
@@ -135,8 +146,6 @@ elif os.environ['FLASK_ENV'] == 'development':
         os.environ["scheduler_lock"] = "True"
 
     print('Development mode running...')
-    # appointment_services.setAppointmentStatus(1, "Faisal", "julaidan.faisal@gmail.com", "3202343", "Accepted", 1)
-
 
 else:
     raise Exception("Please set FLASK_ENV first to either 'production', 'development', or 'staging' in .env file")

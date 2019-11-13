@@ -15,6 +15,7 @@ const initialState = user ?
     {
         isAuthenticated: false,
         user: null,
+        companyID: null,
         isRequestingDemo: false,
         isSigningUp: false,
         isLoggingIn: false,
@@ -47,15 +48,19 @@ export const auth = (state = initialState, action) => {
 
         case actionTypes.SIGNUP_REQUEST:
             return updateObject(state, {
+                companyID: null,
                 isSigningUp: true,
                 errorMsg: null,
             });
         case actionTypes.SIGNUP_SUCCESS:
             return updateObject(state, {
+                companyID: action.companyID,
                 isSigningUp: false,
+                errorMsg: null
             });
         case actionTypes.SIGNUP_FAILURE:
             return updateObject(state, {
+                companyID: null,
                 isSigningUp: false,
                 errorMsg: action.error
             });

@@ -18,9 +18,9 @@ const MyComponent = () => {
                     </Col>
                     <Col md={6}>
                         <h1 className={styles.title}>404 - PAGE NOT FOUND</h1>
-                        <h4 className={styles.desc}>The page you are looking for might have been removed had its name
-                            changed or is temporarily
-                            unavailable.</h4>
+                        <h4 className={styles.desc}>The page you are looking for might have been removed, had its name
+                            changed, or is temporarily unavailable.
+                        </h4>
                         <Button variant="outline-info" className={styles.button}> <Link to="/"
                                                                                         style={{textDecoration: 'none'}}>Home
                             Page</Link></Button>

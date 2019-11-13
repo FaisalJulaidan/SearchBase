@@ -32,14 +32,14 @@ POST REQUEST EXAMPLE:
 
 @appointment_router.route("/appointments/set_status", methods=['POST'])
 @jwt_required
-@wrappers.validOwner('Appointment', 'appointmentID')
 @wrappers.AccessAppointmentsRequired
 def set_appointment_status():
     # Authenticate
     user = get_jwt_identity()['user']
 
     data = request.get_json()
-    callback = appointment_services.setAppointmentStatus(data['appointmentID'], data['name'], data['email'], data['phone'], data['status'], user['companyID'])
+
+    callback = appointment_services.setAppointmentStatus(data, user['companyID'])
 
     if callback.Success:
         return helpers.jsonResponse(True, 200, callback.Message)
@@ -48,7 +48,7 @@ def set_appointment_status():
 
 
 @appointment_router.route("/appointments/set_status_public", methods=['POST'])
-@wrappers.AccessAppointmentsRequired
+# @wrappers.AccessAppointmentsRequired
 def set_appointment_status_public():
     data = request.get_json()
     callback = appointment_services.setAppointmentStatusPublic(data['token'], data['appointmentID'], data['status'])
@@ -60,7 +60,7 @@ def set_appointment_status_public():
 
 
 @appointment_router.route("/appointments/verify/<token>", methods=['GET'])
-@wrappers.AccessAppointmentsRequired
+# @wrappers.AccessAppointmentsRequired
 def verify_get_appointment(token):
     callback = appointment_services.verifyRequest(token)
 

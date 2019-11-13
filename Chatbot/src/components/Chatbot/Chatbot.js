@@ -239,7 +239,7 @@ export const Chatbot = ({
                 return setChatbotStatus({ disabled: isDisabled, active: assistant.Active, loading: false });
 
             dataHandler.setAssistantID(assistantID);
-
+            console.log( [].concat(assistant.Flow.groups.map(group => group.blocks)).flat(1))
             initChatbot(
                 assistant,
                 [].concat(assistant.Flow.groups.map(group => group.blocks)).flat(1),

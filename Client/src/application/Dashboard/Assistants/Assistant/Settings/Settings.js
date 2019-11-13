@@ -3,7 +3,7 @@ import {connect} from 'react-redux';
 import {store} from 'store/store';
 
 import {Button, Select, Form, Input, InputNumber, Divider, Switch, Modal, Radio} from 'antd';
-import {assistantActions} from 'store/actions';
+import {assistantActions, marketplaceActions} from 'store/actions';
 import {history} from 'helpers';
 
 import countries from 'helpers/static_data/countries';
@@ -78,10 +78,6 @@ class Settings extends Component {
         });
     };
 
-    onOwnersSelected = (value) => {
-        console.log(`selected ${value}`);
-    };
-
     uploadLogo = async (file) => {
         console.log('UPLOADDDD');
         console.log(file);
@@ -95,7 +91,6 @@ class Settings extends Component {
         const {getFieldDecorator} = this.props.form;
         const {assistant} = this.props;
         const countriesOptions = [...countries.map(country => <Option key={country.code}>{country.name}</Option>)];
-        const usersOptions = [...['user1', 'user2'].map((name, index) => <Option key={index}>{name}</Option>)];
 
         return (
             <>
@@ -213,8 +208,11 @@ class Settings extends Component {
                                          min={1}
                                          style={{marginTop: 10, width: '30%'}}
                                          value={this.state.notifyEvery === 'null' ? 1 : this.state.notifyEvery}
-                                         formatter={value => `${value} hours`}
-                                         parser={value => value.replace('hours', '')}
+                                         formatter={value => value == '1' ? `${value} hour` : `${value} hours`}
+                                         parser={value => {
+                                             value.replace('hour', 'hours');
+                                             value.replace('hours', '');
+                                         }}
                                          onChange={(val) => {
                                              this.setState({notifyEvery: val});
                                          }}/>
@@ -223,7 +221,7 @@ class Settings extends Component {
 
                     <FormItem
                         label="Restricted Countries"
-                        extra="Chatbot will be disabled for users who live in the selected countries."
+                        extra="Chatbot will be disabled for users who live in the selected countries"
                     >
                         {
                             getFieldDecorator('restrictedCountries', {
@@ -238,32 +236,18 @@ class Settings extends Component {
                         }
                     </FormItem>
 
-                    <FormItem
-                        label="Owners"
-                        extra="Selected User(s) will be notified, when there is a new record.">
-                        {
-                            getFieldDecorator('owners', {
-                                initialValue: assistant.Config?.restrictedCountries
-                            })(
-                                <Select mode="multiple" style={{minWidth: '100%'}}
-                                        filterOption={(inputValue, option) => option.props.children.toLowerCase().includes(inputValue.toLowerCase())}
-                                        placeholder="Please select owner or owners">
-                                    {usersOptions}
-                                </Select>
-                            )
-                        }
-                    </FormItem>
-
                     <Button type={'primary'} size={'large'} onClick={this.handleSave}>Save changes</Button>
                 </Form>
+
 
                 <br/>
                 <Divider/>
                 <h2>Assistant Logo</h2>
                 <p>
                     your assistant logo will replace TheSearchBase logo in the
-                    chatbot and emails sent on behalf of your company by us.
-                    If you did not upload a logo specifically for this assistant, your company logo will be used instead
+                    chatbot. If you did not upload a logo specifically for this assistant, your company logo will be
+                    used instead. You can upload your company logo from
+                    <a onClick={() => history.push(`/dashboard/account?tab=Company`)}> <b>here</b></a>
                 </p>
                 <LogoUploader
                     logoPath={assistant.LogoPath}

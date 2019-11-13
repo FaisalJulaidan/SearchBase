@@ -1,14 +1,15 @@
 from threading import Thread
-import os
 from flask import render_template, current_app
 from flask_mail import Mail, Message
+from typing import List
 
 from models import Callback, Assistant, Conversation, Company, StoredFileInfo
 from services import user_services, stored_file_services as sfs
 from utilities import helpers,enums
 
 mail = Mail()
-tsbEmail = "info@thesearchbase.com"
+tsbSendEmail = "notifications@thesearchbase.com"
+tsbReceiveEmail = "info@thesearchbase.com"
 
 
 def sendDemoRequest(data) -> Callback:
@@ -16,7 +17,7 @@ def sendDemoRequest(data) -> Callback:
         # if not data["name"] or data["company"] or (data["phone"] or data["email"]):
         #     return Callback(False, "Required information is missing")
 
-        callback: Callback = __sendEmail(tsbEmail, 'Demo Request', '/emails/arrange_demo.html', data=data)
+        callback: Callback = __sendEmail(tsbReceiveEmail, 'Demo Request', '/emails/arrange_demo.html', data=data)
 
         if not callback.Success:
             raise Exception(callback.Message)
@@ -29,7 +30,7 @@ def sendDemoRequest(data) -> Callback:
 
 def contactUsIndex(name, email, message) -> Callback:
     try:
-        callback: Callback = __sendEmail(tsbEmail, 'TheSearchBase Contact Us', '/emails/message_sent.html',
+        callback: Callback = __sendEmail(tsbReceiveEmail, 'TheSearchBase Contact Us', '/emails/message_sent.html',
                                          name=name, email=email, message=message)
 
         if not callback.Success:
@@ -185,7 +186,7 @@ def sendPasswordResetEmail(email, userID):
 def sendNewCompanyHasRegistered(name, email, companyName, companyID, tel):
     try:
 
-        callback: Callback = __sendEmail(tsbEmail,
+        callback: Callback = __sendEmail(tsbReceiveEmail,
                                          companyName + ' has signed up',
                                          '/emails/company_registered.html',
                                          name=name,
@@ -249,79 +250,39 @@ def sendSolutionAlert(record, solutions):
         return Callback(False, 'Could not send email')
 
 
-# Notify company about new conversations
-def notifyNewConversation(assistant: Assistant, conversation: Conversation):
+def simpleSend(to, title, text):
     try:
 
-        users_callback: Callback = user_services.getAllByCompanyIDWithEnabledNotifications(assistant.CompanyID, True)
-        if not users_callback.Success:
-            return Callback(False, "Users not found!")
+        callback: Callback = __sendEmail(to, title, text)
 
-        if len(users_callback.Data) == 0:
-            return Callback(True, "No user has notifications enabled")
+        if not callback.Success:
+            raise Exception(callback.Message)
 
-        # Get Company
-        company: Company = assistant.Company
-
-        # Get pre singed url to download the file if there are files
-        fileURLsSinged = []
-        if conversation.StoredFile:
-            if conversation.StoredFile.StoredFileInfo:
-                for file in conversation.StoredFile.StoredFileInfo:
-                    fileURLsSinged.append(sfs.genPresigendURL(file.FilePath, 2592000).Data) # Expires in a month
-
-
-        conversations = [{
-            'userType': conversation.UserType.name,
-            'data': conversation.Data,
-            'status': conversation.ApplicationStatus.name,
-            'fileURLsSinged': fileURLsSinged,
-            'completed': "Yes" if conversation.Completed else "No",
-            'dateTime': conversation.DateTime.strftime("%Y/%m/%d %H:%M"),
-            'link': helpers.getDomain() + "/dashboard/assistants/" +
-                               str(assistant.ID) + "?tab=Conversations&conversation_id=" + str(conversation.ID)
-
-        }]
-
-        logoPath = helpers.keyFromStoredFile(company.StoredFile, enums.FileAssetType.Logo).AbsFilePath
-        # send emails, jobs applied for
-        for user in users_callback.Data:
-            email_callback: Callback = __sendEmail(to=user.Email,
-                                                   subject='New ' + conversation.UserType.name
-                                                          + " has engaged with "
-                                                          + assistant.Name + " assistant",
-                                                   template='emails/new_conversations_notification.html',
-                                                   assistantName = assistant.Name,
-                                                   assistantID = assistant.ID,
-                                                   conversations = conversations,
-                                                   logoPath= logoPath,
-                                                   companyName=company.Name,
-                                                   companyURL=company.URL,
-                                                   )
-            if not email_callback.Success:
-                raise Exception(email_callback.Message)
-
-        return Callback(True, "Emails have been sent")
+        return Callback(True, 'Email sent is on its way to ' + to)
 
     except Exception as exc:
-        helpers.logError("mail_service.notifyNewChatbotSession(): " + str(exc))
-        return Callback(False, "Error in notifying companies for new conversations")
+        helpers.logError("mail_service.sendSolutionAlert(): " + str(exc))
+        return Callback(False, 'Could not send email')
 
 
 # Notify company about a new conversation
-def notifyNewConversations(assistant: Assistant, conversations, lastNotificationDate):
+def notifyNewConversations(assistant: Assistant, conversations: List[Conversation], lastNotificationDate):
     try:
 
         users_callback: Callback = user_services.getAllByCompanyIDWithEnabledNotifications(assistant.CompanyID)
         if not users_callback.Success:
             return Callback(False, "Users not found!")
 
+
+        # Get Company
+        company: Company = assistant.Company
+
         if len(users_callback.Data) == 0:
             return Callback(True, "No user has notifications enabled")
 
         conversationsList = []
         for conversation in conversations:
-            # Get pre singed url to download the file if there are files
+            # Get pre singed url to download the file via links
             fileURLsSinged = []
             if conversation.StoredFile:
                 if conversation.StoredFile.StoredFileInfo:
@@ -343,20 +304,22 @@ def notifyNewConversations(assistant: Assistant, conversations, lastNotification
             return Callback(True, "No new conversation to send")
 
         # Get company logo
-        logoPath = helpers.keyFromStoredFile(Assistant.Company.StoredFile.StoredFile, enums.FileAssetType.Logo).AbsFilePath
+        logoPath = helpers.keyFromStoredFile(company.StoredFile, enums.FileAssetType.Logo).AbsFilePath
 
         # send emails, jobs applied for
         for user in users_callback.Data:
+            print("SEND TO :")
+            print(user)
             email_callback: Callback = __sendEmail(to=user.Email,
                                                    subject="New users has engaged with your "
-                                                          + assistant["Name"] + " assistant",
-                                                   template='emails/new_conversations_notification.html',
-                                                   assistantName = assistant["Name"],
-                                                   assistantID = assistant["ID"],
+                                                          + assistant.Name + " assistant",
+                                                   template='/emails/new_conversations_notification.html',
+                                                   assistantName = assistant.Name,
+                                                   assistantID = assistant.ID,
                                                    conversations = conversationsList,
                                                    logoPath = logoPath,
-                                                   companyName = assistant["CompanyName"],
-                                                   companyURL=assistant["CompanyURL"],
+                                                   companyName = company.Name,
+                                                   companyURL=company.URL,
                                                    )
             if not email_callback.Success:
                 raise Exception(email_callback.Message)
@@ -377,21 +340,31 @@ def __sendAsyncEmail(app, msg):
 def __sendEmail(to, subject, template, files=None, **kwargs) -> Callback:
     try:
         # create Message with the Email: title, recipients and sender
-        msg = Message(subject, recipients=[to], sender=tsbEmail)
+        msg = Message(subject, recipients=[to], sender=tsbSendEmail)
+        if template[0] == "/":
+            try:
+                # get app context / if it fails assume its working outside the app
+                app = current_app._get_current_object()
 
-        try:
-            # get app context / if it fails assume its working outside the app
-            app = current_app._get_current_object()
-
-            # load the template which the email will use
-            msg.html = render_template(template, **kwargs)
-        except Exception as exc:  # TODO check error code raise exception
-            # import app. importing it in the beginning of the file will raise an error as it is still not created
-            from app import app
-
-            # use application context to load the template which the email will use
-            with app.app_context():
+                # load the template which the email will use
                 msg.html = render_template(template, **kwargs)
+            except Exception as exc:  # TODO check error code raise exception
+                # import app. importing it in the beginning of the file will raise an error as it is still not created
+                from app import app
+
+                # use application context to load the template which the email will use
+                with app.app_context():
+                    msg.html = render_template(template, **kwargs)
+        else:
+            try:
+                # get app context / if it fails assume its working outside the app
+                app = current_app._get_current_object()
+
+            except Exception as exc:  # TODO check error code raise exception
+                # import app. importing it in the beginning of the file will raise an error as it is still not created
+                from app import app
+                
+            msg.html = template
 
         if files:
             for file in files:

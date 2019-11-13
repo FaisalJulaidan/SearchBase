@@ -5,7 +5,8 @@ import {animateScroll, scroller} from "react-scroll";
 class ScrollTo extends Component {
 
 
-    componentDidUpdate(prevProps) {
+    componentDidUpdate(prevProps, prevState, snapshot) {
+
         if (this.props.location.hash === "")
             if (this.props.location.pathname !== prevProps.location.pathname) {
                 window.scrollTo(0, 0);
@@ -14,9 +15,12 @@ class ScrollTo extends Component {
             }
         else {
             if (this.props.location.pathname !== prevProps.location.pathname) {
-                scroller.scrollTo(this.props.location.hash.replace("#", ""))
+                scroller.scrollTo(this.props.location.hash.replace("#", ""),{
+                    offset: -40,
+                })
             } else {
                 scroller.scrollTo(this.props.location.hash.replace("#", ""), {
+                    offset: -40,
                     duration: 1000,
                     delay: 100,
                     smooth: true,

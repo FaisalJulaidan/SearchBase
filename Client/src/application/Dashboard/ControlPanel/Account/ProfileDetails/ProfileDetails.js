@@ -2,8 +2,6 @@ import React from 'react';
 import { Button, Form, Input, Switch, Divider, Icon, AutoComplete } from 'antd';
 import ChangePassword from './ChangePassword';
 import moment from 'moment-timezone';
-import { TimezoneContext, getTimezone } from 'contexts/timezone';
-
 
 
 const FormItem = Form.Item;
@@ -20,12 +18,6 @@ class ProfileDetails extends React.Component {
         narrowSearch: false
     };
     //
-    static contextType = TimezoneContext;
-
-    setTimezone = async () => {
-        let tz = await getTimezone();
-        this.setState({ timezone: tz });
-    };
 
     handleSubmit = (e) => {
         e.preventDefault();
@@ -34,18 +26,11 @@ class ProfileDetails extends React.Component {
                 this.props.saveProfileDetails(values);
             }
         });
-        setTimeout(() => {
-            let tz = localStorage.getItem('TSB_TZ');
-            if (tz) {
-                localStorage.removeItem('TSB_TZ');
-                this.setTimezone();
-            }
-        }, 1000);
     };
 
     searchTimezone = (input) => {
         let filter = tz.filter(timezone => timezone.toLowerCase().indexOf(input.toLowerCase()) !== -1);
-        this.setState({ tzList: filter.slice(0, 10), narrowSearch: filter.length > 10 ? true : false });
+        this.setState({ tzList: filter.slice(0, 10), narrowSearch: filter.length > 10 });
     };
 
 

@@ -26,6 +26,12 @@ def connect(type, auth, companyID):
         helpers.logError("Marketplace.marketplace_helpers.processRedirect() ERROR: " + str(exc))
         return Callback(False, str(exc))
 
+def sync(companyID):
+    try:
+        return calendar_services.syncAll(companyID)
+    except Exception as exc:
+        helpers.logError("Marketplace.marketplace_helpers.sync() ERROR: " + str(exc))
+        return Callback(False, str(exc))
 
 # Test marketplace item connection (e.g. CRM, Calendar...)
 def testConnection(type, companyID):
@@ -51,7 +57,6 @@ def testConnection(type, companyID):
             exist_callback: Callback = calendar_services.getCalendarByType(type, companyID)
             if not exist_callback.Success:
                 return Callback(True, "", {"Status": "NOT_CONNECTED"})
-
             # If yes test connection
             return Callback(True, "",
                             {"Status":
@@ -103,7 +108,10 @@ def disconnect(type, companyID):
 
 # send request with dynamic method
 def sendRequest(url, method, headers, data=None):
-    data = helpers.cleanDict(data)
+    if data:
+        helpers.logError("DATA SEND 1: " + str(data))
+        data = helpers.cleanDict(data)
+        helpers.logError("DATA SEND 2: " + str(data))
     request = None
     if method.lower() == "put":
         request = requests.put(url, headers=headers, data=data)
@@ -126,3 +134,24 @@ def convertSkillsToString(skills):
                     temp += skill["name"] + ", "
                     skills = temp[:-2]
     return skills
+
+
+def loadSynonyms(construction: bool = False, hospitality: bool = False) -> dict:
+    print(construction)
+    print(hospitality)
+    """
+        Args:
+            construction (bool): Synonyms for industrial.
+            hospitality (bool): Synonyms for hospitality.
+
+        Returns:
+            dict: The value returned
+
+            """
+    # Default is False
+    # for category, isSelected in categories.items():
+    #     print("{} is {}".format(category, isSelected))
+    if construction:
+        return {
+          "chef": {"cook", "caterer", "catering", "food preparation"}
+        }

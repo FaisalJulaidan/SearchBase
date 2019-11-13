@@ -32,28 +32,44 @@
 
 .text_col .subtitle{
     color: #726a84;
-    margin-bottom: .5em;
+    margin-bottom: .75em;
 }
 
 .text_col .button {
+    text-transform: uppercase;
+    border-radius: 2px;
+    text-decoration: none;
     color: #9254de;
     border-color: #9254de;
+    padding-top: 8px;
+    padding-bottom: 8px;
+    font-size: .85em;
+    font-weight: bolder;
+    transition: all 0.4s ease 0s;
 }
 
 .text_col .button:hover {
-    color: #9254de;
-    background: #F8EBFF;
-    border-color: white;
-    transition: border-color 0.4s ease 0s, background-color 0.4s ease 0s;
+    color: white;
+    background: #9254de;
+    border-color: #9254de;
+}
+
+.text_col .button a{
+    transition: all 0.4s ease 0s;
+}
+
+.text_col .button:hover a {
+    color: white;
 }
 
 .text_col .button:not(:disabled):not(.disabled):active {
-    background-color: #F8EBFF;
-    transition: border-color 0.4s ease 0s, background-color 0.4s ease 0s;
+    color: white;
+    background: #9254de;
+    border-color: #9254de;
 }
 
 .text_col .button:focus {
-    box-shadow: 0 0 0 0.2rem rgba(138,107,219,.5);
+    box-shadow: 0 0 0 0.2rem rgba(138, 107, 219, .5);
 }
 
 .text_col .button a {

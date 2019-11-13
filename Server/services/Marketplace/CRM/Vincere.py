@@ -233,10 +233,10 @@ def uploadFile(auth, storedFileInfo: StoredFileInfo):
         file_content = base64.b64encode(file_content).decode('ascii')
 
         body = {
-            "externalID": storedFileInfo.ID,
-            "fileType": "SAMPLE",
-            "name": "TSB_" + storedFileInfo.FilePath,
-            "fileContent": file_content
+            "original_cv": True,
+            "document_type_id": "SAMPLE",
+            "file_name": "TSB_" + storedFileInfo.FilePath,
+            "base_64_content": file_content
         }
 
         conversationResponse = json.loads(conversation.CRMResponse)

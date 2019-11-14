@@ -218,14 +218,12 @@ def insertCandidate(auth, data, companyID) -> Callback:
 
 
 # vincere only takes in candidate documents
-def uploadFile(auth, storedFileInfo: StoredFileInfo):
+def uploadFile(auth, filePath, fileName, conversation):
     try:
-        conversation = storedFileInfo.Conversation
-
         if not conversation.CRMResponse:
             raise Exception("Can't upload file for record with no CRM Response")
 
-        file_callback = stored_file_services.downloadFile(storedFileInfo.AbsFilePath)
+        file_callback = stored_file_services.downloadFile(filePath)
         if not file_callback.Success:
             raise Exception(file_callback.Message)
         file = file_callback.Data
@@ -233,14 +231,14 @@ def uploadFile(auth, storedFileInfo: StoredFileInfo):
         file_content = base64.b64encode(file_content).decode('ascii')
 
         body = {
-            "externalID": storedFileInfo.ID,
-            "fileType": "SAMPLE",
-            "name": "TSB_" + storedFileInfo.FilePath,
-            "fileContent": file_content
+            "original_cv": True,
+            "document_type_id": "SAMPLE",
+            "file_name": "TSB_" + fileName,
+            "base_64_content": file_content
         }
 
         conversationResponse = json.loads(conversation.CRMResponse)
-        entityID = str(conversationResponse.get("changedEntityId"))
+        entityID = str(conversationResponse.get("id"))
 
         if conversation.UserType.value is "Candidate":
             entity = "candidate"

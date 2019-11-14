@@ -220,6 +220,7 @@ def insertCandidate(auth, data, companyID) -> Callback:
 # vincere only takes in candidate documents
 def uploadFile(auth, filePath, fileName, conversation):
     try:
+        helpers.logError("Starting VINCERE File Upload")
         if not conversation.CRMResponse:
             raise Exception("Can't upload file for record with no CRM Response")
 
@@ -256,7 +257,7 @@ def uploadFile(auth, filePath, fileName, conversation):
         return Callback(True, sendQuery_callback.Data.text)
 
     except Exception as exc:
-        helpers.logError("CRM.Vincere.insertCandidate() ERROR: " + str(exc))
+        helpers.logError("CRM.Vincere.uploadFile() ERROR: " + str(exc))
         return Callback(False, str(exc))
 
 

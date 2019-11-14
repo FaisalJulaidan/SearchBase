@@ -287,6 +287,7 @@ def insertCandidate(auth, data, companyID) -> Callback:
 
 def uploadFile(auth, filePath, fileName, conversation):
     try:
+        helpers.logError("Starting BULLHORN File Upload")
         if not conversation.CRMResponse:
             raise Exception("Can't upload file for record with no CRM Response")
 

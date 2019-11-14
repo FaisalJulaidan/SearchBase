@@ -3,28 +3,28 @@
     padding: 80px 0;
 }
 
-.col_intro{
+.col_intro {
     text-align: center;
 }
 
-.col_intro h1{
+.col_intro h1 {
     font-weight: bold;
     font-size: 2em;
     color: #444444;
 }
 
-.col_intro hr{
+.col_intro hr {
     background-color: #9254de;
     max-width: 75px;
     height: 3px;
 }
 
-.col_intro h4{
+.col_intro h4 {
     color: #444444;
     font-size: 1.1em;
 }
 
-.col_card{
+.col_card {
     margin-top: 60px;
 }
 
@@ -37,44 +37,107 @@
     color: #848484;
 }
 
-.row_input{
+.row_input {
     padding-top: 40px;
     padding-bottom: 60px;
     background-color: #f4f4f4;
     text-align: center;
 }
 
-.input_title{
+.input_title {
     display: block;
     margin-bottom: 10px;
     color: #848484;
     text-transform: uppercase;
 }
 
-.input{
+.input {
     padding-top: 40px;
     padding-bottom: 40px;
     font-size: 2em;
     text-align: center;
 }
 
-.results{
+.results {
     padding: 30px 0;
 }
 
-.results_title h1{
+.results_title_wrapper{
+    display: flex;
+    flex-direction: column;
+}
+.results_title{
+    display: flex;
+    align-items: center;
+    margin: auto;
+}
+.results_title h1 {
     color: #444444;
     font-weight: bold;
+    font-size: .85em;
     text-transform: uppercase;
 }
 
-.results_title hr{
+.results_title hr {
     background-color: #9254de;
-    max-width: 30px;
-    height: 3px;
-    margin: 10px auto 0 auto;
+    max-width: 20px;
+    min-width: 15px;
+    height: 2px;
+    margin: 0 10px;
 }
 
-.row_result{
-    padding-top: 40px;
+.row_result {
+    padding-top: 20px;
+    padding-bottom: 20px;
+}
+
+.row_result_text {
+    padding-top: 60px;
+}
+
+.row_result_text h1{
+    color: #444444;
+}
+
+.button {
+    margin-top: 40px;
+    text-transform: uppercase;
+    border-radius: 2px;
+    text-decoration: none;
+    color: #9254de;
+    border-color: #9254de;
+    padding-top: 8px;
+    padding-bottom: 8px;
+    font-size: .9em;
+    font-weight: bolder;
+    transition: all 0.4s ease 0s;
+}
+
+.button:hover {
+    color: white;
+    background: #9254de;
+    border-color: #9254de;
+}
+
+.button a {
+    transition: all 0.4s ease 0s;
+}
+
+.button:hover a {
+    color: white;
+}
+
+.button:not(:disabled):not(.disabled):active {
+    color: white;
+    background: #9254de;
+    border-color: #9254de;
+}
+
+.button:focus {
+    box-shadow: 0 0 0 0.2rem rgba(138, 107, 219, .5);
+}
+
+.button a {
+    text-decoration: none;
+    color: #9254de;
 }

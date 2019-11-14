@@ -1,11 +1,31 @@
-.value{
+.wrapper {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    text-align: center;
+
+}
+
+.value_wrapper {
+    height: 75%;
+    display: flex;
+    flex-flow: column;
+    align-items: center;
+}
+
+.value {
     color: #9254de;
-    font-size: 2.5em;
+    margin: auto;
     line-height: 1em;
 }
 
-.title{
+.icon {
+    margin: .5em 0;
+    color: #848484aa;
+}
+
+.title {
     margin-top: 10px;
-    color: #767676;
+    color: #848484dd;
     font-size: .85em;
 }

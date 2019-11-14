@@ -285,24 +285,25 @@ def insertCandidate(auth, data, companyID) -> Callback:
         return Callback(False, str(exc))
 
 
-def uploadFile(auth, storedFileInfo: StoredFileInfo):
+def uploadFile(auth, filePath, fileName, conversation):
     try:
-        conversation = storedFileInfo.Conversation
-
         if not conversation.CRMResponse:
             raise Exception("Can't upload file for record with no CRM Response")
 
-        file_callback = stored_file_services.downloadFile(storedFileInfo.AbsFilePath)
+        file_callback = stored_file_services.downloadFile(filePath)
         if not file_callback.Success:
             raise Exception(file_callback.Message)
         file = file_callback.Data
         file_content = file.get()["Body"].read()
         file_content = base64.b64encode(file_content).decode('ascii')
 
+        conversationResponse = json.loads(conversation.CRMResponse)
+        entityID = str(conversationResponse.get("changedEntityId"))
+
         body = {
-            "externalID": storedFileInfo.ID,
+            "externalID": entityID,
             "fileType": "SAMPLE",
-            "name": "TSB_" + storedFileInfo.FilePath,
+            "name": "TSB_" + fileName,
             "fileContent": file_content
         }
 

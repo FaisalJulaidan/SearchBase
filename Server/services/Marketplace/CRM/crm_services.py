@@ -175,7 +175,7 @@ def updateCandidate(candidateID, conversation, companyID, sourceID):
         return Callback(False, "CRM type did not match with those on the system")
 
 
-def uploadFile(filePath, fileName, conversation):
+def uploadFile(file, conversation):
     helpers.logError("Starting CRM File Upload")
     callback: Callback = assistant_services.getByID(conversation.AssistantID, conversation.Assistant.CompanyID)
     if not callback.Success:
@@ -187,7 +187,7 @@ def uploadFile(filePath, fileName, conversation):
         if crm_type is CRM.Jobscience or crm_type is CRM.Mercury:
             return Callback(True, "CRM does not support file upload at this time")
 
-        return eval(crm_type.value + ".uploadFile(assistant.CRM.Auth, filePath, fileName, conversation)")
+        return eval(crm_type.value + ".uploadFile(assistant.CRM.Auth, file, conversation)")
     else:
         return Callback(False, "CRM type did not match with those on the system")
 

@@ -295,7 +295,7 @@ def uploadFile(auth, file, conversation):
         # if not file_callback.Success:
         #     raise Exception(file_callback.Message)
         # file = file_callback.Data
-        file_content = file.read()
+        file_content = file.seek(0).read()
         file_content = base64.b64encode(file_content).decode('ascii')
 
         conversationResponse = json.loads(conversation.CRMResponse)

@@ -119,7 +119,6 @@ def retrieveRestToken(auth, companyID):
         return Callback(False, str(exc))
 
 
-# create query url and also tests the BhRestToken to see if it still valid, if not it generates a new one and new url
 def sendQuery(auth, query, method, body, companyID, optionalParams=None):
     try:
         # get url
@@ -129,10 +128,10 @@ def sendQuery(auth, query, method, body, companyID, optionalParams=None):
         headers = {'Content-Type': 'application/json', "x-api-key": api_key, "id-token": auth.get("id_token", "none")}
 
         # test the Token (id_token)
-        helpers.logError("url: " + url)
-        helpers.logError("headers: " + str(headers))
+        helpers.logError("Vincere url: " + url)
+        helpers.logError("Vincere headers: " + str(headers))
         r = marketplace_helpers.sendRequest(url, method, headers, json.dumps(body))
-        helpers.logError("response text: " + r.text)
+        helpers.logError("Vincere response text: " + r.text)
 
         if r.status_code == 401:  # wrong rest token
             callback: Callback = retrieveRestToken(auth, companyID)
@@ -218,29 +217,27 @@ def insertCandidate(auth, data, companyID) -> Callback:
 
 
 # vincere only takes in candidate documents
-def uploadFile(auth, storedFileInfo: StoredFileInfo):
+def uploadFile(auth, filePath, fileName, conversation):
     try:
-        conversation = storedFileInfo.Conversation
-
         if not conversation.CRMResponse:
             raise Exception("Can't upload file for record with no CRM Response")
 
-        file_callback = stored_file_services.downloadFile(storedFileInfo.AbsFilePath)
+        file_callback = stored_file_services.downloadFile(filePath.split("/")[-1])
         if not file_callback.Success:
             raise Exception(file_callback.Message)
         file = file_callback.Data
         file_content = file.get()["Body"].read()
         file_content = base64.b64encode(file_content).decode('ascii')
 
-        body = {
-            "externalID": storedFileInfo.ID,
-            "fileType": "SAMPLE",
-            "name": "TSB_" + storedFileInfo.FilePath,
-            "fileContent": file_content
-        }
-
         conversationResponse = json.loads(conversation.CRMResponse)
-        entityID = str(conversationResponse.get("changedEntityId"))
+        entityID = str(conversationResponse.get("id"))
+
+        body = {
+            "original_cv": True,
+            "document_type_id": "SAMPLE",
+            "file_name": "TSB_" + fileName,
+            "base_64_content": file_content
+        }
 
         if conversation.UserType.value is "Candidate":
             entity = "candidate"
@@ -258,7 +255,7 @@ def uploadFile(auth, storedFileInfo: StoredFileInfo):
         return Callback(True, sendQuery_callback.Data.text)
 
     except Exception as exc:
-        helpers.logError("CRM.Vincere.insertCandidate() ERROR: " + str(exc))
+        helpers.logError("CRM.Vincere.uploadFile() ERROR: " + str(exc))
         return Callback(False, str(exc))
 
 
@@ -333,7 +330,7 @@ def searchCandidates(auth, companyID, data) -> Callback:
     try:
         query = "q="
 
-        fields = "fl=id,name,primary_email,mobile,current_location,skill,desired_salary,currency,deleted,last_update,met_status"
+        fields = "fl=id,name,primary_email,mobile,phone,current_location,skill,desired_salary,currency,deleted,last_update,met_status"
 
         # populate filter
         query += populateFilter(data.get("location"), "current_city")
@@ -374,7 +371,7 @@ def searchCandidates(auth, companyID, data) -> Callback:
             result.append(databases_services.createPandaCandidate(id=record.get("id", ""),
                                                                   name=record.get("name"),
                                                                   email=record.get("primary_email"),
-                                                                  mobile=record.get("mobile"),
+                                                                  mobile=record.get("mobile", record.get("phone")),
                                                                   location=
                                                                   record.get("current_location", {}).get("city", ""),
                                                                   skills=record.get("skill", "").split(","),  # str list
@@ -398,7 +395,7 @@ def searchPerfectCandidates(auth, companyID, data) -> Callback:
     try:
         query = "q="
 
-        fields = "fl=id,name,primary_email,mobile,current_location,skill,desired_salary,currency,deleted,last_update,met_status"
+        fields = "fl=id,name,primary_email,mobile,phone,current_location,skill,desired_salary,currency,deleted,last_update,met_status"
 
         # populate filter
         query += populateFilter(data.get("location"), "current_city")
@@ -455,7 +452,6 @@ def searchPerfectCandidates(auth, companyID, data) -> Callback:
 
                 # remove the last (least important filter)
                 query = ",".join(query.split(",")[:-1])
-
                 # if no filters left - stop
                 if not query:
                     break
@@ -463,10 +459,15 @@ def searchPerfectCandidates(auth, companyID, data) -> Callback:
         result = []
         # TODO educations uses ids - need to retrieve them
         for record in records:
+            currency = record.get("currency", "gbp").lower()
+            if currency == "pound":
+                currency = "GBP"
+            else:
+                currency = record.get("currency", "GBP").upper()
             result.append(databases_services.createPandaCandidate(id=record.get("id", ""),
                                                                   name=record.get("name"),
                                                                   email=record.get("primary_email"),
-                                                                  mobile=record.get("mobile"),
+                                                                  mobile=record.get("mobile", record.get("phone")),
                                                                   location=record.get("current_location", ""),
                                                                   skills=record.get("skill", ""),  # stringified json
                                                                   linkdinURL=None,
@@ -475,7 +476,7 @@ def searchPerfectCandidates(auth, companyID, data) -> Callback:
                                                                   education=None,
                                                                   yearsExperience=0,
                                                                   desiredSalary=record.get("desired_salary", 0),
-                                                                  currency=Currency(record.get("currency").upper()),
+                                                                  currency=Currency(currency.upper()),
                                                                   source="Vincere"))
 
         return Callback(True, "Search has been successful", result)

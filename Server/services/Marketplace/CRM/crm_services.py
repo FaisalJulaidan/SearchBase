@@ -1,7 +1,8 @@
 from sqlalchemy.sql import and_
 
 from models import db, Callback, Conversation, Assistant, CRM as CRM_Model, StoredFile
-from services.Marketplace.CRM import Greenhouse, Bullhorn, Mercury, Jobscience, Vincere
+from services import assistant_services
+from services.Marketplace.CRM import Greenhouse, Bullhorn, Mercury, Jobscience, Vincere, Adapt
 # Process chatbot session
 from utilities import helpers
 from utilities.enums import CRM, UserType, DataType, Period, DataType as DT
@@ -174,14 +175,18 @@ def updateCandidate(candidateID, conversation, companyID, sourceID):
         return Callback(False, "CRM type did not match with those on the system")
 
 
-def uploadFile(assistant: Assistant, storedFile: StoredFile):
+def uploadFile(filePath, fileName, conversation):
+    callback: Callback = assistant_services.getByID(conversation.AssistantID, conversation.Assistant.CompanyID)
+    if not callback.Success:
+        return Callback(False, "Assistant not found!")
+    assistant: Assistant = callback.Data
 
     crm_type = assistant.CRM.Type
     if CRM.has_value(crm_type.value):
         if crm_type is CRM.Jobscience or crm_type is CRM.Mercury:
             return Callback(True, "CRM does not support file upload at this time")
 
-        return eval(crm_type.value + ".uploadFile(assistant.CRM.Auth, storedFile)")
+        return eval(crm_type.value + ".uploadFile(assistant.CRM.Auth, filePath, fileName, conversation)")
     else:
         return Callback(False, "CRM type did not match with those on the system")
 
@@ -222,7 +227,8 @@ def searchCandidatesCustom(crm, companyID, candidate_data, perfect=False):
     }
 
     crm_type = crm.Type.value
-    if perfect and crm_type == "Bullhorn":
+    campaignCRMs = ["Bullhorn", "Vincere"]
+    if perfect and crm_type in campaignCRMs:
         searchFunc = "searchPerfectCandidates"
     else:
         searchFunc = "searchCandidates"
@@ -503,5 +509,5 @@ def additionalCandidateNotesBuilder(data, selectedSolutions=None):
 
 # prevents IDEA from automatically removing dependencies that are used in eval
 def ideaCalmer():
-    print(Jobscience, Mercury, Greenhouse)
+    print(Jobscience, Mercury, Greenhouse, Vincere, Adapt)
 

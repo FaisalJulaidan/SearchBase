@@ -119,7 +119,6 @@ def retrieveRestToken(auth, companyID):
         return Callback(False, str(exc))
 
 
-# create query url and also tests the BhRestToken to see if it still valid, if not it generates a new one and new url
 def sendQuery(auth, query, method, body, companyID, optionalParams=None):
     try:
         # get url
@@ -228,7 +227,7 @@ def uploadFile(auth, filePath, fileName, conversation):
             raise Exception(file_callback.Message)
         file = file_callback.Data
         file_content = file.get()["Body"].read()
-        file_content = base64.b64encode(file_content).decode('ascii')
+        file_content = base64.b64encode(file_content)
 
         conversationResponse = json.loads(conversation.CRMResponse)
         entityID = str(conversationResponse.get("id"))

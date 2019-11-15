@@ -16,7 +16,7 @@ class Marketplace extends React.Component {
             <NoHeaderPanel>
                 <div className={styles.Header}>
                     <Title className={styles.Title}>
-                        <Icon type="interation"/> Marketplace
+                        <Icon type="shop"/> Marketplace
                     </Title>
                     <Paragraph type="secondary">
                         From the list below, choose your CRM or ATS for your account to be directly connected.

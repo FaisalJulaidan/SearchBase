@@ -19,7 +19,7 @@ class Integration extends React.Component {
         dataCircle: "#9254de",
         async: true,
         defer: true,
-        isTestButtonDisabled: false,
+        isTestButtonDisabled: false
     };
 
     componentDidMount() {
@@ -114,7 +114,7 @@ class Integration extends React.Component {
 
 
                 <div>
-                    <h2>Customize Chatbot Color:</h2>
+                    <h2>Chatbot Customisation</h2>
                     <p>
                         Currently you can edit the colour setting of your assistant's button.
                         Simply pick your preferred one bellow.
@@ -132,9 +132,9 @@ class Integration extends React.Component {
 
                 <br/>
 
-                <Form {...formItemLayout} onChange={() => this.updatePosition()}>
+                <Form layout='vertical' wrapperCol={{span: 15}} style={{width: '100%'}} onChange={() => this.updatePosition()}>
                     <Form.Item label="Chatbot Position"
-                               help={'It will show up the chatbot on the left side or the right side on your website'}>
+                               help={'The location of the chatbot on your web page'}>
                         {getFieldDecorator('chatbotPosition', {
                             initialValue: this.props.assistant.Config.chatbotPosition
                         })(
@@ -148,7 +148,7 @@ class Integration extends React.Component {
 
                 <br/>
                 <Divider/>
-                <h2>Installation Code:</h2>
+                <h2>Installation Code</h2>
                 <div>
                     <p>
                         To integrate your assistant, you must paste the pre-made code into any

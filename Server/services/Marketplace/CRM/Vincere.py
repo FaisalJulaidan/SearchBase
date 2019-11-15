@@ -227,7 +227,7 @@ def uploadFile(auth, filePath, fileName, conversation):
             raise Exception(file_callback.Message)
         file = file_callback.Data
         file_content = file.get()["Body"].read()
-        file_content = base64.b64encode(file_content)
+        file_content = base64.b64encode(file_content).decode('ascii')
 
         conversationResponse = json.loads(conversation.CRMResponse)
         entityID = str(conversationResponse.get("id"))
@@ -236,7 +236,7 @@ def uploadFile(auth, filePath, fileName, conversation):
             "original_cv": True,
             "document_type_id": "SAMPLE",
             "file_name": "TSB_" + fileName,
-            "base_64_content": str(file_content)
+            "base_64_content": file_content
         }
 
         if conversation.UserType.value is "Candidate":

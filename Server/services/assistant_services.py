@@ -1,18 +1,19 @@
-from sqlalchemy import and_
+import json
+from datetime import datetime
+from os.path import join
 
+from jsonschema import validate
+from sqlalchemy import and_
+from sqlalchemy.orm import joinedload
 from werkzeug.utils import secure_filename
-from models import db, Assistant, Callback, AutoPilot, AppointmentAllocationTime, Company, StoredFileInfo, StoredFile
+
+from config import BaseConfig
+from models import db, Assistant, Callback, AutoPilot, AppointmentAllocationTime, StoredFileInfo, StoredFile
 from services import auto_pilot_services, flow_services, stored_file_services
 from services.Marketplace.CRM import crm_services
 from services.Marketplace.Calendar import calendar_services
 from services.Marketplace.Messenger import messenger_servicess
 from utilities import helpers, json_schemas, enums
-from sqlalchemy.orm import joinedload
-from os.path import join
-from config import BaseConfig
-from jsonschema import validate
-from datetime import datetime
-import json
 
 
 def create(name, desc, welcomeMessage, topBarText, template, companyID) -> Assistant or None:
@@ -29,6 +30,13 @@ def create(name, desc, welcomeMessage, topBarText, template, companyID) -> Assis
             if not callback.Success:
                 raise Exception(callback.Message)
 
+        config = {
+            "restrictedCountries": [],
+            "chatbotPosition": "Right"
+        }
+
+        validate(config, json_schemas.assistant_config)
+
         assistant = Assistant(Name=name,
                               Description=desc,
                               Flow=flow,
@@ -36,6 +44,7 @@ def create(name, desc, welcomeMessage, topBarText, template, companyID) -> Assis
                               TopBarText=topBarText,
                               SecondsUntilPopup=0,
                               Active=True,
+                              Config=config,
                               CompanyID=companyID)
 
         db.session.add(assistant)

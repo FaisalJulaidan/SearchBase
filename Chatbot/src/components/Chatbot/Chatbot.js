@@ -19,8 +19,7 @@ import {
     isReady,
     optionalDelayExecution,
     promiseWrapper,
-    useInterval,
-    genUniqueFileName,
+    useInterval
 } from '../../utils';
 import { fetchData, getCurBlock } from '../../utils/flowHandler';
 // Constants
@@ -259,6 +258,10 @@ export const Chatbot = ({
         }
     }, [initChatbot, setChatbotStatus]);
 
+    let position = undefined;
+
+    if (assistant)
+        position = assistant.Config.chatbotPosition || 'Right';
 
     return (
         <>
@@ -268,8 +271,9 @@ export const Chatbot = ({
                         <div ref={chatbotRef}
                              style={{ position: isDirectLink ? 'relative' : '' }}
                              className={[
-                                 animation.open ? 'ZoomIn' : 'ZoomOut',
-                                 isDirectLink ? 'Chatbot_DirectLink' : 'Chatbot'
+                                 animation.open ? `ZoomIn_${position}` : `ZoomOut_${position}`,
+                                 isDirectLink ? 'Chatbot_DirectLink' : 'Chatbot',
+                                 position
                              ].join(' ')}>
                             <Header isDirectLink={isDirectLink}
                                     title={assistant.TopBarText}
@@ -291,6 +295,7 @@ export const Chatbot = ({
                                         disabled={disabled}
                                         active={active}
                                         loading={loading}
+                                        position={position}
                                         openWindow={openWindow}/>
                     }
                 </>

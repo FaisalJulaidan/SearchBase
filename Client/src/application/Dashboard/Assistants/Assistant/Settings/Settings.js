@@ -1,10 +1,10 @@
-import React, {Component} from 'react';
-import {connect} from 'react-redux';
-import {store} from 'store/store';
+import React, { Component } from 'react';
+import { connect } from 'react-redux';
+import { store } from 'store/store';
 
-import {Button, Select, Form, Input, InputNumber, Divider, Switch, Modal, Radio} from 'antd';
-import {assistantActions, marketplaceActions} from 'store/actions';
-import {history} from 'helpers';
+import { Button, Divider, Form, Input, InputNumber, Modal, Radio, Select, Switch } from 'antd';
+import { assistantActions } from 'store/actions';
+import { history } from 'helpers';
 
 import countries from 'helpers/static_data/countries';
 import LogoUploader from 'components/LogoUploader/LogoUploader';
@@ -57,6 +57,7 @@ class Settings extends Component {
                 values.secondsUntilPopup = 0;
             values.alertsEnabled = this.state.isAlertsEnabled;
             values.config = {
+                ...this.props.assistant.Config,
                 restrictedCountries: values.restrictedCountries || []
             };
 

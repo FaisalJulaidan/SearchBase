@@ -23,11 +23,16 @@ def generate():
     aramco: Company = Company.query.filter(Company.Name == "Aramco").first()
     sabic: Company = Company.query.filter(Company.Name == "Sabic").first()
 
+    config = {
+        "restrictedCountries": [],
+        "chatbotPosition": "Right"
+    }
+
     # Create and validate a flow for an assistant
     # Create Assistants for Aramco and Sabic companies
     reader_a = Assistant(Name="Reader", Message="Hey there",
                          TopBarText="Aramco Bot", SecondsUntilPopup=1,
-                         Active=True, Company=aramco)
+                         Config=config, Active=True, Company=aramco)
 
     flow = {
         "groups": [

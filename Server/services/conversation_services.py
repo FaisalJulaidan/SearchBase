@@ -172,7 +172,7 @@ def uploadFiles(files, conversation, data, keys):
                                                                                         key=key)
                             crm_upload_callback: Callback = crm_services.uploadFile(upload_callback.Data, file.filename,
                                                                                     conversation)
-                            helpers.logError("FILE UPLOAD COMPLETE")
+
                             uploadedFilesCallbacks.append(upload_callback)
 
         # Check if a file failed to be uploaded

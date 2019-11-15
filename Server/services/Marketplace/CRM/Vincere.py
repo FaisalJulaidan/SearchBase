@@ -220,16 +220,18 @@ def insertCandidate(auth, data, companyID) -> Callback:
 # vincere only takes in candidate documents
 def uploadFile(auth, filePath, fileName, conversation):
     try:
-        helpers.logError("Starting VINCERE File Upload")
         if not conversation.CRMResponse:
             raise Exception("Can't upload file for record with no CRM Response")
 
-        file_callback = stored_file_services.downloadFile(filePath)
+        file_callback = stored_file_services.downloadFile(filePath.split("/")[-1])
         if not file_callback.Success:
             raise Exception(file_callback.Message)
         file = file_callback.Data
         file_content = file.get()["Body"].read()
         file_content = base64.b64encode(file_content).decode('ascii')
+
+        conversationResponse = json.loads(conversation.CRMResponse)
+        entityID = str(conversationResponse.get("id"))
 
         body = {
             "original_cv": True,
@@ -237,9 +239,6 @@ def uploadFile(auth, filePath, fileName, conversation):
             "file_name": "TSB_" + fileName,
             "base_64_content": file_content
         }
-
-        conversationResponse = json.loads(conversation.CRMResponse)
-        entityID = str(conversationResponse.get("id"))
 
         if conversation.UserType.value is "Candidate":
             entity = "candidate"

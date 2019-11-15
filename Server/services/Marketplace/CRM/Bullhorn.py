@@ -289,7 +289,6 @@ def uploadFile(auth, filePath, fileName, conversation):
     try:
         if not conversation.CRMResponse:
             raise Exception("Can't upload file for record with no CRM Response")
-        helpers.logError("Starting BULLHORN File Upload: " + filePath)
 
         file_callback = stored_file_services.downloadFile(filePath.split("/")[-1])
         if not file_callback.Success:
@@ -307,9 +306,6 @@ def uploadFile(auth, filePath, fileName, conversation):
             "name": "TSB_" + fileName,
             "fileContent": file_content
         }
-
-        conversationResponse = json.loads(conversation.CRMResponse)
-        entityID = str(conversationResponse.get("changedEntityId"))
 
         if conversation.UserType.value is "Candidate":
             entity = "Candidate"

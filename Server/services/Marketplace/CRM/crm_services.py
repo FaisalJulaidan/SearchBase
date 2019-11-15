@@ -176,7 +176,6 @@ def updateCandidate(candidateID, conversation, companyID, sourceID):
 
 
 def uploadFile(filePath, fileName, conversation):
-    helpers.logError("Starting CRM File Upload")
     callback: Callback = assistant_services.getByID(conversation.AssistantID, conversation.Assistant.CompanyID)
     if not callback.Success:
         return Callback(False, "Assistant not found!")

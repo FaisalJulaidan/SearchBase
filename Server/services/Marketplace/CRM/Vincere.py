@@ -236,7 +236,7 @@ def uploadFile(auth, filePath, fileName, conversation):
             "original_cv": True,
             "document_type_id": "SAMPLE",
             "file_name": "TSB_" + fileName,
-            "base_64_content": file_content
+            "base_64_content": str(file_content)
         }
 
         if conversation.UserType.value is "Candidate":

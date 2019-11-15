@@ -234,7 +234,7 @@ def uploadFile(auth, filePath, fileName, conversation):
 
         body = {
             "original_cv": True,
-            "document_type_id": "SAMPLE",
+            "document_type_id": 1,
             "file_name": "TSB_" + fileName,
             "base_64_content": file_content
         }

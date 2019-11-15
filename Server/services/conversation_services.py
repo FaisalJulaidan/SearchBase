@@ -170,7 +170,7 @@ def uploadFiles(files, conversation, data, keys):
                                                                                         identifier_value=conversation.ID,
                                                                                         stored_file_id=sf.ID,
                                                                                         key=key)
-                            crm_upload_callback: Callback = crm_services.uploadFile(file.filename, upload_callback.Data,
+                            crm_upload_callback: Callback = crm_services.uploadFile(upload_callback.Data, file.filename,
                                                                                     conversation)
                             helpers.logError("FILE UPLOAD COMPLETE")
                             uploadedFilesCallbacks.append(upload_callback)

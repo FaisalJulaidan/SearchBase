@@ -1,8 +1,15 @@
 .Chatbot_Button {
     position: fixed;
     bottom: 30px;
-    right: 30px;
     z-index: 1000;
+}
+
+.Left {
+    left: 30px;
+}
+
+.Right {
+    right: 30px;
 }
 
 .Chatbot_Button button {

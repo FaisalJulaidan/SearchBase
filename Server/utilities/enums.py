@@ -67,7 +67,7 @@ class Status(Enum):
         return any(value == item.value for item in cls)
 
 
-                
+
 def planCreator(planID: str, assistants: int = 0, campaigns: int = 0, autopilot: int = 0, databases: int = 0, appointments: int = 0):
     return {
       'planID': planID,
@@ -102,7 +102,7 @@ class Period(Enum):
 
 
 @unique
-class JobType(Enum):  
+class JobType(Enum):
     Permanent = 'Permanent'
     Temporary = 'Temporary'
     Contract = 'Contract'
@@ -210,7 +210,7 @@ def dataTypeCreator(name: str, enumName: str, validation: ValidationType, sectio
             'userTypes': [ut.value for ut in userTypes],
             'blockTypes': [bt.value for bt in blockTypes],
             }
-            
+
 
 @unique
 class DataType(Enum):

@@ -23,6 +23,7 @@
 
 .Question > button > span {
     display: block;
+    text-align: center;
 }
 
 /* for the skip button */

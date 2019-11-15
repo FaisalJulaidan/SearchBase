@@ -8,44 +8,26 @@ const ResultItem = props => {
 
     let valSize = '2.5em';
     let titleSize = '0.85em';
-    let valFontWeight = 'normal';
     let fontAwesomeSize = '2x';
-    let iconMargin = '.25em 0';
     switch (props.valSize) {
         case 'small':
             valSize = '1.5em';
-            valFontWeight = 'lighter';
             fontAwesomeSize = "1x";
             titleSize = '0.75em';
-            iconMargin = '0';
             break;
         case 'large':
             valSize = '6em';
-            valFontWeight = 'bold';
             fontAwesomeSize = "3x";
-            titleSize = '1em';
-            iconMargin = '.5em 0';
+            titleSize = '.9em';
             break;
     }
 
-    let isZero = () => {
-        if (Number.isInteger(props.value))
-            return props.value === 0;
-        else
-            return props.value === "0";
-    };
-
+    let formatted = new Intl.NumberFormat('en-gb').format(props.value);
     return (
         <div className={styles.wrapper}>
-            <div className={styles.value_wrapper}>
-            <span className={styles.value} style={isZero() ? {} : {fontSize: valSize, fontWeight: valFontWeight}}>
-                {isZero()
-                    ? <FontAwesomeIcon size={fontAwesomeSize} style={{margin: iconMargin}} className={styles.icon}
-                                       icon={faMinus}/>
-                    : (props.currency ? `£${props.value}` : `${props.value}`)
-                }
+            <span className={styles.value} style={{fontSize: valSize}}>
+                {(props.currency ? `£${formatted}` : `${formatted}`)}
             </span>
-            </div>
             <h1 className={styles.title} style={{fontSize: titleSize}}>{props.title}</h1>
         </div>
     );

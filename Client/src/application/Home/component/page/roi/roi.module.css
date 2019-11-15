@@ -38,12 +38,17 @@
 }
 
 .row_input {
-    padding-top: 40px;
+    padding-top: 60px;
     padding-bottom: 60px;
-    background-color: #f4f4f4;
+    background-color: #ededed;
     text-align: center;
 }
 
+.input_question {
+    display: block;
+    margin-bottom: 10px;
+    color: #444444;
+}
 .input_title {
     display: block;
     margin-bottom: 10px;
@@ -92,7 +97,7 @@
 }
 
 .row_result_text {
-    padding-top: 60px;
+    padding-top: 40px;
 }
 
 .row_result_text h1{

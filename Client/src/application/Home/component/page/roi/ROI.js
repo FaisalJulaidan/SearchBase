@@ -13,6 +13,10 @@ class ROI extends React.Component {
     };
 
     render() {
+        let hoursSavedPerCons = 85;
+        let revenueSavedPerCons = 43;
+        let revenueGenerated = this.state.consultants * hoursSavedPerCons * revenueSavedPerCons;
+        let hoursSavedPerYear = this.state.consultants * 85;
         return (
             <Layout>
                 <Container className={styles.container}>
@@ -28,23 +32,18 @@ class ROI extends React.Component {
                             <Card className={styles.card}>
                                 <Container>
                                     <Row className={styles.row_input}>
-                                        <Col>
-                                            <span className={styles.input_title}>Consultant number</span>
-                                            <Input className={styles.input} size="large" placeholder="15"
+                                        <Col xs={12}>
+                                            <span className={styles.input_question}>How many recruiters & consultants work in your firm?</span>
+                                        </Col>
+                                        <Col xs={{span: 4, offset: 4}}>
+                                            {/*<span className={styles.input_title}>Consultant number</span>*/}
+                                            <Input className={styles.input} size="large" placeholder="50"
                                                    value={this.state.consultants}
                                                    onChange={e => {
                                                        if (isNaN(e.target.value))
                                                            return;
                                                        this.setState({consultants: e.target.value})
                                                    }}/>
-                                        </Col>
-                                        <Col>
-                                            <span className={styles.input_title}>staff number</span>
-                                            <Input className={styles.input} size="large" placeholder="20"/>
-                                        </Col>
-                                        <Col>
-                                            <span className={styles.input_title}>staff number</span>
-                                            <Input className={styles.input} size="large" placeholder="30"/>
                                         </Col>
                                     </Row>
                                     <div className={styles.results}>
@@ -57,8 +56,8 @@ class ROI extends React.Component {
                                         </div>
                                         <Row className={styles.row_result}>
                                             <Col>
-                                                <ResultItem title="Revenue generated per yr." currency valSize="large"
-                                                            value={this.state.consultants * 3612}/>
+                                                <ResultItem title="revenue generated per year" currency valSize="large"
+                                                            value={revenueGenerated}/>
                                             </Col>
                                         </Row>
                                         <Row className={styles.row_result_text}>
@@ -68,14 +67,12 @@ class ROI extends React.Component {
                                         </Row>
                                         <Row className={styles.row_result}>
                                             <Col>
-                                                <ResultItem title="Hours Saved per yr."
-                                                            value={this.state.consultants * 84}/>
+                                                <ResultItem title="Hours saved"
+                                                            value={hoursSavedPerYear}/>
                                             </Col>
                                             <Col>
-                                                <ResultItem title="Productivity Pounds Saved per yr." value='0'/>
-                                            </Col>
-                                            <Col>
-                                                <ResultItem title="Addt'l Revenue per yr." currency value='0'/>
+                                                <ResultItem title="£ saved per consultant" currency
+                                                            value={this.state.consultants.length === 0 ? 0 : hoursSavedPerCons * revenueSavedPerCons}/>
                                             </Col>
                                         </Row>
                                         <Row className={styles.row_result_text}>
@@ -86,33 +83,21 @@ class ROI extends React.Component {
                                             </Col>
                                         </Row>
                                         <Row className={styles.row_result}>
-                                            <Col>
-                                                <ResultItem title="Hours Saved per yr."
-                                                            valSize="small"
-                                                            value={this.state.consultants * 84}/>
+                                            <Col xs={3}>
+                                                <ResultItem title="Days"
+                                                            value={((this.state.consultants * 84) / 24).toFixed()}/>
                                             </Col>
-                                            <Col>
-                                                <ResultItem title="Productivity Pounds Saved per yr."
-                                                            valSize="small" value='0'/>
+                                            <Col xs={3}>
+                                                <ResultItem title="Audiobooks"
+                                                            value={(this.state.consultants * 84 / 11).toFixed()}/>
                                             </Col>
-                                            <Col>
-                                                <ResultItem title="Addt'l Revenue per yr." valSize="small"
-                                                            currency
-                                                            value='0'/>
+                                            <Col xs={3}>
+                                                <ResultItem title="Ferrari 488"
+                                                            value={(revenueGenerated / 195363).toFixed()}/>
                                             </Col>
-                                            <Col>
-                                                <ResultItem title="Hours Saved per yr."
-                                                            valSize="small"
-                                                            value={this.state.consultants * 84}/>
-                                            </Col>
-                                            <Col>
-                                                <ResultItem title="Productivity Pounds Saved per yr."
-                                                            valSize="small" value='0'/>
-                                            </Col>
-                                            <Col>
-                                                <ResultItem title="Addt'l Revenue per yr." valSize="small"
-                                                            currency
-                                                            value='0'/>
+                                            <Col xs={3}>
+                                                <ResultItem title="Gold Britannia Coin"
+                                                            value={(revenueGenerated / 1177).toFixed()}/>
                                             </Col>
                                         </Row>
                                         <Row>

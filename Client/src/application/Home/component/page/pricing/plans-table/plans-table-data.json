@@ -13,7 +13,9 @@
     "JobScience": true,
     "Vincere": true,
     "Mercury Xrm": true,
-    "Greenhouse": true
+    "Greenhouse": true,
+    "JobAdder": true,
+    "Workable": true
   },
   "Pro": {
     "Website ChatBot": true,
@@ -34,6 +36,8 @@
     "Vincere": true,
     "Mercury Xrm": true,
     "Greenhouse": true,
+    "JobAdder": true,
+    "Workable": true,
     "Outlook": true,
     "Gmail": true,
     "Twilio": true,
@@ -67,6 +71,8 @@
     "Vincere": true,
     "Mercury Xrm": true,
     "Greenhouse": true,
+    "JobAdder": true,
+    "Workable": true,
     "Outlook": true,
     "Gmail": true,
     "Twilio": true,

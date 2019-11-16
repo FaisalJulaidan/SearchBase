@@ -3,26 +3,26 @@ import styles from './pricing.module.css';
 import {Col, Container, Row, Nav, Tab} from "react-bootstrap";
 import Layout from "../../../hoc/layout/Layout";
 import {BREAKPOINTS, WEBSITE_TITLE} from "../../../../../constants/config";
-import AgencyPricingTab from "./tabs/AgencyPricingTab";
-import InHousePricingTab from "./tabs/InHousePricingTab";
+import LeadGenerationPricingTab from "./tabs/LeadGenerationPricingTab";
+import AutomationPricingTab from "./tabs/AutomationPricingTab";
 import EnterprisePricingTab from "./tabs/EnterprisePricingTab";
 
 class Pricing extends React.Component {
 
     state = {
-        activeTab: 'agency'
+        activeTab: 'lead-generation'
     };
 
     componentDidMount() {
         document.title = "Pricing | " + WEBSITE_TITLE;
-        if (["agency", "enterprise", "in-house"].includes(this.props.location.hash.replace("#", ""))) {
+        if (["lead-generation", "automation", "enterprise"].includes(this.props.location.hash.replace("#", ""))) {
             this.setState({activeTab: this.props.location.hash.replace("#", "")});
         }
     }
 
     componentDidUpdate(prevProps, prevState, snapshot) {
         if (this.props.location.hash !== prevProps.location.hash &&
-            ["agency", "enterprise", "in-house"].includes(this.props.location.hash.replace("#", ""))) {
+            ["lead-generation", "automation", "enterprise"].includes(this.props.location.hash.replace("#", ""))) {
             this.setState({activeTab: this.props.location.hash.replace("#", "")});
         }
     }
@@ -51,12 +51,21 @@ class Pricing extends React.Component {
                                      onSelect={() => {
                                      }}>
                                     <Nav.Item className={styles.tab}>
-                                        <Nav.Link eventKey="agency"
-                                                  style={this.state.activeTab === 'agency' ? {
+                                        <Nav.Link eventKey="lead-generation"
+                                                  style={this.state.activeTab === 'lead-generation' ? {
                                                       fontWeight: '900',
                                                       color: "#9254de"
                                                   } : {}}>
-                                            Agency
+                                            Lead Generation
+                                        </Nav.Link>
+                                    </Nav.Item>
+                                    <Nav.Item className={styles.tab}>
+                                        <Nav.Link eventKey="automation"
+                                                  style={this.state.activeTab === 'automation' ? {
+                                                      fontWeight: '900',
+                                                      color: "#9254de"
+                                                  } : {}}>
+                                            Automation
                                         </Nav.Link>
                                     </Nav.Item>
                                     <Nav.Item className={styles.tab}>
@@ -68,29 +77,20 @@ class Pricing extends React.Component {
                                             Enterprise
                                         </Nav.Link>
                                     </Nav.Item>
-                                    <Nav.Item className={styles.tab}>
-                                        <Nav.Link eventKey="in-house"
-                                                  style={this.state.activeTab === 'in-house' ? {
-                                                      fontWeight: '900',
-                                                      color: "#9254de"
-                                                  } : {}}>
-                                            In House
-                                        </Nav.Link>
-                                    </Nav.Item>
                                 </Nav>
                             </Col>
                         </Row>
                         <Row>
                             <Col>
                                 <Tab.Content>
-                                    <Tab.Pane eventKey="agency">
-                                        <AgencyPricingTab/>
+                                    <Tab.Pane eventKey="lead-generation">
+                                        <LeadGenerationPricingTab/>
+                                    </Tab.Pane>
+                                    <Tab.Pane eventKey="automation">
+                                        <AutomationPricingTab/>
                                     </Tab.Pane>
                                     <Tab.Pane eventKey="enterprise">
                                         <EnterprisePricingTab/>
-                                    </Tab.Pane>
-                                    <Tab.Pane eventKey="in-house">
-                                        <InHousePricingTab/>
                                     </Tab.Pane>
                                 </Tab.Content>
                             </Col>

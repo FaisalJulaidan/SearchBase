@@ -238,7 +238,6 @@ export const Chatbot = ({
                 return setChatbotStatus({ disabled: isDisabled, active: assistant.Active, loading: false });
 
             dataHandler.setAssistantID(assistantID);
-            console.log( [].concat(assistant.Flow.groups.map(group => group.blocks)).flat(1))
             initChatbot(
                 assistant,
                 [].concat(assistant.Flow.groups.map(group => group.blocks)).flat(1),
@@ -265,7 +264,7 @@ export const Chatbot = ({
 
     return (
         <>
-            {active ?
+            {!disabled ?
                 <>
                     {open && !loading ?
                         <div ref={chatbotRef}
@@ -292,7 +291,6 @@ export const Chatbot = ({
                         </div>
                         :
                             <ChatButton btnColor={btnColor}
-                                        disabled={disabled}
                                         active={active}
                                         loading={loading}
                                         position={position}

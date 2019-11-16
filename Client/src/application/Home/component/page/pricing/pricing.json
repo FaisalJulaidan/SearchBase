@@ -8,7 +8,8 @@
     "items": [
       "Website Chatbot",
       "CRM Integration"
-    ]
+    ],
+    "disabled": true
   },
   {
     "id": "essential-plus",

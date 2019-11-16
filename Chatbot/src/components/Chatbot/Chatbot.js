@@ -93,7 +93,7 @@ export const Chatbot = ({
             }
         };
 
-        if (isDirectLink) {
+        if (isDirectLink && active) {
             setChatbotAnimation({ open: true });
             setChatbotStatus({ open: true });
         }

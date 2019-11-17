@@ -6,7 +6,7 @@ import {Container, Row, Col, Card} from "react-bootstrap";
 import {Fade} from "react-reveal";
 import SignupFormPayment from "./SignupFormPayment";
 import {WEBSITE_TITLE} from "../../../../../constants/config";
-import pricingJSON from "../pricing/pricing.json";
+import pricingJSON from "../pricing/pricingAgency.json";
 import {Elements} from 'react-stripe-elements';
 
 class Payment extends React.Component {

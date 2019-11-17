@@ -3,39 +3,36 @@
     "id": "essential",
     "stripe_key": "plan_G7Sth78cbr8Pgl",
     "title": "Essential",
-    "subtitle": "Suitable for teams of up to 3 members",
-    "price": "£99",
-    "price_subtitle": "per month billed annually",
+    "subtitle": "",
+    "price": "£29.99",
+    "price_subtitle": "per month per seat",
     "items": [
       "Website Chatbot",
-      "CRM Integration",
-      "Outbound Messages"
+      "CRM Integration"
     ]
   },
   {
     "id": "pro",
     "stripe_key": "plan_G7SuTtSoBxJ7aS",
-    "title": "Pro",
-    "subtitle": "Suitable for teams of up to 10 members",
-    "price": "£249",
-    "price_subtitle": "per month billed annually",
+    "title": "Essential+",
+    "subtitle": "",
+    "price": "£49.99",
+    "price_subtitle": "per month per seat",
     "items": [
       "Website Chatbot",
       "CRM Integration",
       "Outbound Messages",
       "Pre-screen Candidates",
-      "Qualify Candidates",
-      "Automated Decision Making",
-      "Automated Engagement"
+      "Qualify Candidates"
     ]
   },
   {
     "id": "premium",
     "stripe_key": "plan_G7SuT5aJA1OFJU",
-    "title": "Premium",
-    "subtitle": "Suitable for teams of up to 50 members",
-    "price": "£1,150",
-    "price_subtitle": "per month billed annually",
+    "title": "Pro",
+    "subtitle": "",
+    "price": "£69.99",
+    "price_subtitle": "per month per seat",
     "items": [
       "Website Chatbot",
       "CRM Integration",

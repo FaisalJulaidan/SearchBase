@@ -1,0 +1,14 @@
+[
+  {
+    "id": "essential",
+    "stripe_key": "plan_G7Sth78cbr8Pgl",
+    "title": "Essential",
+    "subtitle": "Suitable for teams of up to 3 members",
+    "price": "£99",
+    "price_subtitle": "per month",
+    "items": [
+      "Website Chatbot",
+      "CRM Integration"
+    ]
+  }
+]

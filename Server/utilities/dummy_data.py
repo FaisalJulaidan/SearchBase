@@ -9,7 +9,6 @@ from utilities import helpers, enums
 
 # Generates dummy data for testing
 def generate():
-
     # Companies creation
     db.session.add(Company(Name='Aramco', URL='ff.com', StripeID='cus_00000000000000', SubID='sub_00000000000000',
                            Active=True, AccessAssistants=True, AccessCampaigns=True, AccessAutoPilot=True,
@@ -33,152 +32,6 @@ def generate():
     reader_a = Assistant(Name="Reader", Message="Hey there",
                          TopBarText="Aramco Bot", SecondsUntilPopup=1,
                          Config=config, Active=True, Company=aramco)
-
-    flow = {
-        "groups": [
-            {
-                "blocks": [
-                    {
-                        "Content": {
-                            "answers": [
-                                {
-                                    "action": "Go To Next Block",
-                                    "afterMessage": "",
-                                    "blockToGoID": "1Nto4DL8B",
-                                    "id": "WZXp26mdL",
-                                    "keywords": [
-                                        "python"
-                                    ],
-                                    "score": 2,
-                                    "text": "low"
-                                },
-                                {
-                                    "action": "Go To Next Block",
-                                    "afterMessage": "",
-                                    "blockToGoID": "1Nto4DL8B",
-                                    "id": "godj9rom5",
-                                    "keywords": [],
-                                    "score": 5,
-                                    "text": "medium"
-                                },
-                                {
-                                    "action": "Go To Next Block",
-                                    "afterMessage": "",
-                                    "blockToGoID": "1Nto4DL8B",
-                                    "id": "E6phkGY5u",
-                                    "keywords": [],
-                                    "score": 8,
-                                    "text": "high"
-                                }
-                            ],
-                            "text": "what?"
-                        },
-                        "DataType": enums.DataType.CandidateSkills.value['enumName'],
-                        "ID": "8EDEBiDHa",
-                        "SkipAction": "End Chat",
-                        "SkipBlockToGoID": None,
-                        "SkipText": "Skip!",
-                        "Skippable": False,
-                        "StoreInDB": True,
-                        "Type": "Question"
-                    },
-                    {
-                        "Type": "Solutions",
-                        "StoreInDB": False,
-                        "Skippable": True,
-                        "SkipText": "Not found what you're looking for?",
-                        "SkipAction": "Go To Next Block",
-                        "SkipBlockToGoID": None,
-                        "DataType": enums.DataType.NoType.value['enumName'],
-                        "Content": {
-                            "showTop": 5,
-                            "action": "Go To Next Block",
-                            "blockToGoID": None,
-                            "afterMessage": "123",
-                            "databaseType": "Candidates"
-                        },
-                        "ID": "1Nto4DL8B"
-                    }
-                ],
-                "description": "The best group",
-                "id": "tisd83f4",
-                "name": "group 1"
-            }
-        ]
-    }
-
-    flow = {
-        "groups": [
-            {
-                "blocks": [
-                    {
-                        "Content": {
-                            "answers": [
-                                {
-                                    "action": "Go To Next Block",
-                                    "afterMessage": "",
-                                    "blockToGoID": "1Nto4DL8B",
-                                    "id": "WZXp26mdL",
-                                    "keywords": [
-                                        "python"
-                                    ],
-                                    "score": 2,
-                                    "text": "low"
-                                },
-                                {
-                                    "action": "Go To Next Block",
-                                    "afterMessage": "",
-                                    "blockToGoID": "1Nto4DL8B",
-                                    "id": "godj9rom5",
-                                    "keywords": [],
-                                    "score": 5,
-                                    "text": "medium"
-                                },
-                                {
-                                    "action": "Go To Next Block",
-                                    "afterMessage": "",
-                                    "blockToGoID": "1Nto4DL8B",
-                                    "id": "E6phkGY5u",
-                                    "keywords": [],
-                                    "score": 8,
-                                    "text": "high"
-                                }
-                            ],
-                            "text": "what?"
-                        },
-                        "DataType": enums.DataType.CandidateSkills.value['enumName'],
-                        "ID": "8EDEBiDHa",
-                        "SkipAction": "End Chat",
-                        "SkipBlockToGoID": None,
-                        "SkipText": "Skip!",
-                        "Skippable": False,
-                        "StoreInDB": True,
-                        "Type": "Question"
-                    },
-                    {
-                        "Type": "Solutions",
-                        "StoreInDB": False,
-                        "Skippable": True,
-                        "SkipText": "Not found what you're looking for?",
-                        "SkipAction": "Go To Next Block",
-                        "SkipBlockToGoID": None,
-                        "DataType": enums.DataType.NoType.value['enumName'],
-                        "Content": {
-                            "showTop": 5,
-                            "action": "Go To Next Block",
-                            "blockToGoID": None,
-                            "afterMessage": "123",
-                            "databaseType": "Candidates"
-                        },
-                        "ID": "1Nto4DL8B"
-                    }
-                ],
-                "description": "The best group",
-                "id": "tisd83f4",
-                "name": "group 1"
-            }
-        ]
-    }
 
     flow = {
         "groups": [
@@ -501,260 +354,277 @@ def generate():
         ]
     }
 
-    test = {"groups": [{"id": "u0Q88uPGM", "name": "Main", "blocks": [{"ID": "aReFwax_N", "Type": "Raw Text", "Content": {
-        "text": "Before we can process your application we need to ask you a few questions to further qualify you. ",
-        "action": "Go To Next Block", "blockToGoID": "l931XnlT1"}, "DataType": "NoType", "SkipText": "Skip!",
-                                                                "Skippable": False, "StoreInDB": False,
-                                                                "SkipAction": "End Chat", "SkipBlockToGoID": None},
-                                                               {"ID": "l931XnlT1", "Type": "User Input",
-                                                                "Content": {"text": "What is your name?",
-                                                                            "action": "Go To Next Block",
-                                                                            "keywords": [], "blockToGoID": "57u9dl6YO",
-                                                                            "afterMessage": ""},
-                                                                "DataType": "CandidateName", "SkipText": "Skip!",
-                                                                "Skippable": False, "StoreInDB":True,
-                                                                "SkipAction": "End Chat", "SkipBlockToGoID": None},
-                                                               {"ID": "57u9dl6YO", "Type": "User Input", "Content": {
-                                                                   "text": "What is the best mobile number we can reach you on?",
-                                                                   "action": "Go To Next Block", "keywords": [],
-                                                                   "blockToGoID": "N-lHcLlze", "afterMessage": ""},
-                                                                "DataType": "CandidateMobile", "SkipText": "Skip!",
-                                                                "Skippable": False, "StoreInDB": True,
-                                                                "SkipAction": "End Chat", "SkipBlockToGoID": None},
-                                                               {"ID": "N-lHcLlze", "Type": "Question",
-                                                                "Content": {"text": "Are you over the age of 18? ",
-                                                                            "answers": [
-                                                                                {"id": "Na12wF9Z4", "text": "Yes",
-                                                                                 "score": 10,
-                                                                                 "action": "Go To Next Block",
-                                                                                 "keywords": [],
-                                                                                 "blockToGoID": "KBZ_QivPh",
-                                                                                 "afterMessage": "Great"},
-                                                                                {"id": "wl2JC3GdS", "text": "No",
-                                                                                 "score": -999, "action": "End Chat",
-                                                                                 "keywords": [], "blockToGoID": None,
-                                                                                 "afterMessage": "Unfortunately we will not be able to process your application you are older than 18 years old."}]},
-                                                                "DataType": "NoType", "SkipText": "Skip!",
-                                                                "Skippable": False, "StoreInDB": True,
-                                                                "SkipAction": "End Chat", "SkipBlockToGoID": None},
-                                                               {"ID": "KBZ_QivPh", "Type": "Question", "Content": {
-                                                                   "text": "Have you previously worked in a factory? ",
-                                                                   "answers": [
-                                                                       {"id": "ATqZwA9eO", "text": "Yes", "score": 5,
-                                                                        "action": "Go To Next Block", "keywords": [],
-                                                                        "blockToGoID": "AYjTC7dt-",
-                                                                        "afterMessage": "Very good"},
-                                                                       {"id": "arxgdOu3W", "text": "No", "score": 0,
-                                                                        "action": "Go To Next Block", "keywords": [],
-                                                                        "blockToGoID": "AYjTC7dt-",
-                                                                        "afterMessage": "Okay, that's not a problem"}]},
-                                                                "DataType": "NoType", "SkipText": "Skip!",
-                                                                "Skippable": False, "StoreInDB": True,
-                                                                "SkipAction": "End Chat", "SkipBlockToGoID": None},
-                                                               {"ID": "AYjTC7dt-", "Type": "Question", "Content": {
-                                                                   "text": "Are you legible to work in the UK?",
-                                                                   "answers": [
-                                                                       {"id": "wCNV3L3Qv", "text": "Yes", "score": 10,
-                                                                        "action": "Go To Next Block", "keywords": [],
-                                                                        "blockToGoID": "qo5i9AOn9",
-                                                                        "afterMessage": "Cool"},
-                                                                       {"id": "1ijkqdIyo", "text": "No", "score": -999,
-                                                                        "action": "End Chat", "keywords": [],
-                                                                        "blockToGoID": None,
-                                                                        "afterMessage": "Unfortunately, for any role that we have advertised, you will need to be eligible to work in the United Kingdom"}]},
-                                                                "DataType": "NoType", "SkipText": "Skip!",
-                                                                "Skippable": False, "StoreInDB": True,
-                                                                "SkipAction": "End Chat", "SkipBlockToGoID": None},
-                                                               {"ID": "qo5i9AOn9", "Type": "User Input", "Content": {
-                                                                   "text": "Enter below what documents you can provide us? ",
-                                                                   "action": "Go To Next Block", "keywords": [],
-                                                                   "blockToGoID": "oyDNWmdnE",
-                                                                   "afterMessage": "Great, thanks for your input"},
-                                                                "DataType": "NoType", "SkipText": "Skip!",
-                                                                "Skippable": False, "StoreInDB": True,
-                                                                "SkipAction": "End Chat", "SkipBlockToGoID": None},
-                                                               {"ID": "oyDNWmdnE", "Type": "Question", "Content": {
-                                                                   "text": "Do you have any unspent criminal convictions?",
-                                                                   "answers": [
-                                                                       {"id": "NLj1Q4ZJ0", "text": "Yes", "score": -999,
-                                                                        "action": "End Chat", "keywords": [],
-                                                                        "blockToGoID": None,
-                                                                        "afterMessage": "Unfortunately you cannot proceed if you have any unspent criminal convictions."},
-                                                                       {"id": "AGPOnFfz2", "text": "No", "score": 10,
-                                                                        "action": "Go To Next Block", "keywords": [],
-                                                                        "blockToGoID": "Bu1AH28Eg",
-                                                                        "afterMessage": "Ok"}]}, "DataType": "NoType",
-                                                                "SkipText": "Skip!", "Skippable": False,
-                                                                "StoreInDB": True, "SkipAction": "End Chat",
-                                                                "SkipBlockToGoID": None},
-                                                               {"ID": "Bu1AH28Eg", "Type": "Question", "Content": {
-                                                                   "text": "Will you pass a Drug and Alcohol test?",
-                                                                   "answers": [
-                                                                       {"id": "Du1jlagy9", "text": "Yes", "score": 10,
-                                                                        "action": "Go To Next Block", "keywords": [],
-                                                                        "blockToGoID": "9RVd_x2tv",
-                                                                        "afterMessage": "Okay, you qualify very well for the job."},
-                                                                       {"id": "DOndgOo9B", "text": "No", "score": -999,
-                                                                        "action": "End Chat", "keywords": [],
-                                                                        "blockToGoID": None,
-                                                                        "afterMessage": "Unfortunately we canot progress further if you cannot pass a Drugs and Alcohol test."}]},
-                                                                "DataType": "NoType", "SkipText": "Skip!",
-                                                                "Skippable": False, "StoreInDB": True,
-                                                                "SkipAction": "End Chat", "SkipBlockToGoID": None},
-                                                               {"ID": "9RVd_x2tv", "Type": "Question", "Content": {
-                                                                   "text": "Fantastic, so before I book you in for the registration, I'm going to go through the job role and benefits, is that ok?",
-                                                                   "answers": [
-                                                                       {"id": "FI_Lmlrtx", "text": "Let's do it",
-                                                                        "score": 0, "action": "Go To Next Block",
-                                                                        "keywords": [], "blockToGoID": "a-6xv2ksf",
-                                                                        "afterMessage": "Great"}]},
-                                                                "DataType": "NoType", "SkipText": "Skip!",
-                                                                "Skippable": False, "StoreInDB": True,
-                                                                "SkipAction": "End Chat", "SkipBlockToGoID": None},
-                                                               {"ID": "a-6xv2ksf", "Type": "Question", "Content": {
-                                                                   "text": "You will be picking and packing products in our factory. You will be working with poultry. Are you okay with this?",
-                                                                   "answers": [
-                                                                       {"id": "KYLkQ0wbP", "text": "Yes", "score": 10,
-                                                                        "action": "Go To Next Block", "keywords": [],
-                                                                        "blockToGoID": "dW6pjcEVe",
-                                                                        "afterMessage": "Great"},
-                                                                       {"id": "7mCmnc6Dv", "text": "No", "score": 0,
-                                                                        "action": "End Chat", "keywords": [],
-                                                                        "blockToGoID": None,
-                                                                        "afterMessage": "Unfortunately as the role is very physically demanding, you will not be fit for this job."}]},
-                                                                "DataType": "NoType", "SkipText": "Skip!",
-                                                                "Skippable": False, "StoreInDB": True,
-                                                                "SkipAction": "End Chat", "SkipBlockToGoID": None},
-                                                               {"ID": "dW6pjcEVe", "Type": "Raw Text", "Content": {
-                                                                   "text": "Pay rates (Days = £9.50PH - Plus £1.71 for late hours premium",
-                                                                   "action": "Go To Next Block",
-                                                                   "blockToGoID": "U34o91ZXH"}, "DataType": "NoType",
-                                                                "SkipText": "Skip!", "Skippable": False,
-                                                                "StoreInDB": False, "SkipAction": "End Chat",
-                                                                "SkipBlockToGoID": None},
-                                                               {"ID": "U34o91ZXH", "Type": "Raw Text", "Content": {
-                                                                   "text": "Regular overtime available (Between 41 - 50 hours = time and a half - Plus £1.71 for late hours premium) (50 plus hours = double pay - Plus £1.71 for late hours premium) ",
-                                                                   "action": "Go To Next Block",
-                                                                   "blockToGoID": "ExmDcwN5Y"}, "DataType": "NoType",
-                                                                "SkipText": "Skip!", "Skippable": False,
-                                                                "StoreInDB": False, "SkipAction": "End Chat",
-                                                                "SkipBlockToGoID": None},
-                                                               {"ID": "ExmDcwN5Y", "Type": "Raw Text", "Content": {
-                                                                   "text": "Shift are based on a 4 on 3 off pattern",
-                                                                   "action": "Go To Next Block",
-                                                                   "blockToGoID": "eaOW-wjsb"}, "DataType": "NoType",
-                                                                "SkipText": "Skip!", "Skippable": False,
-                                                                "StoreInDB": False, "SkipAction": "End Chat",
-                                                                "SkipBlockToGoID": None},
-                                                               {"ID": "eaOW-wjsb", "Type": "Raw Text", "Content": {
-                                                                   "text": "Public transport links are fantastic (except on Sunday)",
-                                                                   "action": "Go To Next Block",
-                                                                   "blockToGoID": "QTNAVyAHG"}, "DataType": "NoType",
-                                                                "SkipText": "Skip!", "Skippable": False,
-                                                                "StoreInDB": False, "SkipAction": "End Chat",
-                                                                "SkipBlockToGoID": None},
-                                                               {"ID": "QTNAVyAHG", "Type": "Raw Text", "Content": {
-                                                                   "text": "And finally, we provide full training ",
-                                                                   "action": "Go To Next Block",
-                                                                   "blockToGoID": "z_wmNJ6av"}, "DataType": "NoType",
-                                                                "SkipText": "Skip!", "Skippable": False,
-                                                                "StoreInDB": False, "SkipAction": "End Chat",
-                                                                "SkipBlockToGoID": None},
-                                                               {"ID": "z_wmNJ6av", "Type": "Question", "Content": {
-                                                                   "text": "Are you happy with everything so far?",
-                                                                   "answers": [
-                                                                       {"id": "P7sV_VvCW", "text": "Yes", "score": 0,
-                                                                        "action": "Go To Next Block", "keywords": [],
-                                                                        "blockToGoID": "ncMzXBZkw",
-                                                                        "afterMessage": "Fantastic. Let's run you over the benefits as well"}]},
-                                                                "DataType": "NoType", "SkipText": "Skip!",
-                                                                "Skippable": False, "StoreInDB": True,
-                                                                "SkipAction": "End Chat", "SkipBlockToGoID": None},
-                                                               {"ID": "ncMzXBZkw", "Type": "Raw Text", "Content": {
-                                                                   "text": "Subsidised canteen serving hot and cold food (cash or contactless)",
-                                                                   "action": "Go To Next Block",
-                                                                   "blockToGoID": "lro-HEL6-"}, "DataType": "NoType",
-                                                                "SkipText": "Skip!", "Skippable": False,
-                                                                "StoreInDB": False, "SkipAction": "End Chat",
-                                                                "SkipBlockToGoID": None},
-                                                               {"ID": "lro-HEL6-", "Type": "Raw Text",
-                                                                "Content": {"text": "Free hot drinks machine",
-                                                                            "action": "Go To Next Block",
-                                                                            "blockToGoID": "bnPPP397f"},
-                                                                "DataType": "NoType", "SkipText": "Skip!",
-                                                                "Skippable": False, "StoreInDB": False,
-                                                                "SkipAction": "End Chat", "SkipBlockToGoID": None},
-                                                               {"ID": "bnPPP397f", "Type": "Raw Text",
-                                                                "Content": {"text": "2 snack machines",
-                                                                            "action": "Go To Next Block",
-                                                                            "blockToGoID": "VJnJiDoS0"},
-                                                                "DataType": "NoType", "SkipText": "Skip!",
-                                                                "Skippable": False, "StoreInDB": False,
-                                                                "SkipAction": "End Chat", "SkipBlockToGoID": None},
-                                                               {"ID": "VJnJiDoS0", "Type": "Raw Text",
-                                                                "Content": {"text": "2 x 30 minute breaks",
-                                                                            "action": "Go To Next Block",
-                                                                            "blockToGoID": "FRI-Ytaox"},
-                                                                "DataType": "NoType", "SkipText": "Skip!",
-                                                                "Skippable": False, "StoreInDB": False,
-                                                                "SkipAction": "End Chat", "SkipBlockToGoID": None},
-                                                               {"ID": "FRI-Ytaox", "Type": "Raw Text", "Content": {
-                                                                   "text": "Arcade machine, ping pong table and pool table",
-                                                                   "action": "Go To Next Block",
-                                                                   "blockToGoID": "jKfIB7nJZ"}, "DataType": "NoType",
-                                                                "SkipText": "Skip!", "Skippable": False,
-                                                                "StoreInDB": False, "SkipAction": "End Chat",
-                                                                "SkipBlockToGoID": None},
-                                                               {"ID": "jKfIB7nJZ", "Type": "Raw Text", "Content": {
-                                                                   "text": "Music playing throughout the warehouse",
-                                                                   "action": "Go To Next Block",
-                                                                   "blockToGoID": "XrekYSlv1"}, "DataType": "NoType",
-                                                                "SkipText": "Skip!", "Skippable": False,
-                                                                "StoreInDB": False, "SkipAction": "End Chat",
-                                                                "SkipBlockToGoID": None},
-                                                               {"ID": "XrekYSlv1", "Type": "Raw Text", "Content": {
-                                                                   "text": "Thank you for running through our chatbot. We will be in touch with you very soon to confirm your appointment with the location and start date",
-                                                                   "action": "End Chat", "blockToGoID": None},
-                                                                "DataType": "NoType", "SkipText": "Skip!",
-                                                                "Skippable": False, "StoreInDB": False,
-                                                                "SkipAction": "End Chat", "SkipBlockToGoID": None}],
-                 "description": "Chat"}]}
+    test = {
+        "groups": [{"id": "u0Q88uPGM", "name": "Main", "blocks": [{"ID": "aReFwax_N", "Type": "Raw Text", "Content": {
+            "text": "Before we can process your application we need to ask you a few questions to further qualify you. ",
+            "action": "Go To Next Block", "blockToGoID": "l931XnlT1"}, "DataType": "NoType", "SkipText": "Skip!",
+                                                                   "Skippable": False, "StoreInDB": False,
+                                                                   "SkipAction": "End Chat", "SkipBlockToGoID": None},
+                                                                  {"ID": "l931XnlT1", "Type": "User Input",
+                                                                   "Content": {"text": "What is your name?",
+                                                                               "action": "Go To Next Block",
+                                                                               "keywords": [],
+                                                                               "blockToGoID": "57u9dl6YO",
+                                                                               "afterMessage": ""},
+                                                                   "DataType": "CandidateName", "SkipText": "Skip!",
+                                                                   "Skippable": False, "StoreInDB": True,
+                                                                   "SkipAction": "End Chat", "SkipBlockToGoID": None},
+                                                                  {"ID": "57u9dl6YO", "Type": "User Input", "Content": {
+                                                                      "text": "What is the best mobile number we can reach you on?",
+                                                                      "action": "Go To Next Block", "keywords": [],
+                                                                      "blockToGoID": "N-lHcLlze", "afterMessage": ""},
+                                                                   "DataType": "CandidateMobile", "SkipText": "Skip!",
+                                                                   "Skippable": False, "StoreInDB": True,
+                                                                   "SkipAction": "End Chat", "SkipBlockToGoID": None},
+                                                                  {"ID": "N-lHcLlze", "Type": "Question",
+                                                                   "Content": {"text": "Are you over the age of 18? ",
+                                                                               "answers": [
+                                                                                   {"id": "Na12wF9Z4", "text": "Yes",
+                                                                                    "score": 10,
+                                                                                    "action": "Go To Next Block",
+                                                                                    "keywords": [],
+                                                                                    "blockToGoID": "KBZ_QivPh",
+                                                                                    "afterMessage": "Great"},
+                                                                                   {"id": "wl2JC3GdS", "text": "No",
+                                                                                    "score": -999, "action": "End Chat",
+                                                                                    "keywords": [], "blockToGoID": None,
+                                                                                    "afterMessage": "Unfortunately we will not be able to process your application you are older than 18 years old."}]},
+                                                                   "DataType": "NoType", "SkipText": "Skip!",
+                                                                   "Skippable": False, "StoreInDB": True,
+                                                                   "SkipAction": "End Chat", "SkipBlockToGoID": None},
+                                                                  {"ID": "KBZ_QivPh", "Type": "Question", "Content": {
+                                                                      "text": "Have you previously worked in a factory? ",
+                                                                      "answers": [
+                                                                          {"id": "ATqZwA9eO", "text": "Yes", "score": 5,
+                                                                           "action": "Go To Next Block", "keywords": [],
+                                                                           "blockToGoID": "AYjTC7dt-",
+                                                                           "afterMessage": "Very good"},
+                                                                          {"id": "arxgdOu3W", "text": "No", "score": 0,
+                                                                           "action": "Go To Next Block", "keywords": [],
+                                                                           "blockToGoID": "AYjTC7dt-",
+                                                                           "afterMessage": "Okay, that's not a problem"}]},
+                                                                   "DataType": "NoType", "SkipText": "Skip!",
+                                                                   "Skippable": False, "StoreInDB": True,
+                                                                   "SkipAction": "End Chat", "SkipBlockToGoID": None},
+                                                                  {"ID": "AYjTC7dt-", "Type": "Question", "Content": {
+                                                                      "text": "Are you legible to work in the UK?",
+                                                                      "answers": [
+                                                                          {"id": "wCNV3L3Qv", "text": "Yes",
+                                                                           "score": 10,
+                                                                           "action": "Go To Next Block", "keywords": [],
+                                                                           "blockToGoID": "qo5i9AOn9",
+                                                                           "afterMessage": "Cool"},
+                                                                          {"id": "1ijkqdIyo", "text": "No",
+                                                                           "score": -999,
+                                                                           "action": "End Chat", "keywords": [],
+                                                                           "blockToGoID": None,
+                                                                           "afterMessage": "Unfortunately, for any role that we have advertised, you will need to be eligible to work in the United Kingdom"}]},
+                                                                   "DataType": "NoType", "SkipText": "Skip!",
+                                                                   "Skippable": False, "StoreInDB": True,
+                                                                   "SkipAction": "End Chat", "SkipBlockToGoID": None},
+                                                                  {"ID": "qo5i9AOn9", "Type": "User Input", "Content": {
+                                                                      "text": "Enter below what documents you can provide us? ",
+                                                                      "action": "Go To Next Block", "keywords": [],
+                                                                      "blockToGoID": "oyDNWmdnE",
+                                                                      "afterMessage": "Great, thanks for your input"},
+                                                                   "DataType": "NoType", "SkipText": "Skip!",
+                                                                   "Skippable": False, "StoreInDB": True,
+                                                                   "SkipAction": "End Chat", "SkipBlockToGoID": None},
+                                                                  {"ID": "oyDNWmdnE", "Type": "Question", "Content": {
+                                                                      "text": "Do you have any unspent criminal convictions?",
+                                                                      "answers": [
+                                                                          {"id": "NLj1Q4ZJ0", "text": "Yes",
+                                                                           "score": -999,
+                                                                           "action": "End Chat", "keywords": [],
+                                                                           "blockToGoID": None,
+                                                                           "afterMessage": "Unfortunately you cannot proceed if you have any unspent criminal convictions."},
+                                                                          {"id": "AGPOnFfz2", "text": "No", "score": 10,
+                                                                           "action": "Go To Next Block", "keywords": [],
+                                                                           "blockToGoID": "Bu1AH28Eg",
+                                                                           "afterMessage": "Ok"}]},
+                                                                   "DataType": "NoType",
+                                                                   "SkipText": "Skip!", "Skippable": False,
+                                                                   "StoreInDB": True, "SkipAction": "End Chat",
+                                                                   "SkipBlockToGoID": None},
+                                                                  {"ID": "Bu1AH28Eg", "Type": "Question", "Content": {
+                                                                      "text": "Will you pass a Drug and Alcohol test?",
+                                                                      "answers": [
+                                                                          {"id": "Du1jlagy9", "text": "Yes",
+                                                                           "score": 10,
+                                                                           "action": "Go To Next Block", "keywords": [],
+                                                                           "blockToGoID": "9RVd_x2tv",
+                                                                           "afterMessage": "Okay, you qualify very well for the job."},
+                                                                          {"id": "DOndgOo9B", "text": "No",
+                                                                           "score": -999,
+                                                                           "action": "End Chat", "keywords": [],
+                                                                           "blockToGoID": None,
+                                                                           "afterMessage": "Unfortunately we canot progress further if you cannot pass a Drugs and Alcohol test."}]},
+                                                                   "DataType": "NoType", "SkipText": "Skip!",
+                                                                   "Skippable": False, "StoreInDB": True,
+                                                                   "SkipAction": "End Chat", "SkipBlockToGoID": None},
+                                                                  {"ID": "9RVd_x2tv", "Type": "Question", "Content": {
+                                                                      "text": "Fantastic, so before I book you in for the registration, I'm going to go through the job role and benefits, is that ok?",
+                                                                      "answers": [
+                                                                          {"id": "FI_Lmlrtx", "text": "Let's do it",
+                                                                           "score": 0, "action": "Go To Next Block",
+                                                                           "keywords": [], "blockToGoID": "a-6xv2ksf",
+                                                                           "afterMessage": "Great"}]},
+                                                                   "DataType": "NoType", "SkipText": "Skip!",
+                                                                   "Skippable": False, "StoreInDB": True,
+                                                                   "SkipAction": "End Chat", "SkipBlockToGoID": None},
+                                                                  {"ID": "a-6xv2ksf", "Type": "Question", "Content": {
+                                                                      "text": "You will be picking and packing products in our factory. You will be working with poultry. Are you okay with this?",
+                                                                      "answers": [
+                                                                          {"id": "KYLkQ0wbP", "text": "Yes",
+                                                                           "score": 10,
+                                                                           "action": "Go To Next Block", "keywords": [],
+                                                                           "blockToGoID": "dW6pjcEVe",
+                                                                           "afterMessage": "Great"},
+                                                                          {"id": "7mCmnc6Dv", "text": "No", "score": 0,
+                                                                           "action": "End Chat", "keywords": [],
+                                                                           "blockToGoID": None,
+                                                                           "afterMessage": "Unfortunately as the role is very physically demanding, you will not be fit for this job."}]},
+                                                                   "DataType": "NoType", "SkipText": "Skip!",
+                                                                   "Skippable": False, "StoreInDB": True,
+                                                                   "SkipAction": "End Chat", "SkipBlockToGoID": None},
+                                                                  {"ID": "dW6pjcEVe", "Type": "Raw Text", "Content": {
+                                                                      "text": "Pay rates (Days = £9.50PH - Plus £1.71 for late hours premium",
+                                                                      "action": "Go To Next Block",
+                                                                      "blockToGoID": "U34o91ZXH"}, "DataType": "NoType",
+                                                                   "SkipText": "Skip!", "Skippable": False,
+                                                                   "StoreInDB": False, "SkipAction": "End Chat",
+                                                                   "SkipBlockToGoID": None},
+                                                                  {"ID": "U34o91ZXH", "Type": "Raw Text", "Content": {
+                                                                      "text": "Regular overtime available (Between 41 - 50 hours = time and a half - Plus £1.71 for late hours premium) (50 plus hours = double pay - Plus £1.71 for late hours premium) ",
+                                                                      "action": "Go To Next Block",
+                                                                      "blockToGoID": "ExmDcwN5Y"}, "DataType": "NoType",
+                                                                   "SkipText": "Skip!", "Skippable": False,
+                                                                   "StoreInDB": False, "SkipAction": "End Chat",
+                                                                   "SkipBlockToGoID": None},
+                                                                  {"ID": "ExmDcwN5Y", "Type": "Raw Text", "Content": {
+                                                                      "text": "Shift are based on a 4 on 3 off pattern",
+                                                                      "action": "Go To Next Block",
+                                                                      "blockToGoID": "eaOW-wjsb"}, "DataType": "NoType",
+                                                                   "SkipText": "Skip!", "Skippable": False,
+                                                                   "StoreInDB": False, "SkipAction": "End Chat",
+                                                                   "SkipBlockToGoID": None},
+                                                                  {"ID": "eaOW-wjsb", "Type": "Raw Text", "Content": {
+                                                                      "text": "Public transport links are fantastic (except on Sunday)",
+                                                                      "action": "Go To Next Block",
+                                                                      "blockToGoID": "QTNAVyAHG"}, "DataType": "NoType",
+                                                                   "SkipText": "Skip!", "Skippable": False,
+                                                                   "StoreInDB": False, "SkipAction": "End Chat",
+                                                                   "SkipBlockToGoID": None},
+                                                                  {"ID": "QTNAVyAHG", "Type": "Raw Text", "Content": {
+                                                                      "text": "And finally, we provide full training ",
+                                                                      "action": "Go To Next Block",
+                                                                      "blockToGoID": "z_wmNJ6av"}, "DataType": "NoType",
+                                                                   "SkipText": "Skip!", "Skippable": False,
+                                                                   "StoreInDB": False, "SkipAction": "End Chat",
+                                                                   "SkipBlockToGoID": None},
+                                                                  {"ID": "z_wmNJ6av", "Type": "Question", "Content": {
+                                                                      "text": "Are you happy with everything so far?",
+                                                                      "answers": [
+                                                                          {"id": "P7sV_VvCW", "text": "Yes", "score": 0,
+                                                                           "action": "Go To Next Block", "keywords": [],
+                                                                           "blockToGoID": "ncMzXBZkw",
+                                                                           "afterMessage": "Fantastic. Let's run you over the benefits as well"}]},
+                                                                   "DataType": "NoType", "SkipText": "Skip!",
+                                                                   "Skippable": False, "StoreInDB": True,
+                                                                   "SkipAction": "End Chat", "SkipBlockToGoID": None},
+                                                                  {"ID": "ncMzXBZkw", "Type": "Raw Text", "Content": {
+                                                                      "text": "Subsidised canteen serving hot and cold food (cash or contactless)",
+                                                                      "action": "Go To Next Block",
+                                                                      "blockToGoID": "lro-HEL6-"}, "DataType": "NoType",
+                                                                   "SkipText": "Skip!", "Skippable": False,
+                                                                   "StoreInDB": False, "SkipAction": "End Chat",
+                                                                   "SkipBlockToGoID": None},
+                                                                  {"ID": "lro-HEL6-", "Type": "Raw Text",
+                                                                   "Content": {"text": "Free hot drinks machine",
+                                                                               "action": "Go To Next Block",
+                                                                               "blockToGoID": "bnPPP397f"},
+                                                                   "DataType": "NoType", "SkipText": "Skip!",
+                                                                   "Skippable": False, "StoreInDB": False,
+                                                                   "SkipAction": "End Chat", "SkipBlockToGoID": None},
+                                                                  {"ID": "bnPPP397f", "Type": "Raw Text",
+                                                                   "Content": {"text": "2 snack machines",
+                                                                               "action": "Go To Next Block",
+                                                                               "blockToGoID": "VJnJiDoS0"},
+                                                                   "DataType": "NoType", "SkipText": "Skip!",
+                                                                   "Skippable": False, "StoreInDB": False,
+                                                                   "SkipAction": "End Chat", "SkipBlockToGoID": None},
+                                                                  {"ID": "VJnJiDoS0", "Type": "Raw Text",
+                                                                   "Content": {"text": "2 x 30 minute breaks",
+                                                                               "action": "Go To Next Block",
+                                                                               "blockToGoID": "FRI-Ytaox"},
+                                                                   "DataType": "NoType", "SkipText": "Skip!",
+                                                                   "Skippable": False, "StoreInDB": False,
+                                                                   "SkipAction": "End Chat", "SkipBlockToGoID": None},
+                                                                  {"ID": "FRI-Ytaox", "Type": "Raw Text", "Content": {
+                                                                      "text": "Arcade machine, ping pong table and pool table",
+                                                                      "action": "Go To Next Block",
+                                                                      "blockToGoID": "jKfIB7nJZ"}, "DataType": "NoType",
+                                                                   "SkipText": "Skip!", "Skippable": False,
+                                                                   "StoreInDB": False, "SkipAction": "End Chat",
+                                                                   "SkipBlockToGoID": None},
+                                                                  {"ID": "jKfIB7nJZ", "Type": "Raw Text", "Content": {
+                                                                      "text": "Music playing throughout the warehouse",
+                                                                      "action": "Go To Next Block",
+                                                                      "blockToGoID": "XrekYSlv1"}, "DataType": "NoType",
+                                                                   "SkipText": "Skip!", "Skippable": False,
+                                                                   "StoreInDB": False, "SkipAction": "End Chat",
+                                                                   "SkipBlockToGoID": None},
+                                                                  {"ID": "XrekYSlv1", "Type": "Raw Text", "Content": {
+                                                                      "text": "Thank you for running through our chatbot. We will be in touch with you very soon to confirm your appointment with the location and start date",
+                                                                      "action": "End Chat", "blockToGoID": None},
+                                                                   "DataType": "NoType", "SkipText": "Skip!",
+                                                                   "Skippable": False, "StoreInDB": False,
+                                                                   "SkipAction": "End Chat", "SkipBlockToGoID": None}],
+                    "description": "Chat"}]}
 
     flow_services.updateFlow(flow, reader_a)
 
     helper_a = Assistant(Name="Candidate Insert Bot", Message="Test candidate insert", TopBarText="Insert Candidate",
-                         SecondsUntilPopup=1, Active=True, Company=aramco)
+                         Config=config, SecondsUntilPopup=1, Active=True, Company=aramco)
     flow_services.updateFlow(candidate_insert_flow, helper_a)
     helper_b = Assistant(Name="Candidate Search Bot", Message="Test candidate search", TopBarText="Search Candidates",
-                         SecondsUntilPopup=1, Active=True, Company=aramco)
+                         Config=config, SecondsUntilPopup=1, Active=True, Company=aramco)
     flow_services.updateFlow(candidate_search_flow, helper_b)
     helper_c = Assistant(Name="Job Search Bot", Message="Test job search", TopBarText="Search Jobs",
-                         SecondsUntilPopup=1, Active=True, Company=aramco)
+                         Config=config, SecondsUntilPopup=1, Active=True, Company=aramco)
     flow_services.updateFlow(job_search_flow, helper_c)
     helper_d = Assistant(Name="Client Insert Bot", Message="Test client insert", TopBarText="Insert Client",
-                         SecondsUntilPopup=1, Active=True, Company=aramco)
+                         Config=config, SecondsUntilPopup=1, Active=True, Company=aramco)
     flow_services.updateFlow(client_insert_flow, helper_d)
 
     flow_services.updateFlow(flow, reader_a)
 
     helper_e = Assistant(Name="TEST BOT", Message="TEST", TopBarText="TEST",
-                         SecondsUntilPopup=1, Active=True, Company=aramco)
+                         Config=config, SecondsUntilPopup=1, Active=True, Company=aramco)
     flow_services.updateFlow(test, helper_e)
 
+    helper_a = Assistant(Name="Helper", Message="Hey there", TopBarText="Aramco Bot", Config=config,
+                         SecondsUntilPopup=1, Active=True, Company=aramco)
 
-    helper_a = Assistant(Name="Helper", Message="Hey there", TopBarText="Aramco Bot", SecondsUntilPopup=1, Active=True, Company=aramco)
-
-    reader_s = Assistant(Name="Reader", Message="Hey there", TopBarText="Sabic Bot", SecondsUntilPopup=1, Active=True, Company=sabic)
-    helper_s = Assistant(Name="Helper", Message="Hey there", TopBarText="Sabic Bot", SecondsUntilPopup=1, Active=True, Company=sabic)
+    reader_s = Assistant(Name="Reader", Message="Hey there", TopBarText="Sabic Bot", Config=config, SecondsUntilPopup=1,
+                         Active=True, Company=sabic)
+    helper_s = Assistant(Name="Helper", Message="Hey there", TopBarText="Sabic Bot", Config=config, SecondsUntilPopup=1,
+                         Active=True, Company=sabic)
 
     helpers.seed()
 
-    db.session.add(Role(Name="Admin", Company= aramco, AddUsers=True, EditChatbots=True, EditUsers=True, DeleteUsers=True, AccessBilling=True))
-    db.session.add(Role(Name="User", Company= aramco, AddUsers=False, EditChatbots=True, EditUsers=False, DeleteUsers=False, AccessBilling=False))
+    db.session.add(
+        Role(Name="Admin", Company=aramco, AddUsers=True, EditChatbots=True, EditUsers=True, DeleteUsers=True,
+             AccessBilling=True))
+    db.session.add(
+        Role(Name="User", Company=aramco, AddUsers=False, EditChatbots=True, EditUsers=False, DeleteUsers=False,
+             AccessBilling=False))
 
-    db.session.add(Role(Name="Admin", Company= sabic, AddUsers=True, EditChatbots=True, EditUsers=True, DeleteUsers=True, AccessBilling=True))
-    db.session.add(Role(Name="User", Company= sabic, AddUsers=False, EditChatbots=True, EditUsers=False, DeleteUsers=False, AccessBilling=False))
-
+    db.session.add(Role(Name="Admin", Company=sabic, AddUsers=True, EditChatbots=True, EditUsers=True, DeleteUsers=True,
+                        AccessBilling=True))
+    db.session.add(
+        Role(Name="User", Company=sabic, AddUsers=False, EditChatbots=True, EditUsers=False, DeleteUsers=False,
+             AccessBilling=False))
 
     # Get Roles
     ownerRole = Role.query.filter(Role.Name == "Owner").first()
@@ -765,21 +635,23 @@ def generate():
     admin_sabic = Role.query.filter(Role.Company == sabic).filter(Role.Name == "Admin").first()
     user_sabic = Role.query.filter(Role.Company == sabic).filter(Role.Name == "User").first()
 
-    user_services.create(firstname='Sylvester', surname='Stallone', email='aa@aa.com', password='123', phone='43444236456',
+    user_services.create(firstname='Sylvester', surname='Stallone', email='aa@aa.com', password='123',
+                         phone='43444236456',
                          companyID=aramco.ID, roleID=ownerRole.ID, verified=True, timeZone="Europe/London")
     user_services.create(firstname='Evg', surname='Test', email='evgeniy67@abv.bg', password='123', phone='43444236456',
                          companyID=aramco.ID, roleID=admin_aramco.ID, verified=True, timeZone="Europe/London")
-    user_services.create(firstname='firstname', surname='lastname', email='e2@e.com', password='123', phone='43444236456',
+    user_services.create(firstname='firstname', surname='lastname', email='e2@e.com', password='123',
+                         phone='43444236456',
                          companyID=aramco.ID, roleID=admin_aramco.ID, verified=True, timeZone="Europe/London")
-    user_services.create(firstname='firstname', surname='lastname', email='e3@e.com', password='123', phone='43444236456',
+    user_services.create(firstname='firstname', surname='lastname', email='e3@e.com', password='123',
+                         phone='43444236456',
                          companyID=aramco.ID, roleID=user_aramco.ID, verified=True, timeZone="Europe/London")
 
     user_services.create(firstname='Ali', surname='Khalid', email='bb@bb.com', password='123', phone='43444236456',
                          companyID=sabic.ID, roleID=ownerRole.ID, verified=True, timeZone="Europe/London")
-    user_services.create(firstname='firstname', surname='lastname', email='e5@e.com', password='123', phone='43444236456',
+    user_services.create(firstname='firstname', surname='lastname', email='e5@e.com', password='123',
+                         phone='43444236456',
                          companyID=sabic.ID, roleID=admin_sabic.ID, verified=True, timeZone="Europe/London")
-
-
 
     # Chatbot Conversations
     data = {
@@ -820,20 +692,19 @@ def generate():
     }
     conversation1 = Conversation(Data=data, DateTime=datetime.now(),
                                  TimeSpent=55, SolutionsReturned=2, QuestionsAnswered=3,
-                                 UserType=enums.UserType.Candidate, Score= 1,
+                                 UserType=enums.UserType.Candidate, Score=1,
                                  ApplicationStatus=enums.Status.Accepted, Assistant=reader_a)
     db.session.add(conversation1)
     db.session.add(Conversation(Data=data, DateTime=datetime.now(),
                                 TimeSpent=120, SolutionsReturned=20, QuestionsAnswered=7,
-                                UserType=enums.UserType.Client, Score= 0.05, Completed=False,
+                                UserType=enums.UserType.Client, Score=0.05, Completed=False,
                                 ApplicationStatus=enums.Status.Rejected, Assistant=reader_a))
 
     # add chatbot session in bulk
     for i in range(50):
         db.session.add(Conversation(Data=data, DateTime=datetime.now() - timedelta(days=i),
-                                    TimeSpent=i+40, SolutionsReturned=i+3, QuestionsAnswered=i+4,
-                                    UserType=enums.UserType.Candidate, Score= 0.45, Assistant=reader_a))
-
+                                    TimeSpent=i + 40, SolutionsReturned=i + 3, QuestionsAnswered=i + 4,
+                                    UserType=enums.UserType.Candidate, Score=0.45, Assistant=reader_a))
 
     db1: Database = Database(Name='db1', Type=enums.DatabaseType.Candidates, Company=aramco)
     db2: Database = Database(Name='db2', Type=enums.DatabaseType.Candidates, Company=aramco)
@@ -853,7 +724,8 @@ def generate():
     db.session.add(addCandidate(db2, 'Ahmed', 1500, "Web Developer", "html,css, javascript",
                                 2, "Cardiff"))
 
-    db.session.add(addJob(db3, 'Python Developer', 'a job for someone who is good at python', 1500, 'London', Currency('USD')))
+    db.session.add(
+        addJob(db3, 'Python Developer', 'a job for someone who is good at python', 1500, 'London', Currency('USD')))
     db.session.add(addJob(db3, 'Python Developer', None, None, 'London', Currency('GBP')))
 
     for i in list(range(120)):
@@ -885,22 +757,20 @@ def generate():
         "phone_number": "441143032341"
     }))
 
-
     # Create an AutoPilot for a Company
     reader_a.AutoPilot = auto_pilot_services.create('First Pilot',
-                               "First pilot to automate the acceptance and rejection of candidates application",
-                               aramco.ID).Data
+                                                    "First pilot to automate the acceptance and rejection of candidates application",
+                                                    aramco.ID).Data
     auto_pilot_services.create('Second Pilot', '', aramco.ID)
-
 
     appointment_services.dummyCreateAppointmentAllocationTime("Test Times", aramco.ID)
 
     # Add Appointment
-    a = Appointment(DateTime=datetime.now() + timedelta(days=5), Conversation=conversation1, UserTimeZone="Europe/London")
+    a = Appointment(DateTime=datetime.now() + timedelta(days=5), Conversation=conversation1,
+                    UserTimeZone="Europe/London")
 
     db.session.add(a)
     db.session.commit()
-
 
 
 def addCandidate(db, name, desiredSalary, jobTitle, skills, exp, location):
@@ -908,10 +778,10 @@ def addCandidate(db, name, desiredSalary, jobTitle, skills, exp, location):
                      CandidateName=name,
                      CandidateDesiredSalary=desiredSalary,
                      CandidateJobTitle=jobTitle,
-                     CandidateSkills =skills,
-                     CandidateYearsExperience = exp,
-                     CandidateLocation = location,
-                     Currency= Currency('USD'))
+                     CandidateSkills=skills,
+                     CandidateYearsExperience=exp,
+                     CandidateLocation=location,
+                     Currency=Currency('USD'))
 
 
 def addJob(db, title, description, salary, location, currency: Currency or None):
@@ -920,4 +790,4 @@ def addJob(db, title, description, salary, location, currency: Currency or None)
                JobDescription=description,
                JobLocation=location,
                JobSalary=salary,
-               Currency= currency)
+               Currency=currency)

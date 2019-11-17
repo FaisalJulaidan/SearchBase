@@ -10,12 +10,14 @@
     border-radius: 5px;
 }
 
-.Left {
-    left: 30px;
+.Chatbot.Left {
+    left: 30px !important;
+    right: auto;
 }
 
-.Right {
-    right: 30px;
+.Chatbot.Right {
+    right: 30px !important;
+    left: auto;
 }
 
 .Chatbot_DirectLink_Container {

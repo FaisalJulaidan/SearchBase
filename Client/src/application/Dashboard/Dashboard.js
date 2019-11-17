@@ -206,7 +206,7 @@ class Dashboard extends Component {
                             </Menu.Item> : null}
 
                         <Menu.Item key="marketplace">
-                            <Icon type="interation"/>
+                            <Icon type="shop"/>
                             <span>Marketplace</span>
                         </Menu.Item>
 

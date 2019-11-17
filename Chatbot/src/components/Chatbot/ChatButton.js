@@ -5,7 +5,7 @@ import './styles/Animations.css';
 // Components
 import { Button, Icon } from 'antd';
 
-const Header = ({ loading, disabled, openWindow, btnColor, position }) => {
+const Header = ({ loading, active, openWindow, btnColor, position }) => {
 
     const styling = {
         width: '50px',
@@ -22,8 +22,8 @@ const Header = ({ loading, disabled, openWindow, btnColor, position }) => {
                 type="primary"
                 shape="circle"
                 size="large"
-                ghost={disabled}
-                disabled={disabled}
+                ghost={!active}
+                disabled={!active}
                 loading={loading}
                 style={styling}>
                 {!loading && <Icon type="message" theme="outlined" style={{ fontSize: '25px', margin: '11px 2px' }}/>}

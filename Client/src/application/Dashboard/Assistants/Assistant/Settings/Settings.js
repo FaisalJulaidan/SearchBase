@@ -245,7 +245,7 @@ class Settings extends Component {
                 <Divider/>
                 <h2>Assistant Logo</h2>
                 <p>
-                    your assistant logo will replace TheSearchBase logo in the
+                    Your uploaded logo will replace SearchBase cloud logo in the
                     chatbot. If you did not upload a logo specifically for this assistant, your company logo will be
                     used instead. You can upload your company logo from
                     <a onClick={() => history.push(`/dashboard/account?tab=Company`)}> <b>here</b></a>

@@ -56,7 +56,16 @@ class Pricing extends React.Component {
                                                       fontWeight: '900',
                                                       color: "#9254de"
                                                   } : {}}>
-                                            Agency
+                                            Basic
+                                        </Nav.Link>
+                                    </Nav.Item>
+                                    <Nav.Item className={styles.tab}>
+                                        <Nav.Link eventKey="in-house"
+                                                  style={this.state.activeTab === 'in-house' ? {
+                                                      fontWeight: '900',
+                                                      color: "#9254de"
+                                                  } : {}}>
+                                            Automation
                                         </Nav.Link>
                                     </Nav.Item>
                                     <Nav.Item className={styles.tab}>
@@ -66,15 +75,6 @@ class Pricing extends React.Component {
                                                       color: "#9254de"
                                                   } : {}}>
                                             Enterprise
-                                        </Nav.Link>
-                                    </Nav.Item>
-                                    <Nav.Item className={styles.tab}>
-                                        <Nav.Link eventKey="in-house"
-                                                  style={this.state.activeTab === 'in-house' ? {
-                                                      fontWeight: '900',
-                                                      color: "#9254de"
-                                                  } : {}}>
-                                            In House
                                         </Nav.Link>
                                     </Nav.Item>
                                 </Nav>

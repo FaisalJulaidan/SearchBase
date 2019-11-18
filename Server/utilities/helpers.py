@@ -127,7 +127,7 @@ def logError(exception):
         print(traceback.format_exc())
     else:
         mail_services.simpleSend("tsberrorlogs@gmail.com", "Error Log", str(exception))
-    logging.error(traceback.format_exc() + exception + "\n \n")
+        logging.error(traceback.format_exc() + exception + "\n \n")
 
 
 # ID Hasher

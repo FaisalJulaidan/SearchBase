@@ -2,7 +2,7 @@ import React from 'react';
 import styles from './in-house-pricing-tab.module.css';
 import {Link} from "react-router-dom";
 import {Button, Col, Row, Card} from "react-bootstrap";
-import pricingJSON from "../pricing.json";
+import pricingJSON from "../pricingInHouse.json";
 import PricingItem from "../pricing-item/PricingItem";
 import PlansTable from "../plans-table/PlansTable";
 

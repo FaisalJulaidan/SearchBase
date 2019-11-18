@@ -1,6 +1,7 @@
 from sqlalchemy.sql import and_
 
 from models import db, Callback, Conversation, Assistant, CRM as CRM_Model, StoredFile
+from services import assistant_services
 from services.Marketplace.CRM import Greenhouse, Bullhorn, Mercury, Jobscience, Vincere, Adapt
 # Process chatbot session
 from utilities import helpers
@@ -174,14 +175,18 @@ def updateCandidate(candidateID, conversation, companyID, sourceID):
         return Callback(False, "CRM type did not match with those on the system")
 
 
-def uploadFile(assistant: Assistant, storedFile: StoredFile):
+def uploadFile(filePath, fileName, conversation):
+    callback: Callback = assistant_services.getByID(conversation.AssistantID, conversation.Assistant.CompanyID)
+    if not callback.Success:
+        return Callback(False, "Assistant not found!")
+    assistant: Assistant = callback.Data
 
     crm_type = assistant.CRM.Type
     if CRM.has_value(crm_type.value):
         if crm_type is CRM.Jobscience or crm_type is CRM.Mercury:
             return Callback(True, "CRM does not support file upload at this time")
 
-        return eval(crm_type.value + ".uploadFile(assistant.CRM.Auth, storedFile)")
+        return eval(crm_type.value + ".uploadFile(assistant.CRM.Auth, filePath, fileName, conversation)")
     else:
         return Callback(False, "CRM type did not match with those on the system")
 

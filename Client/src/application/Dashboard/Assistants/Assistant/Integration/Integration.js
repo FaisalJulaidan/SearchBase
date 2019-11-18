@@ -1,11 +1,13 @@
 import React from 'react';
 
-import {Button, Divider, Input} from "antd";
+import { Button, Divider, Form, Input, Radio } from 'antd';
 
-import styles from "./Integration.module.less"
-import {getLink, hasher} from "helpers";
-import {SwatchesPicker} from 'react-color';
-import {connect} from 'react-redux';
+import styles from './Integration.module.less';
+import { getLink, hasher } from 'helpers';
+import { SwatchesPicker } from 'react-color';
+import { connect } from 'react-redux';
+import { store } from 'store/store';
+import { assistantActions } from 'store/actions';
 
 const {TextArea} = Input;
 
@@ -17,7 +19,7 @@ class Integration extends React.Component {
         dataCircle: "#9254de",
         async: true,
         defer: true,
-        isTestButtonDisabled: false,
+        isTestButtonDisabled: false
     };
 
     componentDidMount() {
@@ -68,7 +70,37 @@ class Integration extends React.Component {
 
     getChatbotScript = () => `<script>const s=document.createElement("script");s.src="${getLink("/api/widgets/chatbot")}";s.setAttribute('data-name','${this.state.dataName}');s.setAttribute('data-id','${this.state.assistantID}');s.setAttribute('data-circle','${this.state.dataCircle}');document.body.appendChild(s);</script>`;
 
+    updatePosition = () => this.props.form.validateFields((err, values) => {
+        if (!err) {
+            const configs = {
+                assistantDesc: this.props.assistant.Description || null,
+                assistantName: this.props.assistant.Name,
+                config: {
+                    ...this.props.assistant.Config,
+                    chatbotPosition: values.chatbotPosition
+                },
+                notifyEvery: this.props.assistant.NotifyEvery === null ? 'null' : this.props.assistant.NotifyEvery,
+                secondsUntilPopup: this.props.assistant.SecondsUntilPopup,
+                topBarTitle: this.props.assistant.TopBarText,
+                welcomeMessage: this.props.assistant.Message
+            };
+
+            store.dispatch(
+                assistantActions.updateAssistantConfigs(this.props.assistant.ID, configs)
+            );
+        }
+    });
+
     render() {
+        const { getFieldDecorator } = this.props.form;
+        const formItemLayout = {
+            labelCol: {
+                md: { span: 5 },
+                lg: { span: 3 }
+            },
+            wrapperCol: { span: 14 },
+            labelAlign: 'left'
+        };
         return (
             <>
                 <div className={styles.Header}>
@@ -82,7 +114,7 @@ class Integration extends React.Component {
 
 
                 <div>
-                    <h2>Customize Chatbot Color:</h2>
+                    <h2>Chatbot Customisation</h2>
                     <p>
                         Currently you can edit the colour setting of your assistant's button.
                         Simply pick your preferred one bellow.
@@ -99,8 +131,24 @@ class Integration extends React.Component {
 
 
                 <br/>
+
+                <Form layout='vertical' wrapperCol={{span: 15}} style={{width: '100%'}} onChange={() => this.updatePosition()}>
+                    <Form.Item label="Chatbot Position"
+                               help={'The location of the chatbot on your web page'}>
+                        {getFieldDecorator('chatbotPosition', {
+                            initialValue: this.props.assistant.Config.chatbotPosition
+                        })(
+                            <Radio.Group>
+                                <Radio value="Left">Left</Radio>
+                                <Radio value="Right">Right</Radio>
+                            </Radio.Group>
+                        )}
+                    </Form.Item>
+                </Form>
+
+                <br/>
                 <Divider/>
-                <h2>Installation Code:</h2>
+                <h2>Installation Code</h2>
                 <div>
                     <p>
                         To integrate your assistant, you must paste the pre-made code into any
@@ -130,4 +178,5 @@ function mapStateToProps(state) {
     };
 }
 
-export default connect(mapStateToProps)(Integration);
+
+export default Form.create()(connect(mapStateToProps)(Integration));

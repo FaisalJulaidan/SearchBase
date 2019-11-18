@@ -119,7 +119,6 @@ def retrieveRestToken(auth, companyID):
         return Callback(False, str(exc))
 
 
-# create query url and also tests the BhRestToken to see if it still valid, if not it generates a new one and new url
 def sendQuery(auth, query, method, body, companyID, optionalParams=None):
     try:
         # get url
@@ -218,29 +217,27 @@ def insertCandidate(auth, data, companyID) -> Callback:
 
 
 # vincere only takes in candidate documents
-def uploadFile(auth, storedFileInfo: StoredFileInfo):
+def uploadFile(auth, filePath, fileName, conversation):
     try:
-        conversation = storedFileInfo.Conversation
-
         if not conversation.CRMResponse:
             raise Exception("Can't upload file for record with no CRM Response")
 
-        file_callback = stored_file_services.downloadFile(storedFileInfo.AbsFilePath)
+        file_callback = stored_file_services.downloadFile(filePath.split("/")[-1])
         if not file_callback.Success:
             raise Exception(file_callback.Message)
         file = file_callback.Data
         file_content = file.get()["Body"].read()
         file_content = base64.b64encode(file_content).decode('ascii')
 
-        body = {
-            "externalID": storedFileInfo.ID,
-            "fileType": "SAMPLE",
-            "name": "TSB_" + storedFileInfo.FilePath,
-            "fileContent": file_content
-        }
-
         conversationResponse = json.loads(conversation.CRMResponse)
-        entityID = str(conversationResponse.get("changedEntityId"))
+        entityID = str(conversationResponse.get("id"))
+
+        body = {
+            "original_cv": True,
+            "document_type_id": 1,
+            "file_name": "TSB_" + fileName,
+            "base_64_content": file_content
+        }
 
         if conversation.UserType.value is "Candidate":
             entity = "candidate"
@@ -258,7 +255,7 @@ def uploadFile(auth, storedFileInfo: StoredFileInfo):
         return Callback(True, sendQuery_callback.Data.text)
 
     except Exception as exc:
-        helpers.logError("CRM.Vincere.insertCandidate() ERROR: " + str(exc))
+        helpers.logError("CRM.Vincere.uploadFile() ERROR: " + str(exc))
         return Callback(False, str(exc))
 
 

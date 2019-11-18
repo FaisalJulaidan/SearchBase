@@ -1,13 +1,11 @@
 import React from 'react';
-
 // Styles
 import './styles/ChatButton.css';
-import  './styles/Animations.css';
-
+import './styles/Animations.css';
 // Components
 import { Button, Icon } from 'antd';
 
-const Header = ({ loading, disabled, openWindow, btnColor }) => {
+const Header = ({ loading, active, openWindow, btnColor, position }) => {
 
     const styling = {
         width: '50px',
@@ -18,14 +16,14 @@ const Header = ({ loading, disabled, openWindow, btnColor }) => {
     };
 
     return (
-        <div className={`${'Chatbot_Button'} ${'BounceIn'}`}>
+        <div className={`${'Chatbot_Button'} ${'BounceIn'} ${position}`}>
             <Button
                 onClick={openWindow}
                 type="primary"
                 shape="circle"
                 size="large"
-                ghost={disabled}
-                disabled={disabled}
+                ghost={!active}
+                disabled={!active}
                 loading={loading}
                 style={styling}>
                 {!loading && <Icon type="message" theme="outlined" style={{ fontSize: '25px', margin: '11px 2px' }}/>}

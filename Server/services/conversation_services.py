@@ -2,16 +2,16 @@ from datetime import datetime, timedelta
 from typing import List
 
 from jsonschema import validate
-from sqlalchemy.sql import desc
-from sqlalchemy.orm import joinedload
 from sqlalchemy import and_
+from sqlalchemy.orm import joinedload
+from sqlalchemy.sql import desc
 
-from utilities.enums import UserType, Status, Webhooks
 from models import db, Callback, Conversation, Assistant, StoredFile, StoredFileInfo
 from services import assistant_services, stored_file_services, auto_pilot_services, mail_services, webhook_services, \
     databases_services
 from services.Marketplace.CRM import crm_services
 from utilities import json_schemas, helpers, enums
+from utilities.enums import UserType, Status, Webhooks
 
 
 # Process chatbot conversation data
@@ -66,11 +66,12 @@ def processConversation(assistantHashID, data: dict) -> Callback:
         }
 
         webhook_services.fireRequests(webhookData, callback.Data.CompanyID, Webhooks.Conversations)
-      
+
         if not data.get("crmInformation"):
             # AutoPilot Operations
             if assistant.AutoPilot and conversation.Completed:
-                ap_callback: Callback = auto_pilot_services.processConversation(conversation, assistant.AutoPilot, assistant)
+                ap_callback: Callback = auto_pilot_services.processConversation(conversation, assistant.AutoPilot,
+                                                                                assistant)
                 if ap_callback.Success:
                     conversation.AutoPilotStatus = True
                     conversation.ApplicationStatus = ap_callback.Data['applicationStatus']
@@ -89,8 +90,9 @@ def processConversation(assistantHashID, data: dict) -> Callback:
                 conversation.CRMResponse = crm_callback.Message
         else:
             crmInformation = helpers.decodeID(data["crmInformation"].get("source"))
-            
-            crmInformation = helpers.verificationSigner.loads(data["crmInformation"].get("source"), salt='crm-information')
+
+            crmInformation = helpers.verificationSigner.loads(data["crmInformation"].get("source"),
+                                                              salt='crm-information')
             print(crmInformation)
             source = crmInformation["source"]
             sourceID = crmInformation["crmID"]
@@ -99,7 +101,8 @@ def processConversation(assistantHashID, data: dict) -> Callback:
             # 1 - DATABASE
             # 2 - CR
             if source == "crm":
-                crm_callback: Callback = crm_services.updateCandidate(candidateID, conversation, assistant.CompanyID, sourceID)
+                crm_callback: Callback = crm_services.updateCandidate(candidateID, conversation, assistant.CompanyID,
+                                                                      sourceID)
                 if crm_callback.Success:
                     conversation.CRMSynced = True
                 conversation.CRMResponse = crm_callback.Message
@@ -127,15 +130,14 @@ def processConversation(assistantHashID, data: dict) -> Callback:
 
 def getFileByConversationID(assistantID, conversationID, filePath):
     try:
-        file: StoredFileInfo = db.session.query(StoredFileInfo)\
+        file: StoredFileInfo = db.session.query(StoredFileInfo) \
             .filter(and_(Assistant.ID == assistantID,
                          Conversation.ID == conversationID,
-                         StoredFileInfo.FilePath == filePath))\
+                         StoredFileInfo.FilePath == filePath)) \
             .first()
 
         if not file:
             return Callback(False, "Could not gather file.")
-
 
         return Callback(False, "Gathered storedfile.", file)
     except Exception as exc:
@@ -146,7 +148,7 @@ def getFileByConversationID(assistantID, conversationID, filePath):
 
 def uploadFiles(files, conversation, data, keys):
     try:
-        sf : StoredFile = StoredFile()
+        sf: StoredFile = StoredFile()
 
         db.session.add(sf)
         db.session.flush()
@@ -160,12 +162,17 @@ def uploadFiles(files, conversation, data, keys):
                     for submittedFile in data['submittedFiles']:
                         if file.filename == submittedFile['uploadedFileName']:
                             uploadedFiles.append(file.filename)
-                            key = enums.FileAssetType.NoType # TODO once BlockType-Upgrade is done
-                            upload_callback: Callback = stored_file_services.uploadFile(file, submittedFile['fileName'], True, model=Conversation,
-                                                                                                            identifier="ID",
-                                                                                                            identifier_value=conversation.ID,
-                                                                                                            stored_file_id=sf.ID,
-                                                                                                            key=key)
+                            key = enums.FileAssetType.NoType  # TODO once BlockType-Upgrade is done
+                            upload_callback: Callback = stored_file_services.uploadFile(file,
+                                                                                        submittedFile['fileName'],
+                                                                                        True, model=Conversation,
+                                                                                        identifier="ID",
+                                                                                        identifier_value=conversation.ID,
+                                                                                        stored_file_id=sf.ID,
+                                                                                        key=key)
+                            crm_upload_callback: Callback = crm_services.uploadFile(upload_callback.Data, file.filename,
+                                                                                    conversation)
+
                             uploadedFilesCallbacks.append(upload_callback)
 
         # Check if a file failed to be uploaded
@@ -186,12 +193,12 @@ def uploadFiles(files, conversation, data, keys):
 def getAllByAssistantID(assistantID):
     try:
         conversations: List[Conversation] = db.session.query(Conversation) \
-            .options(joinedload('StoredFile').joinedload("StoredFileInfo"))\
+            .options(joinedload('StoredFile').joinedload("StoredFileInfo")) \
             .filter(Conversation.AssistantID == assistantID) \
             .order_by(desc(Conversation.DateTime)).all()
         # for conversation in conversations:
-            # if(conversation.StoredFile != None):
-                # conversation.__Files = helpers.getListFromSQLAlchemyList()
+        # if(conversation.StoredFile != None):
+        # conversation.__Files = helpers.getListFromSQLAlchemyList()
         return Callback(True, "Conversations retrieved successfully.", conversations)
     except Exception as exc:
         helpers.logError("conversation_services.getAllByAssistantID(): " + str(exc))
@@ -252,6 +259,7 @@ def getAllRecordsByAssistantIDInTheLast(hours, assistantID):
         return Callback(False, "Error in returning records for the last " + str(hours) +
                         " hours for assistant with ID: " + str(assistantID))
 
+
 def setFileByID(conversationID: int, fileID: int) -> Callback:
     try:
         result: Conversation = db.session.query(Conversation).filter(Conversation.ID == conversationID).first()
@@ -265,6 +273,7 @@ def setFileByID(conversationID: int, fileID: int) -> Callback:
         helpers.logError("conversation_services.setFileByID(): " + str(exc))
         db.session.rollback()
         return Callback(False, "Could not set file by ID")
+
 
 # ----- Deletions ----- #
 def deleteByID(conversationID):

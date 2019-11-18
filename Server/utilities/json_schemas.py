@@ -5,9 +5,10 @@ assistant_config = {
     "type": "object",
     "properties": {
         "restrictedCountries": {"type": "array", "items": {"type": "string"}},
+        "chatbotPosition": {"enum": ["Right", "Left"]},
         # "buttonColor": {"type": "string"},
     },
-    "required": ["restrictedCountries"],
+    "required": ["restrictedCountries", "chatbotPosition"],
     "additionalProperties": False
 }
 

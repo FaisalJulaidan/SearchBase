@@ -157,14 +157,15 @@ class Users extends React.Component {
                 bordered
                 dataSource={users}
                 columns={this.columns}
-                scroll={{x: 600}}
+                scroll={{ x: 'max-content' }}
                 loading={isLoading}
+
                 />
 
                 <AddUserModal
                 roles={roles}
                 visible={this.state.addUserModalVisible}
-                handleCancel={this.hideAddUserModal}
+                hideModal={this.hideAddUserModal}
                 handleSave={this.addUser}
                 />
 
@@ -172,7 +173,7 @@ class Users extends React.Component {
                 userData={this.state.userToEdit}
                 roles={roles}
                 visible={this.state.editUserModalVisible}
-                handleCancel={this.hideEditUserModal}
+                hideModal={this.hideEditUserModal}
                 handleSave={this.editUser}
                 />
             </>

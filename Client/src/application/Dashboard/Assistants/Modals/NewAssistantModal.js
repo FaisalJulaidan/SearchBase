@@ -35,7 +35,6 @@ class NewAssistantModal extends Component {
     };
 
 
-
     render() {
 
         const {getFieldDecorator} = this.props.form;

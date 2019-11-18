@@ -8,7 +8,7 @@ class NewAssistantModal extends Component {
 
 
     refrences = [];
-    job_template = {};
+    jobTemplate = {};
 
     handleAdd = () => {
         this.props.form.validateFields((err, values) => {
@@ -33,7 +33,7 @@ class NewAssistantModal extends Component {
                 const newAssistant = {
                     assistantDesc: '',
                     assistantName: values.assistantName,
-                    flow: this.job_template.flow,
+                    flow: this.jobTemplate.flow,
                     template: 'none',
                     topBarText: values.topBarText,
                     welcomeMessage: values.welcomeMessage
@@ -45,10 +45,10 @@ class NewAssistantModal extends Component {
     };
 
     async componentDidMount() {
-        this.job_template = deepClone(await import('helpers/static_data/job-template'));
+        this.jobTemplate = deepClone(await import('helpers/quick_build_templates/job-template'));
 
         let forms = [];
-        const { blocks } = this.job_template.flow.groups[0];
+        const { blocks } = this.jobTemplate.flow.groups[0];
         blocks.forEach(block => {
             if (block.Type !== 'Question') {
                 const form = block.Content.text.match(/\$\{.*?}\$/g);

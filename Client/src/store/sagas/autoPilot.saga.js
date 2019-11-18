@@ -80,14 +80,15 @@ function* deleteAutoPilot({autoPilotID, meta}) {
 
 function* updateStatus({status, autoPilotID}) {
     try {
+        console.log(status)
         loadingMessage('Updating Status', 0);
         const res = yield http.put(`/auto_pilot/${autoPilotID}/status`, {status});
-        yield put(autoPilotActions.updateAutoPilotSuccess('Status updated successfully', status, autoPilotID));
-        yield successMessage('Status updated');
+        yield put(autoPilotActions.updateStatusSuccess('Status updated successfully', status, autoPilotID));
+        successMessage('Status updated');
 
     } catch (error) {
         const msg = error.response?.data?.msg || "Couldn't update assistant's status";
-        yield put(autoPilotActions.updateAutoPilotFailure(msg));
+        yield put(autoPilotActions.updateStatusFailure(msg));
         errorMessage(msg);
     }
 }

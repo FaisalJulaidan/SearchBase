@@ -159,6 +159,20 @@ class AutoPilot extends React.Component {
         });
     };
 
+    onActivateHandler = (checked) => {
+        if (!checked) {
+            confirm({
+                title: `Deactivate auto pilot`,
+                content: <p>Are you sure you want to deactivate this auto pilot</p>,
+                onOk: () => {
+                    this.props.dispatch(autoPilotActions.updateStatus(checked, this.props.autoPilot.ID));
+                }
+            });
+            return;
+        }
+        this.props.dispatch(autoPilotActions.updateStatus(checked, this.props.autoPilot.ID));
+    };
+
     onSubmit = () => this.props.form.validateFields((err, values) => {
         console.log(err);
         if (!err) {
@@ -308,12 +322,21 @@ class AutoPilot extends React.Component {
                             </Breadcrumb>
                         </div>
 
-                        <div className={styles.Title}>
-                            <Title>{autoPilot?.Name}</Title>
-                            <Paragraph type="secondary">
-                                {autoPilot?.Description}
-                            </Paragraph>
-                        </div>
+                        <Row>
+                            <Col span={20}>
+                                <Title>{autoPilot?.Name}</Title>
+                                <Paragraph type="secondary">
+                                    {autoPilot?.Description}
+                                </Paragraph>
+                            </Col>
+                            <Col span={4}>
+                                <Switch checkedChildren="On" unCheckedChildren="Off"
+                                        checked={autoPilot?.Active}
+                                        loading={this.props.isStatusChanging}
+                                        onChange={this.onActivateHandler}
+                                        style={{ marginTop: '17%', marginLeft: '70%' }}/>
+                            </Col>
+                        </Row>
                     </div>
 
                     <div className={styles.Body}>
@@ -1082,6 +1105,7 @@ function mapStateToProps(state) {
         autoPilot: state.autoPilot.autoPilot,
         autoPilotsList: state.autoPilot.autoPilotsList,
         isLoading: state.autoPilot.isLoading,
+        isStatusChanging: state.autoPilot.isStatusChanging,
         appointmentAllocationTime: state.appointmentAllocationTime.allocationTimes,
         aatLoading: state.appointmentAllocationTime.isLoading,
         campaignOptions: state.campaign.campaignOptions //TODO: To be removed (Fetching assistants for referral for now)

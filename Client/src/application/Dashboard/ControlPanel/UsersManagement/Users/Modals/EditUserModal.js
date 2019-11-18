@@ -17,12 +17,8 @@ class EditUserModal extends React.Component {
         });
     };
 
-    closeModal = () => {
-        this.props.handleCancel();
-    };
-
     render() {
-        const {userData, roles, form} = this.props;
+        const {userData, roles, form, visible, hideModal} = this.props;
         const {getFieldDecorator} = form;
 
         return (
@@ -30,11 +26,11 @@ class EditUserModal extends React.Component {
                 width={500}
                 title="Edit User"
                 destroyOnClose={true}
-                visible={this.props.visible}
+                visible={visible}
                 onOk={this.onSubmit}
-                onCancel={this.props.handleCancel}
+                onCancel={hideModal}
                 footer={[
-                    <Button key="Cancel" onClick={this.closeModal}>Cancel</Button>,
+                    <Button key="Cancel" onClick={hideModal}>Cancel</Button>,
                     <Button key="submit" type="primary" onClick={this.onSubmit}>{"Save"}</Button>
                 ]}>
 

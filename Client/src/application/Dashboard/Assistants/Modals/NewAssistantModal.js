@@ -29,6 +29,7 @@ class NewAssistantModal extends Component {
     handleAdd = () => {
         this.props.form.validateFields((err, values) => {
             if (!err) {
+                values.flow = null; // flow is for Quick Build only. Set to null because they Add Assistant uses the same route which expects a flow key
                 this.props.addAssistant(values)
             }
         });

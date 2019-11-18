@@ -16,6 +16,7 @@ import {history} from 'helpers';
 import {campaignActions} from "store/actions";
 
 const FormItem = Form.Item;
+const confirm = Modal.confirm;
 
 const {Title, Paragraph} = Typography;
 const {TextArea} = Input;
@@ -43,7 +44,8 @@ class Campaign extends React.Component {
             textMessage: "",
             isSaved: true, //check if the campaign is saved or not
             campaignName: "",
-            outreach_type: ""
+            outreach_type: "",
+            active: false
         };
     }
 
@@ -61,6 +63,7 @@ class Campaign extends React.Component {
                         textMessage: campaign?.Message,
                         use_crm: campaign?.UseCRM,
                         location: campaign?.Location,
+                        active: campaign?.Active,
                     });
                     this.props.form.setFieldsValue({
                         name: trimText.capitalize(trimText.trimDash(campaign?.Name)),
@@ -254,7 +257,7 @@ class Campaign extends React.Component {
                     this.state.skills,
                     this.state.textMessage,
                 )).then(() => {
-                    this.setState({campaignNameModalVisibility: false})
+                    this.setState({campaignNameModalVisibility: false});
                     history.push('/dashboard/campaigns')
                 });
             }
@@ -273,6 +276,20 @@ class Campaign extends React.Component {
                     .then(() => history.push('/dashboard/campaigns'));
             }
         });
+    };
+
+    onActivateHandler = (checked) => {
+        if (!checked) {
+            confirm({
+                title: `Deactivate campaign`,
+                content: <p>Are you sure you want to deactivate this campaign</p>,
+                onOk: () => {
+                    this.props.dispatch(campaignActions.updateStatus(checked, this.props.campaign.ID));
+                }
+            });
+            return;
+        }
+        this.props.dispatch(campaignActions.updateStatus(checked, this.props.campaign.ID));
     };
 
     render() {
@@ -609,6 +626,7 @@ class Campaign extends React.Component {
 
                             <Button loading={this.props.isCandidatesLoading} icon="rocket" type="primary"
                                     onClick={this.handleLaunch}
+                                    disabled={this.state.active}
                                     size={"large"}>
                                 Launch
                             </Button>
@@ -646,6 +664,7 @@ function mapStateToProps(state) {
         isLaunchingCampaign: state.campaign.isLaunchingCampaign,
         isSaving: state.campaign.isSaving,
         isDeleting: state.campaign.isDeleting,
+        isStatusChanging: state.campaign.isStatusChanging,
         errorMsg: state.campaign.errorMsg
     };
 }

@@ -243,3 +243,19 @@ def sendCampaign(campaign_details, companyID):
     except Exception as exc:
         helpers.logError("campaign_services.sendCampaign(): " + str(exc))
         return Callback(False, 'Error while sending campaign!')
+
+
+def updateStatus(campaignID, newStatus, companyID):
+    try:
+
+        if newStatus is None: raise Exception("Please provide the new status true/false")
+        db.session.query(Campaign).filter(and_(Campaign.ID == campaignID, Campaign.CompanyID == companyID)) \
+            .update({"Active": newStatus})
+
+        db.session.commit()
+        return Callback(True, 'Campaign status has been changed.')
+
+    except Exception as exc:
+        helpers.logError("campaign_services.updateStatus(): " + str(exc))
+        db.session.rollback()
+        return Callback(False, "Could not change the Campaign's status.")

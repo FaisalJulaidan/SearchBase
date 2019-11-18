@@ -490,7 +490,7 @@ def additionalCandidateNotesBuilder(data, selectedSolutions=None):
     # }
 
     paragraph = "At " + str(date.today().strftime("%B %d, %Y")) + \
-                "SearchBase has also collected the following information regarding this candidate: "
+                " SearchBase has also collected the following information regarding this candidate: "
     for key, value in data.items():
         # if not sentences.get(key):
         #     helpers.logError(str(key) + " needs to be added to crm_services.additionalCandidateNotesBuilder.")

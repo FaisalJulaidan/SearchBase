@@ -63,7 +63,7 @@
             "SkipBlockToGoID": null,
             "DataType": "NoType",
             "Content": {
-              "text": "${JOB_DESCRIPTION}$ & the benefits are ${JOB BENEFITS}$",
+              "text": "${JOB DESCRIPTION}$ & the benefits are ${JOB BENEFITS}$",
               "action": "Go To Next Block",
               "blockToGoID": "imD0JdVG"
             },
@@ -78,7 +78,7 @@
             "SkipBlockToGoID": null,
             "DataType": "NoType",
             "Content": {
-              "text": "The job is located, ${JOB_LOCATION}$",
+              "text": "The job is located, ${JOB LOCATION}$",
               "action": "Go To Next Block",
               "blockToGoID": "cOi41vty"
             },
@@ -88,7 +88,7 @@
             "Content": {
               "action": "Go To Next Block",
               "blockToGoID": "nv1eMgRD",
-              "text": "The salary for the role is ${JOB_SALARY}$"
+              "text": "The salary for the role is ${JOB SALARY}$"
             },
             "DataType": "NoType",
             "ID": "cOi41vty",

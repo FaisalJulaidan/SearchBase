@@ -11,12 +11,12 @@
 }
 
 .Chatbot.Left {
-    left: 30px;
+    left: 30px ;
     right: auto;
 }
 
 .Chatbot.Right {
-    right: 30px;
+    right: 30px ;
     left: auto;
 }
 
@@ -66,6 +66,17 @@
         border-radius: 0;
         margin: auto auto;
     }
+    
+    .Chatbot.Left {
+        left: auto;
+        right: auto;
+    }
+
+    .Chatbot.Right {
+        right: auto;
+        left: auto;
+    }
+
 }
 
 /* All iPhones  ----------- */

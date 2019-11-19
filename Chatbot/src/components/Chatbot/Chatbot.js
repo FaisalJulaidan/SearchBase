@@ -92,7 +92,7 @@ export const Chatbot = ({
             } else {
                 try {
                   let data = JSON.parse(used)
-                  if(moment.unix(data.exp) < moment()){
+                  if(moment.unix(data.exp) < moment() || !data.exp){
                     localStorage.setItem('TSB_CHATBOT_USED', JSON.stringify({exp: moment().add(1, 'days').unix()}));
                     return false
                   }

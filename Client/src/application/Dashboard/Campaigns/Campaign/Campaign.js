@@ -159,15 +159,6 @@ class Campaign extends React.Component {
         this.props.form.validateFields((err, values) => {
             if (!err) {
               if(!this.state.assistantLinkInMessage){
-                Modal.confirm({
-                  title: 'You have not put the assistant link in your text message, are you sure you still want to send your campaign?',
-                  content: `If you click YES, this campaign will be sent without your chatbots link!.`,
-                  okText: 'Yes',
-                  okType: 'ghost',
-                  cancelText: 'No',
-                  onOk: () => this.launchCampaign(values  )
-                });
-              } else {
                 this.launchCampaign(values)
               }
             }
@@ -230,23 +221,39 @@ class Campaign extends React.Component {
         event.preventDefault();
         this.props.form.validateFields((err, values) => {
             if (!err) {
-                this.props.dispatch(campaignActions.fetchCampaignCandidatesData(
-                    values.assistant_id,
-                    this.state.use_crm,
-                    values.crm_id,
-                    values.database_id,
-                    values.messenger_id,
-                    values.location,
-                    values.jobTitle,
-                    values.jobType,
-                    this.state.skills,
-                    this.state.textMessage,
-                    values.outreach_type,
-                    values.email_title,
-                ));
+              if(!this.state.assistantLinkInMessage){
+                Modal.confirm({
+                  title: 'You have not put the assistant link in your text message, are you sure you still want to send your campaign?',
+                  content: `If you click YES, this campaign will be sent without your chatbots link!.`,
+                  okText: 'Yes',
+                  okType: 'ghost',
+                  cancelText: 'No',
+                  onOk: () => this.searchCandidates(values)
+                });
+              } else {
+                this.searchCandidates(values)
+              }
             }
         });
     };
+
+    searchCandidates = (values) => {
+      this.props.dispatch(campaignActions.fetchCampaignCandidatesData(
+          values.assistant_id,
+          this.state.use_crm,
+          values.crm_id,
+          values.database_id,
+          values.messenger_id,
+          values.location,
+          values.jobTitle,
+          values.jobType,
+          this.state.skills,
+          this.state.textMessage,
+          values.outreach_type,
+          values.email_title,
+      ));
+    }
+    
 
     handleSave = () => {
         this.props.form.validateFields((err, values) => {
@@ -314,7 +321,6 @@ class Campaign extends React.Component {
 
         return (<NoHeaderPanel>
             <div className={styles.Header}>
-          {this.state.assistantLinkInMessage ? <h1>lol</h1> : <h1>nolol</h1>}
                 <Title className={styles.Title}>
                     <Icon type="rocket"/> Campaign Outreach
                 </Title>

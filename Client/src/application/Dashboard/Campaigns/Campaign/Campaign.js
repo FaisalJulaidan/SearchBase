@@ -158,9 +158,7 @@ class Campaign extends React.Component {
         
         this.props.form.validateFields((err, values) => {
             if (!err) {
-              if(!this.state.assistantLinkInMessage){
-                this.launchCampaign(values)
-              }
+              this.launchCampaign(values)
             }
         });
     };

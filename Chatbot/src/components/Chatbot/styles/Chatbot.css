@@ -11,12 +11,12 @@
 }
 
 .Chatbot.Left {
-    left: 30px !important;
+    left: 30px;
     right: auto;
 }
 
 .Chatbot.Right {
-    right: 30px !important;
+    right: 30px;
     left: auto;
 }
 

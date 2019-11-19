@@ -1,20 +1,20 @@
-import React, {Component} from 'react';
-import {Modal, Typography, Icon, Menu} from 'antd';
-import {connect} from 'react-redux';
+import React, { Component } from 'react';
+import { Icon, Menu, Modal, Typography } from 'antd';
+import { connect } from 'react-redux';
 
-import styles from "./Assistants.module.less"
+import styles from './Assistants.module.less';
 
-import {assistantActions, marketplaceActions} from "store/actions";
-import {RobotIcon} from "components/SVGs";
-import {history} from "helpers";
+import { assistantActions } from 'store/actions';
+import { RobotIcon } from 'components/SVGs';
+import { history } from 'helpers';
 
-import NewAssistantModal from "./Modals/NewAssistantModal";
-import EditAssistantModal from "./Modals/EditAssistantModal";
-import NoHeaderPanel from 'components/NoHeaderPanel/NoHeaderPanel'
-import CreateNewBox from "components/CreateNewBox/CreateNewBox"
-import ViewBox from "components/ViewBox/ViewBox";
-import LoadingViewBox from "components/LoadingViewBox/LoadingViewBox";
-import QuickBuildModal from "./Modals/QuickBuildModal";
+import NewAssistantModal from './Modals/NewAssistantModal';
+import EditAssistantModal from './Modals/EditAssistantModal';
+import NoHeaderPanel from 'components/NoHeaderPanel/NoHeaderPanel';
+import CreateNewBox from 'components/CreateNewBox/CreateNewBox';
+import ViewBox from 'components/ViewBox/ViewBox';
+import LoadingViewBox from 'components/LoadingViewBox/LoadingViewBox';
+import QuickBuildModal from './Modals/QuickBuildModal';
 
 
 const {Title, Paragraph, Text} = Typography;
@@ -136,6 +136,7 @@ class Assistants extends Component {
 
                 <QuickBuildModal visible={this.state.quickBuildModalVisible}
                                  addAssistant={this.addAssistant}
+                                 isAssistantNameValid={this.isAssistantNameValid}
                                  hideModal={this.hideQuickBuildModal}
                 />
             </>

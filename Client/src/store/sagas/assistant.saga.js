@@ -33,7 +33,7 @@ function* fetchAssistant({assistantID, meta}) {
     }
 }
 
-function* addAssistant({type, newAssistant}) {
+function* addAssistant({newAssistant}) {
     try {
         loadingMessage('Building assistant...', 0);
         const res = yield http.post(`/assistants`, newAssistant);

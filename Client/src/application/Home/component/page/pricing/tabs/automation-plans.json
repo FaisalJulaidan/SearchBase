@@ -7,7 +7,8 @@
     "price_subtitle": "per seat per month billed monthly",
     "items": [
       "Website Chatbot",
-      "CRM Integration"
+      "CRM Integration",
+      "SMS Outreach"
     ],
     "disabled": true
   },
@@ -20,6 +21,7 @@
     "items": [
       "Website Chatbot",
       "CRM Integration",
+      "SMS Outreach",
       "Pre-screen Candidates",
       "Qualify Candidates",
       "Automated Decision Making",
@@ -36,6 +38,7 @@
     "items": [
       "Website Chatbot",
       "CRM Integration",
+      "SMS Outreach",
       "Pre-screen Candidates",
       "Qualify Candidates",
       "Automated Decision Making",

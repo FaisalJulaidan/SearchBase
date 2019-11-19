@@ -2,7 +2,7 @@ import React from 'react';
 import styles from './automation-pricing-tab.module.css';
 import {Link} from "react-router-dom";
 import {Button, Col, Row, Card} from "react-bootstrap";
-import pricingJSON from "../pricingInHouse.json";
+import plansJSON from "./automation-plans.json";
 import PricingItem from "../pricing-item/PricingItem";
 import PlansTable from "../plans-table/PlansTable";
 
@@ -13,7 +13,7 @@ import {faChevronRight} from "@fortawesome/free-solid-svg-icons";
 
 const AutomationPricingTab = () => {
 
-    let pricing = pricingJSON.map((plan, key) => {
+    let plans = plansJSON.map((plan, key) => {
         return (
             <Col className={styles.col_item} xs={{span: 10, offset: 1}} sm={{span: 8, offset: 2}}
                  md={{span: 4, offset: 0}}
@@ -28,7 +28,7 @@ const AutomationPricingTab = () => {
                 <Card className={styles.card}>
                     <Card.Body className={styles.pricing_card_body}>
                         <Row>
-                            {pricing}
+                            {plans}
                         </Row>
                         <Row className={styles.row_buttons}>
                             <Col xs={{span: 10, offset: 1}} md={{span:6,offset:0}} lg={{span: 4, offset: 2}} className={styles.col_button}>

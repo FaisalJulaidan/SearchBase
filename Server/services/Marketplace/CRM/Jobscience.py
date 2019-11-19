@@ -492,13 +492,13 @@ def searchCandidates(access_token, conversation) -> Callback:
         result = []
 
         #  Iterative generalisation:
-        while len(records) < 50:
+        while len(records) < 500:
             # send query
             sendQuery_callback: Callback = sendQuery(access_token, "get", {},
                                                      "SELECT+X18_Digit_ID__c,ID,Name,Title,email,phone,MailingCity," +
                                                      "ts2__Desired_Salary__c,ts2__Date_Available__c,ts2__Years_of_Experience__c,ts2__Desired_Hourly__c,Min_Basic__c," +
                                                      "ts2__EduDegreeName1__c,ts2__Education__c+from+Contact+" + query +
-                                                     "+LIMIT+200")  # Limit set to 10 TODO: Customize
+                                                     "+LIMIT+500")  # Limit set to 10 TODO: Customize
             if not sendQuery_callback.Success:
                 raise Exception(sendQuery_callback.Message)
 

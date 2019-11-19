@@ -10,6 +10,7 @@ import { history } from 'helpers';
 
 import NewAssistantModal from './Modals/NewAssistantModal';
 import EditAssistantModal from './Modals/EditAssistantModal';
+import CloneAssistantModal from './Modals/CloneAssistantModal';
 import NoHeaderPanel from 'components/NoHeaderPanel/NoHeaderPanel';
 import CreateNewBox from 'components/CreateNewBox/CreateNewBox';
 import ViewBox from 'components/ViewBox/ViewBox';
@@ -25,6 +26,7 @@ class Assistants extends Component {
         newAssistantModalVisible: false,
         editModalVisible: false,
         quickBuildModalVisible: false,
+        cloneModalVisible: false,
         assistantToEdit: null
     };
 
@@ -37,6 +39,9 @@ class Assistants extends Component {
 
     showEditModal = (assistant) => this.setState({editModalVisible: true, assistantToEdit: assistant});
     hideEditModal = () => this.setState({editModalVisible: false});
+
+    showCloneModal = (assistant) => this.setState({ cloneModalVisible: true, assistantToEdit: assistant });
+    hideCloneModal = () => this.setState({ cloneModalVisible: false });
 
     showQuickBuildModal = () => this.setState({quickBuildModalVisible: true});
     hideQuickBuildModal = () => this.setState({quickBuildModalVisible: false});
@@ -68,6 +73,8 @@ class Assistants extends Component {
     };
 
     optionsMenuClickHandler = (e, assistant) => {
+        if (e.key === 'clone')
+            this.showCloneModal(assistant);
         if (e.key === 'edit')
             this.showEditModal(assistant);
         if (e.key === 'delete')
@@ -76,12 +83,16 @@ class Assistants extends Component {
 
     // it must be an array of Menu.Item. ViewBox expect that in its options Menu
     optionsMenuItems = [
-        <Menu.Item style={{padding: 10, paddingRight: 30}} key="edit">
-            <Icon type="edit" theme="twoTone" twoToneColor="#595959" style={{marginRight: 5}}/>
+        <Menu.Item style={{ padding: 10, paddingRight: 30 }} key="clone">
+            <Icon type="copy" theme="twoTone" twoToneColor="#595959" style={{ marginRight: 5 }}/>
+            Clone
+        </Menu.Item>,
+        <Menu.Item style={{ padding: 10, paddingRight: 30 }} key="edit">
+            <Icon type="edit" theme="twoTone" twoToneColor="#595959" style={{ marginRight: 5 }}/>
             Edit
         </Menu.Item>,
         <Menu.Item style={{padding: 10, paddingRight: 30}} key="delete">
-            <Icon type="delete" theme="twoTone" twoToneColor="#f50808"/>
+            <Icon type="delete" theme="twoTone" twoToneColor="#f50808" style={{ marginRight: 5 }}/>
             Delete
         </Menu.Item>
     ];
@@ -131,14 +142,22 @@ class Assistants extends Component {
                                     assistant={this.state.assistantToEdit}
                                     hideModal={this.hideEditModal}
                                     isAssistantNameValid={this.isAssistantNameValid}
-                                    updateAssistant={this.updateAssistant}
-                />
+                                    updateAssistant={this.updateAssistant}/>
 
                 <QuickBuildModal visible={this.state.quickBuildModalVisible}
                                  addAssistant={this.addAssistant}
                                  isAssistantNameValid={this.isAssistantNameValid}
-                                 hideModal={this.hideQuickBuildModal}
-                />
+                                 hideModal={this.hideQuickBuildModal}/>
+
+
+                {
+                    this.state.cloneModalVisible &&
+                    <CloneAssistantModal visible={true}
+                                         assistant={this.state.assistantToEdit}
+                                         addAssistant={this.addAssistant}
+                                         isAssistantNameValid={this.isAssistantNameValid}
+                                         hideModal={this.hideCloneModal}/>
+                }
             </>
         );
     }

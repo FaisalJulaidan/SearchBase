@@ -43,7 +43,7 @@ class Campaign extends React.Component {
             textMessage: "",
             isSaved: true, //check if the campaign is saved or not
             campaignName: "",
-            outreach_type: "",
+            outreach_type: "sms",
             assistantLinkInMessage: false
         };
     }
@@ -62,7 +62,7 @@ class Campaign extends React.Component {
                         textMessage: campaign?.Message,
                         use_crm: campaign?.UseCRM,
                         location: campaign?.Location,
-                        assistantLinkInMessage: campaign?.Message.indexOf("{assistant.link}") !== -1 
+                        assistantLinkInMessage: campaign?.Message.indexOf("{assistant.link}") !== -1
                     }, state => console.log(this.state));
                     this.props.form.setFieldsValue({
                         name: trimText.capitalize(trimText.trimDash(campaign?.Name)),
@@ -79,8 +79,8 @@ class Campaign extends React.Component {
                 history.push(`/dashboard/campaigns`)
             });
         }
-        if(this.state.textMessage.indexOf("{assistant.link}") !== -1 && this.state.assistantLinkInMessage){
-          this.setState({assistantLinkInMessage: true})
+        if (this.state.textMessage.indexOf("{assistant.link}") !== -1 && this.state.assistantLinkInMessage) {
+            this.setState({assistantLinkInMessage: true})
         }
     }
 
@@ -94,8 +94,8 @@ class Campaign extends React.Component {
 
         let linkInMessage = this.state.textMessage.indexOf("{assistant.link}") !== -1
 
-        if(linkInMessage !== this.state.assistantLinkInMessage){
-          this.setState({assistantLinkInMessage: linkInMessage})
+        if (linkInMessage !== this.state.assistantLinkInMessage) {
+            this.setState({assistantLinkInMessage: linkInMessage})
         }
     };
 
@@ -155,30 +155,30 @@ class Campaign extends React.Component {
     };
 
     handleModalLaunch = () => {
-        
+
         this.props.form.validateFields((err, values) => {
             if (!err) {
-              this.launchCampaign(values)
+                this.launchCampaign(values)
             }
         });
     };
 
     launchCampaign = (values) => {
-      this.props.dispatch(campaignActions.launchCampaign(
-          values.assistant_id,
-          this.state.use_crm,
-          values.crm_id,
-          values.database_id,
-          values.messenger_id,
-          values.location,
-          values.jobTitle,
-          values.jobType,
-          this.state.skills,
-          values.text,
-          this.state.candidate_list,
-          values.outreach_type,
-          values.email_title
-      ));
+        this.props.dispatch(campaignActions.launchCampaign(
+            values.assistant_id,
+            this.state.use_crm,
+            values.crm_id,
+            values.database_id,
+            values.messenger_id,
+            values.location,
+            values.jobTitle,
+            values.jobType,
+            this.state.skills,
+            values.text,
+            this.state.candidate_list,
+            values.outreach_type,
+            values.email_title
+        ));
     }
 
     handleModalSelectAll = () => {
@@ -219,39 +219,39 @@ class Campaign extends React.Component {
         event.preventDefault();
         this.props.form.validateFields((err, values) => {
             if (!err) {
-              if(!this.state.assistantLinkInMessage){
-                Modal.confirm({
-                  title: 'You have not put the Assistant\'s Link in your message!',
-                  content: `Do you wish to proceed?`,
-                  okText: 'Yes',
-                  okType: 'ghost',
-                  cancelText: 'No',
-                  onOk: () => this.searchCandidates(values)
-                });
-              } else {
-                this.searchCandidates(values)
-              }
+                if (!this.state.assistantLinkInMessage) {
+                    Modal.confirm({
+                        title: 'You have not put the Assistant\'s Link in your message!',
+                        content: `Do you wish to proceed?`,
+                        okText: 'Yes',
+                        okType: 'ghost',
+                        cancelText: 'No',
+                        onOk: () => this.searchCandidates(values)
+                    });
+                } else {
+                    this.searchCandidates(values)
+                }
             }
         });
     };
 
     searchCandidates = (values) => {
-      this.props.dispatch(campaignActions.fetchCampaignCandidatesData(
-          values.assistant_id,
-          this.state.use_crm,
-          values.crm_id,
-          values.database_id,
-          values.messenger_id,
-          values.location,
-          values.jobTitle,
-          values.jobType,
-          this.state.skills,
-          this.state.textMessage,
-          values.outreach_type,
-          values.email_title,
-      ));
+        this.props.dispatch(campaignActions.fetchCampaignCandidatesData(
+            values.assistant_id,
+            this.state.use_crm,
+            values.crm_id,
+            values.database_id,
+            values.messenger_id,
+            values.location,
+            values.jobTitle,
+            values.jobType,
+            this.state.skills,
+            this.state.textMessage,
+            values.outreach_type,
+            values.email_title,
+        ));
     }
-    
+
 
     handleSave = () => {
         this.props.form.validateFields((err, values) => {
@@ -473,10 +473,24 @@ class Campaign extends React.Component {
                                     );
                                 }
                             })()}
-                            <FormItem label={"Messaging Service"}>
+
+
+                            <FormItem label={"Outreach Type "}>
+                                {getFieldDecorator("outreach_type", {initialValue: "sms"})(
+                                    <Radio.Group onChange={(e) => {
+                                        this.setState({outreach_type: e.target.value})
+                                    }}>
+                                        <Radio.Button value="sms">SMS</Radio.Button>
+                                        <Radio.Button value="email">Email</Radio.Button>
+                                    </Radio.Group>
+                                )}
+                            </FormItem>
+
+                            <FormItem label={"Messaging Service"}
+                                      style={this.state.outreach_type !== 'sms' ? {display: 'none'} : {display: 'block'}}>
                                 {getFieldDecorator("messenger_id", {
                                     rules: [{
-                                        required: true,
+                                        required: this.state.outreach_type === 'sms',
                                         message: "Please select the messaging service"
                                     }],
                                 })(
@@ -553,17 +567,6 @@ class Campaign extends React.Component {
                                             this.setState({distance: value})
                                         }}
                                     />
-                                )}
-                            </FormItem>
-
-                            <FormItem label={"Outreach Type "}>
-                                {getFieldDecorator("outreach_type", {initialValue: "sms"})(
-                                    <Radio.Group onChange={(e) => {
-                                        this.setState({outreach_type: e.target.value})
-                                    }}>
-                                        <Radio.Button value="sms">SMS</Radio.Button>
-                                        <Radio.Button value="email">Email</Radio.Button>
-                                    </Radio.Group>
                                 )}
                             </FormItem>
 

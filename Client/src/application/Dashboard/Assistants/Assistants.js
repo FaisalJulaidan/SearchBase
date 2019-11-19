@@ -83,7 +83,7 @@ class Assistants extends Component {
 
     // it must be an array of Menu.Item. ViewBox expect that in its options Menu
     optionsMenuItems = [
-        <Menu.Item style={{ padding: 10, paddingRight: 30 }} key="copy">
+        <Menu.Item style={{ padding: 10, paddingRight: 30 }} key="clone">
             <Icon type="copy" theme="twoTone" twoToneColor="#595959" style={{ marginRight: 5 }}/>
             Clone
         </Menu.Item>,
@@ -149,11 +149,15 @@ class Assistants extends Component {
                                  isAssistantNameValid={this.isAssistantNameValid}
                                  hideModal={this.hideQuickBuildModal}/>
 
-                <CloneAssistantModal visible={this.state.cloneModalVisible}
-                                     assistant={this.state.assistantToEdit}
-                                     addAssistant={this.addAssistant}
-                                     isAssistantNameValid={this.isAssistantNameValid}
-                                     hideModal={this.hideCloneModal}/>
+
+                {
+                    this.state.cloneModalVisible &&
+                    <CloneAssistantModal visible={true}
+                                         assistant={this.state.assistantToEdit}
+                                         addAssistant={this.addAssistant}
+                                         isAssistantNameValid={this.isAssistantNameValid}
+                                         hideModal={this.hideCloneModal}/>
+                }
             </>
         );
     }

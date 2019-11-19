@@ -43,6 +43,7 @@ def assistants():
                                                        data.get('assistantDesc'),
                                                        data.get('welcomeMessage'),
                                                        data.get('topBarText'),
+                                                       data.get('flow'),
                                                        data.get('template'),
                                                        user['companyID'])
         if not callback.Success:

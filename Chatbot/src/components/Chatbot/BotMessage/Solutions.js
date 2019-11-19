@@ -36,7 +36,7 @@ const Solutions = ({responded, submitSolution, skipResponse, solutions, skippabl
     let button = skippable ?
         (<Button block data-warning="true" type="danger" key={8}
                  disabled={responded}
-                 className={'SkipButton'}
+                 className={['Button', 'Danger', 'SkipButton'].join(' ')}
                  onClick={skipResponse}>
             {skipText}
         </Button>) : null;

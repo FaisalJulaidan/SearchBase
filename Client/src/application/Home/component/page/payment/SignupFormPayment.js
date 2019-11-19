@@ -9,7 +9,7 @@ import {Link, withRouter} from "react-router-dom";
 import {authActions, paymentActions} from '../../../../../store/actions/index';
 import {injectStripe} from 'react-stripe-elements';
 import {errorMessage} from "helpers/alert";
-import pricingJSON from "../pricing/pricingAgency.json";
+import plansJSON from "../pricing/tabs/lead-generation-plans.json";
 
 const FormItem = Form.Item;
 const {Option} = Select;
@@ -25,9 +25,9 @@ const selectBeforeURL = (
 class SignupFormPayment extends React.Component {
 
     componentDidMount() {
-        const found = pricingJSON.some(item => item.id === this.props.planID);
+        const found = plansJSON.some(item => item.id === this.props.planID);
         if (!found) {
-            this.setState({planID: pricingJSON[0].id})
+            this.setState({planID: plansJSON[0].id})
         } else {
             this.setState({planID: this.props.planID})
         }
@@ -49,7 +49,7 @@ class SignupFormPayment extends React.Component {
 
     onSignupSuccessful = (companyID, planID) => {
         // const plans = {"essential": "plan_D3lp2yVtTotk2f", "pro": "plan_D3lp9R7ombKmSO", "premium": "plan_D3lpeLZ3EV8IfA"}; //Testing plans
-        let plan = pricingJSON.find(item => item.id === planID) || pricingJSON[0];
+        let plan = plansJSON.find(item => item.id === planID) || plansJSON[0];
         this.props.dispatch(paymentActions.generateCheckoutSession(companyID, plan?.stripe_key));
     };
 
@@ -204,9 +204,9 @@ class SignupFormPayment extends React.Component {
                             this.setState({planID: value})
                         }}>
                             {
-                                pricingJSON.map((plan) => {
+                                plansJSON.map((plan) => {
                                     return (
-                                        <Select.Option key={plan.id}>{plan.title}</Select.Option>
+                                        <Select.Option key={plan.id}>{plan.title} ({plan.price})</Select.Option>
                                     );
                                 })
                             }

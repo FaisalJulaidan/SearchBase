@@ -16,11 +16,10 @@ from services.Marketplace.Messenger import messenger_servicess
 from utilities import helpers, json_schemas, enums
 
 
-def create(name, desc, welcomeMessage, topBarText, template, companyID) -> Assistant or None:
+def create(name, desc, welcomeMessage, topBarText, flow, template, companyID) -> Assistant or None:
     try:
-
-        flow = None
-        if template and template != 'none':
+        # if there is already a flow then ignore creating from template
+        if not flow and template and template != 'none':
             # Get json template
             relative_path = join('static/assistant_templates', template + '.json')
             absolute_path = join(BaseConfig.APP_ROOT, relative_path)
@@ -30,11 +29,11 @@ def create(name, desc, welcomeMessage, topBarText, template, companyID) -> Assis
             if not callback.Success:
                 raise Exception(callback.Message)
 
+        # default assistant config values
         config = {
             "restrictedCountries": [],
             "chatbotPosition": "Right"
         }
-
         validate(config, json_schemas.assistant_config)
 
         assistant = Assistant(Name=name,

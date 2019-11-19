@@ -121,6 +121,12 @@ class Campaign extends React.Component {
         this.setState({textMessage: textMessage}); //Update TextMessage State for Phone.JS
     };
 
+    addAssistantLink = () => {
+        let textMessage = this.state.textMessage + " {assistant.link} ";
+        this.props.form.setFieldsValue({text: textMessage}); //Update Message Input
+        this.setState({textMessage: textMessage}); //Update TextMessage State for Phone.JS
+    };
+
     //TODO:: Skill should be validated before submission | Empty String can be accepted
     handleSkillSubmit = (e) => {
         if (e.target.value.length === 0)
@@ -547,6 +553,9 @@ class Campaign extends React.Component {
 
                             <FormItem
                                 label={<span>Message
+                                <Button type="default" size="small" shape="round"
+                                        style={{margin: '0 5px', fontSize: '.9em', borderColor: 'red'}}
+                                        onClick={this.addAssistantLink}>Assistant Link</Button>
                                 <Button type="default" size="small" shape="round"
                                         style={{margin: '0 5px', fontSize: '.9em'}}
                                         onClick={this.addCandidateName}>Candidate Name</Button>

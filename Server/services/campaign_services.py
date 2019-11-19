@@ -215,8 +215,9 @@ def sendCampaign(campaign_details, companyID):
             if not candidate_phone:   
                 continue
 
-            # insert candidate details in text
-            tempText = text.replace("{candidate.name}", candidate.get("CandidateName"))
+            # insert assistant link and candidate details in text
+            tempText = text.replace("{assistant.link}", candidate.get("CandidateName"))\
+                            .replace("{candidate.name}", candidate.get("CandidateName"))
 
             access = helpers.verificationSigner.dumps({"candidateID": candidate.get("ID"), "source": source, "crmID": crmID}, salt='crm-information')
 

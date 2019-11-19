@@ -27,8 +27,8 @@ const AgencyPricingTab = () => {
                     <Card.Body className={styles.pricing_card_body}>
                         <Row>
                             {plans}
-                            <Col className={styles.col_item} xs={{span: 10, offset: 1}} sm={{span: 8, offset: 2}}
-                                 md={{span: 4, offset: 0}}>
+                            <Col className={styles.col_item}
+                                 xs={{span: 10, offset: 1}} sm={{span: 8, offset: 2}} md={{span: 8, offset: 0}}>
                                 <div className={styles.product_wrapper}>
                                     <div>
                                         <h1>CHATBOTS</h1>

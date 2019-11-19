@@ -403,38 +403,45 @@ def insertCompany(auth, conversation: Conversation) -> Callback:
 
 
 def fetchSkillsForCandidateSearch(list_of_contactIDs: list, list_of_skills, access_token):
-    # Need set of contact ID's returned from searchCandidates()
-    query_segment = ",".join(list_of_contactIDs)
 
-    # Add LIKE statements:
-    like_string = ""
-    for skill in list_of_skills:
+    records_to_return = []
+    for i in range(0, len(list_of_contactIDs), 500):
+        # Need set of contact ID's returned from searchCandidates()
+        if i+500 <= len(list_of_contactIDs):
+            query_segment = ",".join(list_of_contactIDs[i:i+500])
+        else:
+            query_segment = ",".join(list_of_contactIDs[i:len(list_of_contactIDs)])
+        # Add LIKE statements:
+        like_string = ""
+        for skill in list_of_skills:
 
-        like_string += "+AND+("
+            like_string += "+AND+("
 
-        # TODO: Generate synonyms:
-        synonyms = (skill,)
-        for synonym in synonyms:
-            like_string += "ts2__Skill_Name__c+LIKE+" + "'%" + synonym + "%'+or+"
+            # TODO: Generate synonyms:
+            synonyms = (skill,)
+            for synonym in synonyms:
+                like_string += "ts2__Skill_Name__c+LIKE+" + "'%" + synonym + "%'+or+"
 
-        # Remove final or:
-        if len(synonyms) > 0:
-            like_string = like_string[:-4]
+            # Remove final or:
+            if len(synonyms) > 0:
+                like_string = like_string[:-4]
 
-        like_string += ")"
+            like_string += ")"
 
-    # Note: This assumes at least one skill is given
-    sendQuery_callback: Callback = sendQuery(access_token, "get", {},
-                                             "SELECT+ts2__Skill_Name__c,ts2__Last_Used__c,ts2__Contact__c" +
-                                             "+FROM+ts2__Skill__c+WHERE+" +
-                                             "ts2__Contact__c+IN+(" + query_segment + ")" + like_string + "+LIMIT+1000")
+        # Note: This assumes at least one skill is given
+        sendQuery_callback: Callback = sendQuery(access_token, "get", {},
+                                                "SELECT+ts2__Skill_Name__c,ts2__Last_Used__c,ts2__Contact__c" +
+                                                "+FROM+ts2__Skill__c+WHERE+" +
+                                                "ts2__Contact__c+IN+(" + query_segment + ")" + like_string + "+LIMIT+1000")
 
-    if not sendQuery_callback.Success:
-        raise Exception(sendQuery_callback.Message)
+        if not sendQuery_callback.Success:
+            raise Exception(sendQuery_callback.Message)
 
-    candidate_skills_fetch = json.loads(sendQuery_callback.Data.text)
+        candidate_skills_fetch = json.loads(sendQuery_callback.Data.text)
+        records_to_return += candidate_skills_fetch['records']
 
-    return candidate_skills_fetch['records']
+    print("CURRENT LENGTH IS: {}".format(len(records_to_return)))
+    return records_to_return
 
 
 # Need to make it so that if only skill is provided, a search can still be done.
@@ -480,7 +487,7 @@ def searchCandidates(access_token, conversation) -> Callback:
                                                  "SELECT+X18_Digit_ID__c,ID,Name,Title,email,phone,MailingCity," +
                                                  "ts2__Desired_Salary__c,ts2__Date_Available__c,ts2__Years_of_Experience__c,ts2__Desired_Hourly__c,Min_Basic__c," +
                                                  "ts2__EduDegreeName1__c,ts2__Education__c+from+Contact+" + query +
-                                                 "+LIMIT+500")  # Limit set to 10 TODO: Customize
+                                                 "+LIMIT+5000")  # Limit set to 10 TODO: Customize
 
         if not sendQuery_callback.Success:
             raise Exception(sendQuery_callback.Message)
@@ -492,13 +499,13 @@ def searchCandidates(access_token, conversation) -> Callback:
         result = []
 
         #  Iterative generalisation:
-        while len(records) < 500:
+        while len(records) < 5000:
             # send query
             sendQuery_callback: Callback = sendQuery(access_token, "get", {},
                                                      "SELECT+X18_Digit_ID__c,ID,Name,Title,email,phone,MailingCity," +
                                                      "ts2__Desired_Salary__c,ts2__Date_Available__c,ts2__Years_of_Experience__c,ts2__Desired_Hourly__c,Min_Basic__c," +
                                                      "ts2__EduDegreeName1__c,ts2__Education__c+from+Contact+" + query +
-                                                     "+LIMIT+500")  # Limit set to 10 TODO: Customize
+                                                     "+LIMIT+5000")  # Limit set to 10 TODO: Customize
             if not sendQuery_callback.Success:
                 raise Exception(sendQuery_callback.Message)
 
@@ -547,7 +554,7 @@ def searchCandidates(access_token, conversation) -> Callback:
             candidate_skills = fetchSkillsForCandidateSearch(list_of_contactIDs, skills, access_token)
 
         # <-- CALL SKILLS SEARCH -->
-
+        print("Number of records: {}".format(len(records)))
         for record_num, record in enumerate(records):
             has_skills: bool = False
 

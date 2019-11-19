@@ -28,7 +28,7 @@ const AgencyPricingTab = () => {
                         <Row>
                             {plans}
                             <Col className={styles.col_item} xs={{span: 10, offset: 1}} sm={{span: 8, offset: 2}}
-                                 md={{span: 8, offset: 0}}>
+                                 md={{span: 4, offset: 0}}>
                                 <div className={styles.product_wrapper}>
                                     <div>
                                         <h1>CHATBOTS</h1>
@@ -80,7 +80,7 @@ const AgencyPricingTab = () => {
             <div>
                 <Row>
                     <Col md={{span: 10, offset: 1}} className={styles.col_demo_text}>
-                        <h1>Join the 100+ businesses which are using SearchBase to connect with their customers.</h1>
+                        <h1> Join the 100 + businesses which are using SearchBase to connect with their customers.</h1>
                     </Col>
                 </Row>
                 <Row>

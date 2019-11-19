@@ -21,27 +21,29 @@
     margin-bottom: 5em;
 }
 
-.tabs{
-    box-shadow: -2px -2px 10px -3px rgba(0,0,0,.15);
-    border: none;
-    background: white;
-}
-
-.tab{
+.tabs {
+    box-shadow: -2px -2px 10px -3px rgba(0, 0, 0, .15);
     border: none;
     background: #ECECEC;
 }
 
-.tab a{
+.tab {
+    border: none;
+    background: #ECECEC;
+}
+
+.tab a {
     color: #767676;
     font-size: 1.1em;
     padding-top: 16px;
     padding-bottom: 18px;
     text-transform: uppercase;
+    height: 100%;
+    align-self: center;
     border-radius: 0 !important;
 }
 
-.tab:hover{
+.tab:hover {
     background: #a865e133;
 }
 
@@ -57,6 +59,7 @@
         padding-top: 5em;
         padding-bottom: 7em;
     }
+
     .hero .text_wrapper .title {
         font-size: 1.6em;
     }

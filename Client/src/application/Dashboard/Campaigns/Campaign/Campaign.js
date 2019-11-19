@@ -223,8 +223,8 @@ class Campaign extends React.Component {
             if (!err) {
               if(!this.state.assistantLinkInMessage){
                 Modal.confirm({
-                  title: 'You have not put the assistant link in your text message, are you sure you still want to send your campaign?',
-                  content: `If you click YES, this campaign will be sent without your chatbots link!.`,
+                  title: 'You have not put the Assistant\'s Link in your message!',
+                  content: `Do you wish to proceed?`,
                   okText: 'Yes',
                   okType: 'ghost',
                   cancelText: 'No',

@@ -326,6 +326,45 @@ def insertCompany(auth, data, companyID) -> Callback:
         return Callback(False, str(exc))
 
 
+def updateCandidate(auth, data, companyID) -> Callback:
+    try:
+        # availability, yearsExperience
+        body = {
+            "first_name": data.get("firstName"),
+            "last_name": data.get("lastName"),
+            "candidate_source_id": "29093",
+            "mobile": data.get("mobile"),
+            "nearest_train_station": data.get("city"),
+            "registration_date": datetime.datetime.now().isoformat()[:23] + "Z",
+            "email": data.get("email"),
+            "skills": data.get("skills"),
+            "education_summary": data.get("educations"),
+            "desired_salary": data.get("annualSalary"),
+            "desired_contract_rate": data.get("dayRate"),
+            "experience": str(data.get("yearsExperience")) + " years",
+            "note": crm_services.additionalCandidateNotesBuilder(
+                {
+                    "dateAvailable": data.get("availability"),
+                    "preferredJobTitle": data.get("preferredJobTitle"),
+                    "preferredJobType": data.get("preferredJobType")
+                },
+                data.get("selectedSolutions")
+            )
+        }
+
+        # send query
+        sendQuery_callback: Callback = sendQuery(auth, "candidate/"+data["id"], "put", body, companyID)
+
+        if not sendQuery_callback.Success:
+            raise Exception(sendQuery_callback.Message)
+
+        return Callback(True, sendQuery_callback.Data.text)
+
+    except Exception as exc:
+        helpers.logError("CRM.Vincere.insertCandidate() ERROR: " + str(exc))
+        return Callback(False, str(exc))
+
+
 def searchCandidates(auth, companyID, data) -> Callback:
     try:
         query = "q="

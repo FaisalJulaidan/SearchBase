@@ -17,17 +17,18 @@ class AddUserModal extends React.Component {
 
 
     render() {
-        const {roles, form} = this.props;
+        const {roles, form, visible, hideModal} = this.props;
         const {getFieldDecorator} = form;
 
         return (
             <Modal
                 width={500}
                 title="Add New User"
+                onCancel={hideModal}
                 destroyOnClose={true}
-                visible={this.props.visible}
+                visible={visible}
                 footer={[
-                    <Button key="Cancel" onClick={this.props.handleCancel}>Cancel</Button>,
+                    <Button key="Cancel" onClick={hideModal}>Cancel</Button>,
                     <Button key="submit" type="primary" onClick={this.onSubmit}>{"Add"}</Button>
                 ]}>
                 <Form layout='vertical'>

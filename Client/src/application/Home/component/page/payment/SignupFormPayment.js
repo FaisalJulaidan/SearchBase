@@ -9,7 +9,7 @@ import {Link, withRouter} from "react-router-dom";
 import {authActions, paymentActions} from '../../../../../store/actions/index';
 import {injectStripe} from 'react-stripe-elements';
 import {errorMessage} from "helpers/alert";
-import pricingJSON from "../pricing/pricing.json";
+import pricingJSON from "../pricing/pricingAgency.json";
 
 const FormItem = Form.Item;
 const {Option} = Select;

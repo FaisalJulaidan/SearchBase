@@ -102,7 +102,7 @@ class Roles extends React.Component {
                     bordered
                     dataSource={roles}
                     columns={this.columns}
-                    scroll={{x: 600}}
+                    scroll={{ x: 'max-content' }}
                     loading={isLoading}
                     />
             </>

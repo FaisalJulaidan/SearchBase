@@ -480,22 +480,23 @@ def additionalCandidateNotesBuilder(data, selectedSolutions=None):
     if not data:
         return ""
 
-    sentences = {
-        "yearsExperience": "They have [yearsExperience] years experience with their qualifications. ",
-        "preferredJobTitle": "They have stated that their preferred jobs are connected with \"[preferredJobTitle]\". ",
-        "preferredJobType": "They also prefer [preferredJobType] roles. ",
-        "skills": "They are also well versed in [skills]. ",
-        "dateAvailable": "They are available from [dateAvailable]. ",
-        "educations": "For education they have provided \"[educations]\". "
-    }
+    # sentences = {
+    #     "yearsExperience": "They have [yearsExperience] years experience with their qualifications. ",
+    #     "preferredJobTitle": "They have stated that their preferred jobs are connected with \"[preferredJobTitle]\". ",
+    #     "preferredJobType": "They also prefer [preferredJobType] roles. ",
+    #     "skills": "They are also well versed in [skills]. ",
+    #     "dateAvailable": "They are available from [dateAvailable]. ",
+    #     "educations": "For education they have provided \"[educations]\". "
+    # }
 
     paragraph = "At " + str(date.today().strftime("%B %d, %Y")) + \
-                "SearchBase has also collected the following information regarding this candidate: "
+                " SearchBase has also collected the following information regarding this candidate: "
     for key, value in data.items():
-        if not sentences.get(key):
-            helpers.logError(str(key) + " needs to be added to crm_services.additionalCandidateNotesBuilder.")
-            continue
-        paragraph += sentences[key].replace("[" + key + "]", value)
+        # if not sentences.get(key):
+        #     helpers.logError(str(key) + " needs to be added to crm_services.additionalCandidateNotesBuilder.")
+        #     continue
+        # paragraph += sentences[key].replace("[" + key + "]", value)
+        paragraph += "  - " + key + ": " + str(value) + "\n"
 
     if selectedSolutions:
         paragraph += "\n\nThe Candidate has also expressed interest in the following jobs: "

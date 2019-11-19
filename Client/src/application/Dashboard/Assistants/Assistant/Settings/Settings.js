@@ -2,9 +2,9 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { store } from 'store/store';
 
-import { Button, Divider, Form, Input, InputNumber, Modal, Radio, Select, Switch } from 'antd';
-import { assistantActions } from 'store/actions';
-import { history } from 'helpers';
+import {Button, Select, Form, Input, InputNumber, Divider, Switch, Modal, Radio} from 'antd';
+import {assistantActions, usersManagementActions} from 'store/actions';
+import {history, getCompany} from 'helpers';
 
 import countries from 'helpers/static_data/countries';
 import LogoUploader from 'components/LogoUploader/LogoUploader';
@@ -34,6 +34,7 @@ class Settings extends Component {
             notifyEvery: assistant.NotifyEvery === null ? 'null' : assistant.NotifyEvery,
             isManualNotify: manualNotify.indexOf(assistant.NotifyEvery) === -1
         });
+        this.props.dispatch(usersManagementActions.getUsers());
     }
 
 
@@ -60,6 +61,9 @@ class Settings extends Component {
                 ...this.props.assistant.Config,
                 restrictedCountries: values.restrictedCountries || []
             };
+
+            values.Owners = [].push(values.Owners); //To be removed when server-side codes for multiple owners are ready
+            // values.Owners = values.Owners || []; //To be uncommented after removing above line
 
             delete values.restrictedCountries;
             values.notifyEvery = this.state.notifyEvery;
@@ -92,7 +96,8 @@ class Settings extends Component {
         const {getFieldDecorator} = this.props.form;
         const {assistant} = this.props;
         const countriesOptions = [...countries.map(country => <Option key={country.code}>{country.name}</Option>)];
-
+        const ownersOptions = [this.props.usersList?.map(user => <Option
+            key={user.user.ID}>{`${user.user.Firstname} ${user.user.Surname} (${user.user.Email})`}</Option>)];
         return (
             <>
                 <Form layout='vertical' wrapperCol={{span: 10}}>
@@ -221,6 +226,23 @@ class Settings extends Component {
                     </Form.Item>
 
                     <FormItem
+                        label="Owner"
+                        extra="Selected user will be notified, when there is a new record.">
+                        {
+                            getFieldDecorator('Owners', {
+                                initialValue: assistant?.Owners
+                            })(
+                                <Select style={{width: '100%'}}
+                                        loading={this.state.isLoading}
+                                        filterOption={(inputValue, option) => option.props.children.toLowerCase().includes(inputValue.toLowerCase())}
+                                        placeholder="Please select a user">
+                                    {ownersOptions}
+                                </Select>
+                            )
+                        }
+                    </FormItem>
+
+                    <FormItem
                         label="Restricted Countries"
                         extra="Chatbot will be disabled for users who live in the selected countries"
                     >
@@ -237,6 +259,7 @@ class Settings extends Component {
                         }
                     </FormItem>
 
+
                     <Button type={'primary'} size={'large'} onClick={this.handleSave}>Save changes</Button>
                 </Form>
 
@@ -245,7 +268,7 @@ class Settings extends Component {
                 <Divider/>
                 <h2>Assistant Logo</h2>
                 <p>
-                    Your uploaded logo will replace SearchBase cloud logo in the
+                    your assistant logo will replace TheSearchBase logo in the
                     chatbot. If you did not upload a logo specifically for this assistant, your company logo will be
                     used instead. You can upload your company logo from
                     <a onClick={() => history.push(`/dashboard/account?tab=Company`)}> <b>here</b></a>
@@ -266,7 +289,10 @@ class Settings extends Component {
 }
 
 function mapStateToProps(state) {
-    return {};
+    return {
+        usersList: state.usersManagement.usersList,
+        isLoading: state.usersManagement.isLoading
+    };
 }
 
 export default connect(mapStateToProps)(Form.create()(Settings));

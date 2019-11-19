@@ -17,16 +17,27 @@ const PricingItem = (props) => {
         <div className={styles.wrapper}>
             <h1 className={styles.title}>{props.plan?.title}</h1>
             <hr/>
-            {!props?.hide_subtitle && <h1 className={styles.subtitle}>{props.plan?.subtitle}</h1>}
+            {!props?.hideSubtitle && <h1 className={styles.subtitle}>{props.plan?.subtitle}</h1>}
             <h4 className={styles.price}>{props.plan?.price}</h4>
             <h4 className={styles.price_subtitle}>{props.plan?.price_subtitle}</h4>
-            <Link to={`/order-plan?plan=${props.id}`} style={{width: 'fit-content'}}>
-                <Button variant="outline-light" className={styles.button}>Order Now</Button>
-            </Link>
+            {props.plan?.disabled
+                ?
+                <Link to={"/get-started"} style={{width: 'fit-content'}}>
+                    <Button variant="outline-light" className={styles.button}>Book a Demo</Button>
+                </Link>
+                :
+                <Link to={`/order-plan?plan=${props.id}`} style={{width: 'fit-content'}}>
+                    <Button variant="outline-light" className={styles.button}>Get Started</Button>
+                </Link>
+            }
+
             <hr/>
             <ul className={styles.list}>
                 {items}
             </ul>
+            <h4 className={styles.enterprise}
+                style={props?.showAutomationButton ? {display: 'block'} : {display: 'none'}}>Need more? Check out
+                our <Link to="#automation" onClick={() => window.scrollTo(0, 250)}>Automation</Link> solution</h4>
         </div>
     );
 };
@@ -38,9 +49,11 @@ PricingItem.propTypes = {
         price: PropTypes.string.isRequired,
         price_subtitle: PropTypes.string,
         icon: PropTypes.string,
-        items: PropTypes.arrayOf(PropTypes.string)
+        items: PropTypes.arrayOf(PropTypes.string),
+        disabled: PropTypes.bool
     }),
-    hide_subtitle: PropTypes.bool
+    hideSubtitle: PropTypes.bool,
+    showAutomationButton: PropTypes.bool
 };
 
 export default PricingItem;

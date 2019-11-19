@@ -1,5 +1,5 @@
 import React from 'react';
-import styles from './in-house-pricing-tab.module.css';
+import styles from './automation-pricing-tab.module.css';
 import {Link} from "react-router-dom";
 import {Button, Col, Row, Card} from "react-bootstrap";
 import pricingJSON from "../pricingInHouse.json";
@@ -11,14 +11,14 @@ import {scroller} from "react-scroll";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faChevronRight} from "@fortawesome/free-solid-svg-icons";
 
-const InHousePricingTab = () => {
+const AutomationPricingTab = () => {
 
     let pricing = pricingJSON.map((plan, key) => {
         return (
             <Col className={styles.col_item} xs={{span: 10, offset: 1}} sm={{span: 8, offset: 2}}
                  md={{span: 4, offset: 0}}
                  key={key}>
-                <PricingItem id={plan.id} plan={plan} hide_subtitle={true}/>
+                <PricingItem id={plan.id} plan={plan} hideSubtitle={true}/>
             </Col>
         );
     });
@@ -31,16 +31,21 @@ const InHousePricingTab = () => {
                             {pricing}
                         </Row>
                         <Row className={styles.row_buttons}>
-                            <Col xs={{span:10,offset:1}} sm={{span:8,offset:2}} md={{span:6,offset:3}} lg={{span: 4, offset: 4}} className={styles.col_button}>
+                            <Col xs={{span: 10, offset: 1}} md={{span:6,offset:0}} lg={{span: 4, offset: 2}} className={styles.col_button}>
                                 <Button variant="outline-light" className={styles.compare_button}
                                         onClick={() => {
-                                            scroller.scrollTo("plans-table-enterprise", {
+                                            scroller.scrollTo("plans-table", {
                                                 offset: -100, duration: 1000,
                                                 delay: 100, smooth: true,
                                             })
                                         }}>
                                     see full plan comparison 👀
                                 </Button>
+                            </Col>
+                            <Col xs={{span: 10, offset: 1}} md={{span:6,offset:0}} lg={4} className={styles.col_button}>
+                                <Button as={Link} to="#enterprise" onClick={() => window.scrollTo(0, 250)}
+                                        variant="primary" className={styles.enterprise_button}>see our enterprise
+                                    solution</Button>
                             </Col>
                         </Row>
                     </Card.Body>
@@ -50,7 +55,7 @@ const InHousePricingTab = () => {
                 <Row>
                     <Col xs={12} lg={6} className={styles.col_card}>
                         <Card className={styles.card}>
-                            <Card.Body className={styles.product_card_body}>
+                            <Card.Body className={styles.product_wrapper}>
                                 <div>
                                     <h1>CHATBOTS</h1>
                                     <p>Our chatbots help you spend less time screening and qualifying candidates.</p>
@@ -63,7 +68,7 @@ const InHousePricingTab = () => {
                     </Col>
                     <Col xs={12} lg={6} className={styles.col_card}>
                         <Card className={styles.card}>
-                            <Card.Body className={styles.product_card_body}>
+                            <Card.Body className={styles.product_wrapper}>
                                 <div>
                                     <h1>SMS outreach</h1>
                                     <p>Candidates may have access to the internet, so we have developed a solution that works, offline and online.</p>
@@ -76,7 +81,7 @@ const InHousePricingTab = () => {
                     </Col>
                     <Col xs={12} lg={6} className={styles.col_card}>
                         <Card className={styles.card}>
-                            <Card.Body className={styles.product_card_body}>
+                            <Card.Body className={styles.product_wrapper}>
                                 <div>
                                     <h1>Candidate Activation</h1>
                                     <p>Connect with candidates that they have never engaged with or have simply lost communication with.</p>
@@ -89,7 +94,7 @@ const InHousePricingTab = () => {
                     </Col>
                     <Col xs={12} lg={6} className={styles.col_card}>
                         <Card className={styles.card}>
-                            <Card.Body className={styles.product_card_body}>
+                            <Card.Body className={styles.product_wrapper}>
                                 <div>
                                     <h1>Automation & Engagement</h1>
                                     <p>Set up a tailored automation sequences that help you improve the efficiency of your workflow.</p>
@@ -115,7 +120,7 @@ const InHousePricingTab = () => {
                     </Col>
                 </Row>
             </div>
-            <div className={styles.table_wrapper} id={"plans-table-enterprise"}>
+            <div className={styles.table_wrapper} id={"plans-table"}>
                 <h1>Full Plan Comparison</h1>
                 <hr/>
                 <h4>Interested in a strategic partner to help you roll out automatic recruitment? Check out our
@@ -126,4 +131,4 @@ const InHousePricingTab = () => {
     );
 };
 
-export default InHousePricingTab;
+export default AutomationPricingTab;

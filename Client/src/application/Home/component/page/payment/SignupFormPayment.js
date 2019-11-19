@@ -203,13 +203,14 @@ class SignupFormPayment extends React.Component {
                         <Select onSelect={(value) => {
                             this.setState({planID: value})
                         }}>
-                            {
-                                pricingJSON.map((plan) => {
-                                    return (
-                                        <Select.Option key={plan.id}>{plan.title}</Select.Option>
-                                    );
-                                })
-                            }
+                            {/*{*/}
+                            {/*    pricingJSON.map((plan) => {*/}
+                            {/*        return (*/}
+                            {/*            <Select.Option key={plan.id}>{plan.title}</Select.Option>*/}
+                            {/*        );*/}
+                            {/*    })*/}
+                            {/*}*/}
+                            <Select.Option key={"essential"}>"Starter"</Select.Option>
                         </Select>
                     )}
                 </FormItem>

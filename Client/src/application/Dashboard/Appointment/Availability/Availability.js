@@ -6,7 +6,7 @@ import { AutoComplete, Button, Dropdown, Icon, Input, Menu, Table } from 'antd';
 import {checkDate} from "helpers";
 import 'types/TimeSlots_Types';
 import 'types/AutoPilot_Types';
-import './Availabilty.less';
+import './Availability.less';
 import { assistantActions, databaseActions } from 'store/actions';
 
 let momentFormat = 'DD/MM/YYYY';

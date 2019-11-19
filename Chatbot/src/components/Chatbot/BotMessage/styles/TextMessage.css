@@ -2,6 +2,13 @@
 
 .SkipButton {
     border-radius: 0 0 25px 25px !important;
+    left: -3px;
+    top: 3px;
+    border: none !important;
+}
+
+.SkipButton[disabled] {
+    pointer-events: none;
 }
 
 /* for the skip button */

@@ -43,7 +43,8 @@ class Campaign extends React.Component {
             textMessage: "",
             isSaved: true, //check if the campaign is saved or not
             campaignName: "",
-            outreach_type: ""
+            outreach_type: "",
+            assistantLinkInMessage: false
         };
     }
 
@@ -61,7 +62,8 @@ class Campaign extends React.Component {
                         textMessage: campaign?.Message,
                         use_crm: campaign?.UseCRM,
                         location: campaign?.Location,
-                    });
+                        assistantLinkInMessage: campaign?.Message.indexOf("{assistant.link}") !== -1 
+                    }, state => console.log(this.state));
                     this.props.form.setFieldsValue({
                         name: trimText.capitalize(trimText.trimDash(campaign?.Name)),
                         assistant_id: campaign?.AssistantID,
@@ -77,6 +79,9 @@ class Campaign extends React.Component {
                 history.push(`/dashboard/campaigns`)
             });
         }
+        if(this.state.textMessage.indexOf("{assistant.link}") !== -1 && this.state.assistantLinkInMessage){
+          this.setState({assistantLinkInMessage: true})
+        }
     }
 
     componentDidUpdate(prevProps, prevState, snapshot) {
@@ -85,6 +90,12 @@ class Campaign extends React.Component {
             this.showModal(true);
         } else if (prevProps.isLaunchingCampaign && (this.props.errorMsg === null)) {
             this.showModal(false);
+        }
+
+        let linkInMessage = this.state.textMessage.indexOf("{assistant.link}") !== -1
+
+        if(linkInMessage !== this.state.assistantLinkInMessage){
+          this.setState({assistantLinkInMessage: linkInMessage})
         }
     };
 
@@ -144,26 +155,42 @@ class Campaign extends React.Component {
     };
 
     handleModalLaunch = () => {
+        
         this.props.form.validateFields((err, values) => {
             if (!err) {
-                this.props.dispatch(campaignActions.launchCampaign(
-                    values.assistant_id,
-                    this.state.use_crm,
-                    values.crm_id,
-                    values.database_id,
-                    values.messenger_id,
-                    values.location,
-                    values.jobTitle,
-                    values.jobType,
-                    this.state.skills,
-                    values.text,
-                    this.state.candidate_list,
-                    values.outreach_type,
-                    values.email_title
-                ));
+              if(!this.state.assistantLinkInMessage){
+                Modal.confirm({
+                  title: 'You have not put the assistant link in your text message, are you sure you still want to send your campaign?',
+                  content: `If you click YES, this campaign will be sent without your chatbots link!.`,
+                  okText: 'Yes',
+                  okType: 'ghost',
+                  cancelText: 'No',
+                  onOk: () => this.launchCampaign(values  )
+                });
+              } else {
+                this.launchCampaign(values)
+              }
             }
         });
     };
+
+    launchCampaign = (values) => {
+      this.props.dispatch(campaignActions.launchCampaign(
+          values.assistant_id,
+          this.state.use_crm,
+          values.crm_id,
+          values.database_id,
+          values.messenger_id,
+          values.location,
+          values.jobTitle,
+          values.jobType,
+          this.state.skills,
+          values.text,
+          this.state.candidate_list,
+          values.outreach_type,
+          values.email_title
+      ));
+    }
 
     handleModalSelectAll = () => {
         if (this.props?.candidate_list?.length === this.state.candidate_list.length)
@@ -287,6 +314,7 @@ class Campaign extends React.Component {
 
         return (<NoHeaderPanel>
             <div className={styles.Header}>
+          {this.state.assistantLinkInMessage ? <h1>lol</h1> : <h1>nolol</h1>}
                 <Title className={styles.Title}>
                     <Icon type="rocket"/> Campaign Outreach
                 </Title>
@@ -475,7 +503,7 @@ class Campaign extends React.Component {
 
                             <FormItem label={"Job Type"}>
                                 {getFieldDecorator("jobType", {initialValue: "permanent"})(
-                                    <Radio.Group defaultValue="permanent">
+                                    <Radio.Group>
                                         <Radio.Button value="permanent">Permanent</Radio.Button>
                                         <Radio.Button value="temporary">Temporary</Radio.Button>
                                         <Radio.Button value="contract">Contract</Radio.Button>
@@ -503,9 +531,9 @@ class Campaign extends React.Component {
                                         whitespace: true,
                                         message: "Please enter the location"
                                     }],
+                                    initialValue: this.state.location
                                 })(
                                     <AutoComplete placeholder="Type in your location"
-                                                  value={this.state.location}
                                                   type="text"
                                                   dataSource={this.state.locations}
                                                   onChange={value => this.findLocation(value)}/>
@@ -514,10 +542,9 @@ class Campaign extends React.Component {
 
                             <FormItem label={`Distance within ${this.state.distance} miles`}
                                       style={{display: this.state.location ? 'block' : 'none'}}>
-                                {getFieldDecorator("distance")(
+                                {getFieldDecorator("distance", {initialValue: this.state.distance})(
                                     <Slider
                                         step={5}
-                                        defaultValue={[this.state.distance]}
                                         onChange={(value) => {
                                             this.setState({distance: value})
                                         }}
@@ -527,7 +554,7 @@ class Campaign extends React.Component {
 
                             <FormItem label={"Outreach Type "}>
                                 {getFieldDecorator("outreach_type", {initialValue: "sms"})(
-                                    <Radio.Group defaultValue="sms" onChange={(e) => {
+                                    <Radio.Group onChange={(e) => {
                                         this.setState({outreach_type: e.target.value})
                                     }}>
                                         <Radio.Button value="sms">SMS</Radio.Button>
@@ -574,7 +601,7 @@ class Campaign extends React.Component {
 
                             <FormItem label={"Follow up every:"}>
                                 {getFieldDecorator("followUp", {initialValue: "never"})(
-                                    <Radio.Group defaultValue="never" onChange={(e) => {
+                                    <Radio.Group onChange={(e) => {
                                         this.setState({followUp: e.target.value})
                                     }}>
                                         <Radio.Button value="never">Never</Radio.Button>
@@ -588,7 +615,7 @@ class Campaign extends React.Component {
 
                             <FormItem label={"Schedule for every:"}>
                                 {getFieldDecorator("schedule", {initialValue: "never"})(
-                                    <Radio.Group defaultValue="off" onChange={(e) => {
+                                    <Radio.Group onChange={(e) => {
                                         this.setState({schedule: e.target.value})
                                     }}>
                                         <Radio.Button value="never">Never</Radio.Button>

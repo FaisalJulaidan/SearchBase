@@ -53,7 +53,7 @@
       "desc": "Outlook is the Microsoft Email Service provider. You can easily integrate your Outlook into SearchBase and if you have scheduled any appointments or calendar events, we will automatically create the events in your calendar.",
       "image": "/images/CRM/outlook.svg",
       "type": "Outlook",
-      "disabled": false,
+      "disabled": true,
       "status": "NOT_CONNECTED"
     },
     {

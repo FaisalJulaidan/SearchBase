@@ -20,7 +20,7 @@ def getChatbot(assistantHashID) -> Callback:
 
         assistant: Assistant = db.session.query(Assistant).options(joinedload("Company").joinedload("StoredFile").joinedload("StoredFileInfo"))\
                                      .filter(Assistant.ID == assistantID[0]).first()
-
+        
         if not assistant:
             return Callback(False, '')
 
@@ -46,6 +46,7 @@ def getChatbot(assistantHashID) -> Callback:
 
         data = {
             "assistant": assistantDict,
+            "companyName": assistant.Company.Name,
             "isDisabled": False,
             "currencies": options_services.getOptions().Data['databases']['currencyCodes']
         }

@@ -12,6 +12,24 @@
     "desc": "Massive Tennis fan, RDLC Pirate ☠️ , 22 years of Recruitment experience"
   },
   {
+    "name": "Faisal Juladan",
+    "title": "CTO",
+    "img": "/static/images/home/team/faisal.jpeg",
+    "desc": "Unpredictable Crypto Currency Trader - still believes in Bitcoin. Cardiff University"
+  },
+  {
+    "name": "Martyn Redstone",
+    "title": "Director of Growth",
+    "img": "/static/images/home/team/martyn.jpg",
+    "desc": "a chatbot chatterbox with 15 years of recruitment experience. Lover of my beard and my family (maybe not in that order)"
+  },
+  {
+    "name": "Evgeniy Tonchev",
+    "title": "Head Of Engineering",
+    "img": "/static/images/home/team/ton.jpeg",
+    "desc": "Ex-Hardcore League of Legends player, now semi-retired. Often goes by the name 'Evgenius'. Cardiff University "
+  },
+  {
     "name": "Jan-Paul Boos",
     "title": "Board Advisor",
     "img": "/images/home/team/jan.jpg",
@@ -22,18 +40,6 @@
     "title": "Board Advisor",
     "img": "/images/home/team/gareth-morris.jpg",
     "desc": ""
-  },
-  {
-    "name": "Faisal Juladan",
-    "title": "CTO",
-    "img": "/images/home/team/faisal.jpeg",
-    "desc": "Unpredictable Crypto Currency Trader - still believes in Bitcoin. Cardiff University"
-  },
-  {
-    "name": "Evgeniy Tonchev",
-    "title": "Head Of Engineering",
-    "img": "/images/home/team/ton.jpg",
-    "desc": "Ex-Hardcore League of Legends player, now semi-retired. Often goes by the name 'Evgenius'. Cardiff University "
   },
   {
     "name": "Abdullah Hashim",

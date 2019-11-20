@@ -9,7 +9,7 @@
     background-color: #9254de;
     max-width: 100px;
     height: 3px;
-    margin-bottom: 80px;
+    margin-bottom: 60px;
 }
 
 .col_item {
@@ -22,7 +22,7 @@
     height: 84px;
     width: 84px;
     padding: 10px;
-    background: #6c63ff0F;
+    background: #9254de14;
     border-radius: 50%;
     object-fit: contain;
     transition: transform 0.2s linear;

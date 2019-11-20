@@ -80,7 +80,7 @@ class AutoPilots extends React.Component {
                 <NoHeaderPanel>
                     <div className={styles.Header}>
                         <Title className={styles.Title}>
-                            <Icon type="interation"/> Auto Pilots
+                            <Icon type="clock-circle"/> Auto Pilots
                         </Title>
                         <Paragraph type="secondary">
                             Connect your Assistants to an Auto Pilot to automate managing candidate acceptance and appointment scheduling

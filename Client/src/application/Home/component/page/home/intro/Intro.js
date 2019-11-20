@@ -1,7 +1,7 @@
 import React from 'react';
 import {Button, Col, Container, Row} from "react-bootstrap";
 import styles from "./intro.module.css";
-import {Bounce} from "react-reveal";
+import {Bounce,Zoom} from "react-reveal";
 import {Link} from "react-router-dom";
 import TextTransition from "react-text-transition";
 import {getLink} from "helpers";
@@ -67,9 +67,9 @@ class Intro extends React.Component {
             }
 
             return (
-                <Bounce key={i} wait={1000} when={animWhen} onReveal={this.onReveal}>
+                <Zoom key={i} wait={1200} when={animWhen} onReveal={this.onReveal}>
                     <MessageItem mine={message.mine} text={message.text}/>
-                </Bounce>
+                </Zoom>
             )
 
         });
@@ -94,9 +94,9 @@ class Intro extends React.Component {
                     <Col xs={{span: 8, offset: 2}} md={{span: 6, offset: 0}} lg={{span: 4, offset: 1}}>
                         <MobileFrame>
                             {messages}
-                            <Bounce when={this.state.animWhen.offerReveal}>
+                            <Zoom when={this.state.animWhen.offerReveal}>
                                 <JobOfferItem/>
-                            </Bounce>
+                            </Zoom>
                         </MobileFrame>
                     </Col>
                 </Row>

@@ -8,7 +8,8 @@ from services import user_services, stored_file_services as sfs
 from utilities import helpers,enums
 
 mail = Mail()
-tsbEmail = "info@thesearchbase.com"
+tsbSendEmail = "notifications@thesearchbase.com"
+tsbReceiveEmail = "info@thesearchbase.com"
 
 
 def sendDemoRequest(data) -> Callback:
@@ -16,7 +17,7 @@ def sendDemoRequest(data) -> Callback:
         # if not data["name"] or data["company"] or (data["phone"] or data["email"]):
         #     return Callback(False, "Required information is missing")
 
-        callback: Callback = __sendEmail(tsbEmail, 'Demo Request', '/emails/arrange_demo.html', data=data)
+        callback: Callback = __sendEmail(tsbReceiveEmail, 'Demo Request', '/emails/arrange_demo.html', data=data)
 
         if not callback.Success:
             raise Exception(callback.Message)
@@ -29,7 +30,7 @@ def sendDemoRequest(data) -> Callback:
 
 def contactUsIndex(name, email, message) -> Callback:
     try:
-        callback: Callback = __sendEmail(tsbEmail, 'TheSearchBase Contact Us', '/emails/message_sent.html',
+        callback: Callback = __sendEmail(tsbReceiveEmail, 'TheSearchBase Contact Us', '/emails/message_sent.html',
                                          name=name, email=email, message=message)
 
         if not callback.Success:
@@ -185,7 +186,7 @@ def sendPasswordResetEmail(email, userID):
 def sendNewCompanyHasRegistered(name, email, companyName, companyID, tel):
     try:
 
-        callback: Callback = __sendEmail(tsbEmail,
+        callback: Callback = __sendEmail(tsbReceiveEmail,
                                          companyName + ' has signed up',
                                          '/emails/company_registered.html',
                                          name=name,
@@ -339,7 +340,7 @@ def __sendAsyncEmail(app, msg):
 def __sendEmail(to, subject, template, files=None, **kwargs) -> Callback:
     try:
         # create Message with the Email: title, recipients and sender
-        msg = Message(subject, recipients=[to], sender=tsbEmail)
+        msg = Message(subject, recipients=[to], sender=tsbSendEmail)
         if template[0] == "/":
             try:
                 # get app context / if it fails assume its working outside the app

@@ -18,7 +18,7 @@ def create(name, url, ownerEmail) -> Company or None:
         db.session.add(newCompany)
 
         db.session.commit()
-        return Callback(True, "Company uas been created successfully.", newCompany)
+        return Callback(True, "Company has been created successfully.", newCompany)
 
     except stripe.error as exc:
         helpers.logError("company_service.create() Stripe Issue: " + str(exc))
@@ -110,6 +110,7 @@ def getByStripeID(id) -> Callback:
         helpers.logError("company_service.getByStripeID(): " + str(exc))
         db.session.rollback()
         return Callback(False, 'Could not get the assistant by nickname.')
+
 
 
 def update(companyName, websiteURL, trackData: bool, techSupport: bool, accountSpecailst: bool, companyID):

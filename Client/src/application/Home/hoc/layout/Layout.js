@@ -12,7 +12,7 @@ class Layout extends Component {
             <StickyContainer id="content-wrap" style={{background: this.props.background}}>
                 <Header id="header"/>
                 {this.props.children}
-                <Footer background={this.props.background} id="footer"/>
+                <Footer id="footer"/>
             </StickyContainer>
         )
     }

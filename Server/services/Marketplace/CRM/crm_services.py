@@ -1,14 +1,15 @@
 from sqlalchemy.sql import and_
 
 from models import db, Callback, Conversation, Assistant, CRM as CRM_Model, StoredFile
-from services.Marketplace.CRM import Greenhouse, Bullhorn, Mercury, Jobscience, Vincere
+from services import assistant_services
+from services.Marketplace.CRM import Greenhouse, Bullhorn, Mercury, Jobscience, Vincere, Adapt
 # Process chatbot session
 from utilities import helpers
 from utilities.enums import CRM, UserType, DataType, Period, DataType as DT
+from datetime import date
 
 
 def processConversation(assistant: Assistant, conversation: Conversation) -> Callback:
-    print("Should be processing the conversation")
     # Insert base on userType
     if conversation.UserType is UserType.Candidate:
         return insertCandidate(assistant, conversation)
@@ -110,8 +111,8 @@ def insertClient(assistant: Assistant, conversation: Conversation):
         return Callback(False, "CRM type did not match with those on the system")
 
 
-def updateCandidate(details, conversation, companyID):
-    crm_callback: Callback = getByID(details["source_id"], companyID)
+def updateCandidate(candidateID, conversation, companyID, sourceID):
+    crm_callback: Callback = getByID(sourceID, companyID)
 
     if not crm_callback.Success:
 
@@ -125,7 +126,7 @@ def updateCandidate(details, conversation, companyID):
 
     name = (conversation.Name or " ").split(" ")
     data = {
-        "id": details["id"],
+        "id": candidateID,
         "name": conversation.Name or " ",
         "firstName": helpers.getListValue(name, 0, " "),
         "lastName": helpers.getListValue(name, 1, " "),
@@ -174,14 +175,18 @@ def updateCandidate(details, conversation, companyID):
         return Callback(False, "CRM type did not match with those on the system")
 
 
-def uploadFile(assistant: Assistant, storedFile: StoredFile):
+def uploadFile(filePath, fileName, conversation):
+    callback: Callback = assistant_services.getByID(conversation.AssistantID, conversation.Assistant.CompanyID)
+    if not callback.Success:
+        return Callback(False, "Assistant not found!")
+    assistant: Assistant = callback.Data
 
     crm_type = assistant.CRM.Type
     if CRM.has_value(crm_type.value):
         if crm_type is CRM.Jobscience or crm_type is CRM.Mercury:
             return Callback(True, "CRM does not support file upload at this time")
 
-        return eval(crm_type.value + ".uploadFile(assistant.CRM.Auth, storedFile)")
+        return eval(crm_type.value + ".uploadFile(assistant.CRM.Auth, filePath, fileName, conversation)")
     else:
         return Callback(False, "CRM type did not match with those on the system")
 
@@ -191,7 +196,7 @@ def searchCandidates(assistant: Assistant, session):
         "location": __checkFilter(session['keywordsByDataType'], DT.CandidateLocation),
         "preferredJotTitle": __checkFilter(session['keywordsByDataType'], DT.JobTitle),
         "yearsExperience": __checkFilter(session['keywordsByDataType'], DT.CandidateYearsExperience),
-        "skills": __checkFilter(session['keywordsByDataType'], DT.CandidateSkills),
+        "skills": __checkFilter(session['keywordsByDataType'], DT.CandidateSkills, True),
         "jobCategory": __checkFilter(session['keywordsByDataType'], DT.JobCategory),
         "education": __checkFilter(session['keywordsByDataType'], DT.CandidateEducation)
     }
@@ -222,7 +227,8 @@ def searchCandidatesCustom(crm, companyID, candidate_data, perfect=False):
     }
 
     crm_type = crm.Type.value
-    if perfect and crm_type == "Bullhorn":
+    campaignCRMs = ["Bullhorn", "Vincere"]
+    if perfect and crm_type in campaignCRMs:
         searchFunc = "searchPerfectCandidates"
     else:
         searchFunc = "searchCandidates"
@@ -268,10 +274,12 @@ def searchJobs(assistant: Assistant, session):
 
 
 # private helper function
-def __checkFilter(keywords, dataType: DT):
+def __checkFilter(keywords, dataType: DT, returnList=False):
 
-    if keywords.get(dataType.value["name"]):
+    if keywords.get(dataType.value["name"]) and not returnList:
         return " ".join(keywords[dataType.value["name"]])
+    elif keywords.get(dataType.value["name"]):
+        return keywords.get(dataType.value["name"])
     return None
 
 
@@ -305,6 +313,11 @@ def connect(crm_type, auth, companyID) -> Callback:
         # Save
         db.session.add(connection)
         db.session.commit()
+
+        # refresh tokens
+        test_callback: Callback = testConnection(crm_type, test_callback.Data, companyID)
+        if not test_callback.Success:
+            return test_callback
 
         return Callback(True, 'CRM has been connected successfully', connection)
 
@@ -467,17 +480,23 @@ def additionalCandidateNotesBuilder(data, selectedSolutions=None):
     if not data:
         return ""
 
-    sentences = {
-        "yearsExperience": "They have [yearsExperience] years experience with their qualifications. ",
-        "preferredJobTitle": "They have stated that their preferred jobs are connected with \"[preferredJobTitle]\". ",
-        "preferredJobType": "They also prefer [preferredJobType] roles. ",
-        "skills": "They are also well versed in [skills]. ",
-        "educations": "For education they have provided \"[educations]\". "
-    }
+    # sentences = {
+    #     "yearsExperience": "They have [yearsExperience] years experience with their qualifications. ",
+    #     "preferredJobTitle": "They have stated that their preferred jobs are connected with \"[preferredJobTitle]\". ",
+    #     "preferredJobType": "They also prefer [preferredJobType] roles. ",
+    #     "skills": "They are also well versed in [skills]. ",
+    #     "dateAvailable": "They are available from [dateAvailable]. ",
+    #     "educations": "For education they have provided \"[educations]\". "
+    # }
 
-    paragraph = "SearchBase has also collected the following information regarding this candidate: "
+    paragraph = "At " + str(date.today().strftime("%B %d, %Y")) + \
+                " SearchBase has also collected the following information regarding this candidate: "
     for key, value in data.items():
-        paragraph += sentences[key].replace("[" + key + "]", value)
+        # if not sentences.get(key):
+        #     helpers.logError(str(key) + " needs to be added to crm_services.additionalCandidateNotesBuilder.")
+        #     continue
+        # paragraph += sentences[key].replace("[" + key + "]", value)
+        paragraph += "  - " + key + ": " + str(value) + "\n"
 
     if selectedSolutions:
         paragraph += "\n\nThe Candidate has also expressed interest in the following jobs: "
@@ -491,5 +510,5 @@ def additionalCandidateNotesBuilder(data, selectedSolutions=None):
 
 # prevents IDEA from automatically removing dependencies that are used in eval
 def ideaCalmer():
-    print(Jobscience, Mercury, Greenhouse)
+    print(Jobscience, Mercury, Greenhouse, Vincere, Adapt)
 

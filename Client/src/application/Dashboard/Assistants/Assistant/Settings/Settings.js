@@ -1,10 +1,10 @@
-import React, {Component} from 'react';
-import {connect} from 'react-redux';
-import {store} from 'store/store';
+import React, { Component } from 'react';
+import { connect } from 'react-redux';
+import { store } from 'store/store';
 
-import {Button, Select, Form, Input, InputNumber, Divider, Switch, Modal, Radio} from 'antd';
-import {assistantActions, marketplaceActions} from 'store/actions';
-import {history} from 'helpers';
+import { Button, Divider, Form, Input, InputNumber, Modal, Radio, Select, Switch } from 'antd';
+import { assistantActions } from 'store/actions';
+import { history } from 'helpers';
 
 import countries from 'helpers/static_data/countries';
 import LogoUploader from 'components/LogoUploader/LogoUploader';
@@ -57,6 +57,7 @@ class Settings extends Component {
                 values.secondsUntilPopup = 0;
             values.alertsEnabled = this.state.isAlertsEnabled;
             values.config = {
+                ...this.props.assistant.Config,
                 restrictedCountries: values.restrictedCountries || []
             };
 
@@ -244,7 +245,7 @@ class Settings extends Component {
                 <Divider/>
                 <h2>Assistant Logo</h2>
                 <p>
-                    your assistant logo will replace TheSearchBase logo in the
+                    Your uploaded logo will replace SearchBase cloud logo in the
                     chatbot. If you did not upload a logo specifically for this assistant, your company logo will be
                     used instead. You can upload your company logo from
                     <a onClick={() => history.push(`/dashboard/account?tab=Company`)}> <b>here</b></a>

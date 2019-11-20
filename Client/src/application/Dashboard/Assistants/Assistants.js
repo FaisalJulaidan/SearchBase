@@ -1,19 +1,21 @@
-import React, {Component} from 'react';
-import {Modal, Typography, Icon, Menu} from 'antd';
-import {connect} from 'react-redux';
+import React, { Component } from 'react';
+import { Icon, Menu, Modal, Typography } from 'antd';
+import { connect } from 'react-redux';
 
-import styles from "./Assistants.module.less"
+import styles from './Assistants.module.less';
 
-import {assistantActions, marketplaceActions} from "store/actions";
-import {RobotIcon} from "components/SVGs";
-import {history} from "helpers";
+import { assistantActions } from 'store/actions';
+import { RobotIcon } from 'components/SVGs';
+import { history } from 'helpers';
 
-import NewAssistantModal from "./Modals/NewAssistantModal";
-import EditAssistantModal from "./Modals/EditAssistantModal";
-import NoHeaderPanel from 'components/NoHeaderPanel/NoHeaderPanel'
-import CreateNewBox from "components/CreateNewBox/CreateNewBox"
-import ViewBox from "components/ViewBox/ViewBox";
-import LoadingViewBox from "components/LoadingViewBox/LoadingViewBox";
+import NewAssistantModal from './Modals/NewAssistantModal';
+import EditAssistantModal from './Modals/EditAssistantModal';
+import CloneAssistantModal from './Modals/CloneAssistantModal';
+import NoHeaderPanel from 'components/NoHeaderPanel/NoHeaderPanel';
+import CreateNewBox from 'components/CreateNewBox/CreateNewBox';
+import ViewBox from 'components/ViewBox/ViewBox';
+import LoadingViewBox from 'components/LoadingViewBox/LoadingViewBox';
+import QuickBuildModal from './Modals/QuickBuildModal';
 
 
 const {Title, Paragraph, Text} = Typography;
@@ -23,6 +25,8 @@ class Assistants extends Component {
     state = {
         newAssistantModalVisible: false,
         editModalVisible: false,
+        quickBuildModalVisible: false,
+        cloneModalVisible: false,
         assistantToEdit: null
     };
 
@@ -35,6 +39,12 @@ class Assistants extends Component {
 
     showEditModal = (assistant) => this.setState({editModalVisible: true, assistantToEdit: assistant});
     hideEditModal = () => this.setState({editModalVisible: false});
+
+    showCloneModal = (assistant) => this.setState({ cloneModalVisible: true, assistantToEdit: assistant });
+    hideCloneModal = () => this.setState({ cloneModalVisible: false });
+
+    showQuickBuildModal = () => this.setState({quickBuildModalVisible: true});
+    hideQuickBuildModal = () => this.setState({quickBuildModalVisible: false});
 
     addAssistant = (values) => {
         this.props.dispatch(assistantActions.addAssistant(values));
@@ -63,6 +73,8 @@ class Assistants extends Component {
     };
 
     optionsMenuClickHandler = (e, assistant) => {
+        if (e.key === 'clone')
+            this.showCloneModal(assistant);
         if (e.key === 'edit')
             this.showEditModal(assistant);
         if (e.key === 'delete')
@@ -71,64 +83,82 @@ class Assistants extends Component {
 
     // it must be an array of Menu.Item. ViewBox expect that in its options Menu
     optionsMenuItems = [
-        <Menu.Item style={{padding:10, paddingRight: 30}} key="edit">
-            <Icon type="edit" theme="twoTone" twoToneColor="#595959" style={{marginRight: 5}}/>
+        <Menu.Item style={{ padding: 10, paddingRight: 30 }} key="clone">
+            <Icon type="copy" theme="twoTone" twoToneColor="#595959" style={{ marginRight: 5 }}/>
+            Clone
+        </Menu.Item>,
+        <Menu.Item style={{ padding: 10, paddingRight: 30 }} key="edit">
+            <Icon type="edit" theme="twoTone" twoToneColor="#595959" style={{ marginRight: 5 }}/>
             Edit
         </Menu.Item>,
-        <Menu.Item style={{padding:10, paddingRight: 30}} key="delete">
-            <Icon type="delete" theme="twoTone" twoToneColor="#f50808" />
+        <Menu.Item style={{padding: 10, paddingRight: 30}} key="delete">
+            <Icon type="delete" theme="twoTone" twoToneColor="#f50808" style={{ marginRight: 5 }}/>
             Delete
         </Menu.Item>
     ];
 
     render() {
         return (
-        <>
-            <NoHeaderPanel>
-                <div className={styles.Header}>
-                    <Title className={styles.Title}>
-                        <Icon type="robot"/> Assistants
-                    </Title>
-                    <Paragraph type="secondary">
-                        Here you can see all assistants created by you
-                    </Paragraph>
-                </div>
+            <>
+                <NoHeaderPanel>
+                    <div className={styles.Header}>
+                        <Title className={styles.Title}>
+                            <Icon type="robot"/> Assistants
+                        </Title>
+                        <Paragraph type="secondary">
+                            Here you can see all assistants created by you
+                        </Paragraph>
+                    </div>
 
-                <div className={styles.Body}>
-                    <CreateNewBox text={'Add Assistant'} onClick={this.showNewAssistantModal}/>
-                    <CreateNewBox text={'Quick Build'} onClick={()=>{}}/>
-                    {
-                        this.props.isLoading ? <LoadingViewBox/>
-                        :
-                        this.props.assistantList.map(
-                            (assistant, i) =>
-                                <ViewBox
-                                    onClick={() => history.push(`/dashboard/assistants/${assistant.ID}`)}
-                                    optionsMenuItems={this.optionsMenuItems}
-                                    optionsMenuClickHandler={(e)=>this.optionsMenuClickHandler(e, assistant)}
-                                    key={i}
-                                    title={assistant.Name}
-                                    text={assistant.Description || "No description"}
-                                    icon={<RobotIcon/>}
-                                    iconWidth={75} iconHeight={75} iconTop={183} iconRight={15}
-                                />
-                        )
-                    }
-                </div>
-            </NoHeaderPanel>
+                    <div className={styles.Body}>
+                        <CreateNewBox text={'Add Assistant'} onClick={this.showNewAssistantModal}/>
+                        <CreateNewBox text={'Quick Build'} onClick={this.showQuickBuildModal}/>
+                        {
+                            this.props.isLoading ? <LoadingViewBox/>
+                                :
+                                this.props.assistantList.map(
+                                    (assistant, i) =>
+                                        <ViewBox
+                                            onClick={() => history.push(`/dashboard/assistants/${assistant.ID}`)}
+                                            optionsMenuItems={this.optionsMenuItems}
+                                            optionsMenuClickHandler={(e) => this.optionsMenuClickHandler(e, assistant)}
+                                            key={i}
+                                            title={assistant.Name}
+                                            text={assistant.Description || "No description"}
+                                            icon={<RobotIcon/>}
+                                            iconWidth={75} iconHeight={75} iconTop={183} iconRight={15}
+                                        />
+                                )
+                        }
+                    </div>
+                </NoHeaderPanel>
 
-            <NewAssistantModal visible={this.state.newAssistantModalVisible}
-                               addAssistant={this.addAssistant}
-                               isAssistantNameValid={this.isAssistantNameValid}
-                               hideModal={this.hideNewAssistantModal}/>
+                <NewAssistantModal visible={this.state.newAssistantModalVisible}
+                                   addAssistant={this.addAssistant}
+                                   isAssistantNameValid={this.isAssistantNameValid}
+                                   hideModal={this.hideNewAssistantModal}/>
 
-            <EditAssistantModal visible={this.state.editModalVisible}
-                       assistant={this.state.assistantToEdit}
-                       hideModal={this.hideEditModal}
-                       isAssistantNameValid={this.isAssistantNameValid}
-                       updateAssistant={this.updateAssistant}
-            />
-        </>
+                <EditAssistantModal visible={this.state.editModalVisible}
+                                    assistant={this.state.assistantToEdit}
+                                    hideModal={this.hideEditModal}
+                                    isAssistantNameValid={this.isAssistantNameValid}
+                                    updateAssistant={this.updateAssistant}/>
+
+                <QuickBuildModal visible={this.state.quickBuildModalVisible}
+                                 addAssistant={this.addAssistant}
+                                 isAssistantNameValid={this.isAssistantNameValid}
+                                 hideModal={this.hideQuickBuildModal}/>
+
+
+                {
+                    this.state.cloneModalVisible &&
+                    <CloneAssistantModal visible={true}
+                                         assistant={this.state.assistantToEdit}
+                                         addAssistant={this.addAssistant}
+                                         isAssistantNameValid={this.isAssistantNameValid}
+                                         hideModal={this.hideCloneModal}/>
+                }
+            </>
         );
     }
 }

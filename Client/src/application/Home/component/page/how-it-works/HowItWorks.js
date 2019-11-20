@@ -1,12 +1,9 @@
 import React from 'react';
 import styles from './how-it-works.module.css';
-// import featuresJson from './features.json';
 import descriptiveSectionsJSON from './descriptive-sections.json';
-// import FeatureItem from "./feature-item/FeatureItem";
 import {WEBSITE_TITLE} from '../../../../../constants/config';
 import Layout from "../../../hoc/layout/Layout";
 import Steps from "./steps/Steps";
-import Slider from "./slider/Slider";
 import DescriptiveSection from "./descriptive-section/DescriptiveSection";
 import {Col, Container, Row} from "react-bootstrap";
 
@@ -40,22 +37,18 @@ class HowItWorks extends React.Component {
 
         return (
             <Layout>
-                <div>
-                    <div className={styles.section}>
-                        <Container>
-                            <Row>
-                                <Col md={{span: 8, offset: 2}} className={styles.col_intro}>
-                                    <h1>A game changing improvement.</h1>
-                                    <hr/>
-                                    <h2>Outsmart, Outperform the competition with Automation.</h2>
-                                </Col>
-                            </Row>
-                        </Container>
-                    </div>
-                    <Steps/>
-                    {/*<Slider/>*/}
-                    {descriptiveSections}
-                </div>
+                <Container className={styles.container}>
+                    <Row>
+                        <Col md={{span: 8, offset: 2}} className={styles.col_intro}>
+                            <h1>A game changing improvement.</h1>
+                            <hr/>
+                            <h2>Outsmart, Outperform the competition with Automation.</h2>
+                        </Col>
+                    </Row>
+                </Container>
+                <Steps/>
+                {/*<Slider/>*/}
+                {descriptiveSections}
             </Layout>
         );
     }

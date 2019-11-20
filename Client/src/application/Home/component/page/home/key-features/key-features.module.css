@@ -22,9 +22,8 @@
     display: block;
     text-transform: uppercase;
     color: #444444;
-    font-weight: bold;
-    font-size: 1.3em;
-    letter-spacing: .5px;
+    font-weight: 900;
+    font-size: 1.5em;
     position: relative;
     padding: 0 0 10px;
 }
@@ -33,26 +32,22 @@
     background-color: #9254de;
     height: 3px;
     margin: 0;
-    width: 60px;
+    width: 45px;
 }
 
 .col_text .subtitle {
-    margin-top: 1em;
+    margin-top: .5em;
     color: #726a84;
 }
 
 .col_text .list {
-    font-family: 'Noto Sans TC', sans-serif;
+    margin-top: 1.5em;
     color: #9254de;
-    list-style-type: square;
-    list-style-position: inside;
-    font-size: 1.2em;
     font-weight: bold;
 }
 
 .col_text .list li {
-    font-weight: 500;
-    margin-top: 1em;
+    margin-top: .75em;
     list-style: none;
 }
 

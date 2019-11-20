@@ -1,23 +1,51 @@
 import copy
 import json
+import math
 import os
 from os.path import join
+from typing import List
 
+import boto3
+from botocore.exceptions import ClientError
 from jsonschema import validate
+from sqlalchemy.orm import joinedload
 
 from config import BaseConfig
 from models import db, Assistant, Conversation, StoredFileInfo
 from services import stored_file_services
 from utilities import json_schemas, enums
-from sqlalchemy.orm import joinedload
-from typing import List
-import boto3
-from botocore.exceptions import ClientError
-import math
 
 
 # NOTE: Make sure to take a backup of the database before running these functions
 # =============================================================================
+def migrateAssistantConfig():
+    try:
+        for assistant in db.session.query(Assistant).all():
+            newConfig = copy.deepcopy(assistant.Config)  # deep clone is IMPORTANT
+
+            if assistant.Config:
+                restrictedCountries = assistant.Config.get("restrictedCountries", [])
+            else:
+                restrictedCountries = []
+
+            newConfig = {
+                "restrictedCountries": restrictedCountries,
+                "chatbotPosition": "Right",
+            }
+
+            validate(json_schemas.assistant_config, newConfig)
+
+            assistant.Config = newConfig
+
+        # Save all changes
+        db.session.commit()
+        print("Assistant migration done successfully :)")
+
+    except Exception as exc:
+        print(exc.args)
+        db.session.rollback()
+        print("Assistant failed :(")
+
 
 def cleanStoredFiles():
     try:

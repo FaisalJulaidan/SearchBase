@@ -1,7 +1,9 @@
 import inspect
 import logging
 import os
-import re
+import re  
+import random
+import string
 import traceback
 from datetime import time
 from enum import Enum
@@ -19,7 +21,7 @@ from sqlalchemy_utils import Currency
 
 from config import BaseConfig
 from models import db, Assistant, Job, Callback, Role, Company, StoredFile, StoredFileInfo
-from services import flow_services, assistant_services, appointment_services, company_services
+from services import flow_services, assistant_services, appointment_services, company_services, mail_services
 from utilities.enums import Period, FileAssetType
 
 # ======== Global Variables ======== #
@@ -56,31 +58,76 @@ def getRemoteAddress():
 # ======== Helper Functions ======== #
 
 # Get domain based on current environment
-def getDomain(port=5000):
+def getDomain(port=5000, subdomain=None, domain=None):
+    subdomain = subdomain+"." if subdomain is not None else ""
+    domain = domain if domain is not None else "www.thesearchbase.com"
     if os.environ['FLASK_ENV'] == 'development':
-        return 'http://localhost:'+str(port)
+        return 'http://localhost:{}'.format(str(port))
     elif os.environ['FLASK_ENV'] == 'staging':
         return 'https://staging.thesearchbase.com'
     elif os.environ['FLASK_ENV'] == 'production':
-        return 'https://www.thesearchbase.com'
+        return 'https://{}{}'.format(subdomain, domain)
     return None
 
 
 def cleanDict(target):
+
+    # reoccurring function
+    def checkDict(target):
+        # clean dict connections
+        newDict = dict(target)
+
+        # go through dict items
+        for k, v in target.items():
+            if type(v) is str:  # if string strip the white spaces
+                if not v.strip():
+                    newDict.pop(k)
+            elif type(v) is dict:  # if dict loop it through the same function
+                v = checkDict(v)
+                if v:
+                    newDict[k] = v
+                else:
+                    newDict.pop(k)
+            else:  # if anything else do plain if check
+                if not v:
+                    newDict.pop(k)
+
+        return newDict
+
     if type(target) is str:
-        return json.dumps({k: v for k, v in json.loads(target).items() if v})
+        return json.dumps(checkDict(json.loads(target)))
     elif type(target) is dict:
-        return {k: v for k, v in target.items() if v}
+        return checkDict(target)
     elif isinstance(target, type({}.items())):
+        logError(".ITEMS() IS USED")  # checking if the if statement is used in production
+        logError(".ITEMS() IS USED")
+        logError(".ITEMS() IS USED")
         return {k: v for k, v in target if v}
     return target
 
+def randomAlphanumeric(length):
+    """
+    Generate a random string with the combination of lowercase and uppercase letters
+
+    Args:
+        length [int] -- The length of the newly generated alphanumeric, defaults to 5
+
+    Returns:
+        Alphanumeric string
+
+    Raises:
+        TODO: Write exceptions
+    """
+    letters = string.ascii_letters
+    return ''.join(random.choice(letters) for i in range(length))
 
 def logError(exception):
     if os.environ['FLASK_ENV'] == 'development':
         print(exception)
         print(traceback.format_exc())
-    logging.error(traceback.format_exc() + exception + "\n \n")
+    else:
+        mail_services.simpleSend("tsberrorlogs@gmail.com", "Error Log", str(exception))
+        logging.error(traceback.format_exc() + exception + "\n \n")
 
 
 # ID Hasher
@@ -89,10 +136,12 @@ hashids = Hashids(salt=BaseConfig.HASH_IDS_SALT, min_length=5)
 def encodeID(id):
     return hashids.encrypt(id)
 
-
 def decodeID(id):
     return hashids.decrypt(id)
 
+def encodeMultipleParams(*argv):
+    print(argv)
+    return hashids.encrypt(*argv)
 
 # Encryptors
 def encrypt(value, isDict=False):
@@ -306,6 +355,7 @@ def validateRequest(req, check: dict, throwIfNotValid: bool = True):
                 returnDict["missing"].append(item)
             elif check[item]['type']:
                 if not isinstance(req[item], check[item]['type']):
+                    print(req[item])
                     returnDict["errors"].append("Parameter {} is not of required type {}".format(item, str(check[item]['type'].__name__)))
         returnDict["inputs"][item] = req[item] if item in req and item is not None else None
     if len(returnDict["missing"]) != 0:

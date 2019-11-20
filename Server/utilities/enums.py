@@ -67,6 +67,32 @@ class Status(Enum):
         return any(value == item.value for item in cls)
 
 
+
+def planCreator(planID: str, assistants: int = 0, campaigns: int = 0, autopilot: int = 0, databases: int = 0, appointments: int = 0):
+    return {
+      'planID': planID,
+      'accessAssistants': assistants,
+      'accessCampaigns': campaigns,
+      'accessAutopilot': autopilot,
+      'accessDatabases': databases,
+      'accessAppointments'  : appointments }
+
+@unique
+class Plan(Enum):
+    Basic = planCreator("", 0, 0, 0, 0, 0)
+    Essential = planCreator("plan_G7Sth78cbr8Pgl", 1, 0, 0, 1, 0)
+    Pro = planCreator("plan_G7SuTtSoBxJ7aS", 1, 1, 0, 1, 0)
+    Premium = planCreator("plan_G7SuT5aJA1OFJU", 1, 1, 1, 1, 1)
+    Staff = planCreator("", 1, 1, 1, 1, 1)
+
+    @classmethod
+    def get_plan(cls, value):
+        for item in cls:
+            if(value == item.value['planID']):
+                return item
+        return None
+
+
 @unique
 class Period(Enum):
     Annually = 'Annually'
@@ -184,6 +210,7 @@ def dataTypeCreator(name: str, enumName: str, validation: ValidationType, sectio
             'userTypes': [ut.value for ut in userTypes],
             'blockTypes': [bt.value for bt in blockTypes],
             }
+
 
 @unique
 class DataType(Enum):

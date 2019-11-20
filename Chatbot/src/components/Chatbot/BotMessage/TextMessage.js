@@ -8,9 +8,9 @@ const TextMessage = ({ key, text, responded, skipResponse, skipText, skippable }
 
     // Create the skip button if Skippable is set as true
     let skipBtn = skippable ?
-        (<Button block data-warning="true" type="danger" key={8}
+        (<Button block data-warning="true"
                  disabled={responded}
-                 className={'SkipButton'}
+                 className={['Button', 'Danger', 'SkipButton'].join(' ')}
                  onClick={skipResponse}>
             {skipText}
         </Button>) : null;

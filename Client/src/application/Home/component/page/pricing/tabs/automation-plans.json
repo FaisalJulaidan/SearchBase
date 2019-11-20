@@ -1,0 +1,51 @@
+[
+  {
+    "id": "essential",
+    "stripe_key": "plan_G7Sth78cbr8Pgl",
+    "title": "Essential",
+    "price": "£29.99",
+    "price_subtitle": "per seat per month billed monthly",
+    "items": [
+      "Website Chatbot",
+      "CRM Integration",
+      "SMS Outreach"
+    ],
+    "disabled": true
+  },
+  {
+    "id": "essential-plus",
+    "stripe_key": "",
+    "title": "Essential+",
+    "price": "£49.99",
+    "price_subtitle": "per seat per month billed monthly",
+    "items": [
+      "Website Chatbot",
+      "CRM Integration",
+      "SMS Outreach",
+      "Pre-screen Candidates",
+      "Qualify Candidates",
+      "Automated Decision Making",
+      "Automated Engagement"
+    ],
+    "disabled": true
+  },
+  {
+    "id": "pro",
+    "stripe_key": "",
+    "title": "Pro",
+    "price": "£69.99",
+    "price_subtitle": "per seat per month billed monthly",
+    "items": [
+      "Website Chatbot",
+      "CRM Integration",
+      "SMS Outreach",
+      "Pre-screen Candidates",
+      "Qualify Candidates",
+      "Automated Decision Making",
+      "Automated Engagement",
+      "Automated Scheduling",
+      "Re-engage Passive Candidates"
+    ],
+    "disabled": true
+  }
+]

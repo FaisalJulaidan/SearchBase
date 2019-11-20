@@ -15,7 +15,6 @@ import { CSSTransition, TransitionGroup } from 'react-transition-group';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCloud } from '@fortawesome/free-solid-svg-icons';
 import { AuthorisedRoute } from '../../hoc/AuthorisedRoute';
-
 import Home from './Home/Home';
 import Assistants from './Assistants/Assistants';
 import Assistant from './Assistants/Assistant/Assistant';
@@ -32,6 +31,24 @@ import AutoPilot from './AutoPilots/AutoPilot/AutoPilot';
 import Appointment from './Appointment/Appointment';
 import Marketplace from './Marketplace/Marketplace';
 import Item from './Marketplace/Item/Item';
+import { WEBSITE_TITLE } from '../../constants/config';
+
+// const Home = React.lazy(() => import('./Home/Home'));
+// const Assistants = React.lazy(() => import('./Assistants/Assistants'));
+// const Assistant = React.lazy(() => import('./Assistants/Assistant/Assistant'));
+// const Databases = React.lazy(() => import('./Databases/Databases'));
+// const Database = React.lazy(() => import('./Databases/Database/Database'));
+// const Account = React.lazy(() => import('./ControlPanel/Account/Account'));
+// const Billing = React.lazy(() => import('./ControlPanel/Billing/Billing'));
+// const UsersManagement = React.lazy(() => import('./ControlPanel/UsersManagement/UsersManagement'));
+// const Documentation = React.lazy(() => import('./Documentation/Documentation'));
+// const Campaigns = React.lazy(() => import('./Campaigns/Campaigns'));
+// const Campaign = React.lazy(() => import('./Campaigns/Campaign/Campaign'));
+// const AutoPilots = React.lazy(() => import('./AutoPilots/AutoPilots'));
+// const AutoPilot = React.lazy(() => import('./AutoPilots/AutoPilot/AutoPilot'));
+// const Appointment = React.lazy(() => import('./Appointment/Appointment'));
+// const Marketplace = React.lazy(() => import('./Marketplace/Marketplace'));
+// const Item = React.lazy(() => import('./Marketplace/Item/Item'));
 
 
 const { SubMenu } = Menu;
@@ -46,6 +63,15 @@ class Dashboard extends Component {
 
     componentWillMount() {
         this.props.dispatch(optionsActions.getOptions());
+    }
+
+    componentDidMount() {
+        document.title = "Dashboard | " + WEBSITE_TITLE;
+        // appending js file for customer helpers
+        const script = document.createElement('script');
+        script.async = true;
+        script.text = `(function() {var walkme = document.createElement('script'); walkme.type = 'text/javascript'; walkme.async = true; walkme.src = 'https://cdn.walkme.com/users/6f20ba1396c84695af1d50635299db80/walkme_6f20ba1396c84695af1d50635299db80_https.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(walkme, s); window._walkmeConfig = {smartLoad:true}; })();`;
+        document.body.appendChild(script);
     }
 
 
@@ -196,7 +222,7 @@ class Dashboard extends Component {
                             </Menu.Item> : null}
 
                         <Menu.Item key="marketplace">
-                            <Icon type="interation"/>
+                            <Icon type="shop"/>
                             <span>Marketplace</span>
                         </Menu.Item>
 

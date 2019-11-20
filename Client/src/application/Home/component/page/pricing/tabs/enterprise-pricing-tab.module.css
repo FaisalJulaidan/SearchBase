@@ -1,0 +1,189 @@
+.wrapper {
+    padding-top: 4em;
+}
+
+.card {
+    box-shadow: 0 2px 20px 0 rgba(0, 0, 0, .1);
+    border: none;
+    border-radius: 3px;
+    height: 100%;
+}
+
+.desc_wrapper {
+    text-align: center;
+}
+
+.desc_wrapper h1 {
+    font-size: 2em;
+    font-weight: 900;
+    color: #444444;
+    text-transform: uppercase;
+}
+
+
+.desc_wrapper p {
+    margin-top: 18px;
+    margin-bottom: 40px;
+    font-size: 1.1em;
+    line-height: 1.8em;
+    color: #767676;
+}
+
+.desc_wrapper .learn {
+    display: block;
+    text-transform: uppercase;
+    font-size: .8em;
+    font-weight: 900;
+    margin-top: 15px;
+    letter-spacing: 5px;
+    color: #444444;
+}
+
+.contact_button {
+    width: fit-content;
+    margin: auto;
+    text-transform: uppercase;
+    border-radius: 3px;
+    text-decoration: none;
+    color: white !important;
+    border: solid transparent 0;
+    padding: 8px 24px;
+    font-weight: bolder;
+    word-spacing: 3px;
+    background-color: #9254de;
+    transition: border-color 0.4s ease 0s, background-color 0.4s ease 0s;
+}
+
+.contact_button a{
+    text-decoration: none;
+    color: white;
+}
+
+.contact_button:hover {
+    background-color: #9C7DED;
+    transition: border-color 0.4s ease 0s, background-color 0.4s ease 0s;
+}
+
+.contact_button:not(:disabled):not(.disabled):active {
+    background-color: #9C7DED;
+    transition: border-color 0.4s ease 0s, background-color 0.4s ease 0s;
+}
+
+.contact_button:focus {
+    box-shadow: 0 0 0 0.2rem rgba(138, 107, 219, .5);
+}
+
+.contact_button:not(:disabled):not(.disabled):active:focus {
+    box-shadow: 0 0 0 0.2rem rgba(138, 107, 219, .5);
+}
+
+.product_wrapper {
+    padding-top: 10px;
+    padding-bottom: 10px;
+    display: flex;
+}
+
+.col_card{
+    margin-top: 30px;
+}
+
+.product_wrapper {
+    padding-top: 20px;
+    padding-bottom: 20px;
+    display: flex;
+    align-items: center;
+}
+
+.product_wrapper div {
+    width: 75%;
+}
+
+.product_wrapper div h1 {
+    text-transform: uppercase;
+    color: #444444;
+    font-weight: 900;
+    font-size: 1.1em;
+}
+
+.product_wrapper div p {
+    font-size: .9em;
+    margin-top: .5em;
+    color: #767676;
+}
+
+.product_wrapper a {
+    text-transform: uppercase;
+    text-align: right;
+    align-self: center;
+    width: 25%;
+    font-size: .8em;
+    font-weight: bold;
+    text-decoration: none;
+    color: #9254de;
+}
+
+.product_wrapper a:hover {
+    color: #9C7DED;
+}
+
+.product_wrapper a .icon {
+    transition: all 0.3s ease 50ms;
+    margin-left: 5px;
+    margin-right: 5px;
+}
+
+.product_wrapper a:hover .icon {
+    margin-left: 10px;
+    margin-right: 0;
+}
+
+.col_demo_text {
+    margin-top: 100px;
+    text-align: center;
+}
+
+.col_demo_text h1 {
+    text-align: center;
+    color: #444444;
+    font-size: 2.2em;
+    font-weight: bold;
+}
+
+.col_demo_button {
+    margin-top: 30px;
+    text-align: center;
+}
+
+.demo_button {
+    width: fit-content;
+    margin: auto;
+    text-transform: uppercase;
+    border-radius: 2px;
+    text-decoration: none;
+    color: white !important;
+    border: solid transparent 0;
+    padding: 8px 24px;
+    font-weight: bolder;
+    font-size: 1.1em;
+    word-spacing: 3px;
+    background-color: #9254de;
+    transition: border-color 0.4s ease 0s, background-color 0.4s ease 0s;
+}
+
+.demo_button:hover {
+    background-color: #9C7DED;
+    transition: border-color 0.4s ease 0s, background-color 0.4s ease 0s;
+}
+
+.demo_button:not(:disabled):not(.disabled):active {
+    background-color: #9C7DED;
+    transition: border-color 0.4s ease 0s, background-color 0.4s ease 0s;
+}
+
+.demo_button:focus {
+    box-shadow: 0 0 0 0.2rem rgba(138, 107, 219, .5);
+}
+
+.demo_button:not(:disabled):not(.disabled):active:focus {
+    box-shadow: 0 0 0 0.2rem rgba(138, 107, 219, .5);
+}

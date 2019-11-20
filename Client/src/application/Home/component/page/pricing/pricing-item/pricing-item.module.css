@@ -1,0 +1,111 @@
+.wrapper {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    color: #767676;
+    margin: 15px 5px;
+    /*align-items: center;*/
+}
+
+.title {
+    color: #444444;
+    font-weight: 900;
+    font-size: 2em;
+}
+
+.wrapper hr {
+    background-color: #9254de;
+    min-width: 60px;
+    width: fit-content;
+    margin: .5em 0;
+    height: 2px;
+}
+
+.subtitle {
+    color: #726a84;
+    font-size: .9em;
+}
+
+.price {
+    color: #9254de;
+    font-size: 3em;
+    font-weight: 900;
+    margin-top: .4em;
+}
+
+.price_subtitle {
+    margin: 0.2em 0 1em 0;
+    font-size: .95em;
+    font-weight: bold;
+    color: #9254de;
+}
+
+.list {
+    margin-top: .5em;
+    color: #767676;
+    font-size: 0.95em;
+}
+
+.list li {
+    margin: .5em 0;
+}
+
+.list li .icon {
+    margin-right: 5px;
+}
+
+.list li:first-child {
+    margin-top: 0;
+}
+
+.list li:last-child {
+    margin-bottom: 0;
+}
+
+/**** Primary Button ****/
+.button {
+    text-transform: uppercase;
+    margin: 0.85em 0;
+    width: fit-content;
+    border-radius: 2px;
+    text-decoration: none;
+    color: #9254de;
+    border-color: #9254de;
+    transition: all 0.4s ease 0s, background-color 0.4s ease 0s;
+}
+
+.button:hover {
+    color: white;
+    background: #9254de;
+    border-color: #9254de;
+}
+
+.button:not(:disabled):not(.disabled):active {
+    color: white;
+    background: #9254de;
+    border-color: #9254de;
+}
+
+.button:focus {
+    box-shadow: 0 0 0 0.2rem rgba(138, 107, 219, .5);
+}
+
+.button a {
+    text-decoration: none;
+    color: #9254de;
+}
+
+.enterprise {
+    color: #848484;
+    font-size: .85em;
+    margin-top: 40px;
+}
+
+.enterprise a {
+    color: #9254de;
+    text-decoration: none;
+}
+
+.enterprise a:hover {
+    color: #9C7DED;
+}

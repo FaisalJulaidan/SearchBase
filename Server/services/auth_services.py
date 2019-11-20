@@ -82,7 +82,7 @@ def signup(details) -> Callback:
         # ###############
 
         # Return a callback with a message
-        return Callback(True, "Signed up successfully")
+        return Callback(True, "Signed up successfully", company.ID)
 
     except Exception as exc:
         helpers.logError("auth_services.signup(): " + str(exc))

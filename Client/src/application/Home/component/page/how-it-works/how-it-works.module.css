@@ -1,11 +1,11 @@
 .col_intro{
     text-align: center;
-    color: #444444;
 }
 
 .col_intro h1{
     font-weight: bold;
     font-size: 2em;
+    color: #444444;
 }
 
 .col_intro hr{
@@ -15,12 +15,14 @@
 }
 
 .col_intro h2{
+    color: #444444;
     font-size: 1.1em;
 }
 
-.section {
+.container {
     line-height: normal;
-    padding: 80px 0;
+    padding-top: 80px;
+    padding-bottom: 80px;
 }
 
 .section_features_intro{
@@ -28,8 +30,9 @@
 }
 
 @media (max-width: 991.98px) {
-    .section {
-        padding: 40px 0;
+    .container {
+        padding-top: 40px;
+        padding-bottom: 40px;
     }
     .col_intro h1{
         font-size: 1.8em;

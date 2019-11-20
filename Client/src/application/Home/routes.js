@@ -13,6 +13,10 @@ import Signup from "./component/page/signup/Signup";
 import GDPR from "./component/page/gdpr/GDPR";
 import GetStarted from "./component/page/get-started/GetStarted";
 import SuccessfulLogin from "./component/util/SuccessfulLogin";
+import Pricing from "./component/page/pricing/Pricing";
+import Payment from "./component/page/payment/Payment";
+import SuccessPayment from "./component/page/payment/success/SuccessPayment";
+import ROI from "./component/page/roi/ROI";
 
 class Routes extends Component {
     render() {
@@ -21,6 +25,10 @@ class Routes extends Component {
                 <Route path="/" exact component={Home}/>
                 <Route path="/features" exact component={HowItWorks}/>
                 <Route path="/how-it-works" exact component={HowItWorks}/>
+                <Route path="/pricing" exact component={Pricing}/>
+                <Route path="/roi" exact component={ROI}/>
+                <Route path="/order-plan" exact component={Payment}/>
+                <Route path="/success-payment" exact component={SuccessPayment}/>
                 <Route path="/our-team" exact component={OurTeam}/>
                 <Route path="/terms" exact component={Terms}/>
                 <Route path="/privacy" exact component={Policies}/>
@@ -30,7 +38,6 @@ class Routes extends Component {
                 <Route path="/signup" exact component={Signup}/>
                 <Route path="/get-started" exact component={GetStarted}/>
                 <Route path="/successful-login" exact component={SuccessfulLogin}/>
-                {/*<Route path='/dashboard' exact component={(() => <>{(()=>{window.location.reload()})()}</>)}/>*/}
                 <Route path="" exact component={NotFound404}/>
             </Switch>
         )

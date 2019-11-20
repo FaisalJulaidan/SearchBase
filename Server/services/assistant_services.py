@@ -1,24 +1,25 @@
-from sqlalchemy import and_
+import json
+from datetime import datetime
+from os.path import join
 
+from jsonschema import validate
+from sqlalchemy import and_
+from sqlalchemy.orm import joinedload
 from werkzeug.utils import secure_filename
-from models import db, Assistant, Callback, AutoPilot, AppointmentAllocationTime, Company, StoredFileInfo, StoredFile
+
+from config import BaseConfig
+from models import db, Assistant, Callback, AutoPilot, AppointmentAllocationTime, StoredFileInfo, StoredFile
 from services import auto_pilot_services, flow_services, stored_file_services
 from services.Marketplace.CRM import crm_services
 from services.Marketplace.Calendar import calendar_services
 from services.Marketplace.Messenger import messenger_servicess
 from utilities import helpers, json_schemas, enums
-from sqlalchemy.orm import joinedload
-from os.path import join
-from config import BaseConfig
-from jsonschema import validate
-import json
 
 
-def create(name, desc, welcomeMessage, topBarText, template, companyID) -> Assistant or None:
+def create(name, desc, welcomeMessage, topBarText, flow, template, companyID) -> Assistant or None:
     try:
-
-        flow = None
-        if template and template != 'none':
+        # if there is already a flow then ignore creating from template
+        if not flow and template and template != 'none':
             # Get json template
             relative_path = join('static/assistant_templates', template + '.json')
             absolute_path = join(BaseConfig.APP_ROOT, relative_path)
@@ -28,6 +29,13 @@ def create(name, desc, welcomeMessage, topBarText, template, companyID) -> Assis
             if not callback.Success:
                 raise Exception(callback.Message)
 
+        # default assistant config values
+        config = {
+            "restrictedCountries": [],
+            "chatbotPosition": "Right"
+        }
+        validate(config, json_schemas.assistant_config)
+
         assistant = Assistant(Name=name,
                               Description=desc,
                               Flow=flow,
@@ -35,6 +43,7 @@ def create(name, desc, welcomeMessage, topBarText, template, companyID) -> Assis
                               TopBarText=topBarText,
                               SecondsUntilPopup=0,
                               Active=True,
+                              Config=config,
                               CompanyID=companyID)
 
         db.session.add(assistant)
@@ -219,6 +228,10 @@ def updateConfigs(id, name, desc, message, topBarText, secondsUntilPopup, notify
         assistant.SecondsUntilPopup = secondsUntilPopup
         assistant.NotifyEvery = None if notifyEvery == "null" else int(notifyEvery)
         assistant.Config = config
+
+        if not assistant.LastNotificationDate and notifyEvery != "null":
+            assistant.LastNotificationDate = datetime.now()
+
 
         db.session.commit()
         return Callback(True, name + ' Updated Successfully', assistant)

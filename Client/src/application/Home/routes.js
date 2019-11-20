@@ -26,7 +26,7 @@ class Routes extends Component {
                 <Route path="/features" exact component={HowItWorks}/>
                 <Route path="/how-it-works" exact component={HowItWorks}/>
                 <Route path="/pricing" exact component={Pricing}/>
-                <Route path="/roi" exact component={ROI}/>
+                {/*<Route path="/roi" exact component={ROI}/>*/}
                 <Route path="/order-plan" exact component={Payment}/>
                 <Route path="/success-payment" exact component={SuccessPayment}/>
                 <Route path="/our-team" exact component={OurTeam}/>

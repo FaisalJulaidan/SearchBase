@@ -39,9 +39,9 @@ const Header = (props) => {
                                 <NavDropdown.Item className={styles.link} as={Link} to="/pricing">
                                     Pricing
                                 </NavDropdown.Item>
-                                <NavDropdown.Item className={styles.link} as={Link} to="/roi">
-                                    ROI Calculator
-                                </NavDropdown.Item>
+                                {/*<NavDropdown.Item className={styles.link} as={Link} to="/roi">*/}
+                                    {/*ROI Calculator*/}
+                                {/*</NavDropdown.Item>*/}
                             </NavDropdown>
                             <Nav.Link className={styles.link} as={Link} to="/login">Log in</Nav.Link>
                         </Nav>

@@ -209,7 +209,6 @@ def searchCandidates(assistant: Assistant, session):
             return eval(crm_type.value + ".searchCandidates(assistant.CRM.Auth)")
         if crm_type is CRM.Jobscience:
             return eval(crm_type.value + ".searchCandidates(assistant.CRM.Auth, data)")
-
         return eval(crm_type.value + ".searchCandidates(assistant.CRM.Auth, assistant.CompanyID, data)")
     else:
         return Callback(False, "CRM type did not match with those on the system")
@@ -245,6 +244,16 @@ def searchCandidatesCustom(crm, companyID, candidate_data, perfect=False):
     else:
         return Callback(False, "CRM type did not match with those on the system")
 
+
+def searchPlacements(crm, companyID, params):
+    print(crm)
+    crm_type = crm.Type.value
+    if CRM.has_value(crm_type):
+        if crm.Type is not CRM.Bullhorn:
+            return Callback(True, "CRM does not support placement search at this time")
+        return Bullhorn.searchPlacement(crm.Auth, companyID, params)
+    else:
+        return Callback(False, "CRM type did not match with those on the system")
 
 def searchJobs(assistant: Assistant, session):
     data = {

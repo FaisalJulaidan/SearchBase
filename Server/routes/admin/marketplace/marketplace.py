@@ -6,7 +6,7 @@ from services.Marketplace import marketplace_helpers
 from services.Marketplace.CRM import crm_services
 from services.Marketplace.Messenger import messenger_servicess
 from services.Marketplace.Calendar import Google, calendar_services
-from utilities import helpers, wrappers
+from utilities import helpers, wrappers, enums
 
 marketplace_router: Blueprint = Blueprint('marketplace_router', __name__, template_folder="../../templates")
 
@@ -32,6 +32,28 @@ def marketplace():
                                         "calendars": helpers.getListFromSQLAlchemyList(calendar_callback.Data),
                                         "messengers": helpers.getListFromSQLAlchemyList(messenger_callback.Data),
                                     })
+
+
+# ===== Connect ===== #
+@marketplace_router.route("/marketplace/testBullhorn", methods=['POST'])
+def testBullhorn():
+    # Authenticate
+    # user = get_jwt_identity()['user']
+    if request.method == "POST":
+        print(request)
+        data = request.json
+        print(data)
+        crm_callback: Callback = crm_services.getByID(3,1)
+        if not crm_callback.Success:
+            raise Exception("CRM not found.")
+
+        crm = crm_callback.Data
+        callback = crm_services.searchPlacements(crm, 1, data.get("data"))
+          # callback: Callback = marketplace_helpers.search(data.get("params"))
+
+        if not callback.Success:
+            return helpers.jsonResponse(False, 400, callback.Message)
+        return helpers.jsonResponse(True, 200, "Success", callback.Data)
 
 
 # ===== Connect ===== #

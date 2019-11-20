@@ -496,7 +496,7 @@ def queryGen(input, match, queryType, match2=None):
     elif queryType == "AND":
         queryText = "{}:{} AND".format(input, convertToBullhornType(match))
     elif queryType == "OR":
-        queryText = "{}:{} AND".format(input, convertToBullhornType(match))
+        queryText = "{}:{} OR".format(input, convertToBullhornType(match))
     elif queryType == "NOT":
         queryText = "-{}:{}".format(input, convertToBullhornType(match))
     elif queryType == "MATCH":

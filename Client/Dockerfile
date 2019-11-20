@@ -1,7 +1,7 @@
 #Build Stage Start
 
 #Specify a base image
-FROM node:alpine as builder
+FROM node:10 as builder
 
 #Specify a working directory
 WORKDIR '/app'
@@ -10,7 +10,7 @@ WORKDIR '/app'
 COPY package.json .
 
 #Install dependencies
-RUN npm install --silent
+RUN npm install
 RUN npm install react-scripts@1.1.1 -g --silent
 
 #Copy remaining files

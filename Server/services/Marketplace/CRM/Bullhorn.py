@@ -495,6 +495,8 @@ def queryGen(input, match, queryType, match2=None):
         queryText = "{}: {} TO {}]".format(input, convertToBullhornType(match), convertToBullhornType(match2))
     elif queryType == "AND":
         queryText = "{}:{} AND".format(input, convertToBullhornType(match))
+    elif queryType == "OR":
+        queryText = "{}:{} AND".format(input, convertToBullhornType(match))
     elif queryType == "NOT":
         queryText = "-{}:{}".format(input, convertToBullhornType(match))
     elif queryType == "MATCH":
@@ -525,6 +527,44 @@ def searchPlacement(auth, companyID, data, fields="fields=candidate"):
         return Callback(True, 'Gathered placement data', result)
     except Exception as exc:
         helpers.logError("Marketplace.CRM.Bullhorn.searchPlacement() ERROR: " + str(exc))
+        return Callback(False, str(exc))
+
+
+def searchCandidatesDynamic(auth, companyID, data, fields=None, multiple=False) -> Callback:
+    try:
+        query = ""
+        if multiple:
+            for item in data:
+                query += "{},".format(item)
+            query = query[:-1]
+        else:
+            query = "query="
+            for item in data:
+                query += queryGen(item['input'], item['match'], item['queryType'], item.get("match2", None))
+        if not fields:
+            fields = "fields=id,name,email,mobile,address,primarySkills,status,educations,dayRate,salary"
+        result = []
+        while True:
+            if(multiple):
+                sendQuery_callback: Callback = sendQuery(auth, "entity/Candidate/{}".format(query), "get", {}, companyID,
+                                    [fields, "count=199"])
+            else:
+                sendQuery_callback: Callback = sendQuery(auth, "search/Candidate", "get", {}, companyID,
+                                                    [fields, query, "count=199"])
+            if not sendQuery_callback.Success:
+                raise Exception(sendQuery_callback.Message)
+            return_body = json.loads(sendQuery_callback.Data.text)
+
+            if isinstance(return_body["data"], dict):
+                result.append(return_body["data"])
+            else:
+                for record in return_body["data"]:
+                    result.append(record)
+            if return_body.get("total", 0) > 0 or "AND" not in query:
+                break
+        return Callback(True, 'Gathered Candidate data', result)
+    except Exception as exc:
+        helpers.logError("Marketplace.CRM.Bullhorn.searchCandidatesDynamic() ERROR: " + str(exc))
         return Callback(False, str(exc))
 
 

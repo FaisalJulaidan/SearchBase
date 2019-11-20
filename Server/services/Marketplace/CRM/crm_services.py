@@ -214,7 +214,7 @@ def searchCandidates(assistant: Assistant, session):
         return Callback(False, "CRM type did not match with those on the system")
 
 
-def searchCandidatesCustom(crm, companyID, candidate_data, perfect=False, customData=False, fields=None):
+def searchCandidatesCustom(crm, companyID, candidate_data, perfect=False, customData=False, fields=None, customSearch=None, **kwargs):
     if customData:
         data = candidate_data
     else:
@@ -232,6 +232,8 @@ def searchCandidatesCustom(crm, companyID, candidate_data, perfect=False, custom
     campaignCRMs = ["Bullhorn", "Vincere"]
     if perfect and crm_type in campaignCRMs:
         searchFunc = "searchPerfectCandidates"
+    elif customSearch:
+        searchFunc = "searchCandidates{}".format(customSearch)
     else:
         searchFunc = "searchCandidates"
 
@@ -243,7 +245,7 @@ def searchCandidatesCustom(crm, companyID, candidate_data, perfect=False, custom
         if crm.Type is CRM.Jobscience:
             return eval(crm_type + "." + searchFunc + "(crm.Auth, data)")
         if crm.Type is CRM.Bullhorn:
-            return eval(crm_type + "." + searchFunc + "(crm.Auth, companyID, data, fields)")
+            return eval(crm_type + "." + searchFunc + "(crm.Auth, companyID, data, fields, **kwargs)")
 
         return eval(crm_type + "." + searchFunc + "(crm.Auth, companyID, data)")
     else:

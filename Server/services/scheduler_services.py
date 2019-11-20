@@ -10,8 +10,9 @@ from sqlalchemy.orm import joinedload
 from sqlalchemy.sql.expression import func
 
 from models import db, Callback, Assistant, Conversation, Company, AutoPilot
-from services import mail_services
+from services import mail_services, url_services
 from services.Marketplace.CRM import crm_services
+from services.Marketplace.Messenger import messenger_servicess
 from utilities import helpers, enums
 
 jobstores = {
@@ -76,6 +77,7 @@ def sendConversationsNotifications(assistantID=None):
 
 # If assistantID is supplied, it will only look for data relating to that assistant
 def sendAutopilotReferrals():
+    print("lalal")
     try:
         from app import app
         with app.app_context():
@@ -84,10 +86,18 @@ def sendAutopilotReferrals():
             now = datetime.now()
             autopilots = db.session.query(AutoPilot).filter(and_(AutoPilot.LastReferral != None, 24 <= func.TIMESTAMPDIFF(text('HOUR'), AutoPilot.LastReferral, yesterday))).all()
 
+            print("lalal")
             for ap in autopilots:
+                print("lalal")
                 crm_callback = crm_services.getCRMByType(enums.CRM.Bullhorn, ap.CompanyID)
                 if not crm_callback.Success:
                     raise Exception("Company is not connected to bullhorn")
+
+                messenger_callback = messenger_servicess.getMessengerByType(enums.Messenger.Twilio, ap.CompanyID)
+                if not messenger_callback.Success:
+                    raise Exception("Company is not connected to twilio")
+
+                messenger = messenger_callback.Data
 
                 crm = crm_callback.Data
                 params = [{"input": "dateBegin", "match": ap.LastReferral, "queryType": "BETWEEN", "match2": now}]
@@ -100,12 +110,22 @@ def sendAutopilotReferrals():
                     return
 
                 ids = [item['candidate']['id'] for item in search_callback.Data]
+                
+                candidate_search = crm_services.searchCandidatesCustom(crm, ap.CompanyID, ids, customData=True, fields="fields=mobile,email,name", customSearch="Dynamic", multiple=True)
+                
+                testChatbot : Assistant = db.session.query(Assistant).first() #NEEDS TO CHANGE
 
-                candidate_search = crm_services.searchCandidatesCustom(crm, ap.CompanyID, {"ids": ids}, customData=True, fields="fields=mobile,email")
+                hashedAssistantID = helpers.encodeID(testChatbot.ID)
 
-                print("-----")
-                print(candidate_search.Data)
-                print("-----")
+                messageText = "Hi {}".format("batu")
+                messageText += "%0aWe're happy you've been placed!"
+                messageText += "%0aCould you please refer us using this chatbot?%0a"
+                url = url_services.createShortenedURL(helpers.getDomain(3000) + "/chatbot_direct_link/" + \
+                  hashedAssistantID, domain="recruitbot.ai")
+                messageText += url.Data
+                # mail_services.simpleSend(candidate_email, campaign_details.get("email_title"), tempText)
+                messenger_servicess.sendMessage(messenger.Type, "07519228384", messageText, messenger.Auth)
+                ap.LastReferral = now
             # Save changes to the db
             db.session.commit()
 
@@ -136,5 +156,5 @@ def test():
 # Run scheduled tasks
 scheduler.add_job(sendConversationsNotifications, 'cron', hour='*/1', id='sendConversationsNotifications', replace_existing=True)
 scheduler.add_job(pingDatabaseConnection, 'cron', hour='*/5', id='pingDatabaseConnection', replace_existing=True)
-scheduler.add_job(sendAutopilotReferrals, 'cron', minute='*/3', id='sendAutopilotReferrals', replace_existing=True)
+scheduler.add_job(sendAutopilotReferrals, 'cron', second='*/10', id='sendAutopilotReferrals', replace_existing=True)
 # scheduler.add_job(test, 'cron', second='*/3', id='test', replace_existing=True)

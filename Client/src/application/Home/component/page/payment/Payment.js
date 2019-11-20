@@ -6,14 +6,14 @@ import {Container, Row, Col, Card} from "react-bootstrap";
 import {Fade} from "react-reveal";
 import SignupFormPayment from "./SignupFormPayment";
 import {WEBSITE_TITLE} from "../../../../../constants/config";
-import pricingJSON from "../pricing/pricingAgency.json";
+import plansJSON from "../pricing/tabs/lead-generation-plans.json";
 import {Elements} from 'react-stripe-elements';
 
 class Payment extends React.Component {
 
     state = {
         currentStep: 0,
-        planID: pricingJSON[pricingJSON.length - 1].id
+        planID: plansJSON[plansJSON.length - 1].id
     };
 
     componentDidMount() {

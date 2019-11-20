@@ -552,7 +552,7 @@ def searchCandidates(auth, companyID, data, fields=None) -> Callback:
                                                  [fields, query, "count=199"])
             if not sendQuery_callback.Success:
                 raise Exception(sendQuery_callback.Message)
-            print("lol")
+              
             return_body = json.loads(sendQuery_callback.Data.text)
             if return_body.get("total", 0) > 0 or "AND" not in query:
                 break

@@ -490,9 +490,10 @@ def convertToBullhornType(input):
 def queryGen(input, match, queryType, match2=None):
     queryText = ""
     if queryType == "BETWEEN":
-        queryText = "{{{} TO {}}}".format(convertToBullhornType(match), convertToBullhornType(match2))
+        print(match2)
+        queryText = "{}:{{{} TO {}}}".format(input, convertToBullhornType(match), convertToBullhornType(match2))
     elif queryType == "BETWEENEXCLUSIVE":
-        queryText = "[{} TO {}]".format(convertToBullhornType(match), convertToBullhornType(match2))
+        queryText = "{}: {} TO {}]".format(input, convertToBullhornType(match), convertToBullhornType(match2))
     elif queryType == "AND":
         queryText = "{}:{} AND".format(input, convertToBullhornType(match))
     elif queryType == "NOT":
@@ -507,7 +508,8 @@ def searchPlacement(auth, companyID, data, fields="fields=candidate"):
         query = "query="
         for item in data:
             query += queryGen(item['input'], item['match'], item['queryType'], item.get("match2", None))
-            
+        print("laaaaaaaaaaaaaaaaaaaaalol")
+        print(query)
 
         while True:
             sendQuery_callback: Callback = sendQuery(auth, "search/Placement", "get", {}, companyID,
@@ -522,11 +524,8 @@ def searchPlacement(auth, companyID, data, fields="fields=candidate"):
             query = "AND".join(query.split("AND")[:-1])
         
         result = []
-        print(return_body)
         for record in return_body["data"]:
             result.append(record)
-
-        print(result)
         return Callback(True, 'Gathered placement data', result)
     except Exception as exc:
         helpers.logError("Marketplace.CRM.Bullhorn.searchPlacement() ERROR: " + str(exc))

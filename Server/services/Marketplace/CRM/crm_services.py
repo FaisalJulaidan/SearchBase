@@ -246,7 +246,6 @@ def searchCandidatesCustom(crm, companyID, candidate_data, perfect=False):
 
 
 def searchPlacements(crm, companyID, params):
-    print(crm)
     crm_type = crm.Type.value
     if CRM.has_value(crm_type):
         if crm.Type is not CRM.Bullhorn:

@@ -1,16 +1,18 @@
 import os
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from apscheduler.executors.pool import ThreadPoolExecutor, ProcessPoolExecutor
 from apscheduler.jobstores.sqlalchemy import SQLAlchemyJobStore
 from apscheduler.schedulers.background import BackgroundScheduler
 from pytz import utc
-from sqlalchemy import and_
+from sqlalchemy import and_, text
 from sqlalchemy.orm import joinedload
+from sqlalchemy.sql.expression import func
 
-from models import db, Callback, Assistant, Conversation, Company
+from models import db, Callback, Assistant, Conversation, Company, AutoPilot
 from services import mail_services
-from utilities import helpers
+from services.Marketplace.CRM import crm_services
+from utilities import helpers, enums
 
 jobstores = {
     'default': SQLAlchemyJobStore(url=os.environ['SQLALCHEMY_DATABASE_URI'])
@@ -72,6 +74,36 @@ def sendConversationsNotifications(assistantID=None):
         helpers.logError(str(e))
 
 
+# If assistantID is supplied, it will only look for data relating to that assistant
+def sendAutopilotReferrals():
+    try:
+        from app import app
+        with app.app_context():
+            #NEEDS STORED FILEREIMPLEMENTED
+            yesterday = datetime.now() - timedelta(days=1)
+            now = datetime.now()
+            autopilots = db.session.query(AutoPilot).filter(and_(AutoPilot.LastReferral != None, 24 <= func.TIMESTAMPDIFF(text('HOUR'), AutoPilot.LastReferral, yesterday))).all()
+
+            for ap in autopilots:
+                crm_callback = crm_services.getCRMByType(enums.CRM.Bullhorn, ap.CompanyID)
+                if not crm_callback.Success:
+                    raise Exception("Company is not connected to bullhorn")
+
+                crm = crm_callback.Data
+                print(ap.LastReferral)
+                params = [{"input": "dateBegin", "match": ap.LastReferral, "queryType": "BETWEEN", "match2": now}]
+                print(crm)
+                print(crm.Auth)
+                search_callback = crm_services.searchPlacements(crm, ap.CompanyID, params)
+                print(search_callback.Data)
+
+            # Save changes to the db
+            db.session.commit()
+
+    except Exception as e:
+        print('rah')
+        helpers.logError(str(e))
+
 ''' 
 This function is to fix the constant lose of database connection after the wait_timeout has passed.
 It will make the simplest query to the database every while to make sure the connection is alive
@@ -95,4 +127,5 @@ def test():
 # Run scheduled tasks
 scheduler.add_job(sendConversationsNotifications, 'cron', hour='*/1', id='sendConversationsNotifications', replace_existing=True)
 scheduler.add_job(pingDatabaseConnection, 'cron', hour='*/5', id='pingDatabaseConnection', replace_existing=True)
+scheduler.add_job(sendAutopilotReferrals, 'cron', second='*/10', id='sendAutopilotReferrals', replace_existing=True)
 # scheduler.add_job(test, 'cron', second='*/3', id='test', replace_existing=True)

@@ -214,16 +214,19 @@ def searchCandidates(assistant: Assistant, session):
         return Callback(False, "CRM type did not match with those on the system")
 
 
-def searchCandidatesCustom(crm, companyID, candidate_data, perfect=False):
-    data = {
-        "location": candidate_data.get("location"),
-        "preferredJotTitle": candidate_data.get("jobTitle"),
-        "skills": candidate_data.get("skills"),
-        "jobType": candidate_data.get("jobType")
-        # "yearsExperience": checkFilter(session['keywordsByDataType'], DT.CandidateYearsExperience),
-        # "jobCategory": checkFilter(session['keywordsByDataType'], DT.CandidateJobCategory),
-        # "education": checkFilter(session['keywordsByDataType'], DT.CandidateEducation)
-    }
+def searchCandidatesCustom(crm, companyID, candidate_data, perfect=False, customData=False, fields=None):
+    if customData:
+        data = candidate_data
+    else:
+        data = {
+            "location": candidate_data.get("location"),
+            "preferredJotTitle": candidate_data.get("jobTitle"),
+            "skills": candidate_data.get("skills"),
+            "jobType": candidate_data.get("jobType")
+            # "yearsExperience": checkFilter(session['keywordsByDataType'], DT.CandidateYearsExperience),
+            # "jobCategory": checkFilter(session['keywordsByDataType'], DT.CandidateJobCategory),
+            # "education": checkFilter(session['keywordsByDataType'], DT.CandidateEducation)
+        }
 
     crm_type = crm.Type.value
     campaignCRMs = ["Bullhorn", "Vincere"]
@@ -239,6 +242,8 @@ def searchCandidatesCustom(crm, companyID, candidate_data, perfect=False):
             return eval(crm_type + "." + searchFunc + "(crm.Auth)")
         if crm.Type is CRM.Jobscience:
             return eval(crm_type + "." + searchFunc + "(crm.Auth, data)")
+        if crm.Type is CRM.Bullhorn:
+            return eval(crm_type + "." + searchFunc + "(crm.Auth, companyID, data, fields)")
 
         return eval(crm_type + "." + searchFunc + "(crm.Auth, companyID, data)")
     else:

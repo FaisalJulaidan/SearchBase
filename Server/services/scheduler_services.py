@@ -90,13 +90,22 @@ def sendAutopilotReferrals():
                     raise Exception("Company is not connected to bullhorn")
 
                 crm = crm_callback.Data
-                print(ap.LastReferral)
                 params = [{"input": "dateBegin", "match": ap.LastReferral, "queryType": "BETWEEN", "match2": now}]
-                print(crm)
-                print(crm.Auth)
                 search_callback = crm_services.searchPlacements(crm, ap.CompanyID, params)
-                print(search_callback.Data)
 
+                if not search_callback.Success:
+                    raise Exception("Placement search failed")
+                
+                if len(search_callback.Data) == 0:
+                    return
+
+                ids = [item['candidate']['id'] for item in search_callback.Data]
+
+                candidate_search = crm_services.searchCandidatesCustom(crm, ap.CompanyID, {"ids": ids}, customData=True, fields="fields=mobile,email")
+
+                print("-----")
+                print(candidate_search.Data)
+                print("-----")
             # Save changes to the db
             db.session.commit()
 

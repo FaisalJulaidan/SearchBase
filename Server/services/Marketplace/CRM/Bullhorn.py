@@ -490,7 +490,6 @@ def convertToBullhornType(input):
 def queryGen(input, match, queryType, match2=None):
     queryText = ""
     if queryType == "BETWEEN":
-        print(match2)
         queryText = "{}:{{{} TO {}}}".format(input, convertToBullhornType(match), convertToBullhornType(match2))
     elif queryType == "BETWEENEXCLUSIVE":
         queryText = "{}: {} TO {}]".format(input, convertToBullhornType(match), convertToBullhornType(match2))
@@ -508,9 +507,6 @@ def searchPlacement(auth, companyID, data, fields="fields=candidate"):
         query = "query="
         for item in data:
             query += queryGen(item['input'], item['match'], item['queryType'], item.get("match2", None))
-        print("laaaaaaaaaaaaaaaaaaaaalol")
-        print(query)
-
         while True:
             sendQuery_callback: Callback = sendQuery(auth, "search/Placement", "get", {}, companyID,
                                                  [fields, query, "count=199"])
@@ -539,7 +535,6 @@ def searchCandidates(auth, companyID, data, fields=None) -> Callback:
             fields = "fields=id,name,email,mobile,address,primarySkills,status,educations,dayRate,salary"
 
         # populate filter
-        
         if not data.get("ids"):
             query += populateFilter(data.get("location"), "address.city")
 
@@ -557,7 +552,7 @@ def searchCandidates(auth, companyID, data, fields=None) -> Callback:
                                                  [fields, query, "count=199"])
             if not sendQuery_callback.Success:
                 raise Exception(sendQuery_callback.Message)
-
+            print("lol")
             return_body = json.loads(sendQuery_callback.Data.text)
             if return_body.get("total", 0) > 0 or "AND" not in query:
                 break

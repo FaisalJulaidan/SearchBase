@@ -1,10 +1,10 @@
-import React, { Component } from 'react';
-import { connect } from 'react-redux';
-import { store } from 'store/store';
+import React, {Component} from 'react';
+import {connect} from 'react-redux';
+import {store} from 'store/store';
 
 import {Button, Select, Form, Input, InputNumber, Divider, Switch, Modal, Radio} from 'antd';
 import {assistantActions, usersManagementActions} from 'store/actions';
-import { history } from 'helpers';
+import {history} from 'helpers';
 
 import countries from 'helpers/static_data/countries';
 import LogoUploader from 'components/LogoUploader/LogoUploader';
@@ -61,12 +61,12 @@ class Settings extends Component {
                 ...this.props.assistant.Config,
                 restrictedCountries: values.restrictedCountries || []
             };
-
             values.Owners = [].push(values.Owners); //To be removed when server-side codes for multiple owners are ready
             // values.Owners = values.Owners || []; //To be uncommented after removing above line
 
             delete values.restrictedCountries;
             values.notifyEvery = this.state.notifyEvery;
+            // console.log(values);
 
             store.dispatch(assistantActions.updateAssistantConfigs(this.props.assistant.ID, values));
         }
@@ -96,8 +96,16 @@ class Settings extends Component {
         const {getFieldDecorator} = this.props.form;
         const {assistant} = this.props;
         const countriesOptions = [...countries.map(country => <Option key={country.code}>{country.name}</Option>)];
-        const ownersOptions = [this.props.usersList?.map(user => <Option
-            key={user.user.ID}>{`${user.user.Firstname} ${user.user.Surname} (${user.user.Email})`}</Option>)];
+        const ownersOptions = [this.props.usersList?.map(user => {
+                return (
+                    <Option
+                        key={user.user.ID}>{`${user.user.Firstname} ${user.user.Surname} (${user.user.Email})`}
+                    </Option>
+                );
+            }
+        )];
+
+
         return (
             <>
                 <Form layout='vertical' wrapperCol={{span: 10}}>

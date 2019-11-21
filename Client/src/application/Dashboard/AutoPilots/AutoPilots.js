@@ -5,7 +5,7 @@ import {Icon, Typography, Menu, Modal, Tabs} from 'antd';
 import 'types/TimeSlots_Types'
 
 import AssistantAutopilots from './Assistant/AssistantAutopilots'
-import CRMAutopilots from './CRM/CRMAutopilot'
+import CRMAutopilots from './CRM/CRMAutopilots'
 
 const {Title, Paragraph} = Typography;
 
@@ -54,10 +54,10 @@ class AutoPilots extends React.Component {
                         </Paragraph>
                     </div>
                     <Tabs onTabClick={this.setTab} activeKey={key}>
-                      <Tabs.TabPane tab="Assistant Autopilot" key="Assistant">
+                      <Tabs.TabPane tab="Assistant Autopilots" key="Assistant">
                           <AssistantAutopilots/>
                       </Tabs.TabPane>
-                      <Tabs.TabPane tab="CRM Autopilot" key="CRM">
+                      <Tabs.TabPane tab="CRM Autopilots" key="CRM">
                           <CRMAutopilots/>
                       </Tabs.TabPane>
                     </Tabs>

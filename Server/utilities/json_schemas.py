@@ -12,6 +12,7 @@ assistant_config = {
     "additionalProperties": False
 }
 
+
 conversation = {
     "type": "object",
     "properties": {

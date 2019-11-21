@@ -8,6 +8,8 @@ import pandas
 from sqlalchemy import and_
 from sqlalchemy_utils import Currency
 
+from services.Marketplace.marketplace_helpers import convertSkillsToString
+from utilities.enums import DatabaseType, DataType as DT
 from models import db, Callback, Database, Candidate, Assistant, Job
 from services import assistant_services
 from services.Marketplace.CRM import crm_services
@@ -388,12 +390,15 @@ def scanCandidates(session, dbIDs, extraCandidates=None, campaign=False):
         __wordsCounter(DT.CandidateLocation, Candidate.CandidateLocation, keywords, df, 6)
 
         # JobTitle
+        __wordsCounter(DT.CandidateJobTitle, Candidate.CandidateJobTitle, keywords, df, 1)
         __wordsCounter(DT.JobTitle, Candidate.CandidateJobTitle, keywords, df, 1)
 
         # Skills
         __wordsCounter(DT.CandidateSkills, Candidate.CandidateSkills, keywords, df, 2)
         __wordsCounter(DT.JobEssentialSkills, Candidate.CandidateSkills, keywords, df, 2)
 
+        # Availability
+        __wordsCounter(DT.CandidateAvailability, Candidate.CandidateAvailability, keywords, df, 1)
 
         topResults = json.loads(df[df['Score'] > 0].nlargest(session.get('showTop', 2), 'Score')
                                 .to_json(orient='records'))
@@ -472,6 +477,7 @@ def scanJobs(session, dbIDs, extraJobs=None):
         # Check if there are no Jobs.
         if not len(df):
             return Callback(True, '', [])
+
 
         # Fill None values with 0 for numeric columns and with empty string for string columns
         df = df.fillna({Job.JobSalary.name: 0, Job.JobYearsRequired.name: 0}).fillna('')
@@ -603,6 +609,7 @@ def __salary(row, dbSalaryColumn, dbCurrencyColumn, salaryInput: str, plus=4, fo
     # Convert db salary currency if did not match with user's entered currency
     dbSalary = row[dbSalaryColumn.name] or 0
     if (row[dbCurrencyColumn.name] != userSalary[1]) and dbSalary > 0:
+        print("Convert")
         dbSalary = helpers.currencyConverter.convert(row[dbCurrencyColumn.name], userSalary[1], dbSalary)
         row[dbSalaryColumn.name] = dbSalary
 

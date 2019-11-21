@@ -14,5 +14,11 @@ class Webhook(db.Model):
     Company = db.relationship('Company', back_populates='Webhooks')
 
 
+# owners_table = db.Table('owners', db.Model.metadata,
+#                              db.Column('user_id', db.Integer, db.ForeignKey(User.ID)),
+#                              db.Column('assistant_id', db.Integer, db.ForeignKey("Assistants.ID"))
+#                              )
+
+
 def __repr__(self):
         return '<Webhooks {}>'.format(self.ID)

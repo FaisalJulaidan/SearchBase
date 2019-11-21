@@ -20,14 +20,19 @@ def testConnection(auth):
         return Callback(False, "Error in testing")
 
 
-def sendMessage(sendto, body, auth):
-    print("Attempting to send message")
+def sendMessage(sendto, body, auth, whatsapp=False):
+    # print("Attempting to send message")
     try:
         client = Client(auth.get("account_sid"), auth.get("auth_token"))
+        sender = auth.get("phone_number")
+
+        if whatsapp:
+            sendto = "whatsapp:" + sendto
+            sender = "whatsapp:" + sender
 
         message = client.messages.create(
             to=sendto,
-            from_=auth.get("phone_number"),
+            from_=sender,
             body=body)
 
         print(message.sid)

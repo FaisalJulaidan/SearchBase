@@ -13,6 +13,7 @@ export const CONTENT_TEXT = 'text';
 export const CONTENT_AFTER_MESSAGE = 'afterMessage';
 export const CONTENT_KEYWORDS = 'keywords';
 export const CONTENT_ANSWERS = 'answers';
+export const CONTENT_TYPES = 'types';
 
 export const SKIP_ACTION = 'SkipAction';
 export const SKIP_BLOCKTOGOID = 'SkipBlockToGoID';
@@ -31,6 +32,8 @@ export const USER_INPUT_BLOCKTOGOID = SUPER_BLOCKTOGOID;
 export const FILE_UPLOAD_FILE_TYPES = 'fileTypes';
 export const FILE_UPLOAD_ACTION = SUPER_ACTION;
 export const FILE_UPLOAD_BLOCKTOGOID = SUPER_BLOCKTOGOID;
+
+
 
 export const QUESTION_ANSWERS = 'answers';
 export const QUESTION_TEXT = 'text';

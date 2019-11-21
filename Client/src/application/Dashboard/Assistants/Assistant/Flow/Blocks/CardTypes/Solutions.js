@@ -11,7 +11,7 @@ import {
     SkipFormItem,
     ShowGoToBlockSkipFormItem,
     ShowGoToGroupSkipFormItem, SkippableFormItem, SkipTextFormItem
-} from './CardTypesFormItems'
+} from './FormItems'
 
 const FormItem = Form.Item;
 

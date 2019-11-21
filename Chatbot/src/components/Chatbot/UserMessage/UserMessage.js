@@ -7,6 +7,7 @@ import './styles/UserMessage.css';
 // Components
 import TextMessage from './TextMessage';
 import { Icon, Tooltip } from 'antd';
+import { getContainerElement } from '../../helpers';
 
 const UserMessage = ({ type, message, addUserMessage, setChatbotStatus, rewind, finished }) => {
     const addStatus = (component) => {
@@ -32,12 +33,7 @@ const UserMessage = ({ type, message, addUserMessage, setChatbotStatus, rewind, 
     return (
         <div className={'User'}>
             {finished ? null : <Tooltip placement={'left'}
-                                        getPopupContainer={() => {
-                                            if (document.getElementById('TheSearchBase_Chatbot_Input'))
-                                                return document.getElementById('TheSearchBase_Chatbot_Input');
-                                            else
-                                                return document.getElementById('TheSearchBase_Chatbot')
-                                        }}
+                                        getPopupContainer={() => getContainerElement()}
                                         title="Rewind to change your answer to this question">
                 <Icon type="sync" onClick={() => rewind(message.index)}/>
             </Tooltip>}

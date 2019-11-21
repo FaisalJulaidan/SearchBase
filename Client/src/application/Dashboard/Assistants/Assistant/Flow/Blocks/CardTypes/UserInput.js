@@ -1,6 +1,6 @@
-import React, {Component} from 'react';
-import {Card, Divider, Form, Icon, Input, Tag, Tooltip} from "antd";
-import {getInitialVariables, initActionType, initActionTypeSkip} from './CardTypesHelpers'
+import React, { Component } from 'react';
+import { Card, Divider, Form, Icon, Input, Tag, Tooltip } from 'antd';
+import { getInitialVariables, initActionType, initActionTypeSkip } from './CardTypesHelpers';
 import {
     ActionFormItem,
     AfterMessageFormItem,
@@ -15,7 +15,7 @@ import {
     SkippableFormItem,
     SkipTextFormItem,
     StoreInDBFormItem
-} from './CardTypesFormItems'
+} from './FormItems';
 
 const FormItem = Form.Item;
 
@@ -35,8 +35,8 @@ class UserInput extends Component {
     };
 
     componentDidMount() {
-        const {modalState, options} = this.props;
-        const {block} = getInitialVariables(options.flow, modalState);
+        const { modalState, options } = this.props;
+        const { block } = getInitialVariables(options.flow, modalState);
         this.setState({
             ...initActionType(block, this.props.modalState.allGroups),
             ...initActionTypeSkip(block, this.props.modalState.allGroups),
@@ -114,7 +114,8 @@ class UserInput extends Component {
                     <DataTypeFormItem FormItem={FormItem} block={block}
                                       getFieldDecorator={getFieldDecorator}
                                       options={this.props.options}
-                                      layout={layout}/>
+                                      layout={layout}
+                                      blockType={"User Input"}/>
 
                     <FormItem label="Scoring Keywords" {...layout}
                               extra="Every matched keyword from user input will add up to the score">

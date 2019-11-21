@@ -1,12 +1,12 @@
-import React, {Component} from 'react';
+import React, { Component } from 'react';
 
-import styles from "./Blocks.module.less";
-import {Button, Form, Modal, Empty} from "antd";
+import styles from './Blocks.module.less';
+import { Button, Empty, Form } from 'antd';
 
-import Block from "./Block/Block";
-import {DragDropContext, Draggable, Droppable} from 'react-beautiful-dnd';
-import NewBlockModal from "./Modals/NewBlockModal";
-import EditBlockModal from "./Modals/EditBlockModal1";
+import Block from './Block/Block';
+import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd';
+import NewBlockModal from './Modals/NewBlockModal';
+import EditBlockModal from './Modals/EditBlockModal1';
 
 // a little function to help us with reordering the result
 const reorder = (list, startIndex, endIndex) => {
@@ -18,12 +18,12 @@ const reorder = (list, startIndex, endIndex) => {
 };
 
 const getItemStyle = draggableStyle => ({margin: `0 0 8px 0`, ...draggableStyle});
-const confirm = Modal.confirm;
 
 class Blocks extends Component {
 
     state = {
         addBlockVisible: false,
+        // addBlockVisible: true,
         editBlockVisible: false,
         deleteBlockVisible: false,
         blocks: [],

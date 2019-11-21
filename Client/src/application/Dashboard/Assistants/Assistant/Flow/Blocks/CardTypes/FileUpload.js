@@ -12,7 +12,7 @@ import {
     ShowGoToBlockFormItem, ShowGoToBlockSkipFormItem,
     ShowGoToGroupFormItem, ShowGoToGroupSkipFormItem, SkipFormItem,
     SkippableFormItem, SkipTextFormItem
-} from './CardTypesFormItems'
+} from './FormItems'
 
 const FormItem = Form.Item;
 
@@ -94,7 +94,8 @@ class FileUpload extends Component {
                     <DataTypeFormItem FormItem={FormItem} block={block}
                                       getFieldDecorator={getFieldDecorator}
                                       options={this.props.options}
-                                      layout={layout}/>
+                                      layout={layout}
+                                      blockType={"File Upload"}/>
 
                     <FileTypesFormItem FormItem={FormItem} typesAllowed={typesAllowed} block={block}
                                        getFieldDecorator={getFieldDecorator}

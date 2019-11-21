@@ -1,10 +1,14 @@
-import React, {Component} from 'react';
-import {Icon, Modal} from 'antd';
-import UserInput from "../CardTypes/UserInput";
-import Question from "../CardTypes/Question";
-import FileUpload from "../CardTypes/FileUpload";
-import Solutions from "../CardTypes/Solutions";
-import RawText from "../CardTypes/RawText";
+import React, { Component } from 'react';
+import { Modal } from 'antd';
+import UserInput from '../CardTypes/UserInput';
+import Question from '../CardTypes/Question';
+import FileUpload from '../CardTypes/FileUpload';
+import Solutions from '../CardTypes/Solutions';
+import RawText from '../CardTypes/RawText';
+import SalaryPicker from '../CardTypes/SalaryPicker';
+import JobType from '../CardTypes/JobType';
+import UserType from '../CardTypes/UserType';
+import DatePicker from '../CardTypes/DatePicker';
 
 class EditBlockModal extends Component {
 
@@ -48,14 +52,17 @@ class EditBlockModal extends Component {
                                handleEditBlock={this.handleEditBlock}
                                handleDeleteBlock={this.props.handleDeleteBlock}
                                options={this.props.options}/> : null}
+
                 {this.props.block.Type === "Question" ?
                     <Question modalState={this.state} handleEditBlock={this.handleEditBlock}
                               handleDeleteBlock={this.props.handleDeleteBlock}
                               options={this.props.options}/> : null}
+
                 {this.props.block.Type === "File Upload" ?
                     <FileUpload modalState={this.state} handleEditBlock={this.handleEditBlock}
                                 handleDeleteBlock={this.props.handleDeleteBlock}
                                 options={this.props.options}/> : null}
+
                 {this.props.block.Type === "Solutions" ?
                     <Solutions modalState={this.state} handleEditBlock={this.handleEditBlock}
                                handleDeleteBlock={this.props.handleDeleteBlock}
@@ -65,6 +72,34 @@ class EditBlockModal extends Component {
                     <RawText modalState={this.state} handleEditBlock={this.handleEditBlock}
                              handleDeleteBlock={this.props.handleDeleteBlock}
                              options={this.props.options}/> : null
+                }
+
+                {this.props.block.Type === 'Salary Picker' ?
+                    <SalaryPicker modalState={this.state}
+                                  handleEditBlock={this.handleEditBlock}
+                                  handleDeleteBlock={this.props.handleDeleteBlock}
+                                  options={this.props.options}/> : null
+                }
+
+                {this.props.block.Type === 'Job Type' ?
+                    <JobType modalState={this.state}
+                             handleEditBlock={this.handleEditBlock}
+                             handleDeleteBlock={this.props.handleDeleteBlock}
+                             options={this.props.options}/> : null
+                }
+
+                {this.props.block.Type === 'User Type' ?
+                    <UserType modalState={this.state}
+                              handleEditBlock={this.handleEditBlock}
+                              handleDeleteBlock={this.props.handleDeleteBlock}
+                              options={this.props.options}/> : null
+                }
+
+                {this.props.block.Type === 'Date Picker' ?
+                    <DatePicker modalState={this.state}
+                                handleEditBlock={this.handleEditBlock}
+                                handleDeleteBlock={this.props.handleDeleteBlock}
+                                options={this.props.options}/> : null
                 }
 
 

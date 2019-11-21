@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, { useEffect, useState } from 'react';
 // Constants
 import * as flowAttributes from '../../../constants/FlowAttributes';
 import * as messageTypes from '../../../constants/MessageType';
@@ -9,6 +9,7 @@ import './styles/BotMessage.css';
 import Question from './Question';
 import TextMessage from './TextMessage';
 import Solutions from './Solutions';
+import PredefinedAnswers from './PredefinedAnswers';
 
 const BotMessage = ({ type, message, addUserMessage, addBotMessage, setChatbotStatus, index, active, thinking }) => {
     let [skip, setSkip] = useState({skipText: false, skippable: false});
@@ -67,29 +68,37 @@ const BotMessage = ({ type, message, addUserMessage, addBotMessage, setChatbotSt
     const findMessageType = (type, message) => {
         let { block } = message;
         switch (type) {
-            case messageTypes.TEXT:
-            case messageTypes.USER_INPUT:
-            case messageTypes.FILE_UPLOAD:
-            case messageTypes.RAW_TEXT:
+            case messageTypes.JOB_TYPE:
+            case messageTypes.USER_TYPE:
                 return (
-                    <TextMessage
-                        key={message.index}
-                        text={message.text}
-                    />);
+                    <PredefinedAnswers submitAnswer={submitAnswer}
+                                        key={message.index}
+                                        answers={message.block[flowAttributes.CONTENT]['types']}
+                                        question={message.block[flowAttributes.CONTENT][flowAttributes.QUESTION_TEXT]}/>
+                );
             case messageTypes.QUESTION:
                 return (
                     <Question
                         submitAnswer={submitAnswer}
                         key={message.index}
                         answers={message.block[flowAttributes.CONTENT][flowAttributes.QUESTION_ANSWERS]}
-                        question={message.block[flowAttributes.CONTENT][flowAttributes.QUESTION_TEXT]}/>);
+                        question={message.block[flowAttributes.CONTENT][flowAttributes.QUESTION_TEXT]}/>
+                );
             case messageTypes.SOLUTIONS:
-                return (<Solutions
-                    solutions={block.fetchedData.solutions}
-                    submitSolution={submitSolution}
-                    afterMessage={message.block[flowAttributes.CONTENT][flowAttributes.CONTENT_AFTER_MESSAGE]}/>);
+                return (
+                    <Solutions
+                        solutions={block.fetchedData.solutions}
+                        submitSolution={submitSolution}
+                        afterMessage={message.block[flowAttributes.CONTENT][flowAttributes.CONTENT_AFTER_MESSAGE]}/>
+                );
 
             default:
+                return (
+                    <TextMessage
+                        key={message.index}
+                        text={message.text}
+                    />
+                );
         }
     };
 

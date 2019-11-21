@@ -1,0 +1,27 @@
+[
+  {
+    "title": "Cordant Group",
+    "image": "/static/images/home/partners/cordant.png",
+    "link": "https://www.cordantgroup.com/"
+  },
+  {
+    "title": "Acorn People",
+    "image": "/static/images/home/partners/acorn.png",
+    "link": "https://www.acornpeople.com/"
+  },
+  {
+    "title": "PRS Recruitment Service",
+    "image": "/static/images/home/partners/prs.png",
+    "link": "https://www.prsjobs.com/"
+  },
+  {
+    "title": "CPS Group",
+    "image": "/static/images/home/partners/cps.png",
+    "link": "https://www.cpsgroupuk.com/"
+  },
+  {
+    "title": "Claremont Consulting",
+    "image": "/static/images/home/partners/claremont.png",
+    "link": "https://www.claremontconsulting.com/"
+  }
+]

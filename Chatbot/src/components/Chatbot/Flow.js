@@ -63,7 +63,6 @@ const Flow = ({messages, setChatbotStatus, addUserMessage, addBotMessage, hideSi
     })
 
     useEffect(() => {
-        console.log(inputOpen)
         let timeOut = setTimeout(() => {
             flowRef.current.scrollTo({ top: scrollRef.current.offsetTop, behavior: 'smooth' });
         }, 200);

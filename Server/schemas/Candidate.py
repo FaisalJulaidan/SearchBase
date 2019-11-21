@@ -9,7 +9,8 @@ class Candidate(db.Model):
     CandidateLocation = db.Column(db.String(64), nullable=False) # Required
     CandidateSkills = db.Column(db.String(5000), nullable=False) # Required
     CandidateLinkdinURL = db.Column(db.String(512), nullable=True)
-    CandidateAvailability = db.Column(db.String(64), nullable=True)
+    CandidateAvailability = db.Column(db.String(120), nullable=True)
+    CandidateConsultantName = db.Column(db.String(64), nullable=True)
     CandidateJobTitle = db.Column(db.String(120), nullable=True)
     CandidateEducation = db.Column(db.String(64), nullable=True)
     CandidateYearsExperience = db.Column(db.Float(), nullable=True)

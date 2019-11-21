@@ -12,6 +12,7 @@ import Integrations from "./integrations/Integrations";
 import KeyFeatures from "./key-features/KeyFeatures";
 import Conversations from "./conversations/Conversations";
 import Statistics from "./statistics/Statistics";
+import Partners from "./partners/Partners";
 
 const Home = () => {
 
@@ -23,9 +24,11 @@ const Home = () => {
                 <section className={styles.section}>
                     <Intro/>
                 </section>
-                <DividerButton scrollTo="videoIntro"/>
                 <section className={styles.section}>
-                    <MessageIntro id="videoIntro"/>
+                    <Partners/>
+                </section>
+                <section className={styles.section}>
+                    <MessageIntro id="intro2"/>
                 </section>
                 <DividerButton scrollTo="ourFocus"/>
                 <section className={styles.section}>

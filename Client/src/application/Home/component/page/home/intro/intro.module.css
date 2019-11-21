@@ -1,16 +1,4 @@
-.image_wrapper {
-    position: relative;
-    width: 100%;
-    height: 0;
-    padding-top: 75.44%;
-}
 
-.image_wrapper .image {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-}
 
 .text_col {
     line-height: normal;

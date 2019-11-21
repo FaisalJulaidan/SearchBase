@@ -12,13 +12,12 @@ assistant_config = {
     "additionalProperties": False
 }
 
-
 conversation = {
     "type": "object",
     "properties": {
         "collectedData": {"type": "array", "items": {
             "type": "object",
-            "properties":{
+            "properties": {
                 "blockID": {"type": "string"},
                 "questionText": {"type": "string"},
                 "dataType": {"enum": [e.value['name'] for e in enums.DataType]},
@@ -32,7 +31,7 @@ conversation = {
         "keywordsByDataType": {"type": "object", "items": {"type": "array"}},
         "selectedSolutions": {"type": "array", "items": {
             "type": "object",
-            "properties":{
+            "properties": {
                 "data": {"type": "object"},
                 "databaseType": {"enum": [e.name for e in enums.DatabaseType]},
             },
@@ -44,20 +43,18 @@ conversation = {
     "additionalProperties": False
 }
 
-
-
 flow = {
     "type": "object",
     "properties": {
         "groups": {"type": "array", "items": {
             "type": "object",
-            "properties":{
+            "properties": {
                 "id": {"type": "string"},
                 "name": {"type": "string"},
                 "description": {"type": "string"},
                 "blocks": {"type": "array", "items": {
                     "type": "object",
-                    "properties":{
+                    "properties": {
                         "ID": {"type": "string"},
                         "DataType": {"enum": [e.name for e in enums.DataType]},
                         "Type": {"enum": [e.value for e in enums.BlockType]},
@@ -71,13 +68,13 @@ flow = {
                     "required": ["ID", "DataType", "Type", "StoreInDB", "Skippable", "SkipAction",
                                  "SkipBlockToGoID", "SkipText", "Content"],
                     "additionalProperties": False
-                    }
                 }
+                           }
             },
             "required": ["id", "name", "description", "blocks"],
             "additionalProperties": False
-            }
-        },
+        }
+                   },
     },
     "required": ["groups"],
     "additionalProperties": False
@@ -120,7 +117,7 @@ UserInput = {
         "afterMessage": {"type": "string"},
         "keywords": {"type": "array", "items": {"type": "string"}},
     },
-    "required": ["text", "action", "afterMessage", "blockToGoID"], #, "keywords"
+    "required": ["text", "action", "afterMessage", "blockToGoID", "keywords"],
     "additionalProperties": False
 }
 
@@ -159,5 +156,84 @@ RawText = {
         "blockToGoID": {"type": ["string", "null"]},
     },
     "required": ["text", "action", "blockToGoID"],
+    "additionalProperties": False
+}
+
+SalaryPicker = {
+    "type": "object",
+    "properties": {
+        "text": {"type": "string"},
+        "min": {"type": "integer", "minimum": 0},
+        "max": {"type": "integer", "minimum": 1},
+        "period": {"enum": ["Annually", "Daily"]},
+        "currency": {"enum": ['GBP', 'USD', 'EUR', 'CAD', 'AUD']},
+        "blockToGoID": {"type": ["string", "null"]},
+        "action": {"enum": [e.value for e in enums.BlockAction]},
+        "afterMessage": {"type": "string"},
+    },
+    "required": ["text", "min", "max", "period", "currency", "blockToGoID", "action", "afterMessage",],
+    "additionalProperties": False
+}
+
+UserType = {
+    "type": "object",
+    "properties": {
+        "text": {"type": "string"},
+        "types": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "text": {"type": "string"},
+                    "value": {"enum": [ut.value for ut in enums.UserType]},
+                    "blockToGoID": {"type": ["string", "null"]},
+                    "action": {"enum": [e.value for e in enums.BlockAction]},
+                    "score": {"type": "integer"},
+                    "afterMessage": {"type": "string"},
+                },
+                "required": ["text", "value", "blockToGoID", "action", "score", "afterMessage"],
+                "additionalProperties": False
+            }
+        }
+    },
+    "required": ["text", "types"],
+    "additionalProperties": False
+}
+
+JobType = {
+    "type": "object",
+    "properties": {
+        "text": {"type": "string"},
+        "types": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "text": {"type": "string"},
+                    "value": {"enum": [jt.value for jt in enums.JobType]},
+                    "blockToGoID": {"type": ["string", "null"]},
+                    "action": {"enum": [e.value for e in enums.BlockAction]},
+                    "score": {"type": "integer"},
+                    "afterMessage": {"type": "string"},
+                },
+                "required": ["text", "value", "blockToGoID", "action", "score", "afterMessage"],
+                "additionalProperties": False
+            }
+        }
+    },
+    "required": ["text", "types"],
+    "additionalProperties": False
+}
+
+DatePicker = {
+    "type": "object",
+    "properties": {
+        "text": {"type": "string"},
+        "type": {"enum": ["Exact", "Multiple"]},
+        "blockToGoID": {"type": ["string", "null"]},
+        "action": {"enum": [e.value for e in enums.BlockAction]},
+        "afterMessage": {"type": "string"},
+    },
+    "required": ["text", "type", "action", "blockToGoID", "afterMessage"],
     "additionalProperties": False
 }

@@ -12,7 +12,7 @@ crm_auto_pilot_router: Blueprint = Blueprint('crm_auto_pilot_router', __name__, 
 @crm_auto_pilot_router.route("/crm_auto_pilots", methods=['GET', 'POST'])
 @jwt_required
 @wrappers.AccessAutoPilotRequired
-def auto_pilots():
+def crm_auto_pilots():
     # Authenticate
     user = get_jwt_identity()['user']
 
@@ -25,7 +25,7 @@ def auto_pilots():
     if request.method == "POST":
         callback: Callback = crm_auto_pilot_services.create(request.json.get('name'),
                                                         request.json.get('description'),
-                                                        request.json.get('CRM_type')
+                                                        request.json.get('CRM_type'),
                                                         user['companyID'])
         if not callback.Success:
             return helpers.jsonResponse(False, 400, callback.Message, None)

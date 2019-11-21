@@ -127,7 +127,7 @@ const updateStatusFailure = (errorMsg) => ({
     errorMsg
 });
 
-export const autoPilotActions = {
+export const CRMAutoPilotActions = {
     fetchCRMAutoPilots,
     fetchCRMAutoPilotsSuccess,
     fetchCRMAutoPilotsFailure,

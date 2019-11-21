@@ -1,16 +1,15 @@
 import {all, put, takeLatest} from 'redux-saga/effects'
 import * as actionTypes from '../actions/actionTypes';
-import {autoPilotActions} from "../actions";
+import {CRMAutoPilotActions, autoPilotActions} from "../actions";
 import {errorMessage, http, loadingMessage, successMessage} from "helpers";
 
 function* fetchCRMAutoPilots() {
     try {
         const res = yield http.get(`/crm_auto_pilots`);
-        yield put(autoPilotActions.fetchAutoPilotsSuccess(res.data?.data));
-
+        yield put(CRMAutoPilotActions.fetchCRMAutoPilotsSuccess(res.data?.data));
     } catch (error) {
-        const msg = error.response?.data?.msg || "Couldn't load auto pilots";
-        yield put(autoPilotActions.fetchAutoPilotsFailure(msg));
+        const msg = error.response?.data?.msg || "Couldn't load CRM auto pilots";
+        yield put(CRMAutoPilotActions.fetchCRMAutoPilotsFailure(msg));
         errorMessage(msg);
     }
 }
@@ -21,7 +20,7 @@ function* fetchCRMAutoPilot({autoPilotID, meta}) {
         yield put({...autoPilotActions.fetchAutoPilotSuccess(res.data?.data), meta});
 
     } catch (error) {
-        const msg = error.response?.data?.msg || "Couldn't load auto pilots";
+        const msg = error.response?.data?.msg || "Couldn't load CRM auto pilot";
         yield put({...autoPilotActions.fetchAutoPilotFailure(msg), meta});
         errorMessage(msg);
     }

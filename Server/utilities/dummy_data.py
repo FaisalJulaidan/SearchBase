@@ -761,6 +761,7 @@ def generate():
     reader_a.AutoPilot = auto_pilot_services.create('First Pilot',
                                                     "First pilot to automate the acceptance and rejection of candidates application",
                                                     aramco.ID).Data
+
     auto_pilot_services.create('Second Pilot', '', aramco.ID)
 
     appointment_services.dummyCreateAppointmentAllocationTime("Test Times", aramco.ID)

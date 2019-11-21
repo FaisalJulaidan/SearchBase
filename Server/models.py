@@ -77,9 +77,8 @@ Conversation: Conversation = Conversation
 from schemas.CRM import CRM
 CRM: CRM = CRM
 
-
-from schemas.CRMAutopilot import CRMAutopilot
-CRMAutopilot: CRMAutopilot = CRMAutopilot
+from schemas.CRMAutoPilot import CRMAutoPilot
+CRMAutoPilot: CRMAutoPilot = CRMAutoPilot
 
 from schemas.Database import Database
 Database: Database = Database

@@ -18,7 +18,7 @@ class CRM(db.Model):
 
     Campaigns = db.relationship('Campaign', back_populates='CRM')
 
-    CRMAutopilot = db.relationship('CRMAutopilot', back_populates='CRM')
+    CRMAutoPilot = db.relationship('CRMAutoPilot', back_populates='CRM')
 
     # Constraints:
     # each company will have one CRM of each type

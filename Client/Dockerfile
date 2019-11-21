@@ -22,7 +22,6 @@ RUN npm run build
 #Run Stage Start
 FROM nginx
 
-COPY nginx.conf /etc/nginx/nginx.conf
 
 #Copy production build files from builder phase to nginx
-COPY --from=builder /app/build /usr/share/nginx/html
+COPY --from=builder /app/build var/www/new.searchbase.com/public

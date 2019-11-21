@@ -12,9 +12,7 @@ const {Title, Paragraph} = Typography;
 class CRMAutoPilot extends React.Component {
 
     render() {
-      console.log(this.props)
       const { crmAP } = this.props
-      console.log(crmAP)
 
       return(
       <div className={styles.Header}>

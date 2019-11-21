@@ -21,7 +21,6 @@ class AutoPilot(db.Model):
     SendRejectionSMS = db.Column(db.Boolean, nullable=False, default=False)
     RejectionSMSBody = db.Column(db.Text, nullable=False)
 
-    LastReferral = db.Column(db.DateTime(), default=None)
 
     SendCandidatesAppointments = db.Column(db.Boolean, nullable=False, default=False)
 

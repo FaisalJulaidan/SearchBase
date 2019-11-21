@@ -28,7 +28,8 @@ import Documentation from './Documentation/Documentation';
 import Campaigns from './Campaigns/Campaigns';
 import Campaign from './Campaigns/Campaign/Campaign';
 import AutoPilots from './AutoPilots/AutoPilots';
-import AutoPilot from './AutoPilots/AutoPilot/AutoPilot';
+import AssistantAutoPilot from './AutoPilots/Assistant/AssistantAutopilot';
+import CRMAutopilot from './AutoPilots/CRM/CRMAutopilot';
 import Appointment from './Appointment/Appointment';
 import Marketplace from './Marketplace/Marketplace';
 import Item from './Marketplace/Item/Item';
@@ -303,10 +304,13 @@ class Dashboard extends Component {
 
                                             <AuthorisedRoute path={`${match.path}/auto_pilots`}
                                                              permission={company.AccessAutoPilot} component={AutoPilots}
+                                                             />
+                                            {/* <AuthorisedRoute path={`${match.path}/auto_pilots/assistant/:id`}
+                                                             permission={company.AccessAutoPilot} component={AssistantAutoPilot}
                                                              exact/>
-                                            <AuthorisedRoute path={`${match.path}/auto_pilots/:id`}
-                                                             permission={company.AccessAutoPilot} component={AutoPilot}
-                                                             exact/>
+                                            <AuthorisedRoute path={`${match.path}/auto_pilots/crm/:id`}
+                                                             permission={company.AccessAutoPilot} component={CRMAutopilot}
+                                                             exact/> */}
 
                                             <Route path={`${match.path}/users_management`} component={UsersManagement}
                                                    exact/>

@@ -43,6 +43,7 @@ class Company(db.Model):
     Campaigns = db.relationship('Campaign', back_populates='Company')
     AppointmentAllocationTimes = db.relationship('AppointmentAllocationTime', back_populates='Company')
     Webhooks = db.relationship('Webhook', back_populates='Company')
+    CRMAutoPilots = db.relationship('CRMAutopilot', back_populates='Company')
 
 
     def __repr__(self):

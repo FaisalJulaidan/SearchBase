@@ -39,7 +39,7 @@ const customPanelStyle = {
     overflow: 'hidden'
 };
 
-class AutoPilot extends React.Component {
+class AssistantAutoPilot extends React.Component {
 
     state = {
         rejectApplications: false,
@@ -86,7 +86,7 @@ class AutoPilot extends React.Component {
     componentDidMount() {
         this.props.dispatch(appointmentAllocationTimeActions.fetchAAT());
         this.props.dispatch(campaignActions.fetchCampaigns()); //TODO: To be removed (Fetching assistants for referral for now)
-        this.props.dispatch(autoPilotActions.fetchAutoPilot(this.props.match.params.id))
+        this.props.dispatch(autoPilotActions.fetchAutoPilot(this.props.id))
             .then(() => {
                 const {autoPilot} = this.props;
                 this.setState({  //TODO:: Uncomment referral fields when server-side is done
@@ -116,7 +116,7 @@ class AutoPilot extends React.Component {
                     // contractFollowUpEmailBody: autoPilot.ContractFollowUpEmailBody,
                     // contractFollowUpSMSBody: autoPilot.ContractFollowUpSMSBody.split('\n').map(x => `<p>${x ? x : '&nbsp;'}</p>`).join(' '),
                 });
-            }).catch(() => history.push(`/dashboard/auto_pilots`));
+            }).catch(() => history.push(`/dashboard/auto_pilots`))  ;
     }
 
     onRejectChange = (checked) => this.setState({
@@ -294,13 +294,12 @@ class AutoPilot extends React.Component {
 
         return (
             <>
-                <NoHeaderPanel>
                     <div className={styles.Header}>
                         <div style={{marginBottom: 20}}>
                             <Breadcrumb>
                                 <Breadcrumb.Item>
                                     <a href={'javascript:void(0);'}
-                                       onClick={() => history.push('/dashboard/auto_pilots')}>
+                                       onClick={() => history.push('/dashboard/auto_pilots/assistant')}>
                                         Auto Pilots
                                     </a>
                                 </Breadcrumb.Item>
@@ -364,12 +363,12 @@ class AutoPilot extends React.Component {
                                         <FormItem label="Auto accept applicants "
                                                   help="Select the percentage to auto accept the applicants">
                                             {getFieldDecorator('acceptApplications', {
-                                                valuePropName: 'checked'
+                                                valuePropName: 'checked', 
+                                                setFieldsValue: this.state.acceptApplications
                                             })(
                                                 <>
                                                     <Switch onChange={this.onAcceptChange}
                                                             style={{marginRight: 15}}
-                                                            checked={this.state.acceptApplications}
                                                     />
                                                     A score greater than
                                                     <InputNumber min={0} max={100}
@@ -857,7 +856,7 @@ class AutoPilot extends React.Component {
                                             )}
                                             {getFieldDecorator("contractFollowUpSchedule", {initialValue: "2"})(
                                                 <Radio.Group  disabled={!this.state.contractFollowUp}
-                                                              defaultValue="2" onChange={(e) => {
+                                                              onChange={(e) => {
                                                     this.setState({contractFollowUpSchedule: e.target.value})
                                                 }}>
                                                     <Radio.Button value="1">1 Week</Radio.Button>
@@ -1071,7 +1070,6 @@ class AutoPilot extends React.Component {
                         </div>
 
                     </div>
-                </NoHeaderPanel>
             </>
         );
     }
@@ -1088,4 +1086,4 @@ function mapStateToProps(state) {
     };
 }
 
-export default connect(mapStateToProps)(Form.create()(AutoPilot));
+export default connect(mapStateToProps)(Form.create()(AssistantAutoPilot));

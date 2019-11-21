@@ -1,66 +1,19 @@
 import React from 'react'
-import {connect} from 'react-redux';
 import styles from "./AutoPilots.module.less";
 import NoHeaderPanel from 'components/NoHeaderPanel/NoHeaderPanel'
-import {Icon, Typography, Menu, Modal} from 'antd';
-import CreateNewBox from "components/CreateNewBox/CreateNewBox";
-import ViewBox from "components/ViewBox/ViewBox";
-import LoadingViewBox from "components/LoadingViewBox/LoadingViewBox";
-import {AutoPilotIcon} from "components/SVGs";
-import NewAutoPilotModal from './Modals/NewAutoPilotModal'
-import EditAutoPilotModal from './Modals/EditAutoPilotModal'
-import {autoPilotActions} from "store/actions";
+import {Icon, Typography, Menu, Modal, Tabs} from 'antd';
 import 'types/TimeSlots_Types'
-import {history} from "helpers";
+
+import AssistantAutopilots from './Assistant/AssistantAutopilots'
+import CRMAutopilots from './CRM/CRMAutopilot'
 
 const {Title, Paragraph} = Typography;
 
 class AutoPilots extends React.Component {
 
     state = {
-        newAutoPilotModalVisible: false,
-        editAutoPilotModalVisible: false,
-        autoPilotToEdit: null,
-    };
-
-    componentDidMount() {
-        this.props.dispatch(autoPilotActions.fetchAutoPilots())
+      tab: null
     }
-
-    showNewAutoPilotModal = () => this.setState({newAutoPilotModalVisible: true});
-    closeNewAutoPilotModal = () => this.setState({newAutoPilotModalVisible: false,});
-
-    showEditAutoPilotModal = (autoPilot) => this.setState({autoPilotToEdit: autoPilot, editAutoPilotModalVisible: true});
-    closeEditAutoPilotModal = () => this.setState({editAutoPilotModalVisible: false});
-
-    addAutoPilot = (values) => {
-        this.props.dispatch(autoPilotActions.addAutoPilot(values));
-        this.closeNewAutoPilotModal();
-    };
-
-    updateAutoPilot = (autoPilotID, values) => {
-        this.props.dispatch(autoPilotActions.updateAutoPilot(autoPilotID, values));
-        this.closeEditAutoPilotModal();
-    };
-
-    deleteAutoPilot = (autoPilotID) => {
-        Modal.confirm({
-            title: `Delete auto pilot confirmation`,
-            content: `If you click OK, this auto pilot will be deleted and disconnected from all assistants that are connected to it`,
-            onOk: () => {
-                console.log(this.props);
-                this.props.dispatch(autoPilotActions.deleteAutoPilot(autoPilotID))
-            }
-        });
-    };
-
-    optionsMenuClickHandler = (e, autoPilot) => {
-        if (e.key === 'edit')
-            this.showEditAutoPilotModal(autoPilot);
-        if (e.key === 'delete')
-            this.deleteAutoPilot(autoPilot.ID)
-    };
-
 
     // it must be an array of Menu.Item. ViewBox expect that in its options Menu
     optionsMenuItems = [
@@ -74,7 +27,21 @@ class AutoPilots extends React.Component {
         </Menu.Item>
     ];
 
+    checkPageIs = (name) => {
+      return this.props.location.pathname.indexOf(name) !== -1
+    }
+
+    setTab = (tabKey) => {
+      if(!this.checkPageIs(tabKey.toLowerCase())) {
+        this.setState({tab: tabKey})
+        let newPage = `/dashboard/auto_pilots/${tabKey.toLowerCase()}`
+        this.props.history.push(newPage)
+      }
+    }
+
     render() {
+        
+        let key = this.state.tab ? this.state.tab : this.checkPageIs("assistant") ? "Assistant" : "CRM"
         return (
             <>
                 <NoHeaderPanel>
@@ -86,58 +53,18 @@ class AutoPilots extends React.Component {
                             Connect your Assistants to an Auto Pilot to automate managing candidate acceptance and appointment scheduling
                         </Paragraph>
                     </div>
-
-                    <div className={styles.Body}>
-                        <CreateNewBox text={'Add Auto Pilot'} onClick={this.showNewAutoPilotModal}/>
-
-                        {
-                            this.props.isLoading ? <LoadingViewBox/>
-                            :
-                            this.props.autoPilotsList.map(
-                                (/**@type AutoPilots*/ autoPilot, i) =>
-                                    <ViewBox
-                                        onClick={() => history.push(`/dashboard/auto_pilots/${autoPilot.ID}`)}
-                                        optionsMenuItems={this.optionsMenuItems}
-                                        optionsMenuClickHandler={(e)=>this.optionsMenuClickHandler(e, autoPilot)}
-                                        key={i}
-                                        title={autoPilot.Name}
-                                        text={autoPilot.Description}
-                                        icon={<AutoPilotIcon/>}
-                                        iconTop={175}
-                                        iconRight={15}
-                                    />
-                            )
-                        }
-                    </div>
+                    <Tabs onTabClick={this.setTab} activeKey={key}>
+                      <Tabs.TabPane tab="Assistant Autopilot" key="Assistant">
+                          <AssistantAutopilots/>
+                      </Tabs.TabPane>
+                      <Tabs.TabPane tab="CRM Autopilot" key="CRM">
+                          <CRMAutopilots/>
+                      </Tabs.TabPane>
+                    </Tabs>
                 </NoHeaderPanel>
-
-                <NewAutoPilotModal
-                    autoPilotsList={this.props.autoPilotsList}
-                    addAutoPilot={this.addAutoPilot}
-                    visible={this.state.newAutoPilotModalVisible}
-                    showModal={this.showNewAutoPilotModal}
-                    closeModal={this.closeNewAutoPilotModal}
-                />
-
-                <EditAutoPilotModal
-                    autoPilotsList={this.props.autoPilotsList}
-                    updateAutoPilot={this.updateAutoPilot}
-                    autoPilot={this.state.autoPilotToEdit}
-                    visible={this.state.editAutoPilotModalVisible}
-                    showModal={this.showEditAutoPilotModal}
-                    closeModal={this.closeEditAutoPilotModal}
-                />
             </>
         )
     }
 }
 
-function mapStateToProps(state) {
-    return {
-        autoPilotsList: state.autoPilot.autoPilotsList,
-        isLoading: state.autoPilot.isLoading
-    };
-}
-
-export default connect(mapStateToProps)(AutoPilots);
-
+export default AutoPilots

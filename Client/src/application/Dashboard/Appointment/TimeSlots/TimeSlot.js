@@ -1,5 +1,5 @@
 import React from 'react';
-import styles from '../../AutoPilots/AutoPilot/AutoPilot.module.less';
+import styles from '../../AutoPilots/Assistant/AutoPilot.module.less';
 import moment from 'moment';
 import momentTZ from 'moment-timezone';
 import { convertTimezone, getTimezone } from 'helpers';

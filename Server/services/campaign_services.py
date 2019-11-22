@@ -108,7 +108,7 @@ def getCampaignOptions(companyID):
         databases_callback: Callback = databases_services.getDatabasesList(companyID)
         if not databases_callback.Success:
             return helpers.jsonResponse(False, 400, "Cannot fetch Databases")
-
+        print(assistants_callback.Data)
         return Callback(True, "Information has been retrieved", {
             "assistants": helpers.getListFromLimitedQuery(['ID',
                                                            'Name',

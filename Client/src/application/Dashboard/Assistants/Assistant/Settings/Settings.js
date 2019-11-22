@@ -24,7 +24,8 @@ class Settings extends Component {
         // alertOptions: {0: "Immediately", 4: "4 hours", 8: "8 hours", 12: "12 hours", 24: "24 hours"}
         alertOptions: {0: 'Immediately'},
         isManualNotify: false,
-        notifyEvery: 'null'
+        notifyEvery: 'null',
+        ownerID: 0
     };
 
     componentDidMount() {
@@ -61,9 +62,8 @@ class Settings extends Component {
                 ...this.props.assistant.Config,
                 restrictedCountries: values.restrictedCountries || []
             };
-
-            values.Owners = [].push(values.Owners); //To be removed when server-side codes for multiple owners are ready
-            // values.Owners = values.Owners || []; //To be uncommented after removing above line
+            values.owners = [parseInt(this.state.ownerID) || 0]; //To be removed when server-side codes for multiple owners are ready
+            // values.owners = values.owners || []; //To be uncommented after removing above line
 
             delete values.restrictedCountries;
             values.notifyEvery = this.state.notifyEvery;
@@ -98,6 +98,8 @@ class Settings extends Component {
         const countriesOptions = [...countries.map(country => <Option key={country.code}>{country.name}</Option>)];
         const ownersOptions = [this.props.usersList?.map(user => <Option
             key={user.user.ID}>{`${user.user.Firstname} ${user.user.Surname} (${user.user.Email})`}</Option>)];
+        const initialOwner = this.props.usersList?.filter(
+            user => user.user.ID === assistant?.UserID)[0]?.user.ID.toString();
         return (
             <>
                 <Form layout='vertical' wrapperCol={{span: 10}}>
@@ -229,13 +231,16 @@ class Settings extends Component {
                         label="Owner"
                         extra="Selected user will be notified, when there is a new record.">
                         {
-                            getFieldDecorator('Owners', {
-                                initialValue: assistant?.Owners
+                            getFieldDecorator('owners', {
+                                // initialValue: {initialOwner}
                             })(
                                 <Select style={{width: '100%'}}
                                         loading={this.state.isLoading}
                                         filterOption={(inputValue, option) => option.props.children.toLowerCase().includes(inputValue.toLowerCase())}
-                                        placeholder="Please select a user">
+                                        placeholder="Please select a user"
+                                        onChange={(val) => {
+                                                     this.setState({ownerID: val});
+                                                 }}>
                                     {ownersOptions}
                                 </Select>
                             )

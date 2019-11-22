@@ -64,8 +64,9 @@ class Campaigns extends Component {
                             <Icon type="rocket"/> Campaign
                         </Title>
                         <Paragraph type="secondary">
-                            Here you can use our Outreach engine to Engage with the candidates inside your CRM via SMS
-                            and Email
+                            Here you can use our Outreach engine to Engage with the candidates inside your CRM via SMS and
+                            Email. Campaigns are a great way for you to keep your CRM or database refreshed with GDPR compliant
+                            information.
                         </Paragraph>
                     </div>
 

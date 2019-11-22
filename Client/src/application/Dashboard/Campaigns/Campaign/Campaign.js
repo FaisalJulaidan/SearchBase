@@ -2,8 +2,8 @@ import React from 'react';
 import {connect} from 'react-redux';
 import NoHeaderPanel from 'components/NoHeaderPanel/NoHeaderPanel'
 import {
-    Typography, Form, Input, Icon, Divider, Button, Tag, AutoComplete, Select, Switch, Modal,
-    List, Checkbox, Spin, Radio, Slider, InputNumber
+    Typography, Form, Input, Breadcrumb, Divider, Button, Tag, AutoComplete, Select, Switch, Modal,
+    List, Checkbox, Spin, Radio, Slider, InputNumber, Row, Col
 } from 'antd';
 
 import {trimText} from "../../../../helpers";
@@ -64,6 +64,7 @@ class Campaign extends React.Component {
                         use_crm: campaign?.UseCRM,
                         location: campaign?.Location,
                         active: campaign?.Active,
+                        campaignName: trimText.capitalize(trimText.trimDash(campaign?.Name))
                     });
                     this.props.form.setFieldsValue({
                         name: trimText.capitalize(trimText.trimDash(campaign?.Name)),
@@ -88,6 +89,10 @@ class Campaign extends React.Component {
             this.showModal(true);
         } else if (prevProps.isLaunchingCampaign && (this.props.errorMsg === null)) {
             this.showModal(false);
+        } else if (prevProps.isSaving && (this.props.errorMsg === null)) {
+            this.setState({campaignName: this.props.form.getFieldValue("name")})
+        } else if (prevProps.isStatusChanging && (this.props.errorMsg === null)) {
+            this.setState({active: this.props?.campaign?.Active})
         }
     };
 
@@ -298,14 +303,31 @@ class Campaign extends React.Component {
 
         return (<NoHeaderPanel>
             <div className={styles.Header}>
-                <Title className={styles.Title}>
-                    <Icon type="rocket"/> Campaign Outreach
-                </Title>
-                <Paragraph type="secondary">
-                    Here you can use our Outreach engine to Engage with the candidates inside your CRM via SMS and
-                    Email. Campaigns are a great way for you to keep your CRM or database refreshed with GDPR compliant
-                    information.
-                </Paragraph>
+                <div style={{marginBottom: 20}}>
+                    <Breadcrumb style={{display: this.state.isSaved ? 'block' : 'none'}} >
+                        <Breadcrumb.Item>
+                            <a href={'javascript:void(0);'}
+                               onClick={() => history.push('/dashboard/campaigns')}>
+                                Campaigns
+                            </a>
+                        </Breadcrumb.Item>
+                        <Breadcrumb.Item>{this.state.campaignName}</Breadcrumb.Item>
+                    </Breadcrumb>
+
+                    <Row style={{display: this.state.isSaved ? 'block' : 'none'}} >
+                        <Col span={20}>
+                            <Title>{this.state.campaignName}</Title>
+                        </Col>
+                        <Col span={4}>
+                            <Switch checkedChildren="On" unCheckedChildren="Off"
+                                    checked={this.state.active}
+                                    loading={this.props.isStatusChanging}
+                                    onChange={this.onActivateHandler}
+                                    style={{marginTop: '17%', marginLeft: '70%'}}/>
+                        </Col>
+                    </Row>
+
+                </div>
             </div>
             {this.state.isSaved && this.props.isLoading ? <Spin/> :
                 <div className={styles.mainContainer}>
@@ -626,7 +648,7 @@ class Campaign extends React.Component {
 
                             <Button loading={this.props.isCandidatesLoading} icon="rocket" type="primary"
                                     onClick={this.handleLaunch}
-                                    disabled={this.state.active}
+                                    disabled={!this.state.active}
                                     size={"large"}>
                                 Launch
                             </Button>

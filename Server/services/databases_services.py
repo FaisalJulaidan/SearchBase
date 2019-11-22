@@ -390,8 +390,8 @@ def scanCandidates(session, dbIDs, extraCandidates=None, campaign=False):
         __wordsCounter(DT.CandidateLocation, Candidate.CandidateLocation, keywords, df, 6)
 
         # JobTitle
-        __wordsCounter(DT.CandidateJobTitle, Candidate.CandidateJobTitle, keywords, df, 1)
-        __wordsCounter(DT.JobTitle, Candidate.CandidateJobTitle, keywords, df, 1)
+        # __wordsCounter(DT.CandidateJobTitle, Candidate.CandidateJobTitle, keywords, df, 1)
+        # __wordsCounter(DT.JobTitle, Candidate.CandidateJobTitle, keywords, df, 1)
 
         # Skills
         __wordsCounter(DT.CandidateSkills, Candidate.CandidateSkills, keywords, df, 2)

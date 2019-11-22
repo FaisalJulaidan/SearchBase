@@ -23,17 +23,11 @@ export const MercuryFeatures = () =>
         </Paragraph>
 
         <Paragraph>
-            You can request both information by heading to this link:
-            <Text code style={{margin: '0 0 0 5px'}}>
-                {/*<a href="https://www.Mercury.com/uk/technical-support-2/" target={'_blank'}*/}
-                {/*style={{cursor: 'pointer'}}>*/}
-                {/*https://www.Mercury.com/uk/technical-support-2/*/}
-                {/*</a>*/}
-            </Text>.
+            You can request that information by contacting your account manager at Mercury.
         </Paragraph>
 
         <Paragraph>
-            Once you have the necessary information, you can simply start using Mercury + TheSearchBase.
+            Once you have the necessary information, you can start using Mercury + TheSearchBase.
         </Paragraph>
 
         <Paragraph>
@@ -41,7 +35,8 @@ export const MercuryFeatures = () =>
                 style={{cursor: 'pointer'}}>
                 https://myapps.microsoft.com
                 </a>,
-            go to Profile at the top right and press 'Sign out everywhere'.
+             click on the Profile Icon on the top right, go to 'Profile' and then press 'Sign out everywhere'. This will
+             also disable Mercury's automatic log in.
         </Paragraph>
 
         <Title level={2}>Guidelines and Resources</Title>

@@ -45,7 +45,7 @@ class Campaign extends React.Component {
             isSaved: true, //check if the campaign is saved or not
             campaignName: "",
             outreach_type: "sms",
-            assistantLinkInMessage: false
+            assistantLinkInMessage: false,
             active: false
         };
     }
@@ -342,7 +342,7 @@ class Campaign extends React.Component {
         return (<NoHeaderPanel>
             <div className={styles.Header}>
                 <div style={{marginBottom: 20}}>
-                    <Breadcrumb style={{display: this.state.isSaved ? 'block' : 'none'}} >
+                    <Breadcrumb style={{display: this.state.isSaved ? 'block' : 'none'}}>
                         <Breadcrumb.Item>
                             <a href={'javascript:void(0);'}
                                onClick={() => history.push('/dashboard/campaigns')}>
@@ -352,7 +352,7 @@ class Campaign extends React.Component {
                         <Breadcrumb.Item>{this.state.campaignName}</Breadcrumb.Item>
                     </Breadcrumb>
 
-                    <Row style={{display: this.state.isSaved ? 'block' : 'none'}} >
+                    <Row style={{display: this.state.isSaved ? 'block' : 'none'}}>
                         <Col span={20}>
                             <Title>{this.state.campaignName}</Title>
                         </Col>
@@ -691,7 +691,7 @@ class Campaign extends React.Component {
 
                             <Button loading={this.props.isCandidatesLoading} icon="rocket" type="primary"
                                     onClick={this.handleLaunch}
-                                    disabled={!this.state.active}
+                                    disabled={!this.state.isSaved ? false : !this.state.active}
                                     size={"large"}>
                                 Launch
                             </Button>

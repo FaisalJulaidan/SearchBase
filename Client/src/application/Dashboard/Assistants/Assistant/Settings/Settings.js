@@ -66,7 +66,6 @@ class Settings extends Component {
 
             delete values.restrictedCountries;
             values.notifyEvery = this.state.notifyEvery;
-            // console.log(values);
 
             store.dispatch(assistantActions.updateAssistantConfigs(this.props.assistant.ID, values));
         }
@@ -96,16 +95,8 @@ class Settings extends Component {
         const {getFieldDecorator} = this.props.form;
         const {assistant} = this.props;
         const countriesOptions = [...countries.map(country => <Option key={country.code}>{country.name}</Option>)];
-        const ownersOptions = [this.props.usersList?.map(user => {
-                return (
-                    <Option
-                        key={user.user.ID}>{`${user.user.Firstname} ${user.user.Surname} (${user.user.Email})`}
-                    </Option>
-                );
-            }
-        )];
-
-
+        const ownersOptions = [this.props.usersList?.map(user => <Option
+            key={user.user.ID}>{`${user.user.Firstname} ${user.user.Surname} (${user.user.Email})`}</Option>)];
         return (
             <>
                 <Form layout='vertical' wrapperCol={{span: 10}}>
@@ -237,13 +228,16 @@ class Settings extends Component {
                         label="Owner"
                         extra="Selected user will be notified, when there is a new record.">
                         {
-                            getFieldDecorator('Owners', {
-                                initialValue: assistant?.Owners
+                            getFieldDecorator('owners', {
+                                // initialValue: {initialOwner}
                             })(
                                 <Select style={{width: '100%'}}
                                         loading={this.state.isLoading}
                                         filterOption={(inputValue, option) => option.props.children.toLowerCase().includes(inputValue.toLowerCase())}
-                                        placeholder="Please select a user">
+                                        placeholder="Please select a user"
+                                        onChange={(val) => {
+                                                     this.setState({ownerID: val});
+                                                 }}>
                                     {ownersOptions}
                                 </Select>
                             )

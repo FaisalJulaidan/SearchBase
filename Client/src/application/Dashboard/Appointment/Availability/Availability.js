@@ -72,7 +72,10 @@ class Availability extends React.Component {
             };
 
             dates.forEach(date => {
-                let realDate = checkDate(date, true, true);
+                if(date[0] === " "){
+                  date = date.substr(1, date.length-1)
+                }
+                let realDate = checkDate(date, true, false);
                 if(!realDate) return
                 if (realDate.isBetween(start, end) || realDate.isSame(start, 'date') || realDate.isSame(end, 'date')) {
                     let key = searchArray(record.ID); // key exists?

@@ -4,7 +4,7 @@
     "stripe_key": "plan_G7Sth78cbr8Pgl",
     "title": "Starter Pack",
     "price": "£99",
-    "price_subtitle": "per seat per month billed monthly",
+    "price_subtitle": "per month billed monthly",
     "items": [
       "Website ChatBot",
       "CRM Integration",

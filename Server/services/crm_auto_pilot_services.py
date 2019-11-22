@@ -9,30 +9,6 @@ from utilities import helpers, enums
 from utilities.enums import UserType, Status
 
 
-# from models import db
-# class CRMAutopilot(db.Model):
-#     ID = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
-#     Name = db.Column(db.String(128), nullable=False)
-#     Description = db.Column(db.String(260), nullable=True)
-#     Active = db.Column(db.Boolean, nullable=False, default=True)
-
-#     LastReferral = db.Column(db.DateTime(), default=None)
-
-#     CRMID = db.Column(db.Integer, db.ForeignKey('CRM.ID', ondelete='cascade'), nullable=False)
-#     CRM = db.relationship('CRM', back_populates='CRMAutopilot')
-
-#     # Relationships:
-#     CompanyID = db.Column(db.Integer, db.ForeignKey('company.ID', ondelete='cascade'), nullable=False)
-#     Company = db.relationship('Company', back_populates='CRMAutoPilots')
-
-#     # Constraints:
-#     # cannot have two auto pilot with the same name under one company
-#     __table_args__ = (db.UniqueConstraint('CompanyID', 'Name', name='uix1_crm_auto_pilot'),)
-
-#     def __repr__(self):
-#         return '<CRMAutopilot {}>'.format(self.ID)
-
-
 def create(name, desc, crmType, companyID: int) -> Callback:
     try:
 
@@ -82,76 +58,87 @@ def fetchAll(companyID) -> Callback:
         helpers.logError("crm_auto_pilot_services.fetchAll(): " + str(exc))
         return Callback(False, 'Could not fetch all the AutoPilots.')
 
-# # ----- Updaters ----- #
-# def update(id, name, desc, companyID: int) -> Callback:
-#     try:
+# ----- Updaters ----- #
+def update(id, name, desc, companyID: int) -> Callback:
+    try:
 
-#         # Get AutoPilot
-#         autoPilot_callback: Callback = getByID(id, companyID)
-#         if not autoPilot_callback.Success: return autoPilot_callback
-#         autoPilot = autoPilot_callback.Data
+        # Get AutoPilot
+        crm_autoPilot_callback: Callback = getByID(id, companyID)
+        if not crm_autoPilot_callback.Success: return crm_autoPilot_callback
+        crm_autoPilot = crm_autoPilot_callback.Data
 
-#         # Update the autoPilot
-#         autoPilot.Name = name
-#         autoPilot.Description = desc
+        # Update the autoPilot
+        crm_autoPilot.Name = name
+        crm_autoPilot.Description = desc
 
-#         # Save all changes
-#         db.session.commit()
-#         return Callback(True, "Updated the AutoPilot successfully.", autoPilot)
+        # Save all changes
+        db.session.commit()
+        return Callback(True, "Updated the AutoPilot successfully.", crm_autoPilot)
 
-#     except Exception as exc:
-#         helpers.logError("auto_pilot.update(): " + str(exc))
-#         db.session.rollback()
-#         return Callback(False, "Couldn't update the AutoPilot.")
+    except Exception as exc:
+        helpers.logError("crm_auto_pilot_services.update(): " + str(exc))
+        db.session.rollback()
+        return Callback(False, "Couldn't update the AutoPilot.")
+
+    # ID = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
+    # Name = db.Column(db.String(128), nullable=False)
+    # Description = db.Column(db.String(260), nullable=True)
+    # Active = db.Column(db.Boolean, nullable=False, default=True)
+
+    # LastReferral = db.Column(db.DateTime(), default=None)
+
+    # sendReferralEmail = db.Column(db.Boolean, nullable=False, default=False)
+    # ReferralEmailTitle = db.Column(db.String(260), nullable=True)
+    # ReferralEmailBody = db.Column(db.Text, nullable=False)
+
+    # sendReferralSMS = db.Column(db.Boolean, nullable=False, default=False)
+    # ReferralSMS = db.Column(db.Text, nullable=False)
+    
+    # ReferralAssistantID = db.Column(db.Integer, db.ForeignKey('assistant.ID', ondelete='cascade'), nullable=False)
+    # ReferralAssistant = db.relationship('Assistant', back_populates='CRMAutoPilots')
+ 
+    # CRMID = db.Column(db.Integer, db.ForeignKey('CRM.ID', ondelete='cascade'), nullable=False)
+    # CRM = db.relationship('CRM', back_populates='CRMAutoPilot')
+
+    # # Relationships:
+    # CompanyID = db.Column(db.Integer, db.ForeignKey('company.ID', ondelete='cascade'), nullable=False)
+    # Company = db.relationship('Company', back_populates='CRMAutoPilots')
+
+def updateConfigs(id, name, desc, active, referralAssistantID, referralEmailTitle, referralEmailBody, referralSMSBody, sendReferralEmail, sendReferralSMS, companyID: int) -> Callback:
+    try:
+
+        # Get AutoPilot
+        crmAutopilot_callback: Callback = getByID(id, companyID)
+        if not crmAutopilot_callback.Success: return crmAutopilot_callback
+        crmAutopilot : CRMAutoPilot = crmAutopilot_callback.Data
+
+        # Update the autoPilot
+        crmAutopilot.Name = name
+        crmAutopilot.Description = desc
+        crmAutopilot.Active = active
+        crmAutopilot.LastReferral = datetime.now() if referralAssistantID else None
+
+        crmAutopilot.SendReferralEmail = sendReferralEmail
+        crmAutopilot.ReferralEmailTitle = referralEmailTitle
+        crmAutopilot.ReferralEmailBody = referralEmailBody
+
+        crmAutopilot.SendReferralSMS = sendReferralSMS
+        crmAutopilot.ReferralSMSBody = referralSMSBody
+        
+        # crmAutopilot.CRMID = 1
+        
+        crmAutopilot.ReferralAssistantID = referralAssistantID
 
 
-# def updateConfigs(id, name, desc, active, acceptApplications, acceptanceScore, sendAcceptanceEmail,
-#                   acceptanceEmailTitle,
-#                   acceptanceEmailBody, sendAcceptanceSMS, acceptanceSMSBody, rejectApplications, rejectionScore,
-#                   sendRejectionEmail, rejectionEmailTitle, rejectionEmailBody, sendRejectionSMS, rejectionSMSBody,
-#                   sendCandidatesAppointments, appointmentAllocationTimes, companyID: int) -> Callback:
-#     try:
+        # Save all changes
 
-#         # Get AutoPilot
-#         autoPilot_callback: Callback = getByID(id, companyID)
-#         if not autoPilot_callback.Success: return autoPilot_callback
-#         autoPilot = autoPilot_callback.Data
+        db.session.commit()
+        return Callback(True, "Updated the CRM AutoPilot successfully.", crmAutopilot)
 
-#         # Update the autoPilot
-#         autoPilot.Name = name
-#         autoPilot.Description = desc
-#         autoPilot.Active = active
-
-#         autoPilot.AcceptApplications = acceptApplications
-#         autoPilot.AcceptanceScore = acceptanceScore
-#         autoPilot.SendAcceptanceEmail = sendAcceptanceEmail
-#         autoPilot.AcceptanceEmailTitle = acceptanceEmailTitle
-#         autoPilot.AcceptanceEmailBody = acceptanceEmailBody
-#         autoPilot.SendAcceptanceSMS = sendAcceptanceSMS
-#         autoPilot.AcceptanceSMSBody = acceptanceSMSBody
-
-#         autoPilot.AppointmentAllocationTimeID = appointmentAllocationTimes
-
-#         autoPilot.RejectApplications = rejectApplications
-#         autoPilot.RejectionScore = rejectionScore
-#         autoPilot.SendRejectionEmail = sendRejectionEmail
-#         autoPilot.RejectionEmailTitle = rejectionEmailTitle
-#         autoPilot.RejectionEmailBody = rejectionEmailBody
-#         autoPilot.SendRejectionSMS = sendRejectionSMS
-#         autoPilot.RejectionSMSBody = rejectionSMSBody
-
-#         autoPilot.SendCandidatesAppointments = sendCandidatesAppointments
-
-#         # Save all changes
-
-#         db.session.commit()
-#         return Callback(True, "Updated the AutoPilot successfully.", autoPilot)
-
-#     except Exception as exc:
-#         helpers.logError("auto_pilot.update(): " + str(exc))
-#         db.session.rollback()
-#         return Callback(False, 'Could not update the AutoPilot.')
-
+    except Exception as exc:
+        helpers.logError("crm_auto_pilot_services.update(): " + str(exc))
+        db.session.rollback()
+        return Callback(False, 'Could not update the AutoPilot.')
 
 # def updateStatus(autoPilotID, newStatus, companyID):
 #     try:

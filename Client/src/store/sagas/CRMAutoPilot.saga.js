@@ -42,6 +42,7 @@ function* addCRMAutoPilot({type, newAutoPilot}) {
 
 function* updateCRMAutoPilot({CRMAutoPilotID, updatedValues}) {
     try {
+        console.log(updatedValues)
         const res = yield http.put(`crm_auto_pilot/${CRMAutoPilotID}`, updatedValues);
         yield put(CRMAutoPilotActions.updateCRMAutoPilotSuccess(CRMAutoPilotID, res.data?.data, res.data?.msg));
         successMessage('CRM Auto pilot updated');

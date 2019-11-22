@@ -269,16 +269,12 @@ def simpleSend(to, title, text):
 def notifyNewConversations(assistant: Assistant, conversations: List[Conversation], lastNotificationDate):
     try:
 
-        users_callback: Callback = user_services.getAllByCompanyIDWithEnabledNotifications(assistant.CompanyID)
-        if not users_callback.Success:
-            return Callback(False, "Users not found!")
-
+        user_callback: Callback = user_services.getByID(assistant.UserID)
+        if not user_callback.Success:
+            return Callback(False, "User not found!")
 
         # Get Company
         company: Company = assistant.Company
-
-        if len(users_callback.Data) == 0:
-            return Callback(True, "No user has notifications enabled")
 
         conversationsList = []
         for conversation in conversations:
@@ -307,22 +303,19 @@ def notifyNewConversations(assistant: Assistant, conversations: List[Conversatio
         logoPath = helpers.keyFromStoredFile(company.StoredFile, enums.FileAssetType.Logo).AbsFilePath
 
         # send emails, jobs applied for
-        for user in users_callback.Data:
-            print("SEND TO :")
-            print(user)
-            email_callback: Callback = __sendEmail(to=user.Email,
-                                                   subject="New users has engaged with your "
-                                                          + assistant.Name + " assistant",
-                                                   template='/emails/new_conversations_notification.html',
-                                                   assistantName = assistant.Name,
-                                                   assistantID = assistant.ID,
-                                                   conversations = conversationsList,
-                                                   logoPath = logoPath,
-                                                   companyName = company.Name,
-                                                   companyURL=company.URL,
-                                                   )
-            if not email_callback.Success:
-                raise Exception(email_callback.Message)
+        email_callback: Callback = __sendEmail(to=user_callback.Data.Email,
+                                               subject="New users has engaged with your "
+                                                      + assistant.Name + " assistant",
+                                               template='/emails/new_conversations_notification.html',
+                                               assistantName = assistant.Name,
+                                               assistantID = assistant.ID,
+                                               conversations = conversationsList,
+                                               logoPath = logoPath,
+                                               companyName = company.Name,
+                                               companyURL=company.URL,
+                                               )
+        if not email_callback.Success:
+            raise Exception(email_callback.Message)
 
         return Callback(True, "Emails have been sent")
 

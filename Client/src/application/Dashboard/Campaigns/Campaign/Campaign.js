@@ -44,7 +44,8 @@ class Campaign extends React.Component {
             textMessage: "",
             isSaved: true, //check if the campaign is saved or not
             campaignName: "",
-            outreach_type: "",
+            outreach_type: "sms",
+            assistantLinkInMessage: false
             active: false
         };
     }
@@ -63,6 +64,7 @@ class Campaign extends React.Component {
                         textMessage: campaign?.Message,
                         use_crm: campaign?.UseCRM,
                         location: campaign?.Location,
+                        assistantLinkInMessage: campaign?.Message.indexOf("{assistant.link}") !== -1,
                         active: campaign?.Active,
                         campaignName: trimText.capitalize(trimText.trimDash(campaign?.Name))
                     });
@@ -81,6 +83,9 @@ class Campaign extends React.Component {
                 history.push(`/dashboard/campaigns`)
             });
         }
+        if (this.state.textMessage.indexOf("{assistant.link}") !== -1 && this.state.assistantLinkInMessage) {
+            this.setState({assistantLinkInMessage: true})
+        }
     }
 
     componentDidUpdate(prevProps, prevState, snapshot) {
@@ -93,6 +98,12 @@ class Campaign extends React.Component {
             this.setState({campaignName: this.props.form.getFieldValue("name")})
         } else if (prevProps.isStatusChanging && (this.props.errorMsg === null)) {
             this.setState({active: this.props?.campaign?.Active})
+        }
+
+        let linkInMessage = this.state.textMessage.indexOf("{assistant.link}") !== -1
+
+        if (linkInMessage !== this.state.assistantLinkInMessage) {
+            this.setState({assistantLinkInMessage: linkInMessage})
         }
     };
 
@@ -129,6 +140,12 @@ class Campaign extends React.Component {
         this.setState({textMessage: textMessage}); //Update TextMessage State for Phone.JS
     };
 
+    addAssistantLink = () => {
+        let textMessage = this.state.textMessage + " {assistant.link} ";
+        this.props.form.setFieldsValue({text: textMessage}); //Update Message Input
+        this.setState({textMessage: textMessage}); //Update TextMessage State for Phone.JS
+    };
+
     //TODO:: Skill should be validated before submission | Empty String can be accepted
     handleSkillSubmit = (e) => {
         if (e.target.value.length === 0)
@@ -146,26 +163,31 @@ class Campaign extends React.Component {
     };
 
     handleModalLaunch = () => {
+
         this.props.form.validateFields((err, values) => {
             if (!err) {
-                this.props.dispatch(campaignActions.launchCampaign(
-                    values.assistant_id,
-                    this.state.use_crm,
-                    values.crm_id,
-                    values.database_id,
-                    values.messenger_id,
-                    values.location,
-                    values.jobTitle,
-                    values.jobType,
-                    this.state.skills,
-                    values.text,
-                    this.state.candidate_list,
-                    values.outreach_type,
-                    values.email_title
-                ));
+                this.launchCampaign(values)
             }
         });
     };
+
+    launchCampaign = (values) => {
+        this.props.dispatch(campaignActions.launchCampaign(
+            values.assistant_id,
+            this.state.use_crm,
+            values.crm_id,
+            values.database_id,
+            values.messenger_id,
+            values.location,
+            values.jobTitle,
+            values.jobType,
+            this.state.skills,
+            values.text,
+            this.state.candidate_list,
+            values.outreach_type,
+            values.email_title
+        ));
+    }
 
     handleModalSelectAll = () => {
         if (this.props?.candidate_list?.length === this.state.candidate_list.length)
@@ -205,23 +227,39 @@ class Campaign extends React.Component {
         event.preventDefault();
         this.props.form.validateFields((err, values) => {
             if (!err) {
-                this.props.dispatch(campaignActions.fetchCampaignCandidatesData(
-                    values.assistant_id,
-                    this.state.use_crm,
-                    values.crm_id,
-                    values.database_id,
-                    values.messenger_id,
-                    values.location,
-                    values.jobTitle,
-                    values.jobType,
-                    this.state.skills,
-                    this.state.textMessage,
-                    values.outreach_type,
-                    values.email_title,
-                ));
+                if (!this.state.assistantLinkInMessage) {
+                    Modal.confirm({
+                        title: 'You have not put the Assistant\'s Link in your message!',
+                        content: `Do you wish to proceed?`,
+                        okText: 'Yes',
+                        okType: 'ghost',
+                        cancelText: 'No',
+                        onOk: () => this.searchCandidates(values)
+                    });
+                } else {
+                    this.searchCandidates(values)
+                }
             }
         });
     };
+
+    searchCandidates = (values) => {
+        this.props.dispatch(campaignActions.fetchCampaignCandidatesData(
+            values.assistant_id,
+            this.state.use_crm,
+            values.crm_id,
+            values.database_id,
+            values.messenger_id,
+            values.location,
+            values.jobTitle,
+            values.jobType,
+            this.state.skills,
+            this.state.textMessage,
+            values.outreach_type,
+            values.email_title,
+        ));
+    }
+
 
     handleSave = () => {
         this.props.form.validateFields((err, values) => {
@@ -474,10 +512,24 @@ class Campaign extends React.Component {
                                     );
                                 }
                             })()}
-                            <FormItem label={"Messaging Service"}>
+
+
+                            <FormItem label={"Outreach Type "}>
+                                {getFieldDecorator("outreach_type", {initialValue: "sms"})(
+                                    <Radio.Group onChange={(e) => {
+                                        this.setState({outreach_type: e.target.value})
+                                    }}>
+                                        <Radio.Button value="sms">SMS</Radio.Button>
+                                        <Radio.Button value="email">Email</Radio.Button>
+                                    </Radio.Group>
+                                )}
+                            </FormItem>
+
+                            <FormItem label={"Messaging Service"}
+                                      style={this.state.outreach_type !== 'sms' ? {display: 'none'} : {display: 'block'}}>
                                 {getFieldDecorator("messenger_id", {
                                     rules: [{
-                                        required: true,
+                                        required: this.state.outreach_type === 'sms',
                                         message: "Please select the messaging service"
                                     }],
                                 })(
@@ -508,7 +560,7 @@ class Campaign extends React.Component {
 
                             <FormItem label={"Job Type"}>
                                 {getFieldDecorator("jobType", {initialValue: "permanent"})(
-                                    <Radio.Group defaultValue="permanent">
+                                    <Radio.Group>
                                         <Radio.Button value="permanent">Permanent</Radio.Button>
                                         <Radio.Button value="temporary">Temporary</Radio.Button>
                                         <Radio.Button value="contract">Contract</Radio.Button>
@@ -536,9 +588,9 @@ class Campaign extends React.Component {
                                         whitespace: true,
                                         message: "Please enter the location"
                                     }],
+                                    initialValue: this.state.location
                                 })(
                                     <AutoComplete placeholder="Type in your location"
-                                                  value={this.state.location}
                                                   type="text"
                                                   dataSource={this.state.locations}
                                                   onChange={value => this.findLocation(value)}/>
@@ -547,25 +599,13 @@ class Campaign extends React.Component {
 
                             <FormItem label={`Distance within ${this.state.distance} miles`}
                                       style={{display: this.state.location ? 'block' : 'none'}}>
-                                {getFieldDecorator("distance")(
+                                {getFieldDecorator("distance", {initialValue: this.state.distance})(
                                     <Slider
                                         step={5}
-                                        defaultValue={[this.state.distance]}
                                         onChange={(value) => {
                                             this.setState({distance: value})
                                         }}
                                     />
-                                )}
-                            </FormItem>
-
-                            <FormItem label={"Outreach Type "}>
-                                {getFieldDecorator("outreach_type", {initialValue: "sms"})(
-                                    <Radio.Group defaultValue="sms" onChange={(e) => {
-                                        this.setState({outreach_type: e.target.value})
-                                    }}>
-                                        <Radio.Button value="sms">SMS</Radio.Button>
-                                        <Radio.Button value="email">Email</Radio.Button>
-                                    </Radio.Group>
                                 )}
                             </FormItem>
 
@@ -587,6 +627,9 @@ class Campaign extends React.Component {
                             <FormItem
                                 label={<span>Message
                                 <Button type="default" size="small" shape="round"
+                                        style={{margin: '0 5px', fontSize: '.9em', borderColor: 'red'}}
+                                        onClick={this.addAssistantLink}>Assistant Link</Button>
+                                <Button type="default" size="small" shape="round"
                                         style={{margin: '0 5px', fontSize: '.9em'}}
                                         onClick={this.addCandidateName}>Candidate Name</Button>
                             </span>}>
@@ -604,7 +647,7 @@ class Campaign extends React.Component {
 
                             <FormItem label={"Follow up every:"}>
                                 {getFieldDecorator("followUp", {initialValue: "never"})(
-                                    <Radio.Group defaultValue="never" onChange={(e) => {
+                                    <Radio.Group onChange={(e) => {
                                         this.setState({followUp: e.target.value})
                                     }}>
                                         <Radio.Button value="never">Never</Radio.Button>
@@ -618,7 +661,7 @@ class Campaign extends React.Component {
 
                             <FormItem label={"Schedule for every:"}>
                                 {getFieldDecorator("schedule", {initialValue: "never"})(
-                                    <Radio.Group defaultValue="off" onChange={(e) => {
+                                    <Radio.Group onChange={(e) => {
                                         this.setState({schedule: e.target.value})
                                     }}>
                                         <Radio.Button value="never">Never</Radio.Button>

@@ -108,14 +108,15 @@ def getCampaignOptions(companyID):
         databases_callback: Callback = databases_services.getDatabasesList(companyID)
         if not databases_callback.Success:
             return helpers.jsonResponse(False, 400, "Cannot fetch Databases")
-
+        
         return Callback(True, "Information has been retrieved", {
             "assistants": helpers.getListFromLimitedQuery(['ID',
                                                            'Name',
                                                            'Description',
                                                            'Message',
                                                            'TopBarText',
-                                                           'Active'],
+                                                           'Active',
+                                                           'UserID'],
                                                           assistants_callback.Data),
             "crms": helpers.getListFromSQLAlchemyList(
                 crms_callback.Data),
@@ -215,18 +216,16 @@ def sendCampaign(campaign_details, companyID):
             if not candidate_phone:   
                 continue
 
-            # insert candidate details in text
-            tempText = text.replace("{candidate.name}", candidate.get("CandidateName"))
-
             access = helpers.verificationSigner.dumps({"candidateID": candidate.get("ID"), "source": source, "crmID": crmID}, salt='crm-information')
 
             url : Callback = url_services.createShortenedURL(helpers.getDomain(3000) + "/chatbot_direct_link/" + \
                hashedAssistantID + "?source=" + str(access), domain="recruitbot.ai")
-            
             if not url.Success:
                 raise Exception("Failed to create shortened URL")
 
-            tempText += "\n\n" + url.Data
+            # insert assistant link and candidate details in text
+            tempText = text.replace("{assistant.link}", url.Data)\
+                            .replace("{candidate.name}", candidate.get("CandidateName"))
             
 
             helpers.logError("outreach_type: " + str(campaign_details.get("outreach_type")))

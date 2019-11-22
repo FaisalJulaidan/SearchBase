@@ -16,11 +16,10 @@ from services.Marketplace.Messenger import messenger_servicess
 from utilities import helpers, json_schemas, enums
 
 
-def create(name, desc, welcomeMessage, topBarText, template, companyID) -> Assistant or None:
+def create(name, desc, welcomeMessage, topBarText, flow, template, companyID) -> Assistant or None:
     try:
-
-        flow = None
-        if template and template != 'none':
+        # if there is already a flow then ignore creating from template
+        if not flow and template and template != 'none':
             # Get json template
             relative_path = join('static/assistant_templates', template + '.json')
             absolute_path = join(BaseConfig.APP_ROOT, relative_path)
@@ -30,11 +29,11 @@ def create(name, desc, welcomeMessage, topBarText, template, companyID) -> Assis
             if not callback.Success:
                 raise Exception(callback.Message)
 
+        # default assistant config values
         config = {
             "restrictedCountries": [],
             "chatbotPosition": "Right"
         }
-
         validate(config, json_schemas.assistant_config)
 
         assistant = Assistant(Name=name,
@@ -116,7 +115,8 @@ def getAll(companyID) -> Callback:
                                   Assistant.Description,
                                   Assistant.Message,
                                   Assistant.TopBarText,
-                                  Assistant.Active)\
+                                  Assistant.Active,
+                                  Assistant.UserID)\
             .filter(Assistant.CompanyID == companyID).all()
 
         if len(result) == 0:
@@ -213,7 +213,7 @@ def update(id, name, desc, message, topBarText, companyID) -> Callback:
                         "Couldn't update assistant " + str(id))
 
 
-def updateConfigs(id, name, desc, message, topBarText, secondsUntilPopup, notifyEvery, config, companyID) -> Callback:
+def updateConfigs(id, name, desc, message, topBarText, secondsUntilPopup, notifyEvery, config, owners, companyID) -> Callback:
     try:
         # Validate the json config
         validate(config, json_schemas.assistant_config)
@@ -229,10 +229,10 @@ def updateConfigs(id, name, desc, message, topBarText, secondsUntilPopup, notify
         assistant.SecondsUntilPopup = secondsUntilPopup
         assistant.NotifyEvery = None if notifyEvery == "null" else int(notifyEvery)
         assistant.Config = config
+        assistant.UserID = owners[0]
 
         if not assistant.LastNotificationDate and notifyEvery != "null":
             assistant.LastNotificationDate = datetime.now()
-
 
         db.session.commit()
         return Callback(True, name + ' Updated Successfully', assistant)
@@ -258,6 +258,24 @@ def updateStatus(assistantID, newStatus, companyID):
         helpers.logError("assistant_services.changeStatus(): " + str(exc))
         db.session.rollback()
         return Callback(False, "Could not change the assistant's status.")
+
+
+def updateContacts(contacts, assistantID, companyID):
+    try:
+        if not contacts:
+            db.session.query(Assistant).filter(and_(Assistant.ID == assistantID, Assistant.CompanyID == companyID)) \
+                .update({"User": None})
+
+        db.session.query(Assistant).filter(and_(Assistant.ID == assistantID, Assistant.CompanyID == companyID)) \
+            .update({"User": contacts[0]})
+
+        db.session.commit()
+        return Callback(True, 'Assistant contacts have been changed.')
+
+    except Exception as exc:
+        helpers.logError("assistant_services.updateContacts(): " + str(exc))
+        db.session.rollback()
+        return Callback(False, "Could not change the assistant's contacts.")
 
 
 # ----- Deletion ----- #

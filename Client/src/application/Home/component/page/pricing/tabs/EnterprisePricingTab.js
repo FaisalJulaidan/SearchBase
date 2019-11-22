@@ -37,7 +37,7 @@ const EnterprisePricingTab = () => {
                 <Row>
                     <Col md={{span: 10, offset: 1}} lg={{span: 8, offset: 2}} className={styles.col_card}>
                         <Card className={styles.card}>
-                            <Card.Body className={styles.product_card_body}>
+                            <Card.Body className={styles.product_wrapper}>
                                 <div>
                                     <h1>CHATBOTS</h1>
                                     <p>Our chatbots help you spend less time screening and qualifying candidates.</p>
@@ -50,7 +50,7 @@ const EnterprisePricingTab = () => {
                     </Col>
                     <Col md={{span: 10, offset: 1}} lg={{span: 8, offset: 2}} className={styles.col_card}>
                         <Card className={styles.card}>
-                            <Card.Body className={styles.product_card_body}>
+                            <Card.Body className={styles.product_wrapper}>
                                 <div>
                                     <h1>SMS outreach</h1>
                                     <p>Candidates may have access to the internet, so we have developed a solution that
@@ -64,7 +64,7 @@ const EnterprisePricingTab = () => {
                     </Col>
                     <Col md={{span: 10, offset: 1}} lg={{span: 8, offset: 2}} className={styles.col_card}>
                         <Card className={styles.card}>
-                            <Card.Body className={styles.product_card_body}>
+                            <Card.Body className={styles.product_wrapper}>
                                 <div>
                                     <h1>Candidate Activation</h1>
                                     <p>Connect with candidates that they have never engaged with or have simply lost
@@ -78,9 +78,9 @@ const EnterprisePricingTab = () => {
                     </Col>
                     <Col md={{span: 10, offset: 1}} lg={{span: 8, offset: 2}} className={styles.col_card}>
                         <Card className={styles.card}>
-                            <Card.Body className={styles.product_card_body}>
+                            <Card.Body className={styles.product_wrapper}>
                                 <div>
-                                    <h1>Automation & Engamenet</h1>
+                                    <h1>Automation & Engagement</h1>
                                     <p>Set up a tailored automation sequences that help you improve the efficiency of
                                         your workflow.</p>
                                 </div>

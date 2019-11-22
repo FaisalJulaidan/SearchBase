@@ -32,6 +32,7 @@ import Flow from './Flow';
 import Settings from './Settings';
 import Input from './Input';
 import Signature from './Signature';
+import moment from 'moment'
 import 'antd/dist/antd.css';
 
 export const Chatbot = ({
@@ -86,10 +87,21 @@ export const Chatbot = ({
         const hasBeenUsed = () => {
             let used = localStorage.getItem('TSB_CHATBOT_USED');
             if (used === null) {
-                localStorage.setItem('TSB_CHATBOT_USED', true);
+                localStorage.setItem('TSB_CHATBOT_USED', JSON.stringify({exp: moment().add(1, 'days').unix()}));
                 return false;
             } else {
-                return true;
+                try {
+                  let data = JSON.parse(used)
+                  if(moment.unix(data.exp) < moment() || !data.exp){
+                    localStorage.setItem('TSB_CHATBOT_USED', JSON.stringify({exp: moment().add(1, 'days').unix()}));
+                    return false
+                  }
+                  return true;
+                } catch {
+                  localStorage.setItem('TSB_CHATBOT_USED', JSON.stringify({exp: moment().add(1, 'days').unix()}));
+                  return false
+                }
+                
             }
         };
 

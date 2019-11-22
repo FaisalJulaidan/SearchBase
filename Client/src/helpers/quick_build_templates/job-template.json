@@ -1,0 +1,304 @@
+{
+  "flow": {
+    "groups": [
+      {
+        "blocks": [
+          {
+            "Type": "Question",
+            "StoreInDB": true,
+            "Skippable": false,
+            "SkipText": "Skip!",
+            "SkipAction": "End Chat",
+            "SkipBlockToGoID": null,
+            "DataType": "NoType",
+            "Content": {
+              "text": "Before we start, is there anything you would like to know?",
+              "answers": [
+                {
+                  "id": "iSo_3g1N",
+                  "text": "Apply for the Job",
+                  "keywords": [],
+                  "blockToGoID": "nv1eMgRD",
+                  "action": "Go To Specific Block",
+                  "afterMessage": "Great, let's go through the job requirement ",
+                  "score": 5
+                },
+                {
+                  "id": "cTEG2zwV",
+                  "text": "Where is the job located?",
+                  "keywords": [],
+                  "blockToGoID": "NMIhKo4P",
+                  "action": "Go To Specific Block",
+                  "afterMessage": "OK, let me show you...",
+                  "score": 5
+                },
+                {
+                  "action": "Go To Specific Block",
+                  "afterMessage": "Sure, let me tell you a little more",
+                  "blockToGoID": "IrhzQ1a7",
+                  "id": "fsFdkf7q",
+                  "keywords": [],
+                  "score": 5,
+                  "text": "Tell me about the job?"
+                },
+                {
+                  "action": "Go To Specific Block",
+                  "afterMessage": "OK, let us tell you more...",
+                  "blockToGoID": "cOi41vty",
+                  "id": "CG-KdHPF",
+                  "keywords": [],
+                  "score": 5,
+                  "text": "What is the salary?"
+                }
+              ]
+            },
+            "ID": "OTemeqPc"
+          },
+          {
+            "Type": "Raw Text",
+            "StoreInDB": false,
+            "Skippable": false,
+            "SkipText": "Skip!",
+            "SkipAction": "End Chat",
+            "SkipBlockToGoID": null,
+            "DataType": "NoType",
+            "Content": {
+              "text": "${Job Description}$ & the benefits are ${Job Benefits}$",
+              "action": "Go To Next Block",
+              "blockToGoID": "imD0JdVG"
+            },
+            "ID": "IrhzQ1a7"
+          },
+          {
+            "Type": "Raw Text",
+            "StoreInDB": false,
+            "Skippable": false,
+            "SkipText": "Skip!",
+            "SkipAction": "End Chat",
+            "SkipBlockToGoID": null,
+            "DataType": "NoType",
+            "Content": {
+              "text": "The job is located, ${Job Location}$",
+              "action": "Go To Next Block",
+              "blockToGoID": "cOi41vty"
+            },
+            "ID": "imD0JdVG"
+          },
+          {
+            "Content": {
+              "action": "Go To Next Block",
+              "blockToGoID": "nv1eMgRD",
+              "text": "The salary for the role is ${Job Salary}$"
+            },
+            "DataType": "NoType",
+            "ID": "cOi41vty",
+            "SkipAction": "End Chat",
+            "SkipBlockToGoID": null,
+            "SkipText": "Skip!",
+            "Skippable": false,
+            "StoreInDB": false,
+            "Type": "Raw Text"
+          },
+          {
+            "Content": {
+              "action": "Go To Next Block",
+              "blockToGoID": "M8uAtCrF",
+              "text": "The requirements for this job are ${Job Requirements}$"
+            },
+            "DataType": "NoType",
+            "ID": "nv1eMgRD",
+            "SkipAction": "End Chat",
+            "SkipBlockToGoID": null,
+            "SkipText": "Skip!",
+            "Skippable": false,
+            "StoreInDB": false,
+            "Type": "Raw Text"
+          },
+          {
+            "Content": {
+              "answers": [
+                {
+                  "action": "Go To Next Block",
+                  "afterMessage": "Great",
+                  "blockToGoID": "NOcvpFSt",
+                  "id": "SnbZRYbx",
+                  "keywords": [],
+                  "score": 5,
+                  "text": "Yes, I am."
+                },
+                {
+                  "action": "End Chat",
+                  "afterMessage": "Sorry, to qualify for this role, you need to meet the requirements.",
+                  "blockToGoID": null,
+                  "id": "ZsqDDrCE",
+                  "keywords": [],
+                  "score": -999,
+                  "text": "No "
+                }
+              ],
+              "text": "Are you happy with the job requirements? "
+            },
+            "DataType": "NoType",
+            "ID": "M8uAtCrF",
+            "SkipAction": "End Chat",
+            "SkipBlockToGoID": null,
+            "SkipText": "Skip!",
+            "Skippable": false,
+            "StoreInDB": true,
+            "Type": "Question"
+          },
+          {
+            "Content": {
+              "action": "Go To Next Block",
+              "afterMessage": "Last question....",
+              "blockToGoID": "vwNj8gwm",
+              "keywords": [],
+              "text": "What is your name?"
+            },
+            "DataType": "CandidateName",
+            "ID": "NOcvpFSt",
+            "SkipAction": "End Chat",
+            "SkipBlockToGoID": null,
+            "SkipText": "Skip!",
+            "Skippable": false,
+            "StoreInDB": true,
+            "Type": "User Input"
+          },
+          {
+            "Content": {
+              "answers": [
+                {
+                  "action": "Go To Specific Block",
+                  "afterMessage": "Cool",
+                  "blockToGoID": "X85kNbQe",
+                  "id": "l2CV0ALP",
+                  "keywords": [],
+                  "score": 5,
+                  "text": "Mobile"
+                },
+                {
+                  "action": "Go To Specific Block",
+                  "afterMessage": "Sure",
+                  "blockToGoID": "Yav4KhzS",
+                  "id": "aZx-05A4",
+                  "keywords": [],
+                  "score": 5,
+                  "text": "Mail"
+                }
+              ],
+              "text": "What;s your preferred method of contact?"
+            },
+            "DataType": "NoType",
+            "ID": "vwNj8gwm",
+            "SkipAction": "End Chat",
+            "SkipBlockToGoID": null,
+            "SkipText": "Skip!",
+            "Skippable": false,
+            "StoreInDB": true,
+            "Type": "Question"
+          },
+          {
+            "Content": {
+              "action": "Go To Specific Block",
+              "afterMessage": "Great, thank you for your information.",
+              "blockToGoID": "MfFsew9H",
+              "keywords": [],
+              "text": "What's the best mobile number to reach you on?"
+            },
+            "DataType": "CandidateMobile",
+            "ID": "X85kNbQe",
+            "SkipAction": "End Chat",
+            "SkipBlockToGoID": null,
+            "SkipText": "Skip!",
+            "Skippable": false,
+            "StoreInDB": true,
+            "Type": "User Input"
+          },
+          {
+            "Content": {
+              "action": "Go To Next Block",
+              "afterMessage": "Great, thank you for your information.",
+              "blockToGoID": "MfFsew9H",
+              "keywords": [],
+              "text": "What is the best email address to contact you on?"
+            },
+            "DataType": "CandidateEmail",
+            "ID": "Yav4KhzS",
+            "SkipAction": "End Chat",
+            "SkipBlockToGoID": null,
+            "SkipText": "Skip!",
+            "Skippable": false,
+            "StoreInDB": true,
+            "Type": "User Input"
+          },
+          {
+            "Content": {
+              "action": "End Chat",
+              "blockToGoID": null,
+              "text": "One of our consultants will be in touch as soon as possible."
+            },
+            "DataType": "NoType",
+            "ID": "MfFsew9H",
+            "SkipAction": "End Chat",
+            "SkipBlockToGoID": null,
+            "SkipText": "Skip!",
+            "Skippable": false,
+            "StoreInDB": false,
+            "Type": "Raw Text"
+          },
+          {
+            "Type": "Raw Text",
+            "StoreInDB": false,
+            "Skippable": false,
+            "SkipText": "Skip!",
+            "SkipAction": "End Chat",
+            "SkipBlockToGoID": null,
+            "DataType": "NoType",
+            "Content": {
+              "text": "The job is located, ${Job Location}$ (MENU)",
+              "action": "Go To Next Block",
+              "blockToGoID": "55p3czu2"
+            },
+            "ID": "NMIhKo4P"
+          },
+          {
+            "Type": "Question",
+            "StoreInDB": true,
+            "Skippable": false,
+            "SkipText": "Skip!",
+            "SkipAction": "End Chat",
+            "SkipBlockToGoID": null,
+            "DataType": "NoType",
+            "Content": {
+              "text": "Now that you know a little more, how can we point you in the right direction?",
+              "answers": [
+                {
+                  "id": "nrB7AvD_",
+                  "text": "Apply for the job",
+                  "keywords": [],
+                  "blockToGoID": "nv1eMgRD",
+                  "action": "Go To Specific Block",
+                  "afterMessage": "Great, let's get started",
+                  "score": 5
+                },
+                {
+                  "id": "AXVi8rmW",
+                  "text": "What is the salary?",
+                  "keywords": [],
+                  "blockToGoID": "cOi41vty",
+                  "action": "Go To Specific Block",
+                  "afterMessage": "Sure, let me tell you more",
+                  "score": 5
+                }
+              ]
+            },
+            "ID": "55p3czu2"
+          }
+        ],
+        "description": "",
+        "id": "KW13Hnf1",
+        "name": "Main"
+      }
+    ]
+  }
+}

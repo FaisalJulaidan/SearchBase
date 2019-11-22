@@ -35,7 +35,7 @@ class ROI extends React.Component {
                                         <Col xs={12}>
                                             <span className={styles.input_question}>How many recruiters & consultants work in your firm?</span>
                                         </Col>
-                                        <Col xs={{span: 4, offset: 4}}>
+                                        <Col xs={{span: 6, offset: 3}} md={{span: 4, offset: 4}}>
                                             {/*<span className={styles.input_title}>Consultant number</span>*/}
                                             <Input className={styles.input} size="large" placeholder="50"
                                                    value={this.state.consultants}
@@ -83,19 +83,19 @@ class ROI extends React.Component {
                                             </Col>
                                         </Row>
                                         <Row className={styles.row_result}>
-                                            <Col xs={3}>
+                                            <Col xs={{span: 8, offset: 2}} sm={{span: 6, offset: 0}} lg={3}>
                                                 <ResultItem title="Days"
                                                             value={((this.state.consultants * 84) / 24).toFixed()}/>
                                             </Col>
-                                            <Col xs={3}>
+                                            <Col xs={{span: 8, offset: 2}} sm={{span: 6, offset: 0}} lg={3}>
                                                 <ResultItem title="Audiobooks"
                                                             value={(this.state.consultants * 84 / 11).toFixed()}/>
                                             </Col>
-                                            <Col xs={3}>
+                                            <Col xs={{span: 8, offset: 2}} sm={{span: 6, offset: 0}} lg={3}>
                                                 <ResultItem title="Ferrari 488"
                                                             value={(revenueGenerated / 195363).toFixed()}/>
                                             </Col>
-                                            <Col xs={3}>
+                                            <Col xs={{span: 8, offset: 2}} sm={{span: 6, offset: 0}} lg={3}>
                                                 <ResultItem title="Gold Britannia Coin"
                                                             value={(revenueGenerated / 1177).toFixed()}/>
                                             </Col>

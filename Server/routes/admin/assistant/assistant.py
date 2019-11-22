@@ -3,6 +3,7 @@ from flask_jwt_extended import jwt_required, get_jwt_identity
 
 from models import Callback
 from services import assistant_services
+from services.user_services import getOwnersOfAssistants
 from utilities import helpers, wrappers
 
 
@@ -24,21 +25,28 @@ def assistants():
         callback: Callback = assistant_services.getAll(user['companyID'])
         if not callback.Success:
             return helpers.jsonResponse(False, 404, "Cannot fetch Assistants")
-        return helpers.jsonResponse(True, 200,
-                                    "Assistants Returned!",
-                                    {"assistants": helpers.getListFromLimitedQuery(['ID',
+
+        callback: Callback = getOwnersOfAssistants(helpers.getListFromLimitedQuery(['ID',
                                                                                     'Name',
                                                                                     'Description',
                                                                                     'Message',
                                                                                     'TopBarText',
-                                                                                    'Active'],
-                                                                                   callback.Data)})
+                                                                                    'Active',
+                                                                                    'OwnerID'],
+                                                                                   callback.Data))
+        if not callback.Success:
+            return helpers.jsonResponse(False, 404, "Cannot fetch Owners")
+
+        return helpers.jsonResponse(True, 200,
+                                    "Assistants Returned!",
+                                    {"assistants": callback.Data})
     if request.method == "POST":
         data = request.json
         callback: Callback = assistant_services.create(data.get('assistantName'),
                                                        data.get('assistantDesc'),
                                                        data.get('welcomeMessage'),
                                                        data.get('topBarText'),
+                                                       data.get('flow'),
                                                        data.get('template'),
                                                        user['companyID'])
         if not callback.Success:
@@ -106,6 +114,7 @@ def assistant_configs(assistantID):
                                                               updatedSettings.get("secondsUntilPopup"),
                                                               updatedSettings.get("notifyEvery"),
                                                               updatedSettings.get('config'),
+                                                              updatedSettings.get("owners"),
                                                               user['companyID']
                                                               )
     if not callback.Success:

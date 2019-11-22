@@ -1,9 +1,9 @@
 .wrapper {
     display: flex;
-    flex-flow: column;
+    flex-direction: column;
     height: 100%;
     color: #767676;
-    margin: 25px 10px;
+    margin: 15px 5px;
     /*align-items: center;*/
 }
 
@@ -33,9 +33,9 @@
     margin-top: .4em;
 }
 
-.price_subtitle{
+.price_subtitle {
     margin: 0.2em 0 1em 0;
-    font-size: 1.1em;
+    font-size: .95em;
     font-weight: bold;
     color: #9254de;
 }
@@ -44,14 +44,13 @@
     margin-top: .5em;
     color: #767676;
     font-size: 0.95em;
-    flex-grow: 1;
 }
 
 .list li {
     margin: .5em 0;
 }
 
-.list li .icon{
+.list li .icon {
     margin-right: 5px;
 }
 
@@ -94,4 +93,19 @@
 .button a {
     text-decoration: none;
     color: #9254de;
+}
+
+.enterprise {
+    color: #848484;
+    font-size: .85em;
+    margin-top: 40px;
+}
+
+.enterprise a {
+    color: #9254de;
+    text-decoration: none;
+}
+
+.enterprise a:hover {
+    color: #9C7DED;
 }

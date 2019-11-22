@@ -23,17 +23,11 @@ export const VincereFeatures = () =>
             </ul>
         </Paragraph>
         <Paragraph>
-            You can request both information by heading to this link:
-            <Text code style={{margin: '0 0 0 5px'}}>
-                <a href="https://www.Vincere.com/uk/technical-support-2/" target={'_blank'}
-                   style={{cursor: 'pointer'}}>
-                    https://www.Vincere.com/uk/technical-support-2/
-                </a>
-            </Text>.
+            You can request that information by contacting your Vincere account manager.
         </Paragraph>
 
         <Paragraph>
-            Once you have the necessary information, you can simply start using Vincere + TheSearchBase.
+            Once you have the necessary information, you can start using Vincere + TheSearchBase.
         </Paragraph>
 
         <Title level={2}>Guidelines and Resources</Title>

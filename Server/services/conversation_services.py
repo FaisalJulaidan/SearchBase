@@ -93,7 +93,6 @@ def processConversation(assistantHashID, data: dict) -> Callback:
 
             crmInformation = helpers.verificationSigner.loads(data["crmInformation"].get("source"),
                                                               salt='crm-information')
-            print(crmInformation)
             source = crmInformation["source"]
             sourceID = crmInformation["crmID"]
             candidateID = crmInformation["candidateID"]

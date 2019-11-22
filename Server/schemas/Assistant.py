@@ -44,6 +44,8 @@ class Assistant(db.Model):
     Conversations = db.relationship('Conversation', back_populates='Assistant')
 
     Campaigns = db.relationship('Campaign', back_populates='Assistant')
+    
+    CRMAutoPilots = db.relationship('Assistant', back_populates='ReferralAssistant')
 
     # Constraints:
     # cannot have two assistants with the same name under one company

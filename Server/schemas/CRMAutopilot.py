@@ -6,13 +6,23 @@ class CRMAutoPilot(db.Model):
     Active = db.Column(db.Boolean, nullable=False, default=True)
 
     LastReferral = db.Column(db.DateTime(), default=None)
-
+    ReferralEmailTitle = db.Column(db.String(260), nullable=True)
+    ReferralEmailBody = db.Column(db.Text, nullable=False)
+    ReferralSMS = db.Column(db.Text, nullable=False)
+    
+    ReferralAssistantID = db.Column(db.Integer, db.ForeignKey('assistant.ID', ondelete='cascade'), nullable=False)
+    ReferralAssistant = db.relationship('Assistant', back_populates='CRMAutoPilots')
+ 
     CRMID = db.Column(db.Integer, db.ForeignKey('CRM.ID', ondelete='cascade'), nullable=False)
     CRM = db.relationship('CRM', back_populates='CRMAutoPilot')
 
     # Relationships:
     CompanyID = db.Column(db.Integer, db.ForeignKey('company.ID', ondelete='cascade'), nullable=False)
     Company = db.relationship('Company', back_populates='CRMAutoPilots')
+
+
+    # AssistantID = db.Column(db.Integer, db.ForeignKey('assistant.ID', ondelete='SET NULL'))
+    # Assistant = db.relationship("Assistant", back_populates="Campaigns")
 
     # Constraints:
     # cannot have two auto pilot with the same name under one company

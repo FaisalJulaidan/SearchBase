@@ -63,7 +63,6 @@ class Settings extends Component {
             };
             values.owners = [parseInt(values.owners) || 0]; //To be removed when server-side codes for multiple owners are ready
             // values.owners = values.owners || []; //To be uncommented after removing above line
-            console.log(values);
             delete values.restrictedCountries;
             values.notifyEvery = this.state.notifyEvery;
 
@@ -83,7 +82,6 @@ class Settings extends Component {
     };
 
     uploadLogo = async (file) => {
-        console.log('UPLOADDDD');
         console.log(file);
         this.props.dispatch(assistantActions.uploadLogo(this.props.assistant.ID, file));
     };

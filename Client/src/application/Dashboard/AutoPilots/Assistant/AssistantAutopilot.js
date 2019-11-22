@@ -40,7 +40,7 @@ const customPanelStyle = {
 };
 
 class AssistantAutoPilot extends React.Component {
-
+  
     state = {
         rejectApplications: false,
         acceptApplications: false,
@@ -84,6 +84,7 @@ class AssistantAutoPilot extends React.Component {
     };
 
     componentDidMount() {
+      console.log("mount")
         this.props.dispatch(appointmentAllocationTimeActions.fetchAAT());
         this.props.dispatch(campaignActions.fetchCampaigns()); //TODO: To be removed (Fetching assistants for referral for now)
         this.props.dispatch(autoPilotActions.fetchAutoPilot(this.props.id))
@@ -116,7 +117,7 @@ class AssistantAutoPilot extends React.Component {
                     // contractFollowUpEmailBody: autoPilot.ContractFollowUpEmailBody,
                     // contractFollowUpSMSBody: autoPilot.ContractFollowUpSMSBody.split('\n').map(x => `<p>${x ? x : '&nbsp;'}</p>`).join(' '),
                 });
-            }).catch(() => history.push(`/dashboard/auto_pilots`))  ;
+            }).catch((e) => {console.log("kek"); console.log(e)})  ;
     }
 
     onRejectChange = (checked) => this.setState({
@@ -167,7 +168,7 @@ class AssistantAutoPilot extends React.Component {
             // const timeSlots = TimeSlotsRef.current.state.weekDays;
             let payload = {
                 active: autoPilot.Active,
-                name: values.name,
+                namewh: values.name,
                 description: values.description,
 
                 acceptApplications: state.acceptApplications,

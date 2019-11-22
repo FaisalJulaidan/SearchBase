@@ -92,7 +92,7 @@ class CRMAutoPilots extends React.Component {
             <>
                 <div className={styles.Body}>
                     {id && !this.props.isLoading ?     
-                    <CRMAutoPilot crmAP={this.props.CRMautoPilotsList.find(crmAP => crmAP.ID === parseInt(id))}/> 
+                    <CRMAutoPilot assistants={this.props.assistants} crmAP={this.props.CRMautoPilotsList.find(crmAP => crmAP.ID === parseInt(id))}/> 
                     :
                     <>
                       <CreateNewBox text={'Add CRM Auto Pilot'} onClick={this.showNewAutoPilotModal}/>
@@ -141,10 +141,10 @@ class CRMAutoPilots extends React.Component {
 }
 
 function mapStateToProps(state) {
-  console.log(state)
     return {
         CRMautoPilotsList: state.CRMAutoPilot.CRMAutoPilotsList,
-        isLoading: state.CRMAutoPilot.isLoading
+        isLoading: state.CRMAutoPilot.isLoading,
+        assistants: state.assistant.assistantList
     };
 }
 

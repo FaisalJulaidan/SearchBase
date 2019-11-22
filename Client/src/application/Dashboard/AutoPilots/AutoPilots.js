@@ -11,10 +11,6 @@ const {Title, Paragraph} = Typography;
 
 class AutoPilots extends React.Component {
 
-    state = {
-      tab: null
-    }
-
     // it must be an array of Menu.Item. ViewBox expect that in its options Menu
     optionsMenuItems = [
         <Menu.Item style={{padding:10, paddingRight: 30}} key="edit">
@@ -28,20 +24,26 @@ class AutoPilots extends React.Component {
     ];
 
     checkPageIs = (name) => {
-      return this.props.location.pathname.indexOf(name) !== -1
-    }
+      if(this.props.location.pathname.indexOf(name.toLowerCase()) !== -1){
+        return name
+      }
+      return null
+      }
 
     setTab = (tabKey) => {
       if(!this.checkPageIs(tabKey.toLowerCase())) {
-        this.setState({tab: tabKey})
         let newPage = `/dashboard/auto_pilots/${tabKey.toLowerCase()}`
         this.props.history.push(newPage)
       }
     }
+    componentDidMount(){
+      if(!this.checkPageIs("assistant") && !this.checkPageIs("crm")){
+        this.setTab("assistant")
+      }
+    }
 
-    render() {
-        
-        let key = this.state.tab ? this.state.tab : this.checkPageIs("assistant") ? "Assistant" : "CRM"
+    render() {      
+      let def = this.checkPageIs("crm") ? "CRM" : "Assistant"
         return (
             <>
                 <NoHeaderPanel>
@@ -53,7 +55,7 @@ class AutoPilots extends React.Component {
                             Connect your Assistants to an Auto Pilot to automate managing candidate acceptance and appointment scheduling
                         </Paragraph>
                     </div>
-                    <Tabs onTabClick={this.setTab} activeKey={key}>
+                    <Tabs onTabClick={this.setTab} defaultActiveKey={def}>
                       <Tabs.TabPane tab="Assistant Autopilots" key="Assistant">
                           <AssistantAutopilots/>
                       </Tabs.TabPane>

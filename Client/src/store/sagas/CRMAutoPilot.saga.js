@@ -40,17 +40,17 @@ function* addCRMAutoPilot({type, newAutoPilot}) {
     }
 }
 
-// function* updateAutoPilot({autoPilotID, updatedValues}) {
-//     try {
-//         const res = yield http.put(`auto_pilot/${autoPilotID}`, updatedValues);
-//         yield put(autoPilotActions.updateAutoPilotSuccess(autoPilotID, res.data?.data, res.data?.msg));
-//         successMessage('Auto pilot updated');
-//     } catch (error) {
-//         const msg = error.response?.data?.msg || "Couldn't update auto pilot";
-//         yield put(autoPilotActions.updateAutoPilotFailure(msg));
-//         errorMessage(msg);
-//     }
-// }
+function* updateCRMAutoPilot({CRMAutoPilotID, updatedValues}) {
+    try {
+        const res = yield http.put(`crm_auto_pilot/${CRMAutoPilotID}`, updatedValues);
+        yield put(CRMAutoPilotActions.updateCRMAutoPilotSuccess(CRMAutoPilotID, res.data?.data, res.data?.msg));
+        successMessage('CRM Auto pilot updated');
+    } catch (error) {
+        const msg = error.response?.data?.msg || "Couldn't update CRM auto pilot";
+        yield put(CRMAutoPilotActions.updateCRMAutoPilotFailure(msg));
+        errorMessage(msg);
+    }
+}
 
 // function* updateAutoPilotConfigs({autoPilotID, updatedValues}) {
 //     try {
@@ -103,9 +103,9 @@ function* watchAddCRMAutoPilot() {
     yield takeLatest(actionTypes.ADD_CRM_AUTOPILOT_REQUEST, addCRMAutoPilot)
 }
 
-// function* watchUpdateAutoPilot() {
-//     yield takeLatest(actionTypes.UPDATE_AUTOPILOT_REQUEST, updateAutoPilot)
-// }
+function* watchUpdateCRMAutoPilot() {
+    yield takeLatest(actionTypes.UPDATE_CRM_AUTOPILOT_REQUEST, updateCRMAutoPilot)
+}
 
 // function* watchUpdateAutoPilotConfigs() {
 //     yield takeLatest(actionTypes.UPDATE_AUTOPILOT_CONFIGS_REQUEST, updateAutoPilotConfigs)
@@ -124,6 +124,7 @@ export function* CRMAutoPilotSaga() {
         watchFetchCRMAutoPilots(),
         watchFetchCRMAutoPilot(),
         watchAddCRMAutoPilot(),
+        watchUpdateCRMAutoPilot(),
         // watchUpdateAutoPilot(),
         // watchUpdateAutoPilotConfigs(),
         // watchDeleteAutoPilot(),

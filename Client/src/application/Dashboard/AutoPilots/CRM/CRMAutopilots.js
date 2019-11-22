@@ -7,9 +7,9 @@ import CreateNewBox from "components/CreateNewBox/CreateNewBox";
 import ViewBox from "components/ViewBox/ViewBox";
 import LoadingViewBox from "components/LoadingViewBox/LoadingViewBox";
 import {AutoPilotIcon} from "components/SVGs";
-import NewAutoPilotModal from '../Modals/NewAutoPilotModal'
-import EditAutoPilotModal from '../Modals/EditAutoPilotModal'
-import {CRMAutoPilotActions} from "store/actions";
+import NewAutoPilotModal from './Modals/NewCRMAutoPilotModal'
+import EditAutoPilotModal from './Modals/EditCRMAutoPilotModal'
+import {CRMAutoPilotActions, assistantActions} from "store/actions";
 import 'types/TimeSlots_Types'
 import {history} from "helpers";
 
@@ -27,7 +27,8 @@ class CRMAutoPilots extends React.Component {
     };
 
     componentDidMount() {
-        // this.props.dispatch(CRMAutoPilotActions.fetchCRMAutoPilots())
+        this.props.dispatch(CRMAutoPilotActions.fetchCRMAutoPilots())
+        this.props.dispatch(assistantActions.fetchAssistants())
     }
 
     showNewAutoPilotModal = () => this.setState({newAutoPilotModalVisible: true});
@@ -92,7 +93,10 @@ class CRMAutoPilots extends React.Component {
             <>
                 <div className={styles.Body}>
                     {id && !this.props.isLoading ?     
-                    <CRMAutoPilot assistants={this.props.assistants} crmAP={this.props.CRMautoPilotsList.find(crmAP => crmAP.ID === parseInt(id))}/> 
+                    <CRMAutoPilot 
+                        assistants={this.props.assistants} 
+                        crmAP={this.props.CRMautoPilotsList.find(crmAP => crmAP.ID === parseInt(id))} 
+                        update={(values) => this.props.dispatch(CRMAutoPilotActions.updateCRMAutoPilot(id, values))}/> 
                     :
                     <>
                       <CreateNewBox text={'Add CRM Auto Pilot'} onClick={this.showNewAutoPilotModal}/>

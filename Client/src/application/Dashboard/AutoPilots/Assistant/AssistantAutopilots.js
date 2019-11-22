@@ -7,8 +7,8 @@ import CreateNewBox from "components/CreateNewBox/CreateNewBox";
 import ViewBox from "components/ViewBox/ViewBox";
 import LoadingViewBox from "components/LoadingViewBox/LoadingViewBox";
 import {AutoPilotIcon} from "components/SVGs";
-import NewAutoPilotModal from '../Modals/NewAutoPilotModal'
-import EditAutoPilotModal from '../Modals/EditAutoPilotModal'
+import NewAutoPilotModal from './Modals/NewAutoPilotModal'
+import EditAutoPilotModal from './Modals/EditAutoPilotModal'
 import {autoPilotActions} from "store/actions";
 import 'types/TimeSlots_Types'
 import {history} from "helpers";

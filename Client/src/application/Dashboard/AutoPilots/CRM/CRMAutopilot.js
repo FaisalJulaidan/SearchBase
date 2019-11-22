@@ -1,9 +1,9 @@
 import React from 'react'
-import {Breadcrumb, Button, Col, Collapse, Form, Input, Row, Switch, Typography} from 'antd';
+import {Breadcrumb, Button, Col, Collapse, Form, Input, Divider, Row, Switch, Typography, Select} from 'antd';
 import CKEditor from '@ckeditor/ckeditor5-react';
 import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
 import 'types/TimeSlots_Types'
-import {history} from "helpers";
+import {history, trimText} from "helpers";
 
 import {CRMAutoPilotActions} from "store/actions";
 
@@ -35,15 +35,45 @@ const toolbar = [
 
 class CRMAutoPilot extends React.Component {
 
+
     state = {
-      referralEmailBody: this.props.crmAP.referralEmailBody,
-      sendReferralEmail: this.props.crmAP.referralEmailBody && this.props.crmAP.ReferralEmailTitle,
-      sendReferralSMS: this.props.crmAP.referralSMSBody && this.props.crmAP.ReferralSMS,
-      referralSMSBody: this.props.crmAP.referralSMSBody
+      referralEmailBody: this.props?.crmAP?.referralEmailBody,
+      sendReferralEmail: this.props?.crmAP?.referralEmailBody && this.props?.crmAP?.ReferralEmailTitle,
+      sendReferralSMS: this.props?.crmAP?.referralSMSBody && this.props?.crmAP?.ReferralSMS,
+      referralSMSBody: this.props?.crmAP?.referralSMSBody,
+      autoRefer: this.props?.crmAP?.referralAssistantID !== null
+    }
+
+    componentWillMount() {
+      if(!this.props.crmAP){
+        history.push("/dashboard/auto_pilots/crm")  
+      }
+    }
+
+    referralError = () => {
+      let valid = this.state.sendReferralEmail ? this.state.referralEmailBody !== "" : true
+      valid = this.state.sendReferralSMS ?  this.state.referralSMSBody !== "" : valid
+      return valid
+    }
+
+    onSubmit = ()  =>  {
+      this.props.form.validateFields((err, values) => {
+        const { referralEmailBody, referralSMSBody } = this.state
+        let valid = !err && this.referralError()
+        let updatedValues = [{referralEmailBody}, {referralEmailBody}].concat(Object.keys(values).map(key => ({[key]: values[key]})))
+        updatedValues = updatedValues.filter(value => Object.keys(value).filter(key => value[key] !== null && value[key] !== undefined).length !== 0) 
+        updatedValues = updatedValues.reduce((prev, curr) => ({...prev, [Object.keys(curr)[0]]: Object.keys(curr).map(key => curr[key])[0] }), {})
+        if(valid){
+          this.props.update(values)
+        }
+      })
+    }
+
+    handleDelete = () => {
+
     }
 
     render() {
-      console.log(this.props)
       const {getFieldDecorator} = this.props.form;  
       const { crmAP } = this.props
       const { sendReferralEmail, sendReferralSMS } = this.state
@@ -78,11 +108,9 @@ class CRMAutoPilot extends React.Component {
                                     help="Select an assistant to auto refer the applicants">
                               {getFieldDecorator('referApplications', {
                                   valuePropName: 'checked',
-                                  initialValue: crmAP.LastReferral !== null,
+                                  initialValue: this.state.autoRefer,
                               })(
-                                  <Switch onChange={this.onReferChange}
-                                          style={{marginRight: 15}}
-                                  />
+                                  <Switch onChange={e => this.setState({autoRefer: e})} style={{marginRight: 15}} />
                               )}
                           </FormItem>
                           <FormItem label={"Assistant"}>
@@ -95,9 +123,9 @@ class CRMAutoPilot extends React.Component {
                               })(
                                   <Select placeholder={"Please select an assistant"}
                                           loading={this.props.isLoading}
-                                          disabled={!this.state.referApplications}>
+                                          disabled={!this.state.autoRefer}>
                                       {(() => {
-                                          return this.props.campaignOptions?.assistants?.map((item, key) => {
+                                          return this.props?.assistants.map((item, key) => {
                                               return (
                                                   <Select.Option key={key} value={item.ID}>
                                                       {trimText.capitalize(trimText.trimDash(item.Name))}
@@ -118,18 +146,19 @@ class CRMAutoPilot extends React.Component {
                                   </div>
                               )}
                           </FormItem>
-                          <FormItem label="Referral Email Title" vi>
-                              {getFieldDecorator('referralEmailTitle', {
-                                  initialValue: crmAP.ReferralEmailTitle,
-                                  rules: [{required: true}]
-                              })(
-                                  <Input placeholder=""/>
-                              )}
-                          </FormItem>
                           { sendReferralEmail &&
+                          <>
+                              <FormItem label="Referral Email Title" vi>
+                                {getFieldDecorator('referralEmailTitle', {
+                                    initialValue: crmAP.ReferralEmailTitle,
+                                    rules: [{required: true}]
+                                })(
+                                    <Input placeholder="referral email title"/>
+                                )}
+                              </FormItem>
                               <Row className={styles.CEKwrapper}>
                                   <h4>Referral letter</h4>
-                                  { this.state.sendReferralEmailErrors &&
+                                  { this.state.referralEmailBody === "" &&
                                     <p style={{color: 'red'}}> * Title and Body field are required</p>}
                                   <ButtonGroup style={{margin: '5px 0'}}>
                                       <Button onClick={() => this.setState({ referralEmailBody: this.state.referralEmailBody + ' ${candidateName}$' })}>
@@ -151,6 +180,7 @@ class CRMAutoPilot extends React.Component {
                                       </Col>
                                   </Row>
                               </Row>
+                          </>
                           }
                           <FormItem label="Auto send SMS"
                                     help="Referred applicants will be notified via SMS if telephone number is provided in the chat  (candidates applications only)">
@@ -166,7 +196,7 @@ class CRMAutoPilot extends React.Component {
                           {sendReferralSMS &&
                               <Row className={styles.CEKwrapper}>
                                   <h4>Referral message</h4>
-                                  {this.state.sendReferralSMSErrors &&
+                                  {this.state.referralSMSBody === "" &&
                                       <p style={{color: 'red'}}> * Body field is required</p>}
                                   <ButtonGroup style={{margin: '5px 0'}}>
                                       <Button onClick={() =>this.setState({ referralSMSBody: this.state.referralSMSBody + ' ${candidateName}$'})}>
@@ -190,9 +220,13 @@ class CRMAutoPilot extends React.Component {
                                   </Row>
                               </Row>
                           }
-
                       </Panel>
                   </Collapse>
+                  <Button type={'primary'} size={'large'} onClick={this.onSubmit} style={{marginTop: 30}}>
+                      Save changes
+                  </Button>
+                  <Divider/>
+                  <Button type={'danger'} size={'large'} onClick={this.handleDelete}>Delete Auto Pilot</Button>
               </Form> 
           </div>
       </div>)

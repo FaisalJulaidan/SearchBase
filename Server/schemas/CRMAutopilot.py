@@ -21,9 +21,6 @@ class CRMAutoPilot(db.Model):
     Company = db.relationship('Company', back_populates='CRMAutoPilots')
 
 
-    # AssistantID = db.Column(db.Integer, db.ForeignKey('assistant.ID', ondelete='SET NULL'))
-    # Assistant = db.relationship("Assistant", back_populates="Campaigns")
-
     # Constraints:
     # cannot have two auto pilot with the same name under one company
     __table_args__ = (db.UniqueConstraint('CompanyID', 'Name', name='uix1_crm_auto_pilot'),)

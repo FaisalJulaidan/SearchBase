@@ -1,10 +1,10 @@
-import React, { Component } from 'react';
-import { connect } from 'react-redux';
-import { store } from 'store/store';
+import React, {Component} from 'react';
+import {connect} from 'react-redux';
+import {store} from 'store/store';
 
-import { Button, Divider, Form, Input, InputNumber, Modal, Radio, Select, Switch } from 'antd';
-import { assistantActions } from 'store/actions';
-import { history } from 'helpers';
+import {Button, Select, Form, Input, InputNumber, Divider, Switch, Modal, Radio} from 'antd';
+import {assistantActions, usersManagementActions} from 'store/actions';
+import {history} from 'helpers';
 
 import countries from 'helpers/static_data/countries';
 import LogoUploader from 'components/LogoUploader/LogoUploader';
@@ -34,6 +34,7 @@ class Settings extends Component {
             notifyEvery: assistant.NotifyEvery === null ? 'null' : assistant.NotifyEvery,
             isManualNotify: manualNotify.indexOf(assistant.NotifyEvery) === -1
         });
+        this.props.dispatch(usersManagementActions.getUsers());
     }
 
 
@@ -60,7 +61,8 @@ class Settings extends Component {
                 ...this.props.assistant.Config,
                 restrictedCountries: values.restrictedCountries || []
             };
-
+            values.owners = [parseInt(values.owners) || 0]; //To be removed when server-side codes for multiple owners are ready
+            // values.owners = values.owners || []; //To be uncommented after removing above line
             delete values.restrictedCountries;
             values.notifyEvery = this.state.notifyEvery;
 
@@ -80,7 +82,6 @@ class Settings extends Component {
     };
 
     uploadLogo = async (file) => {
-        console.log('UPLOADDDD');
         console.log(file);
         this.props.dispatch(assistantActions.uploadLogo(this.props.assistant.ID, file));
     };
@@ -92,7 +93,10 @@ class Settings extends Component {
         const {getFieldDecorator} = this.props.form;
         const {assistant} = this.props;
         const countriesOptions = [...countries.map(country => <Option key={country.code}>{country.name}</Option>)];
-
+        const ownersOptions = [this.props.usersList?.map(user => <Option
+            key={user.user.ID}>{`${user.user.Firstname} ${user.user.Surname} (${user.user.Email})`}</Option>)];
+        let initialOwner = this.props.usersList?.filter(
+            user => user.user.ID === assistant?.UserID)[0]?.user.ID;
         return (
             <>
                 <Form layout='vertical' wrapperCol={{span: 10}}>
@@ -221,6 +225,23 @@ class Settings extends Component {
                     </Form.Item>
 
                     <FormItem
+                        label="Owner"
+                        extra="Selected user will be notified, when there is a new record.">
+                        {
+                            getFieldDecorator('owners', {
+                                initialValue: `${initialOwner}`
+                            })(
+                                <Select style={{width: '100%'}}
+                                        loading={this.state.isLoading}
+                                        filterOption={(inputValue, option) => option.props.children.toLowerCase().includes(inputValue.toLowerCase())}
+                                        placeholder="Please select a user">
+                                    {ownersOptions}
+                                </Select>
+                            )
+                        }
+                    </FormItem>
+
+                    <FormItem
                         label="Restricted Countries"
                         extra="Chatbot will be disabled for users who live in the selected countries"
                     >
@@ -236,6 +257,7 @@ class Settings extends Component {
                             )
                         }
                     </FormItem>
+
 
                     <Button type={'primary'} size={'large'} onClick={this.handleSave}>Save changes</Button>
                 </Form>
@@ -266,7 +288,10 @@ class Settings extends Component {
 }
 
 function mapStateToProps(state) {
-    return {};
+    return {
+        usersList: state.usersManagement.usersList,
+        isLoading: state.usersManagement.isLoading
+    };
 }
 
 export default connect(mapStateToProps)(Form.create()(Settings));

@@ -14,14 +14,14 @@ class CRMAutoPilot(db.Model):
     SendReferralSMS = db.Column(db.Boolean, nullable=False, default=False)
     ReferralSMSBody = db.Column(db.Text, nullable=False, default=None)
     
-    ReferralAssistantID = db.Column(db.Integer, db.ForeignKey('assistant.ID', ondelete='cascade'), nullable=False)
+    ReferralAssistantID = db.Column(db.Integer, db.ForeignKey('assistant.ID', ondelete='SET NULL'), nullable=False)
     ReferralAssistant = db.relationship('Assistant', back_populates='CRMAutoPilots')
  
-    CRMID = db.Column(db.Integer, db.ForeignKey('CRM.ID', ondelete='cascade'), nullable=False)
+    CRMID = db.Column(db.Integer, db.ForeignKey('CRM.ID', ondelete='SET NULL'), nullable=False)
     CRM = db.relationship('CRM', back_populates='CRMAutoPilot')
 
     # Relationships:
-    CompanyID = db.Column(db.Integer, db.ForeignKey('company.ID', ondelete='cascade'), nullable=False)
+    CompanyID = db.Column(db.Integer, db.ForeignKey('company.ID', ondelete='SET NULL'), nullable=False)
     Company = db.relationship('Company', back_populates='CRMAutoPilots')
 
 

@@ -40,7 +40,6 @@ const { SubMenu } = Menu;
 const { Divider } = Menu;
 const { Header, Content, Footer, Sider } = Layout;
 
-
 class Dashboard extends Component {
     state = {
         collapsed: false

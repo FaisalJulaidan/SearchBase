@@ -32,6 +32,7 @@ class AutoPilots extends React.Component {
 
     setTab = (tabKey) => {
       if(!this.checkPageIs(tabKey.toLowerCase())) {
+        console.log(`setting to ${tabKey}`)
         let newPage = `/dashboard/auto_pilots/${tabKey.toLowerCase()}`
         this.props.history.push(newPage)
       }

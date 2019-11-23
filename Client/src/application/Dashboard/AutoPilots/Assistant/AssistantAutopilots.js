@@ -82,19 +82,22 @@ class AssistantAutoPilots extends React.Component {
         </Menu.Item>
     ];
 
+
     render() {
         // let open = this.state.openAutoPilot
         const { openAutoPilot } = this.state
         let loc = history.location.pathname.split("/")
-        let inBasePage = loc[loc.length-1] === "assistant"
-        let id = openAutoPilot ? openAutoPilot : !inBasePage ? loc[loc.length-1] : null  
-
+        let inBasePage = loc[loc.length-1] === "assistant" || loc[loc.length-1] === "auto_pilots"
+        console.log(loc)
+        console.log(inBasePage)
+        let id = (inBasePage ? null : loc[loc.length-1]) || openAutoPilot || null
+        console.log(id) 
         return (
             <>
                 <div className={styles.Body}>
                     {id ?     
                     <AssistantAutopilot id={id}/> 
-                    :
+                    : 
                     <>
                       <CreateNewBox text={'Add Auto Pilot'} onClick={this.showNewAutoPilotModal}/>
                       {

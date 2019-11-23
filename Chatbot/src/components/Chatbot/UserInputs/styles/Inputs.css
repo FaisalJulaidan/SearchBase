@@ -149,6 +149,15 @@
     display: inherit;
 }
 
+
+#TheSearchBase_Chatbot_Input input.ant-calendar-input {
+    font-size: 16px !important;
+}
+
+#TheSearchBase_Chatbot_Input input.ant-calendar-picker-input.ant-input {
+    font-size: 16px !important;
+}
+
 .Input > .Submit {
     padding-top: 15px;
 }
@@ -156,7 +165,7 @@
 /* Smart phones (portrait and landscape) ----------- */
 @media only screen and (min-device-width: 320px) and (max-device-width: 480px) {
     .ant-calendar-picker-container.DatepickerCalendar > .ant-calendar {
-        width: calc(100vw - 71px) !important;
+        width: calc(100vw - 76px) !important;
     }
 }
 

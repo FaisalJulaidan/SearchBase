@@ -35,14 +35,15 @@ const Header = (props) => {
                                 </NavDropdown.Item>
                             </NavDropdown>
                             <Nav.Link className={styles.link} as={Link} to="/how-it-works">How it works</Nav.Link>
-                            <NavDropdown id="pricing" className={styles.link_dropdown} title="Pricing">
-                                <NavDropdown.Item className={styles.link} as={Link} to="/pricing">
-                                    Pricing
-                                </NavDropdown.Item>
-                                {/*<NavDropdown.Item className={styles.link} as={Link} to="/roi">*/}
-                                    {/*ROI Calculator*/}
-                                {/*</NavDropdown.Item>*/}
-                            </NavDropdown>
+                            <Nav.Link className={styles.link} as={Link} to="/pricing">Pricing</Nav.Link>
+                            {/*<NavDropdown id="pricing" className={styles.link_dropdown} title="Pricing">*/}
+                            {/*    <NavDropdown.Item className={styles.link} as={Link} to="/pricing">*/}
+                            {/*        Pricing*/}
+                            {/*    </NavDropdown.Item>*/}
+                            {/*    <NavDropdown.Item className={styles.link} as={Link} to="/roi">*/}
+                            {/*        ROI Calculator*/}
+                            {/*    </NavDropdown.Item>*/}
+                            {/*</NavDropdown>*/}
                             <Nav.Link className={styles.link} as={Link} to="/login">Log in</Nav.Link>
                         </Nav>
                         <div className={styles.button_wrapper}>

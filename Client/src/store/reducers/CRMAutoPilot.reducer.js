@@ -92,6 +92,7 @@ export const CRMAutoPilot = (state = initialState, action) => {
                 isLoading: true
             });
         case actionTypes.UPDATE_CRM_AUTOPILOT_CONFIGS_SUCCESS:
+            console.log(action)
             return updateObject(state, {
                 successMsg: action.successMsg,
                 isLoading: false,

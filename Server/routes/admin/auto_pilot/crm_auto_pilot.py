@@ -45,7 +45,7 @@ def crm_auto_pilot(autoPilotID):
         callback = crm_auto_pilot_services.getByID(autoPilotID, user['companyID'])
         if not callback.Success:
             return helpers.jsonResponse(False, 400, callback.Message, None)
-        return helpers.jsonResponse(True, 200, callback.Message, auto_pilot_services.parseAutoPilot(callback.Data))
+        return helpers.jsonResponse(True, 200, callback.Message, helpers.getDictFromSQLAlchemyObj(callback.Data))
 
     # Update AutoPilot
     if request.method == "PUT":
@@ -67,7 +67,7 @@ def crm_auto_pilot(autoPilotID):
     #     return helpers.jsonResponse(True, 200, callback.Message, callback.Data)
 
 
-@crm_auto_pilot_router.route("/auto_pilot/<int:autoPilotID>/configs", methods=['PUT'])
+@crm_auto_pilot_router.route("/crm_auto_pilot/<int:autoPilotID>/configs", methods=['PUT'])
 @jwt_required
 @wrappers.AccessAutoPilotRequired
 def auto_pilot_configs(autoPilotID):
@@ -77,21 +77,21 @@ def auto_pilot_configs(autoPilotID):
     # Update AutoPilot extended configs
     if request.method == "PUT":
         data = request.json
-        callback: Callback = auto_pilot_services \
+        callback: Callback = crm_auto_pilot_services \
             .updateConfigs(autoPilotID,
-                           data.get('name', None),
-                           data.get('description', None),
-                           data.get('active', None),
-                           data.get('referralAssistant', None),
-                           data.get('referralEmailTitle', None),
-                           data.get('referralEmailBody', None),
-                           data.get('referralSMSBody', None),
-                           data.get('sendReferralEmail', None),
-                           data.get('sendReferralSMS', None),
+                           data.get('Name', None),
+                           data.get('Description', None),
+                           data.get('Active', None),
+                           data.get('ReferralAssistantID', None),
+                           data.get('ReferralEmailTitle', None),
+                           data.get('ReferralEmailBody', None),
+                           data.get('ReferralSMSBody', None),
+                           data.get('SendReferralEmail', None),
+                           data.get('SendReferralSMS', None),
                            user['companyID'])
         if not callback.Success:
             return helpers.jsonResponse(False, 400, callback.Message, None)
-        return helpers.jsonResponse(True, 200, callback.Message, auto_pilot_services.parseAutoPilot(callback.Data))
+        return helpers.jsonResponse(True, 200, callback.Message, helpers.getDictFromSQLAlchemyObj(callback.Data))
 
 
 # @crm_auto_pilot_router.route("/auto_pilot/<int:autoPilotID>/status", methods=['PUT'])

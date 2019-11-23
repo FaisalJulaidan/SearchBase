@@ -14,14 +14,14 @@ function* fetchCRMAutoPilots() {
     }
 }
 
-function* fetchCRMAutoPilot({autoPilotID, meta}) {
+function* fetchCRMAutoPilot({CRMAutoPilotID, meta}) {
     try {
-        const res = yield http.get(`/auto_pilot/${autoPilotID}`);
-        yield put({...autoPilotActions.fetchAutoPilotSuccess(res.data?.data), meta});
+        const res = yield http.get(`/crm_auto_pilot/${CRMAutoPilotID}`);
+        yield put({...CRMAutoPilotActions.fetchCRMAutoPilotSuccess(res.data?.data), meta});
 
     } catch (error) {
         const msg = error.response?.data?.msg || "Couldn't load CRM auto pilot";
-        yield put({...autoPilotActions.fetchAutoPilotFailure(msg), meta});
+        yield put({...CRMAutoPilotActions.fetchCRMAutoPilotFailure(msg), meta});
         errorMessage(msg);
     }
 }
@@ -42,7 +42,6 @@ function* addCRMAutoPilot({type, newAutoPilot}) {
 
 function* updateCRMAutoPilot({CRMAutoPilotID, updatedValues}) {
     try {
-        console.log(updatedValues)
         const res = yield http.put(`crm_auto_pilot/${CRMAutoPilotID}`, updatedValues);
         yield put(CRMAutoPilotActions.updateCRMAutoPilotSuccess(CRMAutoPilotID, res.data?.data, res.data?.msg));
         successMessage('CRM Auto pilot updated');
@@ -53,17 +52,17 @@ function* updateCRMAutoPilot({CRMAutoPilotID, updatedValues}) {
     }
 }
 
-// function* updateAutoPilotConfigs({autoPilotID, updatedValues}) {
-//     try {
-//         const res = yield http.put(`auto_pilot/${autoPilotID}/configs`, updatedValues);
-//         yield put(autoPilotActions.updateAutoPilotConfigsSuccess(res.data?.data, res.data?.msg));
-//         successMessage('Auto pilot updated');
-//     } catch (error) {
-//         const msg = error.response?.data?.msg || "Couldn't update auto pilot";
-//         yield put(autoPilotActions.updateAutoPilotConfigsFailure(msg));
-//         errorMessage(msg);
-//     }
-// }
+function* updateCRMAutoPilotConfigs({CRMAutoPilotID, updatedValues}) {
+    try {
+        const res = yield http.put(`crm_auto_pilot/${CRMAutoPilotID}/configs`, updatedValues);
+        yield put(CRMAutoPilotActions.updateCRMAutoPilotConfigsSuccess(res.data?.data, res.data?.msg));
+        successMessage('CRM Auto pilot updated');
+    } catch (error) {
+        const msg = error.response?.data?.msg || "Couldn't update auto pilot";
+        yield put(CRMAutoPilotActions.updateCRMAutoPilotConfigsSuccess(msg));
+        errorMessage(msg);
+    }
+}
 
 // function* deleteAutoPilot({autoPilotID, meta}) {
 //     try {
@@ -108,9 +107,9 @@ function* watchUpdateCRMAutoPilot() {
     yield takeLatest(actionTypes.UPDATE_CRM_AUTOPILOT_REQUEST, updateCRMAutoPilot)
 }
 
-// function* watchUpdateAutoPilotConfigs() {
-//     yield takeLatest(actionTypes.UPDATE_AUTOPILOT_CONFIGS_REQUEST, updateAutoPilotConfigs)
-// }
+function* watchUpdateCRMAutoPilotConfigs() {
+    yield takeLatest(actionTypes.UPDATE_CRM_AUTOPILOT_CONFIGS_REQUEST, updateCRMAutoPilotConfigs)
+}
 
 // function* watchDeleteAutoPilot() {
 //     yield takeLatest(actionTypes.DELETE_AUTOPILOT_REQUEST, deleteAutoPilot)
@@ -126,6 +125,7 @@ export function* CRMAutoPilotSaga() {
         watchFetchCRMAutoPilot(),
         watchAddCRMAutoPilot(),
         watchUpdateCRMAutoPilot(),
+        watchUpdateCRMAutoPilotConfigs()
         // watchUpdateAutoPilot(),
         // watchUpdateAutoPilotConfigs(),
         // watchDeleteAutoPilot(),

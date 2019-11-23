@@ -7,21 +7,21 @@ class CRMAutoPilot(db.Model):
 
     LastReferral = db.Column(db.DateTime(), default=None)
 
-    SendReferralEmail = db.Column(db.Boolean, nullable=False, default=False)
+    SendReferralEmail = db.Column(db.Boolean, nullable=True, default=False)
     ReferralEmailTitle = db.Column(db.String(260), nullable=True, default=None)
-    ReferralEmailBody = db.Column(db.Text, nullable=False, default=None)
+    ReferralEmailBody = db.Column(db.Text, nullable=True, default=None)
 
-    SendReferralSMS = db.Column(db.Boolean, nullable=False, default=False)
-    ReferralSMSBody = db.Column(db.Text, nullable=False, default=None)
+    SendReferralSMS = db.Column(db.Boolean, nullable=True, default=False)
+    ReferralSMSBody = db.Column(db.Text, nullable=True, default=None)
     
-    ReferralAssistantID = db.Column(db.Integer, db.ForeignKey('assistant.ID', ondelete='SET NULL'), nullable=False)
+    ReferralAssistantID = db.Column(db.Integer, db.ForeignKey('assistant.ID', ondelete='SET NULL'), nullable=True)
     ReferralAssistant = db.relationship('Assistant', back_populates='CRMAutoPilots')
  
-    CRMID = db.Column(db.Integer, db.ForeignKey('CRM.ID', ondelete='SET NULL'), nullable=False)
+    CRMID = db.Column(db.Integer, db.ForeignKey('CRM.ID', ondelete='SET NULL'), nullable=True)
     CRM = db.relationship('CRM', back_populates='CRMAutoPilot')
 
     # Relationships:
-    CompanyID = db.Column(db.Integer, db.ForeignKey('company.ID', ondelete='SET NULL'), nullable=False)
+    CompanyID = db.Column(db.Integer, db.ForeignKey('company.ID', ondelete='cascade'), nullable=False)
     Company = db.relationship('Company', back_populates='CRMAutoPilots')
 
 

@@ -1,4 +1,5 @@
 import React from 'react'
+import {connect} from 'react-redux';
 import {Breadcrumb, Button, Col, Collapse, Form, Input, Divider, Row, Switch, Typography, Select} from 'antd';
 import CKEditor from '@ckeditor/ckeditor5-react';
 import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
@@ -37,10 +38,11 @@ class CRMAutoPilot extends React.Component {
 
 
     state = {
-      referralEmailBody: this.props?.crmAP?.referralEmailBody,
-      sendReferralEmail: this.props?.crmAP?.referralEmailBody && this.props?.crmAP?.ReferralEmailTitle,
-      sendReferralSMS: this.props?.crmAP?.referralSMSBody && this.props?.crmAP?.ReferralSMS,
-      referralSMSBody: this.props?.crmAP?.referralSMSBody,
+      referralEmailBody: this.props?.crmAP?.ReferralEmailBody,
+      referralEmailTitle: this.props?.crmAp?.ReferralEmailTitle,
+      sendReferralEmail: this.props?.crmAP?.SendReferralEmail,
+      sendReferralSMS: this.props?.crmAP?.SendReferralSMS,
+      referralSMSBody: this.props?.crmAP?.ReferralSMSBody,
       autoRefer: this.props?.crmAP?.referralAssistantID !== null
     }
 
@@ -48,6 +50,11 @@ class CRMAutoPilot extends React.Component {
       if(!this.props.crmAP){
         history.push("/dashboard/auto_pilots/crm")  
       }
+    }
+
+    componentDidMount() {
+      console.log(parseInt(this.props.id))
+      this.props.dispatch(CRMAutoPilotActions.fetchCRMAutoPilot(parseInt(this.props.id)))
     }
 
     referralError = () => {
@@ -58,12 +65,12 @@ class CRMAutoPilot extends React.Component {
 
     onSubmit = ()  =>  {
       this.props.form.validateFields((err, values) => {
-        const { referralEmailBody, referralSMSBody } = this.state
+        const { referralEmailBody, referralSMSBody, referralEmailTitle } = this.state
         let valid = !err && this.referralError()  
-        let updatedValues = [{referralEmailBody}, {referralSMSBody}].concat(Object.keys(values).map(key => ({[key]: values[key]}))) 
+        let updatedValues = [{ReferralEmailBody: referralEmailBody}, {ReferralSMSBody: referralSMSBody}, {ReferralEmailTitle: referralEmailTitle}].concat(Object.keys(values).map(key => ({[key]: values[key]}))) 
         updatedValues = updatedValues.reduce((prev, curr) => ({...prev, ...curr}), {})
         if(valid){
-          this.props.update(values)
+          this.props.dispatch(CRMAutoPilotActions.updateCRMAutoPilotConfigs(this.props.crmAP.ID, updatedValues))
         }
       })
     }
@@ -75,8 +82,13 @@ class CRMAutoPilot extends React.Component {
     render() {
       const {getFieldDecorator} = this.props.form;  
       const { crmAP } = this.props
-      const { sendReferralEmail, sendReferralSMS } = this.state
+      const { sendReferralEmail, sendReferralSMS, autoRefer } = this.state
 
+      console.log(crmAP)
+
+      let activeKeys = []
+
+      activeKeys = autoRefer ? [...activeKeys, "1"] : activeKeys
       return(
       <div className={styles.Header}>
           <div style={{marginBottom: 20}}>
@@ -100,7 +112,7 @@ class CRMAutoPilot extends React.Component {
               <Form layout='vertical' wrapperCol={{span: 15}} style={{width: '100%'}} id={'CRMAutoPilotForm'}>
                   <h2>General</h2>
                   <FormItem label="Name">
-                    {getFieldDecorator('name', {
+                    {getFieldDecorator('Name', {
                         initialValue: crmAP.Name,
                         rules: [{required: true}]
                     })(
@@ -108,7 +120,7 @@ class CRMAutoPilot extends React.Component {
                     )}
                   </FormItem>
                   <FormItem label="Description">
-                    {getFieldDecorator('desc', {
+                    {getFieldDecorator('Description', {
                         initialValue: crmAP.Description,
                         rules: [{required: true}]
                     })(
@@ -116,63 +128,62 @@ class CRMAutoPilot extends React.Component {
                     )}
                   </FormItem>
                   <FormItem label="Active">
-                    {getFieldDecorator('active', {
+                    {getFieldDecorator('Active', {
                         initialValue: crmAP.Active,
                     })(
                         <Switch/>
                     )}
                   </FormItem>
                   <h2>Referral</h2>
-                  <Collapse bordered={false}>
+                  <Collapse bordered={false} defaultActiveKey={activeKeys}>
                       <Panel header={<h2>Automatically asks candidates for referral after placement</h2>}
-                              key="3"
+                              key="1"
                               style={customPanelStyle}>
                           <FormItem label="Auto refer applicants "
                                     help="Select an assistant to auto refer the applicants">
-                              <Switch onChange={e => this.setState({autoRefer: e})} style={{marginRight: 15}} />
+                              <Switch onChange={e => this.setState({autoRefer: e})} style={{marginRight: 15}} defaultChecked={this.state.autoRefer}/>
                           </FormItem>
-                          <FormItem label={"Assistant"}>
-                              {getFieldDecorator("referralAssistant", {
-                                  initialValue: crmAP.referralAssistantID,
-                                  rules: [{
-                                      required: true,
-                                      message: "Please select an assistant"
-                                  }],
-                              })(
-                                  <Select placeholder={"Please select an assistant"}
-                                          loading={this.props.isLoading}
-                                          disabled={!this.state.autoRefer}>
-                                      {(() => {
-                                          return this.props?.assistants.map((item, key) => {
-                                              return (
-                                                  <Select.Option key={key} value={item.ID}>
-                                                      {trimText.capitalize(trimText.trimDash(item.Name))}
-                                                  </Select.Option>
-                                              );
-                                          });
-                                      })()}
-                                  </Select>
-                              )}
-                          </FormItem>
-                          <FormItem label="Auto send referral emails"
-                                    help="Referred applicants will be notified via email if email is provided in the chat  (candidates applications only)">
-                              {getFieldDecorator('sendReferralEmail', {
-                                  initialValue: sendReferralEmail
-                              })(
-                                  <div style={{marginLeft: 3}}>
-                                      <Switch disabled={!this.state.autoRefer} onChange={e => this.setState({sendReferralEmail: e})}/>
-                                  </div>
-                              )}
-                          </FormItem>
-                          { sendReferralEmail &&
+                          {this.state.autoRefer &&
+                            <>
+                              <FormItem label={"Assistant"}>
+                                  {getFieldDecorator("ReferralAssistantID", {
+                                      initialValue: crmAP.ReferralAssistantID,
+                                      rules: [{
+                                          required: true,
+                                          message: "Please select an assistant"
+                                      }],
+                                  })(
+                                      <Select placeholder={"Please select an assistant"}
+                                              loading={this.props.isLoading}
+                                              disabled={!this.state.autoRefer}>
+                                          {(() => {
+                                              return this.props?.assistants.map((item, key) => {
+                                                  return (
+                                                      <Select.Option key={key} value={item.ID}>
+                                                          {trimText.capitalize(trimText.trimDash(item.Name))}
+                                                      </Select.Option>
+                                                  );
+                                              });
+                                          })()}
+                                      </Select>
+                                  )}
+                              </FormItem>
+                              <FormItem label="Auto send referral emails"
+                                        help="Referred applicants will be notified via email if email is provided in the chat  (candidates applications only)">
+                                  {getFieldDecorator('SendReferralEmail', {
+                                      initialValue: sendReferralEmail
+                                  })(
+                                      <div style={{marginLeft: 3}}>
+                                          <Switch checked={sendReferralEmail} onChange={e => this.setState({sendReferralEmail: e})}/>
+                                      </div>
+                                  )}
+                              </FormItem>
+                            </>
+                          }
+                          { sendReferralEmail && this.state.autoRefer &&
                           <>
                               <FormItem label="Referral Email Title">
-                                {getFieldDecorator('referralEmailTitle', {
-                                    initialValue: crmAP.ReferralEmailTitle,
-                                    rules: [{required: true}]
-                                })(
-                                    <Input placeholder="referral email title"/>
-                                )}
+                                <Input placeholder="referral email title" defaultValue={crmAP.ReferralEmailTitle} onChange={e => this.setState({referralEmailTitle: e.target.value})}/>
                               </FormItem>
                               <Row className={styles.CEKwrapper}>
                                   <h4>Referral letter</h4>
@@ -200,17 +211,19 @@ class CRMAutoPilot extends React.Component {
                               </Row>
                           </>
                           }
+                          { this.state.autoRefer &&
                           <FormItem label="Auto send SMS"
                                     help="Referred applicants will be notified via SMS if telephone number is provided in the chat  (candidates applications only)">
-                              {getFieldDecorator('sendReferralSMS', {
+                              {getFieldDecorator('SendReferralSMS', {
                                   initialValue: sendReferralSMS,
                                   rules: []
                               })(
                                   <div style={{marginLeft: 3}}>
-                                      <Switch disabled={!this.state.autoRefer} onChange={e => this.setState({sendReferralSMS: e})}/>
+                                      <Switch checked={sendReferralSMS} onChange={e => this.setState({sendReferralSMS: e})}/>
                                   </div>
                               )}
                           </FormItem>
+                          }
                           {sendReferralSMS &&
                               <Row className={styles.CEKwrapper}>
                                   <h4>Referral message</h4>
@@ -252,5 +265,15 @@ class CRMAutoPilot extends React.Component {
 }
 
 
-export default Form.create()(CRMAutoPilot);
+
+function mapStateToProps(state) {
+  console.log(state.CRMAutoPilot.CRMAutoPilot)
+    return {
+        isLoading: state.CRMAutoPilot.isLoading,
+        assistants: state.assistant.assistantList,
+        crmAP: state.CRMAutoPilot.CRMAutoPilot
+    };
+}
+
+export default connect(mapStateToProps)(Form.create()(CRMAutoPilot));
 

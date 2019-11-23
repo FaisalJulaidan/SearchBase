@@ -80,30 +80,6 @@ def update(id, name, desc, companyID: int) -> Callback:
         db.session.rollback()
         return Callback(False, "Couldn't update the AutoPilot.")
 
-    # ID = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
-    # Name = db.Column(db.String(128), nullable=False)
-    # Description = db.Column(db.String(260), nullable=True)
-    # Active = db.Column(db.Boolean, nullable=False, default=True)
-
-    # LastReferral = db.Column(db.DateTime(), default=None)
-
-    # sendReferralEmail = db.Column(db.Boolean, nullable=False, default=False)
-    # ReferralEmailTitle = db.Column(db.String(260), nullable=True)
-    # ReferralEmailBody = db.Column(db.Text, nullable=False)
-
-    # sendReferralSMS = db.Column(db.Boolean, nullable=False, default=False)
-    # ReferralSMS = db.Column(db.Text, nullable=False)
-    
-    # ReferralAssistantID = db.Column(db.Integer, db.ForeignKey('assistant.ID', ondelete='cascade'), nullable=False)
-    # ReferralAssistant = db.relationship('Assistant', back_populates='CRMAutoPilots')
- 
-    # CRMID = db.Column(db.Integer, db.ForeignKey('CRM.ID', ondelete='cascade'), nullable=False)
-    # CRM = db.relationship('CRM', back_populates='CRMAutoPilot')
-
-    # # Relationships:
-    # CompanyID = db.Column(db.Integer, db.ForeignKey('company.ID', ondelete='cascade'), nullable=False)
-    # Company = db.relationship('Company', back_populates='CRMAutoPilots')
-
 def updateConfigs(id, name, desc, active, referralAssistantID, referralEmailTitle, referralEmailBody, referralSMSBody, sendReferralEmail, sendReferralSMS, companyID: int) -> Callback:
     try:
 

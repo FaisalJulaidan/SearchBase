@@ -9,7 +9,7 @@ from sqlalchemy import and_, text
 from sqlalchemy.orm import joinedload
 from sqlalchemy.sql.expression import func
 
-from models import db, Callback, Assistant, Conversation, Company, AutoPilot
+from models import db, Callback, Assistant, Conversation, Company, AutoPilot, CRMAutoPilot
 from services import mail_services, url_services
 from services.Marketplace.CRM import crm_services
 from services.Marketplace.Messenger import messenger_servicess
@@ -77,7 +77,6 @@ def sendConversationsNotifications(assistantID=None):
 
 # If assistantID is supplied, it will only look for data relating to that assistant
 def sendAutopilotReferrals():
-    return
     print('run')
     try:
         from app import app
@@ -85,22 +84,23 @@ def sendAutopilotReferrals():
             #NEEDS STORED FILEREIMPLEMENTED
             yesterday = datetime.now() - timedelta(days=1)
             now = datetime.now()
-            autopilots = db.session.query(AutoPilot).filter(and_(AutoPilot.LastReferral != None, 24 <= func.TIMESTAMPDIFF(text('HOUR'), AutoPilot.LastReferral, yesterday))).all()
-
-            for ap in autopilots:
-                crm_callback = crm_services.getCRMByType(enums.CRM.Bullhorn, ap.CompanyID)
+            crmaplist = db.session.query(CRMAutoPilot)\
+                .filter(and_(CRMAutoPilot.LastReferral != None, 24 <= func.TIMESTAMPDIFF(text('HOUR'), CRMAutoPilot.LastReferral, yesterday))).all()
+            print(crmaplist)
+            for crmAP in crmaplist:
+                crm_callback = crm_services.getCRMByType(enums.CRM.Bullhorn, crmAP.CompanyID)
                 if not crm_callback.Success:
                     raise Exception("Company is not connected to bullhorn")
 
-                messenger_callback = messenger_servicess.getMessengerByType(enums.Messenger.Twilio, ap.CompanyID)
+                messenger_callback = messenger_servicess.getMessengerByType(enums.Messenger.Twilio, crmAP.CompanyID)
                 if not messenger_callback.Success:
                     raise Exception("Company is not connected to twilio")
 
                 messenger = messenger_callback.Data
 
                 crm = crm_callback.Data
-                params = [{"input": "dateBegin", "match": ap.LastReferral, "queryType": "BETWEEN", "match2": now}]
-                search_callback = crm_services.searchPlacements(crm, ap.CompanyID, params)
+                params = [{"input": "dateBegin", "match": crmAP.LastReferral, "queryType": "BETWEEN", "match2": now}]
+                search_callback = crm_services.searchPlacements(crm, crmAP.CompanyID, params)
 
                 if not search_callback.Success:
                     raise Exception("Placement search failed")
@@ -110,7 +110,7 @@ def sendAutopilotReferrals():
 
                 ids = [item['candidate']['id'] for item in search_callback.Data]
                 
-                candidate_search = crm_services.searchCandidatesCustom(crm, ap.CompanyID, ids, customData=True, fields="fields=mobile,email,name", customSearch="Dynamic", multiple=True)
+                candidate_search = crm_services.searchCandidatesCustom(crm, crmAP.CompanyID, ids, customData=True, fields="fields=mobile,email,name", customSearch="Dynamic", multiple=True)
                 
                 testChatbot : Assistant = db.session.query(Assistant).first() #NEEDS TO CHANGE
 
@@ -124,7 +124,7 @@ def sendAutopilotReferrals():
                 messageText += url.Data
                 # mail_services.simpleSend(candidate_email, campaign_details.get("email_title"), tempText)
                 messenger_servicess.sendMessage(messenger.Type, "07519228384", messageText, messenger.Auth)
-                ap.LastReferral = now
+                crmAP.LastReferral = now
             # Save changes to the db
             db.session.commit()
 
@@ -155,5 +155,5 @@ def test():
 # Run scheduled tasks
 scheduler.add_job(sendConversationsNotifications, 'cron', hour='*/1', id='sendConversationsNotifications', replace_existing=True)
 scheduler.add_job(pingDatabaseConnection, 'cron', hour='*/5', id='pingDatabaseConnection', replace_existing=True)
-# scheduler.add_job(sendAutopilotReferrals, 'cron', second='*/10', id='sendAutopilotReferrals', replace_existing=True)
+scheduler.add_job(sendAutopilotReferrals, 'cron', second='*/10', id='sendAutopilotReferrals', replace_existing=True)
 # scheduler.add_job(test, 'cron', second='*/3', id='test', replace_existing=True)

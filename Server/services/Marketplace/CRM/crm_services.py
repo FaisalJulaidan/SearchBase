@@ -234,6 +234,8 @@ def searchCandidatesCustom(crm, companyID, candidate_data, perfect=False):
     campaignCRMs = ["Bullhorn", "Vincere"]
     if perfect and crm_type in campaignCRMs:
         searchFunc = "searchPerfectCandidates"
+    elif crm_type == "Jobscience":
+        searchFunc = "searchCandidatesByShortlist"
     else:
         searchFunc = "searchCandidates"
 

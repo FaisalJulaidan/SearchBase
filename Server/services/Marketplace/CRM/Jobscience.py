@@ -358,7 +358,6 @@ def insertClientContact(access_token, conversation: Conversation, prsCompanyID) 
         if conversation.get("lastName") == "":
             conversation["lastName"] = "DEFAULT_LAST"
 
-
         body = {
             "FirstName": conversation.get("firstName"),  # TODO: Decide on default values
             "LastName": conversation.get("lastName"),
@@ -403,12 +402,11 @@ def insertCompany(auth, conversation: Conversation) -> Callback:
 
 
 def fetchSkillsForCandidateSearch(list_of_contactIDs: list, list_of_skills, access_token):
-
     records_to_return = []
     for i in range(0, len(list_of_contactIDs), 500):
         # Need set of contact ID's returned from searchCandidates()
-        if i+500 <= len(list_of_contactIDs):
-            query_segment = ",".join(list_of_contactIDs[i:i+500])
+        if i + 500 <= len(list_of_contactIDs):
+            query_segment = ",".join(list_of_contactIDs[i:i + 500])
         else:
             query_segment = ",".join(list_of_contactIDs[i:len(list_of_contactIDs)])
         # Add LIKE statements:
@@ -430,9 +428,9 @@ def fetchSkillsForCandidateSearch(list_of_contactIDs: list, list_of_skills, acce
 
         # Note: This assumes at least one skill is given
         sendQuery_callback: Callback = sendQuery(access_token, "get", {},
-                                                "SELECT+ts2__Skill_Name__c,ts2__Last_Used__c,ts2__Contact__c" +
-                                                "+FROM+ts2__Skill__c+WHERE+" +
-                                                "ts2__Contact__c+IN+(" + query_segment + ")" + like_string + "+LIMIT+1000")
+                                                 "SELECT+ts2__Skill_Name__c,ts2__Last_Used__c,ts2__Contact__c" +
+                                                 "+FROM+ts2__Skill__c+WHERE+" +
+                                                 "ts2__Contact__c+IN+(" + query_segment + ")" + like_string + "+LIMIT+1000")
 
         if not sendQuery_callback.Success:
             raise Exception(sendQuery_callback.Message)
@@ -442,6 +440,104 @@ def fetchSkillsForCandidateSearch(list_of_contactIDs: list, list_of_skills, acce
 
     print("CURRENT LENGTH IS: {}".format(len(records_to_return)))
     return records_to_return
+
+
+def searchCandidatesByShortlist(access_token, conversation) -> Callback:
+    print("THIS HAS BEEN CALLED...")
+    # TODO: Fetch all short list links
+    # https://prsjobs--jsfull.cs83.my.salesforce.com/services/data/v37.0/query/?q=SELECT+name,ts2__r_contact__c,ts2__Status__c+from+ts2__s_UserListLink__c
+
+    sendQuery_callback: Callback = sendQuery(access_token, "get", {},
+                                             "SELECT+name,ts2__r_contact__c,ts2__Status__c+from+ts2__s_UserListLink__c")
+
+    if not sendQuery_callback.Success:
+        raise Exception(sendQuery_callback.Message)
+
+    shortlist_fetch = json.loads(sendQuery_callback.Data.text)
+    shortlists = shortlist_fetch['records']
+
+    contact_ids = []
+    result = []
+
+    for shortlist in shortlists:
+        print("Shortlist: {}".format(shortlist.get('ts2__r_contact__c')))
+        contact_ids.append("'" + shortlist.get('ts2__r_contact__c') + "'")
+    contact_ids = contact_ids[0:500]
+    query = "WHERE+X18_Digit_ID__c+IN+("+",".join(contact_ids)+")"
+    print(query)
+    # TODO: Fetch associated candidate object
+    # https://prsjobs--jsfull.cs83.my.salesforce.com/services/data/v37.0/sobjects/Contact/0030O0000232s7FQAQ
+    print("Should be fetching contacts...")
+    sendQuery_callback: Callback = sendQuery(access_token, "get", {},
+                                             "SELECT+X18_Digit_ID__c,ID,Name,Title,email,phone,MailingCity," +
+                                             "ts2__Desired_Salary__c,ts2__Date_Available__c,ts2__Years_of_Experience__c,ts2__Desired_Hourly__c,Min_Basic__c," +
+                                             "ts2__EduDegreeName1__c,ts2__Education__c+from+Contact+" + query)  # Limit set to 10 TODO: Customize
+
+    if not sendQuery_callback.Success:
+        raise Exception(sendQuery_callback.Message)
+
+    records = json.loads(sendQuery_callback.Data.text)['records']
+    list_of_contactIDs = []
+
+    # <-- CALL SKILLS SEARCH -->
+    for record in records:
+        print(record)
+        list_of_contactIDs.append("'" + record.get("Id") + "'")
+
+        # Fetch associated candidate skills
+        skills = conversation.get("skills")
+
+        if type(skills) != list:
+            skills = skills.split(" ")
+
+        candidate_skills = []
+        if len(records) > 0:
+            candidate_skills = fetchSkillsForCandidateSearch(list_of_contactIDs, skills, access_token)
+
+    # <-- CALL SKILLS SEARCH -->
+    print("Number of records: {}".format(len(records)))
+    for record_num, record in enumerate(records):
+        has_skills: bool = False
+
+        skills_string = ""
+        counter = 0
+        for skill in candidate_skills:
+            # Cap skills at 5:
+
+            if skill.get("ts2__Contact__c") == record.get("Id") and counter < 5:
+                counter += 1
+                has_skills = True
+
+                skills_string += skill.get("ts2__Skill_Name__c")
+                if skill.get("ts2__Last_Used__c") is not None:
+                    skills_string += "(" + skill.get("ts2__Last_Used__c") + "), "  # Display year of use
+                else:
+                    skills_string += ""
+
+        if has_skills:
+            result.append(databases_services.createPandaCandidate(id=record.get("X18_Digit_ID__c", str(record_num)),
+                                                                      name=record.get("Name"),
+                                                                      email=record.get("Email"),
+                                                                      mobile=record.get("Phone"),
+                                                                      location=record.get("MailingCity"),
+                                                                      skills=skills_string,
+                                                                      linkdinURL=None,
+                                                                      availability=record.get(
+                                                                          "ts2__Date_Available__c") or
+                                                                                   "Not Specified",
+                                                                      jobTitle=record.get("Title"),
+                                                                      education=record.get('ts2__EduDegreeName1__c'),
+                                                                      yearsExperience=record.get(
+                                                                          'ts2__Years_of_Experience__c'),
+                                                                      desiredSalary=record.get(
+                                                                          'ts2__Desired_Salary__c') or
+                                                                                    record.get(
+                                                                                        'ts2__Desired_Hourly__c') or
+                                                                                    record.get('Min_Basic__c', 0),
+                                                                      currency=Currency("GBP"),
+                                                                      source="Jobscience"))
+
+    return Callback(True, sendQuery_callback.Message, result)
 
 
 # Need to make it so that if only skill is provided, a search can still be done.
@@ -540,7 +636,6 @@ def searchCandidates(access_token, conversation) -> Callback:
 
         # <-- CALL SKILLS SEARCH -->
         for record in records:
-
             list_of_contactIDs.append("'" + record.get("Id") + "'")
 
         # Fetch associated candidate skills
@@ -781,7 +876,7 @@ def getAllJobs(access_token, companyID, fields=None) -> Callback:  # TODO: See t
 
 
 # TODO: Clean up this sendquery and enacpsulate refresh token logic:
-def sendQuery(auth, method, body, query):
+def sendQuery(auth, method, body, query, simple=False, c_id=None):
     try:
 
         url = buildUrl(query, method)
@@ -814,12 +909,15 @@ def sendQuery(auth, method, body, query):
         return Callback(False, str(exc))
 
 
-def buildUrl(query, method):
+def buildUrl(query, method, simple=False, c_id=None):
     url = BASE_URL
     if method == "post":
         url = url + query  # Append object to be edited
     elif method == "get":
-        url = url + "query/?q=" + query  # Append SOQL query
+        if simple:
+            url = url + "/sobjects/Contact/" + c_id
+        else:
+            url = url + "query/?q=" + query  # Append SOQL query
     elif method == 'patch':
         url = url + query
     return url

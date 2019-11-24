@@ -15,6 +15,21 @@ const fetchMarketplaceFailure = (error) => ({
     error
 });
 
+const fetchMarketplaceItem = (marketplaceType) => ({
+    type: actionTypes.FETCH_MARKETPLACE_ITEM_REQUEST,
+    marketplaceType
+})
+
+const fetchMarketplaceItemSuccess = () => ({
+    type: actionTypes.FETCH_MARKETPLACE_ITEM_REQUEST,
+    activeItem
+})
+
+const fetchMarketplaceItemFailure = () => ({
+    type: actionTypes.FETCH_MARKETPLACE_ITEM_REQUEST,
+})
+
+
 const pingMarketplace = (marketplaceType) => ({
     type: actionTypes.PING_MARKETPLACE_REQUEST,
     meta: {thunk: true},
@@ -79,10 +94,16 @@ const exportRecruiterValueReportFailure = (error) => ({
 });
 
 
+
+
 export const marketplaceActions = {
     fetchMarketplace,
     fetchMarketplaceSuccess,
     fetchMarketplaceFailure,
+
+    fetchMarketplaceItem,
+    fetchMarketplaceItemSuccess,
+    fetchMarketplaceItemFailure,
 
     pingMarketplace,
     pingMarketplaceSuccess,

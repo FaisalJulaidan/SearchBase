@@ -15,6 +15,17 @@ function* fetchMarketplace() {
     }
 }
 
+function* fetchMarketplaceItem({marketplaceType}) {
+    try {
+        const res = yield http.get(`/marketplace/${marketplaceType}`);
+        yield put(marketplaceActions.fetchMarketplaceItemSuccess(res.data.data));
+    } catch (error) {
+        const msg = error.response?.data?.msg || "Couldn't fetch marketplace item";
+        errorMessage(msg);
+        yield put(marketplaceActions.fetchMarketplaceItemFailure());
+    }
+}
+
 function* pingMarketplace({marketplaceType, meta}) {
     try {
         const res = yield http.get(`/marketplace/${marketplaceType}`);
@@ -71,6 +82,10 @@ function* watchFetchMarketplace() {
     yield takeEvery(actionTypes.FETCH_MARKETPLACE_REQUEST, fetchMarketplace)
 }
 
+function* watchFetchItemMarketplace() {
+    yield takeEvery(actionTypes.FETCH_MARKETPLACE_REQUEST, fetchMarketplaceItem)
+}
+
 function* watchConnectMarketplace() {
     yield takeEvery(actionTypes.CONNECT_MARKETPLACE_REQUEST, connectMarketplace)
 }
@@ -90,7 +105,7 @@ export function* marketplaceSaga() {
         watchFetchMarketplace(),
         watchConnectMarketplace(),
         watchDisconnectMarketplace(),
-
+        watchFetchItemMarketplace(),
         watchExportRecruiterValueReport()
 
     ])

@@ -5,6 +5,7 @@ const initialState = {
     marketplaceItems: null,
 
     connectionStatus: 'NOT_CONNECTED',
+    activeItem: null,
 
     isPinging: false,
     isDisconnecting: false,
@@ -26,6 +27,17 @@ export const marketplace = (state = initialState, action) => {
                 marketplaceItems: action.marketplaceItems
             });
         case actionTypes.FETCH_MARKETPLACE_FAILURE:
+            return updateObject(state, {
+                marketplaceItems: null
+            });
+
+        case actionTypes.FETCH_MARKETPLACE_ITEM_REQUEST:
+            return updateObject(state, {});
+        case actionTypes.FETCH_MARKETPLACE_ITEM_SUCCESS:
+            return updateObject(state, {
+                activeItem: action.activeItem
+            });
+        case actionTypes.FETCH_MARKETPLACE_ITEM_FAILURE:
             return updateObject(state, {
                 marketplaceItems: null
             });

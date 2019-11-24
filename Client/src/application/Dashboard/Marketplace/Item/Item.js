@@ -7,7 +7,7 @@ import {marketplaceActions} from "store/actions";
 import styles from './Item.module.less'
 import {DefaultButton} from './Components/Common'
 import {AdaptFeatures, AdaptFormItems, AdaptHeader} from "./Components/Adapt";
-import {BullhornFeatures, BullhornFormItems, BullhornHeader} from "./Components/Bullhorn";
+import {BullhornFeatures, BullhornFormItems, BullhornHeader, BullhornConnections} from "./Components/Bullhorn";
 import {JobscienceFeatures, JobscienceHeader} from "./Components/Jobscience";
 import {VincereFeatures, VincereFormItems, VincereHeader} from "./Components/Vincere";
 import {GreenhouseFeatures, GreenhouseFormItem, GreenhouseHeader} from "./Components/Greenhouse";
@@ -32,6 +32,7 @@ class Item extends React.Component {
     marketplaceItem = data.Items.find(/**@type {MarketplaceItem}*/item => item.type === this.props.match.params.type);
 
     componentWillMount() {
+        this.props.dispatch(marketplaceActions.fetchMarketplaceItem(this.marketplaceItem.type))
         this.props.dispatch(marketplaceActions.pingMarketplace(this.marketplaceItem.type))
             .then(() => {
                 if (this.marketplaceItem.type === "Bullhorn" && this.props.connectionStatus === "CONNECTED")
@@ -136,6 +137,8 @@ class Item extends React.Component {
                     return <BullhornFeatures/>;
                 if (place === 'form')
                     return <BullhornFormItems {...formOptions}/>;
+                if (place === 'connections')
+                    return <BullhornConnections {...formOptions} />;
                 if (place === 'button') {
                     // windowObject.url = "https://auth.bullhornstaffing.com/oauth/authorize?response_type=code" +
                     //     "&client_id=7719607b-7fe7-4715-b723-809cc57e2714&redirect_uri=" +
@@ -311,6 +314,11 @@ class Item extends React.Component {
                             <TabPane tab="Feature" key="1">
                                 {this.getMarketplaceComponent(type, 'features')}
                             </TabPane>
+                            {this.getMarketplaceComponent(type, 'connections') ?
+                            <TabPane tab="Connections" key="2">
+                                {this.getMarketplaceComponent(type, 'connections')}
+                            </TabPane>
+                             : null}
                         </Tabs>
                     </div>
                 </NoHeaderPanel>
@@ -330,6 +338,7 @@ class Item extends React.Component {
 
 
 function mapStateToProps(state) {
+  console.log(state)
     return {
         connectionStatus: state.marketplace.connectionStatus,
         isPinging: state.marketplace.isPinging,

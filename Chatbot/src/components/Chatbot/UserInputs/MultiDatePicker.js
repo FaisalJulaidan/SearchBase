@@ -49,6 +49,7 @@ const MultiDatePicker = ({ message, submitMessage }) => {
                 return;
             }
             let valid = false;
+            console.log(e.path)
             e.path.forEach(node => {
                 if (node.classList) {
                     if (node.classList.contains('DatepickerCalendar')) {

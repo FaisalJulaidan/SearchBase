@@ -21,7 +21,7 @@ class EditAutoPilotModal extends Component {
         const {getFieldDecorator} = form;
 
         return (
-            <Modal title="Edit Auto Pilot" visible={this.props.visible}
+            <Modal title="Edit CRM Auto Pilot" visible={this.props.visible}
                    onOk={this.onSubmit}
                    onCancel={this.props.closeModal}>
                 <Form layout='horizontal'>

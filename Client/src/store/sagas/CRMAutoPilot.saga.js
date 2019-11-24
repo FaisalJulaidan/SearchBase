@@ -29,13 +29,13 @@ function* fetchCRMAutoPilot({CRMAutoPilotID, meta}) {
 function* addCRMAutoPilot({type, newAutoPilot}) {
     try {
         loadingMessage('Creating auto pilot...', 0);
-        const res = yield http.post(`/auto_pilots`, newAutoPilot);
-        yield put(autoPilotActions.addAutoPilotSuccess(res.data?.data, res.data?.msg));
-        successMessage('Auto pilot added');
+        const res = yield http.post(`/crm_auto_pilots`, newAutoPilot);
+        yield put(CRMAutoPilotActions.addCRMAutoPilotSuccess(res.data?.data, res.data?.msg));
+        successMessage('CRM Auto pilot added');
 
     } catch (error) {
-        const msg = error.response?.data?.msg || "Couldn't create a new auto pilot";
-        yield put(autoPilotActions.addAutoPilotFailure(msg));
+        const msg = error.response?.data?.msg || "Couldn't create a new CRM auto pilot";
+        yield put(CRMAutoPilotActions.addCRMAutoPilotFailure(msg));
         errorMessage(msg);
     }
 }
@@ -64,18 +64,18 @@ function* updateCRMAutoPilotConfigs({CRMAutoPilotID, updatedValues}) {
     }
 }
 
-// function* deleteAutoPilot({autoPilotID, meta}) {
-//     try {
-//         loadingMessage('Removing auto pilot...', 0);
-//         const res = yield http.delete(`/auto_pilot/${autoPilotID}`);
-//         yield put({...autoPilotActions.deleteAutoPilotSuccess(autoPilotID, res.data?.msg), meta});
-//         successMessage('AutoPilot deleted');
-//     } catch (error) {
-//         const msg = error.response?.data?.msg || "Couldn't delete auto pilot";
-//         yield put({...autoPilotActions.deleteAutoPilotFailure(msg), meta});
-//         errorMessage(msg);
-//     }
-// }
+function* deleteCRMAutoPilot({CRMAutoPilotID, meta}) {
+    try {
+        loadingMessage('Removing auto pilot...', 0);
+        const res = yield http.delete(`/crm_auto_pilot/${autoPilotID}`);
+        yield put({...CRMAutoPilotActions.deleteCRMAutoPilotSuccess(autoPilotID, res.data?.msg), meta});
+        successMessage('CRM AutoPilot deleted');
+    } catch (error) {
+        const msg = error.response?.data?.msg || "Couldn't delete CRM auto pilot";
+        yield put({...CRMAutoPilotActions.deleteCRMAutoPilotFailure(msg), meta});
+        errorMessage(msg);
+    }
+}
 
 // function* updateStatus({status, autoPilotID}) {
 //     try {
@@ -111,9 +111,9 @@ function* watchUpdateCRMAutoPilotConfigs() {
     yield takeLatest(actionTypes.UPDATE_CRM_AUTOPILOT_CONFIGS_REQUEST, updateCRMAutoPilotConfigs)
 }
 
-// function* watchDeleteAutoPilot() {
-//     yield takeLatest(actionTypes.DELETE_AUTOPILOT_REQUEST, deleteAutoPilot)
-// }
+function* watchDeleteAutoPilot() {
+    yield takeLatest(actionTypes.DELETE_CRM_AUTOPILOT_REQUEST, deleteCRMAutoPilot)
+}
 
 // function* watchUpdateStatus() {
 //     yield takeLatest(actionTypes.UPDATE_AUTOPILOT_STATUS_REQUEST, updateStatus)
@@ -125,8 +125,8 @@ export function* CRMAutoPilotSaga() {
         watchFetchCRMAutoPilot(),
         watchAddCRMAutoPilot(),
         watchUpdateCRMAutoPilot(),
-        watchUpdateCRMAutoPilotConfigs()
-        // watchUpdateAutoPilot(),
+        watchUpdateCRMAutoPilotConfigs(),
+        watchDeleteAutoPilot()
         // watchUpdateAutoPilotConfigs(),
         // watchDeleteAutoPilot(),
         // watchUpdateStatus(),

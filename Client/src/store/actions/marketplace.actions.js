@@ -20,13 +20,28 @@ const fetchMarketplaceItem = (marketplaceType) => ({
     marketplaceType
 })
 
-const fetchMarketplaceItemSuccess = () => ({
-    type: actionTypes.FETCH_MARKETPLACE_ITEM_REQUEST,
+const fetchMarketplaceItemSuccess = (activeItem) => ({
+    type: actionTypes.FETCH_MARKETPLACE_ITEM_SUCCESS,
     activeItem
 })
 
 const fetchMarketplaceItemFailure = () => ({
-    type: actionTypes.FETCH_MARKETPLACE_ITEM_REQUEST,
+    type: actionTypes.FETCH_MARKETPLACE_ITEM_FAILURE
+})
+
+const saveMarketplaceItem = (marketplaceType, CRMAutoPilotID) => ({
+    type: actionTypes.SAVE_MARKETPLACE_ITEM_REQUEST,
+    marketplaceType,
+    CRMAutoPilotID
+})
+
+const saveMarketplaceItemSuccess = (activeItem) => ({
+    type: actionTypes.SAVE_MARKETPLACE_ITEM_SUCCESS,
+    activeItem
+})
+
+const saveMarketplaceItemFailure = () => ({
+    type: actionTypes.SAVE_MARKETPLACE_ITEM_FAILURE
 })
 
 
@@ -104,6 +119,10 @@ export const marketplaceActions = {
     fetchMarketplaceItem,
     fetchMarketplaceItemSuccess,
     fetchMarketplaceItemFailure,
+
+    saveMarketplaceItem,
+    saveMarketplaceItemFailure,
+    saveMarketplaceItemSuccess,
 
     pingMarketplace,
     pingMarketplaceSuccess,

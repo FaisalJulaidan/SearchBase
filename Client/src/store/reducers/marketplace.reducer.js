@@ -10,6 +10,7 @@ const initialState = {
     isPinging: false,
     isDisconnecting: false,
     isConnecting: false,
+    isLoading: false,
 
     errorMsg: null
 };
@@ -32,16 +33,34 @@ export const marketplace = (state = initialState, action) => {
             });
 
         case actionTypes.FETCH_MARKETPLACE_ITEM_REQUEST:
-            return updateObject(state, {});
+            return updateObject(state, {isLoading: true});
         case actionTypes.FETCH_MARKETPLACE_ITEM_SUCCESS:
             return updateObject(state, {
-                activeItem: action.activeItem
+                activeItem: action.activeItem,
+                isLoading: false
             });
         case actionTypes.FETCH_MARKETPLACE_ITEM_FAILURE:
             return updateObject(state, {
-                marketplaceItems: null
+                marketplaceItems: null,
+                isLoading: false
             });
 
+        // Save marketplace
+        case actionTypes.SAVE_MARKETPLACE_ITEM_REQUEST:
+          return updateObject(state, {
+            isLoading: true
+          })
+
+        case actionTypes.SAVE_MARKETPLACE_ITEM_SUCCESS:
+          return updateObject(state, {
+            isLoading: true,
+            activeItem: action.activeItem
+          })
+
+        case actionTypes.SAVE_MARKETPLACE_ITEM_FAILURE:
+          return updateObject(state, {
+            isLoading: false
+          })
         // PING MARKETPLACE
         case actionTypes.PING_MARKETPLACE_REQUEST:
             return updateObject(state, {

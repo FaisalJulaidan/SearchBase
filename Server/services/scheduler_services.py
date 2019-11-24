@@ -9,7 +9,7 @@ from sqlalchemy import and_, text
 from sqlalchemy.orm import joinedload
 from sqlalchemy.sql.expression import func
 
-from models import db, Callback, Assistant, Conversation, Company, AutoPilot, CRMAutoPilot
+from models import db, Callback, Assistant, Conversation, Company, AutoPilot, CRMAutoPilot, CRM
 from services import mail_services, url_services
 from services.Marketplace.CRM import crm_services
 from services.Marketplace.Messenger import messenger_servicess
@@ -84,9 +84,8 @@ def sendAutopilotReferrals():
             #NEEDS STORED FILEREIMPLEMENTED
             yesterday = datetime.now() - timedelta(days=1)
             now = datetime.now()
-            crmaplist = db.session.query(CRMAutoPilot)\
+            crmaplist = db.session.query(CRMAutoPilot).filter(CRMAutoPilot.ID == CRM.ID) \
                 .filter(and_(CRMAutoPilot.LastReferral != None, 24 <= func.TIMESTAMPDIFF(text('HOUR'), CRMAutoPilot.LastReferral, yesterday))).all()
-            print(crmaplist)
             for crmAP in crmaplist:
                 crm_callback = crm_services.getCRMByType(enums.CRM.Bullhorn, crmAP.CompanyID)
                 if not crm_callback.Success:
@@ -116,15 +115,22 @@ def sendAutopilotReferrals():
 
                 hashedAssistantID = helpers.encodeID(testChatbot.ID)
 
-                messageText = "Hi {}".format("batu")
-                messageText += "%0aWe're happy you've been placed!"
-                messageText += "%0aCould you please refer us using this chatbot?%0a"
                 url = url_services.createShortenedURL(helpers.getDomain(3000) + "/chatbot_direct_link/" + \
                   hashedAssistantID, domain="recruitbot.ai")
-                messageText += url.Data
-                # mail_services.simpleSend(candidate_email, campaign_details.get("email_title"), tempText)
-                messenger_servicess.sendMessage(messenger.Type, "07519228384", messageText, messenger.Auth)
-                crmAP.LastReferral = now
+                if crmAP.SendReferralEmail:
+                  EmailBody = crmAP.ReferralEmailBody.replace("{assistant.link}", url.Data)
+                if crmAP.SendReferralSMS:
+                  SMSBody = crmAP.ReferralSMSBody.replace("{assistant.link}", url.Data)
+
+      
+                for candidate in candidate_search.Data:
+                  if crmAP.SendReferralEmail and candidate['email']:
+                    mail_services.simpleSend(candidate['email'], crmAP.ReferralEmailTitle, EmailBody)
+                    crmAP.LastReferral = now
+                  if crmAP.SendReferralSMS and candidate['mobile']:
+                    messenger_servicess.sendMessage(messenger.Type, candidate['mobile'], SMSBody, messenger.Auth)
+                    crmAP.LastReferral = now  
+
             # Save changes to the db
             db.session.commit()
 

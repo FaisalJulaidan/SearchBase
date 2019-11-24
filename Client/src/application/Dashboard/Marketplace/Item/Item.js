@@ -3,7 +3,7 @@ import {Breadcrumb, Button, Dropdown, Form, Icon, Menu, Modal, Tabs, Typography}
 import 'types/Marketplace_Types';
 import {getLink, history} from "helpers";
 import NoHeaderPanel from 'components/NoHeaderPanel/NoHeaderPanel'
-import {marketplaceActions} from "store/actions";
+import {marketplaceActions, CRMAutoPilotActions} from "store/actions";
 import styles from './Item.module.less'
 import {DefaultButton} from './Components/Common'
 import {AdaptFeatures, AdaptFormItems, AdaptHeader} from "./Components/Adapt";
@@ -33,6 +33,7 @@ class Item extends React.Component {
 
     componentWillMount() {
         this.props.dispatch(marketplaceActions.fetchMarketplaceItem(this.marketplaceItem.type))
+        this.props.dispatch(CRMAutoPilotActions.fetchCRMAutoPilots())
         this.props.dispatch(marketplaceActions.pingMarketplace(this.marketplaceItem.type))
             .then(() => {
                 if (this.marketplaceItem.type === "Bullhorn" && this.props.connectionStatus === "CONNECTED")
@@ -41,6 +42,7 @@ class Item extends React.Component {
     }
 
     componentDidMount() {
+      console.log(this.props)
 
         // Authenticate users through Callback/Redirect URI
         const {location, dispatch} = this.props;
@@ -78,6 +80,9 @@ class Item extends React.Component {
 
         return link
     };
+    save = (type, id) => {
+      this.props.dispatch(marketplaceActions.saveMarketplaceItem(type, id))
+    }
 
 
     /**
@@ -138,7 +143,9 @@ class Item extends React.Component {
                 if (place === 'form')
                     return <BullhornFormItems {...formOptions}/>;
                 if (place === 'connections')
-                    return <BullhornConnections {...formOptions} />;
+                    return <BullhornConnections {...formOptions} 
+                              crmAP={this.props.CRMAPList.find(item=>item.ID===this.props.CRMAPID)} 
+                              CRMAPList={this.props.CRMAPList} save={this.save}/>;
                 if (place === 'button') {
                     // windowObject.url = "https://auth.bullhornstaffing.com/oauth/authorize?response_type=code" +
                     //     "&client_id=7719607b-7fe7-4715-b723-809cc57e2714&redirect_uri=" +
@@ -338,7 +345,6 @@ class Item extends React.Component {
 
 
 function mapStateToProps(state) {
-  console.log(state)
     return {
         connectionStatus: state.marketplace.connectionStatus,
         isPinging: state.marketplace.isPinging,
@@ -349,6 +355,9 @@ function mapStateToProps(state) {
         isLoading: state.marketplace.isLoading,
 
         exportData: state.marketplace.exportData,
+        CRMAPID: state.marketplace.activeItem.CRMAutoPilotID,
+
+        CRMAPList: state.CRMAutoPilot.CRMAutoPilotsList
     };
 }
 

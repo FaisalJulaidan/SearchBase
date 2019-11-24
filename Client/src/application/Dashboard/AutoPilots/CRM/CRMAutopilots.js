@@ -37,6 +37,7 @@ class CRMAutoPilots extends React.Component {
     closeEditAutoPilotModal = () => this.setState({editAutoPilotModalVisible: false});
 
     addAutoPilot = (values) => {
+      console.log("lolistan")
         this.props.dispatch(CRMAutoPilotActions.addCRMAutoPilot(values));
         this.closeNewAutoPilotModal();
     };
@@ -52,7 +53,7 @@ class CRMAutoPilots extends React.Component {
             content: `If you click OK, this auto pilot will be deleted and disconnected from all assistants that are connected to it`,
             onOk: () => {
                 console.log(this.props);
-                this.props.dispatch(CRMAutoPilotActions.deleteAutoPilot(autoPilotID))
+                this.props.dispatch(CRMAutoPilotActions.deleteCRMAutoPilot(autoPilotID))
             }
         });
     };

@@ -16,13 +16,12 @@ class CRMAutoPilot(db.Model):
     
     ReferralAssistantID = db.Column(db.Integer, db.ForeignKey('assistant.ID', ondelete='SET NULL'), nullable=True)
     ReferralAssistant = db.relationship('Assistant', back_populates='CRMAutoPilots')
- 
-    CRMID = db.Column(db.Integer, db.ForeignKey('CRM.ID', ondelete='SET NULL'), nullable=True)
-    CRM = db.relationship('CRM', back_populates='CRMAutoPilot')
 
     # Relationships:
     CompanyID = db.Column(db.Integer, db.ForeignKey('company.ID', ondelete='cascade'), nullable=False)
     Company = db.relationship('Company', back_populates='CRMAutoPilots')
+
+    CRMS = db.relationship('CRM', back_populates='CRMAutoPilot')
 
 
     # Constraints:

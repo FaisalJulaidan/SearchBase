@@ -26,10 +26,11 @@ function* fetchCRMAutoPilot({CRMAutoPilotID, meta}) {
     }
 }
 
-function* addCRMAutoPilot({type, newAutoPilot}) {
+function* addCRMAutoPilot({type, newCRMAutoPilot}) {
     try {
+      console.log(newCRMAutoPilot)
         loadingMessage('Creating auto pilot...', 0);
-        const res = yield http.post(`/crm_auto_pilots`, newAutoPilot);
+        const res = yield http.post(`/crm_auto_pilots`, newCRMAutoPilot);
         yield put(CRMAutoPilotActions.addCRMAutoPilotSuccess(res.data?.data, res.data?.msg));
         successMessage('CRM Auto pilot added');
 
@@ -42,6 +43,7 @@ function* addCRMAutoPilot({type, newAutoPilot}) {
 
 function* updateCRMAutoPilot({CRMAutoPilotID, updatedValues}) {
     try {
+        
         const res = yield http.put(`crm_auto_pilot/${CRMAutoPilotID}`, updatedValues);
         yield put(CRMAutoPilotActions.updateCRMAutoPilotSuccess(CRMAutoPilotID, res.data?.data, res.data?.msg));
         successMessage('CRM Auto pilot updated');
@@ -67,8 +69,8 @@ function* updateCRMAutoPilotConfigs({CRMAutoPilotID, updatedValues}) {
 function* deleteCRMAutoPilot({CRMAutoPilotID, meta}) {
     try {
         loadingMessage('Removing auto pilot...', 0);
-        const res = yield http.delete(`/crm_auto_pilot/${autoPilotID}`);
-        yield put({...CRMAutoPilotActions.deleteCRMAutoPilotSuccess(autoPilotID, res.data?.msg), meta});
+        const res = yield http.delete(`/crm_auto_pilot/${CRMAutoPilotID}`);
+        yield put({...CRMAutoPilotActions.deleteCRMAutoPilotSuccess(CRMAutoPilotID, res.data?.msg), meta});
         successMessage('CRM AutoPilot deleted');
     } catch (error) {
         const msg = error.response?.data?.msg || "Couldn't delete CRM auto pilot";

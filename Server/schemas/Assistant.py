@@ -27,7 +27,7 @@ class Assistant(db.Model):
     Company = db.relationship('Company', back_populates='Assistants')
 
     CRMID = db.Column(db.Integer, db.ForeignKey('CRM.ID', ondelete='SET NULL'))
-    CRM = db.relationship('CRM', back_populates='Assistants')
+    CRM = db.relationship('CRM', back_populates='Assistants', foreign_keys=[CRMID])
 
     CalendarID = db.Column(db.Integer, db.ForeignKey('calendar.ID', ondelete='SET NULL'))
     Calendar = db.relationship('Calendar', back_populates='Assistants')

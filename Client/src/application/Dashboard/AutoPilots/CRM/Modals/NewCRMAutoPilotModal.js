@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {Form, Input, Modal} from "antd";
+import {Form, Input, Modal, Select} from "antd";
 import {autoPilotActions} from "store/actions";
 import {store} from "store/store";
 import PropTypes from 'prop-types';
@@ -7,7 +7,7 @@ import 'types/TimeSlots_Types'
 
 const FormItem = Form.Item;
 
-class NewAutoPilotModal extends Component {
+class NewCRMAutoPilotModal extends Component {
 
     onSubmit = () => {
         this.props.form.validateFields((err, values) => {
@@ -25,35 +25,27 @@ class NewAutoPilotModal extends Component {
             <Modal title="Add CRM Auto Pilot" visible={this.props.visible}
                    onOk={this.onSubmit}
                    onCancel={this.props.closeModal}>
-                <Form layout='horizontal'>
+                <Form layout='horizontal' key="NewCRMAutoPilot">
                     <FormItem label="Name">
                         {getFieldDecorator('name', {
                             initialValue: '',
                             rules: [{
                                 whitespace: true,
                                 required: true,
-                                message: "Please input a name for your Auto Pilot"},
-                                {validator: (_, value, callback) => {
-                                        const { /**@type AutoPilot[]*/ autoPilotsList} = this.props;
-                                        if (autoPilotsList.some(autoPilot => autoPilot.Name === value
-                                            && this.props.autoPilot.Name !== value))
-                                            return callback("Auto Pilot name already exists");
-                                        else
-                                            return callback()
-                                    }
-                                }],
+                                message: "Please input a name for your CRM Auto Pilot"},
+                                ],
                         })(
                             <Input type="text" placeholder="Name of the auto pilot"/>
                         )}
                     </FormItem>
-
                     <FormItem label="Description">
                         {getFieldDecorator('description', {
                             rules: [{
+                                required: true,
                                 message: "Please add description",
                             }],
                         })(
-                            <Input type="text" placeholder="Name of the auto pilot"/>
+                            <Input type="text" placeholder="Name of the CRM auto pilot"/>
                         )}
                     </FormItem>
                 </Form>
@@ -62,9 +54,6 @@ class NewAutoPilotModal extends Component {
     }
 }
 
-NewAutoPilotModal.propTypes = {
-    autoPilotsList: PropTypes.array,
-};
-export default Form.create()(NewAutoPilotModal);
+export default Form.create()(NewCRMAutoPilotModal);
 
 

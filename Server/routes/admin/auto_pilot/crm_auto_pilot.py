@@ -25,7 +25,6 @@ def crm_auto_pilots():
     if request.method == "POST":
         callback: Callback = crm_auto_pilot_services.create(request.json.get('name'),
                                                         request.json.get('description'),
-                                                        request.json.get('CRM_type'),
                                                         user['companyID'])
         if not callback.Success:
             return helpers.jsonResponse(False, 400, callback.Message, None)
@@ -50,7 +49,7 @@ def crm_auto_pilot(autoPilotID):
     # Update AutoPilot
     if request.method == "PUT":
         data = request.json
-        callback: Callback = auto_pilot_services \
+        callback: Callback = crm_auto_pilot_services \
             .update(autoPilotID,
                     data.get('name'),
                     data.get('description'),
@@ -60,11 +59,11 @@ def crm_auto_pilot(autoPilotID):
         return helpers.jsonResponse(True, 200, callback.Message, helpers.getDictFromSQLAlchemyObj(callback.Data))
 
     # Delete assistant
-    # if request.method == "DELETE":
-    #     callback: Callback = auto_pilot_services.removeByID(autoPilotID, user['companyID'])
-    #     if not callback.Success:
-    #         return helpers.jsonResponse(False, 400, callback.Message, None)
-    #     return helpers.jsonResponse(True, 200, callback.Message, callback.Data)
+    if request.method == "DELETE":
+        callback: Callback = crm_auto_pilot_services.removeByID(autoPilotID, user['companyID'])
+        if not callback.Success:
+            return helpers.jsonResponse(False, 400, callback.Message, None)
+        return helpers.jsonResponse(True, 200, callback.Message, callback.Data)
 
 
 @crm_auto_pilot_router.route("/crm_auto_pilot/<int:autoPilotID>/configs", methods=['PUT'])

@@ -335,6 +335,10 @@ def getDictFromLimitedQuery(columnsList, tuple) -> dict:
             dict[key] = v
     return dict
 
+# EXCEPTION MESSAGE SUPPLIED HERE SHOULD BE SAFE TO SHOW THE FROTNEND
+class APIException(Exception):
+   def __init__(self, message):
+        super().__init__(message)
 
 class requestException(Exception):
     pass

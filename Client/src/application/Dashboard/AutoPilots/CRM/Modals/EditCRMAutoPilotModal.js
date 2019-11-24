@@ -10,6 +10,7 @@ class EditAutoPilotModal extends Component {
 
 
     onSubmit = () => this.props.form.validateFields((err, values) => {
+        console.log(err)
         if (!err) {
             this.props.updateAutoPilot(this.props.autoPilot.ID, values)
         }
@@ -29,17 +30,7 @@ class EditAutoPilotModal extends Component {
                         {getFieldDecorator('name', {
                             initialValue: autoPilot?.Name || '',
                             rules: [{
-                                whitespace: true,
-                                required: true,
-                                message: "Please add name or the name you entered is duplicated",
-                                validator: (_, value, callback) => {
-                                    const { /**@type AutoPilot[]*/ autoPilotsList} = this.props;
-                                    if (autoPilotsList.some(autoPilot => autoPilot.Name === value
-                                        && this.props.autoPilot.Name !== value))
-                                        return callback(value + ' is duplicated');
-                                    else
-                                        return callback()
-                                }
+                                required: true
                             }],
                         })(
                             <Input type="text" placeholder="Name of the auto pilot"/>

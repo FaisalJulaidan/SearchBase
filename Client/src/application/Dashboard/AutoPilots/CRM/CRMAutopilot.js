@@ -43,18 +43,11 @@ class CRMAutoPilot extends React.Component {
       sendReferralEmail: this.props?.crmAP?.SendReferralEmail,
       sendReferralSMS: this.props?.crmAP?.SendReferralSMS,
       referralSMSBody: this.props?.crmAP?.ReferralSMSBody,
-      autoRefer: this.props?.crmAP?.referralAssistantID !== null
+      autoRefer: !(this.props?.crmAP?.ReferralAssistantID === undefined || this.props?.crmAP?.ReferralAssistantID === null)
     }
 
     componentWillMount() {
-      if(!this.props.crmAP){
-        history.push("/dashboard/auto_pilots/crm")  
-      }
-    }
-
-    componentDidMount() {
-      console.log(parseInt(this.props.id))
-      this.props.dispatch(CRMAutoPilotActions.fetchCRMAutoPilot(parseInt(this.props.id)))
+      this.props.dispatch(CRMAutoPilotActions.fetchCRMAutoPilot(this.props.id))
     }
 
     referralError = () => {
@@ -83,11 +76,10 @@ class CRMAutoPilot extends React.Component {
       const {getFieldDecorator} = this.props.form;  
       const { crmAP } = this.props
       const { sendReferralEmail, sendReferralSMS, autoRefer } = this.state
-
-      console.log(crmAP)
-
       let activeKeys = []
 
+
+      
       activeKeys = autoRefer ? [...activeKeys, "1"] : activeKeys
       return(
       <div className={styles.Header}>
@@ -108,6 +100,7 @@ class CRMAutoPilot extends React.Component {
                   {crmAP.Description}
               </Paragraph>
           </div>
+          { crmAP &&
           <div className={styles.Body}>
               <Form layout='vertical' wrapperCol={{span: 15}} style={{width: '100%'}} id={'CRMAutoPilotForm'}>
                   <h2>General</h2>
@@ -131,7 +124,7 @@ class CRMAutoPilot extends React.Component {
                     {getFieldDecorator('Active', {
                         initialValue: crmAP.Active,
                     })(
-                        <Switch/>
+                        <Switch checked={crmAP.Active}/>
                     )}
                   </FormItem>
                   <h2>Referral</h2>
@@ -260,6 +253,7 @@ class CRMAutoPilot extends React.Component {
                   <Button type={'danger'} size={'large'} onClick={this.handleDelete}>Delete Auto Pilot</Button>
               </Form> 
           </div>
+      }
       </div>)
     }
 }

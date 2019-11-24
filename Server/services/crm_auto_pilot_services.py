@@ -6,27 +6,17 @@ from services.Marketplace.Messenger import messenger_servicess
 from services.Marketplace.CRM import crm_services
 from sqlalchemy import and_
 from utilities import helpers, enums
+from utilities.helpers import APIException
 from utilities.enums import UserType, Status
 
 
-def create(name, desc, crmType, companyID: int) -> Callback:
+def create(name, desc, companyID: int) -> Callback:
     try:
 
-        crmEnum : enums.CRM = enums.CRM.get_value(crmType)
-
-        if crmEnum is None:
-          raise Exception("Trying to use unknown CRM")
-
-        crm = crm_services.getCRMByType(crmEnum, companyID)
-
-        if crm is None:
-          raise Exception("You are not connected to {}".format(crmEnum.value))
-
-        crmAutoPilot = CRMAutoPilot(Name=name, Description=desc, CRMID=crm.ID, companyID=companyID)
+        crmAutoPilot = CRMAutoPilot(Name=name, Description=desc, CompanyID=companyID)
         db.session.add(crmAutoPilot)
         db.session.commit()
         return Callback(True, "Created CRMAutoPilot succesfully", crmAutoPilot)
-
     except Exception as exc:
         helpers.logError("crm_auto_pilot_services.create(): " + str(exc))
         db.session.rollback()
@@ -132,16 +122,16 @@ def updateConfigs(id, name, desc, active, referralAssistantID, referralEmailTitl
 #         return Callback(False, "Could not change the AutoPilot's status.")
 
 
-# def removeByID(id, companyID):
-#     try:
-#         db.session.query(AutoPilot).filter(and_(AutoPilot.ID == id, AutoPilot.CompanyID == companyID)).delete()
-#         db.session.commit()
-#         return Callback(True, 'AutoPilot has been deleted.')
+def removeByID(id, companyID):
+    try:
+        db.session.query(CRMAutoPilot).filter(and_(CRMAutoPilot.ID == id, CRMAutoPilot.CompanyID == companyID)).delete()
+        db.session.commit()
+        return Callback(True, 'CRMAutoPilot has been deleted.')
 
-#     except Exception as exc:
-#         helpers.logError("auto_pilot.removeByID(): " + str(exc))
-#         db.session.rollback()
-#         return Callback(False, 'Error in deleting AutoPilot.')
+    except Exception as exc:
+        helpers.logError("crm_auto_pilot.removeByID(): " + str(exc))
+        db.session.rollback()
+        return Callback(False, 'Error in deleting CRMAutoPilot.')
 
 
 # # ----- Private Functions (shouldn't be accessed from the outside) ----- #

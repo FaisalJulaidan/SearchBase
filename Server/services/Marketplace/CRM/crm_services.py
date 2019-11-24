@@ -466,6 +466,18 @@ def updateByType(crm_type, newAuth, companyID):
         helpers.logError("Marketplace.marketplace_helpers.saveNewCRMAuth() ERROR: " + str(exc))
         return Callback(False, str(exc))
 
+def updateAutopilotConnection(crm_type, autoPilotID, companyID):
+    try:
+        crm = db.session.query(CRM_Model).filter(
+            and_(CRM_Model.CompanyID == companyID,CRM_Model.Type == crm_type)).first()
+        crm.CRMAutoPilotID = autoPilotID
+        db.session.commit()
+        return Callback(True, "New CRM Autopilot ID has been saved", crm)
+
+    except Exception as exc:
+        db.session.rollback()
+        helpers.logError("Marketplace.marketplace_helpers.updateAutopilotConnection() ERROR: " + str(exc))
+        return Callback(False, str(exc))
 
 # get min/max/average salary from the string and convert to specified period (daily, annually)
 def getSalary(conversation: Conversation, dataType: DataType, salaryType, toPeriod:Period=None):  # type Period

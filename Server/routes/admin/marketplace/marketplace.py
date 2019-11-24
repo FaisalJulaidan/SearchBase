@@ -96,6 +96,31 @@ def crm(type):
             return helpers.jsonResponse(False, 400, callback.Message)
         return helpers.jsonResponse(True, 200, callback.Message)
 
+@marketplace_router.route("/marketplace/<type>/fetch", methods=["GET"])
+@jwt_required
+def crm_fetch(type):
+    # Authenticate
+    user = get_jwt_identity()['user']
+
+    if request.method == "GET":
+        callback: Callback = crm_services.getCRMByType(type, user.get("companyID"))
+        if not callback.Success:
+            return helpers.jsonResponse(False, 400, callback.Message)
+        return helpers.jsonResponse(True, 200, callback.Message, helpers.getDictFromSQLAlchemyObj(callback.Data))
+
+@marketplace_router.route("/marketplace/<type>/save", methods=["POST"])
+@jwt_required
+def crm_save(type):
+    # Authenticate
+    user = get_jwt_identity()['user']
+
+    data = request.json
+    print(data)
+    callback: Callback = crm_services.updateAutopilotConnection(type, data.get("CRMAutoPilotID"), user.get("companyID"))
+    if not callback.Success:
+        return helpers.jsonResponse(False, 400, callback.Message)
+    return helpers.jsonResponse(True, 200, callback.Message, helpers.getDictFromSQLAlchemyObj(callback.Data))
+
 
 @marketplace_router.route("/crm/recruiter_value_report", methods=['POST'])
 @jwt_required

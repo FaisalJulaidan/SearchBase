@@ -2,7 +2,7 @@ import React from 'react';
 import styles from './footer.module.css'
 import {Container, Row, Col} from 'react-bootstrap';
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
-import {faCloud} from '@fortawesome/free-solid-svg-icons'
+import {faCloud, faPhone} from '@fortawesome/free-solid-svg-icons'
 import {faAngellist, faLinkedinIn} from '@fortawesome/free-brands-svg-icons'
 import {Link} from "react-router-dom";
 import EmailShare from "react-email-share-link";
@@ -20,11 +20,20 @@ const Footer = (props) => {
                         <Col xs="auto" sm={4} md={6} lg={{span: 6, offset: 1}}
                              xl={{span: 7, offset: 1}}>
                             <div>
-                            <Link className={styles.logo} to="/">
-                                <FontAwesomeIcon size="6x" icon={faCloud}/>
-                                <h1>SearchBase</h1>
-                            </Link>
+                                <Link className={styles.logo} to="/">
+                                    <FontAwesomeIcon size="2x" icon={faCloud}/>
+                                    <h1>SearchBase</h1>
+                                </Link>
                             </div>
+                            <p className={styles.address}>
+                                SearchBase
+                                <br/>
+                                Floor 6, Aldgate Tower
+                                <br/>
+                                London, E1 8FA
+                                <br/>
+                                (+44) 203-488-0918  <FontAwesomeIcon size="1x" icon={faPhone} style={{marginLeft: '5px'}}/>
+                            </p>
                         </Col>
                         <Col xs="auto" className={styles.nav}>
                             <ul>

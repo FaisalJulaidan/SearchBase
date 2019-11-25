@@ -76,6 +76,7 @@ def getByIDAndCompanyID(userID, companyID) -> Callback:
         db.session.rollback()
         return Callback(False, 'Users could not be retrieved.')
 
+
 def getAllByCompanyID(companyID) -> Callback:
     try:
         # Get result and check if None then raise exception

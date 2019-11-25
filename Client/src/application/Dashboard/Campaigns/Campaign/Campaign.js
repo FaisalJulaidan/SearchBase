@@ -70,7 +70,7 @@ class Campaign extends React.Component {
                         name: trimText.capitalize(trimText.trimDash(campaign?.Name)),
                         assistant_id: campaign?.AssistantID,
                         crm_id: campaign?.CRMID,
-                        shortlist: campaign?.ShortList,
+                        shortlist: campaign?.shortlist,
                         database_id: campaign?.DatabaseID,
                         messenger_id: campaign?.MessengerID,
                         location: campaign?.Location,
@@ -90,7 +90,6 @@ class Campaign extends React.Component {
     componentDidUpdate(prevProps, prevState, snapshot) {
         if (prevProps.isCandidatesLoading && (this.props.errorMsg === null)) {
             this.state.candidate_list = this.props.candidate_list;
-            console.log("candidate list: " + this.state.candidate_list);
             this.showModal(true);
         } else if (prevProps.isLaunchingCampaign && (this.props.errorMsg === null)) {
             this.showModal(false);

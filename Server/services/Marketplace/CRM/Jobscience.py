@@ -458,25 +458,36 @@ def searchCandidatesByShortlist(access_token, conversation) -> Callback:
 
     contact_ids = []
     result = []
-
+    records = []
     for shortlist in shortlists:
         print("Shortlist: {}".format(shortlist.get('ts2__r_contact__c')))
         contact_ids.append("'" + shortlist.get('ts2__r_contact__c') + "'")
-    contact_ids = contact_ids[0:500]
-    query = "WHERE+X18_Digit_ID__c+IN+("+",".join(contact_ids)+")"
-    print(query)
-    # TODO: Fetch associated candidate object
-    # https://prsjobs--jsfull.cs83.my.salesforce.com/services/data/v37.0/sobjects/Contact/0030O0000232s7FQAQ
-    print("Should be fetching contacts...")
-    sendQuery_callback: Callback = sendQuery(access_token, "get", {},
+
+    print("Number of contacts to retrieve: {}".format(len(contact_ids)))
+
+    for i in range(0, len(contact_ids), 500):
+        # Need set of contact ID's returned from searchCandidates()
+        if i + 500 <= len(contact_ids):
+            query_segment = ",".join(contact_ids[i:i + 500])
+        else:
+            query_segment = ",".join(contact_ids[i:len(contact_ids)])
+
+        query = "WHERE+X18_Digit_ID__c+IN+("+query_segment+")"
+        print(query)
+        # TODO: Fetch associated candidate object
+        # https://prsjobs--jsfull.cs83.my.salesforce.com/services/data/v37.0/sobjects/Contact/0030O0000232s7FQAQ
+        print("Should be fetching contacts...")
+        sendQuery_callback: Callback = sendQuery(access_token, "get", {},
                                              "SELECT+X18_Digit_ID__c,ID,Name,Title,email,phone,MailingCity," +
                                              "ts2__Desired_Salary__c,ts2__Date_Available__c,ts2__Years_of_Experience__c,ts2__Desired_Hourly__c,Min_Basic__c," +
                                              "ts2__EduDegreeName1__c,ts2__Education__c+from+Contact+" + query)  # Limit set to 10 TODO: Customize
 
-    if not sendQuery_callback.Success:
-        raise Exception(sendQuery_callback.Message)
+        if not sendQuery_callback.Success:
+            raise Exception(sendQuery_callback.Message)
 
-    records = json.loads(sendQuery_callback.Data.text)['records']
+        records += json.loads(sendQuery_callback.Data.text)['records']
+        print("Number of records retrieved: {}".format(len(records)))
+
     list_of_contactIDs = []
 
     # <-- CALL SKILLS SEARCH -->
@@ -485,14 +496,14 @@ def searchCandidatesByShortlist(access_token, conversation) -> Callback:
         list_of_contactIDs.append("'" + record.get("Id") + "'")
 
         # Fetch associated candidate skills
-        skills = conversation.get("skills")
+    skills = conversation.get("skills")
 
-        if type(skills) != list:
-            skills = skills.split(" ")
+    if type(skills) != list:
+        skills = skills.split(" ")
 
-        candidate_skills = []
-        if len(records) > 0:
-            candidate_skills = fetchSkillsForCandidateSearch(list_of_contactIDs, skills, access_token)
+    candidate_skills = []
+    if len(records) > 0:
+        candidate_skills = fetchSkillsForCandidateSearch(list_of_contactIDs, skills, access_token)
 
     # <-- CALL SKILLS SEARCH -->
     print("Number of records: {}".format(len(records)))
@@ -583,7 +594,7 @@ def searchCandidates(access_token, conversation) -> Callback:
                                                  "SELECT+X18_Digit_ID__c,ID,Name,Title,email,phone,MailingCity," +
                                                  "ts2__Desired_Salary__c,ts2__Date_Available__c,ts2__Years_of_Experience__c,ts2__Desired_Hourly__c,Min_Basic__c," +
                                                  "ts2__EduDegreeName1__c,ts2__Education__c+from+Contact+" + query +
-                                                 "+LIMIT+5000")  # Limit set to 10 TODO: Customize
+                                                 "+LIMIT+500")  # Limit set to 10 TODO: Customize
 
         if not sendQuery_callback.Success:
             raise Exception(sendQuery_callback.Message)
@@ -595,13 +606,13 @@ def searchCandidates(access_token, conversation) -> Callback:
         result = []
 
         #  Iterative generalisation:
-        while len(records) < 5000:
+        while len(records) < 500:
             # send query
             sendQuery_callback: Callback = sendQuery(access_token, "get", {},
                                                      "SELECT+X18_Digit_ID__c,ID,Name,Title,email,phone,MailingCity," +
                                                      "ts2__Desired_Salary__c,ts2__Date_Available__c,ts2__Years_of_Experience__c,ts2__Desired_Hourly__c,Min_Basic__c," +
                                                      "ts2__EduDegreeName1__c,ts2__Education__c+from+Contact+" + query +
-                                                     "+LIMIT+5000")  # Limit set to 10 TODO: Customize
+                                                     "+LIMIT+500")  # Limit set to 10 TODO: Customize
             if not sendQuery_callback.Success:
                 raise Exception(sendQuery_callback.Message)
 

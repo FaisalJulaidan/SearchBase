@@ -10,7 +10,7 @@
     },
     {
       "title": "Vincere",
-      "desc": "",
+      "desc": "Vincere provides customer relationship management, applicant tracking system and operations software for the staffing industry.",
       "image": "/static/images/CRM/vincere.svg",
       "type": "Vincere",
       "disabled": false,
@@ -26,7 +26,7 @@
     },
     {
       "title": "Jobscience",
-      "desc": "",
+      "desc": " Jobscience provides customer relationship management, applicant tracking system and operations software for the staffing industry.",
       "image": "/static/images/CRM/jobscience.svg",
       "type": "Jobscience",
       "disabled": false,
@@ -58,7 +58,7 @@
     },
     {
       "title": "Access",
-      "desc": "",
+      "desc": "Access provides customer relationship management, applicant tracking system and operations software for the staffing industry.",
       "image": "/static/images/CRM/accessgroup.png",
       "type": "JobAdder",
       "disabled": true,
@@ -66,7 +66,7 @@
     },
     {
       "title": "JobAdder",
-      "desc": "",
+      "desc": "JobAdder provides customer relationship management, applicant tracking system and operations software for the staffing industry.",
       "image": "/static/images/CRM/jobadder.jpg",
       "type": "JobAdder",
       "disabled": true,
@@ -74,7 +74,7 @@
     },
     {
       "title": "Workable",
-      "desc": "",
+      "desc": "Workable provides customer relationship management, applicant tracking system and operations software for the staffing industry.",
       "image": "/static/images/CRM/workable.png",
       "type": "Workable",
       "disabled": true,

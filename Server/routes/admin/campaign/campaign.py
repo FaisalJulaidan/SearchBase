@@ -94,3 +94,19 @@ def campaign_id(campaignID):
             return helpers.jsonResponse(False, 400, callback.Message)
 
         return helpers.jsonResponse(True, 200, "Campaign has been saved!")
+
+# Save New
+@campaign_router.route("/select-shortlist", methods=['GET'])
+@jwt_required
+def campaign():
+    user = get_jwt_identity()['user']
+
+    if request.method == "GET":
+        print("GET REQUEST RECEIVED...")
+        # callback: Callback = campaign_services.save(request.json, user['companyID'])
+        callback: Callback
+        if not callback.Success:
+            return helpers.jsonResponse(False, 400, callback.Message)
+
+        return helpers.jsonResponse(True, 200, "Campaign has been saved!",
+                                    helpers.getDictFromSQLAlchemyObj(callback.Data))

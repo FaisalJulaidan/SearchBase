@@ -213,7 +213,7 @@ def update(id, name, desc, message, topBarText, companyID) -> Callback:
                         "Couldn't update assistant " + str(id))
 
 
-def updateConfigs(id, name, desc, message, topBarText, secondsUntilPopup, notifyEvery, config, owners, companyID) -> Callback:
+def updateConfigs(id, name, desc, message, topBarText, secondsUntilPopup, notifyEvery, config, owner, companyID) -> Callback:
     try:
         # Validate the json config
         validate(config, json_schemas.assistant_config)
@@ -229,7 +229,7 @@ def updateConfigs(id, name, desc, message, topBarText, secondsUntilPopup, notify
         assistant.SecondsUntilPopup = secondsUntilPopup
         assistant.NotifyEvery = None if notifyEvery == "null" else int(notifyEvery)
         assistant.Config = config
-        assistant.UserID = owners[0]
+        assistant.UserID = owner
 
         if not assistant.LastNotificationDate and notifyEvery != "null":
             assistant.LastNotificationDate = datetime.now()

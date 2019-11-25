@@ -61,7 +61,7 @@ class Settings extends Component {
                 ...this.props.assistant.Config,
                 restrictedCountries: values.restrictedCountries || []
             };
-            values.owners = [parseInt(values.owners) || 0]; //To be removed when server-side codes for multiple owners are ready
+            values.owners = parseInt(values.owners) || 0; //To be removed when server-side codes for multiple owners are ready
             // values.owners = values.owners || []; //To be uncommented after removing above line
             delete values.restrictedCountries;
             values.notifyEvery = this.state.notifyEvery;

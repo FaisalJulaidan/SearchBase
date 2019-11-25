@@ -78,6 +78,7 @@ def sendConversationsNotifications(assistantID=None):
 # If assistantID is supplied, it will only look for data relating to that assistant
 def sendAutopilotReferrals():
     print('run')
+    return
     try:
         from app import app
         with app.app_context():

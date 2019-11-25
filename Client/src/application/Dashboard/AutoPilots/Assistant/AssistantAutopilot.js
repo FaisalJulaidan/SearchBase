@@ -87,7 +87,7 @@ class AssistantAutoPilot extends React.Component {
       console.log("mount")
         this.props.dispatch(appointmentAllocationTimeActions.fetchAAT());
         this.props.dispatch(campaignActions.fetchCampaigns()); //TODO: To be removed (Fetching assistants for referral for now)
-        this.props.dispatch(autoPilotActions.fetchAutoPilot(this.props.id))
+        this.props.dispatch(autoPilotActions.fetchAutoPilot(this.props.match.params.id))
             .then(() => {
                 const {autoPilot} = this.props;
                 this.setState({  //TODO:: Uncomment referral fields when server-side is done
@@ -294,7 +294,7 @@ class AssistantAutoPilot extends React.Component {
         const {getFieldDecorator} = this.props.form;
 
         return (
-            <>
+                <NoHeaderPanel>
                     <div className={styles.Header}>
                         <div style={{marginBottom: 20}}>
                             <Breadcrumb>
@@ -1071,7 +1071,8 @@ class AssistantAutoPilot extends React.Component {
                         </div>
 
                     </div>
-            </>
+            </NoHeaderPanel>
+            
         );
     }
 }

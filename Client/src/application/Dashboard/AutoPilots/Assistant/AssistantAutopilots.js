@@ -66,7 +66,6 @@ class AssistantAutoPilots extends React.Component {
 
     openAutoPilot = (id) => {
       history.push(`/dashboard/auto_pilots/assistant/${id}`) 
-      this.setState({openAutoPilot: id}) 
     }
 
 
@@ -84,20 +83,10 @@ class AssistantAutoPilots extends React.Component {
 
 
     render() {
-        // let open = this.state.openAutoPilot
-        const { openAutoPilot } = this.state
-        let loc = history.location.pathname.split("/")
-        let inBasePage = loc[loc.length-1] === "assistant" || loc[loc.length-1] === "auto_pilots"
-        console.log(loc)
-        console.log(inBasePage)
-        let id = (inBasePage ? null : loc[loc.length-1]) || openAutoPilot || null
-        console.log(id) 
+
         return (
             <>
                 <div className={styles.Body}>
-                    {id ?     
-                    <AssistantAutopilot id={id}/> 
-                    : 
                     <>
                       <CreateNewBox text={'Add Auto Pilot'} onClick={this.showNewAutoPilotModal}/>
                       {
@@ -119,7 +108,6 @@ class AssistantAutoPilots extends React.Component {
                           )
                       }
                   </> 
-                  }  
                 </div>
 
 

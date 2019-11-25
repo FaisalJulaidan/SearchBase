@@ -301,15 +301,20 @@ class Dashboard extends Component {
                                             <Route path={`${match.path}/account`} component={Account} exact/>
                                             <Route path={`${match.path}/billing`} component={Billing} exact/>
 
-                                            <AuthorisedRoute path={`${match.path}/auto_pilots`}
+                                            <AuthorisedRoute path={`${match.path}/auto_pilots/:type`}
                                                              permission={company.AccessAutoPilot} component={AutoPilots}
+                                                             exact
                                                              />
-                                            {/* <AuthorisedRoute path={`${match.path}/auto_pilots/assistant/:id`}
+                                            <AuthorisedRoute path={`${match.path}/auto_pilots`}
+                                                              permission={company.AccessAutoPilot} component={AutoPilots}
+                                                              exact
+                                                              />
+                                            <AuthorisedRoute path={`${match.path}/auto_pilots/assistant/:id`}
                                                              permission={company.AccessAutoPilot} component={AssistantAutoPilot}
                                                              exact/>
                                             <AuthorisedRoute path={`${match.path}/auto_pilots/crm/:id`}
                                                              permission={company.AccessAutoPilot} component={CRMAutopilot}
-                                                             exact/> */}
+                                                             exact/>
 
                                             <Route path={`${match.path}/users_management`} component={UsersManagement}
                                                    exact/>

@@ -86,16 +86,9 @@ class CRMAutoPilots extends React.Component {
     render() {
         // let open = this.state.openAutoPilot
         const { openAutoPilot } = this.state
-        let loc = history.location.pathname.split("/")
-        let inBasePage = loc[loc.length-1] === "crm"
-        let id = openAutoPilot ? openAutoPilot : !inBasePage ? loc[loc.length-1] : null  
-        console.log(id)
         return (
             <>
                 <div className={styles.Body}>
-                    {id && !this.props.isLoading ?     
-                    <CRMAutoPilot id={id} /> 
-                    :
                     <>
                       <CreateNewBox text={'Add CRM Auto Pilot'} onClick={this.showNewAutoPilotModal}/>
                       {
@@ -117,7 +110,6 @@ class CRMAutoPilots extends React.Component {
                           )
                       }
                   </> 
-                  }  
                 </div>
 
 

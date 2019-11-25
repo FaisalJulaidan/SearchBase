@@ -58,6 +58,21 @@ class CRMAutoPilot extends React.Component {
       return valid
     }
 
+
+    onActivateHandler = (checked) => {
+        // if (!checked) {
+        //     confirm({
+        //         title: `Deactivate assistant`,
+        //         content: <p>Are you sure you want to deactivate this assistant</p>,
+        //         onOk: () => {
+        //             this.props.dispatch(CRMAutoPilotActions.changeAssistantStatus(this.props.assistant.ID, checked));
+        //         }
+        //     });
+        //     return;
+        // }
+        // this.props.dispatch(assistantActions.changeAssistantStatus(this.props.assistant.ID, checked));
+    };
+
     onSubmit = ()  =>  {
       this.props.form.validateFields((err, values) => {
         const { referralEmailBody, referralSMSBody, referralEmailTitle } = this.state
@@ -100,10 +115,21 @@ class CRMAutoPilot extends React.Component {
         </div>
         <div className={styles.Body}>
             <div className={styles.Title}>
-                <Title>{crmAP.Name}</Title>
-                <Paragraph type="secondary">
-                    {crmAP.Description}
-                </Paragraph>
+                <Row>
+                    <Col span={20}>
+                        <Title>{crmAP.Name}</Title>
+                        <Paragraph type="secondary">
+                            {crmAP?.Description || 'No description'}
+                        </Paragraph>
+                    </Col>
+                    <Col span={4}>
+                        <Switch checkedChildren="On" unCheckedChildren="Off"
+                                checked={crmAP.Active}
+                                loading={this.props.isLoading}
+                                onChange={this.onActivateHandler}
+                                style={{ marginTop: '17%', marginLeft: '70%' }}/>
+                    </Col>
+                </Row>
             </div>
             { crmAP &&
                 <Form layout='vertical' wrapperCol={{span: 15}} style={{width: '100%'}} id={'CRMAutoPilotForm'}>
@@ -124,13 +150,7 @@ class CRMAutoPilot extends React.Component {
                           <Input placeholder="CRM Autopilot description"/>
                       )}
                     </FormItem>
-                    <FormItem label="Active">
-                      {getFieldDecorator('Active', {
-                          initialValue: crmAP.Active,
-                      })(
-                          <Switch checked={crmAP.Active}/>
-                      )}
-                    </FormItem>
+
                     <h2>Referral</h2>
                     <Collapse bordered={false} defaultActiveKey={activeKeys}>
                         <Panel header={<h2>Automatically asks candidates for referral after placement</h2>}

@@ -1,6 +1,6 @@
 import React from 'react'
 import {connect} from 'react-redux';
-import {Breadcrumb, Button, Col, Collapse, Form, Input, Divider, Row, Switch, Typography, Select} from 'antd';
+import {Breadcrumb, Button, Col, Collapse, Form, Input, Divider, Row, Switch, Typography, Select, Modal} from 'antd';
 import CKEditor from '@ckeditor/ckeditor5-react';
 import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
 import 'types/TimeSlots_Types'
@@ -14,6 +14,7 @@ import styles from '../Assistant/AutoPilot.module.less';
 const {Panel} = Collapse;
 const ButtonGroup = Button.Group;
 const FormItem = Form.Item;
+const {confirm} = Modal
 
 const customPanelStyle = {
     borderRadius: 4,
@@ -60,17 +61,17 @@ class CRMAutoPilot extends React.Component {
 
 
     onActivateHandler = (checked) => {
-        // if (!checked) {
-        //     confirm({
-        //         title: `Deactivate assistant`,
-        //         content: <p>Are you sure you want to deactivate this assistant</p>,
-        //         onOk: () => {
-        //             this.props.dispatch(CRMAutoPilotActions.changeAssistantStatus(this.props.assistant.ID, checked));
-        //         }
-        //     });
-        //     return;
-        // }
-        // this.props.dispatch(assistantActions.changeAssistantStatus(this.props.assistant.ID, checked));
+        if (!checked) {
+            confirm({
+                title: `Deactivate CRM Autopilot`,
+                content: <p>Are you sure you want to deactivate this CRM Autopilot</p>,
+                onOk: () => {
+                    this.props.dispatch(CRMAutoPilotActions.updateStatus(this.props.match.params.id, checked));
+                }
+            });
+            return;
+        }
+        this.props.dispatch(CRMAutoPilotActions.updateStatus(this.props.match.params.id, checked));
     };
 
     onSubmit = ()  =>  {
@@ -117,15 +118,15 @@ class CRMAutoPilot extends React.Component {
             <div className={styles.Title}>
                 <Row>
                     <Col span={20}>
-                        <Title>{crmAP.Name}</Title>
+                        <Title>{crmAP?.Name}</Title>
                         <Paragraph type="secondary">
-                            {crmAP?.Description || 'No description'}
+                            {crmAP?.Description}
                         </Paragraph>
                     </Col>
                     <Col span={4}>
                         <Switch checkedChildren="On" unCheckedChildren="Off"
-                                checked={crmAP.Active}
-                                loading={this.props.isLoading}
+                                checked={crmAP?.Active}
+                                loading={this.props.isStatusChanging}
                                 onChange={this.onActivateHandler}
                                 style={{ marginTop: '17%', marginLeft: '70%' }}/>
                     </Col>

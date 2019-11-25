@@ -79,19 +79,21 @@ function* deleteCRMAutoPilot({CRMAutoPilotID, meta}) {
     }
 }
 
-// function* updateStatus({status, autoPilotID}) {
-//     try {
-//         loadingMessage('Updating Status', 0);
-//         const res = yield http.put(`/auto_pilot/${autoPilotID}/status`, {status});
-//         yield put(autoPilotActions.updateAutoPilotSuccess('Status updated successfully', status, autoPilotID));
-//         yield successMessage('Status updated');
+function* updateStatus({status, CRMAutoPilotID}) {
+    try {
+      console.log(status)
+      console.log(CRMAutoPilotID)
+        loadingMessage('Updating Status', 0);
+        const res = yield http.put(`/crm_auto_pilot/${CRMAutoPilotID}/status`, {status});
+        yield put(CRMAutoPilotActions.updateStatusSuccess('Status updated successfully', status, CRMAutoPilotID));
+        yield successMessage('Status updated');
 
-//     } catch (error) {
-//         const msg = error.response?.data?.msg || "Couldn't update assistant's status";
-//         yield put(autoPilotActions.updateAutoPilotFailure(msg));
-//         errorMessage(msg);
-//     }
-// }
+    } catch (error) {
+        const msg = error.response?.data?.msg || "Couldn't update CRMAutoPilots status";
+        yield put(autoPilotActions.updateStatusFailure(msg));
+        errorMessage(msg);
+    }
+}
 
 function* watchFetchCRMAutoPilots() {
     yield takeLatest(actionTypes.FETCH_CRM_AUTOPILOTS_REQUEST, fetchCRMAutoPilots)
@@ -117,9 +119,9 @@ function* watchDeleteAutoPilot() {
     yield takeLatest(actionTypes.DELETE_CRM_AUTOPILOT_REQUEST, deleteCRMAutoPilot)
 }
 
-// function* watchUpdateStatus() {
-//     yield takeLatest(actionTypes.UPDATE_AUTOPILOT_STATUS_REQUEST, updateStatus)
-// }
+function* watchUpdateStatus() {
+    yield takeLatest(actionTypes.UPDATE_CRM_AUTOPILOT_STATUS_REQUEST, updateStatus)
+}
 
 export function* CRMAutoPilotSaga() {
     yield all([
@@ -128,9 +130,7 @@ export function* CRMAutoPilotSaga() {
         watchAddCRMAutoPilot(),
         watchUpdateCRMAutoPilot(),
         watchUpdateCRMAutoPilotConfigs(),
-        watchDeleteAutoPilot()
-        // watchUpdateAutoPilotConfigs(),
-        // watchDeleteAutoPilot(),
-        // watchUpdateStatus(),
+        watchDeleteAutoPilot(),
+        watchUpdateStatus(),
     ])
 }

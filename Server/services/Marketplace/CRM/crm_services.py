@@ -65,6 +65,10 @@ def insertCandidate(assistant: Assistant, conversation: Conversation, update_id=
     else:
         func = "insert"
 
+        # do not insert Candidates with no contact information
+        if not data.get("email") and not data.get("mobile"):
+            return Callback(False, "No email and telephone given. Candidate will not be submitted to CRM")
+
     crm_type = assistant.CRM.Type
     if CRM.has_value(crm_type.value):
         if crm_type is CRM.Greenhouse:

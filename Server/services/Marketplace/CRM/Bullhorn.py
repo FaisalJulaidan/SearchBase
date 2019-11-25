@@ -229,7 +229,6 @@ def buildUrl(rest_data, query, optionalParams=None):
 
 def insertCandidate(auth, data, companyID) -> Callback:
     try:
-        # availability, yearsExperience
         body = {
             "name": data.get("name"),
             "firstName": data.get("firstName"),

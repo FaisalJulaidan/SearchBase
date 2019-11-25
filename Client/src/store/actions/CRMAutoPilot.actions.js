@@ -111,7 +111,7 @@ const deleteCRMAutoPilotFailure = (errorMsg) => ({
 });
 
 
-const updateStatus = (status, CRMAutoPilotID) => ({
+const updateStatus = ( CRMAutoPilotID, status) => ({
     type: actionTypes.UPDATE_CRM_AUTOPILOT_STATUS_REQUEST,
     CRMAutoPilotID,
     status

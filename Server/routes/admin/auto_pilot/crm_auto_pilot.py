@@ -93,18 +93,19 @@ def auto_pilot_configs(autoPilotID):
         return helpers.jsonResponse(True, 200, callback.Message, helpers.getDictFromSQLAlchemyObj(callback.Data))
 
 
-# @crm_auto_pilot_router.route("/auto_pilot/<int:autoPilotID>/status", methods=['PUT'])
-# @jwt_required
-# @wrappers.AccessAutoPilotRequired
-# def auto_pilot_status(autoPilotID):
-#     # Authenticate
-#     user = get_jwt_identity()['user']
+@crm_auto_pilot_router.route("/crm_auto_pilot/<int:autoPilotID>/status", methods=['PUT'])
+@jwt_required
+@wrappers.AccessAutoPilotRequired
+def auto_pilot_status(autoPilotID):
+    # Authenticate
+    user = get_jwt_identity()['user']
 
-#     # Update AutoPilot status
-#     if request.method == "PUT":
-#         data = request.json
-#         callback: Callback = auto_pilot_services.updateStatus(autoPilotID, data.get('status'), user['companyID'])
+    # Update AutoPilot status
+    if request.method == "PUT":
+        data = request.json
+        print(data.get('status'))
+        callback: Callback = crm_auto_pilot_services.updateStatus(autoPilotID, data.get('status'), user['companyID'])
 
-#         if not callback.Success:
-#             return helpers.jsonResponse(False, 400, callback.Message, None)
-#         return helpers.jsonResponse(True, 200, callback.Message, None)
+        if not callback.Success:
+            return helpers.jsonResponse(False, 400, callback.Message, None)
+        return helpers.jsonResponse(True, 200, callback.Message, None)

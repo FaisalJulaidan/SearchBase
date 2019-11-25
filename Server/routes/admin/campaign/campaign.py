@@ -3,7 +3,7 @@ from flask_jwt_extended import jwt_required, get_jwt_identity
 
 from models import Callback
 from services import campaign_services
-from utilities import helpers
+from utilities import helpers, wrappers
 
 campaign_router: Blueprint = Blueprint('campaign_router', __name__, template_folder="../../templates")
 
@@ -11,6 +11,7 @@ campaign_router: Blueprint = Blueprint('campaign_router', __name__, template_fol
 # Get data needed for form / Retrieve candidates to which to send / Send Campaign
 @campaign_router.route("/campaign/action", methods=['GET', 'POST', 'PUT'])
 @jwt_required
+@wrappers.AccessCampaignsRequired
 def fill_assistants():
     # Authenticate
     user = get_jwt_identity()['user']
@@ -48,6 +49,7 @@ def fill_assistants():
 # Save New
 @campaign_router.route("/campaign", methods=['POST'])
 @jwt_required
+@wrappers.AccessCampaignsRequired
 def campaign():
     user = get_jwt_identity()['user']
 
@@ -63,6 +65,7 @@ def campaign():
 # Get / Update / Delete
 @campaign_router.route("/campaign/<int:campaignID>", methods=['GET', 'POST', 'DELETE'])
 @jwt_required
+@wrappers.AccessCampaignsRequired
 def campaign_id(campaignID):
     user = get_jwt_identity()['user']
 
@@ -94,3 +97,20 @@ def campaign_id(campaignID):
             return helpers.jsonResponse(False, 400, callback.Message)
 
         return helpers.jsonResponse(True, 200, "Campaign has been saved!")
+
+
+@campaign_router.route("/campaign/<int:campaignID>/status", methods=['PUT'])
+@jwt_required
+@wrappers.AccessCampaignsRequired
+def campaign_status(campaignID):
+    # Authenticate
+    user = get_jwt_identity()['user']
+
+    # Update Campaign status
+    if request.method == "PUT":
+        data = request.json
+        callback: Callback = campaign_services.updateStatus(campaignID, data.get('status'), user['companyID'])
+
+        if not callback.Success:
+            return helpers.jsonResponse(False, 400, callback.Message, None)
+        return helpers.jsonResponse(True, 200, callback.Message, None)

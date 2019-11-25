@@ -106,20 +106,20 @@ def updateConfigs(id, name, desc, active, referralAssistantID, referralEmailTitl
         db.session.rollback()
         return Callback(False, 'Could not update the AutoPilot.')
 
-# def updateStatus(autoPilotID, newStatus, companyID):
-#     try:
+def updateStatus(autoPilotID, newStatus, companyID):
+    try:
 
-#         if not newStatus: raise Exception("Please provide the new status true/false")
-#         db.session.query(AutoPilot).filter(and_(AutoPilot.ID == autoPilotID, AutoPilot.CompanyID == companyID)) \
-#             .update({"Active": newStatus})
+        if newStatus is None: raise Exception("Please provide the new status true/false")
+        db.session.query(CRMAutoPilot).filter(and_(CRMAutoPilot.ID == autoPilotID, CRMAutoPilot.CompanyID == companyID)) \
+            .update({"Active": newStatus})
 
-#         db.session.commit()
-#         return Callback(True, 'AutoPilot status has been changed.')
+        db.session.commit()
+        return Callback(True, 'CRM AutoPilot status has been changed.')
 
-#     except Exception as exc:
-#         helpers.logError("auto_pilot.changeStatus(): " + str(exc))
-#         db.session.rollback()
-#         return Callback(False, "Could not change the AutoPilot's status.")
+    except Exception as exc:
+        helpers.logError("auto_pilot.changeStatus(): " + str(exc))
+        db.session.rollback()
+        return Callback(False, "Could not change the CRM  AutoPilot's status.")
 
 
 def removeByID(id, companyID):

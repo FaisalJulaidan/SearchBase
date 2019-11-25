@@ -6,29 +6,26 @@ import {faMinus} from "@fortawesome/free-solid-svg-icons";
 
 const ResultItem = props => {
 
-    let valSize = '2.5em';
-    let titleSize = '0.85em';
-    let fontAwesomeSize = '2x';
+    let styleClassValue = styles.value;
+    let styleClassTitle = styles.title;
     switch (props.valSize) {
         case 'small':
-            valSize = '1.5em';
-            fontAwesomeSize = "1x";
-            titleSize = '0.75em';
+            styleClassValue = styles.value_small;
+            styleClassTitle = styles.title_small;
             break;
         case 'large':
-            valSize = '6em';
-            fontAwesomeSize = "3x";
-            titleSize = '.9em';
+            styleClassValue = styles.value_big;
+            styleClassTitle = styles.title_big;
             break;
     }
 
     let formatted = new Intl.NumberFormat('en-gb').format(props.value);
     return (
         <div className={styles.wrapper}>
-            <span className={styles.value} style={{fontSize: valSize}}>
+            <span className={`${styles.value} ${styleClassValue}`}>
                 {(props.currency ? `£${formatted}` : `${formatted}`)}
             </span>
-            <h1 className={styles.title} style={{fontSize: titleSize}}>{props.title}</h1>
+            <h1 className={`${styles.title} ${styleClassTitle}`}>{props.title}</h1>
         </div>
     );
 };

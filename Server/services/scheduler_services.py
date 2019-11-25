@@ -86,7 +86,7 @@ def sendAutopilotReferrals():
             yesterday = datetime.now() - timedelta(days=1)
             now = datetime.now()
             crmaplist = db.session.query(CRMAutoPilot).filter(CRMAutoPilot.ID == CRM.ID) \
-                .filter(and_(CRMAutoPilot.LastReferral != None, 24 <= func.TIMESTAMPDIFF(text('HOUR'), CRMAutoPilot.LastReferral, yesterday))).all()
+                .filter(and_(CRMAutoPilot.LastReferral != None, 24 <= func.TIMESTAMPDIFF(text('HOUR'), CRMAutoPilot.LastReferral, yesterday), CRMAutoPilot.Active == True)).all()
             for crmAP in crmaplist:
                 crm_callback = crm_services.getCRMByType(enums.CRM.Bullhorn, crmAP.CompanyID)
                 if not crm_callback.Success:

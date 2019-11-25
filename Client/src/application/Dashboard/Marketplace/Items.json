@@ -1,18 +1,18 @@
 {
   "Items": [
     {
-      "title": "Adapt",
-      "desc": "Bond Adapt, specialist portfolio of recruitment software applications has earned a reputation for increasing business growth.",
-      "image": "/static/images/CRM/adapt.svg",
-      "type": "Adapt",
-      "disabled": false,
-      "status": "NOT_CONNECTED"
-    },
-    {
       "title": "Bullhorn",
       "desc": "Bullhorn provides customer relationship mantagement, applicant tracking system and operations software for the staffing industry.",
       "image": "/static/images/CRM/bullhorn.svg",
       "type": "Bullhorn",
+      "disabled": false,
+      "status": "NOT_CONNECTED"
+    },
+    {
+      "title": "Vincere",
+      "desc": "Vincere provides customer relationship management, applicant tracking system and operations software for the staffing industry.",
+      "image": "/static/images/CRM/vincere.svg",
+      "type": "Vincere",
       "disabled": false,
       "status": "NOT_CONNECTED"
     },
@@ -33,10 +33,10 @@
       "status": "NOT_CONNECTED"
     },
     {
-      "title": "Vincere",
-      "desc": "Vincere provides customer relationship management, applicant tracking system and operations software for the staffing industry.",
-      "image": "/static/images/CRM/vincere.svg",
-      "type": "Vincere",
+      "title": "Adapt",
+      "desc": "Bond Adapt, specialist portfolio of recruitment software applications has earned a reputation for increasing business growth.",
+      "image": "/static/images/CRM/adapt.svg",
+      "type": "Adapt",
       "disabled": false,
       "status": "NOT_CONNECTED"
     },
@@ -49,19 +49,43 @@
       "status": "NOT_CONNECTED"
     },
     {
-      "title": "Outlook",
-      "desc": "Outlook is the Microsoft Email Service provider. You can easily integrate your Outlook into SearchBase and if you have scheduled any appointments or calendar events, we will automatically create the events in your calendar.",
-      "image": "/static/images/CRM/outlook.svg",
-      "type": "Outlook",
-      "disabled": true,
-      "status": "NOT_CONNECTED"
-    },
-    {
       "title": "Twilio",
       "desc": "Twilio two-way SMS and MMS messages allow you to carry on a conversation by both sending and receiving text and multimedia messages. You can integrate all of your Chatbots to natively reach your Talent Pools, Clients and candidates from within SearchBase",
       "image": "/static/images/CRM/twilio.svg",
       "type": "Twilio",
       "disabled": false,
+      "status": "NOT_CONNECTED"
+    },
+    {
+      "title": "Access",
+      "desc": "Access provides customer relationship management, applicant tracking system and operations software for the staffing industry.",
+      "image": "/static/images/CRM/accessgroup.png",
+      "type": "JobAdder",
+      "disabled": true,
+      "status": "NOT_CONNECTED"
+    },
+    {
+      "title": "JobAdder",
+      "desc": "JobAdder provides customer relationship management, applicant tracking system and operations software for the staffing industry.",
+      "image": "/static/images/CRM/jobadder.jpg",
+      "type": "JobAdder",
+      "disabled": true,
+      "status": "NOT_CONNECTED"
+    },
+    {
+      "title": "Workable",
+      "desc": "Workable provides customer relationship management, applicant tracking system and operations software for the staffing industry.",
+      "image": "/static/images/CRM/workable.png",
+      "type": "Workable",
+      "disabled": true,
+      "status": "NOT_CONNECTED"
+    },
+    {
+      "title": "Outlook",
+      "desc": "Outlook is the Microsoft Email Service provider. You can easily integrate your Outlook into SearchBase and if you have scheduled any appointments or calendar events, we will automatically create the events in your calendar.",
+      "image": "/static/images/CRM/outlook.svg",
+      "type": "Outlook",
+      "disabled": true,
       "status": "NOT_CONNECTED"
     },
     {

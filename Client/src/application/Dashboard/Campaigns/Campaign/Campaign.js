@@ -90,6 +90,7 @@ class Campaign extends React.Component {
     componentDidUpdate(prevProps, prevState, snapshot) {
         if (prevProps.isCandidatesLoading && (this.props.errorMsg === null)) {
             this.state.candidate_list = this.props.candidate_list;
+            console.log("candidate list: " + this.state.candidate_list);
             this.showModal(true);
         } else if (prevProps.isLaunchingCampaign && (this.props.errorMsg === null)) {
             this.showModal(false);
@@ -453,7 +454,7 @@ class Campaign extends React.Component {
                                             <Checkbox style={{
                                                 display: (
                                                     this.state.selectedCRM ===
-                                                    this.props.campaignOptions?.crms.find(crm => crm.Type === 'JobScience')?.ID
+                                                    this.props.campaignOptions?.crms.find(crm => crm.Type === 'Jobscience')?.ID
                                                         ? 'block'
                                                         : 'none'
                                                 ),

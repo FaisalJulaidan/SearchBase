@@ -1,54 +1,55 @@
-version: '3'
+version: '3.2'
 
 services:
 
-  nginx:
-    image: nginx:1.15-alpine
-    command: "/bin/sh -c 'while :; do sleep 6h & wait $${!}; nginx -s reload; done & nginx -g \"daemon off;\"'"
-    restart: always
-    ports:
-      - "80:80"
-      - "443:443"
-    volumes:
-      - ./docker/nginx:/etc/nginx/conf.d
-      - ./docker/certbot/conf:/etc/letsencrypt
-      - ./docker/certbot/www:/var/www/certbot
-    networks:
-      - frontend
+    nginx:
+        image: nginx:1.15-alpine
+        command: "/bin/sh -c 'while :; do sleep 6h & wait $${!}; nginx -s reload; done & nginx -g \"daemon off;\"'"
+        restart: always
+        ports:
+            - "80:80"
+            - "443:443"
+        volumes:
+            - ./docker/nginx:/etc/nginx/conf.d
+            - ./docker/certbot/conf:/etc/letsencrypt
+            - ./docker/certbot/www:/var/www/certbot
+            -   chatbot-content:/var/www/chatbot/
+            -   client-content:/var/www/client/
+        networks:
+            - frontend
 
-  certbot:
-    image: certbot/certbot
-    entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;'"
-    volumes:
-      - ./docker/certbot/conf:/etc/letsencrypt
-      - ./docker/certbot/www:/var/www/certbot
-    networks:
-      - frontend
+    certbot:
+        image: certbot/certbot
+        entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;'"
+        volumes:
+            - ./docker/certbot/conf:/etc/letsencrypt
+            - ./docker/certbot/www:/var/www/certbot
+        networks:
+            - frontend
 
-  server:
-    container_name: searchbase_server
-    build: ./Server
-    ports:
-      - 5000:5000
-    networks:
-      - frontend
-    restart: always
+    server:
+        container_name: searchbase_server
+        build: ./Server
+        ports:
+            - 5000:5000
+        networks:
+            - frontend
+        restart: always
 
-  client:
-    container_name: searchbase_client
-    build: ./Client
-    ports:
-      - 3000:3000
-    networks:
-      - frontend
+    client:
+        container_name: searchbase_client
+        build: ./Client
+            -   client-content:/build
 
-  chatbot:
-    container_name: searchbase_chatbot
-    build: ./Chatbot
-    ports:
-      - 3001:3001
-    networks:
-      - frontend
+    chatbot:
+        container_name: searchbase_chatbot
+        build: ./Chatbot
+        volumes:
+            -   chatbot-content:/build
 
 networks:
-  frontend:
+    frontend:
+
+volumes:
+    client-content:
+    chatbot-content:

@@ -19,7 +19,7 @@ const getLink = (src) => {
 const getServerDomain = () => {
     const env = process.env.REACT_APP_ENV;
     if (env === 'development')
-        return 'http://localhost:5000';
+        return 'http://192.168.8.100:5000';
     else if (env === 'staging')
         return 'http://staging.thesearchbase.com';
     else if (env === 'production')

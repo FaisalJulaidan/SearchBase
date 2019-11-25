@@ -77,7 +77,6 @@ def sendConversationsNotifications(assistantID=None):
 
 # If assistantID is supplied, it will only look for data relating to that assistant
 def sendAutopilotReferrals():
-    print('run')
     try:
         from app import app
         with app.app_context():
@@ -86,7 +85,6 @@ def sendAutopilotReferrals():
             now = datetime.now()
             crmaplist = db.session.query(CRMAutoPilot).filter(CRMAutoPilot.ID == CRM.ID) \
                 .filter(and_(CRMAutoPilot.LastReferral != None, 24 <= func.TIMESTAMPDIFF(text('HOUR'), CRMAutoPilot.LastReferral, yesterday), CRMAutoPilot.Active == True)).all()
-            print(crmaplist)
             for crmAP in crmaplist:
                 crm_callback = crm_services.getCRMByType(enums.CRM.Bullhorn, crmAP.CompanyID)
                 if not crm_callback.Success:
@@ -162,5 +160,5 @@ def test():
 # Run scheduled tasks
 scheduler.add_job(sendConversationsNotifications, 'cron', hour='*/1', id='sendConversationsNotifications', replace_existing=True)
 scheduler.add_job(pingDatabaseConnection, 'cron', hour='*/5', id='pingDatabaseConnection', replace_existing=True)
-scheduler.add_job(sendAutopilotReferrals, 'cron', second='*/10', id='sendAutopilotReferrals', replace_existing=True)
+scheduler.add_job(sendAutopilotReferrals, 'cron', hour='*/24', id='sendAutopilotReferrals', replace_existing=True)
 # scheduler.add_job(test, 'cron', second='*/3', id='test', replace_existing=True)

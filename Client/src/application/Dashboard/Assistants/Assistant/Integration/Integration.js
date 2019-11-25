@@ -70,26 +70,6 @@ class Integration extends React.Component {
 
     getChatbotScript = () => `<script>const s=document.createElement("script");s.src="${getLink("/api/widgets/chatbot")}";s.setAttribute('data-name','${this.state.dataName}');s.setAttribute('data-id','${this.state.assistantID}');s.setAttribute('data-circle','${this.state.dataCircle}');document.body.appendChild(s);</script>`;
 
-    updatePosition = () => this.props.form.validateFields((err, values) => {
-        if (!err) {
-            const configs = {
-                assistantDesc: this.props.assistant.Description || null,
-                assistantName: this.props.assistant.Name,
-                config: {
-                    ...this.props.assistant.Config,
-                    chatbotPosition: values.chatbotPosition
-                },
-                notifyEvery: this.props.assistant.NotifyEvery === null ? 'null' : this.props.assistant.NotifyEvery,
-                secondsUntilPopup: this.props.assistant.SecondsUntilPopup,
-                topBarTitle: this.props.assistant.TopBarText,
-                welcomeMessage: this.props.assistant.Message
-            };
-
-            store.dispatch(
-                assistantActions.updateAssistantConfigs(this.props.assistant.ID, configs)
-            );
-        }
-    });
 
     render() {
         const { getFieldDecorator } = this.props.form;
@@ -128,23 +108,6 @@ class Integration extends React.Component {
                     <Input style={{padding: "3px", width: "60px"}} type="color" name="dataCircle"
                            value={this.state.dataCircle} onChange={this.handleChange}/>
                 </div>
-
-
-                <br/>
-
-                <Form layout='vertical' wrapperCol={{span: 15}} style={{width: '100%'}} onChange={() => this.updatePosition()}>
-                    <Form.Item label="Chatbot Position"
-                               help={'The location of the chatbot on your web page'}>
-                        {getFieldDecorator('chatbotPosition', {
-                            initialValue: this.props.assistant.Config.chatbotPosition
-                        })(
-                            <Radio.Group>
-                                <Radio value="Left">Left</Radio>
-                                <Radio value="Right">Right</Radio>
-                            </Radio.Group>
-                        )}
-                    </Form.Item>
-                </Form>
 
                 <br/>
                 <Divider/>

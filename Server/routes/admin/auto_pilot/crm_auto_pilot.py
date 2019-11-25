@@ -80,7 +80,6 @@ def auto_pilot_configs(autoPilotID):
             .updateConfigs(autoPilotID,
                            data.get('Name', None),
                            data.get('Description', None),
-                           data.get('Active', None),
                            data.get('ReferralAssistantID', None),
                            data.get('ReferralEmailTitle', None),
                            data.get('ReferralEmailBody', None),

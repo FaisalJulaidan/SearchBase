@@ -70,7 +70,7 @@ def update(id, name, desc, companyID: int) -> Callback:
         db.session.rollback()
         return Callback(False, "Couldn't update the AutoPilot.")
 
-def updateConfigs(id, name, desc, active, referralAssistantID, referralEmailTitle, referralEmailBody, referralSMSBody, sendReferralEmail, sendReferralSMS, companyID: int) -> Callback:
+def updateConfigs(id, name, desc, referralAssistantID, referralEmailTitle, referralEmailBody, referralSMSBody, sendReferralEmail, sendReferralSMS, companyID: int) -> Callback:
     try:
 
         # Get AutoPilot
@@ -81,7 +81,6 @@ def updateConfigs(id, name, desc, active, referralAssistantID, referralEmailTitl
         # Update the autoPilot
         crmAutopilot.Name = name
         crmAutopilot.Description = desc
-        crmAutopilot.Active = active
         crmAutopilot.LastReferral = datetime.now() if referralAssistantID else None
 
         crmAutopilot.SendReferralEmail = sendReferralEmail

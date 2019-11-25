@@ -78,7 +78,6 @@ def sendConversationsNotifications(assistantID=None):
 # If assistantID is supplied, it will only look for data relating to that assistant
 def sendAutopilotReferrals():
     print('run')
-    return
     try:
         from app import app
         with app.app_context():
@@ -87,6 +86,7 @@ def sendAutopilotReferrals():
             now = datetime.now()
             crmaplist = db.session.query(CRMAutoPilot).filter(CRMAutoPilot.ID == CRM.ID) \
                 .filter(and_(CRMAutoPilot.LastReferral != None, 24 <= func.TIMESTAMPDIFF(text('HOUR'), CRMAutoPilot.LastReferral, yesterday), CRMAutoPilot.Active == True)).all()
+            print(crmaplist)
             for crmAP in crmaplist:
                 crm_callback = crm_services.getCRMByType(enums.CRM.Bullhorn, crmAP.CompanyID)
                 if not crm_callback.Success:

@@ -146,7 +146,7 @@ export const campaign = (state = initialState, action) => {
                 errorMsg: action.error
             });
 
-            //Fetch JobScience shortlists
+        //Fetch JobScience shortlists
         case actionTypes.FETCH_CAMPAIGN_SHORTLISTS:
             return updateObject(state, {
                 shortlists: [],
@@ -155,7 +155,7 @@ export const campaign = (state = initialState, action) => {
             });
         case actionTypes.FETCH_CAMPAIGN_SHORTLISTS_SUCCESS:
             return updateObject(state, {
-                shortlists: action.shortlists,
+                shortlists: Array.isArray(action.shortlists) ? action.shortlists : [],
                 isLoadingShortlists: false,
                 errorMsg: null,
             });

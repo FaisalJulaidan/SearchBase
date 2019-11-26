@@ -446,7 +446,7 @@ class Campaign extends React.Component {
                                                     loading={this.props.isLoading}
                                                     onSelect={value => {
                                                         this.setState({selectedCRM: value});
-                                                        this.props.dispatch(campaignActions.fetchShortlists(value));
+
                                                     }}>
                                                 {this.props.campaignOptions?.crms.map((item, key) => {
                                                     return (
@@ -461,23 +461,25 @@ class Campaign extends React.Component {
                                             <Checkbox
                                                 checked={this.state.useShortlist}
                                                 onChange={(e) => {
+                                                    if (e.target.checked)
+                                                        this.props.dispatch(campaignActions.fetchShortlists(this.state.selectedCRM));
                                                     this.setState({useShortlist: e.target.checked})
                                                 }}
                                                 style={{
                                                     display: (
                                                         this.state.selectedCRM ===
-                                                        this.props.campaignOptions?.crms.find(crm => crm.Type === 'Adapt')?.ID
+                                                        this.props.campaignOptions?.crms.find(crm => crm.Type === 'Jobscience')?.ID
                                                             ? 'block'
                                                             : 'none'
                                                     ),
                                                     marginTop: '10px'
-                                                }}>Use Adapt Shortlist</Checkbox>
+                                                }}>Use Jobscience Shortlist</Checkbox>
                                         )}
                                     </FormItem>
-                                    <FormItem style={{
+                                    <FormItem label="Shortlist" style={{
                                         display: (
                                             this.state.selectedCRM ===
-                                            this.props.campaignOptions?.crms.find(crm => crm.Type === 'Adapt')?.ID &&
+                                            this.props.campaignOptions?.crms.find(crm => crm.Type === 'Jobscience')?.ID &&
                                             this.state.useShortlist ? 'block' : 'none')
                                     }}
                                     >
@@ -490,10 +492,9 @@ class Campaign extends React.Component {
                                             <Select placeholder={"Please select a shortlist"}
                                                     loading={this.props.isLoadingShortlists}>
                                                 {this.props.shortlists?.map((item, key) => {
-                                                    console.log(item);
                                                     return (
-                                                        <Select.Option key={key} value={item.ID}>
-                                                            {trimText.capitalize(trimText.trimDash(item.Type))}
+                                                        <Select.Option key={key} value={item.url}>
+                                                            {trimText.capitalize(trimText.trimDash(item.name))}
                                                         </Select.Option>
                                                     );
                                                 })}
@@ -563,7 +564,7 @@ class Campaign extends React.Component {
                             </FormItem>
                             {this.state.useShortlist && this.state.use_crm
                             && this.state.selectedCRM ===
-                            this.props.campaignOptions?.crms.find(crm => crm.Type === 'Adapt')?.ID
+                            this.props.campaignOptions?.crms.find(crm => crm.Type === 'Jobscience')?.ID
                                 ?
                                 <>
                                 </>

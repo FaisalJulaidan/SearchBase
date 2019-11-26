@@ -112,4 +112,4 @@ def getShortlists(crmID):
             return helpers.jsonResponse(False, 400, callback.Message)
 
         return helpers.jsonResponse(True, 200, "Data Returned!",
-                                    {"shortlists": callback.Data})
+                                    callback.Data)

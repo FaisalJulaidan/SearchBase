@@ -37,7 +37,7 @@
       "desc": "Bond Adapt, specialist portfolio of recruitment software applications has earned a reputation for increasing business growth.",
       "image": "/static/images/CRM/adapt.svg",
       "type": "Adapt",
-      "disabled": false,
+      "disabled": true,
       "status": "NOT_CONNECTED"
     },
     {

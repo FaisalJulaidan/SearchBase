@@ -21,44 +21,7 @@ def processConversation(assistant: Assistant, conversation: Conversation) -> Cal
 
 
 def insertCandidate(assistant: Assistant, conversation: Conversation, update_id=None):
-    name = (conversation.Name or " ").split(" ")
-    data = {
-        "name": conversation.Name or " ",
-        "firstName": helpers.getListValue(name, 0, " "),
-        "lastName": helpers.getListValue(name, 1, " "),
-        "mobile": conversation.PhoneNumber or " ",
-        "city": ", ".join(
-            conversation.Data.get('keywordsByDataType').get(DT.CandidateLocation.value['name']) or
-            conversation.Data.get('keywordsByDataType').get(DT.JobLocation.value['name'], [])),
-        "email": conversation.Email or " ",
-        "emails": conversation.Data.get('keywordsByDataType').get(DT.CandidateEmail.value['name'], []),
-
-        "skills": ", ".join(
-            conversation.Data.get('keywordsByDataType').get(DT.CandidateSkills.value['name'], ) or
-            conversation.Data.get('keywordsByDataType').get(DT.JobEssentialSkills.value['name'], [])) or None,
-        "yearsExperience": ", ".join(
-            conversation.Data.get('keywordsByDataType').get(DT.CandidateYearsExperience.value['name']) or
-            conversation.Data.get('keywordsByDataType').get(DT.JobYearsRequired.value['name'], [])) or None,
-
-        "preferredWorkCity": ", ".join(
-            conversation.Data.get('keywordsByDataType').get(DT.JobLocation.value['name'], [])) or None,
-        "preferredJobTitle": ", ".join(
-            conversation.Data.get('keywordsByDataType').get(DT.JobTitle.value['name'], [])) or None,
-        "preferredJobType": ", ".join(
-            conversation.Data.get('keywordsByDataType').get(DT.JobType.value['name'], [])) or None, # cant be used until predefined values
-
-        "educations": ", ".join(conversation.Data.get('keywordsByDataType').get(DT.CandidateEducation.value['name'],
-                                                                                [])) or None,
-        "availability": ", ".join(
-            conversation.Data.get('keywordsByDataType').get(DT.CandidateAvailability.value['name'], [])) or None,
-
-        "annualSalary": getSalary(conversation, DT.CandidateDesiredSalary, "Min", Period.Annually) or
-                        getSalary(conversation, DT.JobSalary, "Min", Period.Annually),
-        "dayRate": getSalary(conversation, DT.CandidateDesiredSalary, "Min", Period.Daily) or
-                   getSalary(conversation, DT.JobSalary, "Min", Period.Daily),
-
-        "selectedSolutions": conversation.Data.get("selectedSolutions")
-    }
+    data = __extractCandidateInsertData(conversation)
 
     if update_id and assistant.CRM.Type is CRM.Bullhorn:
         func = "update"
@@ -128,45 +91,7 @@ def updateCandidate(candidateID, conversation, companyID, sourceID):
 
         return Callback(False, "CRM " + crm_type.value + " is not allowed for updating")
 
-    name = (conversation.Name or " ").split(" ")
-    data = {
-        "id": candidateID,
-        "name": conversation.Name or " ",
-        "firstName": helpers.getListValue(name, 0, " "),
-        "lastName": helpers.getListValue(name, 1, " "),
-        "mobile": conversation.PhoneNumber or " ",
-        "city": ", ".join(
-            conversation.Data.get('keywordsByDataType').get(DT.CandidateLocation.value['name']) or
-            conversation.Data.get('keywordsByDataType').get(DT.JobLocation.value['name'], [])),
-        "email": conversation.Email or " ",
-        "emails": conversation.Data.get('keywordsByDataType').get(DT.CandidateEmail.value['name'], []),
-
-        "skills": ", ".join(
-            conversation.Data.get('keywordsByDataType').get(DT.CandidateSkills.value['name'], ) or
-            conversation.Data.get('keywordsByDataType').get(DT.JobEssentialSkills.value['name'], [])) or None,
-        "yearsExperience": ", ".join(
-            conversation.Data.get('keywordsByDataType').get(DT.CandidateYearsExperience.value['name']) or
-            conversation.Data.get('keywordsByDataType').get(DT.JobYearsRequired.value['name'], [])) or None,
-
-        "preferredWorkCity": ", ".join(
-            conversation.Data.get('keywordsByDataType').get(DT.JobLocation.value['name'], [])) or None,
-        "preferredJobTitle": ", ".join(
-            conversation.Data.get('keywordsByDataType').get(DT.JobTitle.value['name'], [])) or None,
-        "preferredJobType": ", ".join(
-            conversation.Data.get('keywordsByDataType').get(DT.JobType.value['name'], [])) or None, # cant be used until predefined values
-
-        "educations": ", ".join(conversation.Data.get('keywordsByDataType').get(DT.CandidateEducation.value['name'],
-                                                                                [])) or None,
-        "availability": ", ".join(
-            conversation.Data.get('keywordsByDataType').get(DT.CandidateAvailability.value['name'], [])) or None,
-
-        "annualSalary": getSalary(conversation, DT.CandidateDesiredSalary, "Min", Period.Annually) or
-                        getSalary(conversation, DT.JobSalary, "Min", Period.Annually),
-        "dayRate": getSalary(conversation, DT.CandidateDesiredSalary, "Min", Period.Daily) or
-                   getSalary(conversation, DT.JobSalary, "Min", Period.Daily),
-
-        "selectedSolutions": conversation.Data.get("selectedSolutions")
-    }
+    data = __extractCandidateInsertData(conversation)
 
     if CRM.has_value(crm_type.value):
         # if crm_type is CRM.Greenhouse:
@@ -197,7 +122,7 @@ def uploadFile(filePath, fileName, conversation):
 
 def searchCandidates(assistant: Assistant, session):
     data = {
-        "location": __checkFilter(session['keywordsByDataType'], DT.CandidateLocation),
+        "location": __checkFilter(session['keywordsByDataType'], DT.CandidateCity),
         "preferredJotTitle": __checkFilter(session['keywordsByDataType'], DT.JobTitle),
         "yearsExperience": __checkFilter(session['keywordsByDataType'], DT.CandidateYearsExperience),
         "skills": __checkFilter(session['keywordsByDataType'], DT.CandidateSkills, True),
@@ -255,8 +180,8 @@ def searchCandidatesCustom(crm, companyID, candidate_data, perfect=False):
 def searchJobs(assistant: Assistant, session):
     data = {
         "jobTitle": __checkFilter(session['keywordsByDataType'], DT.JobTitle),
-        "city": __checkFilter(session['keywordsByDataType'], DT.JobLocation) or
-                __checkFilter(session['keywordsByDataType'], DT.CandidateLocation),
+        "city": __checkFilter(session['keywordsByDataType'], DT.JobCity) or
+                __checkFilter(session['keywordsByDataType'], DT.CandidateCity),
         "employmentType": __checkFilter(session['keywordsByDataType'], DT.JobType),
         "skills": __checkFilter(session['keywordsByDataType'], DT.JobEssentialSkills) or
                   __checkFilter(session['keywordsByDataType'], DT.CandidateSkills),
@@ -505,7 +430,7 @@ def additionalCandidateNotesBuilder(data, selectedSolutions=None):
         paragraph += "  - " + key + ": " + str(value) + "\n"
 
     if selectedSolutions:
-        paragraph += "\n\nThe Candidate has also expressed interest in the following jobs: "
+        paragraph += "\n\nThe Candidate has also expressed interest in the following jobs: \n"
         for solution in selectedSolutions:
             for key, value in helpers.cleanDict(solution.get("data")).items():
                 paragraph += "\n " + str(key) + " : " + str(value)
@@ -514,7 +439,59 @@ def additionalCandidateNotesBuilder(data, selectedSolutions=None):
     return paragraph
 
 
+def __extractCandidateInsertData(conversation):
+    name = (conversation.Name or " ").split(" ")
+    return {
+        "name": conversation.Name or " ",
+        "firstName": helpers.getListValue(name, 0, " "),
+        "lastName": helpers.getListValue(name, 1, " "),
+        "mobile": conversation.PhoneNumber or " ",
+        "street": ", ".join(
+            conversation.Data.get('keywordsByDataType').get(DT.CandidateStreet.value['name']) or
+            conversation.Data.get('keywordsByDataType').get(DT.JobStreet.value['name'], [])),
+        "city": ", ".join(
+            conversation.Data.get('keywordsByDataType').get(DT.CandidateCity.value['name']) or
+            conversation.Data.get('keywordsByDataType').get(DT.JobCity.value['name'], [])),
+        "postCode": ", ".join(
+            conversation.Data.get('keywordsByDataType').get(DT.CandidatePostCode.value['name']) or
+            conversation.Data.get('keywordsByDataType').get(DT.JobPostCode.value['name'], [])),
+        "country": ", ".join(
+            conversation.Data.get('keywordsByDataType').get(DT.CandidateCountry.value['name'], [])),
+        "email": conversation.Email or " ",
+        "emails": conversation.Data.get('keywordsByDataType').get(DT.CandidateEmail.value['name'], []),
+
+        "skills": ", ".join(
+            conversation.Data.get('keywordsByDataType').get(DT.CandidateSkills.value['name'], ) or
+            conversation.Data.get('keywordsByDataType').get(DT.JobEssentialSkills.value['name'], [])) or None,
+        "yearsExperience": ", ".join(
+            conversation.Data.get('keywordsByDataType').get(DT.CandidateYearsExperience.value['name']) or
+            conversation.Data.get('keywordsByDataType').get(DT.JobYearsRequired.value['name'], [])) or None,
+
+        "preferredWorkCity": ", ".join(
+            conversation.Data.get('keywordsByDataType').get(DT.JobCity.value['name'], [])) or None,
+        "preferredJobTitle": ", ".join(
+            conversation.Data.get('keywordsByDataType').get(DT.JobTitle.value['name'], [])) or None,
+        "preferredJobType": ", ".join(
+            conversation.Data.get('keywordsByDataType').get(DT.JobType.value['name'], [])) or None,
+
+        "educations": ", ".join(conversation.Data.get('keywordsByDataType').get(DT.CandidateEducation.value['name'],
+                                                                                [])) or None,
+        "linkedIn": ", ".join(conversation.Data.get('keywordsByDataType').get(DT.CandidateLinkdinURL.value['name'],
+                                                                              [])) or None,
+
+        "availability": ", ".join(
+            conversation.Data.get('keywordsByDataType').get(DT.CandidateAvailability.value['name'], [])) or None,
+
+        "annualSalary": getSalary(conversation, DT.CandidateDesiredSalary, "Min", Period.Annually) or
+                        getSalary(conversation, DT.JobSalary, "Min", Period.Annually),
+        "dayRate": getSalary(conversation, DT.CandidateDesiredSalary, "Min", Period.Daily) or
+                   getSalary(conversation, DT.JobSalary, "Min", Period.Daily),
+
+        "selectedSolutions": conversation.Data.get("selectedSolutions")
+    }
+
+
 # prevents IDEA from automatically removing dependencies that are used in eval
-def ideaCalmer():
+def IDEA_Calmer():
     print(Jobscience, Mercury, Greenhouse, Vincere, Adapt)
 

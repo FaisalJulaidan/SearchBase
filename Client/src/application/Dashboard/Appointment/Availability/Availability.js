@@ -66,7 +66,7 @@ class Availability extends React.Component {
             let data = {
                 name: record.CandidateName,
                 skills: record.CandidateSkills,
-                location: record.CandidateLocation,
+                location: record.CandidateCity,
                 consultant: record.CandidateConsultantName,
                 jobTitle: record.CandidateJobTitle
             };

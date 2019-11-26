@@ -138,10 +138,25 @@ const CandidateColumns = [{
     dataIndex: 'CandidateMobile',
     render: (text, record) => (<p>{record.CandidateMobile}</p>)
 }, {
-    title: 'Location',
-    key: 'Location',
-    dataIndex: 'Location',
-    render: (text, record) => (<p>{record.CandidateLocation}</p>)
+    title: 'Street',
+    key: 'CandidateStreet',
+    dataIndex: 'CandidateStreet',
+    render: (text, record) => (<p>{record.CandidateStreet}</p>)
+},{
+    title: 'City',
+    key: 'CandidateCity',
+    dataIndex: 'CandidateCity',
+    render: (text, record) => (<p>{record.CandidateCity}</p>)
+},{
+    title: 'Post Code',
+    key: 'CandidatePostCode',
+    dataIndex: 'CandidatePostCode',
+    render: (text, record) => (<p>{record.CandidatePostCode}</p>)
+},{
+    title: 'Country',
+    key: 'CandidateCountry',
+    dataIndex: 'CandidateCountry',
+    render: (text, record) => (<p>{record.CandidateCountry}</p>)
 }, {
     title: 'Skills',
     key: 'CandidateSkills',

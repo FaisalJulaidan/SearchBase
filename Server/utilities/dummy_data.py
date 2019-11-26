@@ -130,7 +130,7 @@ def generate():
                     # Candidate LOCATION
                     {"Type": "User Input", "StoreInDB": True, "Skippable": False, "SkipText": "Skip!",
                      "SkipAction": "End Chat",
-                     "SkipBlockToGoID": 'None', "DataType": "CandidateLocation",
+                     "SkipBlockToGoID": 'None', "DataType": "CandidateCity",
                      "Content": {"text": "What city are you in?", "blockToGoID": "004",
                                  "action": "Go To Next Block", "afterMessage": "Thank you for the city",
                                  "keywords": []},
@@ -200,7 +200,7 @@ def generate():
                     # Candidate LOCATION
                     {"Type": "User Input", "StoreInDB": True, "Skippable": False, "SkipText": "Skip!",
                      "SkipAction": "End Chat",
-                     "SkipBlockToGoID": 'None', "DataType": "CandidateLocation",
+                     "SkipBlockToGoID": 'None', "DataType": "CandidateCity",
                      "Content": {"text": "What city are you in?", "blockToGoID": "002",
                                  "action": "Go To Next Block", "afterMessage": "Thank you for the city",
                                  "keywords": []},
@@ -263,7 +263,7 @@ def generate():
                     # Job LOCATION
                     {"Type": "User Input", "StoreInDB": True, "Skippable": False, "SkipText": "Skip!",
                      "SkipAction": "End Chat",
-                     "SkipBlockToGoID": 'None', "DataType": "JobLocation",
+                     "SkipBlockToGoID": 'None', "DataType": "JobCity",
                      "Content": {"text": "Job location?", "blockToGoID": "003",
                                  "action": "Go To Next Block", "afterMessage": "thanks",
                                  "keywords": []},
@@ -773,14 +773,14 @@ def generate():
     db.session.commit()
 
 
-def addCandidate(db, name, desiredSalary, jobTitle, skills, exp, location):
+def addCandidate(db, name, desiredSalary, jobTitle, skills, exp, city):
     return Candidate(Database=db,
                      CandidateName=name,
                      CandidateDesiredSalary=desiredSalary,
                      CandidateJobTitle=jobTitle,
                      CandidateSkills=skills,
                      CandidateYearsExperience=exp,
-                     CandidateLocation=location,
+                     CandidateCity=city,
                      Currency=Currency('USD'))
 
 
@@ -788,6 +788,6 @@ def addJob(db, title, description, salary, location, currency: Currency or None)
     return Job(Database=db,
                JobTitle=title,
                JobDescription=description,
-               JobLocation=location,
+               JobCity=location,
                JobSalary=salary,
                Currency=currency)

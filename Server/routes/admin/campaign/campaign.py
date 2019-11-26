@@ -77,7 +77,7 @@ def campaign_id(campaignID):
 
         return helpers.jsonResponse(True, 200, "Campaign has been retrieved!", {
             "campaign": helpers.getDictFromSQLAlchemyObj(callback.Data),
-            "campaignOptions": campaignOptions_callback.Data 
+            "campaignOptions": campaignOptions_callback.Data
         })
 
     if request.method == "POST":
@@ -95,18 +95,21 @@ def campaign_id(campaignID):
 
         return helpers.jsonResponse(True, 200, "Campaign has been saved!")
 
+
 # Save New
-@campaign_router.route("/campaign/select-shortlist", methods=['GET'])
+@campaign_router.route("/campaign/select-shortlist/<int:crmID>", methods=['GET'])
 @jwt_required
-def getShortlists():
+def getShortlists(crmID):
     user = get_jwt_identity()['user']
 
     if request.method == "GET":
         print("GET REQUEST RECEIVED...")
+        print("crm id: {}".format(crmID))
+        print("company id: {}".format(user['companyID']))
 
-        callback: Callback = campaign_services.getShortLists(request.json, user['companyID'])
+        callback: Callback = campaign_services.getShortLists(crmID, user['companyID'])
         if not callback.Success:
             return helpers.jsonResponse(False, 400, callback.Message)
 
-        return helpers.jsonResponse(True, 200, "Campaign has been saved!",
-                                    helpers.getDictFromSQLAlchemyObj(callback.Data))
+        return helpers.jsonResponse(True, 200, "Data Returned!",
+                                    {"shortlists": callback.Data})

@@ -490,6 +490,7 @@ class Campaign extends React.Component {
                                             <Select placeholder={"Please select a shortlist"}
                                                     loading={this.props.isLoadingShortlists}>
                                                 {this.props.shortlists?.map((item, key) => {
+                                                    console.log(item);
                                                     return (
                                                         <Select.Option key={key} value={item.ID}>
                                                             {trimText.capitalize(trimText.trimDash(item.Type))}

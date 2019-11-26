@@ -458,7 +458,7 @@ def getShortLists(access_token) -> Callback:
     for shortlist in shortlists:
         print("The shortlist is {}".format(shortlist))
         shortlist_entries.append({"name": shortlist.get("Name"),
-                                  "url": shortlist.get("url")})
+                                  "url": shortlist.get("attributes").get("url")})
 
     return Callback(True, sendQuery_callback.Message, shortlist_entries)
 

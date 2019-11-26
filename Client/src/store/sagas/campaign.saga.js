@@ -143,6 +143,8 @@ function* fetchCampaignCandidatesData({assistant_id, use_crm, crm_id, useShortli
 function* fetchShortlists({crm_id}) {
     try {
         const res = yield http.get(`/campaign/select-shortlist/`+crm_id);
+        console.log("TEST");
+        console.log(res.data);
         yield put(campaignActions.fetchShortlistsSuccess(
             res.data?.data)
         );

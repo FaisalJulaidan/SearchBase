@@ -278,7 +278,7 @@ class DataType(Enum):
         ValidationType.String,
         DataTypeSection.Candidate,
         [UserType.Candidate],
-        [BlockType.UserInput, BlockType.UserInput])
+        [BlockType.UserInput])
 
     CandidateCity = dataTypeCreator(
         'Candidate City',
@@ -286,7 +286,7 @@ class DataType(Enum):
         ValidationType.String,
         DataTypeSection.Candidate,
         [UserType.Candidate],
-        [BlockType.UserInput, BlockType.UserInput])
+        [BlockType.Question, BlockType.UserInput])
 
     CandidatePostCode = dataTypeCreator(
         'Candidate Post Code',
@@ -294,7 +294,7 @@ class DataType(Enum):
         ValidationType.String,
         DataTypeSection.Candidate,
         [UserType.Candidate],
-        [BlockType.UserInput, BlockType.UserInput])
+        [BlockType.Question, BlockType.UserInput])
 
     CandidateCountry = dataTypeCreator(
         'Candidate Country',
@@ -302,7 +302,7 @@ class DataType(Enum):
         ValidationType.String,
         DataTypeSection.Candidate,
         [UserType.Candidate],
-        [BlockType.UserInput, BlockType.UserInput])
+        [BlockType.Question, BlockType.UserInput])
 
     CandidateSkills = dataTypeCreator(
         'Candidate Skills',

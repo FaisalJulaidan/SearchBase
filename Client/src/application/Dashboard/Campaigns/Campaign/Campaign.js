@@ -369,7 +369,7 @@ class Campaign extends React.Component {
                                             fontSize: '1.2em'
                                         }}>{item.CandidateName}</span>}
                                         description={<span
-                                            style={{fontSize: '1.1em'}}>{item.CandidateLocation + ' - ' + item.CandidateSkills}</span>}/>
+                                            style={{fontSize: '1.1em'}}>{item.CandidateCity + ' - ' + item.CandidateSkills}</span>}/>
                                 </List.Item>
                             )}
                         />

@@ -122,7 +122,7 @@ def uploadFile(filePath, fileName, conversation):
 
 def searchCandidates(assistant: Assistant, session):
     data = {
-        "location": __checkFilter(session['keywordsByDataType'], DT.CandidateLocation),
+        "location": __checkFilter(session['keywordsByDataType'], DT.CandidateCity),
         "preferredJotTitle": __checkFilter(session['keywordsByDataType'], DT.JobTitle),
         "yearsExperience": __checkFilter(session['keywordsByDataType'], DT.CandidateYearsExperience),
         "skills": __checkFilter(session['keywordsByDataType'], DT.CandidateSkills, True),
@@ -178,8 +178,8 @@ def searchCandidatesCustom(crm, companyID, candidate_data, perfect=False):
 def searchJobs(assistant: Assistant, session):
     data = {
         "jobTitle": __checkFilter(session['keywordsByDataType'], DT.JobTitle),
-        "city": __checkFilter(session['keywordsByDataType'], DT.JobLocation) or
-                __checkFilter(session['keywordsByDataType'], DT.CandidateLocation),
+        "city": __checkFilter(session['keywordsByDataType'], DT.JobCity) or
+                __checkFilter(session['keywordsByDataType'], DT.CandidateCity),
         "employmentType": __checkFilter(session['keywordsByDataType'], DT.JobType),
         "skills": __checkFilter(session['keywordsByDataType'], DT.JobEssentialSkills) or
                   __checkFilter(session['keywordsByDataType'], DT.CandidateSkills),
@@ -466,7 +466,7 @@ def __extractCandidateInsertData(conversation):
             conversation.Data.get('keywordsByDataType').get(DT.JobYearsRequired.value['name'], [])) or None,
 
         "preferredWorkCity": ", ".join(
-            conversation.Data.get('keywordsByDataType').get(DT.JobLocation.value['name'], [])) or None,
+            conversation.Data.get('keywordsByDataType').get(DT.JobCity.value['name'], [])) or None,
         "preferredJobTitle": ", ".join(
             conversation.Data.get('keywordsByDataType').get(DT.JobTitle.value['name'], [])) or None,
         "preferredJobType": ", ".join(

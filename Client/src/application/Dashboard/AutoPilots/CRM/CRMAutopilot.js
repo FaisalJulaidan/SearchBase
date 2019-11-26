@@ -2,7 +2,7 @@ import React from 'react'
 import {connect} from 'react-redux';
 import {Breadcrumb, Button, Col, Collapse, Form, Input, Divider, Row, Switch, Typography, Select, Modal} from 'antd';
 import CKEditor from 'components/CKeditor/CKEditor'
-// Client\src\components\CKeditor\CKEditor.js
+import LoadingSpinner from 'components/LoadingSpinner/LoadingSpinner'
 import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
 import 'types/TimeSlots_Types'
 import NoHeaderPanel from 'components/NoHeaderPanel/NoHeaderPanel'
@@ -67,7 +67,7 @@ class CRMAutoPilot extends React.Component {
     onSubmit = ()  =>  {
       this.props.form.validateFields((err, values) => {
         if(!err){
-          this.props.dispatch(CRMAutoPilotActions.updateCRMAutoPilotConfigs(this.props.crmAP.ID, values))
+          this.props.dispatch(CRMAutoPilotActions.updateCRMAutoPilotConfigs(this.props.crmAP.ID, {...this.props.crmAP, ...values}))
         }
       })
     }
@@ -81,7 +81,8 @@ class CRMAutoPilot extends React.Component {
 
       
       activeKeys = autoRefer ? [...activeKeys, "1"] : activeKeys
-      return(
+      return this.props.isLoading ? <LoadingSpinner /> :
+      (
       <NoHeaderPanel>
         <div className={styles.Header}>
             <div style={{marginBottom: 20}}>

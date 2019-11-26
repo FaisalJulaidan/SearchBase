@@ -272,13 +272,37 @@ class DataType(Enum):
         [UserType.Candidate],
         [BlockType.FileUpload])
 
-    CandidateLocation = dataTypeCreator(
-        'Candidate Location',
-        'CandidateLocation',
+    CandidateStreet = dataTypeCreator(
+        'Candidate Street',
+        'CandidateStreet',
         ValidationType.String,
         DataTypeSection.Candidate,
         [UserType.Candidate],
-        [BlockType.UserInput, BlockType.Question])
+        [BlockType.UserInput, BlockType.UserInput])
+
+    CandidateCity = dataTypeCreator(
+        'Candidate City',
+        'CandidateCity',
+        ValidationType.String,
+        DataTypeSection.Candidate,
+        [UserType.Candidate],
+        [BlockType.UserInput, BlockType.UserInput])
+
+    CandidatePostCode = dataTypeCreator(
+        'Candidate Post Code',
+        'CandidatePostCode',
+        ValidationType.String,
+        DataTypeSection.Candidate,
+        [UserType.Candidate],
+        [BlockType.UserInput, BlockType.UserInput])
+
+    CandidateCountry = dataTypeCreator(
+        'Candidate Country',
+        'CandidateCountry',
+        ValidationType.String,
+        DataTypeSection.Candidate,
+        [UserType.Candidate],
+        [BlockType.UserInput, BlockType.UserInput])
 
     CandidateSkills = dataTypeCreator(
         'Candidate Skills',
@@ -286,7 +310,7 @@ class DataType(Enum):
         ValidationType.String,
         DataTypeSection.Candidate,
         [UserType.Candidate],
-        [BlockType.UserInput, BlockType.Question])
+        [BlockType.UserInput, BlockType.UserInput])
 
     CandidateEducation = dataTypeCreator(
         'Candidate Education',
@@ -460,13 +484,29 @@ class DataType(Enum):
         [UserType.Candidate, UserType.Client],
         [BlockType.UserInput, BlockType.Question])
 
-    JobLocation = dataTypeCreator(
-        'Job Location',
-        'JobLocation',
+    JobStreet = dataTypeCreator(
+        'Job Street',
+        'JobStreet',
         ValidationType.String,
-        DataTypeSection.Job,
-        [UserType.Candidate, UserType.Client],
-        [BlockType.UserInput, BlockType.Question])
+        DataTypeSection.Candidate,
+        [UserType.Candidate],
+        [BlockType.UserInput, BlockType.UserInput])
+
+    JobCity = dataTypeCreator(
+        'Job City',
+        'JobCity',
+        ValidationType.String,
+        DataTypeSection.Candidate,
+        [UserType.Candidate],
+        [BlockType.UserInput, BlockType.UserInput])
+
+    JobPostCode = dataTypeCreator(
+        'Job Post Code',
+        'JobPostCode',
+        ValidationType.String,
+        DataTypeSection.Candidate,
+        [UserType.Candidate],
+        [BlockType.UserInput, BlockType.UserInput])
 
     JobType = dataTypeCreator(
         'Job Type',

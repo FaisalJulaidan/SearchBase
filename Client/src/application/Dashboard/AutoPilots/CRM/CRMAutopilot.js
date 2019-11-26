@@ -1,7 +1,8 @@
 import React from 'react'
 import {connect} from 'react-redux';
 import {Breadcrumb, Button, Col, Collapse, Form, Input, Divider, Row, Switch, Typography, Select, Modal} from 'antd';
-import CKEditor from '@ckeditor/ckeditor5-react';
+import CKEditor from 'components/CKeditor/CKEditor'
+// Client\src\components\CKeditor\CKEditor.js
 import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
 import 'types/TimeSlots_Types'
 import NoHeaderPanel from 'components/NoHeaderPanel/NoHeaderPanel'
@@ -40,25 +41,14 @@ class CRMAutoPilot extends React.Component {
 
 
     state = {
-      referralEmailBody: this.props?.crmAP?.ReferralEmailBody,
-      referralEmailTitle: this.props?.crmAp?.ReferralEmailTitle,
       sendReferralEmail: this.props?.crmAP?.SendReferralEmail,
       sendReferralSMS: this.props?.crmAP?.SendReferralSMS,
-      referralSMSBody: this.props?.crmAP?.ReferralSMSBody,
       autoRefer: !(this.props?.crmAP?.ReferralAssistantID === undefined || this.props?.crmAP?.ReferralAssistantID === null)
     }
 
     componentWillMount() {
-      console.log(this.props)
       this.props.dispatch(CRMAutoPilotActions.fetchCRMAutoPilot(this.props.match.params.id))
     }
-
-    referralError = () => {
-      let valid = this.state.sendReferralEmail ? this.state.referralEmailBody !== "" : true
-      valid = this.state.sendReferralSMS ?  this.state.referralSMSBody !== "" : valid
-      return valid
-    }
-
 
     onActivateHandler = (checked) => {
         if (!checked) {
@@ -76,12 +66,8 @@ class CRMAutoPilot extends React.Component {
 
     onSubmit = ()  =>  {
       this.props.form.validateFields((err, values) => {
-        const { referralEmailBody, referralSMSBody, referralEmailTitle } = this.state
-        let valid = !err && this.referralError()  
-        let updatedValues = [{ReferralEmailBody: referralEmailBody}, {ReferralSMSBody: referralSMSBody}, {ReferralEmailTitle: referralEmailTitle}].concat(Object.keys(values).map(key => ({[key]: values[key]}))) 
-        updatedValues = updatedValues.reduce((prev, curr) => ({...prev, ...curr}), {})
-        if(valid){
-          this.props.dispatch(CRMAutoPilotActions.updateCRMAutoPilotConfigs(this.props.crmAP.ID, updatedValues))
+        if(!err){
+          this.props.dispatch(CRMAutoPilotActions.updateCRMAutoPilotConfigs(this.props.crmAP.ID, values))
         }
       })
     }
@@ -189,7 +175,7 @@ class CRMAutoPilot extends React.Component {
                                 <FormItem label="Auto send referral emails"
                                           help="Referred applicants will be notified via email if email is provided in the chat  (candidates applications only)">
                                     {getFieldDecorator('SendReferralEmail', {
-                                        initialValue: sendReferralEmail
+                                        initialValue: sendReferralEmail,
                                     })(
                                         <div style={{marginLeft: 3}}>
                                             <Switch checked={sendReferralEmail} onChange={e => this.setState({sendReferralEmail: e})}/>
@@ -198,37 +184,43 @@ class CRMAutoPilot extends React.Component {
                                 </FormItem>
                               </>
                             }
-                            { sendReferralEmail && this.state.autoRefer &&
                             <>
-                                <FormItem label="Referral Email Title">
-                                  <Input placeholder="referral email title" defaultValue={crmAP.ReferralEmailTitle} onChange={e => this.setState({referralEmailTitle: e.target.value})}/>
+                                <FormItem label="Referral Email Title" style={sendReferralEmail && this.state.autoRefer ? {} : {display: 'none'}}>
+                                  {getFieldDecorator('ReferralEmailTitle', {
+                                        initialValue: crmAP.ReferralEmailTitle,
+                                        rules: [{required: true}],
+                                        hidden: !sendReferralEmail,
+                                    })(
+                                         <Input placeholder="referral email title"/>
+                                    )}
+                                 
                                 </FormItem>
-                                <Row className={styles.CEKwrapper}>
-                                    <h4>Referral letter</h4>
-                                    { this.state.referralEmailBody === "" &&
-                                      <p style={{color: 'red'}}> * Title and Body field are required</p>}
-                                    <ButtonGroup style={{margin: '5px 0'}}>
+                                <Row className={styles.CEKwrapper} style={sendReferralEmail && this.state.autoRefer ? {} : {display: 'none'}}>                                    
+                                    <FormItem label="Referral Email Body">
+                                      <ButtonGroup style={{margin: '5px 0'}}>
                                         <Button onClick={() => this.setState({ referralEmailBody: this.state.referralEmailBody + ' ${candidateName}$' })}>
                                             Candidate Name
                                         </Button>
                                         <Button onClick={() => this.setState({ referralEmailBody: this.state.referralEmailBody + ' ${candidateEmail}$' })}>
                                             Candidate Email
                                         </Button>
-                                    </ButtonGroup>
-                                    <Row>
-                                        <Col span={15}>
-                                            <CKEditor
-                                                editor={ClassicEditor}
-                                                config={{toolbar: toolbar}}
-                                                data={this.state.referralEmailBody}
-                                                onChange={(event, editor) => this.setState(state => state.referralEmailBody = editor?.getData())}
-                                                onInit={editor => this.setState(state => state.referralEmailBody = editor?.getData())}
-                                            />
-                                        </Col>
-                                    </Row>
+                                      </ButtonGroup>
+                                      <Row>
+                                          <Col span={15}>
+                                            {getFieldDecorator('ReferralEmailBody', {
+                                                hidden: !sendReferralEmail,
+                                                rules: [{required: true}],
+                                                initialValue: crmAP.ReferralEmailBody
+                                            })(
+                                                <CKEditor editor={ClassicEditor} >
+    
+                                                </CKEditor>
+                                            )}
+                                          </Col>
+                                      </Row>
+                                    </FormItem>
                                 </Row>
                             </>
-                            }
                             { this.state.autoRefer &&
                             <FormItem label="Auto send SMS"
                                       help="Referred applicants will be notified via SMS if telephone number is provided in the chat  (candidates applications only)">
@@ -242,32 +234,32 @@ class CRMAutoPilot extends React.Component {
                                 )}
                             </FormItem>
                             }
-                            {sendReferralSMS &&
-                                <Row className={styles.CEKwrapper}>
-                                    <h4>Referral message</h4>
-                                    {this.state.referralSMSBody === "" &&
-                                        <p style={{color: 'red'}}> * Body field is required</p>}
-                                    <ButtonGroup style={{margin: '5px 0'}}>
-                                        <Button onClick={() =>this.setState({ referralSMSBody: this.state.referralSMSBody + ' ${candidateName}$'})}>
-                                            Candidate Name
-                                        </Button>
-                                        <Button onClick={() => this.setState({referralSMSBody: this.state.referralSMSBody + ' ${candidateEmail}$'})}>
-                                            Candidate Email
-                                        </Button>
-                                    </ButtonGroup>
-
-                                    <Row>
-                                        <Col span={15}>
-                                            <CKEditor
-                                                editor={ClassicEditor}
-                                                config={{toolbar: ['undo', 'redo']}}
-                                                data={this.state.referralSMSBody}
-                                                onChange={(event, editor) => this.setState(state => state.referralSMSBody = editor?.getData())}
-                                                onInit={editor => this.setState(state => state.referralSMSBody = editor?.getData())}
-                                            />
-                                        </Col>
-                                    </Row>
-                                </Row>
+                            { sendReferralSMS &&
+                            <Row className={styles.CEKwrapper}>
+                                <FormItem label="Referral SMS Body">
+                                  <ButtonGroup style={{margin: '5px 0'}}>
+                                      <Button onClick={() =>this.setState({ referralSMSBody: this.state.referralSMSBody + ' ${candidateName}$'})}>
+                                          Candidate Name
+                                      </Button>
+                                      <Button onClick={() => this.setState({referralSMSBody: this.state.referralSMSBody + ' ${candidateEmail}$'})}>
+                                          Candidate Email
+                                      </Button>
+                                  </ButtonGroup>             
+                                  <Row>
+                                      <Col span={15}>
+                                        {getFieldDecorator('ReferralSMSBody', {
+                                            initialValue: crmAP.ReferralSMSBody,
+                                            hidden: !sendReferralSMS,
+                                            rules: [{required: true}]
+                                        })(
+                                          <CKEditor
+                                              editor={ClassicEditor}
+                                              config={{toolbar: ['undo', 'redo']}}/>
+                                        )}
+                                      </Col>
+                                  </Row>
+                                </FormItem>
+                            </Row>
                             }
                         </Panel>
                     </Collapse>

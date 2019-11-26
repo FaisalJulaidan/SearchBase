@@ -13,8 +13,8 @@ services:
             - ./docker/nginx:/etc/nginx/conf.d
             - ./docker/certbot/conf:/etc/letsencrypt
             - ./docker/certbot/www:/var/www/certbot
-            -   chatbot-content:/var/www/chatbot/
-            -   client-content:/var/www/client/
+            - chatbot-content:/var/www/chatbot/
+            - client-content:/var/www/client/
         networks:
             - frontend
 
@@ -39,13 +39,14 @@ services:
     client:
         container_name: searchbase_client
         build: ./Client
-            -   client-content:/build
+        volumes:
+            - client-content:/build
 
     chatbot:
         container_name: searchbase_chatbot
         build: ./Chatbot
         volumes:
-            -   chatbot-content:/build
+            - chatbot-content:/build
 
 networks:
     frontend:

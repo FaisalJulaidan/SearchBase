@@ -138,8 +138,9 @@ const fetchCampaignCandidatesDataFailure = (error) => ({
 });
 
 // Fetch jobScience shortlist
-const fetchShortlists = () => ({
-    type: actionTypes.FETCH_CAMPAIGN_SHORTLISTS
+const fetchShortlists = (crm_id) => ({
+    type: actionTypes.FETCH_CAMPAIGN_SHORTLISTS,
+    crm_id
 });
 
 const fetchShortlistsSuccess = (shortlists) => ({

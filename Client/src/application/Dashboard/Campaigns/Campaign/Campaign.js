@@ -84,7 +84,6 @@ class Campaign extends React.Component {
                 history.push(`/dashboard/campaigns`)
             });
         }
-        this.props.dispatch(campaignActions.fetchShortlists());
         if (this.state.textMessage.indexOf("{assistant.link}") !== -1 && this.state.assistantLinkInMessage) {
             this.setState({assistantLinkInMessage: true})
         }
@@ -447,6 +446,7 @@ class Campaign extends React.Component {
                                                     loading={this.props.isLoading}
                                                     onSelect={value => {
                                                         this.setState({selectedCRM: value});
+                                                        this.props.dispatch(campaignActions.fetchShortlists(value));
                                                     }}>
                                                 {this.props.campaignOptions?.crms.map((item, key) => {
                                                     return (

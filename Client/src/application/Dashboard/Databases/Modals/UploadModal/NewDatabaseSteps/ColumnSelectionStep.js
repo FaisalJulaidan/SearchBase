@@ -131,8 +131,36 @@ class ColumnSelectionStep extends Component {
         }
 
 
-        if (TSBcolumnOption.column === 'CandidateMobile' && userColumns.length > 1) {
-            validatedData = userColumns[0] + validatedData;
+        if (TSBcolumnOption.column === 'CandidateMobile') {
+            // if there is +44, then do nothing
+            // if there is (.*) remove it then check if there is +44
+            // if there is 44 only remove it
+
+            if (
+                userColumns.length > 1 // there is country code
+            ) {
+
+                validatedData = validatedData.split(' ').join('').replace(/\(.*\)/, '').replace('-', '');
+                if (!validatedData.includes(userColumns[0])) {
+
+                    if (!validatedData.includes(userColumns[0].replace('+', '')))
+                        validatedData = userColumns[0] + validatedData;
+
+                    if (!validatedData.includes('+'))
+                        validatedData = '+' + validatedData;
+
+                    if (!validatedData.includes(userColumns[0]))
+                        validatedData = userColumns[0] + validatedData;
+
+
+                }
+
+            }
+
+
+
+
+
         }
 
         return {

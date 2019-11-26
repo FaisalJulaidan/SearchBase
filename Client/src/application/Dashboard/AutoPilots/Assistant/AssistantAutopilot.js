@@ -11,7 +11,8 @@ import './AutoPilot.less';
 import {history} from 'helpers';
 import {autoPilotActions, appointmentAllocationTimeActions} from 'store/actions';
 import {campaignActions} from "store/actions"; //TODO: To be removed (Fetching assistants for referral for now)
-import CKEditor from '@ckeditor/ckeditor5-react';
+// import CKEditor from '@ckeditor/ckeditor5-react';
+import CKEditor from 'components/CKeditor/CKEditor'
 import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
 import {trimText} from "../../../../helpers";
 
@@ -182,7 +183,7 @@ class AssistantAutoPilot extends React.Component {
             // const timeSlots = TimeSlotsRef.current.state.weekDays;
             let payload = {
                 active: autoPilot.Active,
-                namewh: values.name,
+                name: values.name,
                 description: values.description,
 
                 acceptApplications: state.acceptApplications,
@@ -344,7 +345,7 @@ class AssistantAutoPilot extends React.Component {
                             <Form layout='vertical' wrapperCol={{span: 15}} style={{width: '100%'}}
                                   id={'AutoPilotForm'}>
                                 <FormItem label="Name">
-                                    {getFieldDecorator('name', {
+                                    {getFieldDecorator('Name', {
                                         initialValue: autoPilot.Name,
                                         rules: [
                                             {
@@ -358,7 +359,7 @@ class AssistantAutoPilot extends React.Component {
                                                     // this.props.autoPilotsSlots
                                                     // if there is an error return the callback with the message
                                                     if (this.props.autoPilotsList?.some(autoPilot => autoPilot.Name === value
-                                                        && this.props.autoPilot.Name !== value))
+                                                        && this.props.autoPilot.Name !== value))  
                                                         return callback(value + ' is duplicated');
                                                     else
                                                         return callback();
@@ -386,7 +387,7 @@ class AssistantAutoPilot extends React.Component {
                                            style={customPanelStyle}>
                                         <FormItem label="Auto accept applicants "
                                                   help="Select the percentage to auto accept the applicants">
-                                            {getFieldDecorator('acceptApplications', {
+                                            {getFieldDecorator('AcceptApplications', {
                                                 valuePropName: 'checked', 
                                                 setFieldsValue: this.state.acceptApplications
                                             })(
@@ -559,7 +560,7 @@ class AssistantAutoPilot extends React.Component {
 
                                         <FormItem label="Auto send rejection email"
                                                   help="Rejected applicants will be notified via email if email is provided in the chat (candidates applications only)">
-                                            {getFieldDecorator('sendRejectionEmail', {
+                                            {getFieldDecorator('SendRejectionEmail', {
                                                 initialValue: autoPilot.SendRejectionEmail,
                                                 rules: []
                                             })(
@@ -571,10 +572,9 @@ class AssistantAutoPilot extends React.Component {
                                             )}
                                         </FormItem>
 
-                                        {
-                                            this.state.sendRejectionEmail &&
+                                        { this.state.sendRejectionEmail &&
                                             <FormItem label="Rejection Email Title">
-                                                {getFieldDecorator('rejectionEmailTitle', {
+                                                {getFieldDecorator('RejectionEmailTitle', {
                                                     initialValue: autoPilot?.RejectionEmailTitle,
                                                     rules: [{required: true}]
                                                 })(
@@ -582,17 +582,9 @@ class AssistantAutoPilot extends React.Component {
                                                 )}
                                             </FormItem>
                                         }
-
-                                        {
-                                            this.state.sendRejectionEmail &&
+                                        { this.state.sendRejectionEmail &&
                                             <Row className={styles.CEKwrapper}>
-                                                <h4>Rejection Letter</h4>
-
-                                                {
-                                                    this.state.sendRejectionEmailErrors &&
-                                                    <p style={{color: 'red'}}> * Title and Body field are requierd</p>
-                                                }
-
+                                              <FormItem label="Rejection Letter">
                                                 <ButtonGroup style={{margin: '5px 0px'}}>
                                                     <Button
                                                         onClick={() =>
@@ -611,44 +603,38 @@ class AssistantAutoPilot extends React.Component {
                                                         Candidate Email
                                                     </Button>
                                                 </ButtonGroup>
-
                                                 <Row>
                                                     <Col span={15}>
+                                                    {getFieldDecorator('RejectionEmailBody', {
+                                                        initialValue: autoPilot?.RejectionEmailBody,
+                                                        rules: [{required: true}]
+                                                    })(
                                                         <CKEditor
-                                                            editor={ClassicEditor}
-                                                            config={{toolbar: toolbar}}
-                                                            data={this.state.rejectionEmailBody}
-                                                            onChange={(event, editor) => this.setState(state => state.rejectionEmailBody = editor?.getData())}
-                                                            onInit={editor => this.setState(state => state.rejectionEmailBody = editor?.getData())}
-                                                        />
+                                                                editor={ClassicEditor}
+                                                                config={{toolbar: toolbar}}/>
+                                                    )}
                                                     </Col>
                                                 </Row>
+                                            </FormItem>
                                             </Row>
                                         }
 
                                         <FormItem label="Auto send rejection SMS"
                                                   help="Rejected applicants will be notified via SMS if telephone number is provided in the chat  (candidates applications only)">
-                                            {getFieldDecorator('sendRejectionEmail', {
+                                            {getFieldDecorator('SendRejectionSMS', {
                                                 initialValue: autoPilot.SendRejectionSMS,
                                                 rules: []
                                             })(
                                                 <div style={{marginLeft: 3}}>
                                                     <Switch onChange={this.onSendRejectionSMSChange}
-                                                            checked={this.state.sendRejectionSMS}
                                                             disabled={!this.state.rejectApplications}/>
                                                 </div>
                                             )}
                                         </FormItem>
 
-                                        {
-                                            this.state.sendRejectionSMS &&
+                                        { this.state.sendRejectionSMS &&
                                             <Row className={styles.CEKwrapper}>
-                                                <h4>Rejection Letter</h4>
-
-                                                {
-                                                    this.state.sendRejectionSMSErrors &&
-                                                    <p style={{color: 'red'}}> * Body field is requierd</p>
-                                                }
+                                              <FormItem label="Rejection Letter">
                                                 <ButtonGroup style={{margin: '5px 0px'}}>
                                                     <Button
                                                         onClick={() =>
@@ -667,202 +653,23 @@ class AssistantAutoPilot extends React.Component {
                                                         Candidate Email
                                                     </Button>
                                                 </ButtonGroup>
-
                                                 <Row>
                                                     <Col span={15}>
+                                                    {getFieldDecorator('RejectionEmailBody', {
+                                                        initialValue: autoPilot?.RejectionEmailBody,
+                                                        rules: [{required: true}]
+                                                    })(
                                                         <CKEditor
-                                                            editor={ClassicEditor}
-                                                            config={{toolbar: ['undo', 'redo']}}
-                                                            data={this.state.rejectionSMSBody}
-                                                            onChange={(event, editor) => this.setState(state => state.rejectionSMSBody = editor?.getData())}
-                                                            onInit={editor => this.setState(state => state.rejectionSMSBody = editor?.getData())}
-                                                        />
+                                                                editor={ClassicEditor}
+                                                                config={{toolbar: ['undo', 'redo']}}/>
+                                                    )}
                                                     </Col>
                                                 </Row>
+                                              </FormItem>
                                             </Row>
                                         }
-
                                     </Panel>
                                 </Collapse>
-
-
-                                <Divider/>
-                                <h2>Referral</h2>
-                                <Collapse bordered={false}>
-                                    <Panel header={<h2>Automatically asks candidates for referral after placement</h2>}
-                                           key="3"
-                                           style={customPanelStyle}>
-
-                                        <FormItem label="Auto refer applicants "
-                                                  help="Select an assistant to auto refer the applicants">
-                                            {getFieldDecorator('referApplications', {
-                                                valuePropName: 'checked'
-                                            })(
-                                                <Switch onChange={this.onReferChange}
-                                                        style={{marginRight: 15}}
-                                                        checked={this.state.referApplications}
-                                                />
-                                            )}
-                                        </FormItem>
-
-                                        {
-                                            this.state.referApplications &&
-                                            <FormItem label={"Assistant"}>
-                                                {getFieldDecorator("referralAssistant", {
-                                                    initialValue: this.state.referralAssistant,
-                                                    rules: [{
-                                                        required: true,
-                                                        message: "Please select the assistant"
-                                                    }],
-                                                })(
-                                                    <Select placeholder={"Please select an assistant"}
-                                                            loading={this.props.isLoading}
-                                                            disabled={!this.state.referApplications}>
-                                                        {(() => {
-                                                            return this.props.campaignOptions?.assistants?.map((item, key) => {
-                                                                return (
-                                                                    <Select.Option key={key} value={item.ID}>
-                                                                        {trimText.capitalize(trimText.trimDash(item.Name))}
-                                                                    </Select.Option>
-                                                                );
-                                                            });
-                                                        })()}
-                                                    </Select>
-                                                )}
-                                            </FormItem>
-                                        }
-
-                                        <FormItem label="Auto send referral emails"
-                                                  help="Referred applicants will be notified via email if email is provided in the chat  (candidates applications only)"
-                                        >
-                                            {getFieldDecorator('sendReferralEmail', {
-                                                initialValue: autoPilot?.SendReferralEmail,
-                                                rules: []
-                                            })(
-                                                <div style={{marginLeft: 3}}>
-                                                    <Switch onChange={this.onSendReferralEmailChange}
-                                                            checked={this.state.sendReferralEmail}
-                                                            disabled={!this.state.referApplications}
-
-                                                    />
-                                                </div>
-                                            )}
-                                        </FormItem>
-
-                                        {
-                                            this.state.sendReferralEmail &&
-                                            <FormItem label="Referral Email Title" vi>
-                                                {getFieldDecorator('referralEmailTitle', {
-                                                    initialValue: autoPilot?.ReferralEmailTitle,
-                                                    rules: [{required: true}]
-                                                })(
-                                                    <Input placeholder=""/>
-                                                )}
-                                            </FormItem>
-                                        }
-
-                                        {
-                                            this.state.sendReferralEmail &&
-                                            <Row className={styles.CEKwrapper}>
-                                                <h4>Referral letter</h4>
-
-                                                {
-                                                    this.state.sendReferralEmailErrors &&
-                                                    <p style={{color: 'red'}}> * Title and Body field are required</p>
-                                                }
-
-                                                <ButtonGroup style={{margin: '5px 0'}}>
-                                                    <Button
-                                                        onClick={() =>
-                                                            this.setState({
-                                                                referralEmailBody: this.state.referralEmailBody + ' ${candidateName}$'
-                                                            })
-                                                        }>
-                                                        Candidate Name
-                                                    </Button>
-                                                    <Button
-                                                        onClick={() =>
-                                                            this.setState({
-                                                                referralEmailBody: this.state.referralEmailBody + ' ${candidateEmail}$'
-                                                            })
-                                                        }>
-                                                        Candidate Email
-                                                    </Button>
-                                                </ButtonGroup>
-
-                                                <Row>
-                                                    <Col span={15}>
-                                                        <CKEditor
-                                                            editor={ClassicEditor}
-                                                            config={{toolbar: toolbar}}
-                                                            data={this.state.referralEmailBody}
-                                                            onChange={(event, editor) => this.setState(state => state.referralEmailBody = editor?.getData())}
-                                                            onInit={editor => this.setState(state => state.referralEmailBody = editor?.getData())}
-                                                        />
-                                                    </Col>
-                                                </Row>
-                                            </Row>
-                                        }
-
-                                        <FormItem label="Auto send SMS"
-                                                  help="Referred applicants will be notified via SMS if telephone number is provided in the chat  (candidates applications only)">
-                                            {getFieldDecorator('sendReferralSMS', {
-                                                initialValue: autoPilot?.SendReferralSMS,
-                                                rules: []
-                                            })(
-                                                <div style={{marginLeft: 3}}>
-                                                    <Switch onChange={this.onSendReferralSMSChange}
-                                                            checked={this.state.sendReferralSMS}
-                                                            disabled={!this.state.referApplications}/>
-
-                                                </div>
-                                            )}
-                                        </FormItem>
-
-                                        {
-                                            this.state.sendReferralSMS &&
-                                            <Row className={styles.CEKwrapper}>
-                                                <h4>Referral message</h4>
-                                                {
-                                                    this.state.sendReferralSMSErrors &&
-                                                    <p style={{color: 'red'}}> * Body field is required</p>
-                                                }
-                                                <ButtonGroup style={{margin: '5px 0'}}>
-                                                    <Button
-                                                        onClick={() =>
-                                                            this.setState({
-                                                                referralSMSBody: this.state.referralSMSBody + ' ${candidateName}$'
-                                                            })
-                                                        }>
-                                                        Candidate Name
-                                                    </Button>
-                                                    <Button
-                                                        onClick={() =>
-                                                            this.setState({
-                                                                referralSMSBody: this.state.referralSMSBody + ' ${candidateEmail}$'
-                                                            })
-                                                        }>
-                                                        Candidate Email
-                                                    </Button>
-                                                </ButtonGroup>
-
-                                                <Row>
-                                                    <Col span={15}>
-                                                        <CKEditor
-                                                            editor={ClassicEditor}
-                                                            config={{toolbar: ['undo', 'redo']}}
-                                                            data={this.state.referralSMSBody}
-                                                            onChange={(event, editor) => this.setState(state => state.referralSMSBody = editor?.getData())}
-                                                            onInit={editor => this.setState(state => state.referralSMSBody = editor?.getData())}
-                                                        />
-                                                    </Col>
-                                                </Row>
-                                            </Row>
-                                        }
-
-                                    </Panel>
-                                </Collapse>
-
                                 <Divider/>
                                 <h2>Contract Follow Up</h2>
                                 <Collapse bordered={false}>

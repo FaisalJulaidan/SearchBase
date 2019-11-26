@@ -209,9 +209,7 @@ class CRMAutoPilot extends React.Component {
                                                 rules: [{required: true}],
                                                 initialValue: crmAP.ReferralEmailBody
                                             })(
-                                                <CKEditor editor={ClassicEditor} >
-    
-                                                </CKEditor>
+                                                <CKEditor editor={ClassicEditor} />
                                             )}
                                           </Col>
                                       </Row>

@@ -156,7 +156,10 @@ def insertCandidate(auth, data, companyID) -> Callback:
             "crimson_firstname": data.get("firstName"),
             "crimson_surname": data.get("lastName"),
             "crimson_mobile": data.get("mobile"),
+            "crimson_HomeAddressLine1": data.get("street"),
             "crimson_town": data.get("city"),
+            "crimson_Country": data.get("country"),
+            "crimson_PostCode": data.get("postCode"),
             "crimson_email": data.get("email"),
 
             "crimson_workarea": data.get("preferredWorkCity"),

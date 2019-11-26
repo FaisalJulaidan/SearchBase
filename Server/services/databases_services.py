@@ -186,8 +186,8 @@ def updateCandidate(candidateID, conversation) -> Callback:
             "lastName": helpers.getListValue(conversation.Name, 1, " "),
             "mobile": conversation.PhoneNumber or " ",
             "city": ", ".join(
-                conversation.Data.get('keywordsByDataType').get(DT.CandidateLocation.value['name']) or
-                conversation.Data.get('keywordsByDataType').get(DT.JobLocation.value['name'], [])),
+                conversation.Data.get('keywordsByDataType').get(DT.CandidateCity.value['name']) or
+                conversation.Data.get('keywordsByDataType').get(DT.JobCity.value['name'], [])),
             "email": conversation.Email or " ",
 
             "skills": ", ".join(
@@ -216,7 +216,7 @@ def updateCandidate(candidateID, conversation) -> Callback:
 
         candidate.CandidateName = data.get("name") or candidate.CandidateName
         candidate.CandidateMobile = data.get("mobile") or candidate.CandidateMobile
-        candidate.CandidateLocation = data.get("city") or candidate.CandidateLocation
+        candidate.CandidateCity = data.get("city") or candidate.CandidateCity
         candidate.CandidateEmail = data.get("email") or candidate.CandidateEmail
         candidate.CandidateSkills = data.get("skills") or candidate.CandidateSkills
         candidate.CandidateYearsExperience = data.get("yearsExperience") or candidate.CandidateYearsExperience
@@ -386,8 +386,8 @@ def scanCandidates(session, dbIDs, extraCandidates=None, campaign=False):
         __wordsCounter(DT.CandidateEducation, Candidate.CandidateEducation, keywords, df, 1)
 
         # Location
-        __wordsCounter(DT.JobLocation, Candidate.CandidateLocation, keywords, df, 6)
-        __wordsCounter(DT.CandidateLocation, Candidate.CandidateLocation, keywords, df, 6)
+        __wordsCounter(DT.JobCity, Candidate.CandidateCity, keywords, df, 6)
+        __wordsCounter(DT.CandidateCity, Candidate.CandidateCity, keywords, df, 6)
 
         # JobTitle
         # __wordsCounter(DT.CandidateJobTitle, Candidate.CandidateJobTitle, keywords, df, 1)
@@ -422,9 +422,9 @@ def scanCandidates(session, dbIDs, extraCandidates=None, campaign=False):
         for i, record in enumerate(topResults):
             desc = []
             # Build random dynamic candidate description
-            if record[Candidate.CandidateLocation.name]:
+            if record[Candidate.CandidateCity.name]:
                 desc.append(random.choice(location).replace("[location]",
-                                                            record[Candidate.CandidateLocation.name]))
+                                                            record[Candidate.CandidateCity.name]))
 
             if record[Candidate.CandidateSkills.name]:
                 desc.append(random.choice(skills)
@@ -507,8 +507,8 @@ def scanJobs(session, dbIDs, extraJobs=None):
         __wordsCounter(DT.JobType, Job.JobType, keywords, df, 2)
 
         # Location
-        __wordsCounter(DT.JobLocation, Job.JobLocation, keywords, df, 3)
-        __wordsCounter(DT.CandidateLocation, Job.JobLocation, keywords, df, 3)
+        __wordsCounter(DT.JobCity, Job.JobCity, keywords, df, 3)
+        __wordsCounter(DT.CandidateCity, Job.JobCity, keywords, df, 3)
 
         # Skills
         __wordsCounter(DT.JobEssentialSkills, Job.JobEssentialSkills, keywords, df, 3)
@@ -530,9 +530,9 @@ def scanJobs(session, dbIDs, extraJobs=None):
             if record[Job.JobType.name]:
                 desc.append(random.choice(jobType).replace("[jobType]",
                                                            record[Job.JobType.name]))
-                if record[Job.JobLocation.name]:
+                if record[Job.JobCity.name]:
                     desc[0] += random.choice(location).replace("[location]",
-                                                               record[Job.JobLocation.name])
+                                                               record[Job.JobCity.name])
                 else:
                     desc[0] += ". "
 
@@ -545,8 +545,8 @@ def scanJobs(session, dbIDs, extraJobs=None):
 
             # Build job subtitles
             subTitles = []
-            if record[Job.JobLocation.name]:
-                subTitles.append("Location: " + record[Job.JobLocation.name])
+            if record[Job.JobCity.name]:
+                subTitles.append("Location: " + record[Job.JobCity.name])
 
             if record[Job.JobSalary.name]:
                 currency = record[Job.Currency.name] or ''  # it could be a Currency object e.g. {code: 'USD'...}
@@ -636,7 +636,7 @@ def createPandaCandidate(id, name, email, mobile, location, skills,
             "CandidateName": name or '',
             "CandidateEmail": email or '',
             "CandidateMobile": mobile or '',
-            "CandidateLocation": location or '',
+            "CandidateCity": location or '',
             "CandidateSkills": convertSkillsToString(skills) or '',
             "CandidateLinkdinURL": linkdinURL or '',
             "CandidateAvailability": availability or '',
@@ -657,7 +657,7 @@ def createPandaJob(id, title, desc, location, type, salary, essentialSkills, yea
     return {"ID": id,
             "JobTitle": title or '',
             "JobDescription": desc or '',
-            "JobLocation": location or '',
+            "JobCity": location or '',
             "JobType": type or '',
             "JobSalary": salary or 0,
             "JobEssentialSkills": convertSkillsToString(essentialSkills) or '',

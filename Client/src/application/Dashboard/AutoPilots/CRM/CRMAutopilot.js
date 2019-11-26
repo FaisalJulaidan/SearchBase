@@ -72,10 +72,6 @@ class CRMAutoPilot extends React.Component {
       })
     }
 
-    handleDelete = () => {
-
-    }
-
     render() {
       const {getFieldDecorator} = this.props.form;  
       const { crmAP } = this.props
@@ -277,7 +273,6 @@ class CRMAutoPilot extends React.Component {
 
 
 function mapStateToProps(state) {
-  console.log(state.CRMAutoPilot.CRMAutoPilot)
     return {
         isLoading: state.CRMAutoPilot.isLoading,
         assistants: state.assistant.assistantList,

@@ -84,6 +84,7 @@ class Campaign extends React.Component {
                 history.push(`/dashboard/campaigns`)
             });
         }
+        this.props.dispatch(campaignActions.fetchShortlists());
         if (this.state.textMessage.indexOf("{assistant.link}") !== -1 && this.state.assistantLinkInMessage) {
             this.setState({assistantLinkInMessage: true})
         }
@@ -186,7 +187,7 @@ class Campaign extends React.Component {
             values.outreach_type,
             values.email_title
         ));
-    }
+    };
 
     handleModalSelectAll = () => {
         if (this.props?.candidate_list?.length === this.state.candidate_list.length)
@@ -305,7 +306,7 @@ class Campaign extends React.Component {
                     this.state.skills,
                     this.state.textMessage,
                 )).then(() => {
-                    this.setState({campaignNameModalVisibility: false})
+                    this.setState({campaignNameModalVisibility: false});
                     history.push('/dashboard/campaigns')
                 });
             }
@@ -436,6 +437,7 @@ class Campaign extends React.Component {
                                 <>
                                     <FormItem label={"CRM Type"}>
                                         {getFieldDecorator("crm_id", {
+                                            ...(this.state.selectedCRM !== null && {initialValue: this.state.selectedCRM}),
                                             rules: [{
                                                 required: true,
                                                 message: "Please select your desired CRM"
@@ -464,18 +466,18 @@ class Campaign extends React.Component {
                                                 style={{
                                                     display: (
                                                         this.state.selectedCRM ===
-                                                        this.props.campaignOptions?.crms.find(crm => crm.Type === 'Jobscience')?.ID
+                                                        this.props.campaignOptions?.crms.find(crm => crm.Type === 'Adapt')?.ID
                                                             ? 'block'
                                                             : 'none'
                                                     ),
                                                     marginTop: '10px'
-                                                }}>Use JobScience Shortlist</Checkbox>
+                                                }}>Use Adapt Shortlist</Checkbox>
                                         )}
                                     </FormItem>
                                     <FormItem style={{
                                         display: (
                                             this.state.selectedCRM ===
-                                            this.props.campaignOptions?.crms.find(crm => crm.Type === 'Jobscience')?.ID &&
+                                            this.props.campaignOptions?.crms.find(crm => crm.Type === 'Adapt')?.ID &&
                                             this.state.useShortlist ? 'block' : 'none')
                                     }}
                                     >
@@ -487,10 +489,10 @@ class Campaign extends React.Component {
                                         })(
                                             <Select placeholder={"Please select a shortlist"}
                                                     loading={this.props.isLoadingShortlists}>
-                                                {this.props.shortlists?.crms.map((shortlist, key) => {
+                                                {this.props.shortlists?.map((item, key) => {
                                                     return (
-                                                        <Select.Option key={key} value={shortlist.ID}>
-                                                            {trimText.capitalize(trimText.trimDash(shortlist.name))}
+                                                        <Select.Option key={key} value={item.ID}>
+                                                            {trimText.capitalize(trimText.trimDash(item.Type))}
                                                         </Select.Option>
                                                     );
                                                 })}
@@ -558,10 +560,13 @@ class Campaign extends React.Component {
                                     </Select>
                                 )}
                             </FormItem>
-                            {!this.state.useShortlist
-                                && this.state.selectedCRM ===
-                                this.props.campaignOptions?.crms.find(crm => crm.Type === 'Jobscience')?.ID
+                            {this.state.useShortlist && this.state.use_crm
+                            && this.state.selectedCRM ===
+                            this.props.campaignOptions?.crms.find(crm => crm.Type === 'Adapt')?.ID
                                 ?
+                                <>
+                                </>
+                                :
                                 <>
                                     <FormItem label={"Job Title"}>
                                         {getFieldDecorator("jobTitle", {
@@ -573,7 +578,6 @@ class Campaign extends React.Component {
                                             <Input placeholder={"Please enter your job title"}/>
                                         )}
                                     </FormItem>
-
                                     <FormItem label={"Job Type"}>
                                         {getFieldDecorator("jobType", {initialValue: "permanent"})(
                                             <Radio.Group>
@@ -583,7 +587,6 @@ class Campaign extends React.Component {
                                             </Radio.Group>
                                         )}
                                     </FormItem>
-
                                     <FormItem label={"Skills"}>
                                         {getFieldDecorator("skill")(
                                             <Input
@@ -613,7 +616,6 @@ class Campaign extends React.Component {
                                                           onChange={value => this.findLocation(value)}/>
                                         )}
                                     </FormItem>
-
                                     <FormItem label={`Distance within ${this.state.distance} miles`}
                                               style={{display: this.state.location ? 'block' : 'none'}}>
                                         {getFieldDecorator("distance", {initialValue: this.state.distance})(
@@ -625,10 +627,7 @@ class Campaign extends React.Component {
                                             />
                                         )}
                                     </FormItem>
-
                                 </>
-                                :
-                                <></>
                             }
 
                             <FormItem label={"Email Title "}
@@ -748,6 +747,10 @@ function mapStateToProps(state) {
         isLoading: state.campaign.isLoading,
         isCandidatesLoading: state.campaign.isCandidatesLoading,
         isLaunchingCampaign: state.campaign.isLaunchingCampaign,
+
+        isLoadingShortlists: state.campaign.isLoadingShortlists,
+        shortlists: state.campaign.shortlists,
+
         isSaving: state.campaign.isSaving,
         isDeleting: state.campaign.isDeleting,
         errorMsg: state.campaign.errorMsg

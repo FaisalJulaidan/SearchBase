@@ -139,6 +139,20 @@ function* fetchCampaignCandidatesData({assistant_id, use_crm, crm_id, useShortli
     }
 }
 
+//Fetch JobScience shortlists
+function* fetchShortlists() {
+    try {
+        const res = yield http.get(`/campaign/select-shortlist`);
+        yield put(campaignActions.fetchShortlistsSuccess(
+            res.data?.data)
+        );
+    } catch (error) {
+        const msg = error.response?.data?.msg || "Couldn't load shortlists";
+        errorMessage(msg);
+        yield put(campaignActions.fetchShortlistsFailure(msg));
+    }
+}
+
 //Launch Campaign
 function* launchCampaign({assistant_id, use_crm, crm_id, useShortlist, database_id, messenger_id, location, jobTitle, jobType, skills, text, candidate_list, outreach_type, email_title}) {
     try {
@@ -196,6 +210,10 @@ function* watchFetchCampaignCandidatesData() {
     yield takeEvery(actionTypes.FETCH_CAMPAIGN_CANDIDATES_DATA_REQUEST, fetchCampaignCandidatesData)
 }
 
+function* watchFetchShortlists() {
+    yield takeEvery(actionTypes.FETCH_CAMPAIGN_SHORTLISTS, fetchShortlists)
+}
+
 function* watchLaunchCampaign() {
     yield takeEvery(actionTypes.LAUNCH_CAMPAIGN_REQUEST, launchCampaign)
 }
@@ -208,6 +226,7 @@ export function* campaignSaga() {
         watchUpdateCampaign(),
         watchDeleteCampaign(),
         watchFetchCampaignCandidatesData(),
+        watchFetchShortlists(),
         watchLaunchCampaign()
     ])
 }

@@ -137,7 +137,20 @@ const fetchCampaignCandidatesDataFailure = (error) => ({
     error
 });
 
+// Fetch jobScience shortlist
+const fetchShortlists = () => ({
+    type: actionTypes.FETCH_CAMPAIGN_SHORTLISTS
+});
 
+const fetchShortlistsSuccess = (shortlists) => ({
+    type: actionTypes.FETCH_CAMPAIGN_SHORTLISTS_SUCCESS,
+    shortlists
+});
+
+const fetchShortlistsFailure = (error) => ({
+    type: actionTypes.FETCH_CAMPAIGN_SHORTLISTS_FAILURE,
+    error
+});
 // Launch Campaign
 const launchCampaign = (assistant_id, use_crm, crm_id, useShortlist, database_id, messenger_id, location, jobTitle, jobType, skills, text, candidate_list, outreach_type, email_title) => ({
     type: actionTypes.LAUNCH_CAMPAIGN_REQUEST,
@@ -191,6 +204,10 @@ export const campaignActions = {
     fetchCampaignCandidatesData,
     fetchCampaignCandidatesDataSuccess,
     fetchCampaignCandidatesDataFailure,
+
+    fetchShortlists,
+    fetchShortlistsSuccess,
+    fetchShortlistsFailure,
 
     launchCampaign,
     launchCampaignSuccess,

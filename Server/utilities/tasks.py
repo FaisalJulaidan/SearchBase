@@ -107,6 +107,7 @@ def migrateConversations():
 
 def migrateFlows():
     try:
+        print("MIGRATING FLOWS...")
         for assistant in db.session.query(Assistant).all():
             if assistant.Flow:
                 # Update flow
@@ -203,6 +204,13 @@ def __migrateFlow(flow, assistantID=None):
                                          , "ClientAvailability", "JobStartDate", "JobEndDate" ] \
                         and block['Type'] == enums.BlockType.Question.value:
                     block['DataType'] = 'NoType'
+                print("block['DataType']: ", block['DataType'])
+                if block['DataType'] in ["CandidateLocation"]:
+                    block['DataType'] = 'CandidateCity'
+                    block['Content'].pop('keywords', None)
+                    block['Content'].pop('answers', None)
+
+                    block['Type'] = 'User Input'
 
 
                 if block['DataType'] in ["CandidateAvailableFrom", "CandidateAvailableTo", "CandidateAvailability"]:

@@ -686,10 +686,7 @@ class AssistantAutoPilot extends React.Component {
                                                 />
                                             )}
                                             {getFieldDecorator("contractFollowUpSchedule", {initialValue: "2"})(
-                                                <Radio.Group  disabled={!this.state.contractFollowUp}
-                                                              onChange={(e) => {
-                                                    this.setState({contractFollowUpSchedule: e.target.value})
-                                                }}>
+                                                <Radio.Group  disabled={!this.state.contractFollowUp}>
                                                     <Radio.Button value="1">1 Week</Radio.Button>
                                                     <Radio.Button value="2">2 Weeks</Radio.Button>
                                                     <Radio.Button value="3">3 Weeks</Radio.Button>

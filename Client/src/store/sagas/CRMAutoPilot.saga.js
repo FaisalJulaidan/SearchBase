@@ -28,7 +28,6 @@ function* fetchCRMAutoPilot({CRMAutoPilotID, meta}) {
 
 function* addCRMAutoPilot({type, newCRMAutoPilot}) {
     try {
-      console.log(newCRMAutoPilot)
         loadingMessage('Creating auto pilot...', 0);
         const res = yield http.post(`/crm_auto_pilots`, newCRMAutoPilot);
         yield put(CRMAutoPilotActions.addCRMAutoPilotSuccess(res.data?.data, res.data?.msg));
@@ -81,8 +80,7 @@ function* deleteCRMAutoPilot({CRMAutoPilotID, meta}) {
 
 function* updateStatus({status, CRMAutoPilotID}) {
     try {
-      console.log(status)
-      console.log(CRMAutoPilotID)
+
         loadingMessage('Updating Status', 0);
         const res = yield http.put(`/crm_auto_pilot/${CRMAutoPilotID}/status`, {status});
         yield put(CRMAutoPilotActions.updateStatusSuccess('Status updated successfully', status, CRMAutoPilotID));

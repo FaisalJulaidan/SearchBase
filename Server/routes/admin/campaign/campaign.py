@@ -103,6 +103,7 @@ def getShortlists():
 
     if request.method == "GET":
         print("GET REQUEST RECEIVED...")
+
         callback: Callback = campaign_services.getShortLists(request.json, user['companyID'])
         if not callback.Success:
             return helpers.jsonResponse(False, 400, callback.Message)

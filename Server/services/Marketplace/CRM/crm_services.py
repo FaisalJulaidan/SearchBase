@@ -518,3 +518,6 @@ def additionalCandidateNotesBuilder(data, selectedSolutions=None):
 def ideaCalmer():
     print(Jobscience, Mercury, Greenhouse, Vincere, Adapt)
 
+
+def getshortlists(crm):
+    return Jobscience.getShortLists(crm.Auth)

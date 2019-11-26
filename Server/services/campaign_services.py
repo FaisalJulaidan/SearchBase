@@ -258,3 +258,15 @@ def updateStatus(campaignID, newStatus, companyID):
         helpers.logError("campaign_services.updateStatus(): " + str(exc))
         db.session.rollback()
         return Callback(False, "Could not change the Campaign's status.")
+
+
+def getShortLists(campaign_details, companyID):
+    crm = None
+    if campaign_details.get("use_crm"):
+        crm_callback: Callback = crm_services.getByID(campaign_details.get("crm_id"), companyID)
+        if not crm_callback.Success:
+            raise Exception("CRM not found.")
+
+        crm = crm_callback.Data
+
+    candidates_callback: Callback = crm_services.getshortlists(crm)

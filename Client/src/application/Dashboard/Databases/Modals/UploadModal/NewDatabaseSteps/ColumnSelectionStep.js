@@ -274,7 +274,7 @@ class ColumnSelectionStep extends Component {
                                         rules: [{required: !type.nullable, message: 'This is required field',}]
                                     })
                                     (
-                                        <Select mode="multiple" mode="tags" placeholder="Select Column or Columns"
+                                        <Select mode="tags" placeholder="Select Column or Columns"
                                                 onDeselect={this.handleRemove}
                                                 onChange={this.handleChange}>
                                             {filteredOptions.map(item => (

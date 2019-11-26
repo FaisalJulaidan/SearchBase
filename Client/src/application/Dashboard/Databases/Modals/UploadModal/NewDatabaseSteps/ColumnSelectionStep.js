@@ -233,7 +233,7 @@ class ColumnSelectionStep extends Component {
         });
     });
 
-
+    //s
     render() {
         const formItemLayout = {
             labelCol: {span: 6},

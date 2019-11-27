@@ -54,11 +54,6 @@ class AssistantAutoPilot extends React.Component {
 
         sendCandidatesAppointments: this.props?.autoPilot?.SendCandidatesAppointments,
 
-        acceptanceScore: null,
-        rejectionScore: null,
-
-        contractFollowUpSchedule: null
-
     };
 
     componentDidMount() {

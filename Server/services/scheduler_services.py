@@ -116,9 +116,9 @@ def sendAutopilotReferrals():
                 url = url_services.createShortenedURL(helpers.getDomain(3000) + "/chatbot_direct_link/" + \
                   hashedAssistantID, domain="recruitbot.ai")
                 if crmAP.SendReferralEmail:
-                  EmailBody = crmAP.ReferralEmailBody.replace("{assistant.link}", url.Data)
+                  EmailBody = crmAP.ReferralEmailBody.replace("${assistantLink}$", url.Data)
                 if crmAP.SendReferralSMS:
-                  SMSBody = crmAP.ReferralSMSBody.replace("{assistant.link}", url.Data)
+                  SMSBody = crmAP.ReferralSMSBody.replace("${assistantLink}$", url.Data)
 
       
                 for candidate in candidate_search.Data:
@@ -159,5 +159,5 @@ def test():
 # Run scheduled tasks
 scheduler.add_job(sendConversationsNotifications, 'cron', hour='*/1', id='sendConversationsNotifications', replace_existing=True)
 scheduler.add_job(pingDatabaseConnection, 'cron', hour='*/5', id='pingDatabaseConnection', replace_existing=True)
-scheduler.add_job(sendAutopilotReferrals, 'cron', hour='*/23', id='sendAutopilotReferrals', replace_existing=True)
+scheduler.add_job(sendAutopilotReferrals, 'cron', second='*/15', id='sendAutopilotReferrals', replace_existing=True)
 # scheduler.add_job(test, 'cron', second='*/3', id='test', replace_existing=True)

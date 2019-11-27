@@ -2,7 +2,7 @@ import * as actionTypes from './actionTypes';
 
 
 const fetchMarketplace = () => ({
-    type: actionTypes.FETCH_MARKETPLACE_REQUEST,
+    type: actionTypes.FETCH_MARKETPLACE_REQUEST
 });
 
 const fetchMarketplaceSuccess = (marketplaceItems) => ({
@@ -18,42 +18,42 @@ const fetchMarketplaceFailure = (error) => ({
 const fetchMarketplaceItem = (marketplaceType) => ({
     type: actionTypes.FETCH_MARKETPLACE_ITEM_REQUEST,
     marketplaceType
-})
+});
 
 const fetchMarketplaceItemSuccess = (activeItem) => ({
     type: actionTypes.FETCH_MARKETPLACE_ITEM_SUCCESS,
     activeItem
-})
+});
 
 const fetchMarketplaceItemFailure = () => ({
     type: actionTypes.FETCH_MARKETPLACE_ITEM_FAILURE
-})
+});
 
 const saveMarketplaceItem = (marketplaceType, CRMAutoPilotID) => ({
     type: actionTypes.SAVE_MARKETPLACE_ITEM_REQUEST,
     marketplaceType,
     CRMAutoPilotID
-})
+});
 
 const saveMarketplaceItemSuccess = (activeItem) => ({
     type: actionTypes.SAVE_MARKETPLACE_ITEM_SUCCESS,
     activeItem
-})
+});
 
 const saveMarketplaceItemFailure = () => ({
     type: actionTypes.SAVE_MARKETPLACE_ITEM_FAILURE
-})
+});
 
 
 const pingMarketplace = (marketplaceType) => ({
     type: actionTypes.PING_MARKETPLACE_REQUEST,
-    meta: {thunk: true},
+    meta: { thunk: true },
     marketplaceType
 });
 
 const pingMarketplaceSuccess = (connectionStatus) => ({
     type: actionTypes.PING_MARKETPLACE_SUCCESS,
-    connectionStatus,
+    connectionStatus
 });
 
 const pingMarketplaceFailure = (error) => ({
@@ -68,7 +68,7 @@ const connectMarketplace = (marketplaceType, auth) => ({
 });
 
 const connectMarketplaceSuccess = () => ({
-    type: actionTypes.CONNECT_MARKETPLACE_SUCCESS,
+    type: actionTypes.CONNECT_MARKETPLACE_SUCCESS
 });
 
 const connectMarketplaceFailure = (error) => ({
@@ -107,8 +107,6 @@ const exportRecruiterValueReportFailure = (error) => ({
     type: actionTypes.EXPORT_RECRUITER_VALUE_REPORT_FAILURE,
     error
 });
-
-
 
 
 export const marketplaceActions = {

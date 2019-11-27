@@ -9,7 +9,7 @@ import LoadingViewBox from "components/LoadingViewBox/LoadingViewBox";
 import {AutoPilotIcon} from "components/SVGs";
 import NewAutoPilotModal from './Modals/NewCRMAutoPilotModal'
 import EditAutoPilotModal from './Modals/EditCRMAutoPilotModal'
-import {CRMAutoPilotActions} from "store/actions";
+import {CRMAutoPilotActions, assistantActions} from "store/actions";
 import 'types/TimeSlots_Types'
 import {history} from "helpers";
 
@@ -27,7 +27,8 @@ class CRMAutoPilots extends React.Component {
     };
 
     componentDidMount() {
-        this.props.dispatch(CRMAutoPilotActions.fetchCRMAutoPilots())
+        this.props.dispatch(CRMAutoPilotActions.fetchCRMAutoPilots());
+        this.props.dispatch(assistantActions.fetchAssistants());
     }
 
     showNewAutoPilotModal = () => this.setState({newAutoPilotModalVisible: true});
@@ -37,7 +38,6 @@ class CRMAutoPilots extends React.Component {
     closeEditAutoPilotModal = () => this.setState({editAutoPilotModalVisible: false});
 
     addAutoPilot = (values) => {
-      console.log("lolistan")
         this.props.dispatch(CRMAutoPilotActions.addCRMAutoPilot(values));
         this.closeNewAutoPilotModal();
     };

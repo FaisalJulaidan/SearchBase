@@ -392,7 +392,7 @@ def insertCompany(auth, conversation: Conversation) -> Callback:
         return Callback(False, str(exc))
 
 
-def fetchSkillsForCandidateSearch(list_of_contactIDs: list, list_of_skills, access_token):
+def fetchSkillsForCandidateSearch(list_of_contactIDs: list, list_of_skills, access_token, test=None):
     records_to_return = []
     for i in range(0, len(list_of_contactIDs), 500):
         # Need set of contact ID's returned from searchCandidates()
@@ -416,9 +416,16 @@ def fetchSkillsForCandidateSearch(list_of_contactIDs: list, list_of_skills, acce
                 like_string = like_string[:-4]
 
             like_string += ")"
+        if test:
+            # Note: This assumes at least one skill is given
+            sendQuery_callback: Callback = sendQuery(access_token, "get", {},
+                                                     "SELECT+ts2__Skill_Name__c,ts2__Last_Used__c,ts2__Contact__c" +
+                                                     "+FROM+ts2__Skill__c+WHERE+" +
+                                                     "ts2__Contact__c+IN+(" + query_segment + ")" + "+LIMIT+1000")
 
-        # Note: This assumes at least one skill is given
-        sendQuery_callback: Callback = sendQuery(access_token, "get", {},
+        else:
+            # Note: This assumes at least one skill is given
+            sendQuery_callback: Callback = sendQuery(access_token, "get", {},
                                                  "SELECT+ts2__Skill_Name__c,ts2__Last_Used__c,ts2__Contact__c" +
                                                  "+FROM+ts2__Skill__c+WHERE+" +
                                                  "ts2__Contact__c+IN+(" + query_segment + ")" + like_string + "+LIMIT+1000")
@@ -433,13 +440,37 @@ def fetchSkillsForCandidateSearch(list_of_contactIDs: list, list_of_skills, acce
     return records_to_return
 
 
-def searchCandidatesByShortlist(access_token, conversation) -> Callback:
-    print("THIS HAS BEEN CALLED...")
+def getShortLists(access_token) -> Callback:
     # TODO: Fetch all short list links
     # https://prsjobs--jsfull.cs83.my.salesforce.com/services/data/v37.0/query/?q=SELECT+name,ts2__r_contact__c,ts2__Status__c+from+ts2__s_UserListLink__c
 
     sendQuery_callback: Callback = sendQuery(access_token, "get", {},
-                                             "SELECT+name,ts2__r_contact__c,ts2__Status__c+from+ts2__s_UserListLink__c")
+                                             "SELECT+name+from+ts2__s_UserList__c")
+
+    if not sendQuery_callback.Success:
+        raise Exception(sendQuery_callback.Message)
+
+    shortlist_fetch = json.loads(sendQuery_callback.Data.text)
+    shortlists = shortlist_fetch['records']
+    shortlist_entries = []
+    for shortlist in shortlists:
+        print("The shortlist is {}".format(shortlist))
+        shortlist_entries.append({"name": shortlist.get("Name"),
+                                  "url": shortlist.get("attributes").get("url")})
+
+    return Callback(True, sendQuery_callback.Message, shortlist_entries)
+
+
+def searchCandidatesByShortlist(access_token, conversation) -> Callback:
+    print(conversation)
+
+    print("THIS HAS BEEN CALLED...")
+    # exit(0)
+    # TODO: Fetch all short list links
+    # https://prsjobs--jsfull.cs83.my.salesforce.com/services/data/v37.0/query/?q=SELECT+name,ts2__r_contact__c,ts2__Status__c+from+ts2__s_UserListLink__c
+
+    sendQuery_callback: Callback = sendQuery(access_token, "get", {},
+                                             "SELECT+name,ts2__r_contact__c,ts2__Status__c,ts2__r_user_list__c+from+ts2__s_UserListLink__c+WHERE+ts2__r_user_list__c+=+"+ "'" + conversation.get("database_id").replace('/services/data/v46.0/sobjects/ts2__s_UserList__c/', '') + "'")
 
     if not sendQuery_callback.Success:
         raise Exception(sendQuery_callback.Message)
@@ -450,10 +481,13 @@ def searchCandidatesByShortlist(access_token, conversation) -> Callback:
     contact_ids = []
     result = []
     records = []
-    for shortlist in shortlists:
-        print("Shortlist: {}".format(shortlist.get('ts2__r_contact__c')))
-        contact_ids.append("'" + shortlist.get('ts2__r_contact__c') + "'")
-
+    for shortlist_link in shortlists:
+        if "/services/data/v46.0/sobjects/ts2__s_UserList__c/" + shortlist_link.get("ts2__r_user_list__c") == conversation.get("database_id"):
+            print("Shortlist: {}".format(shortlist_link))
+            contact_ids.append("'" + shortlist_link.get('ts2__r_contact__c') + "'")
+    print("Number of matches: {}".format(len(contact_ids)))
+    print("Exiting...")
+    #exit(0)
     print("Number of contacts to retrieve: {}".format(len(contact_ids)))
 
     for i in range(0, len(contact_ids), 500):
@@ -463,15 +497,15 @@ def searchCandidatesByShortlist(access_token, conversation) -> Callback:
         else:
             query_segment = ",".join(contact_ids[i:len(contact_ids)])
 
-        query = "WHERE+X18_Digit_ID__c+IN+("+query_segment+")"
+        query = "WHERE+X18_Digit_ID__c+IN+(" + query_segment + ")"
         print(query)
         # TODO: Fetch associated candidate object
         # https://prsjobs--jsfull.cs83.my.salesforce.com/services/data/v37.0/sobjects/Contact/0030O0000232s7FQAQ
         print("Should be fetching contacts...")
         sendQuery_callback: Callback = sendQuery(access_token, "get", {},
-                                             "SELECT+X18_Digit_ID__c,ID,Name,Title,email,phone,MailingCity," +
-                                             "ts2__Desired_Salary__c,ts2__Date_Available__c,ts2__Years_of_Experience__c,ts2__Desired_Hourly__c,Min_Basic__c," +
-                                             "ts2__EduDegreeName1__c,ts2__Education__c+from+Contact+" + query)  # Limit set to 10 TODO: Customize
+                                                 "SELECT+X18_Digit_ID__c,ID,Name,Title,email,phone,MailingCity," +
+                                                 "ts2__Desired_Salary__c,ts2__Date_Available__c,ts2__Years_of_Experience__c,ts2__Desired_Hourly__c,Min_Basic__c," +
+                                                 "ts2__EduDegreeName1__c,ts2__Education__c+from+Contact+" + query)  # Limit set to 10 TODO: Customize
 
         if not sendQuery_callback.Success:
             raise Exception(sendQuery_callback.Message)
@@ -490,11 +524,11 @@ def searchCandidatesByShortlist(access_token, conversation) -> Callback:
     skills = conversation.get("skills")
 
     if type(skills) != list:
-        skills = skills.split(" ")
+        skills = []
 
     candidate_skills = []
     if len(records) > 0:
-        candidate_skills = fetchSkillsForCandidateSearch(list_of_contactIDs, skills, access_token)
+        candidate_skills = fetchSkillsForCandidateSearch(list_of_contactIDs, skills, access_token, test=True)
 
     # <-- CALL SKILLS SEARCH -->
     print("Number of records: {}".format(len(records)))
@@ -518,26 +552,26 @@ def searchCandidatesByShortlist(access_token, conversation) -> Callback:
 
         if has_skills:
             result.append(databases_services.createPandaCandidate(id=record.get("X18_Digit_ID__c", str(record_num)),
-                                                                      name=record.get("Name"),
-                                                                      email=record.get("Email"),
-                                                                      mobile=record.get("Phone"),
-                                                                      location=record.get("MailingCity"),
-                                                                      skills=skills_string,
-                                                                      linkdinURL=None,
-                                                                      availability=record.get(
-                                                                          "ts2__Date_Available__c") or
-                                                                                   "Not Specified",
-                                                                      jobTitle=record.get("Title"),
-                                                                      education=record.get('ts2__EduDegreeName1__c'),
-                                                                      yearsExperience=record.get(
-                                                                          'ts2__Years_of_Experience__c'),
-                                                                      desiredSalary=record.get(
-                                                                          'ts2__Desired_Salary__c') or
-                                                                                    record.get(
-                                                                                        'ts2__Desired_Hourly__c') or
-                                                                                    record.get('Min_Basic__c', 0),
-                                                                      currency=Currency("GBP"),
-                                                                      source="Jobscience"))
+                                                                  name=record.get("Name"),
+                                                                  email=record.get("Email"),
+                                                                  mobile=record.get("Phone"),
+                                                                  location=record.get("MailingCity"),
+                                                                  skills=skills_string,
+                                                                  linkdinURL=None,
+                                                                  availability=record.get(
+                                                                      "ts2__Date_Available__c") or
+                                                                               "Not Specified",
+                                                                  jobTitle=record.get("Title"),
+                                                                  education=record.get('ts2__EduDegreeName1__c'),
+                                                                  yearsExperience=record.get(
+                                                                      'ts2__Years_of_Experience__c'),
+                                                                  desiredSalary=record.get(
+                                                                      'ts2__Desired_Salary__c') or
+                                                                                record.get(
+                                                                                    'ts2__Desired_Hourly__c') or
+                                                                                record.get('Min_Basic__c', 0),
+                                                                  currency=Currency("GBP"),
+                                                                  source="Jobscience"))
 
     return Callback(True, sendQuery_callback.Message, result)
 

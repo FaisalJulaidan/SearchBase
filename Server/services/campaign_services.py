@@ -133,9 +133,12 @@ def getCampaignOptions(companyID):
 
 def prepareCampaign(campaign_details, companyID):
     try:
+        print("details: {}".format(campaign_details))
         hashedAssistantID = helpers.encodeID(campaign_details.get("assistant_id"))
-        campaign_details["location"] = campaign_details.get("location").split(",")[0]
-
+        if not campaign_details.get("database_id"):
+            campaign_details["location"] = campaign_details.get("location").split(",")[0]
+        else:
+            campaign_details["location"] = ""
         if campaign_details.get("use_crm"):
             crm_callback: Callback = crm_services.getByID(campaign_details.get("crm_id"), companyID)
             if not crm_callback.Success:
@@ -258,3 +261,16 @@ def updateStatus(campaignID, newStatus, companyID):
         helpers.logError("campaign_services.updateStatus(): " + str(exc))
         db.session.rollback()
         return Callback(False, "Could not change the Campaign's status.")
+
+
+def getShortLists(crm_id, companyID):
+    crm = None
+    if crm_id:
+        crm_callback: Callback = crm_services.getByID(crm_id, companyID)
+        if not crm_callback.Success:
+            raise Exception("CRM not found.")
+        crm = crm_callback.Data
+        print("CRM IS: {}".format(crm))
+
+    candidates_callback: Callback = crm_services.getshortlists(crm)
+    return Callback(True, "Shortlists have been retrieved", candidates_callback.Data)

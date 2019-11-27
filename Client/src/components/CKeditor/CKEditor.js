@@ -16,6 +16,7 @@ class CKeditor extends PureComponent {
 
     render() {
         const { value, disabled, onChange, children, ...others } = this.props
+        console.log(disabled)
         return (
             <div>
               <CKEditor

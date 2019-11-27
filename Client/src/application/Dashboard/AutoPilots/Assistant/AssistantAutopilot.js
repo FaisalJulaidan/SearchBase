@@ -11,9 +11,11 @@ import './AutoPilot.less';
 import {history} from 'helpers';
 import {autoPilotActions, appointmentAllocationTimeActions} from 'store/actions';
 import {campaignActions} from "store/actions"; //TODO: To be removed (Fetching assistants for referral for now)
-import CKEditor from '@ckeditor/ckeditor5-react';
+// import CKEditor from '@ckeditor/ckeditor5-react';
+import CKEditor from 'components/CKeditor/CKEditor'
 import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
 import {trimText} from "../../../../helpers";
+import { CLEAR_ALL_CONVERSATIONS_FAILURE } from '../../../../store/actions/actionTypes';
 
 const {Panel} = Collapse;
 const ButtonGroup = Button.Group;
@@ -33,122 +35,37 @@ const toolbar = [
 ];
 
 const customPanelStyle = {
-    borderRadius: 4,
-    marginBottom: 24,
-    border: 0,
-    overflow: 'hidden'
+    // borderRadius: 4,
+    // marginBottom: 24,
+    // border: 0,
+    // overflow: 'hidden'
 };
 
 class AssistantAutoPilot extends React.Component {
   
     state = {
-        rejectApplications: false,
-        acceptApplications: false,
-        referApplications: false,
-        contractFollowUp: false,
-        sendAcceptanceEmail: false,
-        sendRejectionEmail: false,
-        sendReferralEmail: false,
-        sendContractFollowUpEmail: false,
-        sendAcceptanceSMS: false,
-        sendRejectionSMS: false,
-        sendReferralSMS: false,
-        sendContractFollowUpSMS: false,
-        sendCandidatesAppointments: false,
+        rejectApplications: this.props?.autoPilot?.RejectApplications,
+        acceptApplications: this.props?.autoPilot?.AcceptApplications,
+        sendAcceptanceEmail: this.props?.autoPilot?.SendAcceptanceEmail,
+        sendRejectionEmail: this.props?.autoPilot?.SendRejectionEmail,
+
+        sendAcceptanceSMS: this.props?.autoPilot?.SendAcceptanceSMS,
+        sendRejectionSMS: this.props?.autoPilot?.SendRejectionSMS,
+
+        sendCandidatesAppointments: this.props?.autoPilot?.SendCandidatesAppointments,
 
         acceptanceScore: null,
-        acceptanceEmailBody: '<p>Congrats you got accepted.</p>',
-        acceptanceSMSBody: 'Congrats you got accepted.',
-
         rejectionScore: null,
-        rejectionEmailBody: '<p>Sorry you are not accepted.</p>',
-        rejectionSMSBody: 'Sorry you are not accepted.',
-
-        referralAssistant: null,
-        referralEmailBody: '<p></p>',
-        referralSMSBody: '',
 
         contractFollowUpSchedule: null,
-        contractFollowUpEmailBody: '<p></p>',
-        contractFollowUpSMSBody: '',
-
-        sendAcceptanceEmailErrors: false,
-        sendAcceptanceSMSErrors: false,
-        sendRejectionEmailErrors: false,
-        sendRejectionSMSErrors: false,
-        sendReferralEmailErrors: false,
-        sendReferralSMSErrors: false,
-        sendContractFollowUpEmailErrors: false,
-        sendContractFollowUpSMSErrors: false
 
     };
 
     componentDidMount() {
-      console.log("mount")
         this.props.dispatch(appointmentAllocationTimeActions.fetchAAT());
         this.props.dispatch(campaignActions.fetchCampaigns()); //TODO: To be removed (Fetching assistants for referral for now)
         this.props.dispatch(autoPilotActions.fetchAutoPilot(this.props.match.params.id))
-            .then(() => {
-                const {autoPilot} = this.props;
-                this.setState({  //TODO:: Uncomment referral fields when server-side is done
-                    rejectApplications: autoPilot.RejectApplications,
-                    acceptApplications: autoPilot.AcceptApplications,
-                    // referApplications: autoPilot.ReferApplications,
-                    // contractFollowUp: autoPilot.contractFollowUp,
-                    sendAcceptanceEmail: autoPilot.SendAcceptanceEmail,
-                    sendRejectionEmail: autoPilot.SendRejectionEmail,
-                    // sendReferralEmail: autoPilot.SendReferralEmail,
-                    // sendContractFollowUpEmail: autoPilot.SendContractFollowUpEmail,
-                    sendAcceptanceSMS: autoPilot.SendAcceptanceSMS,
-                    sendRejectionSMS: autoPilot.SendRejectionSMS,
-                    // sendReferralSMS: autoPilot.SendReferralSMS,
-                    // sendContractFollowUpSMS: autoPilot.SendContractFollowUpSMS,
-                    sendCandidatesAppointments: autoPilot.SendCandidatesAppointments,
-                    acceptanceScore: autoPilot.AcceptanceScore * 100,
-                    acceptanceEmailBody: autoPilot.AcceptanceEmailBody,
-                    acceptanceSMSBody: autoPilot.AcceptanceSMSBody.split('\n').map(x => `<p>${x ? x : '&nbsp;'}</p>`).join(' '),
-                    rejectionScore: autoPilot.RejectionScore * 100,
-                    rejectionEmailBody: autoPilot.RejectionEmailBody,
-                    rejectionSMSBody: autoPilot.RejectionSMSBody.split('\n').map(x => `<p>${x ? x : '&nbsp;'}</p>`).join(' '),
-                    // referralAssistant: autoPilot.ReferralAssistant,
-                    // referralEmailBody: autoPilot.ReferralEmailBody,
-                    // referralSMSBody: autoPilot.ReferralSMSBody.split('\n').map(x => `<p>${x ? x : '&nbsp;'}</p>`).join(' ')
-                    // contractFollowUpSchedule: autoPilot.ContractFollowUpSchedule,
-                    // contractFollowUpEmailBody: autoPilot.ContractFollowUpEmailBody,
-                    // contractFollowUpSMSBody: autoPilot.ContractFollowUpSMSBody.split('\n').map(x => `<p>${x ? x : '&nbsp;'}</p>`).join(' '),
-                });
-            }).catch((e) => {console.log("kek"); console.log(e)})  ;
     }
-
-    onRejectChange = (checked) => this.setState({
-        rejectApplications: checked,
-        sendRejectionEmail: checked ? this.state.sendRejectionEmail : false,
-        sendRejectionSMS: checked ? this.state.sendRejectionSMS : false
-    });
-    onAcceptChange = (checked) => this.setState({
-        acceptApplications: checked,
-        sendAcceptanceEmail: checked ? this.state.sendAcceptanceEmail : false,
-        sendAcceptanceSMS: checked ? this.state.sendAcceptanceSMS : false
-    });
-    onReferChange = (checked) => this.setState({
-        referApplications: checked,
-        sendReferralEmail: checked ? this.state.sendReferralEmail : false,
-        sendReferralSMS: checked ? this.state.sendReferralSMS : false
-    });
-    onContractFollowUpChange = (checked) => this.setState({
-        contractFollowUp: checked,
-        sendContractFollowUpEmail: checked ? this.state.sendContractFollowUpEmail : false,
-        sendContractFollowUpSMS: checked ? this.state.sendContractFollowUpSMS : false
-    });
-    onSendAcceptanceEmailChange = (checked) => this.setState({sendAcceptanceEmail: checked});
-    onSendRejectionEmailChange = (checked) => this.setState({sendRejectionEmail: checked});
-    onSendReferralEmailChange = (checked) => this.setState({sendReferralEmail: checked});
-    onSendContractFollowUpEmailChange = (checked) => this.setState({sendContractFollowUpEmail: checked});
-    onSendAcceptanceSMSChange = (checked) => this.setState({sendAcceptanceSMS: checked});
-    onSendRejectionSMSChange = (checked) => this.setState({sendRejectionSMS: checked});
-    onSendReferralSMSChange = (checked) => this.setState({sendReferralSMS: checked});
-    onSendContractFollowUpSMSChange = (checked) => this.setState({sendContractFollowUpSMS: checked});
-
     handleDelete = () => {
         confirm({
             title: `Delete auto pilot confirmation`,
@@ -160,6 +77,9 @@ class AssistantAutoPilot extends React.Component {
         });
     };
 
+    setFormKV = (key, value) => this.props.form.setFieldsValue({[key]: value}) 
+    appendFormKV = (key, value) => this.props.form.setFieldsValue({[key]: `${this.props.form.getFieldValue(key)}${value}`})
+  
     onActivateHandler = (checked) => {
         if (!checked) {
             confirm({
@@ -174,126 +94,18 @@ class AssistantAutoPilot extends React.Component {
         this.props.dispatch(autoPilotActions.updateStatus(checked, this.props.autoPilot.ID));
     };
 
+    fixScores = (values) => {
+      let keys = ["AcceptanceScore", "RejectionScore"]
+      Object.keys(values).filter(key => keys.includes(key)).forEach(key => values[key] = values[key]/100)
+      return values
+    }
+
     onSubmit = () => this.props.form.validateFields((err, values) => {
-        console.log(err);
+        console.log(this.props.form);
         if (!err) {
             const /**@type AutoPilot*/ autoPilot = this.props.autoPilot || {};
-            const {state, TimeSlotsRef} = this;
-            // const timeSlots = TimeSlotsRef.current.state.weekDays;
-            let payload = {
-                active: autoPilot.Active,
-                namewh: values.name,
-                description: values.description,
-
-                acceptApplications: state.acceptApplications,
-                rejectApplications: state.rejectApplications,
-                referApplications: state.referApplications,
-                contractFollowUp: state.contractFollowUp,
-
-                acceptanceScore: state.acceptanceScore / 100,
-                rejectionScore: state.rejectionScore / 100,
-                referralAssistant: state.referralAssistant,
-                contractFollowUpSchedule: state.contractFollowUpSchedule,
-
-                sendAcceptanceEmail: state.sendAcceptanceEmail,
-                acceptanceEmailTitle: values.acceptanceEmailTitle || autoPilot.AcceptanceEmailTitle,
-                acceptanceEmailBody: state.acceptanceEmailBody,
-
-                sendAcceptanceSMS: state.sendAcceptanceSMS,
-                acceptanceSMSBody: state.acceptanceSMSBody.replace(/<\/p>/g, '\n').replace(/<p>/g, '').replace(/&nbsp;/g, ''),
-
-                sendRejectionEmail: state.sendRejectionEmail,
-                rejectionEmailTitle: values.rejectionEmailTitle || autoPilot.RejectionEmailTitle,
-                rejectionEmailBody: state.rejectionEmailBody,
-
-                sendRejectionSMS: state.sendRejectionSMS,
-                rejectionSMSBody: state.rejectionSMSBody.replace(/<\/p>/g, '\n').replace(/<p>/g, '').replace(/&nbsp;/g, ''),
-
-                sendReferralEmail: state.sendReferralEmail,
-                sendReferralEmailTitle: values.referralEmailTitle || autoPilot.ReferralEmailTitle,
-                referralEmailBody: state.referralEmailBody,
-
-                sendReferralSMS: state.sendReferralSMS,
-                referralSMSBody: state.referralSMSBody.replace(/<\/p>/g, '\n').replace(/<p>/g, '').replace(/&nbsp;/g, ''),
-
-                sendContractFollowUpEmail: state.sendContractFollowUpEmail,
-                sendContractFollowUpEmailTitle: values.contractFollowUpEmailTitle || autoPilot.ContractFollowUpEmailTitle,
-                contractFollowUpEmailBody: state.contractFollowUpEmailBody,
-
-                sendContractFollowUpSMS: state.sendContractFollowUpSMS,
-                contractFollowUpSMSBody: state.contractFollowUpSMSBody.replace(/<\/p>/g, '\n').replace(/<p>/g, '').replace(/&nbsp;/g, ''),
-
-                appointmentAllocationTimes: values.AppointmentAllocationTimes,
-                sendCandidatesAppointments: state.sendCandidatesAppointments
-            };
-            if (payload.sendAcceptanceEmail) {
-                if (!payload.acceptanceEmailTitle || !payload.acceptanceEmailBody)
-                    return this.setState({sendAcceptanceEmailErrors: true});
-                else
-                    this.setState({sendAcceptanceEmailErrors: false});
-            } else
-                this.setState({sendAcceptanceEmailErrors: false});
-
-            if (payload.sendAcceptanceSMS) {
-                if (!payload.acceptanceSMSBody)
-                    return this.setState({sendAcceptanceSMSErrors: true});
-                else
-                    this.setState({sendAcceptanceSMSErrors: false});
-            } else
-                this.setState({sendAcceptanceSMSErrors: false});
-
-            if (payload.sendRejectionEmail) {
-                if (!payload.rejectionEmailTitle || !payload.rejectionEmailBody)
-                    return this.setState({sendRejectionEmailErrors: true});
-                else
-                    this.setState({sendRejectionEmailErrors: false});
-            } else
-                this.setState({sendRejectionEmailErrors: false});
-
-            if (payload.sendRejectionSMS) {
-                if (!payload.rejectionSMSBody)
-                    return this.setState({sendRejectionSMSErrors: true});
-                else
-                    this.setState({sendRejectionSMSErrors: false});
-            } else
-                this.setState({sendRejectionSMSErrors: false});
-
-            if (payload.sendReferralEmail) {
-                if (!payload.referralEmailTitle || !payload.referralEmailBody)
-                    return this.setState({sendReferralEmailErrors: true});
-                else
-                    this.setState({sendReferralEmailErrors: false});
-            } else
-                this.setState({sendReferralEmailErrors: false});
-
-            if (payload.sendReferralSMS) {
-                if (!payload.referralSMSBody)
-                    return this.setState({sendReferralSMSErrors: true});
-                else
-                    this.setState({sendReferralSMSErrors: false});
-            } else
-                this.setState({sendReferralSMSErrors: false});
-
-            if (payload.sendContractFollowUpEmail) {
-                if (!payload.contractFollowUpEmailTitle || !payload.contractFollowUpEmailBody)
-                    return this.setState({sendContractFollowUpEmailErrors: true});
-                else
-                    this.setState({sendContractFollowUpEmailErrors: false});
-            } else
-                this.setState({sendContractFollowUpEmailErrors: false});
-
-            if (payload.sendContractFollowUpSMS) {
-                if (!payload.contractFollowUpSMSBody)
-                    return this.setState({sendContractFollowUpSMSErrors: true});
-                else
-                    this.setState({sendContractFollowUpSMSErrors: false});
-            } else
-                this.setState({sendContractFollowUpSMSErrors: false});
-
-
-            payload.appointmentAllocationTimes = payload.appointmentAllocationTimes === 'You have no timetables, please create one!' ? null : payload.appointmentAllocationTimes;
-            console.log(payload);
-            this.props.dispatch(autoPilotActions.updateAutoPilotConfigs(autoPilot.ID, payload));
+            values = this.fixScores(values)
+            this.props.dispatch(autoPilotActions.updateAutoPilotConfigs(autoPilot.ID, {...this.props.autoPilot, ...values}));
         }
 
     });
@@ -301,12 +113,10 @@ class AssistantAutoPilot extends React.Component {
 
     render() {
         const /**@type AutoPilot*/ autoPilot = this.props.autoPilot;
-        const layout = {
-            labelCol: {span: 4},
-            wrapperCol: {span: 18}
-        };
         const {getFieldDecorator} = this.props.form;
-
+        const {acceptApplications, rejectApplications, sendCandidatesAppointments} = this.state
+        let openPanels = [acceptApplications, rejectApplications, sendCandidatesAppointments]
+        openPanels = openPanels.map((val, i) => ({i: i+1, val})).filter(item => item.val).map(item => item.i.toString())
         return (
                 <NoHeaderPanel>
                     <div className={styles.Header}>
@@ -344,7 +154,7 @@ class AssistantAutoPilot extends React.Component {
                             <Form layout='vertical' wrapperCol={{span: 15}} style={{width: '100%'}}
                                   id={'AutoPilotForm'}>
                                 <FormItem label="Name">
-                                    {getFieldDecorator('name', {
+                                    {getFieldDecorator('Name', {
                                         initialValue: autoPilot.Name,
                                         rules: [
                                             {
@@ -358,7 +168,7 @@ class AssistantAutoPilot extends React.Component {
                                                     // this.props.autoPilotsSlots
                                                     // if there is an error return the callback with the message
                                                     if (this.props.autoPilotsList?.some(autoPilot => autoPilot.Name === value
-                                                        && this.props.autoPilot.Name !== value))
+                                                        && this.props.autoPilot.Name !== value))  
                                                         return callback(value + ' is duplicated');
                                                     else
                                                         return callback();
@@ -371,7 +181,7 @@ class AssistantAutoPilot extends React.Component {
                                 </FormItem>
 
                                 <FormItem label="Description">
-                                    {getFieldDecorator('description', {
+                                    {getFieldDecorator('Description', {
                                         initialValue: autoPilot?.Description,
                                         rules: [{}]
                                     })(
@@ -379,697 +189,290 @@ class AssistantAutoPilot extends React.Component {
                                     )}
                                 </FormItem>
 
-                                <Divider/>
-
-                                <Collapse bordered={false}>
+                                <Collapse bordered={false} defaultActiveKey={openPanels}>
                                     <Panel header={<h2> Applications Acceptance Automation</h2>} key="1"
                                            style={customPanelStyle}>
                                         <FormItem label="Auto accept applicants "
                                                   help="Select the percentage to auto accept the applicants">
-                                            {getFieldDecorator('acceptApplications', {
-                                                valuePropName: 'checked', 
-                                                setFieldsValue: this.state.acceptApplications
-                                            })(
-                                                <>
-                                                    <Switch onChange={this.onAcceptChange}
+                                              {getFieldDecorator('AcceptApplications', {
+                                                  valuePropName: 'checked', 
+                                                  initialValue: autoPilot?.AcceptApplications
+                                              })(
+                                                    <Switch onChange={e => this.setState({acceptApplications: e})}
                                                             style={{marginRight: 15}}
                                                     />
-                                                    A score greater than
+                                              )}  
+                                              A score greater than
+                                              {getFieldDecorator('AcceptanceScore', {
+                                                rules: [{required: true}],
+                                                hidden: !this.state.acceptApplications,
+                                                initialValue: (autoPilot?.AcceptanceScore * 100).toFixed(0)
+                                               })(
                                                     <InputNumber min={0} max={100}
-                                                                 onChange={value => this.setState({acceptanceScore: value})}
-                                                                 value={this.state.acceptanceScore}
-                                                                 key={autoPilot?.AcceptanceScore ? 'notLoadedYet' : 'loaded'}
                                                                  formatter={value => `${value}%`}
                                                                  style={{marginLeft: 15}}
                                                                  disabled={!this.state.acceptApplications}/>
-                                                </>
-                                            )}
+                                                  )}
                                         </FormItem>
 
                                         <FormItem label="Auto send acceptance emails"
                                                   help="Accepted applicants will be notified via email if email is provided in the chat  (candidates applications only)"
                                         >
-                                            {getFieldDecorator('sendAcceptanceEmail', {
+                                            {getFieldDecorator('SendAcceptanceEmail', {
                                                 initialValue: autoPilot?.SendAcceptanceEmail,
+                                                hidden: !this.state.acceptApplications,
+                                                valuePropName: 'checked', 
                                                 rules: []
                                             })(
-                                                <div style={{marginLeft: 3}}>
-                                                    <Switch onChange={this.onSendAcceptanceEmailChange}
-                                                            checked={this.state.sendAcceptanceEmail}
-                                                            disabled={!this.state.acceptApplications}
-
-                                                    />
-                                                </div>
+                                                  <Switch onChange={value => this.setState({sendAcceptanceEmail: value})}
+                                                          disabled={!this.state.acceptApplications}/>
                                             )}
                                         </FormItem>
 
-                                        {
-                                            this.state.sendAcceptanceEmail &&
-                                            <FormItem label="Acceptance Email Title" vi>
-                                                {getFieldDecorator('acceptanceEmailTitle', {
+                                        {this.state.sendAcceptanceEmail &&
+                                            <FormItem label="Acceptance Email Title">
+                                                {getFieldDecorator('AcceptanceEmailTitle', {
                                                     initialValue: autoPilot?.AcceptanceEmailTitle,
+                                                    hidden: !this.state.sendAcceptanceEmail,
                                                     rules: [{required: true}]
                                                 })(
                                                     <Input placeholder="Congrats you got accepted"/>
                                                 )}
-                                            </FormItem>
-                                        }
+                                            </FormItem>}
 
-                                        {
-                                            this.state.sendAcceptanceEmail &&
+                                        {this.state.sendAcceptanceEmail &&
                                             <Row className={styles.CEKwrapper}>
-                                                <h4>Acceptance letter</h4>
-
-                                                {
-                                                    this.state.sendAcceptanceEmailErrors &&
-                                                    <p style={{color: 'red'}}> * Title and Body field are requierd</p>
-                                                }
-
+                                              <FormItem label="Acceptance Letter">
                                                 <ButtonGroup style={{margin: '5px 0'}}>
-                                                    <Button
-                                                        onClick={() =>
-                                                            this.setState({
-                                                                acceptanceEmailBody: this.state.acceptanceEmailBody + ' ${candidateName}$'
-                                                            })
-                                                        }>
-                                                        Candidate Name
+                                                    <Button onClick={() => this.appendFormKV("AcceptanceEmailBody", ' ${candidateName}$')}>
+                                                      Candidate Name
                                                     </Button>
-                                                    <Button
-                                                        onClick={() =>
-                                                            this.setState({
-                                                                acceptanceEmailBody: this.state.acceptanceEmailBody + ' ${candidateEmail}$'
-                                                            })
-                                                        }>
+                                                    <Button onClick={() => this.appendFormKV("AcceptanceEmailBody", ' ${candidateEmail}$')}>
                                                         Candidate Email
                                                     </Button>
                                                 </ButtonGroup>
-
                                                 <Row>
                                                     <Col span={15}>
-                                                        <CKEditor
+                                                      {getFieldDecorator('AcceptanceEmailBody', {
+                                                          initialValue: autoPilot?.AcceptanceEmailBody,
+                                                          rules: [{required: true}]
+                                                      })(
+                                                          <CKEditor
                                                             editor={ClassicEditor}
-                                                            config={{toolbar: toolbar}}
-                                                            data={this.state.acceptanceEmailBody}
-                                                            onChange={(event, editor) => this.setState(state => state.acceptanceEmailBody = editor?.getData())}
-                                                            onInit={editor => this.setState(state => state.acceptanceEmailBody = editor?.getData())}
-                                                        />
+                                                            config={{toolbar: toolbar}}/>
+                                                      )}
                                                     </Col>
                                                 </Row>
+                                              </FormItem>
                                             </Row>
                                         }
 
                                         <FormItem label="Auto send SMS"
                                                   help="Accepted applicants will be notified via SMS if telephone number is provided in the chat  (candidates applications only)">
-                                            {getFieldDecorator('sendAcceptanceSMS', {
+                                            {getFieldDecorator('SendAcceptanceSMS', {
                                                 initialValue: autoPilot?.SendAcceptanceSMS,
+                                                valuePropName: 'checked', 
                                                 rules: []
                                             })(
-                                                <div style={{marginLeft: 3}}>
-                                                    <Switch onChange={this.onSendAcceptanceSMSChange}
-                                                            checked={this.state.sendAcceptanceSMS}
-                                                            disabled={!this.state.acceptApplications}/>
-
-                                                </div>
+                                                <Switch onChange={e => this.setState({sendAcceptanceSMS: e})}
+                                                        disabled={!this.state.acceptApplications}/>
                                             )}
                                         </FormItem>
 
-                                        {
-                                            this.state.sendAcceptanceSMS &&
+                                        {this.state.sendAcceptanceSMS &&
                                             <Row className={styles.CEKwrapper}>
-                                                <h4>Acceptance message</h4>
-                                                {
-                                                    this.state.sendAcceptanceSMSErrors &&
-                                                    <p style={{color: 'red'}}> * Body field is required</p>
-                                                }
+                                                <FormItem label="Acceptance Letter">
                                                 <ButtonGroup style={{margin: '5px 0'}}>
-                                                    <Button
-                                                        onClick={() =>
-                                                            this.setState({
-                                                                acceptanceSMSBody: this.state.acceptanceSMSBody + ' ${candidateName}$'
-                                                            })
-                                                        }>
-                                                        Candidate Name
+                                                    <Button onClick={() => this.appendFormKV("AcceptanceSMSBody", ' ${candidateName}$')}>
+                                                      Candidate Name
                                                     </Button>
-                                                    <Button
-                                                        onClick={() =>
-                                                            this.setState({
-                                                                acceptanceSMSBody: this.state.acceptanceSMSBody + ' ${candidateEmail}$'
-                                                            })
-                                                        }>
+                                                    <Button onClick={() => this.appendFormKV("AcceptanceSMSBody", ' ${candidateEmail}$')}>
                                                         Candidate Email
                                                     </Button>
                                                 </ButtonGroup>
-
-                                                <Row>
-                                                    <Col span={15}>
-                                                        <CKEditor
-                                                            editor={ClassicEditor}
-                                                            config={{toolbar: ['undo', 'redo']}}
-                                                            data={this.state.acceptanceSMSBody}
-                                                            onChange={(event, editor) => this.setState(state => state.acceptanceSMSBody = editor?.getData())}
-                                                            onInit={editor => this.setState(state => state.acceptanceSMSBody = editor?.getData())}
-                                                        />
-                                                    </Col>
-                                                </Row>
+                                                  <Row>
+                                                      <Col span={15}>
+                                                        {getFieldDecorator('AcceptanceSMSBody', {
+                                                            initialValue: autoPilot?.AcceptanceSMSBody,
+                                                            hidden: !this.state.sendAcceptanceSMS,
+                                                            rules: [{required: true}]
+                                                        })(
+                                                            <CKEditor
+                                                              editor={ClassicEditor}
+                                                              config={{toolbar: ['undo', 'redo']}}/>
+                                                        )}
+                                                      </Col>
+                                                  </Row>
+                                                </FormItem>
                                             </Row>
                                         }
                                     </Panel>
-
-                                    <Panel header={<h2> Applications Rejection Automation</h2>} key="2"
-                                           style={customPanelStyle}>
+                                    <Panel header={<h2> Applications Rejection Automation</h2>} key="2" style={customPanelStyle}>
                                         <Form.Item label="Auto reject applicants "
                                                    help="Select the percentage to auto reject the applicants">
-                                            {getFieldDecorator('rejectApplications', {
-                                                valuePropName: 'checked'
+                                            {getFieldDecorator('RejectApplications', {
+                                                valuePropName: 'checked', 
+                                                initialValue: autoPilot?.RejectApplications, 
                                             })(
-                                                <>
-                                                    <Switch onChange={this.onRejectChange} style={{marginRight: 15}}
-                                                            checked={this.state.rejectApplications}/>
-                                                    A score less than
+                                                  <Switch onChange={e => this.setState({rejectApplications: e})} style={{marginRight: 15}}/>
+                                            )}
+                                            A score greater than
+                                            {getFieldDecorator('RejectionScore', {
+                                                initialValue: (autoPilot?.RejectionScore * 100).toFixed(2),
+                                                rules: [{required: true}],
+                                                hidden: !this.state.rejectApplications
+                                            })(
                                                     <InputNumber min={1} max={100}
-                                                                 onChange={value => this.setState({rejectionScore: value})}
-                                                                 formatter={value => `${value}%`}
-                                                                 key={autoPilot?.RejectionScore ? 'notLoadedYet' : 'loaded'}
-                                                                 value={this.state.rejectionScore}
                                                                  style={{marginLeft: 15}}
+                                                                 formatter={value => `${value}%`}
                                                                  disabled={!this.state.rejectApplications}/>
-                                                </>
                                             )}
                                         </Form.Item>
 
                                         <FormItem label="Auto send rejection email"
                                                   help="Rejected applicants will be notified via email if email is provided in the chat (candidates applications only)">
-                                            {getFieldDecorator('sendRejectionEmail', {
+                                            {getFieldDecorator('SendRejectionEmail', {
                                                 initialValue: autoPilot.SendRejectionEmail,
+                                                valuePropName: 'checked', 
                                                 rules: []
                                             })(
-                                                <div style={{marginLeft: 3}}>
-                                                    <Switch onChange={this.onSendRejectionEmailChange}
-                                                            checked={this.state.sendRejectionEmail}
-                                                            disabled={!this.state.rejectApplications}/>
-                                                </div>
+                                                <Switch onChange={value => this.setState({sendRejectionEmail: value})}
+                                                        disabled={!this.state.rejectApplications}/>
                                             )}
                                         </FormItem>
 
-                                        {
-                                            this.state.sendRejectionEmail &&
+                                        { this.state.sendRejectionEmail &&
                                             <FormItem label="Rejection Email Title">
-                                                {getFieldDecorator('rejectionEmailTitle', {
+                                                {getFieldDecorator('RejectionEmailTitle', {
                                                     initialValue: autoPilot?.RejectionEmailTitle,
-                                                    rules: [{required: true}]
+                                                    rules: [{required: true}],
+                                                    hidden: !this.state.rejectApplications,
+                                                    
                                                 })(
-                                                    <Input placeholder="Sorry you got rejected"/>
+                                                    <Input placeholder="Sorry you got rejected" disabled={!this.state.rejectApplications}/>
                                                 )}
                                             </FormItem>
                                         }
-
-                                        {
-                                            this.state.sendRejectionEmail &&
+                                        { this.state.sendRejectionEmail &&
                                             <Row className={styles.CEKwrapper}>
-                                                <h4>Rejection Letter</h4>
-
-                                                {
-                                                    this.state.sendRejectionEmailErrors &&
-                                                    <p style={{color: 'red'}}> * Title and Body field are requierd</p>
-                                                }
-
-                                                <ButtonGroup style={{margin: '5px 0px'}}>
-                                                    <Button
-                                                        onClick={() =>
-                                                            this.setState({
-                                                                rejectionEmailBody: this.state.rejectionEmailBody + ' ${candidateName}$'
-                                                            })
-                                                        }>
-                                                        Candidate Name
+                                                <FormItem label="Rejection Email Body">
+                                                   <ButtonGroup style={{margin: '5px 0'}}>
+                                                    <Button onClick={() => this.appendFormKV("RejectionEmailBody", ' ${candidateName}$')}>
+                                                      Candidate Name
                                                     </Button>
-                                                    <Button
-                                                        onClick={() =>
-                                                            this.setState({
-                                                                rejectionEmailBody: this.state.rejectionEmailBody + ' ${candidateEmail}$'
-                                                            })
-                                                        }>
+                                                    <Button onClick={() => this.appendFormKV("RejectionEmailBody", ' ${candidateEmail}$')}>
                                                         Candidate Email
                                                     </Button>
-                                                </ButtonGroup>
-
-                                                <Row>
-                                                    <Col span={15}>
-                                                        <CKEditor
-                                                            editor={ClassicEditor}
-                                                            config={{toolbar: toolbar}}
-                                                            data={this.state.rejectionEmailBody}
-                                                            onChange={(event, editor) => this.setState(state => state.rejectionEmailBody = editor?.getData())}
-                                                            onInit={editor => this.setState(state => state.rejectionEmailBody = editor?.getData())}
-                                                        />
-                                                    </Col>
-                                                </Row>
+                                                  </ButtonGroup>
+                                                  <Row>
+                                                      <Col span={15}>
+                                                        {getFieldDecorator('RejectionEmailBody', {
+                                                            initialValue: autoPilot?.RejectionEmailBody,
+                                                            rules: [{required: true}],
+                                                            hidden: !this.state.rejectApplications
+                                                        })(
+                                                            <CKEditor
+                                                              editor={ClassicEditor}
+                                                              config={{toolbar: toolbar}}
+                                                              disabled={!this.state.rejectApplications}/>
+                                                        )}
+                                                      </Col>
+                                                  </Row>
+                                                </FormItem>
                                             </Row>
                                         }
 
                                         <FormItem label="Auto send rejection SMS"
                                                   help="Rejected applicants will be notified via SMS if telephone number is provided in the chat  (candidates applications only)">
-                                            {getFieldDecorator('sendRejectionEmail', {
+                                            {getFieldDecorator('SendRejectionSMS', {
                                                 initialValue: autoPilot.SendRejectionSMS,
+                                                valuePropName: 'checked', 
                                                 rules: []
                                             })(
-                                                <div style={{marginLeft: 3}}>
-                                                    <Switch onChange={this.onSendRejectionSMSChange}
-                                                            checked={this.state.sendRejectionSMS}
-                                                            disabled={!this.state.rejectApplications}/>
-                                                </div>
+                                                  <Switch onChange={value => this.setState({sendRejectionSMS: value})}
+                                                          disabled={!this.state.rejectApplications}/>
                                             )}
                                         </FormItem>
 
-                                        {
-                                            this.state.sendRejectionSMS &&
+                                        { this.state.sendRejectionSMS &&
                                             <Row className={styles.CEKwrapper}>
-                                                <h4>Rejection Letter</h4>
-
-                                                {
-                                                    this.state.sendRejectionSMSErrors &&
-                                                    <p style={{color: 'red'}}> * Body field is requierd</p>
-                                                }
-                                                <ButtonGroup style={{margin: '5px 0px'}}>
-                                                    <Button
-                                                        onClick={() =>
-                                                            this.setState({
-                                                                rejectionSMSBody: this.state.rejectionSMSBody + ' ${candidateName}$'
-                                                            })
-                                                        }>
-                                                        Candidate Name
+                                              <FormItem label="Rejection SMS Body">
+                                                  <ButtonGroup style={{margin: '5px 0'}}>
+                                                    <Button onClick={() => this.appendFormKV("RejectionSMSBody", ' ${candidateName}$')}>
+                                                      Candidate Name
                                                     </Button>
-                                                    <Button
-                                                        onClick={() =>
-                                                            this.setState({
-                                                                rejectionSMSBody: this.state.rejectionSMSBody + ' ${candidateEmail}$'
-                                                            })
-                                                        }>
+                                                    <Button onClick={() => this.appendFormKV("RejectionSMSBody", ' ${candidateEmail}$')}>
                                                         Candidate Email
                                                     </Button>
-                                                </ButtonGroup>
-
+                                                  </ButtonGroup>
                                                 <Row>
                                                     <Col span={15}>
+                                                    {getFieldDecorator('RejectionSMSBody', {
+                                                        initialValue: autoPilot?.RejectionSMSBody,
+                                                        rules: [{required: true}],
+                                                        hidden: !this.state.sendRejectionSMS
+                                                    })(
                                                         <CKEditor
-                                                            editor={ClassicEditor}
-                                                            config={{toolbar: ['undo', 'redo']}}
-                                                            data={this.state.rejectionSMSBody}
-                                                            onChange={(event, editor) => this.setState(state => state.rejectionSMSBody = editor?.getData())}
-                                                            onInit={editor => this.setState(state => state.rejectionSMSBody = editor?.getData())}
-                                                        />
+                                                                editor={ClassicEditor}
+                                                                config={{toolbar: ['undo', 'redo']}}/>
+                                                    )}
                                                     </Col>
                                                 </Row>
+                                              </FormItem>
                                             </Row>
                                         }
+                                    </Panel>                     
+                                    
+                                <Panel header={<h2> Manage Appointments Automation</h2>} key="3" style={customPanelStyle}>
+                                  <FormItem label="Auto manage and send candidates appointments"
+                                            help="Accepted candidates will receive an email (if provided) to pick
+                                            a time slot for an appointment. You can then confirm these
+                                            appointments from the Appointments page"
 
-                                    </Panel>
-                                </Collapse>
+                                  >
+                                      {getFieldDecorator('SendCandidatesAppointments', {
+                                          initialValue: autoPilot.SendCandidatesAppointments,
+                                          valuePropName: 'checked', 
+                                          rules: []
+                                      })(
+                                          <Switch/>
+                                      )}
+                                  </FormItem>
+                                  <Form.Item
+                                      label="Time table"
+                                      help="Select a time table to be used for automatic appointment slots generation">
+                                      {getFieldDecorator('AppointmentAllocationTimes', {
+                                          initialValue: this.props.autoPilot?.AppointmentAllocationTimeID,
+                                          rules: [{
+                                              required: this.state.sendCandidatesAppointments,
+                                              message: 'Select a time table'
+                                          }]
+                                      })(
+                                          <Select
+                                              disabled={!this.state.sendCandidatesAppointments}
+                                              dropdownRender={menu => (
+                                                  <div>
+                                                      {menu}
+                                                      <Divider style={{margin: '4px 0'}}/>
+                                                      <div
+                                                          onMouseDown={() => history.push(`/dashboard/appointments?tab=TimeSlots`)}
+                                                          style={{padding: '8px', cursor: 'pointer'}}>
+                                                          <Icon type="plus"/> Create time table
+                                                      </div>
+                                                  </div>
+                                              )}>
+                                              {this.props.appointmentAllocationTime.map((time, i) => {
+                                                  return (
+                                                      <Select.Option key={i} value={time.ID}>{time.Name}</Select.Option>);
+                                              })}
+                                          </Select>
+                                      )}
 
-
-                                <Divider/>
-                                <h2>Referral</h2>
-                                <Collapse bordered={false}>
-                                    <Panel header={<h2>Automatically asks candidates for referral after placement</h2>}
-                                           key="3"
-                                           style={customPanelStyle}>
-
-                                        <FormItem label="Auto refer applicants "
-                                                  help="Select an assistant to auto refer the applicants">
-                                            {getFieldDecorator('referApplications', {
-                                                valuePropName: 'checked'
-                                            })(
-                                                <Switch onChange={this.onReferChange}
-                                                        style={{marginRight: 15}}
-                                                        checked={this.state.referApplications}
-                                                />
-                                            )}
-                                        </FormItem>
-
-                                        {
-                                            this.state.referApplications &&
-                                            <FormItem label={"Assistant"}>
-                                                {getFieldDecorator("referralAssistant", {
-                                                    initialValue: this.state.referralAssistant,
-                                                    rules: [{
-                                                        required: true,
-                                                        message: "Please select the assistant"
-                                                    }],
-                                                })(
-                                                    <Select placeholder={"Please select an assistant"}
-                                                            loading={this.props.isLoading}
-                                                            disabled={!this.state.referApplications}>
-                                                        {(() => {
-                                                            return this.props.campaignOptions?.assistants?.map((item, key) => {
-                                                                return (
-                                                                    <Select.Option key={key} value={item.ID}>
-                                                                        {trimText.capitalize(trimText.trimDash(item.Name))}
-                                                                    </Select.Option>
-                                                                );
-                                                            });
-                                                        })()}
-                                                    </Select>
-                                                )}
-                                            </FormItem>
-                                        }
-
-                                        <FormItem label="Auto send referral emails"
-                                                  help="Referred applicants will be notified via email if email is provided in the chat  (candidates applications only)"
-                                        >
-                                            {getFieldDecorator('sendReferralEmail', {
-                                                initialValue: autoPilot?.SendReferralEmail,
-                                                rules: []
-                                            })(
-                                                <div style={{marginLeft: 3}}>
-                                                    <Switch onChange={this.onSendReferralEmailChange}
-                                                            checked={this.state.sendReferralEmail}
-                                                            disabled={!this.state.referApplications}
-
-                                                    />
-                                                </div>
-                                            )}
-                                        </FormItem>
-
-                                        {
-                                            this.state.sendReferralEmail &&
-                                            <FormItem label="Referral Email Title" vi>
-                                                {getFieldDecorator('referralEmailTitle', {
-                                                    initialValue: autoPilot?.ReferralEmailTitle,
-                                                    rules: [{required: true}]
-                                                })(
-                                                    <Input placeholder=""/>
-                                                )}
-                                            </FormItem>
-                                        }
-
-                                        {
-                                            this.state.sendReferralEmail &&
-                                            <Row className={styles.CEKwrapper}>
-                                                <h4>Referral letter</h4>
-
-                                                {
-                                                    this.state.sendReferralEmailErrors &&
-                                                    <p style={{color: 'red'}}> * Title and Body field are required</p>
-                                                }
-
-                                                <ButtonGroup style={{margin: '5px 0'}}>
-                                                    <Button
-                                                        onClick={() =>
-                                                            this.setState({
-                                                                referralEmailBody: this.state.referralEmailBody + ' ${candidateName}$'
-                                                            })
-                                                        }>
-                                                        Candidate Name
-                                                    </Button>
-                                                    <Button
-                                                        onClick={() =>
-                                                            this.setState({
-                                                                referralEmailBody: this.state.referralEmailBody + ' ${candidateEmail}$'
-                                                            })
-                                                        }>
-                                                        Candidate Email
-                                                    </Button>
-                                                </ButtonGroup>
-
-                                                <Row>
-                                                    <Col span={15}>
-                                                        <CKEditor
-                                                            editor={ClassicEditor}
-                                                            config={{toolbar: toolbar}}
-                                                            data={this.state.referralEmailBody}
-                                                            onChange={(event, editor) => this.setState(state => state.referralEmailBody = editor?.getData())}
-                                                            onInit={editor => this.setState(state => state.referralEmailBody = editor?.getData())}
-                                                        />
-                                                    </Col>
-                                                </Row>
-                                            </Row>
-                                        }
-
-                                        <FormItem label="Auto send SMS"
-                                                  help="Referred applicants will be notified via SMS if telephone number is provided in the chat  (candidates applications only)">
-                                            {getFieldDecorator('sendReferralSMS', {
-                                                initialValue: autoPilot?.SendReferralSMS,
-                                                rules: []
-                                            })(
-                                                <div style={{marginLeft: 3}}>
-                                                    <Switch onChange={this.onSendReferralSMSChange}
-                                                            checked={this.state.sendReferralSMS}
-                                                            disabled={!this.state.referApplications}/>
-
-                                                </div>
-                                            )}
-                                        </FormItem>
-
-                                        {
-                                            this.state.sendReferralSMS &&
-                                            <Row className={styles.CEKwrapper}>
-                                                <h4>Referral message</h4>
-                                                {
-                                                    this.state.sendReferralSMSErrors &&
-                                                    <p style={{color: 'red'}}> * Body field is required</p>
-                                                }
-                                                <ButtonGroup style={{margin: '5px 0'}}>
-                                                    <Button
-                                                        onClick={() =>
-                                                            this.setState({
-                                                                referralSMSBody: this.state.referralSMSBody + ' ${candidateName}$'
-                                                            })
-                                                        }>
-                                                        Candidate Name
-                                                    </Button>
-                                                    <Button
-                                                        onClick={() =>
-                                                            this.setState({
-                                                                referralSMSBody: this.state.referralSMSBody + ' ${candidateEmail}$'
-                                                            })
-                                                        }>
-                                                        Candidate Email
-                                                    </Button>
-                                                </ButtonGroup>
-
-                                                <Row>
-                                                    <Col span={15}>
-                                                        <CKEditor
-                                                            editor={ClassicEditor}
-                                                            config={{toolbar: ['undo', 'redo']}}
-                                                            data={this.state.referralSMSBody}
-                                                            onChange={(event, editor) => this.setState(state => state.referralSMSBody = editor?.getData())}
-                                                            onInit={editor => this.setState(state => state.referralSMSBody = editor?.getData())}
-                                                        />
-                                                    </Col>
-                                                </Row>
-                                            </Row>
-                                        }
-
-                                    </Panel>
-                                </Collapse>
-
-                                <Divider/>
-                                <h2>Contract Follow Up</h2>
-                                <Collapse bordered={false}>
-                                    <Panel header={<h2>Automatically suggests contract roles</h2>} key="4"
-                                           style={customPanelStyle}>
-
-                                        <FormItem label="Send job suggestion (before their role finishes)">
-                                            {getFieldDecorator('contractFollowUp', {
-                                                valuePropName: 'checked'
-                                            })(
-                                                <Switch onChange={this.onContractFollowUpChange}
-                                                        style={{marginRight: 15}}
-                                                        checked={this.state.contractFollowUp}
-                                                />
-                                            )}
-                                            {getFieldDecorator("contractFollowUpSchedule", {initialValue: "2"})(
-                                                <Radio.Group  disabled={!this.state.contractFollowUp}>
-                                                    <Radio.Button value="1">1 Week</Radio.Button>
-                                                    <Radio.Button value="2">2 Weeks</Radio.Button>
-                                                    <Radio.Button value="3">3 Weeks</Radio.Button>
-                                                </Radio.Group>
-                                            )}
-                                        </FormItem>
-
-                                        <FormItem label="Auto send Email"
-                                                  help="Applicants will be notified via email if email is provided in the chat  (candidates applications only)"
-                                        >
-                                            {getFieldDecorator('sendContractFollowUpEmail', {
-                                                initialValue: autoPilot?.SendContractFollowUpEmail,
-                                                rules: []
-                                            })(
-                                                <div style={{marginLeft: 3}}>
-                                                    <Switch onChange={this.onSendContractFollowUpEmailChange}
-                                                            checked={this.state.sendContractFollowUpEmail}
-                                                            disabled={!this.state.contractFollowUp}
-
-                                                    />
-                                                </div>
-                                            )}
-                                        </FormItem>
-
-                                        {
-                                            this.state.sendContractFollowUpEmail &&
-                                            <FormItem label="Role Suggestion Email Title" vi>
-                                                {getFieldDecorator('contractFollowUpEmailTitle', {
-                                                    initialValue: autoPilot?.ContractFollowUpEmailTitle,
-                                                    rules: [{required: true}]
-                                                })(
-                                                    <Input placeholder=""/>
-                                                )}
-                                            </FormItem>
-                                        }
-
-                                        {
-                                            this.state.sendContractFollowUpEmail &&
-                                            <Row className={styles.CEKwrapper}>
-                                                <h4>Role Suggestion letter</h4>
-
-                                                {
-                                                    this.state.sendContractFollowUpEmailErrors &&
-                                                    <p style={{color: 'red'}}> * Title and Body field are required</p>
-                                                }
-
-                                                <ButtonGroup style={{margin: '5px 0'}}>
-                                                    <Button
-                                                        onClick={() =>
-                                                            this.setState({
-                                                                contractFollowUpEmailBody: this.state.contractFollowUpEmailBody + ' ${candidateName}$'
-                                                            })
-                                                        }>
-                                                        Candidate Name
-                                                    </Button>
-                                                    <Button
-                                                        onClick={() =>
-                                                            this.setState({
-                                                                contractFollowUpEmailBody: this.state.contractFollowUpEmailBody + ' ${candidateEmail}$'
-                                                            })
-                                                        }>
-                                                        Candidate Email
-                                                    </Button>
-                                                </ButtonGroup>
-
-                                                <Row>
-                                                    <Col span={15}>
-                                                        <CKEditor
-                                                            editor={ClassicEditor}
-                                                            config={{toolbar: toolbar}}
-                                                            data={this.state.contractFollowUpEmailBody}
-                                                            onChange={(event, editor) => this.setState(state => state.contractFollowUpEmailBody = editor?.getData())}
-                                                            onInit={editor => this.setState(state => state.contractFollowUpEmailBody = editor?.getData())}
-                                                        />
-                                                    </Col>
-                                                </Row>
-                                            </Row>
-                                        }
-
-                                        <FormItem label="Auto send SMS"
-                                                  help="Applicants will be notified via SMS if telephone number is provided in the chat  (candidates applications only)">
-                                            {getFieldDecorator('sendContractFollowUpSMS', {
-                                                initialValue: autoPilot?.SendContractFollowUpSMS,
-                                                rules: []
-                                            })(
-                                                <div style={{marginLeft: 3}}>
-                                                    <Switch onChange={this.onSendContractFollowUpSMSChange}
-                                                            checked={this.state.sendContractFollowUpSMS}
-                                                            disabled={!this.state.contractFollowUp}/>
-
-                                                </div>
-                                            )}
-                                        </FormItem>
-
-                                        {
-                                            this.state.sendContractFollowUpSMS &&
-                                            <Row className={styles.CEKwrapper}>
-                                                <h4>Role suggestion message</h4>
-                                                {
-                                                    this.state.sendContractFollowUpSMSErrors &&
-                                                    <p style={{color: 'red'}}> * Body field is required</p>
-                                                }
-                                                <ButtonGroup style={{margin: '5px 0'}}>
-                                                    <Button
-                                                        onClick={() =>
-                                                            this.setState({
-                                                                contractFollowUpSMSBody: this.state.contractFollowUpSMSBody + ' ${candidateName}$'
-                                                            })
-                                                        }>
-                                                        Candidate Name
-                                                    </Button>
-                                                    <Button
-                                                        onClick={() =>
-                                                            this.setState({
-                                                                contractFollowUpSMSBody: this.state.contractFollowUpSMSBody + ' ${candidateEmail}$'
-                                                            })
-                                                        }>
-                                                        Candidate Email
-                                                    </Button>
-                                                </ButtonGroup>
-
-                                                <Row>
-                                                    <Col span={15}>
-                                                        <CKEditor
-                                                            editor={ClassicEditor}
-                                                            config={{toolbar: ['undo', 'redo']}}
-                                                            data={this.state.contractFollowUpSMSBody}
-                                                            onChange={(event, editor) => this.setState(state => state.contractFollowUpSMSBody = editor?.getData())}
-                                                            onInit={editor => this.setState(state => state.contractFollowUpSMSBody = editor?.getData())}
-                                                        />
-                                                    </Col>
-                                                </Row>
-                                            </Row>
-                                        }
-
-                                    </Panel>
-                                </Collapse>
-
-                                <Divider/>
-                                <h2> Manage Appointments Automation</h2>
-                                <FormItem label="Auto manage and send candidates appointments"
-                                          help="Accepted candidates will receive an email (if provided) to pick
-                                           a time slot for an appointment. You can then confirm these
-                                           appointments from the Appointments page"
-
-                                >
-                                    {getFieldDecorator('sendCandidatesAppointments', {
-                                        initialValue: autoPilot.SendCandidatesAppointments,
-                                        rules: []
-                                    })(
-                                        <div style={{marginLeft: 3}}>
-                                            <Switch
-                                                onChange={(value) => this.setState({sendCandidatesAppointments: value})}
-                                                checked={this.state.sendCandidatesAppointments}/>
-                                        </div>
-                                    )}
-                                </FormItem>
-                                <Form.Item
-                                    label="Time table"
-                                    help="Select a time table to be used for automatic appointment slots generation">
-                                    {getFieldDecorator('AppointmentAllocationTimes', {
-                                        initialValue: this.props.autoPilot?.AppointmentAllocationTimeID,
-                                        rules: [{
-                                            required: this.state.sendCandidatesAppointments,
-                                            message: 'Select a time table '
-                                        }]
-                                    })(
-                                        <Select
-                                            disabled={!this.state.sendCandidatesAppointments}
-                                            dropdownRender={menu => (
-                                                <div>
-                                                    {menu}
-                                                    <Divider style={{margin: '4px 0'}}/>
-                                                    <div
-                                                        onMouseDown={() => history.push(`/dashboard/appointments?tab=TimeSlots`)}
-                                                        style={{padding: '8px', cursor: 'pointer'}}>
-                                                        <Icon type="plus"/> Create time table
-                                                    </div>
-                                                </div>
-                                            )}>
-                                            {this.props.appointmentAllocationTime.map((time, i) => {
-                                                return (
-                                                    <Select.Option key={i} value={time.ID}>{time.Name}</Select.Option>);
-                                            })}
-                                        </Select>
-                                    )}
-
-                                </Form.Item>
-                            </Form>
-                        }
+                                  </Form.Item>
+                                </Panel>
+                          </Collapse>          
+                      </Form>
+                      }
 
 
                         <Button type={'primary'} size={'large'} onClick={this.onSubmit}
@@ -1077,7 +480,6 @@ class AssistantAutoPilot extends React.Component {
                             Save changes
                         </Button>
 
-                        <Divider/>
                         <Button type={'danger'} size={'large'} onClick={this.handleDelete}>Delete Auto Pilot</Button>
 
 
@@ -1109,4 +511,4 @@ function mapStateToProps(state) {
     };
 }
 
-export default connect(mapStateToProps)(Form.create()(AssistantAutoPilot));
+export default connect(mapStateToProps)(Form.create()(AssistantAutoPilot)); 

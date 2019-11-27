@@ -64,6 +64,9 @@ class CRMAutoPilot extends React.Component {
         this.props.dispatch(CRMAutoPilotActions.updateStatus(this.props.match.params.id, checked));
     };
 
+    setFormKV = (key, value) => this.props.form.setFieldsValue({ [key]: value });
+    appendFormKV = (key, value) => this.props.form.setFieldsValue({ [key]: `${this.props.form.getFieldValue(key)}${value}` });
+
     onSubmit = () => {
         this.props.form.validateFields((err, values) => {
             if (!err) {
@@ -201,11 +204,11 @@ class CRMAutoPilot extends React.Component {
                                             <FormItem label="Referral Email Body">
                                                 <ButtonGroup style={{ margin: '5px 0' }}>
                                                     <Button
-                                                        onClick={() => this.setState({ referralEmailBody: this.state.referralEmailBody + ' ${candidateName}$' })}>
+                                                        onClick={() => this.appendFormKV('ReferralEmailBody', ' ${candidateName}$')}>
                                                         Candidate Name
                                                     </Button>
                                                     <Button
-                                                        onClick={() => this.setState({ referralEmailBody: this.state.referralEmailBody + ' ${candidateEmail}$' })}>
+                                                        onClick={() => this.appendFormKV('ReferralEmailBody', ' ${candidateEmail}$')}>
                                                         Candidate Email
                                                     </Button>
                                                 </ButtonGroup>
@@ -244,11 +247,11 @@ class CRMAutoPilot extends React.Component {
                                         <FormItem label="Referral SMS Body">
                                             <ButtonGroup style={{ margin: '5px 0' }}>
                                                 <Button
-                                                    onClick={() => this.setState({ referralSMSBody: this.state.referralSMSBody + ' ${candidateName}$' })}>
+                                                        onClick={() => this.appendFormKV('ReferralSMSBody', ' ${candidateName}$')}>
                                                     Candidate Name
                                                 </Button>
                                                 <Button
-                                                    onClick={() => this.setState({ referralSMSBody: this.state.referralSMSBody + ' ${candidateEmail}$' })}>
+                                                        onClick={() => this.appendFormKV('ReferralSMSBody', ' ${candidateEmail}$')}>
                                                     Candidate Email
                                                 </Button>
                                             </ButtonGroup>

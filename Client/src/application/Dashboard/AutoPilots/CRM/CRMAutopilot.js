@@ -18,10 +18,10 @@ const FormItem = Form.Item;
 const { confirm } = Modal;
 
 const customPanelStyle = {
-    borderRadius: 4,
-    marginBottom: 24,
-    border: 0,
-    overflow: 'hidden'
+    // borderRadius: 4,
+    // marginBottom: 24,
+    // border: 0,
+    // overflow: 'hidden'
 };
 
 const { Title, Paragraph } = Typography;
@@ -135,9 +135,10 @@ class CRMAutoPilot extends React.Component {
                                 )}
                             </FormItem>
 
+                            <Divider/>
                             <h2>Referral</h2>
                             <Collapse defaultActiveKey={activeKeys}>
-                                <Panel header={<h2>Automatically asks candidates for referral after placement</h2>}
+                                <Panel header={<h3>Automatically asks candidates for referral after placement</h3>}
                                        key="1"
                                        style={customPanelStyle}>
                                     <FormItem label="Auto refer applicants "

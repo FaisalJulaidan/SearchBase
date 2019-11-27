@@ -193,8 +193,12 @@ class AssistantAutoPilot extends React.Component {
                                 )}
                             </FormItem>
 
+                            <Divider/>
+                            <h2>Qualifier</h2>
                             <Collapse defaultActiveKey={openPanels}>
-                                <Panel header={<h2> Applications Acceptance Automation</h2>} key="1"
+
+
+                                <Panel header={<h3> Applications Acceptance Automation</h3>} key="1"
                                        style={customPanelStyle}>
                                     <FormItem label="Auto accept applicants "
                                               help="Select the percentage to auto accept the applicants">
@@ -315,7 +319,7 @@ class AssistantAutoPilot extends React.Component {
                                     </Row>
                                     }
                                 </Panel>
-                                <Panel header={<h2> Applications Rejection Automation</h2>} key="2"
+                                <Panel header={<h3> Applications Rejection Automation</h3>} key="2"
                                        style={customPanelStyle}>
                                     <Form.Item label="Auto reject applicants "
                                                help="Select the percentage to auto reject the applicants">
@@ -438,7 +442,9 @@ class AssistantAutoPilot extends React.Component {
                                     }
                                 </Panel>
 
-                                <Panel header={<h2> Manage Appointments Automation</h2>} key="3"
+                                <Divider/>
+                                <h2>Appointments</h2>
+                                <Panel header={<h3> Manage Appointments Automation</h3>} key="3"
                                        style={customPanelStyle}>
                                     <FormItem label="Auto manage and send candidates appointments"
                                               help="Accepted candidates will receive an email (if provided) to pick
@@ -492,23 +498,11 @@ class AssistantAutoPilot extends React.Component {
                     }
 
 
-                    <Button type={'primary'} size={'large'} onClick={this.onSubmit}
-                            style={{ marginTop: 30 }}>
+                    <Button type={'primary'} size={'large'} onClick={this.onSubmit} style={{ marginTop: 30 }}>
                         Save changes
                     </Button>
 
                     <Button type={'danger'} size={'large'} onClick={this.handleDelete}>Delete Auto Pilot</Button>
-
-
-                    {/*Blur Effect (Hidden) */}
-                    <div style={{ display: 'none' }}>
-                        <svg id="svg-filter">
-                            <filter id="svg-blur">
-                                <feGaussianBlur in="SourceGraphic" stdDeviation="2"></feGaussianBlur>
-                            </filter>
-                        </svg>
-                    </div>
-
                 </div>
             </NoHeaderPanel>
 

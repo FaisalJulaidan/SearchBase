@@ -117,7 +117,7 @@ def migrateFlows():
 
                 # Update in database only if there are 0 errors
                 assistant.Flow = newFlow
-                print(assistant.Flow)
+
         # Save all changes
         db.session.commit()
         print("Flow migration done successfully :)")

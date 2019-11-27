@@ -11,7 +11,6 @@ const parse = (flow) => {
             block.DataType = block.DataType.enumName;
         });
     });
-
     return newFlow;
 };
 

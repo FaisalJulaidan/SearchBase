@@ -24,10 +24,12 @@ def create(name, desc, welcomeMessage, topBarText, flow, template, companyID) ->
             relative_path = join('static/assistant_templates', template + '.json')
             absolute_path = join(BaseConfig.APP_ROOT, relative_path)
             flow = json.load(open(absolute_path))
-            # Validate template
-            callback: Callback = flow_services.isValidFlow(flow)
-            if not callback.Success:
-                raise Exception(callback.Message)
+
+
+        # Validate flow
+        callback: Callback = flow_services.isValidFlow(flow)
+        if not callback.Success:
+            raise Exception(callback.Message)
 
         # default assistant config values
         config = {

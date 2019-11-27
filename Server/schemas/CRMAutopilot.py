@@ -6,12 +6,12 @@ class CRMAutoPilot(db.Model):
     Active = db.Column(db.Boolean, nullable=False, default=True)
 
     LastReferral = db.Column(db.DateTime(), default=None)
+    AutoReferApplicants = db.Column(db.Boolean, nullable=False, default=False)
 
-    SendReferralEmail = db.Column(db.Boolean, nullable=True, default=False)
+    SendReferralEmail = db.Column(db.Boolean, nullable=False, default=False)
     ReferralEmailTitle = db.Column(db.String(260), nullable=True, default=None)
     ReferralEmailBody = db.Column(db.Text, nullable=True, default=None)
-
-    SendReferralSMS = db.Column(db.Boolean, nullable=True, default=False)
+    SendReferralSMS = db.Column(db.Boolean, nullable=False, default=False)
     ReferralSMSBody = db.Column(db.Text, nullable=True, default=None)
     
     ReferralAssistantID = db.Column(db.Integer, db.ForeignKey('assistant.ID', ondelete='SET NULL'), nullable=True)

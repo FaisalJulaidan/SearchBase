@@ -112,8 +112,12 @@ class AssistantAutoPilot extends React.Component {
         const /**@type AutoPilot*/ autoPilot = this.props.autoPilot;
         const { getFieldDecorator } = this.props.form;
         const { acceptApplications, rejectApplications, sendCandidatesAppointments } = this.state;
-        let openPanels = [acceptApplications, rejectApplications, sendCandidatesAppointments];
-        openPanels = openPanels.map((val, i) => ({i: i + 1, val })).filter(item => item.val).map(item => item.i.toString());
+        let openCollapse1 = [acceptApplications, rejectApplications, sendCandidatesAppointments];
+        openCollapse1 = openCollapse1.map((val, i) => ({i: i + 1, val })).filter(item => item.val).map(item => item.i.toString());
+        
+        let openCollapse2 = [sendCandidatesAppointments];
+        openCollapse2 = openCollapse2.map((val, i) => ({i: i + 1, val })).filter(item => item.val).map(item => item.i.toString());
+
         return (
             <NoHeaderPanel>
                 <div className={styles.Header}>
@@ -186,8 +190,10 @@ class AssistantAutoPilot extends React.Component {
                                 )}
                             </FormItem>
 
-                            <Collapse defaultActiveKey={openPanels}>
-                                <Panel header={<h2> Applications Acceptance Automation</h2>} key="1"
+                            <Divider/>
+                            <h2>Qualifier</h2>
+                            <Collapse defaultActiveKey={openCollapse1}>
+                                <Panel header={<h3> Applications Acceptance Automation</h3>} key="1"
                                        style={customPanelStyle}>
                                     <FormItem label="Auto accept applicants "
                                               help="Select the percentage to auto accept the applicants">
@@ -308,7 +314,7 @@ class AssistantAutoPilot extends React.Component {
                                     </Row>
                                     }
                                 </Panel>
-                                <Panel header={<h2> Applications Rejection Automation</h2>} key="2"
+                                <Panel header={<h3> Applications Rejection Automation</h3>} key="2"
                                        style={customPanelStyle}>
                                     <Form.Item label="Auto reject applicants "
                                                help="Select the percentage to auto reject the applicants">
@@ -430,8 +436,10 @@ class AssistantAutoPilot extends React.Component {
                                     </Row>
                                     }
                                 </Panel>
-
-                                <Panel header={<h2> Manage Appointments Automation</h2>} key="3"
+                            </Collapse>
+                            <h2>Appointments</h2>
+                            <Collapse defaultActiveKey={openCollapse2}>
+                                <Panel header={<h3> Manage Appointments Automation</h3>} key="3"
                                        style={customPanelStyle}>
                                     <FormItem label="Auto manage and send candidates appointments"
                                               help="Accepted candidates will receive an email (if provided) to pick
@@ -444,7 +452,7 @@ class AssistantAutoPilot extends React.Component {
                                             valuePropName: 'checked',
                                             rules: []
                                         })(
-                                            <Switch/>
+                                            <Switch onChange={e => this.setState({sendCandidatesAppointments: e})}/>
                                         )}
                                     </FormItem>
                                     <Form.Item
@@ -485,23 +493,11 @@ class AssistantAutoPilot extends React.Component {
                     }
 
 
-                    <Button type={'primary'} size={'large'} onClick={this.onSubmit}
-                            style={{ marginTop: 30 }}>
+                    <Button type={'primary'} size={'large'} onClick={this.onSubmit} style={{ marginTop: 30 }}>
                         Save changes
                     </Button >
 
-                    <Button type={'danger'} size={'large'}  style={{ marginTop: 30 }} onClick={this.handleDelete}>Delete Auto Pilot</Button>
-
-
-                    {/*Blur Effect (Hidden) */}
-                    <div style={{ display: 'none' }}>
-                        <svg id="svg-filter">
-                            <filter id="svg-blur">
-                                <feGaussianBlur in="SourceGraphic" stdDeviation="2"></feGaussianBlur>
-                            </filter>
-                        </svg>
-                    </div>
-
+                    <Button type={'danger'} size={'large'} style={{ marginTop: 30 }} onClick={this.handleDelete}>Delete Auto Pilot</Button>
                 </div>
             </NoHeaderPanel>
 

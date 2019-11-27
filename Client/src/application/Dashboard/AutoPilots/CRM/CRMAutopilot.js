@@ -18,10 +18,10 @@ const FormItem = Form.Item;
 const { confirm } = Modal;
 
 const customPanelStyle = {
-    borderRadius: 4,
-    marginBottom: 24,
-    border: 0,
-    overflow: 'hidden'
+    // borderRadius: 4,
+    // marginBottom: 24,
+    // border: 0,
+    // overflow: 'hidden'
 };
 
 const { Title, Paragraph } = Typography;
@@ -43,7 +43,7 @@ class CRMAutoPilot extends React.Component {
     state = {
         sendReferralEmail: this.props?.crmAP?.SendReferralEmail,
         sendReferralSMS: this.props?.crmAP?.SendReferralSMS,
-        autoRefer: !(this.props?.crmAP?.ReferralAssistantID === undefined || this.props?.crmAP?.ReferralAssistantID === null)
+        autoRefer: this.props?.crmAP?.AutoReferApplicants
     };
 
     componentWillMount() {
@@ -80,7 +80,6 @@ class CRMAutoPilot extends React.Component {
         const { crmAP } = this.props;
         const { sendReferralEmail, sendReferralSMS, autoRefer } = this.state;
         let activeKeys = [];
-
 
         activeKeys = autoRefer ? [...activeKeys, '1'] : activeKeys;
         return this.props.isLoading ? <LoadingSpinner/> :
@@ -138,15 +137,21 @@ class CRMAutoPilot extends React.Component {
                                 )}
                             </FormItem>
 
+                            <Divider/>
                             <h2>Referral</h2>
                             <Collapse defaultActiveKey={activeKeys}>
-                                <Panel header={<h2>Automatically asks candidates for referral after placement</h2>}
+                                <Panel header={<h3>Automatically asks candidates for referral after placement</h3>}
                                        key="1"
                                        style={customPanelStyle}>
                                     <FormItem label="Auto refer applicants "
                                               help="Select an assistant to auto refer the applicants">
-                                        <Switch onChange={e => this.setState({ autoRefer: e })}
-                                                style={{ marginRight: 15 }} defaultChecked={this.state.autoRefer}/>
+                                            {getFieldDecorator('AutoReferApplicants', {
+                                                initialValue: crmAP.AutoReferApplicants,
+                                                valuePropName: 'checked',
+                                            })(
+                                              <Switch onChange={e => this.setState({ autoRefer: e })}
+                                                      style={{ marginRight: 15 }}/>
+                                            )}
                                     </FormItem>
                                     {this.state.autoRefer &&
                                     <>

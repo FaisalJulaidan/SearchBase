@@ -43,15 +43,12 @@ def testConnection(auth, companyID):
         if auth.get("refresh_token"):
 
             if token_is_ok(auth, companyID):
-                print("[1] Do nothing")
                 return Callback(True, 'Logged in successfully', auth)
 
             else:
-                print("[2] Refresh expired token")
                 callback: Callback = refreshToken(auth, companyID)
 
         else:
-            print("[3] Login")
             callback: Callback = login(auth)
 
         if not callback.Success:
@@ -83,7 +80,6 @@ def token_is_ok(auth, companyID):
 def refreshToken(auth, companyID):
     # get new access token:
     try:
-        print("Getting a new access token")
 
         headers = {
             'Content-Type': "application/x-www-form-urlencoded",
@@ -102,7 +98,6 @@ def refreshToken(auth, companyID):
         resp = json.loads(
             requests.request("POST", (BASE_URL_LOGIN + "token?"), headers=headers,
                              data=body).text)
-        print(resp)
         auth['access_token'] = resp.get('access_token')
 
         saveAuth_callback: Callback = crm_services.updateByType(CRM.Jobscience, auth, companyID)
@@ -148,7 +143,6 @@ def login(auth):
             raise Exception(response.text)
 
         result_body = json.loads(response.text)
-        print(result_body)
 
         return Callback(True, 'Logged in successfully', {"access_token": result_body.get('access_token'),
                                                          "refresh_token": result_body.get("refresh_token")})
@@ -222,9 +216,6 @@ def convertDate(date: str):
 
 def insertCandidate(access_token, conversation: Conversation) -> Callback:
     try:
-
-        print("Inserting candidate")
-        print(conversation)
 
         name = (conversation.get("name") or " ").split(" ")
         body = {
@@ -312,7 +303,7 @@ def updateCandidate(auth, conversation: Conversation, companyID) -> Callback:
                 elif type(propertyValue) is int and propertyValue != 0:
                     filtered_body[propertyKey] = propertyValue
 
-        print("Updating Candidate: {}".format(filtered_body))
+        # print("Updating Candidate: {}".format(filtered_body))
         logging.info("Updating Candidate: {}".format(filtered_body))
 
         # send query
@@ -438,7 +429,7 @@ def fetchSkillsForCandidateSearch(list_of_contactIDs: list, list_of_skills, acce
         candidate_skills_fetch = json.loads(sendQuery_callback.Data.text)
         records_to_return += candidate_skills_fetch['records']
 
-    print("CURRENT LENGTH IS: {}".format(len(records_to_return)))
+    # print("CURRENT LENGTH IS: {}".format(len(records_to_return)))
     return records_to_return
 
 

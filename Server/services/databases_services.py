@@ -609,7 +609,6 @@ def __salary(row, dbSalaryColumn, dbCurrencyColumn, salaryInput: str, plus=4, fo
     # Convert db salary currency if did not match with user's entered currency
     dbSalary = row[dbSalaryColumn.name] or 0
     if (row[dbCurrencyColumn.name] != userSalary[1]) and dbSalary > 0:
-        print("Convert")
         dbSalary = helpers.currencyConverter.convert(row[dbCurrencyColumn.name], userSalary[1], dbSalary)
         row[dbSalaryColumn.name] = dbSalary
 

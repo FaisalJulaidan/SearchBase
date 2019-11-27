@@ -249,7 +249,6 @@ def addEvent(companyID, eventName, description, start, end):
                 'description': description,
                 'start': {'dateTime': start.isoformat()},
                 'end': {'dateTime': end.isoformat()}}
-        helpers.HPrint(json.dumps(data))
         resp = requests.post("https://www.googleapis.com/calendar/v3/calendars/{}/events".format(calendarID), json=data,
                              headers=headers)
         return Callback(True, 'Successfully added event')

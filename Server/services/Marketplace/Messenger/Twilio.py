@@ -33,7 +33,7 @@ def sendMessage(sendto, body, auth, whatsapp=False):
         message = client.messages.create(
             to=sendto,
             from_=sender,
-            body=body)
+            body=body.replace("&nbsp;", "\n")) # add break-lines to sms message
 
         print(message.sid)
 

@@ -5,7 +5,10 @@ class Job(db.Model):
     ID = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
     JobTitle = db.Column(db.String(64), nullable=False) # Required
     JobDescription = db.Column(db.String(5000), nullable=True)
-    JobLocation = db.Column(db.String(64), nullable=False) # Required
+    JobStreet = db.Column(db.String(64), nullable=True)
+    JobCity = db.Column(db.String(64), nullable=True) 
+    JobPostCode = db.Column(db.String(64), nullable=True)
+    JobCountry = db.Column(db.String(64), nullable=True) 
     JobSalary = db.Column(db.Float(), nullable=False, default=0)
     Currency = db.Column(CurrencyType, nullable=False) # Required
     JobType = db.Column(db.String(64), nullable=True)

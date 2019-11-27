@@ -119,7 +119,7 @@ class CompanyDetails extends React.Component {
                 <Divider/>
                 <h2>Company Logo</h2>
                 <p>
-                    your company logo will replace TheSearchBase logo in the
+                    your company logo will replace SearchBase logo in the
                     chatbot and emails sent on behalf of your company by us
                 </p>
                 <LogoUploader

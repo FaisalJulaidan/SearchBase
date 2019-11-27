@@ -71,7 +71,6 @@ def sendConversationsNotifications(assistantID=None):
             db.session.commit()
 
     except Exception as e:
-        print('rah')
         helpers.logError(str(e))
 
 

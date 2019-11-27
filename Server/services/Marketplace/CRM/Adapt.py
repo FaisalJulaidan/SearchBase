@@ -72,7 +72,9 @@ def insertCandidate(auth, data) -> Callback:
             ],
             "ADDRESS": [{
                 "OCC_ID": "Primary",
-                "STREET1": data.get("city"),
+                "STREET1": data.get("street"),
+                "TOWN": data.get("city"),
+                "POST_CODE": data.get("postCode"),
             }],
         }
 

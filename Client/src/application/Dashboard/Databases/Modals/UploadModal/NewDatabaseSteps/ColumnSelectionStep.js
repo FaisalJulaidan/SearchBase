@@ -1,7 +1,7 @@
-import {Form, message, Select, Spin} from "antd";
+import { Form, message, Select, Spin } from 'antd';
 
-import React, {Component} from 'react'
-import "./UploadDatabaseStep/UploadDatabaseStep.less"
+import React, { Component } from 'react';
+import './UploadDatabaseStep/UploadDatabaseStep.less';
 
 const FormItem = Form.Item;
 const Option = Select.Option;
@@ -130,6 +130,39 @@ class ColumnSelectionStep extends Component {
             }
         }
 
+
+        if (TSBcolumnOption.column === 'CandidateMobile') {
+            // if there is +44, then do nothing
+            // if there is (.*) remove it then check if there is +44
+            // if there is 44 only remove it
+
+            if (
+                userColumns.length > 1 // there is country code
+            ) {
+
+                validatedData = validatedData.split(' ').join('').replace(/\(.*\)/, '').replace('-', '');
+                if (!validatedData.includes(userColumns[0])) {
+
+                    if (!validatedData.includes(userColumns[0].replace('+', '')))
+                        validatedData = userColumns[0] + validatedData;
+
+                    if (!validatedData.includes('+'))
+                        validatedData = '+' + validatedData;
+
+                    if (!validatedData.includes(userColumns[0]))
+                        validatedData = userColumns[0] + validatedData;
+
+
+                }
+
+            }
+
+
+
+
+
+        }
+
         return {
             data: validatedData,
             message: message,
@@ -234,39 +267,6 @@ class ColumnSelectionStep extends Component {
                                 </FormItem>
                             );
 
-                            // else if (type.type === "DATETIME") return (
-                            //     <div key={index}>
-                            //         <FormItem label={type.column} {...formItemLayout} >
-                            //             <div>
-                            //                 {getFieldDecorator(type.column, {
-                            //                     defaultValue: selectedColumns,
-                            //                     rules: [{required: !type.nullable, message: 'This is required field',}]
-                            //                 })
-                            //                 (
-                            //                     <Select mode="multiple"
-                            //                             placeholder="Select Column or Columns"
-                            //                             onDeselect={this.handleRemove}
-                            //                             onChange={this.handleChange}
-                            //                             style={{width: "60%", marginRight: 5}}>
-                            //                         {filteredOptions.map(item => (
-                            //                             <Select.Option key={item} value={item}>{item}</Select.Option>
-                            //                         ))}
-                            //                     </Select>
-                            //                 )}
-                            //                 {getFieldDecorator(`${type.column}_DateFormat`)
-                            //                 (
-                            //                     <Select placeholder="Select date format"
-                            //                             style={{width: "calc(40% - 5px)"}}>
-                            //                         <Option value={"MM/DD/YY"}>{"MM/DD/YY"}</Option>
-                            //                         <Option value={"DD/MM/YY"}>{"DD/MM/YY"}</Option>
-                            //                         <Option value={"YY/MM/DD"}>{"YY/MM/DD"}</Option>
-                            //                     </Select>
-                            //                 )}
-                            //             </div>
-                            //         </FormItem>
-                            //     </div>
-                            // );
-
                             else return (
                                 <FormItem label={type.column} {...formItemLayout} key={index}>
                                     {getFieldDecorator(type.column, {
@@ -274,7 +274,7 @@ class ColumnSelectionStep extends Component {
                                         rules: [{required: !type.nullable, message: 'This is required field',}]
                                     })
                                     (
-                                        <Select mode="multiple" placeholder="Select Column or Columns"
+                                        <Select mode="multiple" mode="tags" placeholder="Select Column or Columns"
                                                 onDeselect={this.handleRemove}
                                                 onChange={this.handleChange}>
                                             {filteredOptions.map(item => (

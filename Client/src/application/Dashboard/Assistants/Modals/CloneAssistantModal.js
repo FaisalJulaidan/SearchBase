@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 
 import { Button, Form, Input, Modal, Spin } from 'antd';
 import { assistantActions } from 'store/actions';
-import { deepClone } from 'helpers/deepClone';
+import { deepClone, flow } from 'helpers';
 
 
 class CloneAssistantModal extends Component {
@@ -37,7 +37,7 @@ class CloneAssistantModal extends Component {
                 const newAssistant = {
                     assistantDesc: values.assistantDesc,
                     assistantName: values.assistantName,
-                    flow: this.state.assistant.Flow,
+                    flow: flow.parse(this.state.assistant.Flow),
                     template: 'none',
                     topBarText: values.topBarText,
                     welcomeMessage: values.welcomeMessage

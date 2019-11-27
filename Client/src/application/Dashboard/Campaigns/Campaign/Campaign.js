@@ -47,6 +47,7 @@ class Campaign extends React.Component {
             outreach_type: "sms",
             assistantLinkInMessage: false,
             active: false
+            selectedCRM: null
         };
     }
 
@@ -66,12 +67,14 @@ class Campaign extends React.Component {
                         location: campaign?.Location,
                         assistantLinkInMessage: campaign?.Message.indexOf("{assistant.link}") !== -1,
                         active: campaign?.Active,
+                        selectedCRM: campaign?.CRMID,
                         campaignName: trimText.capitalize(trimText.trimDash(campaign?.Name))
                     });
                     this.props.form.setFieldsValue({
                         name: trimText.capitalize(trimText.trimDash(campaign?.Name)),
                         assistant_id: campaign?.AssistantID,
                         crm_id: campaign?.CRMID,
+                        shortlist: campaign?.shortlist,
                         database_id: campaign?.DatabaseID,
                         messenger_id: campaign?.MessengerID,
                         location: campaign?.Location,
@@ -176,6 +179,7 @@ class Campaign extends React.Component {
             values.assistant_id,
             this.state.use_crm,
             values.crm_id,
+            values.shortlist,
             values.database_id,
             values.messenger_id,
             values.location,
@@ -248,6 +252,7 @@ class Campaign extends React.Component {
             values.assistant_id,
             this.state.use_crm,
             values.crm_id,
+            values.shortlist,
             values.database_id,
             values.messenger_id,
             values.location,
@@ -258,7 +263,7 @@ class Campaign extends React.Component {
             values.outreach_type,
             values.email_title,
         ));
-    }
+    };
 
 
     handleSave = () => {
@@ -271,6 +276,7 @@ class Campaign extends React.Component {
                         values.assistant_id,
                         this.state.use_crm,
                         values.crm_id,
+                        values.shortlist,
                         values.database_id,
                         values.messenger_id,
                         values.location,
@@ -293,6 +299,7 @@ class Campaign extends React.Component {
                     values.assistant_id,
                     this.state.use_crm,
                     values.crm_id,
+                    values.shortlist,
                     values.database_id,
                     values.messenger_id,
                     values.location,
@@ -338,7 +345,6 @@ class Campaign extends React.Component {
     render() {
         const {form} = this.props;
         const {getFieldDecorator} = form;
-
         return (<NoHeaderPanel>
             <div className={styles.Header}>
                 <div style={{marginBottom: 20}}>
@@ -408,7 +414,7 @@ class Campaign extends React.Component {
                                             fontSize: '1.2em'
                                         }}>{item.CandidateName}</span>}
                                         description={<span
-                                            style={{fontSize: '1.1em'}}>{item.CandidateLocation + ' - ' + item.CandidateSkills}</span>}/>
+                                            style={{fontSize: '1.1em'}}>{item.CandidateCity + ' - ' + item.CandidateSkills}</span>}/>
                                 </List.Item>
                             )}
                         />
@@ -459,59 +465,68 @@ class Campaign extends React.Component {
                                         onChange={(checked) => this.setState({use_crm: checked})}
                                         defaultChecked={this.state.use_crm}/>
                             </FormItem>
-                            {(() => {
-                                if (this.state.use_crm) {
-                                    return (
-                                        <FormItem label={"CRM Type"}>
-                                            {getFieldDecorator("crm_id", {
-                                                rules: [{
-                                                    required: true,
-                                                    message: "Please select your desired CRM"
-                                                }],
-                                            })(
-                                                <Select placeholder={"Please select your desired CRM"}
-                                                        loading={this.props.isLoading}>
-                                                    {(() => {
-                                                        return this.props.campaignOptions?.crms.map((item, key) => {
-                                                            return (
-                                                                <Select.Option key={key} value={item.ID}>
-                                                                    {trimText.capitalize(trimText.trimDash(item.Type))}
-                                                                </Select.Option>
-                                                            );
-                                                        });
-                                                    })()}
-                                                </Select>
-                                            )}
-                                        </FormItem>
-                                    );
-                                } else {
-                                    return (
-                                        <FormItem label={"Database"}>
-                                            {getFieldDecorator("database_id", {
-                                                rules: [{
-                                                    required: true,
-                                                    message: "Please select the database"
-                                                }],
-                                            })(
-                                                <Select placeholder={"Please select the database"}
-                                                        loading={this.props.isLoading}>
-                                                    {(() => {
-                                                        return this.props.campaignOptions?.databases.map((item, key) => {
-                                                            if (item.Type?.name !== "Candidates")
-                                                                return;
-                                                            return (
-                                                                <Select.Option key={key} value={item.ID}>
-                                                                    {trimText.capitalize(trimText.trimDash(item.Name))}
-                                                                </Select.Option>
-                                                            );
-                                                        });
-                                                    })()}
-                                                </Select>
-                                            )}
-                                        </FormItem>
-                                    );
-                                }
-                            })()}
+                            {this.state.use_crm ?
+                                <>
+                                    <FormItem label={"CRM Type"}>
+                                        {getFieldDecorator("crm_id", {
+                                            rules: [{
+                                                required: true,
+                                                message: "Please select your desired CRM"
+                                            }],
+                                        })(
+                                            <Select placeholder={"Please select your desired CRM"}
+                                                    loading={this.props.isLoading}
+                                                    onSelect={value => {
+                                                        this.setState({selectedCRM: value});
+                                                    }}>
+                                                {this.props.campaignOptions?.crms.map((item, key) => {
+                                                    return (
+                                                        <Select.Option key={key} value={item.ID}>
+                                                            {trimText.capitalize(trimText.trimDash(item.Type))}
+                                                        </Select.Option>
+                                                    );
+                                                })}
+                                            </Select>
+                                        )}
+                                        {getFieldDecorator("shortlist")(
+                                            <Checkbox style={{
+                                                display: (
+                                                    this.state.selectedCRM ===
+                                                    this.props.campaignOptions?.crms.find(crm => crm.Type === 'Jobscience')?.ID
+                                                        ? 'block'
+                                                        : 'none'
+                                                ),
+                                                marginTop: '10px'
+                                            }}>Use JobScience Shortlist</Checkbox>
+                                        )}
+
+                                    </FormItem>
+                                </>
+                                :
+                                <FormItem label={"Database"}>
+                                    {getFieldDecorator("database_id", {
+                                        rules: [{
+                                            required: true,
+                                            message: "Please select the database"
+                                        }],
+                                    })(
+                                        <Select placeholder={"Please select the database"}
+                                                loading={this.props.isLoading}>
+                                            {(() => {
+                                                return this.props.campaignOptions?.databases.map((item, key) => {
+                                                    if (item.Type?.name !== "Candidates")
+                                                        return;
+                                                    return (
+                                                        <Select.Option key={key} value={item.ID}>
+                                                            {trimText.capitalize(trimText.trimDash(item.Name))}
+                                                        </Select.Option>
+                                                    );
+                                                });
+                                            })()}
+                                        </Select>
+                                    )}
+                                </FormItem>
+                            }
 
 
                             <FormItem label={"Outreach Type "}>

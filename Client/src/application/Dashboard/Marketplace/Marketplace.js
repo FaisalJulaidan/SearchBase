@@ -19,7 +19,8 @@ class Marketplace extends React.Component {
                         <Icon type="shop"/> Marketplace
                     </Title>
                     <Paragraph type="secondary">
-                        From the list below, choose your CRM or ATS for your account to be directly connected.
+                        We integrate with a range of CRM, ATS, Calendars and Messaging Services.
+                        From the list below, choose the one you want for your account to be directly connected with.
                         If you need help with the setup or wish to contact us to arrange an integration with
                         your provider, please contact us at:
                         <Text code>

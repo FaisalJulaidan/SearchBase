@@ -59,13 +59,13 @@ class Settings extends Component {
             values.alertsEnabled = this.state.isAlertsEnabled;
             values.config = {
                 ...this.props.assistant.Config,
-                restrictedCountries: values.restrictedCountries || []
+                restrictedCountries: values.restrictedCountries || [],
+                chatbotPosition: values.chatbotPosition || 'Right'
             };
-            values.owners = [parseInt(values.owners) || 0]; //To be removed when server-side codes for multiple owners are ready
-            // values.owners = values.owners || []; //To be uncommented after removing above line
             delete values.restrictedCountries;
+            delete values.chatbotPosition;
+            values.owner = parseInt(values.owner) || null;
             values.notifyEvery = this.state.notifyEvery;
-
             store.dispatch(assistantActions.updateAssistantConfigs(this.props.assistant.ID, values));
         }
     });
@@ -93,10 +93,13 @@ class Settings extends Component {
         const {getFieldDecorator} = this.props.form;
         const {assistant} = this.props;
         const countriesOptions = [...countries.map(country => <Option key={country.code}>{country.name}</Option>)];
+
         const ownersOptions = [this.props.usersList?.map(user => <Option
             key={user.user.ID}>{`${user.user.Firstname} ${user.user.Surname} (${user.user.Email})`}</Option>)];
+
         let initialOwner = this.props.usersList?.filter(
             user => user.user.ID === assistant?.UserID)[0]?.user.ID;
+
         return (
             <>
                 <Form layout='vertical' wrapperCol={{span: 10}}>
@@ -180,11 +183,24 @@ class Settings extends Component {
                     >
                         <Switch checked={!this.state.isPopupDisabled} onChange={this.togglePopupSwitch}
                                 style={{marginRight: '15px'}}/>
-                        {getFieldDecorator('secondsUntilPopup', {initialValue: assistant.SecondsUntilPopup === 0 ? 1 : assistant.SecondsUntilPopup})(
+                        {getFieldDecorator('secondsUntilPopup',
+                            {initialValue: assistant.SecondsUntilPopup === 0 ? 1 : assistant.SecondsUntilPopup})(
                             <InputNumber disabled={this.state.isPopupDisabled} min={1}/>
                         )}
                         <span className="ant-form-text"> seconds</span>
                     </FormItem>
+
+                    <Form.Item label="Chatbot Position"
+                               extra={'The location of the chatbot on your web page'}>
+                        {getFieldDecorator('chatbotPosition', {
+                            initialValue: this.props.assistant.Config.chatbotPosition
+                        })(
+                            <Radio.Group>
+                                <Radio value="Left">Left</Radio>
+                                <Radio value="Right">Right</Radio>
+                            </Radio.Group>
+                        )}
+                    </Form.Item>
 
                     <Form.Item label="Notify Me Every:"
                                wrapperCol={{span: 20}}
@@ -213,7 +229,7 @@ class Settings extends Component {
                                          min={1}
                                          style={{marginTop: 10, width: '30%'}}
                                          value={this.state.notifyEvery === 'null' ? 1 : this.state.notifyEvery}
-                                         formatter={value => value == '1' ? `${value} hour` : `${value} hours`}
+                                         formatter={value => value === '1' ? `${value} hour` : `${value} hours`}
                                          parser={value => {
                                              value.replace('hour', 'hours');
                                              value.replace('hours', '');
@@ -226,9 +242,9 @@ class Settings extends Component {
 
                     <FormItem
                         label="Owner"
-                        extra="Selected user will be notified, when there is a new record.">
+                        extra="Selected user will be set as the consultant for this Assistant also in your CRM if connected">
                         {
-                            getFieldDecorator('owners', {
+                            getFieldDecorator('owner', {
                                 initialValue: `${initialOwner}`
                             })(
                                 <Select style={{width: '100%'}}

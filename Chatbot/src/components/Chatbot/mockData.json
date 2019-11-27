@@ -760,7 +760,7 @@
               },
               "DataType": {
                 "dataTypeSection": "Candidate",
-                "enumName": "CandidateLocation",
+                "enumName": "CandidateCity",
                 "name": "Candidate Location",
                 "userTypes": [
                   "Candidate"
@@ -1091,7 +1091,7 @@
               },
               "DataType": {
                 "dataTypeSection": "Candidate",
-                "enumName": "CandidateLocation",
+                "enumName": "CandidateCity",
                 "name": "Candidate Location",
                 "userTypes": [
                   "Candidate"

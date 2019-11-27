@@ -9,7 +9,7 @@ from werkzeug.utils import secure_filename
 
 from config import BaseConfig
 from models import db, Assistant, Callback, AutoPilot, AppointmentAllocationTime, StoredFileInfo, StoredFile
-from services import auto_pilot_services, flow_services, stored_file_services
+from services import auto_pilot_services, flow_services, stored_file_services, user_services
 from services.Marketplace.CRM import crm_services
 from services.Marketplace.Calendar import calendar_services
 from services.Marketplace.Messenger import messenger_servicess
@@ -24,10 +24,12 @@ def create(name, desc, welcomeMessage, topBarText, flow, template, companyID) ->
             relative_path = join('static/assistant_templates', template + '.json')
             absolute_path = join(BaseConfig.APP_ROOT, relative_path)
             flow = json.load(open(absolute_path))
-            # Validate template
-            callback: Callback = flow_services.isValidFlow(flow)
-            if not callback.Success:
-                raise Exception(callback.Message)
+
+
+        # Validate flow
+        callback: Callback = flow_services.isValidFlow(flow)
+        if not callback.Success:
+            raise Exception(callback.Message)
 
         # default assistant config values
         config = {
@@ -213,8 +215,13 @@ def update(id, name, desc, message, topBarText, companyID) -> Callback:
                         "Couldn't update assistant " + str(id))
 
 
-def updateConfigs(id, name, desc, message, topBarText, secondsUntilPopup, notifyEvery, config, owners, companyID) -> Callback:
+def updateConfigs(id, name, desc, message, topBarText, secondsUntilPopup, notifyEvery, config, ownerID, companyID) -> Callback:
     try:
+
+        # Check if owner/user belongs to the company
+        if not user_services.getByIDAndCompanyID(ownerID, companyID).Success:
+            raise Exception("User does not exist")
+
         # Validate the json config
         validate(config, json_schemas.assistant_config)
 
@@ -229,7 +236,7 @@ def updateConfigs(id, name, desc, message, topBarText, secondsUntilPopup, notify
         assistant.SecondsUntilPopup = secondsUntilPopup
         assistant.NotifyEvery = None if notifyEvery == "null" else int(notifyEvery)
         assistant.Config = config
-        assistant.UserID = owners[0]
+        assistant.UserID = ownerID
 
         if not assistant.LastNotificationDate and notifyEvery != "null":
             assistant.LastNotificationDate = datetime.now()
@@ -240,8 +247,7 @@ def updateConfigs(id, name, desc, message, topBarText, secondsUntilPopup, notify
     except Exception as exc:
         db.session.rollback()
         helpers.logError("assistant_services.update(): " + str(exc))
-        return Callback(False,
-                        "Couldn't update assistant " + str(id))
+        return Callback(False, "Couldn't update assistant ")
 
 
 def updateStatus(assistantID, newStatus, companyID):

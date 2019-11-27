@@ -114,7 +114,7 @@ def assistant_configs(assistantID):
                                                               updatedSettings.get("secondsUntilPopup"),
                                                               updatedSettings.get("notifyEvery"),
                                                               updatedSettings.get('config'),
-                                                              updatedSettings.get("owners"),
+                                                              updatedSettings.get("owner"),
                                                               user['companyID']
                                                               )
     if not callback.Success:

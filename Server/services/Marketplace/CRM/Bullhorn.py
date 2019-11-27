@@ -218,7 +218,7 @@ def sendQuery(auth, query, method, body, companyID, optionalParams=None):
 def buildUrl(rest_data, query, optionalParams=None):
     # set up initial url
     url = rest_data.get("rest_url", "https://rest.bullhornstaffing.com/rest-services/5i3n9d/") + query + \
-          "?BhRestToken=" + rest_data.get("rest_token", "46c0tkvo-bdf9-4491-8402-66d4f2837fb5")
+          "?BhRestToken=" + str(rest_data.get("rest_token")) + "&count=199"
     # add additional params
     if optionalParams:
         for param in optionalParams:
@@ -229,38 +229,7 @@ def buildUrl(rest_data, query, optionalParams=None):
 
 def insertCandidate(auth, data, companyID) -> Callback:
     try:
-        body = {
-            "name": data.get("name"),
-            "firstName": data.get("firstName"),
-            "lastName": data.get("lastName"),
-            "mobile": data.get("mobile"),
-            "address": {
-                "city": data.get("city"),
-            },
-            "email": data.get("email"),
-
-            # "primarySkills": data.get("skills"),
-            "experience": int(float(data.get("yearsExperience") or 0)),
-
-            "secondaryAddress": {
-                "city": data.get("preferredWorkCity"),
-            },
-
-            "educationDegree": data.get("educations"),
-            "dateAvailable": data.get("availability"),  # TODO CHECK
-
-            "salary": data.get("annualSalary"),
-            "dayRate": data.get("dayRate"),
-
-            "comments": crm_services.additionalCandidateNotesBuilder(
-                {
-                    "preferredJobTitle": data.get("preferredJobTitle"),
-                    "preferredJobType": data.get("preferredJobType"),
-                    "yearsExperience": data.get("yearsExperience"),
-                    "skills": data.get("skills")
-                }, data.get("selectedSolutions")
-            )
-        }
+        body = __extractCandidateInsertBody(data)
 
         # Add additional emails to email2 AND email3
         emails = data.get("emails")
@@ -401,40 +370,8 @@ def insertCompany(auth, data, companyID) -> Callback:
 
 def updateCandidate(auth, data, companyID) -> Callback:
     try:
-        # availability, yearsExperience
-        body = {
-            "id": data.get("id"),
-            "name": data.get("name"),
-            "firstName": data.get("firstName"),
-            "lastName": data.get("lastName"),
-            "mobile": data.get("mobile"),
-            "address": {
-                "city": data.get("city"),
-            },
-            "email": data.get("email"),
-
-            # "primarySkills": data.get("skills"),
-            "experience": data.get("yearsExperience"),
-
-            "secondaryAddress": {
-                "city": data.get("preferredWorkCity"),
-            },
-
-            "educationDegree": data.get("educations"),
-            "dateAvailable": data.get("availability"),  # TODO CHECK
-
-            "salary": data.get("annualSalary"),
-            "dayRate": data.get("dayRate"),
-
-            "comments": crm_services.additionalCandidateNotesBuilder(
-                {
-                    "preferredJobTitle": data.get("preferredJobTitle"),
-                    "preferredJobType": data.get("preferredJobType"),
-                    "yearsExperience": data.get("yearsExperience"),
-                    "skills": data.get("skills")
-                }, data.get("selectedSolutions")
-            )
-        }
+        body = __extractCandidateInsertBody(data)
+        body["id"] = data.get("id")
 
         # Add additional emails to email2 AND email3
         emails = data.get("emails")
@@ -914,3 +851,41 @@ def produceRecruiterValueReport(crm: CRM_Model, companyID) -> Callback:
     except Exception as exc:
         helpers.logError("Marketplace.CRM.Bullhorn.produceRecruiterValueReport() ERROR: " + str(exc))
         return Callback(False, "Error in creating report")
+
+
+def __extractCandidateInsertBody(data):
+    return {
+        "name": data.get("name"),
+        "firstName": data.get("firstName"),
+        "lastName": data.get("lastName"),
+        "mobile": data.get("mobile"),
+        "address": {
+            "city": data.get("city"),
+        },
+        "email": data.get("email"),
+
+        # "primarySkills": data.get("skills"),
+        "experience": int(float(data.get("yearsExperience") or 0)),
+
+        "secondaryAddress": {
+            "address1": data.get("street"),
+            "city": data.get("city") or data.get("preferredWorkCity"),
+            "zip": data.get("postCode")  # TODO add country
+        },
+
+        "educationDegree": data.get("educations"),
+        "dateAvailable": data.get("availability"),  # TODO CHECK
+
+        "salary": data.get("annualSalary"),
+        "dayRate": data.get("dayRate"),
+
+        "comments": crm_services.additionalCandidateNotesBuilder(
+            {
+                "preferredJobTitle": data.get("preferredJobTitle"),
+                "preferredJobType": data.get("preferredJobType"),
+                "yearsExperience": data.get("yearsExperience"),
+                "skills": data.get("skills"),
+                "linkedIn": data.get("linkedIn")
+            }, data.get("selectedSolutions")
+        )
+    }

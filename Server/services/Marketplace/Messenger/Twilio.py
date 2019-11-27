@@ -35,8 +35,6 @@ def sendMessage(sendto, body, auth, whatsapp=False):
             from_=sender,
             body=body)
 
-        print(message.sid)
-
         return Callback(True, "Message has been sent")
     except Exception as exc:
         helpers.logError("Marketplace.Messaging.Twilio.sendMessage() ERROR: " + str(exc))

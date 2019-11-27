@@ -80,7 +80,6 @@ def getByKey(key: str) -> Callback:
         urlshortener = db.session.query(ShortenedURL).filter(ShortenedURL.ID == key).first()
         test = db.session.query(ShortenedURL).all()
 
-        print(test)
 
         if urlshortener is None:
             raise Exception('Key {} does not exist in our database'.format(key))

@@ -150,17 +150,20 @@ def searchCandidatesCustom(crm, companyID, candidate_data, perfect=False):
         "location": candidate_data.get("location"),
         "preferredJotTitle": candidate_data.get("jobTitle"),
         "skills": candidate_data.get("skills"),
-        "jobType": candidate_data.get("jobType")
+        "jobType": candidate_data.get("jobType"),
+        "database_id": candidate_data.get("database_id")
         # "yearsExperience": checkFilter(session['keywordsByDataType'], DT.CandidateYearsExperience),
         # "jobCategory": checkFilter(session['keywordsByDataType'], DT.CandidateJobCategory),
         # "education": checkFilter(session['keywordsByDataType'], DT.CandidateEducation)
     }
 
     crm_type = crm.Type.value
+    print("The candidate data is: {}".format(candidate_data))
+    print("type is {}".format(crm_type))
     campaignCRMs = ["Bullhorn", "Vincere"]
     if perfect and crm_type in campaignCRMs:
         searchFunc = "searchPerfectCandidates"
-    elif crm_type == "Jobscience" and candidate_data.get("shortlist"):
+    elif crm_type == "Jobscience" and candidate_data.get("useShortlist"):
         searchFunc = "searchCandidatesByShortlist"
     else:
         searchFunc = "searchCandidates"
@@ -496,3 +499,7 @@ def __extractCandidateInsertData(conversation):
 def IDEA_Calmer():
     print(Jobscience, Mercury, Greenhouse, Vincere, Adapt)
 
+
+def getshortlists(crm):
+
+    return Jobscience.getShortLists(crm.Auth)

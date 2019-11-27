@@ -224,7 +224,8 @@ def searchCandidatesCustom(crm, companyID, candidate_data, perfect=False):
         "location": candidate_data.get("location"),
         "preferredJotTitle": candidate_data.get("jobTitle"),
         "skills": candidate_data.get("skills"),
-        "jobType": candidate_data.get("jobType")
+        "jobType": candidate_data.get("jobType"),
+        "database_id": candidate_data.get("database_id")
         # "yearsExperience": checkFilter(session['keywordsByDataType'], DT.CandidateYearsExperience),
         # "jobCategory": checkFilter(session['keywordsByDataType'], DT.CandidateJobCategory),
         # "education": checkFilter(session['keywordsByDataType'], DT.CandidateEducation)

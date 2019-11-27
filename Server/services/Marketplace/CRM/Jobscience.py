@@ -471,14 +471,15 @@ def getShortLists(access_token) -> Callback:
 
 
 def searchCandidatesByShortlist(access_token, conversation) -> Callback:
-    shortlist_entries = getShortLists(access_token)
+    print(conversation)
+
     print("THIS HAS BEEN CALLED...")
     # exit(0)
     # TODO: Fetch all short list links
     # https://prsjobs--jsfull.cs83.my.salesforce.com/services/data/v37.0/query/?q=SELECT+name,ts2__r_contact__c,ts2__Status__c+from+ts2__s_UserListLink__c
 
     sendQuery_callback: Callback = sendQuery(access_token, "get", {},
-                                             "SELECT+name,ts2__r_contact__c,ts2__Status__c,ts2__r_user_list__c+from+ts2__s_UserListLink__c+WHERE+ts2__r_user_list__c+=+'a0r0O00000JoCFbQAN'")
+                                             "SELECT+name,ts2__r_contact__c,ts2__Status__c,ts2__r_user_list__c+from+ts2__s_UserListLink__c+WHERE+ts2__r_user_list__c+=+"+ "'" + conversation.get("database_id").replace('/services/data/v46.0/sobjects/ts2__s_UserList__c/', '') + "'")
 
     if not sendQuery_callback.Success:
         raise Exception(sendQuery_callback.Message)
@@ -490,7 +491,7 @@ def searchCandidatesByShortlist(access_token, conversation) -> Callback:
     result = []
     records = []
     for shortlist_link in shortlists:
-        if "/services/data/v46.0/sobjects/ts2__s_UserList__c/" + shortlist_link.get("ts2__r_user_list__c") == "/services/data/v46.0/sobjects/ts2__s_UserList__c/a0r0O00000JoCFbQAN":
+        if "/services/data/v46.0/sobjects/ts2__s_UserList__c/" + shortlist_link.get("ts2__r_user_list__c") == conversation.get("database_id"):
             print("Shortlist: {}".format(shortlist_link))
             contact_ids.append("'" + shortlist_link.get('ts2__r_contact__c') + "'")
     print("Number of matches: {}".format(len(contact_ids)))

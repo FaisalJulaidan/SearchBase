@@ -37,6 +37,7 @@ def insertCandidate(assistant: Assistant, conversation: Conversation, update_id=
         if crm_type is CRM.Greenhouse:
             return Callback(True, "Greenhouse does not accept candidates at this stage")
         if crm_type is CRM.Adapt or crm_type is CRM.Jobscience:
+            data["owner"] = assistant.User
             return eval(crm_type.value + "." + func + "Candidate(assistant.CRM.Auth, data)")
 
         return eval(crm_type.value + "." + func + "Candidate(assistant.CRM.Auth, data, assistant.CompanyID)")

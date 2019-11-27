@@ -216,6 +216,10 @@ def convertDate(date: str):
 
 def insertCandidate(access_token, conversation: Conversation) -> Callback:
     try:
+        if conversation.get("owner") is None:
+            owner_name = "Anonymous"
+        else:
+            owner_name = conversation.get("owner").Firstname
 
         name = (conversation.get("name") or " ").split(" ")
         body = {
@@ -233,15 +237,8 @@ def insertCandidate(access_token, conversation: Conversation) -> Callback:
             "Attributes__c": conversation.get("skills"),
             "ts2__Job_Type__c": conversation.get("preferredJobType"),
             # "ts2__Text_Resume__c": "", # TODO: Link this with File upload
-            "Internal_Notes__c": crm_services.additionalCandidateNotesBuilder(
-                {
-                    "preferredJobTitle": conversation.get("preferredJobTitle"),
-                    "preferredJobType": conversation.get("preferredJobType"),
-                    "yearsExperience": conversation.get("yearsExperience"),
-                    "skills": conversation.get("skills")
-                }, conversation.get("selectedSolutions")
-            ),
-            "RecordTypeId": "0120O000000tJIAQA2"  # ID for a candidate person record type
+            "Internal_Notes__c": "Owner: " + owner_name + ",  Last Updated: " + datetime.now().strftime("%I:%M%p on %B %d, %Y"),
+            "RecordTypeId": "0120O000000tJIAQA2"
         }
 
         # Send query

@@ -226,7 +226,7 @@ def insertCandidate(access_token, conversation: Conversation) -> Callback:
             "FirstName": helpers.getListValue(name, 0, "") or "FIRST_DEFAULT",
             "LastName": helpers.getListValue(name, 1, "") or "LAST_DEFAULT",  # LastName is only required field
             "Title": conversation.get("preferredJobTitle"),
-            "phone": conversation.get('mobile') or " ",
+            "MobilePhone": conversation.get('mobile') or " ",
             "MailingCity": conversation.get("city") or "",
             "email": conversation.get("email") or " ",
             "ts2__Date_Available__c": convertDate(conversation.get("availability")),  # TODO CHECK
@@ -271,7 +271,7 @@ def updateCandidate(auth, conversation: Conversation, companyID) -> Callback:
 
         body = {
             "Title": conversation.get("preferredJobTitle"),
-            "phone": conversation.get('mobile'),
+            "MobilePhone": conversation.get('mobile'),
             "MailingCity": conversation.get("city"),
             "email": conversation.get("email"),
             "ts2__Date_Available__c": convertDate(conversation.get("availability")),  # TODO CHECK
@@ -349,7 +349,7 @@ def insertClientContact(access_token, conversation: Conversation, prsCompanyID) 
         body = {
             "FirstName": conversation.get("firstName"),  # TODO: Decide on default values
             "LastName": conversation.get("lastName"),
-            "phone": conversation.get("mobile", ""),
+            "MobilePhone": conversation.get("mobile", ""),
             "MailingCity": conversation.get("city"),
             # check number of emails and submit them
             "email": conversation.get("email"),
@@ -466,7 +466,7 @@ def searchCandidatesByShortlist(access_token, conversation) -> Callback:
         # https://prsjobs--jsfull.cs83.my.salesforce.com/services/data/v37.0/sobjects/Contact/0030O0000232s7FQAQ
         print("Should be fetching contacts...")
         sendQuery_callback: Callback = sendQuery(access_token, "get", {},
-                                             "SELECT+X18_Digit_ID__c,ID,Name,Title,email,phone,MailingCity," +
+                                             "SELECT+X18_Digit_ID__c,ID,Name,Title,email,MobilePhone,MailingCity," +
                                              "ts2__Desired_Salary__c,ts2__Date_Available__c,ts2__Years_of_Experience__c,ts2__Desired_Hourly__c,Min_Basic__c," +
                                              "ts2__EduDegreeName1__c,ts2__Education__c+from+Contact+" + query)  # Limit set to 10 TODO: Customize
 
@@ -517,7 +517,7 @@ def searchCandidatesByShortlist(access_token, conversation) -> Callback:
             result.append(databases_services.createPandaCandidate(id=record.get("X18_Digit_ID__c", str(record_num)),
                                                                       name=record.get("Name"),
                                                                       email=record.get("Email"),
-                                                                      mobile=record.get("Phone"),
+                                                                      mobile=record.get("MobilePhone"),
                                                                       location=record.get("MailingCity"),
                                                                       skills=skills_string,
                                                                       linkdinURL=None,
@@ -579,7 +579,7 @@ def searchCandidates(access_token, conversation) -> Callback:
 
         # TODO: Differentiate between hourly and salary
         sendQuery_callback: Callback = sendQuery(access_token, "get", {},
-                                                 "SELECT+X18_Digit_ID__c,ID,Name,Title,email,phone,MailingCity," +
+                                                 "SELECT+X18_Digit_ID__c,ID,Name,Title,email,MobilePhone,MailingCity," +
                                                  "ts2__Desired_Salary__c,ts2__Date_Available__c,ts2__Years_of_Experience__c,ts2__Desired_Hourly__c,Min_Basic__c," +
                                                  "ts2__EduDegreeName1__c,ts2__Education__c+from+Contact+" + query +
                                                  "+LIMIT+500")  # Limit set to 10 TODO: Customize
@@ -597,7 +597,7 @@ def searchCandidates(access_token, conversation) -> Callback:
         while len(records) < 500:
             # send query
             sendQuery_callback: Callback = sendQuery(access_token, "get", {},
-                                                     "SELECT+X18_Digit_ID__c,ID,Name,Title,email,phone,MailingCity," +
+                                                     "SELECT+X18_Digit_ID__c,ID,Name,Title,email,MobilePhone,MailingCity," +
                                                      "ts2__Desired_Salary__c,ts2__Date_Available__c,ts2__Years_of_Experience__c,ts2__Desired_Hourly__c,Min_Basic__c," +
                                                      "ts2__EduDegreeName1__c,ts2__Education__c+from+Contact+" + query +
                                                      "+LIMIT+500")  # Limit set to 10 TODO: Customize
@@ -671,7 +671,7 @@ def searchCandidates(access_token, conversation) -> Callback:
                 result.append(databases_services.createPandaCandidate(id=record.get("X18_Digit_ID__c", str(record_num)),
                                                                       name=record.get("Name"),
                                                                       email=record.get("Email"),
-                                                                      mobile=record.get("Phone"),
+                                                                      mobile=record.get("MobilePhone"),
                                                                       location=record.get("MailingCity"),
                                                                       skills=skills_string,
                                                                       linkdinURL=None,
@@ -839,7 +839,7 @@ def searchJobsCustomQuery(access_token, companyID, query, fields=None) -> Callba
 def getAllCandidates(access_token, companyID, fields=None) -> Callback:
     try:
         # send query
-        sendQuery_callback: Callback = sendQuery(access_token, "get", "{}", "SELECT+Name,email,phone+from+Contact+" +
+        sendQuery_callback: Callback = sendQuery(access_token, "get", "{}", "SELECT+Name,email,MobilePhone+from+Contact+" +
                                                  "WHERE+RecordType.Name+IN+('Candidate')+LIMIT+10")
 
         if not sendQuery_callback.Success:

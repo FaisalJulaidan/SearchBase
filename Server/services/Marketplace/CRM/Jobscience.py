@@ -401,7 +401,7 @@ def insertCompany(auth, conversation: Conversation) -> Callback:
         return Callback(False, str(exc))
 
 
-def fetchSkillsForCandidateSearch(list_of_contactIDs: list, list_of_skills, access_token):
+def fetchSkillsForCandidateSearch(list_of_contactIDs: list, list_of_skills, access_token, test=None):
     records_to_return = []
     for i in range(0, len(list_of_contactIDs), 500):
         # Need set of contact ID's returned from searchCandidates()
@@ -425,9 +425,16 @@ def fetchSkillsForCandidateSearch(list_of_contactIDs: list, list_of_skills, acce
                 like_string = like_string[:-4]
 
             like_string += ")"
+        if test:
+            # Note: This assumes at least one skill is given
+            sendQuery_callback: Callback = sendQuery(access_token, "get", {},
+                                                     "SELECT+ts2__Skill_Name__c,ts2__Last_Used__c,ts2__Contact__c" +
+                                                     "+FROM+ts2__Skill__c+WHERE+" +
+                                                     "ts2__Contact__c+IN+(" + query_segment + ")" + "+LIMIT+1000")
 
-        # Note: This assumes at least one skill is given
-        sendQuery_callback: Callback = sendQuery(access_token, "get", {},
+        else:
+            # Note: This assumes at least one skill is given
+            sendQuery_callback: Callback = sendQuery(access_token, "get", {},
                                                  "SELECT+ts2__Skill_Name__c,ts2__Last_Used__c,ts2__Contact__c" +
                                                  "+FROM+ts2__Skill__c+WHERE+" +
                                                  "ts2__Contact__c+IN+(" + query_segment + ")" + like_string + "+LIMIT+1000")
@@ -525,11 +532,11 @@ def searchCandidatesByShortlist(access_token, conversation) -> Callback:
     skills = conversation.get("skills")
 
     if type(skills) != list:
-        skills = skills.split(" ")
+        skills = []
 
     candidate_skills = []
     if len(records) > 0:
-        candidate_skills = fetchSkillsForCandidateSearch(list_of_contactIDs, skills, access_token)
+        candidate_skills = fetchSkillsForCandidateSearch(list_of_contactIDs, skills, access_token, test=True)
 
     # <-- CALL SKILLS SEARCH -->
     print("Number of records: {}".format(len(records)))

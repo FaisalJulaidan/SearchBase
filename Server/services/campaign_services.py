@@ -133,9 +133,12 @@ def getCampaignOptions(companyID):
 
 def prepareCampaign(campaign_details, companyID):
     try:
+        print("details: {}".format(campaign_details))
         hashedAssistantID = helpers.encodeID(campaign_details.get("assistant_id"))
-        campaign_details["location"] = campaign_details.get("location").split(",")[0]
-
+        if not campaign_details.get("database_id"):
+            campaign_details["location"] = campaign_details.get("location").split(",")[0]
+        else:
+            campaign_details["location"] = ""
         if campaign_details.get("use_crm"):
             crm_callback: Callback = crm_services.getByID(campaign_details.get("crm_id"), companyID)
             if not crm_callback.Success:

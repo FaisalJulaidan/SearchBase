@@ -99,7 +99,6 @@ def processConversation(conversation: Conversation, autoPilot: AutoPilot, assist
                 SMSBody = autoPilot.AcceptanceSMSBody \
                     .replace("${candidateName}$", userName) \
                     .replace("${candidateEmail}$", email or "${candidateEmail}$") \
-                    .replace("&nbsp;", "\n")
 
                 acceptance_SMS_callback: Callback = \
                     messenger_servicess.sendMessage(messenger.Type, phone, SMSBody, messenger.Auth)
@@ -114,7 +113,6 @@ def processConversation(conversation: Conversation, autoPilot: AutoPilot, assist
                 SMSBody = autoPilot.RejectionSMSBody \
                     .replace("${candidateName}$", userName) \
                     .replace("${candidateEmail}$", email or "${candidateEmail}$") \
-                    .replace("&nbsp;", "\n")
 
                 rejection_SMS_callback: Callback = \
                     messenger_servicess.sendMessage(messenger.Type, phone, SMSBody, messenger.Auth)

@@ -139,8 +139,6 @@ def convertSkillsToString(skills):
 
 
 def loadSynonyms(construction: bool = False, hospitality: bool = False) -> dict:
-    print(construction)
-    print(hospitality)
     """
         Args:
             construction (bool): Synonyms for industrial.

@@ -113,10 +113,7 @@ class AssistantAutoPilot extends React.Component {
         const { getFieldDecorator } = this.props.form;
         const { acceptApplications, rejectApplications, sendCandidatesAppointments } = this.state;
         let openPanels = [acceptApplications, rejectApplications, sendCandidatesAppointments];
-        openPanels = openPanels.map((val, i) => ({
-            i: i + 1,
-            val
-        })).filter(item => item.val).map(item => item.i.toString());
+        openPanels = openPanels.map((val, i) => ({i: i + 1, val })).filter(item => item.val).map(item => item.i.toString());
         return (
             <NoHeaderPanel>
                 <div className={styles.Header}>
@@ -491,9 +488,9 @@ class AssistantAutoPilot extends React.Component {
                     <Button type={'primary'} size={'large'} onClick={this.onSubmit}
                             style={{ marginTop: 30 }}>
                         Save changes
-                    </Button>
+                    </Button >
 
-                    <Button type={'danger'} size={'large'} onClick={this.handleDelete}>Delete Auto Pilot</Button>
+                    <Button type={'danger'} size={'large'}  style={{ marginTop: 30 }} onClick={this.handleDelete}>Delete Auto Pilot</Button>
 
 
                     {/*Blur Effect (Hidden) */}

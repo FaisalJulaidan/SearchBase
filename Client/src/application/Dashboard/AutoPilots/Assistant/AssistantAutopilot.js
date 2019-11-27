@@ -437,6 +437,7 @@ class AssistantAutoPilot extends React.Component {
                                     }
                                 </Panel>
                             </Collapse>
+                            <br/>
                             <h2>Appointments</h2>
                             <Collapse defaultActiveKey={openCollapse2}>
                                 <Panel header={<h3> Manage Appointments Automation</h3>} key="3"

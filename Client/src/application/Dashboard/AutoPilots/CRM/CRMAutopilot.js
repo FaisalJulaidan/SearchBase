@@ -94,7 +94,7 @@ class CRMAutoPilot extends React.Component {
                                         CRM Auto Pilots
                                     </a>
                                 </Breadcrumb.Item>
-                                <Breadcrumb.Item>{crmAP.Name}</Breadcrumb.Item>
+                                <Breadcrumb.Item>{crmAP?.Name}</Breadcrumb.Item>
                             </Breadcrumb>
                         </div>
                     </div>
@@ -223,9 +223,8 @@ class CRMAutoPilot extends React.Component {
                                                             rules: [{ required: true }],
                                                             initialValue: crmAP.ReferralEmailBody
                                                         })(
-                                                            <CKEditor editor={ClassicEditor}>
+                                                            <CKEditor editor={ClassicEditor} config={{ toolbar: toolbar }} />
 
-                                                            </CKEditor>
                                                         )}
                                                     </Col>
                                                 </Row>

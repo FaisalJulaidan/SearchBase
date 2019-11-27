@@ -2,7 +2,7 @@ import React from 'react';
 import styles from './footer.module.css'
 import {Container, Row, Col} from 'react-bootstrap';
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
-import {faCloud, faPhone} from '@fortawesome/free-solid-svg-icons'
+import {faCloud} from '@fortawesome/free-solid-svg-icons'
 import {faAngellist, faLinkedinIn} from '@fortawesome/free-brands-svg-icons'
 import {Link} from "react-router-dom";
 import EmailShare from "react-email-share-link";
@@ -26,13 +26,11 @@ const Footer = (props) => {
                                 </Link>
                             </div>
                             <p className={styles.address}>
-                                SearchBase
-                                <br/>
                                 Floor 6, Aldgate Tower
                                 <br/>
                                 London, E1 8FA
                                 <br/>
-                                (+44) 203-488-0918  <FontAwesomeIcon size="1x" icon={faPhone} style={{marginLeft: '5px'}}/>
+                                (+44) 203-488-0918
                             </p>
                         </Col>
                         <Col xs="auto" className={styles.nav}>

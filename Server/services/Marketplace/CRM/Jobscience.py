@@ -594,8 +594,9 @@ def searchCandidates(access_token, conversation) -> Callback:
                                     SOQL_type="+LIKE+")
         else:
             # Set job title to skills value:
-            query += populateFilter("%" + conversation.get('skills').split(" ")[0] + "%", "Title", quote_wrap=True,
-                                    SOQL_type="+LIKE+")
+            # query += populateFilter("%" + conversation.get('skills').split(" ")[0] + "%", "Title", quote_wrap=True,
+            #                         SOQL_type="+LIKE+")
+            pass
 
         # Filter on desired salary:
         if conversation.get('desiredSalary') is not None:

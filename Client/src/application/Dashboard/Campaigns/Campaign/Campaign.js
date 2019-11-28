@@ -472,7 +472,7 @@ class Campaign extends React.Component {
                                                     display: (
                                                         this.state.selectedCRM ===
                                                         this.props.campaignOptions?.crms.find(crm => crm.Type === 'Jobscience')?.ID
-                                                            ? 'none'
+                                                            ? 'none' //TODO:: change to 'block' after fixing shortlists on server-side
                                                             : 'none'
                                                     ),
                                                     marginTop: '10px'

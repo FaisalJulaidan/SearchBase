@@ -151,7 +151,7 @@ def prepareCampaign(campaign_details, companyID):
             session = {
                 "showTop": 200,
                 "keywordsByDataType": {
-                    "Candidate Location": [campaign_details.get("location")],
+                    "Candidate City": [campaign_details.get("location")],
                     # "Job Annual Salary": ["1000-5000 GBP Annually"],
                     "Candidate Job Title": [campaign_details.get("jobTitle")],
                 },

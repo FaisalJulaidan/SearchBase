@@ -154,7 +154,7 @@ def prepareCampaign(campaign_details, companyID):
                     "Candidate City": [campaign_details.get("location")],
                     # "Job Annual Salary": ["1000-5000 GBP Annually"],
                     "Candidate Job Title": [campaign_details.get("jobTitle")],
-                    "Candidate Skills": [campaign_details.get("skills")],
+                    # "Candidate Skills": [campaign_details.get("skills")],
                 },
                 "databaseType": "Candidates"
             }

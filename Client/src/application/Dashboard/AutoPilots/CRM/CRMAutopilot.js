@@ -48,6 +48,10 @@ class CRMAutoPilot extends React.Component {
         this.props.dispatch(CRMAutoPilotActions.fetchCRMAutoPilot(this.props.match.params.id));
     }
 
+    componentWillReceiveProps(){
+      console.log(this.props)
+    }
+
     onActivateHandler = (checked) => {
         if (!checked) {
             confirm({
@@ -76,14 +80,11 @@ class CRMAutoPilot extends React.Component {
 
     render() {
         const { getFieldDecorator, getFieldValue } = this.props.form;
-        console.log(getFieldValue("SendReferralEmail"))
-        const { crmAP } = this.props;
+        const crmAP = this.props.crmAP ? this.props.crmAP : {}
         const { autoRefer } = this.state;
         let activeKeys = [];
-
         activeKeys = autoRefer ? [...activeKeys, '1'] : activeKeys;
-        return this.props.isLoading ? <LoadingSpinner/> :
-            (
+        return (
                 <NoHeaderPanel>
                     <div className={styles.Header}>
                         <div style={{ marginBottom: 20 }}>
@@ -184,20 +185,18 @@ class CRMAutoPilot extends React.Component {
                                                 initialValue: crmAP.SendReferralEmail,
                                                 valuePropName: 'checked'
                                             })(
-                                                <div style={{ marginLeft: 3 }}>
-                                                    <Switch/>
-                                                </div>
+                                                  <Switch/>
                                             )}
                                         </FormItem>
                                     </>
                                     }
+                                    {getFieldValue('SendReferralEmail') && this.state.autoRefer &&
                                     <>
-                                        <FormItem label="Referral Email Title"
-                                                  style={crmAP.SendReferralEmail && this.state.autoRefer ? {} : { display: 'none' }}>
+                                        <FormItem label="Referral Email Title">
                                             {getFieldDecorator('ReferralEmailTitle', {
                                                 initialValue: crmAP.ReferralEmailTitle,
                                                 rules: [{ required: true }],
-                                                hidden: !crmAP.SendReferralEmail
+                                                hidden: !(getFieldValue('SendReferralEmail') && this.state.autoRefer),
                                             })(
                                                 <Input placeholder="referral email title"/>
                                             )}
@@ -219,7 +218,7 @@ class CRMAutoPilot extends React.Component {
                                                 <Row>
                                                     <Col span={15}>
                                                         {getFieldDecorator('ReferralEmailBody', {
-                                                            hidden: !crmAP.SendReferralEmail,
+                                                            hidden: !(getFieldValue('SendReferralEmail') && this.state.autoRefer),
                                                             rules: [{ required: true }],
                                                             initialValue: crmAP.ReferralEmailBody
                                                         })(
@@ -230,7 +229,7 @@ class CRMAutoPilot extends React.Component {
                                                 </Row>
                                             </FormItem>
                                         </Row>
-                                    </>
+                                    </>}
                                     {this.state.autoRefer &&
                                     <FormItem label="Auto send SMS"
                                               help="Referred applicants will be notified via SMS if telephone number is provided in the chat  (candidates applications only)">
@@ -239,14 +238,12 @@ class CRMAutoPilot extends React.Component {
                                             rules: [],
                                             valuePropName: 'checked'
                                         })(
-                                            <div style={{ marginLeft: 3 }}>
-                                                <Switch/>
-                                            </div>
+                                            <Switch/>
                                         )}
                                     </FormItem>
                                     }
-                                    <Row className={styles.CEKwrapper}
-                                         style={getFieldValue(`SendReferralSMS`) ? {} : { display: 'none' }}>
+                                    {getFieldValue('SendReferralSMS') && this.state.autoRefer &&
+                                    <Row className={styles.CEKwrapper}>
                                         <FormItem label="Referral SMS Body">
                                             <ButtonGroup style={{ margin: '5px 0' }}>
                                                 <Button
@@ -262,7 +259,7 @@ class CRMAutoPilot extends React.Component {
                                                 <Col span={15}>
                                                     {getFieldDecorator('ReferralSMSBody', {
                                                         initialValue: crmAP.ReferralSMSBody,
-                                                        hidden: !crmAP.SendReferralSMS,
+                                                        hidden: !(getFieldValue('SendReferralSMS') && this.state.autoRefer),
                                                         rules: [{ required: true }]
                                                     })(
                                                         <CKEditor
@@ -272,7 +269,7 @@ class CRMAutoPilot extends React.Component {
                                                 </Col>
                                             </Row>
                                         </FormItem>
-                                    </Row>
+                                    </Row>}
                                 </Panel>
                             </Collapse>
                             <Button type={'primary'} size={'large'} onClick={this.onSubmit} style={{ marginTop: 30 }}>

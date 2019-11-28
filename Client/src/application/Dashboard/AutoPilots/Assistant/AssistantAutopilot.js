@@ -42,21 +42,6 @@ const customPanelStyle = {
 };
 
 class AssistantAutoPilot extends React.Component {
-
-    state = {
-        rejectApplications: this.props?.autoPilot?.RejectApplications,
-        acceptApplications: this.props?.autoPilot?.AcceptApplications,
-        sendAcceptanceEmail: this.props?.autoPilot?.SendAcceptanceEmail,
-        sendRejectionEmail: this.props?.autoPilot?.SendRejectionEmail,
-
-        sendAcceptanceSMS: this.props?.autoPilot?.SendAcceptanceSMS,
-        sendRejectionSMS: this.props?.autoPilot?.SendRejectionSMS,
-
-        sendCandidatesAppointments: this.props?.autoPilot?.SendCandidatesAppointments,
-
-
-    };
-
     componentDidMount() {
         this.props.dispatch(appointmentAllocationTimeActions.fetchAAT());
         this.props.dispatch(campaignActions.fetchCampaigns()); //TODO: To be removed (Fetching assistants for referral for now)
@@ -110,16 +95,18 @@ class AssistantAutoPilot extends React.Component {
 
     render() {
         const /**@type AutoPilot*/ autoPilot = this.props.autoPilot;
-        const { getFieldDecorator } = this.props.form;
-        const { acceptApplications, rejectApplications, sendCandidatesAppointments } = this.state;
-        let openCollapse1 = [acceptApplications, rejectApplications, sendCandidatesAppointments];
+        const { getFieldDecorator, getFieldValue } = this.props.form;
+        const { AcceptApplications, RejectApplications, SendCandidatesAppointments } = this.props?.autoPilot;
+        let openCollapse1 = [AcceptApplications, RejectApplications];
         openCollapse1 = openCollapse1.map((val, i) => ({i: i + 1, val })).filter(item => item.val).map(item => item.i.toString());
-        
-        let openCollapse2 = [sendCandidatesAppointments];
+        console.log(SendCandidatesAppointments)
+        let openCollapse2 = [SendCandidatesAppointments];
         openCollapse2 = openCollapse2.map((val, i) => ({i: i + 1, val })).filter(item => item.val).map(item => item.i.toString());
+        console.log(openCollapse1)
+        console.log(openCollapse2)
 
         return (
-            <NoHeaderPanel>
+            <NoHeaderPanel panelStyles={{position: 'relative'}}>
                 <div className={styles.Header}>
                     <div style={{ marginBottom: 20 }}>
                         <Breadcrumb>
@@ -201,20 +188,18 @@ class AssistantAutoPilot extends React.Component {
                                             valuePropName: 'checked',
                                             initialValue: autoPilot?.AcceptApplications
                                         })(
-                                            <Switch onChange={e => this.setState({ acceptApplications: e })}
-                                                    style={{ marginRight: 15 }}
-                                            />
+                                            <Switch style={{ marginRight: 15 }}/>
                                         )}
                                         A score greater than
                                         {getFieldDecorator('AcceptanceScore', {
                                             rules: [{ required: true }],
-                                            hidden: !this.state.acceptApplications,
+                                            hidden: !getFieldValue('AcceptApplications'),
                                             initialValue: (autoPilot?.AcceptanceScore * 100).toFixed(0)
                                         })(
                                             <InputNumber min={0} max={100}
                                                          formatter={value => `${value}%`}
                                                          style={{ marginLeft: 15 }}
-                                                         disabled={!this.state.acceptApplications}/>
+                                                         disabled={!getFieldValue('AcceptApplications')}/>
                                         )}
                                     </FormItem>
 
@@ -223,27 +208,27 @@ class AssistantAutoPilot extends React.Component {
                                     >
                                         {getFieldDecorator('SendAcceptanceEmail', {
                                             initialValue: autoPilot?.SendAcceptanceEmail,
-                                            hidden: !this.state.acceptApplications,
+                                            hidden: !getFieldValue('SendAcceptanceEmail'),
                                             valuePropName: 'checked',
                                             rules: []
                                         })(
                                             <Switch onChange={value => this.setState({ sendAcceptanceEmail: value })}
-                                                    disabled={!this.state.acceptApplications}/>
+                                                    disabled={!getFieldValue('AcceptApplications')}/>
                                         )}
                                     </FormItem>
 
-                                    {this.state.sendAcceptanceEmail &&
+                                    {getFieldValue('SendAcceptanceEmail') &&
                                     <FormItem label="Acceptance Email Title">
                                         {getFieldDecorator('AcceptanceEmailTitle', {
                                             initialValue: autoPilot?.AcceptanceEmailTitle,
-                                            hidden: !this.state.sendAcceptanceEmail,
+                                            hidden: !getFieldValue('SendAcceptanceEmail'),
                                             rules: [{ required: true }]
                                         })(
                                             <Input placeholder="Congrats you got accepted"/>
                                         )}
                                     </FormItem>}
 
-                                    {this.state.sendAcceptanceEmail &&
+                                    {getFieldValue('SendAcceptanceEmail') &&
                                     <Row className={styles.CEKwrapper}>
                                         <FormItem label="Acceptance Letter">
                                             <ButtonGroup style={{ margin: '5px 0' }}>
@@ -260,6 +245,7 @@ class AssistantAutoPilot extends React.Component {
                                                 <Col span={15}>
                                                     {getFieldDecorator('AcceptanceEmailBody', {
                                                         initialValue: autoPilot?.AcceptanceEmailBody,
+                                                        hidden: !getFieldValue('SendAcceptanceEmail'),
                                                         rules: [{ required: true }]
                                                     })(
                                                         <CKEditor
@@ -279,12 +265,11 @@ class AssistantAutoPilot extends React.Component {
                                             valuePropName: 'checked',
                                             rules: []
                                         })(
-                                            <Switch onChange={e => this.setState({ sendAcceptanceSMS: e })}
-                                                    disabled={!this.state.acceptApplications}/>
+                                            <Switch disabled={!getFieldValue('AcceptApplications')}/>
                                         )}
                                     </FormItem>
 
-                                    {this.state.sendAcceptanceSMS &&
+                                    {getFieldValue('SendAcceptanceSMS') &&
                                     <Row className={styles.CEKwrapper}>
                                         <FormItem label="Acceptance Letter">
                                             <ButtonGroup style={{ margin: '5px 0' }}>
@@ -301,7 +286,7 @@ class AssistantAutoPilot extends React.Component {
                                                 <Col span={15}>
                                                     {getFieldDecorator('AcceptanceSMSBody', {
                                                         initialValue: autoPilot?.AcceptanceSMSBody,
-                                                        hidden: !this.state.sendAcceptanceSMS,
+                                                        hidden: !getFieldValue('SendAcceptanceSMS'),
                                                         rules: [{ required: true }]
                                                     })(
                                                         <CKEditor
@@ -322,48 +307,46 @@ class AssistantAutoPilot extends React.Component {
                                             valuePropName: 'checked',
                                             initialValue: autoPilot?.RejectApplications
                                         })(
-                                            <Switch onChange={e => this.setState({ rejectApplications: e })}
-                                                    style={{ marginRight: 15 }}/>
+                                            <Switch style={{ marginRight: 15 }}/>
                                         )}
                                         A score greater than
                                         {getFieldDecorator('RejectionScore', {
                                             initialValue: (autoPilot?.RejectionScore * 100).toFixed(2),
                                             rules: [{ required: true }],
-                                            hidden: !this.state.rejectApplications
+                                            hidden: !getFieldValue('RejectApplications')
                                         })(
                                             <InputNumber min={1} max={100}
                                                          style={{ marginLeft: 15 }}
                                                          formatter={value => `${value}%`}
-                                                         disabled={!this.state.rejectApplications}/>
+                                                         disabled={!getFieldValue('RejectApplications')}/>
                                         )}
                                     </Form.Item>
 
                                     <FormItem label="Auto send rejection email"
                                               help="Rejected applicants will be notified via email if email is provided in the chat (candidates applications only)">
                                         {getFieldDecorator('SendRejectionEmail', {
-                                            initialValue: autoPilot.SendRejectionEmail,
+                                            initialValue: autoPilot?.SendRejectionEmail,
                                             valuePropName: 'checked',
                                             rules: []
                                         })(
-                                            <Switch onChange={value => this.setState({ sendRejectionEmail: value })}
-                                                    disabled={!this.state.rejectApplications}/>
+                                            <Switch disabled={!getFieldValue('RejectApplications')}/>
                                         )}
                                     </FormItem>
 
-                                    {this.state.sendRejectionEmail &&
+                                    {getFieldValue('SendRejectionEmail') &&
                                     <FormItem label="Rejection Email Title">
                                         {getFieldDecorator('RejectionEmailTitle', {
                                             initialValue: autoPilot?.RejectionEmailTitle,
                                             rules: [{ required: true }],
-                                            hidden: !this.state.rejectApplications
+                                            hidden: !getFieldValue('RejectApplications')
 
                                         })(
                                             <Input placeholder="Sorry you got rejected"
-                                                   disabled={!this.state.rejectApplications}/>
+                                                   disabled={!getFieldValue('RejectApplications')}/>
                                         )}
                                     </FormItem>
                                     }
-                                    {this.state.sendRejectionEmail &&
+                                    {getFieldValue('SendRejectionEmail') &&
                                     <Row className={styles.CEKwrapper}>
                                         <FormItem label="Rejection Email Body">
                                             <ButtonGroup style={{ margin: '5px 0' }}>
@@ -381,12 +364,12 @@ class AssistantAutoPilot extends React.Component {
                                                     {getFieldDecorator('RejectionEmailBody', {
                                                         initialValue: autoPilot?.RejectionEmailBody,
                                                         rules: [{ required: true }],
-                                                        hidden: !this.state.rejectApplications
+                                                        hidden: !getFieldValue('RejectApplications')
                                                     })(
                                                         <CKEditor
                                                             editor={ClassicEditor}
                                                             config={{ toolbar: toolbar }}
-                                                            disabled={!this.state.rejectApplications}/>
+                                                            disabled={!getFieldValue('RejectApplications')}/>
                                                     )}
                                                 </Col>
                                             </Row>
@@ -401,12 +384,11 @@ class AssistantAutoPilot extends React.Component {
                                             valuePropName: 'checked',
                                             rules: []
                                         })(
-                                            <Switch onChange={value => this.setState({ sendRejectionSMS: value })}
-                                                    disabled={!this.state.rejectApplications}/>
+                                            <Switch disabled={!getFieldValue('RejectApplications')}/>
                                         )}
                                     </FormItem>
 
-                                    {this.state.sendRejectionSMS &&
+                                    {getFieldValue('SendRejectionSMS') &&
                                     <Row className={styles.CEKwrapper}>
                                         <FormItem label="Rejection SMS Body">
                                             <ButtonGroup style={{ margin: '5px 0' }}>
@@ -424,7 +406,7 @@ class AssistantAutoPilot extends React.Component {
                                                     {getFieldDecorator('RejectionSMSBody', {
                                                         initialValue: autoPilot?.RejectionSMSBody,
                                                         rules: [{ required: true }],
-                                                        hidden: !this.state.sendRejectionSMS
+                                                        hidden: !getFieldValue('SendRejectionSMS')
                                                     })(
                                                         <CKEditor
                                                             editor={ClassicEditor}
@@ -440,7 +422,7 @@ class AssistantAutoPilot extends React.Component {
                             <br/>
                             <h2>Appointments</h2>
                             <Collapse defaultActiveKey={openCollapse2}>
-                                <Panel header={<h3> Manage Appointments Automation</h3>} key="3"
+                                <Panel header={<h3> Manage Appointments Automation</h3>} key="1"
                                        style={customPanelStyle}>
                                     <FormItem label="Auto manage and send candidates appointments"
                                               help="Accepted candidates will receive an email (if provided) to pick
@@ -453,7 +435,7 @@ class AssistantAutoPilot extends React.Component {
                                             valuePropName: 'checked',
                                             rules: []
                                         })(
-                                            <Switch onChange={e => this.setState({sendCandidatesAppointments: e})}/>
+                                            <Switch/>
                                         )}
                                     </FormItem>
                                     <Form.Item
@@ -462,12 +444,12 @@ class AssistantAutoPilot extends React.Component {
                                         {getFieldDecorator('AppointmentAllocationTimes', {
                                             initialValue: this.props.autoPilot?.AppointmentAllocationTimeID,
                                             rules: [{
-                                                required: this.state.sendCandidatesAppointments,
+                                                required: getFieldValue('SendCandidatesAppointments'),
                                                 message: 'Select a time table'
                                             }]
                                         })(
                                             <Select
-                                                disabled={!this.state.sendCandidatesAppointments}
+                                                disabled={!getFieldValue('SendCandidatesAppointments')}
                                                 dropdownRender={menu => (
                                                     <div>
                                                         {menu}

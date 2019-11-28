@@ -164,7 +164,7 @@ class Campaign extends React.Component {
             values.location,
             values.jobTitle,
             values.jobType,
-            values.skills.split(/[ ,]+/),
+            values.skills?.split(/[ ,]+/),
             values.text,
             this.state.candidate_list,
             values.outreach_type,
@@ -238,7 +238,7 @@ class Campaign extends React.Component {
             values.location,
             values.jobTitle,
             values.jobType,
-            values.skills.split(/[ ,]+/),
+            values.skills?.split(/[ ,]+/),
             this.state.textMessage,
             values.outreach_type,
             values.email_title,
@@ -262,7 +262,7 @@ class Campaign extends React.Component {
                         values.messenger_id,
                         values.location,
                         values.jobTitle,
-                        values.skills.split(/[ ,]+/),
+                        values.skills?.split(/[ ,]+/),
                         this.state.textMessage
                     ));
                 } else {
@@ -286,7 +286,7 @@ class Campaign extends React.Component {
                     values.messenger_id,
                     values.location,
                     values.jobTitle,
-                    values.skills.split(/[ ,]+/),
+                    values.skills?.split(/[ ,]+/),
                     this.state.textMessage
                 )).then(() => {
                     this.setState({campaignNameModalVisibility: false});

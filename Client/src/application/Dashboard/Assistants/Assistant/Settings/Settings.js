@@ -1,10 +1,10 @@
-import React, {Component} from 'react';
-import {connect} from 'react-redux';
-import {store} from 'store/store';
+import React, { Component } from 'react';
+import { connect } from 'react-redux';
+import { store } from 'store/store';
 
-import {Button, Select, Form, Input, InputNumber, Divider, Switch, Modal, Radio} from 'antd';
-import {assistantActions, usersManagementActions} from 'store/actions';
-import {history} from 'helpers';
+import { Button, Select, Form, Input, InputNumber, Divider, Switch, Modal, Radio } from 'antd';
+import { assistantActions, usersManagementActions } from 'store/actions';
+import { history } from 'helpers';
 
 import countries from 'helpers/static_data/countries';
 import LogoUploader from 'components/LogoUploader/LogoUploader';
@@ -22,13 +22,13 @@ class Settings extends Component {
         isPopupDisabled: this.props.assistant.SecondsUntilPopup <= 0,
         isAlertsEnabled: this.props.assistant.MailEnabled,
         // alertOptions: {0: "Immediately", 4: "4 hours", 8: "8 hours", 12: "12 hours", 24: "24 hours"}
-        alertOptions: {0: 'Immediately'},
+        alertOptions: { 0: 'Immediately' },
         isManualNotify: false,
         notifyEvery: 'null'
     };
 
     componentDidMount() {
-        const {assistant} = this.props;
+        const { assistant } = this.props;
         this.setState({
             inputValue: this.props.assistant.SecondsUntilPopup,
             notifyEvery: assistant.NotifyEvery === null ? 'null' : assistant.NotifyEvery,
@@ -47,7 +47,7 @@ class Settings extends Component {
     };
 
     togglePopupSwitch = () => {
-        this.setState({isPopupDisabled: !this.state.isPopupDisabled});
+        this.setState({ isPopupDisabled: !this.state.isPopupDisabled });
     };
 
 
@@ -90,19 +90,12 @@ class Settings extends Component {
 
 
     render() {
-        const {getFieldDecorator} = this.props.form;
-        const {assistant} = this.props;
+        const { getFieldDecorator } = this.props.form;
+        const { assistant } = this.props;
         const countriesOptions = [...countries.map(country => <Option key={country.code}>{country.name}</Option>)];
-
-        const ownersOptions = [this.props.usersList?.map(user => <Option
-            key={user.user.ID}>{`${user.user.Firstname} ${user.user.Surname} (${user.user.Email})`}</Option>)];
-
-        let initialOwner = this.props.usersList?.filter(
-            user => user.user.ID === assistant?.UserID)[0]?.user.ID;
-
         return (
             <>
-                <Form layout='vertical' wrapperCol={{span: 10}}>
+                <Form layout='vertical' wrapperCol={{ span: 10 }}>
 
                     <h2>Basic Settings</h2>
                     <FormItem
@@ -113,8 +106,8 @@ class Settings extends Component {
                             getFieldDecorator('assistantName', {
                                 initialValue: assistant.Name,
                                 rules: [
-                                    {required: true, message: 'Please input your assistant name'},
-                                    {validator: this.checkName}
+                                    { required: true, message: 'Please input your assistant name' },
+                                    { validator: this.checkName }
                                 ]
                             })
                             (<Input placeholder="Recruitment Chatbot"/>)
@@ -182,9 +175,9 @@ class Settings extends Component {
                         extra="This will make your chatbot pop up automatically on your website"
                     >
                         <Switch checked={!this.state.isPopupDisabled} onChange={this.togglePopupSwitch}
-                                style={{marginRight: '15px'}}/>
+                                style={{ marginRight: '15px' }}/>
                         {getFieldDecorator('secondsUntilPopup',
-                            {initialValue: assistant.SecondsUntilPopup === 0 ? 1 : assistant.SecondsUntilPopup})(
+                            { initialValue: assistant.SecondsUntilPopup === 0 ? 1 : assistant.SecondsUntilPopup })(
                             <InputNumber disabled={this.state.isPopupDisabled} min={1}/>
                         )}
                         <span className="ant-form-text"> seconds</span>
@@ -203,14 +196,14 @@ class Settings extends Component {
                     </Form.Item>
 
                     <Form.Item label="Notify Me Every:"
-                               wrapperCol={{span: 20}}
+                               wrapperCol={{ span: 20 }}
                                extra="Select how often you would like to be notified via email of new chats">
-                        <Radio.Group style={{width: '100%'}}
+                        <Radio.Group style={{ width: '100%' }}
                                      value={this.state.isManualNotify ? 'custom' : this.state.notifyEvery
                                      }
                                      onChange={(e) => {
                                          if (e.target.value !== 'custom') {
-                                             this.setState({notifyEvery: e.target.value, isManualNotify: false});
+                                             this.setState({ notifyEvery: e.target.value, isManualNotify: false });
                                          }
                                      }}>
                             <Radio.Button value={'null'}>Never</Radio.Button>
@@ -220,14 +213,14 @@ class Settings extends Component {
                             <Radio.Button value={168}>Weekly</Radio.Button>
                             <Radio.Button value={730}>Monthly</Radio.Button>
                             <Radio.Button value={'custom'} onClick={() => {
-                                this.setState({isManualNotify: !this.state.isManualNotify});
+                                this.setState({ isManualNotify: !this.state.isManualNotify });
                             }}>Custom</Radio.Button>
                         </Radio.Group>
 
                         {this.state.isManualNotify ?
                             <InputNumber placeholder="Amount of time between notifications, in hours"
                                          min={1}
-                                         style={{marginTop: 10, width: '30%'}}
+                                         style={{ marginTop: 10, width: '30%' }}
                                          value={this.state.notifyEvery === 'null' ? 1 : this.state.notifyEvery}
                                          formatter={value => value === '1' ? `${value} hour` : `${value} hours`}
                                          parser={value => {
@@ -235,7 +228,7 @@ class Settings extends Component {
                                              value.replace('hours', '');
                                          }}
                                          onChange={(val) => {
-                                             this.setState({notifyEvery: val});
+                                             this.setState({ notifyEvery: val });
                                          }}/>
                             : null}
                     </Form.Item>
@@ -245,13 +238,17 @@ class Settings extends Component {
                         extra="Selected user will be set as the consultant for this Assistant also in your CRM if connected">
                         {
                             getFieldDecorator('owner', {
-                                initialValue: `${initialOwner}`
+                                initialValue: assistant.UserID ? assistant.UserID : 'null'
                             })(
-                                <Select style={{width: '100%'}}
+                                <Select style={{ width: '100%' }}
                                         loading={this.state.isLoading}
                                         filterOption={(inputValue, option) => option.props.children.toLowerCase().includes(inputValue.toLowerCase())}
                                         placeholder="Please select a user">
-                                    {ownersOptions}
+                                    <Option value={'null'}>None</Option>
+                                    {
+                                        this.props.usersList?.map(user => <Option
+                                            value={user.user.ID}>{`${user.user.Firstname} ${user.user.Surname} (${user.user.Email})`}</Option>)
+                                    }
                                 </Select>
                             )
                         }
@@ -265,7 +262,7 @@ class Settings extends Component {
                             getFieldDecorator('restrictedCountries', {
                                 initialValue: assistant.Config?.restrictedCountries
                             })(
-                                <Select mode="multiple" style={{width: '100%'}}
+                                <Select mode="multiple" style={{ width: '100%' }}
                                         filterOption={(inputValue, option) => option.props.children.toLowerCase().includes(inputValue.toLowerCase())}
                                         placeholder="Please select country or countries">
                                     {countriesOptions}

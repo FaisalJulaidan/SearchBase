@@ -67,7 +67,7 @@ class Campaign extends React.Component {
                         assistantLinkInMessage: campaign?.Message.indexOf("{assistant.link}") !== -1,
                         selectedCRM: campaign?.CRMID,
                         useShortlist: campaign?.useShortlist
-                    }, state => console.log(this.state));
+                    });
                     this.props.form.setFieldsValue({
                         name: trimText.capitalize(trimText.trimDash(campaign?.Name)),
                         assistant_id: campaign?.AssistantID,
@@ -90,7 +90,7 @@ class Campaign extends React.Component {
     }
 
     componentDidUpdate(prevProps, prevState, snapshot) {
-        if (prevProps.isCandidatesLoading && (this.props.errorMsg === null)) {
+        if (prevProps.isCandidatesLoading && !this.props.isCandidatesLoading && (this.props.errorMsg === null)) {
             this.state.candidate_list = this.props.candidate_list;
             this.showModal(true);
         } else if (prevProps.isLaunchingCampaign && (this.props.errorMsg === null)) {

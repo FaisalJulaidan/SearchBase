@@ -463,13 +463,16 @@ class Campaign extends React.Component {
                                                 onChange={(e) => {
                                                     if (e.target.checked)
                                                         this.props.dispatch(campaignActions.fetchShortlists(this.state.selectedCRM));
+                                                    else {
+                                                        this.props.form.setFieldsValue({shortlist_id: ""});
+                                                    }
                                                     this.setState({useShortlist: e.target.checked})
                                                 }}
                                                 style={{
                                                     display: (
                                                         this.state.selectedCRM ===
                                                         this.props.campaignOptions?.crms.find(crm => crm.Type === 'Jobscience')?.ID
-                                                            ? 'block'
+                                                            ? 'none'
                                                             : 'none'
                                                     ),
                                                     marginTop: '10px'

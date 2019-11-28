@@ -35,7 +35,6 @@ class Campaign extends React.Component {
             location: "",
             locations: [],
             distance: 50,
-            skills: [],
             candidate_list: [],
             candidatesModalVisibility: false,
             campaignNameModalVisibility: false,
@@ -60,7 +59,7 @@ class Campaign extends React.Component {
                 .then(() => {
                     let campaign = this.props.campaign;
                     this.setState({
-                        skills: JSON.parse(campaign?.Skills.replace(/'/g, '"')), //Fix JSON with REGEXP
+                        // skills: JSON.parse(campaign?.Skills.replace(/'/g, '"')), //Fix JSON with REGEXP
                         textMessage: campaign?.Message,
                         use_crm: campaign?.UseCRM,
                         location: campaign?.Location,
@@ -75,9 +74,10 @@ class Campaign extends React.Component {
                         shortlist_id: campaign?.shortlistID,
                         database_id: campaign?.DatabaseID,
                         messenger_id: campaign?.MessengerID,
+                        skills: JSON.parse(campaign?.Skills.replace(/'/g, '"')).join(", "),
                         location: campaign?.Location,
                         jobTitle: campaign?.JobTitle,
-                        text: campaign?.Message,
+                        text: campaign?.Message
                     });
                 }).catch((err) => {
                 console.log(err);
@@ -143,22 +143,6 @@ class Campaign extends React.Component {
         this.setState({textMessage: textMessage}); //Update TextMessage State for Phone.JS
     };
 
-    //TODO:: Skill should be validated before submission | Empty String can be accepted
-    handleSkillSubmit = (e) => {
-        if (e.target.value.length === 0)
-            return;
-        this.setState({skills: this.state.skills.concat([e.target.value])});
-        this.props.form.setFieldsValue({skill: ""});
-    };
-
-    onSkillTagClose = (value) => {
-        let skills = this.state.skills.filter(function (skill) {
-            if (skill !== value)
-                return skill
-        });
-        this.setState({skills: skills});
-    };
-
     handleModalLaunch = () => {
 
         this.props.form.validateFields((err, values) => {
@@ -180,7 +164,7 @@ class Campaign extends React.Component {
             values.location,
             values.jobTitle,
             values.jobType,
-            this.state.skills,
+            values.skills.split(/[ ,]+/),
             values.text,
             this.state.candidate_list,
             values.outreach_type,
@@ -254,7 +238,7 @@ class Campaign extends React.Component {
             values.location,
             values.jobTitle,
             values.jobType,
-            this.state.skills,
+            values.skills.split(/[ ,]+/),
             this.state.textMessage,
             values.outreach_type,
             values.email_title,
@@ -278,8 +262,8 @@ class Campaign extends React.Component {
                         values.messenger_id,
                         values.location,
                         values.jobTitle,
-                        this.state.skills,
-                        this.state.textMessage,
+                        values.skills.split(/[ ,]+/),
+                        this.state.textMessage
                     ));
                 } else {
                     this.setState({campaignNameModalVisibility: true})
@@ -302,8 +286,8 @@ class Campaign extends React.Component {
                     values.messenger_id,
                     values.location,
                     values.jobTitle,
-                    this.state.skills,
-                    this.state.textMessage,
+                    values.skills.split(/[ ,]+/),
+                    this.state.textMessage
                 )).then(() => {
                     this.setState({campaignNameModalVisibility: false});
                     history.push('/dashboard/campaigns')
@@ -592,21 +576,13 @@ class Campaign extends React.Component {
                                             </Radio.Group>
                                         )}
                                     </FormItem>
-                                    <FormItem label={"Skills"}>
-                                        {getFieldDecorator("skill")(
+                                    <FormItem label={"Skills"}
+                                              help='Separate skills with commas. For example: JavaScript, HTML, CSS'>
+                                        {getFieldDecorator("skills")(
                                             <Input
-                                                placeholder="Type in a skill and press enter to add to the list of skills"
-                                                type="text"
-                                                onPressEnter={this.handleSkillSubmit}/>
+                                                placeholder="Type in your desired skills"/>
                                         )}
                                     </FormItem>
-                                    <div>
-                                        {this.state.skills.map((skill, i) => {
-                                            return (<Tag visible closable key={i} onClose={() => {
-                                                this.onSkillTagClose(skill)
-                                            }}>{skill}</Tag>)
-                                        })}
-                                    </div>
                                     <FormItem label={"Location"}>
                                         {getFieldDecorator("location", {
                                             rules: [{

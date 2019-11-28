@@ -48,6 +48,7 @@ export const campaign = (state = initialState, action) => {
         //Fetch Campaign
         case actionTypes.FETCH_CAMPAIGN_REQUEST:
             return updateObject(state, {
+                ...initialState,
                 campaign: null,
                 campaignOptions: null,
                 isLoading: true,

@@ -5,7 +5,7 @@ from services import assistant_services, databases_services, mail_services, url_
 from services.Marketplace.CRM import crm_services
 from services.Marketplace.Messenger import messenger_servicess
 from utilities import helpers
-from utilities.enums import CRM
+from utilities.enums import CRM, DataType as DT, DatabaseType
 
 
 def getByID(campaign_id: int, companyID: int):
@@ -133,7 +133,6 @@ def getCampaignOptions(companyID):
 
 def prepareCampaign(campaign_details, companyID):
     try:
-        print("details: {}".format(campaign_details))
         hashedAssistantID = helpers.encodeID(campaign_details.get("assistant_id"))
         if not campaign_details.get("database_id"):
             campaign_details["location"] = campaign_details.get("location", "").split(",")[0]
@@ -151,12 +150,12 @@ def prepareCampaign(campaign_details, companyID):
             session = {
                 "showTop": 200,
                 "keywordsByDataType": {
-                    "Candidate City": [campaign_details.get("location")],
-                    # "Job Annual Salary": ["1000-5000 GBP Annually"],
-                    "Candidate Job Title": [campaign_details.get("jobTitle")],
-                    # "Candidate Skills": [campaign_details.get("skills")],
+                    DT.CandidateCity.value['name']: [campaign_details.get("location")],
+                    # DT.JobSalary.value['name']: ["1000-5000 GBP Annually"],
+                    DT.JobTitle.value['name']: [campaign_details.get("jobTitle")],
+                    DT.CandidateSkills.value['name']: campaign_details.get("skills"),
                 },
-                "databaseType": "Candidates"
+                "databaseType": DatabaseType.Candidates.name
             }
             candidates_callback: Callback = databases_services.scan(session, hashedAssistantID, True,
                                                                     campaign_details.get("database_id"))
@@ -180,7 +179,7 @@ def prepareCampaign(campaign_details, companyID):
 
 def sendCampaign(campaign_details, companyID):
     try:
-        helpers.logError("campaign_details: " + str(campaign_details))
+        print(campaign_details)
         messenger_callback: Callback = messenger_servicess.getByID(campaign_details.get("messenger_id"), companyID)
         if not messenger_callback.Success:
             raise Exception("Messenger not found.")
@@ -233,9 +232,7 @@ def sendCampaign(campaign_details, companyID):
             tempText = text.replace("{assistant.link}", url.Data) \
                 .replace("{candidate.name}", candidate.get("CandidateName"))
 
-            helpers.logError("outreach_type: " + str(campaign_details.get("outreach_type")))
             if campaign_details.get("outreach_type") == "sms":
-                helpers.logError("TRYING TO SEND")
                 messenger_servicess.sendMessage(messenger.Type, candidate_phone, tempText, messenger.Auth)
             elif campaign_details.get("outreach_type") == "whatsapp":
                 messenger_servicess.sendMessage(messenger.Type, candidate_phone, tempText, messenger.Auth, True)

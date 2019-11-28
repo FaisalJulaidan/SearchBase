@@ -645,8 +645,7 @@ class Campaign extends React.Component {
                                     }],
                                 })(
                                     <Input placeholder="Please enter a title for your outreach email"
-                                           type="text"
-                                           onPressEnter={this.handleSkillSubmit}/>
+                                           type="text"/>
                                 )}
                             </FormItem>
 

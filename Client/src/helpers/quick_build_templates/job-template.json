@@ -255,7 +255,7 @@
             "SkipBlockToGoID": null,
             "DataType": "NoType",
             "Content": {
-              "text": "The job is located, ${Job Location}$ (MENU)",
+              "text": "The job is located, ${Job Location}$",
               "action": "Go To Next Block",
               "blockToGoID": "55p3czu2"
             },

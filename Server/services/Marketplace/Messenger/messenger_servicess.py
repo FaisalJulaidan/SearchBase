@@ -11,7 +11,7 @@ def sendMessage(type: Messenger, recipient, body, auth, whatsapp=False) -> Callb
     try:
 
         # Note: Dont actually send message while testing...
-        body = body.replace("<p>", "").replace("</p>", "").replace("&nbsp;", "\n")
+        body = body.replace("<p>", "").replace("</p>", "\n").replace("&nbsp;", "\n")
         # test connection
         if type is Messenger.Twilio:
             return Twilio.sendMessage(recipient, body, auth, whatsapp)  # oauth2

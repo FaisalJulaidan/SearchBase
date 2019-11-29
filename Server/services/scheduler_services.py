@@ -128,7 +128,7 @@ def sendAutopilotReferrals():
                     mail_services.simpleSend(candidate['email'], crmAP.ReferralEmailTitle, EmailBody)
                     crmAP.LastReferral = now
                   if crmAP.SendReferralSMS and candidate['mobile']:
-                    messenger_servicess.sendMessage(messenger.Type, candidate['mobile'], SMSBody, messenger.Auth)
+                    messenger_servicess.sendMessage(messenger.Type, "07519228384", SMSBody, messenger.Auth)
                     crmAP.LastReferral = now  
 
             # Save changes to the db

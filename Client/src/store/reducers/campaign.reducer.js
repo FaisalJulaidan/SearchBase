@@ -8,6 +8,10 @@ const initialState = {
     isLoading: false,
     candidate_list: [],
     isCandidatesLoading: false,
+
+    isLoadingShortlists: false,
+    shortlists: [],
+
     isLaunchingCampaign: false,
     isSaving: false,
     isDeleting: false,
@@ -44,6 +48,7 @@ export const campaign = (state = initialState, action) => {
         //Fetch Campaign
         case actionTypes.FETCH_CAMPAIGN_REQUEST:
             return updateObject(state, {
+                ...initialState,
                 campaign: null,
                 campaignOptions: null,
                 isLoading: true,
@@ -142,6 +147,25 @@ export const campaign = (state = initialState, action) => {
                 errorMsg: action.error
             });
 
+        //Fetch JobScience shortlists
+        case actionTypes.FETCH_CAMPAIGN_SHORTLISTS:
+            return updateObject(state, {
+                shortlists: [],
+                isLoadingShortlists: true,
+                errorMsg: null,
+            });
+        case actionTypes.FETCH_CAMPAIGN_SHORTLISTS_SUCCESS:
+            return updateObject(state, {
+                shortlists: Array.isArray(action.shortlists) ? action.shortlists : [],
+                isLoadingShortlists: false,
+                errorMsg: null,
+            });
+        case actionTypes.FETCH_CAMPAIGN_SHORTLISTS_FAILURE:
+            return updateObject(state, {
+                shortlists: [],
+                isLoadingShortlists: false,
+                errorMsg: action.error
+            });
 
         //Launch Campaign
         case actionTypes.LAUNCH_CAMPAIGN_REQUEST:

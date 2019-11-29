@@ -37,6 +37,7 @@ def insertCandidate(assistant: Assistant, conversation: Conversation, update_id=
         if crm_type is CRM.Greenhouse:
             return Callback(True, "Greenhouse does not accept candidates at this stage")
         if crm_type is CRM.Adapt or crm_type is CRM.Jobscience:
+            data["owner"] = assistant.User
             return eval(crm_type.value + "." + func + "Candidate(assistant.CRM.Auth, data)")
 
         return eval(crm_type.value + "." + func + "Candidate(assistant.CRM.Auth, data, assistant.CompanyID)")
@@ -151,8 +152,8 @@ def searchCandidatesCustom(crm, companyID, candidate_data, perfect=False, custom
             "location": candidate_data.get("location"),
             "preferredJotTitle": candidate_data.get("jobTitle"),
             "skills": candidate_data.get("skills"),
-            "jobType": candidate_data.get("jobType")
-            # "yearsExperience": checkFilter(session['keywordsByDataType'], DT.CandidateYearsExperience),
+            "jobType": candidate_data.get("jobType"),
+            "shortlist_id": candidate_data.get("shortlist_id")# "yearsExperience": checkFilter(session['keywordsByDataType'], DT.CandidateYearsExperience),
             # "jobCategory": checkFilter(session['keywordsByDataType'], DT.CandidateJobCategory),
             # "education": checkFilter(session['keywordsByDataType'], DT.CandidateEducation)
         }
@@ -163,7 +164,7 @@ def searchCandidatesCustom(crm, companyID, candidate_data, perfect=False, custom
         searchFunc = "searchPerfectCandidates"
     elif customSearch:
         searchFunc = "searchCandidates{}".format(customSearch)
-    elif crm_type == "Jobscience" and candidate_data.get("shortlist"):
+    elif crm_type == "Jobscience" and candidate_data.get("useShortlist"):
         searchFunc = "searchCandidatesByShortlist"
     else:
         searchFunc = "searchCandidates"
@@ -522,3 +523,7 @@ def __extractCandidateInsertData(conversation):
 def IDEA_Calmer():
     print(Jobscience, Mercury, Greenhouse, Vincere, Adapt)
 
+
+def getshortlists(crm):
+
+    return Jobscience.getShortLists(crm.Auth)

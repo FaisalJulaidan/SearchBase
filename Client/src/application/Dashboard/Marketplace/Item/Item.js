@@ -183,9 +183,16 @@ class Item extends React.Component {
                 if (place === 'features')
                     return <JobscienceFeatures/>;
                 if (place === 'button') {
-                    windowObject.url = "https://login.salesforce.com/services/oauth2/authorize?" +
+                    if (process.env.REACT_APP_ENV === 'development') {
+                        windowObject.url = "https://prsjobs--jsfull.cs83.my.salesforce.com/services/oauth2/authorize?" +
+                            "response_type=code&client_id=3MVG9w8uXui2aB_pIyoEOL_U6UgvUQqi5KNnTkD95XSD2NQjWfWakra7aHmltLO8e.xdwY.1WgkJAp7KUWsCN&" +
+                            "redirect_uri=" + getLink("/dashboard/marketplace/Jobscience");
+                    }
+                    else {
+                          windowObject.url = "https://login.salesforce.com/services/oauth2/authorize?" +
                         "response_type=code&client_id=3MVG9I5UQ_0k_hTlh64o5U2MnkGkPmYj_xkMpFkEi0tIJXl_CGhXpux_w5khN6pvnNd.IH6Yvo82ZAcRystWE&" +
                         "redirect_uri=" + getLink("/dashboard/marketplace/Jobscience");
+                    }
                     return <DefaultButton buttonText={'Connect to Jobscience Recruitment'}
                                           windowObject={windowObject}
                                           {...buttonsOptions}/>;

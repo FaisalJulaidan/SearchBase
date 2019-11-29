@@ -120,7 +120,6 @@ def getAll(companyID) -> Callback:
                                   Assistant.Active,
                                   Assistant.UserID)\
             .filter(Assistant.CompanyID == companyID).all()
-
         if len(result) == 0:
             return Callback(True, "No assistants  to be retrieved.", [])
 
@@ -128,7 +127,8 @@ def getAll(companyID) -> Callback:
 
     except Exception as exc:
         db.session.rollback()
-        helpers.logError("assistant_services.getAll(): " + str(exc))
+        print(exc)
+        # helpers.logError("assistant_services.getAll(): " + str(exc))
         return Callback(False, 'Could not get all assistants.')
 
 

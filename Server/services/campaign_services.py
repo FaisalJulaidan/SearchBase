@@ -1,3 +1,5 @@
+from copy import deepcopy
+
 from sqlalchemy import and_
 
 from models import Callback, db, Campaign
@@ -11,9 +13,11 @@ from utilities.enums import CRM, DataType as DT, DatabaseType
 def getByID(campaign_id: int, companyID: int):
     try:
         # Get result and check if None then raise exception
-        result = db.session.query(Campaign) \
-            .filter(and_(Campaign.ID == campaign_id, Campaign.CompanyID == companyID)).first()
+        result = deepcopy(db.session.query(Campaign) \
+            .filter(and_(Campaign.ID == campaign_id, Campaign.CompanyID == companyID)).first())
         if not result: raise Exception
+        # result.Skills = str(result.Skills).replace("[", "").replace("]", "").replace("'", "")
+        # result.Skills = result.Skills.split(", ")
         return Callback(True, "Got campaign successfully.", result)
 
     except Exception as exc:
@@ -26,11 +30,15 @@ def getAll(companyID) -> Callback:
         if not companyID:
             raise Exception("Company ID have not been provided")
 
-        result = db.session.query(Campaign) \
-            .filter(Campaign.CompanyID == companyID).all()
+        result = deepcopy(db.session.query(Campaign) \
+            .filter(Campaign.CompanyID == companyID).all())
 
         if len(result) == 0:
             return Callback(True, "No campaigns found", [])
+
+        # for r in result:
+            # r.Skills = str(r.Skills).replace("[", "").replace("]", "").replace("'", "")
+            # r.Skills = r.Skills.split(", ")
 
         return Callback(True, "Campaigns have been retrieved", result)
 
@@ -40,6 +48,7 @@ def getAll(companyID) -> Callback:
         return Callback(False, 'Could not get campaigns.')
 
 
+# save and update
 def save(campaign_details, companyID, campaignID=None):
     try:
         if campaignID:
@@ -51,9 +60,15 @@ def save(campaign_details, companyID, campaignID=None):
         else:
             campaign = Campaign()
 
+        # skills = campaign_details.get("skills")
+        # if campaign_details.get("skills"):
+        #     print(campaign_details.get("skills"))
+        #     skills = ",".join(campaign_details.get("skills"))
+        # else:
+        #     skills = ""
         campaign.Name = campaign_details.get("name")
         campaign.JobTitle = campaign_details.get("jobTitle")
-        campaign.Skills = str(campaign_details.get("skills"))
+        campaign.Skills = str(campaign_details.get("skills", "[]"))
         campaign.Location = campaign_details.get("location")
         campaign.Message = campaign_details.get("message")
         campaign.UseCRM = campaign_details.get("use_crm")
@@ -88,7 +103,6 @@ def removeByID(campaignID, companyID) -> Callback:
 
 def getCampaignOptions(companyID):
     try:
-
         # fetch Assistants
         assistants_callback: Callback = assistant_services.getAll(companyID)
         if not assistants_callback.Success:

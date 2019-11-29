@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 import NoHeaderPanel from 'components/NoHeaderPanel/NoHeaderPanel';
 import {
     Typography, Form, Input, Breadcrumb, Divider, Button, Tag, AutoComplete, Select, Switch, Modal,
-    List, Checkbox, Spin, Radio, Slider, InputNumber, Row, Col
+    List, Checkbox, Spin, Radio, Slider, InputNumber, Row, Col, Icon
 } from 'antd';
 
 import { trimText } from '../../../../helpers';
@@ -36,7 +36,6 @@ class Campaign extends React.Component {
             location: '',
             locations: [],
             distance: 50,
-            skills: [],
             candidate_list: [],
             candidatesModalVisibility: false,
             campaignNameModalVisibility: false,
@@ -46,8 +45,9 @@ class Campaign extends React.Component {
             campaignName: '',
             outreach_type: 'sms',
             assistantLinkInMessage: false,
+            selectedCRM: null,
+            useShortlist: false,
             active: false,
-            selectedCRM: null
         };
     }
 
@@ -61,22 +61,24 @@ class Campaign extends React.Component {
                 .then(() => {
                     let campaign = this.props.campaign;
                     this.setState({
-                        skills: JSON.parse(campaign?.Skills.replace(/'/g, '"')), //Fix JSON with REGEXP
+                        // skills: JSON.parse(campaign?.Skills.replace(/'/g, '"')), //Fix JSON with REGEXP
                         textMessage: campaign?.Message,
                         use_crm: campaign?.UseCRM,
                         location: campaign?.Location,
-                        assistantLinkInMessage: campaign?.Message.indexOf('${assistantLink}$') !== -1,
-                        active: campaign?.Active,
+                        assistantLinkInMessage: campaign?.Message.indexOf("{assistant.link}") !== -1,
                         selectedCRM: campaign?.CRMID,
-                        campaignName: trimText.capitalize(trimText.trimDash(campaign?.Name))
+                        useShortlist: campaign?.useShortlist,
+                        campaignName: trimText.capitalize(trimText.trimDash(campaign?.Name)),
+                        active: campaign?.Active,
                     });
                     this.props.form.setFieldsValue({
                         name: trimText.capitalize(trimText.trimDash(campaign?.Name)),
                         assistant_id: campaign?.AssistantID,
                         crm_id: campaign?.CRMID,
-                        shortlist: campaign?.shortlist,
+                        shortlist_id: campaign?.shortlistID,
                         database_id: campaign?.DatabaseID,
                         messenger_id: campaign?.MessengerID,
+                        skills: JSON.parse(campaign?.Skills.replace(/'/g, '"')).join(", "),
                         location: campaign?.Location,
                         jobTitle: campaign?.JobTitle,
                         text: campaign?.Message
@@ -92,7 +94,7 @@ class Campaign extends React.Component {
     }
 
     componentDidUpdate(prevProps, prevState, snapshot) {
-        if (prevProps.isCandidatesLoading && (this.props.errorMsg === null)) {
+        if (prevProps.isCandidatesLoading && !this.props.isCandidatesLoading && (this.props.errorMsg === null)) {
             this.state.candidate_list = this.props.candidate_list;
             this.showModal(true);
         } else if (prevProps.isLaunchingCampaign && (this.props.errorMsg === null)) {
@@ -149,22 +151,6 @@ class Campaign extends React.Component {
         this.setState({ textMessage: textMessage }); //Update TextMessage State for Phone.JS
     };
 
-    //TODO:: Skill should be validated before submission | Empty String can be accepted
-    handleSkillSubmit = (e) => {
-        if (e.target.value.length === 0)
-            return;
-        this.setState({ skills: this.state.skills.concat([e.target.value]) });
-        this.props.form.setFieldsValue({ skill: '' });
-    };
-
-    onSkillTagClose = (value) => {
-        let skills = this.state.skills.filter(function(skill) {
-            if (skill !== value)
-                return skill;
-        });
-        this.setState({ skills: skills });
-    };
-
     handleModalLaunch = () => {
 
         this.props.form.validateFields((err, values) => {
@@ -179,13 +165,14 @@ class Campaign extends React.Component {
             values.assistant_id,
             this.state.use_crm,
             values.crm_id,
-            values.shortlist,
+            this.state.useShortlist,
+            values.shortlist_id,
             values.database_id,
             values.messenger_id,
             values.location,
             values.jobTitle,
             values.jobType,
-            this.state.skills,
+            values.skills?.split(/[ ,]+/),
             values.text,
             this.state.candidate_list,
             values.outreach_type,
@@ -252,13 +239,14 @@ class Campaign extends React.Component {
             values.assistant_id,
             this.state.use_crm,
             values.crm_id,
-            values.shortlist,
+            this.state.useShortlist,
+            values.shortlist_id,
             values.database_id,
             values.messenger_id,
             values.location,
             values.jobTitle,
             values.jobType,
-            this.state.skills,
+            values.skills?.split(/[ ,]+/),
             this.state.textMessage,
             values.outreach_type,
             values.email_title
@@ -276,12 +264,13 @@ class Campaign extends React.Component {
                         values.assistant_id,
                         this.state.use_crm,
                         values.crm_id,
-                        values.shortlist,
+                        this.state.useShortlist,
+                        values.shortlist_id,
                         values.database_id,
                         values.messenger_id,
                         values.location,
                         values.jobTitle,
-                        this.state.skills,
+                        values.skills?.split(/[ ,]+/),
                         this.state.textMessage
                     ));
                 } else {
@@ -299,12 +288,13 @@ class Campaign extends React.Component {
                     values.assistant_id,
                     this.state.use_crm,
                     values.crm_id,
-                    values.shortlist,
+                    this.state.useShortlist,
+                    values.shortlist_id,
                     values.database_id,
                     values.messenger_id,
                     values.location,
                     values.jobTitle,
-                    this.state.skills,
+                    values.skills?.split(/[ ,]+/),
                     this.state.textMessage
                 )).then(() => {
                     this.setState({ campaignNameModalVisibility: false });
@@ -470,6 +460,7 @@ class Campaign extends React.Component {
                                 <>
                                     <FormItem label={'CRM Type'}>
                                         {getFieldDecorator('crm_id', {
+                                            ...(this.state.selectedCRM !== null && {initialValue: this.state.selectedCRM}),
                                             rules: [{
                                                 required: true,
                                                 message: 'Please select your desired CRM'
@@ -489,18 +480,52 @@ class Campaign extends React.Component {
                                                 })}
                                             </Select>
                                         )}
-                                        {getFieldDecorator('shortlist')(
-                                            <Checkbox style={{
-                                                display: (
-                                                    this.state.selectedCRM ===
-                                                    this.props.campaignOptions?.crms.find(crm => crm.Type === 'Jobscience')?.ID
-                                                        ? 'block'
-                                                        : 'none'
-                                                ),
-                                                marginTop: '10px'
-                                            }}>Use JobScience Shortlist</Checkbox>
+                                        {getFieldDecorator("useShortlist")(
+                                            <Checkbox
+                                                checked={this.state.useShortlist}
+                                                onChange={(e) => {
+                                                    if (e.target.checked)
+                                                        this.props.dispatch(campaignActions.fetchShortlists(this.state.selectedCRM));
+                                                    else {
+                                                        this.props.form.setFieldsValue({shortlist_id: ""});
+                                                    }
+                                                    this.setState({useShortlist: e.target.checked})
+                                                }}
+                                                style={{
+                                                    display: (
+                                                        this.state.selectedCRM ===
+                                                        this.props.campaignOptions?.crms.find(crm => crm.Type === 'Jobscience')?.ID
+                                                            ? 'block'
+                                                            : 'none'
+                                                    ),
+                                                    marginTop: '10px'
+                                                }}>Use Jobscience Shortlist</Checkbox>
                                         )}
-
+                                    </FormItem>
+                                    <FormItem label="Shortlist" style={{
+                                        display: (
+                                            this.state.selectedCRM ===
+                                            this.props.campaignOptions?.crms.find(crm => crm.Type === 'Jobscience')?.ID &&
+                                            this.state.useShortlist ? 'block' : 'none')
+                                    }}
+                                    >
+                                        {getFieldDecorator("shortlist_id", {
+                                            rules: [{
+                                                required: this.state.useShortlist,
+                                                message: "Please select a shortlist"
+                                            }],
+                                        })(
+                                            <Select placeholder={"Please select a shortlist"}
+                                                    loading={this.props.isLoadingShortlists}>
+                                                {this.props.shortlists?.map((item, key) => {
+                                                    return (
+                                                        <Select.Option key={key} value={item.url}>
+                                                            {trimText.capitalize(trimText.trimDash(item.name))}
+                                                        </Select.Option>
+                                                    );
+                                                })}
+                                            </Select>
+                                        )}
                                     </FormItem>
                                 </>
                                 :
@@ -563,67 +588,67 @@ class Campaign extends React.Component {
                                     </Select>
                                 )}
                             </FormItem>
-                            <FormItem label={'Job Title'}>
-                                {getFieldDecorator('jobTitle', {
-                                    rules: [{
-                                        whitespace: true,
-                                        message: 'Please enter your job title'
-                                    }]
-                                })(
-                                    <Input placeholder={'Please enter your job title'}/>
-                                )}
-                            </FormItem>
-
-                            <FormItem label={'Job Type'}>
-                                {getFieldDecorator('jobType', { initialValue: 'permanent' })(
-                                    <Radio.Group>
-                                        <Radio.Button value="permanent">Permanent</Radio.Button>
-                                        <Radio.Button value="temporary">Temporary</Radio.Button>
-                                        <Radio.Button value="contract">Contract</Radio.Button>
-                                    </Radio.Group>
-                                )}
-                            </FormItem>
-
-                            <FormItem label={'Skills'}>
-                                {getFieldDecorator('skill')(
-                                    <Input placeholder="Type in a skill and press enter to add to the list of skills"
-                                           type="text"
-                                           onPressEnter={this.handleSkillSubmit}/>
-                                )}
-                            </FormItem>
-                            <div>
-                                {this.state.skills.map((skill, i) => {
-                                    return (<Tag visible closable key={i} onClose={() => {
-                                        this.onSkillTagClose(skill);
-                                    }}>{skill}</Tag>);
-                                })}
-                            </div>
-                            <FormItem label={'Location'}>
-                                {getFieldDecorator('location', {
-                                    rules: [{
-                                        whitespace: true,
-                                        message: 'Please enter the location'
-                                    }],
-                                    initialValue: this.state.location
-                                })(
-                                    <AutoComplete placeholder="Type in your location"
-                                                  type="text"
-                                                  dataSource={this.state.locations}
-                                                  onChange={value => this.findLocation(value)}/>
-                                )}
-                            </FormItem>
-
-                            <FormItem label={`Distance within ${this.state.distance} miles`}
-                                      style={{ display: this.state.location ? 'block' : 'none' }}>
-                                {getFieldDecorator('distance', { initialValue: this.state.distance })(
-                                    <Slider
-                                        step={5}
-                                        onChange={(value) => {
-                                            this.setState({ distance: value });
-                                        }}
-                                    />
-                                )}
-                            </FormItem>
+                            {this.state.useShortlist && this.state.use_crm
+                            && this.state.selectedCRM ===
+                            this.props.campaignOptions?.crms.find(crm => crm.Type === 'Jobscience')?.ID
+                                ?
+                                <>
+                                </>
+                                :
+                                <>
+                                    <FormItem label={"Job Title"}>
+                                        {getFieldDecorator("jobTitle", {
+                                            rules: [{
+                                                whitespace: true,
+                                                message: "Please enter your job title"
+                                            }],
+                                        })(
+                                            <Input placeholder={"Please enter your job title"}/>
+                                        )}
+                                    </FormItem>
+                                    <FormItem label={"Job Type"}>
+                                        {getFieldDecorator("jobType", {initialValue: "permanent"})(
+                                            <Radio.Group>
+                                                <Radio.Button value="permanent">Permanent</Radio.Button>
+                                                <Radio.Button value="temporary">Temporary</Radio.Button>
+                                                <Radio.Button value="contract">Contract</Radio.Button>
+                                            </Radio.Group>
+                                        )}
+                                    </FormItem>
+                                    <FormItem label={"Skills"}
+                                              help='Separate skills with commas. For example: JavaScript, HTML, CSS'>
+                                        {getFieldDecorator("skills")(
+                                            <Input
+                                                placeholder="Type in your desired skills"/>
+                                        )}
+                                    </FormItem>
+                                    <FormItem label={"Location"}>
+                                        {getFieldDecorator("location", {
+                                            rules: [{
+                                                whitespace: true,
+                                                message: "Please enter the location"
+                                            }],
+                                            initialValue: this.state.location
+                                        })(
+                                            <AutoComplete placeholder="Type in your location"
+                                                          type="text"
+                                                          dataSource={this.state.locations}
+                                                          onChange={value => this.findLocation(value)}/>
+                                        )}
+                                    </FormItem>
+                                    <FormItem label={`Distance within ${this.state.distance} miles`}
+                                              style={{display: this.state.location ? 'block' : 'none'}}>
+                                        {getFieldDecorator("distance", {initialValue: this.state.distance})(
+                                            <Slider
+                                                step={5}
+                                                onChange={(value) => {
+                                                    this.setState({distance: value})
+                                                }}
+                                            />
+                                        )}
+                                    </FormItem>
+                                </>
+                            }
 
                             <FormItem label={'Email Title '}
                                       style={this.state.outreach_type !== 'email' ? { display: 'none' } : { display: 'block' }}>
@@ -635,8 +660,7 @@ class Campaign extends React.Component {
                                     }]
                                 })(
                                     <Input placeholder="Please enter a title for your outreach email"
-                                           type="text"
-                                           onPressEnter={this.handleSkillSubmit}/>
+                                           type="text"/>
                                 )}
                             </FormItem>
 
@@ -742,6 +766,8 @@ function mapStateToProps(state) {
         isLoading: state.campaign.isLoading,
         isCandidatesLoading: state.campaign.isCandidatesLoading,
         isLaunchingCampaign: state.campaign.isLaunchingCampaign,
+        isLoadingShortlists: state.campaign.isLoadingShortlists,
+        shortlists: state.campaign.shortlists,
         isSaving: state.campaign.isSaving,
         isDeleting: state.campaign.isDeleting,
         isStatusChanging: state.campaign.isStatusChanging,

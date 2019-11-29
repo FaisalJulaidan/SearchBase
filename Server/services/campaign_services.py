@@ -5,7 +5,7 @@ from services import assistant_services, databases_services, mail_services, url_
 from services.Marketplace.CRM import crm_services
 from services.Marketplace.Messenger import messenger_servicess
 from utilities import helpers
-from utilities.enums import CRM
+from utilities.enums import CRM, DataType as DT, DatabaseType
 
 
 def getByID(campaign_id: int, companyID: int):
@@ -108,7 +108,7 @@ def getCampaignOptions(companyID):
         databases_callback: Callback = databases_services.getDatabasesList(companyID)
         if not databases_callback.Success:
             return helpers.jsonResponse(False, 400, "Cannot fetch Databases")
-        
+
         return Callback(True, "Information has been retrieved", {
             "assistants": helpers.getListFromLimitedQuery(['ID',
                                                            'Name',
@@ -134,8 +134,10 @@ def getCampaignOptions(companyID):
 def prepareCampaign(campaign_details, companyID):
     try:
         hashedAssistantID = helpers.encodeID(campaign_details.get("assistant_id"))
-        campaign_details["location"] = campaign_details.get("location").split(",")[0]
-
+        if not campaign_details.get("database_id"):
+            campaign_details["location"] = campaign_details.get("location", "").split(",")[0]
+        else:
+            campaign_details["location"] = ""
         if campaign_details.get("use_crm"):
             crm_callback: Callback = crm_services.getByID(campaign_details.get("crm_id"), companyID)
             if not crm_callback.Success:
@@ -148,11 +150,12 @@ def prepareCampaign(campaign_details, companyID):
             session = {
                 "showTop": 200,
                 "keywordsByDataType": {
-                    "Candidate Location": [campaign_details.get("location")],
-                    # "Job Annual Salary": ["1000-5000 GBP Annually"],
-                    "Candidate Job Title": [campaign_details.get("jobTitle")],
+                    DT.CandidateCity.value['name']: [campaign_details.get("location")],
+                    # DT.JobSalary.value['name']: ["1000-5000 GBP Annually"],
+                    DT.JobTitle.value['name']: [campaign_details.get("jobTitle")],
+                    DT.CandidateSkills.value['name']: campaign_details.get("skills"),
                 },
-                "databaseType": "Candidates"
+                "databaseType": DatabaseType.Candidates.name
             }
             candidates_callback: Callback = databases_services.scan(session, hashedAssistantID, True,
                                                                     campaign_details.get("database_id"))
@@ -160,9 +163,10 @@ def prepareCampaign(campaign_details, companyID):
         if not candidates_callback.Success:
             raise Exception(candidates_callback.Message)
 
-        for candidate in candidates_callback.Data:
-            if candidate.get("Currency"):
-                candidate["Currency"] = ""
+        if candidates_callback.Data is not None:
+            for candidate in candidates_callback.Data:
+                if candidate.get("Currency"):
+                    candidate["Currency"] = ""
 
         campaign_details["candidate_list"] = candidates_callback.Data
 
@@ -175,12 +179,12 @@ def prepareCampaign(campaign_details, companyID):
 
 def sendCampaign(campaign_details, companyID):
     try:
-        helpers.logError("campaign_details: " + str(campaign_details))
+        print(campaign_details)
         messenger_callback: Callback = messenger_servicess.getByID(campaign_details.get("messenger_id"), companyID)
         if not messenger_callback.Success:
             raise Exception("Messenger not found.")
-        
-        company : Callback = company_services.getByCompanyID(companyID)
+
+        company: Callback = company_services.getByCompanyID(companyID)
         companyName = company.Data.Name.replace(" ", "").lower() if company.Success else None
 
         messenger = messenger_callback.Data
@@ -195,8 +199,7 @@ def sendCampaign(campaign_details, companyID):
         source = 'crm' if campaign_details.get("use_crm") else 'db'
 
         crmID = campaign_details.get("crm_id") if source == 'crm' else campaign_details.get("database_id")
-        text = campaign_details.get("text") 
-
+        text = campaign_details.get("text")
 
         if not text:
             raise Exception("Message text is missing")
@@ -213,24 +216,23 @@ def sendCampaign(campaign_details, companyID):
                 candidate_phone = candidate.get("CandidateMobile")
                 candidate_email = candidate.get("CandidateEmail")
 
-            if not candidate_phone:   
+            if not candidate_phone:
                 continue
 
-            access = helpers.verificationSigner.dumps({"candidateID": candidate.get("ID"), "source": source, "crmID": crmID}, salt='crm-information')
+            access = helpers.verificationSigner.dumps(
+                {"candidateID": candidate.get("ID"), "source": source, "crmID": crmID}, salt='crm-information')
 
-            url : Callback = url_services.createShortenedURL(helpers.getDomain(3000) + "/chatbot_direct_link/" + \
-               hashedAssistantID + "?source=" + str(access), domain="recruitbot.ai")
+            url: Callback = url_services.createShortenedURL(helpers.getDomain(3000) + "/chatbot_direct_link/" + \
+                                                            hashedAssistantID + "?source=" + str(access),
+                                                            domain="recruitbot.ai")
             if not url.Success:
                 raise Exception("Failed to create shortened URL")
 
             # insert assistant link and candidate details in text
-            tempText = text.replace("${assistantLink}$", url.Data)\
-                            .replace("${candidateName}$", candidate.get("CandidateName"))
-            
+            tempText = text.replace("${assistantLink}$", url.Data) \
+                .replace("${candidateName}$", candidate.get("CandidateName"))
 
-            helpers.logError("outreach_type: " + str(campaign_details.get("outreach_type")))
             if campaign_details.get("outreach_type") == "sms":
-                helpers.logError("TRYING TO SEND")
                 messenger_servicess.sendMessage(messenger.Type, candidate_phone, tempText, messenger.Auth)
             elif campaign_details.get("outreach_type") == "whatsapp":
                 messenger_servicess.sendMessage(messenger.Type, candidate_phone, tempText, messenger.Auth, True)
@@ -258,3 +260,16 @@ def updateStatus(campaignID, newStatus, companyID):
         helpers.logError("campaign_services.updateStatus(): " + str(exc))
         db.session.rollback()
         return Callback(False, "Could not change the Campaign's status.")
+
+
+def getShortLists(crm_id, companyID):
+    crm = None
+    if crm_id:
+        crm_callback: Callback = crm_services.getByID(crm_id, companyID)
+        if not crm_callback.Success:
+            raise Exception("CRM not found.")
+        crm = crm_callback.Data
+        print("CRM IS: {}".format(crm))
+
+    candidates_callback: Callback = crm_services.getshortlists(crm)
+    return Callback(True, "Shortlists have been retrieved", candidates_callback.Data)

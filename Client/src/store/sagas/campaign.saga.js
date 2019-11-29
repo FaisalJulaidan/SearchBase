@@ -33,7 +33,7 @@ function* fetchCampaign({campaignID, meta}) {
 }
 
 //Save Campaign
-function* saveCampaign({name, assistant_id, use_crm, crm_id, shortlist, database_id, messenger_id, location, jobTitle, skills, message, meta}) {
+function* saveCampaign({name, assistant_id, use_crm, crm_id, useShortlist,shortlist_id, database_id, messenger_id, location, jobTitle, skills, message, meta}) {
     try {
         loadingMessage('Saving campaign...', 0);
         const res = yield http.post('/campaign',
@@ -42,7 +42,8 @@ function* saveCampaign({name, assistant_id, use_crm, crm_id, shortlist, database
                 assistant_id,
                 use_crm,
                 crm_id,
-                shortlist,
+                useShortlist,
+                shortlist_id,
                 database_id,
                 messenger_id,
                 location,
@@ -66,7 +67,7 @@ function* saveCampaign({name, assistant_id, use_crm, crm_id, shortlist, database
 }
 
 //update Campaign
-function* updateCampaign({campaignID, name, assistant_id, use_crm, crm_id, shortlist, database_id, messenger_id, location, jobTitle, skills, message}) {
+function* updateCampaign({campaignID, name, assistant_id, use_crm, crm_id, useShortlist,shortlist_id, database_id, messenger_id, location, jobTitle, skills, message}) {
     try {
         loadingMessage('Updating campaign...', 0);
         const res = yield http.post(`/campaign/${campaignID}`,
@@ -75,7 +76,8 @@ function* updateCampaign({campaignID, name, assistant_id, use_crm, crm_id, short
                 assistant_id,
                 use_crm,
                 crm_id,
-                shortlist,
+                useShortlist,
+                shortlist_id,
                 database_id,
                 messenger_id,
                 location,
@@ -109,14 +111,15 @@ function* deleteCampaign({campaignID, meta}) {
 }
 
 //Fetch Candidates data
-function* fetchCampaignCandidatesData({assistant_id, use_crm, crm_id, shortlist, database_id, messenger_id, location, jobTitle, jobType, skills, text, outreach_type, email_title}) {
+function* fetchCampaignCandidatesData({assistant_id, use_crm, crm_id, useShortlist,shortlist_id, database_id, messenger_id, location, jobTitle, jobType, skills, text, outreach_type, email_title}) {
     try {
         const res = yield http.post('/campaign/action',
             {
                 assistant_id,
                 use_crm,
                 crm_id,
-                shortlist,
+                useShortlist,
+                shortlist_id,
                 database_id,
                 messenger_id,
                 location,
@@ -139,8 +142,22 @@ function* fetchCampaignCandidatesData({assistant_id, use_crm, crm_id, shortlist,
     }
 }
 
+//Fetch JobScience shortlists
+function* fetchShortlists({crm_id}) {
+    try {
+        const res = yield http.get(`/campaign/select-shortlist/${crm_id}`);
+        yield put(campaignActions.fetchShortlistsSuccess(
+            res.data?.data)
+        );
+    } catch (error) {
+        const msg = error.response?.data?.msg || "Couldn't load shortlists";
+        errorMessage(msg);
+        yield put(campaignActions.fetchShortlistsFailure(msg));
+    }
+}
+
 //Launch Campaign
-function* launchCampaign({assistant_id, use_crm, crm_id, shortlist, database_id, messenger_id, location, jobTitle, jobType, skills, text, candidate_list, outreach_type, email_title}) {
+function* launchCampaign({assistant_id, use_crm, crm_id, useShortlist,shortlist_id, database_id, messenger_id, location, jobTitle, jobType, skills, text, candidate_list, outreach_type, email_title}) {
     try {
         loadingMessage('Launching the campaign...', 0);
         const res = yield http.put('/campaign/action',
@@ -148,7 +165,8 @@ function* launchCampaign({assistant_id, use_crm, crm_id, shortlist, database_id,
                 assistant_id,
                 use_crm,
                 crm_id,
-                shortlist,
+                useShortlist,
+                shortlist_id,
                 database_id,
                 messenger_id,
                 location,
@@ -211,6 +229,10 @@ function* watchFetchCampaignCandidatesData() {
     yield takeLatest(actionTypes.FETCH_CAMPAIGN_CANDIDATES_DATA_REQUEST, fetchCampaignCandidatesData)
 }
 
+function* watchFetchShortlists() {
+    yield takeEvery(actionTypes.FETCH_CAMPAIGN_SHORTLISTS, fetchShortlists)
+}
+
 function* watchLaunchCampaign() {
     yield takeLatest(actionTypes.LAUNCH_CAMPAIGN_REQUEST, launchCampaign)
 }
@@ -227,6 +249,7 @@ export function* campaignSaga() {
         watchUpdateCampaign(),
         watchDeleteCampaign(),
         watchFetchCampaignCandidatesData(),
+        watchFetchShortlists(),
         watchLaunchCampaign(),
         watchUpdateStatus(),
     ])

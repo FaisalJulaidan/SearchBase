@@ -219,7 +219,7 @@ def updateConfigs(id, name, desc, message, topBarText, secondsUntilPopup, notify
     try:
 
         # Check if owner/user belongs to the company
-        if not user_services.getByIDAndCompanyID(ownerID, companyID).Success:
+        if ownerID and not user_services.getByIDAndCompanyID(ownerID, companyID).Success:
             raise Exception("User does not exist")
 
         # Validate the json config

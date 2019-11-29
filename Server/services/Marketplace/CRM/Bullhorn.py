@@ -860,18 +860,14 @@ def __extractCandidateInsertBody(data):
         "lastName": data.get("lastName"),
         "mobile": data.get("mobile"),
         "address": {
-            "city": data.get("city"),
+            "address1": data.get("street"),
+            "city": data.get("city") or data.get("preferredWorkCity"),
+            "zip": data.get("postCode")  # TODO add country code
         },
         "email": data.get("email"),
 
         # "primarySkills": data.get("skills"),
         "experience": int(float(data.get("yearsExperience") or 0)),
-
-        "secondaryAddress": {
-            "address1": data.get("street"),
-            "city": data.get("city") or data.get("preferredWorkCity"),
-            "zip": data.get("postCode")  # TODO add country
-        },
 
         "educationDegree": data.get("educations"),
         "dateAvailable": data.get("availability"),  # TODO CHECK
@@ -881,11 +877,12 @@ def __extractCandidateInsertBody(data):
 
         "comments": crm_services.additionalCandidateNotesBuilder(
             {
-                "preferredJobTitle": data.get("preferredJobTitle"),
-                "preferredJobType": data.get("preferredJobType"),
-                "yearsExperience": data.get("yearsExperience"),
-                "skills": data.get("skills"),
-                "linkedIn": data.get("linkedIn")
+                "Preferred Job Title": data.get("preferredJobTitle"),
+                "Preferred Job Type": data.get("preferredJobType"),
+                "Years of Experience": data.get("yearsExperience"),
+                "Preferred Work City": data.get("preferredWorkCity"),
+                "Skills": data.get("skills"),
+                "LinkedIn": data.get("linkedIn")
             }, data.get("selectedSolutions")
         )
     }

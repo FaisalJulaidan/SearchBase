@@ -13,8 +13,8 @@ from utilities.enums import CRM, DataType as DT, DatabaseType
 def getByID(campaign_id: int, companyID: int):
     try:
         # Get result and check if None then raise exception
-        result = deepcopy(db.session.query(Campaign) \
-            .filter(and_(Campaign.ID == campaign_id, Campaign.CompanyID == companyID)).first())
+        result = db.session.query(Campaign) \
+            .filter(and_(Campaign.ID == campaign_id, Campaign.CompanyID == companyID)).first()
         if not result: raise Exception
         # result.Skills = str(result.Skills).replace("[", "").replace("]", "").replace("'", "")
         # result.Skills = result.Skills.split(", ")
@@ -30,8 +30,8 @@ def getAll(companyID) -> Callback:
         if not companyID:
             raise Exception("Company ID have not been provided")
 
-        result = deepcopy(db.session.query(Campaign) \
-            .filter(Campaign.CompanyID == companyID).all())
+        result = db.session.query(Campaign) \
+            .filter(Campaign.CompanyID == companyID).all()
 
         if len(result) == 0:
             return Callback(True, "No campaigns found", [])

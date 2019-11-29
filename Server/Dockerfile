@@ -1,5 +1,5 @@
 # Run python in production
-FROM python:3
+FROM python:3.7
 
 # Copy Pipfile and paste it in Server - To be cached -
 COPY Pipfile .

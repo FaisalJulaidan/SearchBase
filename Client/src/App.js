@@ -1,12 +1,9 @@
 import React, { Component, lazy, Suspense } from 'react';
-import { Route, Switch, withRouter} from 'react-router-dom';
-import {connect} from 'react-redux';
-import {PrivateRoute} from './hoc';
+import { Route, Switch, withRouter } from 'react-router-dom';
+import { connect } from 'react-redux';
+import { PrivateRoute } from './hoc';
 import SentryBoundary from 'components/SentryBoundary/SentryBoundary';
 import styles from './components/LoadingSpinner/LoadingSpinner.module.less';
-import {StripeProvider} from 'react-stripe-elements';
-
-import {STRIPE_PK} from "./constants/config";
 
 const Home = lazy(() => import('./application/Home/Home'));
 const Dashboard = lazy(() => import('./application/Dashboard/Dashboard'));
@@ -21,7 +18,7 @@ const AppointmentStatus = lazy(() => import('./application/Public/AppointmentSta
 class App extends Component {
     constructor(props) {
         super(props);
-        this.state = {stripe: null};
+        this.state = { stripe: null };
         // Build Client
         // Clear recent notifications boxes when route change
         // history.listen(() => destroyMessage());
@@ -61,8 +58,7 @@ class App extends Component {
 
     render() {
         return (
-            <StripeProvider stripe={this.state.stripe}>
-                <SentryBoundary>
+            <SentryBoundary>
                 <Suspense fallback={<div className={styles.Loader}> Loading...</div>}>
                     <Switch>
                         <Route path="/forget_password" component={ForgetPassword}/>
@@ -73,10 +69,10 @@ class App extends Component {
                         <Route path="/chatbot_direct_link/" component={ChatbotDirectLink}/>
                         <PrivateRoute path="/dashboard" component={Dashboard}/>
                         <Route path="/" component={Home}/>
-                         {/*<Redirect to={{pathname: '/'}}/> */}
+                        {/*<Redirect to={{pathname: '/'}}/> */}
                     </Switch>
                 </Suspense>
-            </SentryBoundary></StripeProvider>
+            </SentryBoundary>
         );
     }
 }

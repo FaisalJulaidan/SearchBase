@@ -3,9 +3,6 @@
 #Specify a base image
 FROM node:10 as builder
 
-#Specify a working directory
-WORKDIR '/app'
-
 #Copy the dependencies file
 COPY package.json .
 

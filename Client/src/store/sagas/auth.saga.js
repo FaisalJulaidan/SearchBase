@@ -1,8 +1,8 @@
 import * as actionTypes from '../actions/actionTypes';
-import {all, put, takeLatest} from 'redux-saga/effects'
-import {authActions} from "../actions";
-import {history, successMessage} from "helpers";
-import {errorMessage, loadingMessage, warningMessage} from "helpers/alert";
+import { all, put, takeLatest } from 'redux-saga/effects';
+import { authActions } from '../actions';
+import { history, successMessage } from 'helpers';
+import { errorMessage, loadingMessage, warningMessage } from 'helpers/alert';
 import axios from 'axios';
 
 
@@ -10,7 +10,15 @@ import axios from 'axios';
 function* login({email, password, prevPath}) {
     try {
         loadingMessage('Logging you in...');
-        const res = yield axios.post(`${process.env.NODE_ENV!=='development'? process.env.REACT_APP_API_URL:''}/api/auth`, {email, password}, {
+        let url = `${process.env.NODE_ENV !== 'development' ? process.env.REACT_APP_API_URL : ''}/api/auth`;
+        console.log(url, '11111111');
+
+        url = url.replace('\'', '');
+        url = url.replace('%27', '');
+
+        console.log(url, '11111111');
+
+        const res = yield axios.post(url, { email, password }, {
             headers: {'Content-Type': 'application/json'},
         });
 

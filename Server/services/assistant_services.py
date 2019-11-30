@@ -127,7 +127,6 @@ def getAll(companyID) -> Callback:
 
     except Exception as exc:
         db.session.rollback()
-        print(exc)
         # helpers.logError("assistant_services.getAll(): " + str(exc))
         return Callback(False, 'Could not get all assistants.')
 

@@ -193,7 +193,7 @@ def prepareCampaign(campaign_details, companyID):
 
 def sendCampaign(campaign_details, companyID):
     try:
-        print(campaign_details)
+        # print(campaign_details)
         messenger_callback: Callback = messenger_servicess.getByID(campaign_details.get("messenger_id"), companyID)
         if not messenger_callback.Success:
             raise Exception("Messenger not found.")
@@ -283,7 +283,7 @@ def getShortLists(crm_id, companyID):
         if not crm_callback.Success:
             raise Exception("CRM not found.")
         crm = crm_callback.Data
-        print("CRM IS: {}".format(crm))
+        # print("CRM IS: {}".format(crm))
 
     candidates_callback: Callback = crm_services.getshortlists(crm)
     return Callback(True, "Shortlists have been retrieved", candidates_callback.Data)

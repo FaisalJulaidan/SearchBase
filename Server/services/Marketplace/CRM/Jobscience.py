@@ -136,10 +136,10 @@ def login(auth):
         # get the access token and refresh token
         response = requests.post(access_token_url, headers=headers)
 
-        if response.status_code == 200:
-            print("Login to Jobscience Successful")
-        else:
-            print("Login to Jobscience Unsuccessful")
+        # if response.status_code == 200:
+        #     print("Login to Jobscience Successful")
+        # else:
+        #     print("Login to Jobscience Unsuccessful")
 
         if not response.ok:
             raise Exception(response.text)
@@ -165,10 +165,10 @@ def logout(auth, companyID):  # QUESTION: Purpose of companyID param?
         }
 
         response = marketplace_helpers.sendRequest(logout_url, "get", headers, {})
-        if response.status_code == 200:
-            print("Disconnect from Jobscience Successful")
-        else:
-            print("Disconnect from Jobscience Unsuccessful")
+        # if response.status_code == 200:
+        #     print("Disconnect from Jobscience Successful")
+        # else:
+        #     print("Disconnect from Jobscience Unsuccessful")
 
     except Exception as exc:
         helpers.logError("Marketplace.CRM.Jobscience.logout() ERROR: " + str(exc))
@@ -453,7 +453,7 @@ def getShortLists(access_token) -> Callback:
     shortlists = shortlist_fetch['records']
     shortlist_entries = []
     for shortlist in shortlists:
-        print("The shortlist is {}".format(shortlist))
+        # print("The shortlist is {}".format(shortlist))
         shortlist_entries.append({"name": shortlist.get("Name"),
                                   "url": shortlist.get("attributes").get("url")})
 
@@ -461,9 +461,9 @@ def getShortLists(access_token) -> Callback:
 
 
 def searchCandidatesByShortlist(access_token, conversation) -> Callback:
-    print(conversation)
-
-    print("THIS HAS BEEN CALLED...")
+    # print(conversation)
+    #
+    # print("THIS HAS BEEN CALLED...")
     # exit(0)
     # TODO: Fetch all short list links
     # https://prsjobs--jsfull.cs83.my.salesforce.com/services/data/v37.0/query/?q=SELECT+name,ts2__r_contact__c,ts2__Status__c+from+ts2__s_UserListLink__c
@@ -482,12 +482,12 @@ def searchCandidatesByShortlist(access_token, conversation) -> Callback:
     records = []
     for shortlist_link in shortlists:
         if "/services/data/v46.0/sobjects/ts2__s_UserList__c/" + shortlist_link.get("ts2__r_user_list__c") == conversation.get("shortlist_id"):
-            print("Shortlist: {}".format(shortlist_link))
+            # print("Shortlist: {}".format(shortlist_link))
             contact_ids.append("'" + shortlist_link.get('ts2__r_contact__c') + "'")
-    print("Number of matches: {}".format(len(contact_ids)))
-    print("Exiting...")
-    #exit(0)
-    print("Number of contacts to retrieve: {}".format(len(contact_ids)))
+    # print("Number of matches: {}".format(len(contact_ids)))
+    # print("Exiting...")
+    # #exit(0)
+    # print("Number of contacts to retrieve: {}".format(len(contact_ids)))
 
     for i in range(0, len(contact_ids), 500):
         # Need set of contact ID's returned from searchCandidates()
@@ -497,10 +497,10 @@ def searchCandidatesByShortlist(access_token, conversation) -> Callback:
             query_segment = ",".join(contact_ids[i:len(contact_ids)])
 
         query = "WHERE+X18_Digit_ID__c+IN+(" + query_segment + ")"
-        print(query)
+        # print(query)
         # TODO: Fetch associated candidate object
         # https://prsjobs--jsfull.cs83.my.salesforce.com/services/data/v37.0/sobjects/Contact/0030O0000232s7FQAQ
-        print("Should be fetching contacts...")
+        # print("Should be fetching contacts...")
         sendQuery_callback: Callback = sendQuery(access_token, "get", {},
                                              "SELECT+X18_Digit_ID__c,ID,Name,Title,email,MobilePhone,MailingCity," +
                                              "ts2__Desired_Salary__c,ts2__Date_Available__c,ts2__Years_of_Experience__c,ts2__Desired_Hourly__c,Min_Basic__c," +
@@ -510,13 +510,13 @@ def searchCandidatesByShortlist(access_token, conversation) -> Callback:
             raise Exception(sendQuery_callback.Message)
 
         records += json.loads(sendQuery_callback.Data.text)['records']
-        print("Number of records retrieved: {}".format(len(records)))
+        # print("Number of records retrieved: {}".format(len(records)))
 
     list_of_contactIDs = []
 
     # <-- CALL SKILLS SEARCH -->
     for record in records:
-        print(record)
+        # print(record)
         list_of_contactIDs.append("'" + record.get("Id") + "'")
 
         # Fetch associated candidate skills
@@ -530,7 +530,7 @@ def searchCandidatesByShortlist(access_token, conversation) -> Callback:
         candidate_skills = fetchSkillsForCandidateSearch(list_of_contactIDs, skills, access_token, test=True)
 
     # <-- CALL SKILLS SEARCH -->
-    print("Number of records: {}".format(len(records)))
+    # print("Number of records: {}".format(len(records)))
     for record_num, record in enumerate(records):
         has_skills: bool = False
 
@@ -685,7 +685,7 @@ def searchCandidates(access_token, conversation) -> Callback:
             candidate_skills = fetchSkillsForCandidateSearch(list_of_contactIDs, skills, access_token)
 
         # <-- CALL SKILLS SEARCH -->
-        print("Number of records: {}".format(len(records)))
+        # print("Number of records: {}".format(len(records)))
         for record_num, record in enumerate(records):
             has_skills: bool = False
 

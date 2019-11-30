@@ -21,7 +21,6 @@ def testConnection(auth):
 
 
 def sendMessage(sendto, body, auth, whatsapp=False):
-    # print("Attempting to send message")
     try:
         client = Client(auth.get("account_sid"), auth.get("auth_token"))
         sender = auth.get("phone_number")

@@ -34,7 +34,7 @@ class NewAssistantModal extends Component {
                     assistantDesc: '',
                     assistantName: values.assistantName,
                     flow: this.jobTemplate.flow,
-                    template: 'none',
+                    template: 'null',
                     topBarText: values.topBarText,
                     welcomeMessage: values.welcomeMessage
                 };

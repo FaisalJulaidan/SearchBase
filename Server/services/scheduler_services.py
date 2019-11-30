@@ -109,12 +109,12 @@ def sendAutopilotReferrals():
                 
                 candidate_search = crm_services.searchCandidatesCustom(crm, crmAP.CompanyID, ids, customData=True, fields="fields=mobile,email,name", customSearch="Dynamic", multiple=True)
                 
-                asssitant: Assistant = crmAP.ReferralAssistant
+                assistant: Assistant = crmAP.ReferralAssistant
 
                 if not Assistant:
                     raise Exception("CRM autopilot has no assigned autopilot to refer to")
 
-                hashedAssistantID = helpers.encodeID(asssitant.ID)
+                hashedAssistantID = helpers.encodeID(assistant.ID)
 
                 url = url_services.createShortenedURL(helpers.getDomain(3000) + "/chatbot_direct_link/" + \
                   hashedAssistantID, domain="recruitbot.ai")

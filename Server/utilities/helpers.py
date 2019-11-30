@@ -99,9 +99,6 @@ def cleanDict(target):
     elif type(target) is dict:
         return checkDict(target)
     elif isinstance(target, type({}.items())):
-        logError(".ITEMS() IS USED")  # checking if the if statement is used in production
-        logError(".ITEMS() IS USED")
-        logError(".ITEMS() IS USED")
         return {k: v for k, v in target if v}
     return target
 

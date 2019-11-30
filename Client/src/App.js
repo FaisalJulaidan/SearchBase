@@ -48,14 +48,14 @@ class App extends Component {
     // };
     //
     componentDidMount() {
-        if (window.Stripe) {
-            this.setState({stripe: window.Stripe(STRIPE_PK)});
-        } else {
-            document.querySelector('#stripe-js').addEventListener('load', () => {
-                // Create Stripe instance once Stripe.js loads
-                this.setState({stripe: window.Stripe(STRIPE_PK)});
-            });
-        }
+        // if (window.Stripe) {
+        //     this.setState({stripe: window.Stripe(STRIPE_PK)});
+        // } else {
+        //     document.querySelector('#stripe-js').addEventListener('load', () => {
+        //         // Create Stripe instance once Stripe.js loads
+        //         this.setState({stripe: window.Stripe(STRIPE_PK)});
+        //     });
+        // }
         // this.setTimezone();
     }
 

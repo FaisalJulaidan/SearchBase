@@ -83,7 +83,6 @@ class EditUserModal extends React.Component {
                         {getFieldDecorator('roleID', {
                             initialValue: userData?.role.ID,
                             rules: [{
-                                whitespace: true,
                                 required: true,
                                 message: 'Please select a user role',
                             }],

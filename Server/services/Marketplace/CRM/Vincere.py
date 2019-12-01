@@ -65,7 +65,7 @@ def testConnection(auth, companyID):
             callback: Callback = login(auth)
 
         if not callback.Success:
-            raise Exception("Testing failed")
+            raise Exception("Connection test failed")
 
         return Callback(True, 'Logged in successfully', callback.Data)
 

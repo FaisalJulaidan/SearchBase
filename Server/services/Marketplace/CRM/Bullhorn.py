@@ -44,7 +44,7 @@ def testConnection(auth, companyID):
             callback: Callback = login(auth)
 
         if not callback.Success:
-            raise Exception("Testing failed")
+            raise Exception("Connection test failed")
 
         return Callback(True, 'Logged in successfully', callback.Data)
 
@@ -70,7 +70,6 @@ def login(auth):
                            "&password=" + urllib.parse.quote(authCopy.get("password"))
 
         code_request = requests.post(code_url)
-        helpers.logError("url 1: " + str(code_request.url))
 
         if "code=" not in code_request.url:
             raise Exception(code_request.url)
@@ -92,7 +91,6 @@ def login(auth):
         result_body = json.loads(access_token_request.text)
 
         authCopy["refresh_token"] = result_body.get("refresh_token")
-        helpers.logError(str(authCopy))
 
         # Logged in successfully
         return Callback(True, 'Logged in successfully', authCopy)

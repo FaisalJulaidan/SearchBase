@@ -85,20 +85,6 @@ def sendAutopilotReferrals():
             crmaplist = db.session.query(CRMAutoPilot).filter(CRMAutoPilot.ID == CRM.ID) \
                 .filter(and_(CRMAutoPilot.LastReferral != None, 24 <= func.TIMESTAMPDIFF(text('HOUR'), CRMAutoPilot.LastReferral, yesterday), CRMAutoPilot.Active == True)).all()
             for crmAP in crmaplist:
-                crm = crmAP.CRM
-                params = [{"input": "dateBegin", "match": crmAP.LastReferral, "queryType": "BETWEEN", "match2": now}]
-                search_callback = crm_services.searchPlacements(crm, crmAP.CompanyID, params)
-
-                if not search_callback.Success:
-                    raise Exception("Placement search failed")
-                
-                if len(search_callback.Data) == 0:
-                    return
-
-                ids = [item['candidate']['id'] for item in search_callback.Data]
-                
-                candidate_search = crm_services.searchCandidatesCustom(crm, crmAP.CompanyID, ids, customData=True, fields="fields=mobile,email,name", customSearch="Dynamic", multiple=True)
-                
                 assistant: Assistant = crmAP.ReferralAssistant
 
                 if not Assistant:
@@ -107,23 +93,41 @@ def sendAutopilotReferrals():
                 hashedAssistantID = helpers.encodeID(assistant.ID)
 
                 url = url_services.createShortenedURL(helpers.getDomain(3000) + "/chatbot_direct_link/" + \
-                  hashedAssistantID, domain="recruitbot.ai")
-                if crmAP.SendReferralEmail:
-                  EmailBody = crmAP.ReferralEmailBody.replace("${assistantLink}$", url.Data)
-                if crmAP.SendReferralSMS:
-                  SMSBody = crmAP.ReferralSMSBody.replace("${assistantLink}$", url.Data)
+                    hashedAssistantID, domain="recruitbot.ai")
 
-                for candidate in candidate_search.Data:
-                  if crmAP.SendReferralEmail and candidate['email']:
-                    mail_services.simpleSend(candidate['email'], crmAP.ReferralEmailTitle, EmailBody)
-                    crmAP.LastReferral = now
-                  if crmAP.SendReferralSMS and candidate['mobile']:
-                    messenger_callback = messenger_servicess.getMessengerByType(enums.Messenger.Twilio, crmAP.CompanyID)
-                    if not messenger_callback.Success:
-                        raise Exception("Company is not connected to twilio")
-                        messenger_servicess.sendMessage(messenger.Type, candidate['mobile'], SMSBody, messenger.Auth)
-                        crmAP.LastReferral = now  
+                for crm in crmAP.CRMS:
+                    params = [{"input": "dateBegin", "match": crmAP.LastReferral, "queryType": "BETWEEN", "match2": now}]
+                    search_callback = crm_services.searchPlacements(crm, crmAP.CompanyID, params)
 
+                    if not search_callback.Success:
+                        raise Exception("Placement search failed")
+                    
+                    if len(search_callback.Data) == 0:
+                        return
+
+                    ids = [item['candidate']['id'] for item in search_callback.Data]
+                    
+                    candidate_search = crm_services.searchCandidatesCustom(crm, crmAP.CompanyID, ids, customData=True, fields="fields=mobile,email,name", customSearch="Dynamic", multiple=True)
+                    
+                    
+                    
+                    canSendSMS = True
+                    if crmAP.SendReferralSMS:
+                        messenger_callback = messenger_servicess.getMessengerByType(enums.Messenger.Twilio, crmAP.CompanyID)
+                        messenger = messenger_callback.Data
+                        if not messenger_callback.Success:
+                            canSendSMS = False
+                  
+
+                    for candidate in candidate_search.Data:
+                        if crmAP.SendReferralEmail and candidate['email']:
+                            EmailBody = crmAP.ReferralEmailBody.replace("${assistantLink}$", url.Data)
+                            mail_services.simpleSend(candidate['email'], crmAP.ReferralEmailTitle, EmailBody)
+                            crmAP.LastReferral = now
+                        if crmAP.SendReferralSMS and candidate['mobile'] and canSendSMS:
+                            SMSBody = crmAP.ReferralSMSBody.replace("${assistantLink}$", url.Data)
+                            messenger_servicess.sendMessage(messenger.Type, candidate['mobile'], SMSBody, messenger.Auth)
+                            crmAP.LastReferral = now  
             # Save changes to the db
             db.session.commit()
 

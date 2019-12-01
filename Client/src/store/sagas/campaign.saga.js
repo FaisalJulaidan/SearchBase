@@ -1,4 +1,4 @@
-import {all, takeLatest, put} from 'redux-saga/effects'
+import {all, takeLatest, put, takeEvery} from 'redux-saga/effects'
 import * as actionTypes from "../actions/actionTypes";
 import {autoPilotActions, campaignActions} from "../actions";
 import {http, errorMessage, loadingMessage, successMessage} from "helpers";

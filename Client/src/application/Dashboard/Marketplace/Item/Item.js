@@ -42,6 +42,7 @@ class Item extends React.Component {
     }
 
     componentDidMount() {
+      console.log("PROPS")
       console.log(this.props)
 
         // Authenticate users through Callback/Redirect URI
@@ -144,7 +145,7 @@ class Item extends React.Component {
                     return <BullhornFormItems {...formOptions}/>;
                 if (place === 'connections')
                     return <BullhornConnections {...formOptions} 
-                              crmAP={this.props.CRMAPList.find(item=>item.ID===this.props.CRMAPID)} 
+                              crmAP={this.props.CRMAPList.find(item=>item.ID===this.props.activeItem?.CRMAutoPilotID)}
                               CRMAPList={this.props.CRMAPList} save={this.save}/>;
                 if (place === 'button') {
                     // windowObject.url = "https://auth.bullhornstaffing.com/oauth/authorize?response_type=code" +
@@ -362,7 +363,7 @@ function mapStateToProps(state) {
         isLoading: state.marketplace.isLoading,
 
         exportData: state.marketplace.exportData,
-        CRMAPID: state.marketplace.activeItem.CRMAutoPilotID,
+        activeItem: state.marketplace.activeItem,
 
         CRMAPList: state.CRMAutoPilot.CRMAutoPilotsList
     };

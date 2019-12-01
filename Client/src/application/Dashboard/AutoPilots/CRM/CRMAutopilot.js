@@ -138,7 +138,7 @@ class CRMAutoPilot extends React.Component {
                             <FormItem label="Description">
                                 {getFieldDecorator('Description', {
                                     initialValue: crmAP.Description,
-                                    rules: [{ required: true }]
+                                    rules: [{ required: false }]
                                 })(
                                     <Input placeholder="CRM Autopilot description"/>
                                 )}
@@ -151,7 +151,7 @@ class CRMAutoPilot extends React.Component {
                                        key="1"
                                        style={customPanelStyle}>
                                     <FormItem label="Auto refer applicants "
-                                              help="Select an assistant to auto refer the applicants">
+                                              extra="Auto refer the applicants to an assistant">
                                         {getFieldDecorator('AutoReferApplicants', {
                                             initialValue: crmAP.AutoReferApplicants,
                                             valuePropName: 'checked'
@@ -162,7 +162,8 @@ class CRMAutoPilot extends React.Component {
                                     </FormItem>
                                     {this.state.autoRefer &&
                                     <>
-                                        <FormItem label={'Assistant'}>
+                                        <FormItem label={'Assistant'}
+                                                  extra="Select an assistant to auto refer the applicants">
                                             {getFieldDecorator('ReferralAssistantID', {
                                                 initialValue: crmAP.ReferralAssistantID,
                                                 rules: [{
@@ -186,7 +187,7 @@ class CRMAutoPilot extends React.Component {
                                             )}
                                         </FormItem>
                                         <FormItem label="Auto send referral emails"
-                                                  help="Referred applicants will be notified via email if email is provided in the chat  (candidates applications only)">
+                                                  extra="Referred applicants will be notified via email if email is provided in the chat  (candidates applications only)">
                                             {getFieldDecorator('SendReferralEmail', {
                                                 initialValue: crmAP.SendReferralEmail,
                                                 valuePropName: 'checked'
@@ -234,7 +235,7 @@ class CRMAutoPilot extends React.Component {
                                     </>}
                                     {this.state.autoRefer &&
                                     <FormItem label="Auto send SMS"
-                                              help="Referred applicants will be notified via SMS if telephone number is provided in the chat  (candidates applications only)">
+                                              extra="Referred applicants will be notified via SMS if telephone number is provided in the chat  (candidates applications only)">
                                         {getFieldDecorator('SendReferralSMS', {
                                             initialValue: crmAP.SendReferralSMS,
                                             rules: [],

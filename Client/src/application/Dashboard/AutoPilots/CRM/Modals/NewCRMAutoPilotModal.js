@@ -1,9 +1,9 @@
-import React, {Component} from 'react';
-import {Form, Input, Modal, Select} from "antd";
-import {autoPilotActions} from "store/actions";
-import {store} from "store/store";
+import React, { Component } from 'react';
+import { Form, Input, Modal, Select } from 'antd';
+import { autoPilotActions } from 'store/actions';
+import { store } from 'store/store';
 import PropTypes from 'prop-types';
-import 'types/TimeSlots_Types'
+import 'types/TimeSlots_Types';
 
 const FormItem = Form.Item;
 
@@ -12,7 +12,7 @@ class NewCRMAutoPilotModal extends Component {
     onSubmit = () => {
         this.props.form.validateFields((err, values) => {
             if (!err) {
-                this.props.addAutoPilot(values)
+                this.props.addAutoPilot(values);
             }
         });
     };
@@ -20,7 +20,7 @@ class NewCRMAutoPilotModal extends Component {
 
     render() {
 
-        const {getFieldDecorator} = this.props.form;
+        const { getFieldDecorator } = this.props.form;
         return (
             <Modal title="Add CRM Auto Pilot" visible={this.props.visible}
                    onOk={this.onSubmit}
@@ -32,8 +32,16 @@ class NewCRMAutoPilotModal extends Component {
                             rules: [{
                                 whitespace: true,
                                 required: true,
-                                message: "Please input a name for your CRM Auto Pilot"},
-                                ],
+                                message: 'Please input a name for your CRM Auto Pilot'
+                            }, {
+                                validator: (_, value, callback) => {
+                                    const { /**@type AutoPilot[]*/ CRMAutoPilotsList } = this.props;
+                                    if (CRMAutoPilotsList.some(autoPilot => autoPilot.Name === value))
+                                        return callback('Auto Pilot name already exists');
+                                    else
+                                        return callback();
+                                }
+                            }]
                         })(
                             <Input type="text" placeholder="Name of the auto pilot"/>
                         )}
@@ -41,9 +49,9 @@ class NewCRMAutoPilotModal extends Component {
                     <FormItem label="Description">
                         {getFieldDecorator('description', {
                             rules: [{
-                                required: true,
-                                message: "Please add description",
-                            }],
+                                required: false,
+                                message: 'Please add description'
+                            }]
                         })(
                             <Input type="text" placeholder="Name of the CRM auto pilot"/>
                         )}

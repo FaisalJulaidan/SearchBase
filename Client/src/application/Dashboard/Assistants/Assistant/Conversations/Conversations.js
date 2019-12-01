@@ -71,7 +71,6 @@ class Conversations extends React.Component {
             }, {
                 title: 'Score',
                 key: 'Score',
-                align: 'center',
                 sorter: (a, b) => a.Score - b.Score,
                 render: (text, record) => {
                     return (

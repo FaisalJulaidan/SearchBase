@@ -230,7 +230,7 @@ function* watchFetchCampaignCandidatesData() {
 }
 
 function* watchFetchShortlists() {
-    yield takeEvery(actionTypes.FETCH_CAMPAIGN_SHORTLISTS, fetchShortlists)
+    yield takeLatest(actionTypes.FETCH_CAMPAIGN_SHORTLISTS, fetchShortlists)
 }
 
 function* watchLaunchCampaign() {

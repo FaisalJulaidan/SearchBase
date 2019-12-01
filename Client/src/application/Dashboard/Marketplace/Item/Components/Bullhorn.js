@@ -133,8 +133,7 @@ export const BullhornHeader = () =>
     </Paragraph>;
 
 export const BullhornConnections = ({getFieldDecorator, crmAP, save, CRMAPList}) => {
-  console.log(crmAP)
-    let [crmID, setCRMID] = useState(crmAP?.ID)
+    let [crmID, setCRMID] = useState(crmAP?.ID);
     return (<Form layout='vertical' wrapperCol={{span: 15}} style={{width: '100%'}}>
             <h2>Connect to a CRM Autopilot</h2>
             <Form.Item label="Autopilot selection">
@@ -143,7 +142,7 @@ export const BullhornConnections = ({getFieldDecorator, crmAP, save, CRMAPList})
                   rules: [{required: false}]
               })(
                   <Select onChange={e => setCRMID(e)}>
-                    <Select.Option value={null}>Unconnected</Select.Option>
+                    <Select.Option value={null}>None</Select.Option>
                     {CRMAPList.map(item => {
                       return (<Select.Option value={item.ID}>{item.Name}</Select.Option>) 
                     })}
@@ -154,4 +153,4 @@ export const BullhornConnections = ({getFieldDecorator, crmAP, save, CRMAPList})
               </Button>
             </Form.Item>
     </Form>)
-}
+};

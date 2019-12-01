@@ -85,7 +85,7 @@ class CRMAutoPilots extends React.Component {
 
     render() {
         // let open = this.state.openAutoPilot
-        const { openAutoPilot } = this.state
+        const { openAutoPilot } = this.state;
         return (
             <>
                 <div className={styles.Body}>
@@ -94,7 +94,7 @@ class CRMAutoPilots extends React.Component {
                       {
                           this.props.isLoading ? <LoadingViewBox/>
                           :
-                          this.props.CRMautoPilotsList.map(
+                          this.props.CRMAutoPilotsList.map(
                               (/*@type AutoPilots */ autoPilot, i) =>
                                   <ViewBox
                                       onClick={() => this.openAutoPilot(autoPilot.ID)}
@@ -114,7 +114,7 @@ class CRMAutoPilots extends React.Component {
 
 
                 <NewAutoPilotModal
-                    autoPilotsList={this.props.autoPilotsList}
+                    CRMAutoPilotsList={this.props.CRMAutoPilotsList}
                     addAutoPilot={this.addAutoPilot}
                     visible={this.state.newAutoPilotModalVisible}
                     showModal={this.showNewAutoPilotModal}
@@ -122,7 +122,7 @@ class CRMAutoPilots extends React.Component {
                 />
 
                 <EditAutoPilotModal
-                    autoPilotsList={this.props.autoPilotsList}
+                    CRMAutoPilotsList={this.props.CRMAutoPilotsList}
                     updateAutoPilot={this.updateAutoPilot}
                     autoPilot={this.state.autoPilotToEdit}
                     visible={this.state.editAutoPilotModalVisible}
@@ -136,7 +136,7 @@ class CRMAutoPilots extends React.Component {
 
 function mapStateToProps(state) {
     return {
-        CRMautoPilotsList: state.CRMAutoPilot.CRMAutoPilotsList,
+        CRMAutoPilotsList: state.CRMAutoPilot.CRMAutoPilotsList,
     };
 }
 

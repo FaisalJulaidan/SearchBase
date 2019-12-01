@@ -48,7 +48,7 @@ def createShortenedURL(url: str, length: int = min_key_length, expiry: int = Non
         db.session.add(shortened_url)
         db.session.commit()
 
-        return Callback(True, "URL has been succesfully created", "{}/u/{}".format(helpers.getDomain(subdomain=subdomain, domain=domain), key))
+        return Callback(True, "URL has been successfully created", "{}/u/{}".format(helpers.getDomain(subdomain=subdomain, domain=domain), key))
 
     except IntegrityError as e:
         helpers.logError("url_services.createShortenedURL(): " + str(e))

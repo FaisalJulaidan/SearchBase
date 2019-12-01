@@ -19,7 +19,7 @@ from utilities import helpers, json_schemas, enums
 def create(name, desc, welcomeMessage, topBarText, flow, template, companyID) -> Assistant or None:
     try:
         # if there is already a flow then ignore creating from template
-        if not flow and template and template != 'none':
+        if template and template != 'null':
             # Get json template
             relative_path = join('static/assistant_templates', template + '.json')
             absolute_path = join(BaseConfig.APP_ROOT, relative_path)
@@ -27,9 +27,10 @@ def create(name, desc, welcomeMessage, topBarText, flow, template, companyID) ->
 
 
         # Validate flow
-        callback: Callback = flow_services.isValidFlow(flow)
-        if not callback.Success:
-            raise Exception(callback.Message)
+        if flow:
+            callback: Callback = flow_services.isValidFlow(flow)
+            if not callback.Success:
+                raise Exception(callback.Message)
 
         # default assistant config values
         config = {
@@ -120,7 +121,6 @@ def getAll(companyID) -> Callback:
                                   Assistant.Active,
                                   Assistant.UserID)\
             .filter(Assistant.CompanyID == companyID).all()
-
         if len(result) == 0:
             return Callback(True, "No assistants  to be retrieved.", [])
 
@@ -128,7 +128,7 @@ def getAll(companyID) -> Callback:
 
     except Exception as exc:
         db.session.rollback()
-        helpers.logError("assistant_services.getAll(): " + str(exc))
+        # helpers.logError("assistant_services.getAll(): " + str(exc))
         return Callback(False, 'Could not get all assistants.')
 
 

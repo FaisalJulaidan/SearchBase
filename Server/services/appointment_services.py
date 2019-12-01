@@ -289,7 +289,7 @@ def getAppointmentAllocationTimes(id) -> Callback:
             .all()
         return Callback(True, 'Gathered Appointment Allocation Times', result)
     except Exception as exc:
-        print(exc)
+        # print(exc)
         return Callback(False, 'Failed to get any Appointment Allocation Times')
 
 def hasAppointment(companyID, id):

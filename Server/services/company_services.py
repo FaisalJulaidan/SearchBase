@@ -50,7 +50,7 @@ def getByID(id: int, eager: bool = False) -> Company or None:
 
     except Exception as exc:
         db.session.rollback()
-        print(exc)
+        # print(exc)
         return Callback(False,
                         'Company with ID ' + str(id) + ' does not exist')
 
@@ -214,6 +214,6 @@ def activateCompany(companyID):
         return Callback(True, 'Company activated successfully')
 
     except Exception as exc:
-        print(exc)
+        # print(exc)
         db.session.rollback()
         return Callback(False, 'Company activation failed')

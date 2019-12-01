@@ -179,7 +179,8 @@ def deleteWebhook(id: int, companyID: int) -> Callback:
 
 def fireRequests(data, companyID: int, event: enums.Webhooks):
     def handleExceptions(request, exception):
-        print(exception)
+        helpers.logError(str(exception))
+        # print(exception)
         # save error in db
 
     try:

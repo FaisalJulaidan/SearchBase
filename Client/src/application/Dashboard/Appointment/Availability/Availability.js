@@ -19,8 +19,8 @@ class Availability extends React.Component {
         this.state = {
             assistant: null,
             database: null,
-            start: moment().startOf('week'),
-            end: moment().endOf('week'),
+            start: moment().startOf('isoWeek'),
+            end: moment().endOf('isoWeek'),
             searches: {}
         };
     }
@@ -76,6 +76,8 @@ class Availability extends React.Component {
                   date = date.substr(1, date.length-1)
                 }
                 let realDate = checkDate(date, true, false);
+                console.log(realDate)
+                console.log(realDate.isoWeekday())
                 if(!realDate) return
                 if (realDate.isBetween(start, end) || realDate.isSame(start, 'date') || realDate.isSame(end, 'date')) {
                     let key = searchArray(record.ID); // key exists?
@@ -161,11 +163,6 @@ class Availability extends React.Component {
                 key: 'consultant'
             },
             {
-                title: 'Sunday',
-                dataIndex: 'sunday',
-                key: 'sunday'
-            },
-            {
                 title: 'Monday',
                 dataIndex: 'monday',
                 key: 'monday'
@@ -194,7 +191,12 @@ class Availability extends React.Component {
                 title: 'Saturday',
                 dataIndex: 'saturday',
                 key: 'saturday'
-            }
+            },
+            {
+                title: 'Sunday',
+                dataIndex: 'sunday',
+                key: 'sunday'
+            },
         ];
         const menu = (
             <Menu onClick={this.handleMenuClick}>
@@ -220,13 +222,13 @@ class Availability extends React.Component {
                 location: item.data.location,
                 jobTitle: item.data.jobTitle,
                 consultant: item.data.consultant,
-                sunday: item.dates.find(date => date.day() === 0) !== undefined ? availableText : '',
-                monday: item.dates.find(date => date.day() === 1) !== undefined ? availableText : '',
-                tuesday: item.dates.find(date => date.day() === 2) !== undefined ? availableText : '',
-                wednesday: item.dates.find(date => date.day() === 3) !== undefined ? availableText : '',
-                thursday: item.dates.find(date => date.day() === 4) !== undefined ? availableText : '',
-                friday: item.dates.find(date => date.day() === 5) !== undefined ? availableText : '',
-                saturday: item.dates.find(date => date.day() === 6) !== undefined ? availableText : ''
+                monday: item.dates.find(date => date.isoWeekday() === 1) !== undefined ? availableText : '',
+                tuesday: item.dates.find(date => date.isoWeekday() === 2) !== undefined ? availableText : '',
+                wednesday: item.dates.find(date => date.isoWeekday() === 3) !== undefined ? availableText : '',
+                thursday: item.dates.find(date => date.isoWeekday() === 4) !== undefined ? availableText : '',
+                friday: item.dates.find(date => date.isoWeekday() === 5) !== undefined ? availableText : '',
+                saturday: item.dates.find(date => date.isoWeekday() === 6) !== undefined ? availableText : '',
+                sunday: item.dates.find(date => date.isoWeekday() === 7) !== undefined ? availableText : '',
             }));
             // availability = this.searc
             aggregates = this.getSearchAggregates(availability);

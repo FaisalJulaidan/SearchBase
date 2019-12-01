@@ -12,7 +12,7 @@ def testConnection(auth):
         return Callback(login(auth).Success, "Message", auth)
 
     except Exception as exc:
-        return Callback(False, "Testing failed")
+        return Callback(False, "Connection test failed")
 
 
 def login(auth):

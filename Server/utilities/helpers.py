@@ -99,9 +99,6 @@ def cleanDict(target):
     elif type(target) is dict:
         return checkDict(target)
     elif isinstance(target, type({}.items())):
-        logError(".ITEMS() IS USED")  # checking if the if statement is used in production
-        logError(".ITEMS() IS USED")
-        logError(".ITEMS() IS USED")
         return {k: v for k, v in target if v}
     return target
 
@@ -335,6 +332,10 @@ def getDictFromLimitedQuery(columnsList, tuple) -> dict:
             dict[key] = v
     return dict
 
+# EXCEPTION MESSAGE SUPPLIED HERE SHOULD BE SAFE TO SHOW THE FROTNEND
+class APIException(Exception):
+   def __init__(self, message):
+        super().__init__(message)
 
 class requestException(Exception):
     pass

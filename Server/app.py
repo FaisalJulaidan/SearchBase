@@ -17,7 +17,7 @@ from models import db
 from routes.admin.routers import account_router, analytics_router, sub_router, \
     conversation_router, users_router, flow_router, assistant_router, \
     database_router, options_router, marketplace_router, auto_pilot_router, appointment_router, webhook_router, \
-    campaign_router
+    campaign_router, crm_auto_pilot_router
 from routes.public.routers import public_router, reset_password_router, chatbot_router, auth_router
 from routes.staff.routers import staff_router
 from services import scheduler_services
@@ -45,6 +45,7 @@ app.register_blueprint(auth_router, url_prefix='/api')
 app.register_blueprint(campaign_router, url_prefix='/api')
 app.register_blueprint(database_router, url_prefix='/api')
 app.register_blueprint(auto_pilot_router, url_prefix='/api')
+app.register_blueprint(crm_auto_pilot_router, url_prefix='/api')
 app.register_blueprint(options_router, url_prefix='/api')
 app.register_blueprint(appointment_router, url_prefix='/api')
 app.register_blueprint(webhook_router, url_prefix='/api')

@@ -32,7 +32,7 @@ def sendMessage(sendto, body, auth, whatsapp=False):
         message = client.messages.create(
             to=sendto,
             from_=sender,
-            body=body)
+            body=body) # add break-lines to sms message
 
         return Callback(True, "Message has been sent")
     except Exception as exc:

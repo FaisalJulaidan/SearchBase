@@ -243,8 +243,8 @@ def sendCampaign(campaign_details, companyID):
                 raise Exception("Failed to create shortened URL")
 
             # insert assistant link and candidate details in text
-            tempText = text.replace("{assistant.link}", url.Data) \
-                .replace("{candidate.name}", candidate.get("CandidateName"))
+            tempText = text.replace("${assistantLink}$", url.Data) \
+                .replace("${candidateName}$", candidate.get("CandidateName"))
 
             if campaign_details.get("outreach_type") == "sms":
                 messenger_servicess.sendMessage(messenger.Type, candidate_phone, tempText, messenger.Auth)

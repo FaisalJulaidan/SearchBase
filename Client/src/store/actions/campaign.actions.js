@@ -175,6 +175,7 @@ const launchCampaign = (assistant_id, use_crm, crm_id, useShortlist, shortlist_i
     email_title
 });
 
+
 const launchCampaignSuccess = () => ({
     type: actionTypes.LAUNCH_CAMPAIGN_SUCCESS,
 });
@@ -183,6 +184,26 @@ const launchCampaignFailure = (errorMsg) => ({
     type: actionTypes.LAUNCH_CAMPAIGN_FAILURE,
     errorMsg
 });
+
+
+const updateStatus = (status, campaignID) => ({
+    type: actionTypes.UPDATE_CAMPAIGN_STATUS_REQUEST,
+    campaignID,
+    status
+});
+
+const updateStatusSuccess = (successMsg, status, campaignID) => ({
+    type: actionTypes.UPDATE_CAMPAIGN_STATUS_SUCCESS,
+    successMsg,
+    status,
+    campaignID
+});
+
+const updateStatusFailure = (errorMsg) => ({
+    type: actionTypes.UPDATE_CAMPAIGN_STATUS_FAILURE,
+    errorMsg
+});
+
 
 
 export const campaignActions = {
@@ -216,5 +237,11 @@ export const campaignActions = {
 
     launchCampaign,
     launchCampaignSuccess,
-    launchCampaignFailure
+    launchCampaignFailure,
+
+    updateStatus,
+    updateStatusSuccess,
+    updateStatusFailure,
+
+
 };

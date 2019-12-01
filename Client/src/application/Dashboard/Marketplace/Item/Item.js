@@ -3,11 +3,11 @@ import {Breadcrumb, Button, Dropdown, Form, Icon, Menu, Modal, Tabs, Typography}
 import 'types/Marketplace_Types';
 import {getLink, history} from "helpers";
 import NoHeaderPanel from 'components/NoHeaderPanel/NoHeaderPanel'
-import {marketplaceActions} from "store/actions";
+import {marketplaceActions, CRMAutoPilotActions} from "store/actions";
 import styles from './Item.module.less'
 import {DefaultButton} from './Components/Common'
 import {AdaptFeatures, AdaptFormItems, AdaptHeader} from "./Components/Adapt";
-import {BullhornFeatures, BullhornFormItems, BullhornHeader} from "./Components/Bullhorn";
+import {BullhornFeatures, BullhornFormItems, BullhornHeader, BullhornConnections} from "./Components/Bullhorn";
 import {JobscienceFeatures, JobscienceHeader} from "./Components/Jobscience";
 import {VincereFeatures, VincereFormItems, VincereHeader} from "./Components/Vincere";
 import {GreenhouseFeatures, GreenhouseFormItem, GreenhouseHeader} from "./Components/Greenhouse";
@@ -32,6 +32,8 @@ class Item extends React.Component {
     marketplaceItem = data.Items.find(/**@type {MarketplaceItem}*/item => item.type === this.props.match.params.type);
 
     componentWillMount() {
+        this.props.dispatch(marketplaceActions.fetchMarketplaceItem(this.marketplaceItem.type))
+        this.props.dispatch(CRMAutoPilotActions.fetchCRMAutoPilots())
         this.props.dispatch(marketplaceActions.pingMarketplace(this.marketplaceItem.type))
             .then(() => {
                 if (this.marketplaceItem.type === "Bullhorn" && this.props.connectionStatus === "CONNECTED")
@@ -40,6 +42,8 @@ class Item extends React.Component {
     }
 
     componentDidMount() {
+      console.log("PROPS")
+      console.log(this.props)
 
         // Authenticate users through Callback/Redirect URI
         const {location, dispatch} = this.props;
@@ -77,6 +81,9 @@ class Item extends React.Component {
 
         return link
     };
+    save = (type, id) => {
+      this.props.dispatch(marketplaceActions.saveMarketplaceItem(type, id))
+    }
 
 
     /**
@@ -136,6 +143,10 @@ class Item extends React.Component {
                     return <BullhornFeatures/>;
                 if (place === 'form')
                     return <BullhornFormItems {...formOptions}/>;
+                if (place === 'connections')
+                    return <BullhornConnections {...formOptions} 
+                              crmAP={this.props.CRMAPList.find(item=>item.ID===this.props.activeItem?.CRMAutoPilotID)}
+                              CRMAPList={this.props.CRMAPList} save={this.save}/>;
                 if (place === 'button') {
                     // windowObject.url = "https://auth.bullhornstaffing.com/oauth/authorize?response_type=code" +
                     //     "&client_id=7719607b-7fe7-4715-b723-809cc57e2714&redirect_uri=" +
@@ -318,6 +329,11 @@ class Item extends React.Component {
                             <TabPane tab="Feature" key="1">
                                 {this.getMarketplaceComponent(type, 'features')}
                             </TabPane>
+                            {this.getMarketplaceComponent(type, 'connections') ?
+                            <TabPane tab="Connections" key="2">
+                                {this.getMarketplaceComponent(type, 'connections')}
+                            </TabPane>
+                             : null}
                         </Tabs>
                     </div>
                 </NoHeaderPanel>
@@ -347,6 +363,9 @@ function mapStateToProps(state) {
         isLoading: state.marketplace.isLoading,
 
         exportData: state.marketplace.exportData,
+        activeItem: state.marketplace.activeItem,
+
+        CRMAPList: state.CRMAutoPilot.CRMAutoPilotsList
     };
 }
 

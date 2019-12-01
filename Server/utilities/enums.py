@@ -23,6 +23,10 @@ class CRM(Enum):
     def has_value(cls, value):
         return any(value == item.value for item in cls)
 
+    @classmethod
+    def get_value(cls, value):
+        return next((value == item.value for item in cls), None)
+
 
 @unique
 class Calendar(Enum):

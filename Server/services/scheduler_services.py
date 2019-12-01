@@ -1,16 +1,19 @@
 import os
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from apscheduler.executors.pool import ThreadPoolExecutor, ProcessPoolExecutor
 from apscheduler.jobstores.sqlalchemy import SQLAlchemyJobStore
 from apscheduler.schedulers.background import BackgroundScheduler
 from pytz import utc
-from sqlalchemy import and_
+from sqlalchemy import and_, text
 from sqlalchemy.orm import joinedload
+from sqlalchemy.sql.expression import func
 
-from models import db, Callback, Assistant, Conversation, Company
-from services import mail_services
-from utilities import helpers
+from models import db, Callback, Assistant, Conversation, Company, AutoPilot, CRMAutoPilot, CRM
+from services import mail_services, url_services
+from services.Marketplace.CRM import crm_services
+from services.Marketplace.Messenger import messenger_servicess
+from utilities import helpers, enums
 
 jobstores = {
     'default': SQLAlchemyJobStore(url=os.environ['SQLALCHEMY_DATABASE_URI'])
@@ -71,6 +74,66 @@ def sendConversationsNotifications(assistantID=None):
         helpers.logError(str(e))
 
 
+# If assistantID is supplied, it will only look for data relating to that assistant
+def sendAutopilotReferrals():
+    try:
+        from app import app
+        with app.app_context():
+            #NEEDS STORED FILEREIMPLEMENTED
+            yesterday = datetime.now() - timedelta(days=1)
+            now = datetime.now()
+            crmaplist = db.session.query(CRMAutoPilot).filter(CRMAutoPilot.ID == CRM.ID) \
+                .filter(and_(CRMAutoPilot.LastReferral != None, 24 <= func.TIMESTAMPDIFF(text('HOUR'), CRMAutoPilot.LastReferral, yesterday), CRMAutoPilot.Active == True)).all()
+            for crmAP in crmaplist:
+                assistant: Assistant = crmAP.ReferralAssistant
+
+                if not Assistant:
+                    raise Exception("CRM autopilot has no assigned autopilot to refer to")
+
+                hashedAssistantID = helpers.encodeID(assistant.ID)
+
+                url = url_services.createShortenedURL(helpers.getDomain(3000) + "/chatbot_direct_link/" + \
+                    hashedAssistantID, domain="recruitbot.ai")
+
+                for crm in crmAP.CRMS:
+                    params = [{"input": "dateBegin", "match": crmAP.LastReferral, "queryType": "BETWEEN", "match2": now}]
+                    search_callback = crm_services.searchPlacements(crm, crmAP.CompanyID, params)
+
+                    if not search_callback.Success:
+                        raise Exception("Placement search failed")
+                    
+                    if len(search_callback.Data) == 0:
+                        return
+
+                    ids = [item['candidate']['id'] for item in search_callback.Data]
+                    
+                    candidate_search = crm_services.searchCandidatesCustom(crm, crmAP.CompanyID, ids, customData=True, fields="fields=mobile,email,name", customSearch="Dynamic", multiple=True)
+                    
+                    
+                    
+                    canSendSMS = True
+                    if crmAP.SendReferralSMS:
+                        messenger_callback = messenger_servicess.getMessengerByType(enums.Messenger.Twilio, crmAP.CompanyID)
+                        messenger = messenger_callback.Data
+                        if not messenger_callback.Success:
+                            canSendSMS = False
+                  
+
+                    for candidate in candidate_search.Data:
+                        if crmAP.SendReferralEmail and candidate['email']:
+                            EmailBody = crmAP.ReferralEmailBody.replace("${assistantLink}$", url.Data)
+                            mail_services.simpleSend(candidate['email'], crmAP.ReferralEmailTitle, EmailBody)
+                            crmAP.LastReferral = now
+                        if crmAP.SendReferralSMS and candidate['mobile'] and canSendSMS:
+                            SMSBody = crmAP.ReferralSMSBody.replace("${assistantLink}$", url.Data)
+                            messenger_servicess.sendMessage(messenger.Type, candidate['mobile'], SMSBody, messenger.Auth)
+                            crmAP.LastReferral = now  
+            # Save changes to the db
+            db.session.commit()
+
+    except Exception as e:
+        helpers.logError(str(e))
+
 ''' 
 This function is to fix the constant lose of database connection after the wait_timeout has passed.
 It will make the simplest query to the database every while to make sure the connection is alive
@@ -94,4 +157,5 @@ def test():
 # Run scheduled tasks
 scheduler.add_job(sendConversationsNotifications, 'cron', hour='*/1', id='sendConversationsNotifications', replace_existing=True)
 scheduler.add_job(pingDatabaseConnection, 'cron', hour='*/5', id='pingDatabaseConnection', replace_existing=True)
+scheduler.add_job(sendAutopilotReferrals, 'cron', second='*/15', id='sendAutopilotReferrals', replace_existing=True)
 # scheduler.add_job(test, 'cron', second='*/3', id='test', replace_existing=True)

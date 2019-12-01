@@ -1,6 +1,6 @@
-import {all, takeEvery, put} from 'redux-saga/effects'
+import {all, takeLatest, put, takeEvery} from 'redux-saga/effects'
 import * as actionTypes from "../actions/actionTypes";
-import {campaignActions} from "../actions";
+import {autoPilotActions, campaignActions} from "../actions";
 import {http, errorMessage, loadingMessage, successMessage} from "helpers";
 
 //Fetch All
@@ -190,36 +190,55 @@ function* launchCampaign({assistant_id, use_crm, crm_id, useShortlist,shortlist_
     }
 }
 
+//Update Campaign status
+function* updateStatus({status, campaignID}) {
+    try {
+        loadingMessage('Updating Status', 0);
+        const res = yield http.put(`/campaign/${campaignID}/status`, {status});
+        yield put(campaignActions.updateStatusSuccess('Status updated successfully', status, campaignID));
+        successMessage('Status updated');
+
+    } catch (error) {
+        const msg = error.response?.data?.msg || "Couldn't update campaign's status";
+        yield put(campaignActions.updateStatusFailure(msg));
+        errorMessage(msg);
+    }
+}
+
 function* watchFetchCampaigns() {
-    yield takeEvery(actionTypes.FETCH_CAMPAIGNS_REQUEST, fetchCampaigns)
+    yield takeLatest(actionTypes.FETCH_CAMPAIGNS_REQUEST, fetchCampaigns)
 }
 
 function* watchSaveCampaign() {
-    yield takeEvery(actionTypes.SAVE_CAMPAIGN_REQUEST, saveCampaign)
+    yield takeLatest(actionTypes.SAVE_CAMPAIGN_REQUEST, saveCampaign)
 }
 
 function* watchUpdateCampaign() {
-    yield takeEvery(actionTypes.UPDATE_CAMPAIGN_REQUEST, updateCampaign)
+    yield takeLatest(actionTypes.UPDATE_CAMPAIGN_REQUEST, updateCampaign)
 }
 
 function* watchDeleteCampaign() {
-    yield takeEvery(actionTypes.DELETE_CAMPAIGN_REQUEST, deleteCampaign)
+    yield takeLatest(actionTypes.DELETE_CAMPAIGN_REQUEST, deleteCampaign)
 }
 
 function* watchFetchCampaign() {
-    yield takeEvery(actionTypes.FETCH_CAMPAIGN_REQUEST, fetchCampaign)
+    yield takeLatest(actionTypes.FETCH_CAMPAIGN_REQUEST, fetchCampaign)
 }
 
 function* watchFetchCampaignCandidatesData() {
-    yield takeEvery(actionTypes.FETCH_CAMPAIGN_CANDIDATES_DATA_REQUEST, fetchCampaignCandidatesData)
+    yield takeLatest(actionTypes.FETCH_CAMPAIGN_CANDIDATES_DATA_REQUEST, fetchCampaignCandidatesData)
 }
 
 function* watchFetchShortlists() {
-    yield takeEvery(actionTypes.FETCH_CAMPAIGN_SHORTLISTS, fetchShortlists)
+    yield takeLatest(actionTypes.FETCH_CAMPAIGN_SHORTLISTS, fetchShortlists)
 }
 
 function* watchLaunchCampaign() {
-    yield takeEvery(actionTypes.LAUNCH_CAMPAIGN_REQUEST, launchCampaign)
+    yield takeLatest(actionTypes.LAUNCH_CAMPAIGN_REQUEST, launchCampaign)
+}
+
+function* watchUpdateStatus() {
+    yield takeLatest(actionTypes.UPDATE_CAMPAIGN_STATUS_REQUEST, updateStatus)
 }
 
 export function* campaignSaga() {
@@ -231,6 +250,7 @@ export function* campaignSaga() {
         watchDeleteCampaign(),
         watchFetchCampaignCandidatesData(),
         watchFetchShortlists(),
-        watchLaunchCampaign()
+        watchLaunchCampaign(),
+        watchUpdateStatus(),
     ])
 }

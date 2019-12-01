@@ -1,5 +1,5 @@
-import React from 'react';
-import {Typography, Input, Icon, Button} from "antd";
+import React, {useState} from 'react';
+import {Typography, Input, Icon, Button, Form, Select} from "antd";
 import {getLink} from "../../../../../helpers";
 
 const {Title, Paragraph, Text} = Typography;
@@ -132,4 +132,25 @@ export const BullhornHeader = () =>
         relationship management, applicant tracking system and operations software for the staffing industry.
     </Paragraph>;
 
-
+export const BullhornConnections = ({getFieldDecorator, crmAP, save, CRMAPList}) => {
+    let [crmID, setCRMID] = useState(crmAP?.ID);
+    return (<Form layout='vertical' wrapperCol={{span: 15}} style={{width: '100%'}}>
+            <h2>Connect to a CRM Autopilot</h2>
+            <Form.Item label="Autopilot selection">
+              {getFieldDecorator('AutopilotID', {
+                  initialValue: crmAP?.ID || null,
+                  rules: [{required: false}]
+              })(
+                  <Select onChange={e => setCRMID(e)}>
+                    <Select.Option value={null}>None</Select.Option>
+                    {CRMAPList.map(item => {
+                      return (<Select.Option value={item.ID}>{item.Name}</Select.Option>) 
+                    })}
+                  </Select>
+              )}
+              <Button type={'primary'} size={'large'}  style={{marginTop: 30}} onClick={() => save('Bullhorn', crmID)}>
+                  Save changes
+              </Button>
+            </Form.Item>
+    </Form>)
+};

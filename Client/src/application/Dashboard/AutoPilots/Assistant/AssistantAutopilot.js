@@ -4,18 +4,15 @@ import styles from './AutoPilot.module.less';
 import NoHeaderPanel from 'components/NoHeaderPanel/NoHeaderPanel';
 import {
     Breadcrumb, Button, Col, Collapse, Divider, Form, Input, InputNumber, Modal, Row, Spin, Switch, Typography,
-    Select, Icon, Radio
+    Select, Icon
 } from 'antd';
 import 'types/TimeSlots_Types';
 import './AutoPilot.less';
 import { history } from 'helpers';
 import { autoPilotActions, appointmentAllocationTimeActions } from 'store/actions';
-import { campaignActions } from 'store/actions'; //TODO: To be removed (Fetching assistants for referral for now)
-// import CKEditor from '@ckeditor/ckeditor5-react';
+
 import CKEditor from 'components/CKeditor/CKEditor';
 import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
-import { trimText } from '../../../../helpers';
-import { CLEAR_ALL_CONVERSATIONS_FAILURE } from '../../../../store/actions/actionTypes';
 
 const { Panel } = Collapse;
 const ButtonGroup = Button.Group;
@@ -44,7 +41,6 @@ const customPanelStyle = {
 class AssistantAutoPilot extends React.Component {
     componentDidMount() {
         this.props.dispatch(appointmentAllocationTimeActions.fetchAAT());
-        this.props.dispatch(campaignActions.fetchCampaigns()); //TODO: To be removed (Fetching assistants for referral for now)
         this.props.dispatch(autoPilotActions.fetchAutoPilot(this.props.match.params.id));
     }
 
@@ -92,21 +88,23 @@ class AssistantAutoPilot extends React.Component {
 
     });
 
-
     render() {
         const /**@type AutoPilot*/ autoPilot = this.props.autoPilot;
         const { getFieldDecorator, getFieldValue } = this.props.form;
-        const { AcceptApplications, RejectApplications, SendCandidatesAppointments } = this.props?.autoPilot;
-        let openCollapse1 = [AcceptApplications, RejectApplications];
-        openCollapse1 = openCollapse1.map((val, i) => ({i: i + 1, val })).filter(item => item.val).map(item => item.i.toString());
-        console.log(SendCandidatesAppointments)
-        let openCollapse2 = [SendCandidatesAppointments];
-        openCollapse2 = openCollapse2.map((val, i) => ({i: i + 1, val })).filter(item => item.val).map(item => item.i.toString());
-        console.log(openCollapse1)
-        console.log(openCollapse2)
+
+        let openCollapse1 = [autoPilot?.AcceptApplications, autoPilot?.RejectApplications];
+        openCollapse1 = openCollapse1.map((val, i) => ({
+            i: i + 1,
+            val
+        })).filter(item => item.val).map(item => item.i.toString());
+        let openCollapse2 = [autoPilot?.SendCandidatesAppointments];
+        openCollapse2 = openCollapse2.map((val, i) => ({
+            i: i + 1,
+            val
+        })).filter(item => item.val).map(item => item.i.toString());
 
         return (
-            <NoHeaderPanel panelStyles={{position: 'relative'}}>
+            <NoHeaderPanel panelStyles={{ position: 'relative' }}>
                 <div className={styles.Header}>
                     <div style={{ marginBottom: 20 }}>
                         <Breadcrumb>
@@ -478,9 +476,10 @@ class AssistantAutoPilot extends React.Component {
 
                     <Button type={'primary'} size={'large'} onClick={this.onSubmit} style={{ marginTop: 30 }}>
                         Save changes
-                    </Button >
+                    </Button>
 
-                    <Button type={'danger'} size={'large'} style={{ marginTop: 30 }} onClick={this.handleDelete}>Delete Auto Pilot</Button>
+                    <Button type={'danger'} size={'large'} style={{ marginTop: 30 }} onClick={this.handleDelete}>Delete
+                        Auto Pilot</Button>
                 </div>
             </NoHeaderPanel>
 
@@ -495,8 +494,7 @@ function mapStateToProps(state) {
         isLoading: state.autoPilot.isLoading,
         isStatusChanging: state.autoPilot.isStatusChanging,
         appointmentAllocationTime: state.appointmentAllocationTime.allocationTimes,
-        aatLoading: state.appointmentAllocationTime.isLoading,
-        campaignOptions: state.campaign.campaignOptions //TODO: To be removed (Fetching assistants for referral for now)
+        aatLoading: state.appointmentAllocationTime.isLoading
     };
 }
 

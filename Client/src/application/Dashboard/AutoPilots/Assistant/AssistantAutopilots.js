@@ -66,7 +66,7 @@ class AssistantAutoPilots extends React.Component {
 
     openAutoPilot = (id) => {
       history.push(`/dashboard/auto_pilots/assistant/${id}`) 
-    }
+    };
 
 
     // it must be an array of Menu.Item. ViewBox expect that in its options Menu

@@ -78,6 +78,17 @@ class CRMAutoPilot extends React.Component {
         });
     };
 
+    handleDelete = () => {
+        confirm({
+            title: `Delete auto pilot confirmation`,
+            content: `If you click OK, this auto pilot will be deleted and disconnected from all assistants that are connected to it`,
+            onOk: () => {
+                this.props.dispatch(CRMAutoPilotActions.deleteCRMAutoPilot(this.props.crmAP.ID))
+                    .then(() => history.push('/dashboard/auto_pilots/crm'));
+            }
+        });
+    };
+
     componentDidUpdate(){
       if(this.state.autoRefer !== this.props.form.getFieldValue('AutoReferApplicants')){
         this.setState({autoRefer: this.props.form.getFieldValue('AutoReferApplicants')})
@@ -86,7 +97,7 @@ class CRMAutoPilot extends React.Component {
 
     render() {
         const { getFieldDecorator, getFieldValue } = this.props.form;
-        const crmAP = this.props.crmAP ? this.props.crmAP : {}
+        const crmAP = this.props.crmAP ? this.props.crmAP : {};
         const { autoRefer } = this.state;
         let activeKeys = [];
         activeKeys = autoRefer ? [...activeKeys, '1'] : activeKeys;
@@ -274,7 +285,6 @@ class CRMAutoPilot extends React.Component {
                             <Button type={'primary'} size={'large'} onClick={this.onSubmit} style={{ marginTop: 30 }}>
                                 Save changes
                             </Button>
-                            <Divider/>
                             <Button type={'danger'} size={'large'} onClick={this.handleDelete}>Delete Auto
                                 Pilot</Button>
                         </Form>}

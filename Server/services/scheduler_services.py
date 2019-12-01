@@ -85,17 +85,7 @@ def sendAutopilotReferrals():
             crmaplist = db.session.query(CRMAutoPilot).filter(CRMAutoPilot.ID == CRM.ID) \
                 .filter(and_(CRMAutoPilot.LastReferral != None, 24 <= func.TIMESTAMPDIFF(text('HOUR'), CRMAutoPilot.LastReferral, yesterday), CRMAutoPilot.Active == True)).all()
             for crmAP in crmaplist:
-                crm_callback = crm_services.getCRMByType(enums.CRM.Bullhorn, crmAP.CompanyID)
-                if not crm_callback.Success:
-                    raise Exception("Company is not connected to bullhorn")
-
-                messenger_callback = messenger_servicess.getMessengerByType(enums.Messenger.Twilio, crmAP.CompanyID)
-                if not messenger_callback.Success:
-                    raise Exception("Company is not connected to twilio")
-
-                messenger = messenger_callback.Data
-
-                crm = crm_callback.Data
+                crm = crmAP.CRM
                 params = [{"input": "dateBegin", "match": crmAP.LastReferral, "queryType": "BETWEEN", "match2": now}]
                 search_callback = crm_services.searchPlacements(crm, crmAP.CompanyID, params)
 
@@ -128,8 +118,11 @@ def sendAutopilotReferrals():
                     mail_services.simpleSend(candidate['email'], crmAP.ReferralEmailTitle, EmailBody)
                     crmAP.LastReferral = now
                   if crmAP.SendReferralSMS and candidate['mobile']:
-                    messenger_servicess.sendMessage(messenger.Type, candidate['mobile'], SMSBody, messenger.Auth)
-                    crmAP.LastReferral = now  
+                    messenger_callback = messenger_servicess.getMessengerByType(enums.Messenger.Twilio, crmAP.CompanyID)
+                    if not messenger_callback.Success:
+                        raise Exception("Company is not connected to twilio")
+                        messenger_servicess.sendMessage(messenger.Type, candidate['mobile'], SMSBody, messenger.Auth)
+                        crmAP.LastReferral = now  
 
             # Save changes to the db
             db.session.commit()

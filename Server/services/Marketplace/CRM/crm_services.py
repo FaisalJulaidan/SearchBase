@@ -124,7 +124,7 @@ def uploadFile(filePath, fileName, conversation):
 def searchCandidates(assistant: Assistant, session):
     data = {
         "location": __checkFilter(session['keywordsByDataType'], DT.CandidateCity),
-        "preferredJotTitle": __checkFilter(session['keywordsByDataType'], DT.JobTitle),
+        "preferredJotTitle": __checkFilter(session['keywordsByDataType'], DT.PreferredJobTitle),
         "yearsExperience": __checkFilter(session['keywordsByDataType'], DT.CandidateYearsExperience),
         "skills": __checkFilter(session['keywordsByDataType'], DT.CandidateSkills, True),
         "jobCategory": __checkFilter(session['keywordsByDataType'], DT.JobCategory),
@@ -148,7 +148,7 @@ def searchCandidates(assistant: Assistant, session):
 def searchCandidatesCustom(crm, companyID, candidate_data, perfect=False):
     data = {
         "location": candidate_data.get("location"),
-        "preferredJotTitle": candidate_data.get("jobTitle"),
+        "preferredJotTitle": candidate_data.get("preferredJobTitle"),
         "skills": candidate_data.get("skills"),
         "jobType": candidate_data.get("jobType"),
         "shortlist_id": candidate_data.get("shortlist_id")
@@ -183,7 +183,7 @@ def searchCandidatesCustom(crm, companyID, candidate_data, perfect=False):
 
 def searchJobs(assistant: Assistant, session):
     data = {
-        "jobTitle": __checkFilter(session['keywordsByDataType'], DT.JobTitle),
+        "preferredJobTitle": __checkFilter(session['keywordsByDataType'], DT.PreferredJobTitle),
         "city": __checkFilter(session['keywordsByDataType'], DT.JobCity) or
                 __checkFilter(session['keywordsByDataType'], DT.CandidateCity),
         "employmentType": __checkFilter(session['keywordsByDataType'], DT.JobType),
@@ -474,7 +474,7 @@ def __extractCandidateInsertData(conversation):
         "preferredWorkCity": ", ".join(
             conversation.Data.get('keywordsByDataType').get(DT.JobCity.value['name'], [])) or None,
         "preferredJobTitle": ", ".join(
-            conversation.Data.get('keywordsByDataType').get(DT.JobTitle.value['name'], [])) or None,
+            conversation.Data.get('keywordsByDataType').get(DT.PreferredJobTitle.value['name'], [])) or None,
         "preferredJobType": ", ".join(
             conversation.Data.get('keywordsByDataType').get(DT.JobType.value['name'], [])) or None,
 

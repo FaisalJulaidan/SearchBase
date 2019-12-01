@@ -202,7 +202,7 @@ def searchCandidates(auth) -> Callback:
                                                                   skills=None,
                                                                   linkdinURL=None,
                                                                   availability=None,
-                                                                  jobTitle=None,
+                                                                  preferredJobTitle=None,
                                                                   education=
                                                                   getValue(record.get("educations"), "degree"),
                                                                   yearsExperience=0,
@@ -297,7 +297,7 @@ def getAllCandidates(auth) -> Callback:
                                                                   skills=None,
                                                                   linkdinURL=None,
                                                                   availability=None,
-                                                                  jobTitle=None,
+                                                                  preferredJobTitle=None,
                                                                   education= getValue(record.get("educations"), "degree"),
                                                                   yearsExperience=0,
                                                                   desiredSalary=0,

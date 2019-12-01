@@ -76,7 +76,7 @@ class Campaign extends React.Component {
                         messenger_id: campaign?.MessengerID,
                         skills: JSON.parse(campaign?.Skills.replace(/'/g, '"')).join(", "),
                         location: campaign?.Location,
-                        jobTitle: campaign?.JobTitle,
+                        preferredJobTitle: campaign?.PreferredJobTitle,
                         text: campaign?.Message
                     });
                 }).catch((err) => {
@@ -162,7 +162,7 @@ class Campaign extends React.Component {
             values.database_id,
             values.messenger_id,
             values.location,
-            values.jobTitle,
+            values.preferredJobTitle,
             values.jobType,
             values.skills?.split(/[ ,]+/),
             values.text,
@@ -236,7 +236,7 @@ class Campaign extends React.Component {
             values.database_id,
             values.messenger_id,
             values.location,
-            values.jobTitle,
+            values.preferredJobTitle,
             values.jobType,
             values.skills?.split(/[ ,]+/),
             this.state.textMessage,
@@ -261,7 +261,7 @@ class Campaign extends React.Component {
                         values.database_id,
                         values.messenger_id,
                         values.location,
-                        values.jobTitle,
+                        values.preferredJobTitle,
                         values.skills?.split(/[ ,]+/),
                         this.state.textMessage
                     ));
@@ -285,7 +285,7 @@ class Campaign extends React.Component {
                     values.database_id,
                     values.messenger_id,
                     values.location,
-                    values.jobTitle,
+                    values.preferredJobTitle,
                     values.skills?.split(/[ ,]+/),
                     this.state.textMessage
                 )).then(() => {
@@ -558,7 +558,7 @@ class Campaign extends React.Component {
                                 :
                                 <>
                                     <FormItem label={"Job Title"}>
-                                        {getFieldDecorator("jobTitle", {
+                                        {getFieldDecorator("preferredJobTitle", {
                                             rules: [{
                                                 whitespace: true,
                                                 message: "Please enter your job title"

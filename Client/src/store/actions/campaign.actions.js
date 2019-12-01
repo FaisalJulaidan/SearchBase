@@ -37,7 +37,7 @@ const fetchCampaignFailure = (error) => ({
 });
 
 // Save Campaign
-const saveCampaign = (name, assistant_id, use_crm, crm_id, useShortlist,shortlist_id, database_id, messenger_id, location, jobTitle, skills, message) => ({
+const saveCampaign = (name, assistant_id, use_crm, crm_id, useShortlist,shortlist_id, database_id, messenger_id, location, preferredJobTitle, skills, message) => ({
     type: actionTypes.SAVE_CAMPAIGN_REQUEST,
     meta: {thunk: true},
     name,
@@ -49,7 +49,7 @@ const saveCampaign = (name, assistant_id, use_crm, crm_id, useShortlist,shortlis
     database_id,
     messenger_id,
     location,
-    jobTitle,
+    preferredJobTitle,
     skills,
     message
 });
@@ -66,7 +66,7 @@ const saveCampaignFailure = (error) => ({
 
 
 // Update Campaign
-const updateCampaign = (campaignID, name, assistant_id, use_crm, crm_id, useShortlist,shortlist_id, database_id, messenger_id, location, jobTitle, skills, message) => ({
+const updateCampaign = (campaignID, name, assistant_id, use_crm, crm_id, useShortlist,shortlist_id, database_id, messenger_id, location, preferredJobTitle, skills, message) => ({
     type: actionTypes.UPDATE_CAMPAIGN_REQUEST,
     campaignID,
     name,
@@ -78,7 +78,7 @@ const updateCampaign = (campaignID, name, assistant_id, use_crm, crm_id, useShor
     database_id,
     messenger_id,
     location,
-    jobTitle,
+    preferredJobTitle,
     skills,
     message
 });
@@ -111,7 +111,7 @@ const deleteCampaignFailure = (error) => ({
 });
 
 // Fetch Candidates List
-const fetchCampaignCandidatesData = (assistant_id, use_crm, crm_id, useShortlist,shortlist_id, database_id, messenger_id, location, jobTitle, jobType, skills, text, outreach_type, email_title) => ({
+const fetchCampaignCandidatesData = (assistant_id, use_crm, crm_id, useShortlist,shortlist_id, database_id, messenger_id, location, preferredJobTitle, jobType, skills, text, outreach_type, email_title) => ({
         type: actionTypes.FETCH_CAMPAIGN_CANDIDATES_DATA_REQUEST,
         assistant_id,
         use_crm,
@@ -121,7 +121,7 @@ const fetchCampaignCandidatesData = (assistant_id, use_crm, crm_id, useShortlist
         database_id,
         messenger_id,
         location,
-        jobTitle,
+        preferredJobTitle,
         jobType,
         skills,
         text,
@@ -156,7 +156,7 @@ const fetchShortlistsFailure = (error) => ({
     error
 });
 // Launch Campaign
-const launchCampaign = (assistant_id, use_crm, crm_id, useShortlist, shortlist_id, database_id, messenger_id, location, jobTitle, jobType, skills, text, candidate_list, outreach_type, email_title) => ({
+const launchCampaign = (assistant_id, use_crm, crm_id, useShortlist, shortlist_id, database_id, messenger_id, location, preferredJobTitle, jobType, skills, text, candidate_list, outreach_type, email_title) => ({
     type: actionTypes.LAUNCH_CAMPAIGN_REQUEST,
     assistant_id,
     use_crm,
@@ -166,7 +166,7 @@ const launchCampaign = (assistant_id, use_crm, crm_id, useShortlist, shortlist_i
     database_id,
     messenger_id,
     location,
-    jobTitle,
+    preferredJobTitle,
     jobType,
     skills,
     text,

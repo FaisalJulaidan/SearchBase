@@ -207,9 +207,9 @@ const JobColumns = [{
     render: (text, record, index) => (<p>{index + 1}</p>)
 }, {
     title: 'Job Title',
-    key: 'JobTitle',
-    dataIndex: 'JobTitle',
-    render: (text, record) => (<p>{record.JobTitle}</p>)
+    key: 'PreferredJobTitle',
+    dataIndex: 'PreferredJobTitle',
+    render: (text, record) => (<p>{record.PreferredJobTitle}</p>)
 }, {
     title: 'Description',
     key: 'JobDescription',

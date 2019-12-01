@@ -476,9 +476,17 @@ class DataType(Enum):
     # ======================================================================
     # Job
 
-    JobTitle = dataTypeCreator(
-        'Job Title',
-        'JobTitle',
+    CurrentJobTitle = dataTypeCreator(
+        'Current Job Title',
+        'CurrentJobTitle',
+        ValidationType.String,
+        DataTypeSection.Job,
+        [UserType.Candidate, UserType.Client],
+        [BlockType.UserInput, BlockType.Question])
+
+    PreferredJobTitle = dataTypeCreator(
+        'Preferred Job Title',
+        'PreferredJobTitle',
         ValidationType.String,
         DataTypeSection.Job,
         [UserType.Candidate, UserType.Client],

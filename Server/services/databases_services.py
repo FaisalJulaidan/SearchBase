@@ -197,7 +197,7 @@ def updateCandidate(candidateID, conversation) -> Callback:
                 conversation.Data.get('keywordsByDataType').get(DT.CandidateYearsExperience.value['name']) or
                 conversation.Data.get('keywordsByDataType').get(DT.JobYearsRequired.value['name'], [])) or None,
             "preferredJobTitle": ", ".join(
-                conversation.Data.get('keywordsByDataType').get(DT.JobTitle.value['name'], [])) or None,
+                conversation.Data.get('keywordsByDataType').get(DT.PreferredJobTitle.value['name'], [])) or None,
 
             "educations": ", ".join(conversation.Data.get('keywordsByDataType').get(DT.CandidateEducation.value['name'],
                                                                                     [])) or None,
@@ -389,8 +389,8 @@ def scanCandidates(session, dbIDs, extraCandidates=None, campaign=False):
         __wordsCounter(DT.JobCity, Candidate.CandidateCity, keywords, df, 6)
         __wordsCounter(DT.CandidateCity, Candidate.CandidateCity, keywords, df, 6)
 
-        # JobTitle
-        __wordsCounter(DT.JobTitle, Candidate.CandidateJobTitle, keywords, df, 1)
+        # PreferredJobTitle
+        __wordsCounter(DT.PreferredJobTitle, Candidate.CandidateJobTitle, keywords, df, 1)
 
         # Skills
         __wordsCounter(DT.CandidateSkills, Candidate.CandidateSkills, keywords, df, 2)
@@ -497,9 +497,9 @@ def scanJobs(session, dbIDs, extraJobs=None):
         __numCounter(Job.JobYearsRequired, '<', DT.CandidateYearsExperience, keywords, df, plus=5, addInputToScore=True)
 
         # Job Title
-        __wordsCounter(DT.JobTitle, Job.JobTitle, keywords, df, 2)
-        __wordsCounter(DT.JobTitle, Job.JobDescription, keywords, df, 2)
-        __wordsCounter(DT.CandidateSkills, Job.JobTitle, keywords, df, 2)
+        __wordsCounter(DT.PreferredJobTitle, Job.PreferredJobTitle, keywords, df, 2)
+        __wordsCounter(DT.PreferredJobTitle, Job.JobDescription, keywords, df, 2)
+        __wordsCounter(DT.CandidateSkills, Job.PreferredJobTitle, keywords, df, 2)
         __wordsCounter(DT.CandidateSkills, Job.JobDescription, keywords, df, 2)
 
         # Type
@@ -560,7 +560,7 @@ def scanJobs(session, dbIDs, extraJobs=None):
             data.append({
                 "id": record["ID"],
                 "databaseType": DatabaseType.Jobs.value,
-                "title": record[Job.JobTitle.name],
+                "title": record[Job.PreferredJobTitle.name],
                 "subTitles": subTitles,
                 "description": " ".join(desc),
                 "buttonText": "Apply",
@@ -626,7 +626,7 @@ def __salary(row, dbSalaryColumn, dbCurrencyColumn, salaryInput: str, plus=4, fo
 
 
 def createPandaCandidate(id, name, email, mobile, location, skills,
-                         linkdinURL, availability, jobTitle, education,
+                         linkdinURL, availability, preferredJobTitle, education,
                          yearsExperience: int, desiredSalary, currency: Currency, source):
     if isinstance(desiredSalary, str):
         desiredSalary = float(re.sub("[^0-9]", "", desiredSalary))
@@ -638,7 +638,7 @@ def createPandaCandidate(id, name, email, mobile, location, skills,
             "CandidateSkills": convertSkillsToString(skills) or '',
             "CandidateLinkdinURL": linkdinURL or '',
             "CandidateAvailability": availability or '',
-            "CandidateJobTitle": jobTitle or '',
+            "CandidateJobTitle": preferredJobTitle or '',
             "CandidateEducation": education or '',
             "CandidateYearsExperience": yearsExperience or 0,
             "CandidateDesiredSalary": desiredSalary or 0,
@@ -653,7 +653,7 @@ def createPandaJob(id, title, desc, location, type, salary, essentialSkills, yea
     if isinstance(salary, str):
         salary = float(re.sub("[^0-9]", "", salary))
     return {"ID": id,
-            "JobTitle": title or '',
+            "PreferredJobTitle": title or '',
             "JobDescription": desc or '',
             "JobCity": location or '',
             "JobType": type or '',

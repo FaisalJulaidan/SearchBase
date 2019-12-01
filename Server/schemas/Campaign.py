@@ -5,7 +5,7 @@ class Campaign(db.Model):
 
     ID = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
     Name = db.Column(db.String(80))
-    JobTitle = db.Column(db.String(80))
+    PreferredJobTitle = db.Column(db.String(80))
     Skills = db.Column(db.String(80))
     Location = db.Column(db.String(80))
     Message = db.Column(db.String(512))

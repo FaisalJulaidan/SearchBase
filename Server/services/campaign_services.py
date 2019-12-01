@@ -67,7 +67,7 @@ def save(campaign_details, companyID, campaignID=None):
         # else:
         #     skills = ""
         campaign.Name = campaign_details.get("name")
-        campaign.JobTitle = campaign_details.get("jobTitle")
+        campaign.PreferredJobTitle = campaign_details.get("preferredJobTitle")
         campaign.Skills = str(campaign_details.get("skills", "[]"))
         campaign.Location = campaign_details.get("location")
         campaign.Message = campaign_details.get("message")
@@ -166,7 +166,7 @@ def prepareCampaign(campaign_details, companyID):
                 "keywordsByDataType": {
                     DT.CandidateCity.value['name']: [campaign_details.get("location")],
                     # DT.JobSalary.value['name']: ["1000-5000 GBP Annually"],
-                    DT.JobTitle.value['name']: [campaign_details.get("jobTitle")],
+                    DT.PreferredJobTitle.value['name']: [campaign_details.get("preferredJobTitle")],
                     DT.CandidateSkills.value['name']: campaign_details.get("skills"),
                 },
                 "databaseType": DatabaseType.Candidates.name

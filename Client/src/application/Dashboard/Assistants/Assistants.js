@@ -136,7 +136,8 @@ class Assistants extends Component {
                 <NewAssistantModal visible={this.state.newAssistantModalVisible}
                                    addAssistant={this.addAssistant}
                                    isAssistantNameValid={this.isAssistantNameValid}
-                                   hideModal={this.hideNewAssistantModal}/>
+                                   hideModal={this.hideNewAssistantModal}
+                                   assistantTemplates={this.props.options.assistantTemplates}/>
 
                 <EditAssistantModal visible={this.state.editModalVisible}
                                     assistant={this.state.assistantToEdit}
@@ -167,6 +168,7 @@ function mapStateToProps(state) {
     return {
         assistantList: state.assistant.assistantList,
         isLoading: state.assistant.isLoading,
+        options: state.options.options,
     };
 }
 

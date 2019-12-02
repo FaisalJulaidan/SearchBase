@@ -1,7 +1,7 @@
-import React, {Component} from 'react';
-import {Button, Card, Collapse, Divider, Form, Icon, Input, Modal, Popconfirm, Tag, Tooltip, Typography} from "antd";
+import React, { Component } from 'react';
+import { Button, Card, Collapse, Divider, Form, Icon, Input, Modal, Popconfirm, Tag, Tooltip, Typography } from 'antd';
 
-import {getInitialVariables, initActionType, initActionTypeSkip} from './CardTypesHelpers'
+import { getInitialVariables, initActionType, initActionTypeSkip } from './CardTypesHelpers';
 import {
     ActionFormItem,
     AfterMessageFormItem,
@@ -17,11 +17,11 @@ import {
     SkippableFormItem,
     SkipTextFormItem,
     StoreInDBFormItem
-} from './FormItems'
+} from './FormItems';
 import shortid from 'shortid';
-import './CardTypes.less'
+import './CardTypes.less';
 
-const {Paragraph} = Typography;
+const { Paragraph } = Typography;
 
 const FormItem = Form.Item;
 
@@ -56,12 +56,12 @@ class Question extends Component {
                     StoreInDB: values.storeInDB,
 
                     Skippable: values.isSkippable || false,
-                    SkipText: values.SkipText || "Skip!",
-                    SkipAction: values.SkipAction || "End Chat",
+                    SkipText: values.SkipText || 'Skip!',
+                    SkipAction: values.SkipAction || 'End Chat',
                     SkipBlockToGoID: values.skipBlockToGoID || values.skipBlockToGoIDGroup || null,
 
                     DataType: flowOptions.dataTypes
-                        .find((dataType) => dataType.name === values.dataType[values.dataType.length-1]),
+                        .find((dataType) => dataType.name === values.dataType[values.dataType.length - 1]),
                     Content: {
                         text: values.text,
                         answers: this.state.answers
@@ -76,7 +76,7 @@ class Question extends Component {
                     this.props.handleEditBlock(options);
                 }
             }
-    });
+        });
 
     //Add single answer
     addAnswer = () => this.props.form.validateFields(['answer', 'action', 'blockToGoID', 'blockToGoIDGroup', 'afterMessage', 'scoreWeight'],
@@ -88,21 +88,21 @@ class Question extends Component {
                     keywords: this.state.tags,
                     blockToGoID: values.blockToGoID || values.blockToGoIDGroup || null,
                     action: values.action,
-                    afterMessage: values.afterMessage || "",
+                    afterMessage: values.afterMessage || '',
                     score: values.scoreWeight || 0
                 };
 
                 // remove old edited answer
-                this.removeAnswer({id: this.state.editedAnswer?.id})
+                this.removeAnswer({ id: this.state.editedAnswer?.id })
                     .then(() => {
                         let answers = [answer].concat(this.state.answers);
-                        this.setState({answers, tags: []});
+                        this.setState({ answers, tags: [] });
                         this.hideAddAnswer();
                     });
             }
         });
-    showAddAnswer = () => this.setState({modalVisible: true});
-    hideAddAnswer = () => this.setState({modalVisible: false, editedAnswer: {}, tags: []});
+    showAddAnswer = () => this.setState({ modalVisible: true });
+    hideAddAnswer = () => this.setState({ modalVisible: false, editedAnswer: {}, tags: [] });
     removeAnswer = deletedAnswer => new Promise(res => {
         this.setState({
             answers: [...this.state.answers].filter(answer => answer.id !== deletedAnswer.id)
@@ -111,26 +111,26 @@ class Question extends Component {
 
     showEditAnswer = answer => this.setState({
         modalVisible: true, editedAnswer: answer, tags: answer.keywords,
-        ...initActionType({Content: answer}, this.props.modalState.allGroups)
+        ...initActionType({ Content: answer }, this.props.modalState.allGroups)
     });
 
     //Tags component's functions
-    removeTag = (removedTag) => this.setState({tags: this.state.tags.filter(tag => tag !== removedTag)});
-    showInput = () => this.setState({inputVisible: true}, () => this.input.focus());
-    handleInputChange = e => this.setState({inputValue: e.target.value});
+    removeTag = (removedTag) => this.setState({ tags: this.state.tags.filter(tag => tag !== removedTag) });
+    showInput = () => this.setState({ inputVisible: true }, () => this.input.focus());
+    handleInputChange = e => this.setState({ inputValue: e.target.value });
     saveInputRef = input => this.input = input;
     handleInputConfirm = () => {
         const inputValue = this.state.inputValue;
         let tags = this.state.tags;
         if (inputValue && tags.indexOf(inputValue) === -1)
             tags = [...tags, inputValue];
-        this.setState({tags, inputVisible: false, inputValue: '',});
+        this.setState({ tags, inputVisible: false, inputValue: '' });
     };
 
 
     componentWillMount() {
-        const {modalState, options} = this.props;
-        const {block} = getInitialVariables(options.flow, modalState);
+        const { modalState, options } = this.props;
+        const { block } = getInitialVariables(options.flow, modalState);
         this.setState({
             ...initActionType(block, this.props.modalState.allGroups),
             ...initActionTypeSkip(block, this.props.modalState.allGroups),
@@ -140,17 +140,17 @@ class Question extends Component {
     }
 
     render() {
-        const {modalState, options, form, handleNewBlock, handleEditBlock, handleDeleteBlock} = this.props;
-        const {blockOptions, block} = getInitialVariables(options.flow ,modalState, 'Question');
-        const {allGroups, allBlocks, currentGroup, layout} = modalState;
-        const {getFieldDecorator} = form;
+        const { modalState, options, form, handleNewBlock, handleEditBlock, handleDeleteBlock } = this.props;
+        const { blockOptions, block } = getInitialVariables(options.flow, modalState, 'Question');
+        const { allGroups, allBlocks, currentGroup, layout } = modalState;
+        const { getFieldDecorator } = form;
 
-        const {tags, inputVisible, inputValue, showSkip} = this.state;
+        const { tags, inputVisible, inputValue, showSkip } = this.state;
 
         const buttons = ButtonsForm(handleNewBlock, handleEditBlock, handleDeleteBlock, this.onSubmit, block);
 
         return (
-            <Card style={{width: '100%'}} actions={buttons}>
+            <Card style={{ width: '100%' }} actions={buttons}>
                 <Form layout='horizontal' id={'Flow_Questions'}>
                     <QuestionFormItem FormItem={FormItem} block={block}
                                       getFieldDecorator={getFieldDecorator}
@@ -161,18 +161,18 @@ class Question extends Component {
                                       getFieldDecorator={getFieldDecorator}
                                       options={this.props.options}
                                       layout={layout}
-                                      blockType={"Question"}/>
+                                      blockType={'Question'}/>
 
                     <FormItem label="Answers"{...layout}>
-                        <Button onClick={this.showAddAnswer} type="primary" icon="plus" size={"small"}>Add
+                        <Button onClick={this.showAddAnswer} type="primary" icon="plus" size={'small'}>Add
                             Answer</Button>
                         <Collapse accordion>
                             {
                                 this.state.answers.map((answer, i) => (
                                     <Collapse.Panel
                                         header={
-                                            <Paragraph style={{width: 'calc(100% - 85px)', margin: 0}}
-                                                       ellipsis={{rows: 1}}>
+                                            <Paragraph style={{ width: 'calc(100% - 85px)', margin: 0 }}
+                                                       ellipsis={{ rows: 1 }}>
                                                 {answer.text}
                                             </Paragraph>
                                         }
@@ -184,7 +184,7 @@ class Question extends Component {
                                                             this.showEditAnswer(answer);
                                                             event.stopPropagation();
                                                         }}
-                                                        size={"small"}></Button>
+                                                        size={'small'}></Button>
                                                 <Popconfirm placement="topRight"
                                                             title="Are you sure delete this answer?"
                                                             onConfirm={(event) => {
@@ -194,8 +194,8 @@ class Question extends Component {
                                                             okText="Yes" cancelText="No">
                                                     <Button type="danger" icon="delete"
                                                             onClick={(event) => event.stopPropagation()}
-                                                            style={{marginLeft: 5}}
-                                                            size={"small"}></Button>
+                                                            style={{ marginLeft: 5 }}
+                                                            size={'small'}></Button>
                                                 </Popconfirm>
                                             </div>
                                         }>
@@ -221,7 +221,7 @@ class Question extends Component {
                     {
                         showSkip &&
                         <>
-                            <Divider dashed={true} style={{fontWeight: 'normal', fontSize: '14px'}}>
+                            <Divider dashed={true} style={{ fontWeight: 'normal', fontSize: '14px' }}>
                                 Skip Button
                             </Divider>
 
@@ -266,8 +266,8 @@ class Question extends Component {
                                 initialValue: this.state.editedAnswer?.text,
                                 rules: [{
                                     required: true,
-                                    message: "Please input answer field",
-                                }],
+                                    message: 'Please input answer field'
+                                }]
                             })(
                                 <Input placeholder="Ex: Yes I need it :)"/>
                             )}
@@ -291,7 +291,7 @@ class Question extends Component {
                                         ref={this.saveInputRef}
                                         type="text"
                                         size="small"
-                                        style={{width: 78}}
+                                        style={{ width: 78 }}
                                         value={inputValue}
                                         onChange={this.handleInputChange}
                                         onBlur={this.handleInputConfirm}
@@ -301,7 +301,7 @@ class Question extends Component {
                                 {!inputVisible && (
                                     <Tag
                                         onClick={this.showInput}
-                                        style={{background: '#fff', borderStyle: 'dashed'}}>
+                                        style={{ background: '#fff', borderStyle: 'dashed' }}>
                                         <Icon type="plus"/> New Keyword
                                     </Tag>
                                 )}
@@ -309,11 +309,11 @@ class Question extends Component {
                         </FormItem>
 
                         <ScoreFormItem FormItem={FormItem} layout={layout} getFieldDecorator={getFieldDecorator}
-                                       block={{Content: {ID: block.ID, score: this.state.editedAnswer?.score}}}/>
+                                       block={{ Content: { ID: block.ID, score: this.state.editedAnswer?.score } }}/>
 
                         <ActionFormItem FormItem={FormItem}
                                         blockOptions={blockOptions}
-                                        block={{Content: {ID: block.ID, action: this.state.editedAnswer?.action}}}
+                                        block={{ Content: { ID: block.ID, action: this.state.editedAnswer?.action } }}
                                         setStateHandler={(state) => this.setState(state)}
                                         getFieldDecorator={getFieldDecorator}
                                         layout={layout}/>

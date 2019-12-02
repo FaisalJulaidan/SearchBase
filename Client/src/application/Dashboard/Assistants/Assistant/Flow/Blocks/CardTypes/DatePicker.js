@@ -95,7 +95,7 @@ class DatePicker extends Component {
                     <QuestionFormItem FormItem={FormItem} block={block}
                                       getFieldDecorator={getFieldDecorator}
                                       layout={layout}
-                                      placeholder="Ex: What is your email?"/>
+                                      placeholder="Ex: What dates best suit you?"/>
 
                     <DataTypeFormItem FormItem={FormItem} block={block}
                                       getFieldDecorator={getFieldDecorator}

@@ -44,7 +44,8 @@ class SalaryPicker extends Component {
                     SkipAction: values.SkipAction || 'End Chat',
                     SkipBlockToGoID: values.skipBlockToGoID || values.skipBlockToGoIDGroup || null,
 
-                    DataType: flowOptions.dataTypes.find(dataType => dataType.name === "Job Salary"),
+                    DataType: flowOptions.dataTypes
+                        .find((dataType) => dataType.name === values.dataType[values.dataType.length - 1]),
                     Content: {
                         text: values.text,
                         min: +values.minSalary,
@@ -96,7 +97,7 @@ class SalaryPicker extends Component {
                     <QuestionFormItem FormItem={FormItem} block={block}
                                       getFieldDecorator={getFieldDecorator}
                                       layout={layout}
-                                      placeholder="Ex: What is your email?"/>
+                                      placeholder="Ex: What is your desired salary?"/>
 
                     <DataTypeFormItem FormItem={FormItem} block={block}
                                       getFieldDecorator={getFieldDecorator}

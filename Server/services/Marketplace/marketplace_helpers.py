@@ -109,9 +109,7 @@ def disconnect(type, companyID):
 # send request with dynamic method
 def sendRequest(url, method, headers, data=None):
     if data:
-        helpers.logError("DATA SEND 1: " + str(data))
         data = helpers.cleanDict(data)
-        helpers.logError("DATA SEND 2: " + str(data))
     request = None
     if method.lower() == "put":
         request = requests.put(url, headers=headers, data=data)

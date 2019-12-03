@@ -84,7 +84,6 @@ class Campaign extends React.Component {
                         text: campaign?.Message
                     });
                 }).catch((err) => {
-                console.log(err);
                 history.push(`/dashboard/campaigns`);
             });
         }
@@ -598,6 +597,7 @@ class Campaign extends React.Component {
                                 <>
                                     <FormItem label={"Job Title"}>
                                         {getFieldDecorator("jobTitle", {
+                                            initialValue: "",
                                             rules: [{
                                                 whitespace: true,
                                                 message: "Please enter your job title"
@@ -617,7 +617,7 @@ class Campaign extends React.Component {
                                     </FormItem>
                                     <FormItem label={"Skills"}
                                               help='Separate skills with commas. For example: JavaScript, HTML, CSS'>
-                                        {getFieldDecorator("skills")(
+                                        {getFieldDecorator("skills", {initialValue: ""})(
                                             <Input
                                                 placeholder="Type in your desired skills"/>
                                         )}

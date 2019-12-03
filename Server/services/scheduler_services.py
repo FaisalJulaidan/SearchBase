@@ -62,6 +62,7 @@ def sendConversationsNotifications(assistantID=None):
                                      Conversation.AssistantID == assistant.ID))\
                         .all()
                     if len(conversations) != 0:
+                        print("DELELTE SEND SEND ")
                         assistant.LastNotificationDate = now
                         callback: Callback = mail_services.notifyNewConversations(assistant, conversations, assistant.LastNotificationDate)
                         if not callback.Success:

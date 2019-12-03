@@ -128,16 +128,6 @@ class NewAssistantModal extends Component {
                                 {this.props.assistantTemplates.map((temp, i) => (
                                     <Option key={i} value={temp.fileName}>{temp.label}</Option>
                                 ))}
-
-                                {/*<Option key={2} value={'main'}>Main</Option>*/}
-                                {/*<Option key={3} value={'appointment'}>Appointment</Option>*/}
-                                {/*<Option key={4} value={'join-us'}>Join Us</Option>*/}
-                                {/*<Option key={5} value={'referral'}>Referral</Option>*/}
-                                {/*<Option key={6} value={'apply'}>Apply Chatbot</Option>*/}
-                                {/*<Option key={7} value={'update-candidates'}>Update Candidates</Option>*/}
-                                {/*<Option key={8} value={'client-chatbot'}>Client Chatbot</Option>*/}
-                                {/*<Option key={9} value={'pre-screen'}>Pre-Screen</Option>*/}
-                                {/*<Option key={10} value={'template-1'}>Template 1</Option>*/}
                             </Select>
                         )}
                     </FormItem>

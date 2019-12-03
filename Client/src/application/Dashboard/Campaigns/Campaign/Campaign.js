@@ -332,6 +332,7 @@ class Campaign extends React.Component {
     };
 
     render() {
+        console.log(this.props.candidate_list?.length);
         const { form } = this.props;
         const { getFieldDecorator } = form;
         return (<NoHeaderPanel>
@@ -381,6 +382,7 @@ class Campaign extends React.Component {
                             </Button>
                             <Button onClick={this.handleModalLaunch}
                                     type="primary"
+                                    disabled={!this.props.candidate_list?.length}
                                     loading={this.props.isLaunchingCampaign}
                                     icon="rocket">Launch</Button>
                         </div>}

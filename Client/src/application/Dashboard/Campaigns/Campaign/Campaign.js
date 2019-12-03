@@ -47,7 +47,7 @@ class Campaign extends React.Component {
             assistantLinkInMessage: false,
             selectedCRM: null,
             useShortlist: false,
-            active: false,
+            active: false
         };
     }
 
@@ -65,11 +65,11 @@ class Campaign extends React.Component {
                         textMessage: campaign?.Message,
                         use_crm: campaign?.UseCRM,
                         location: campaign?.Location,
-                        assistantLinkInMessage: campaign?.Message.indexOf("{assistant.link}") !== -1,
+                        assistantLinkInMessage: campaign?.Message.indexOf('{assistant.link}') !== -1,
                         selectedCRM: campaign?.CRMID,
                         useShortlist: campaign?.useShortlist,
                         campaignName: trimText.capitalize(trimText.trimDash(campaign?.Name)),
-                        active: campaign?.Active,
+                        active: campaign?.Active
                     });
                     this.props.form.setFieldsValue({
                         name: trimText.capitalize(trimText.trimDash(campaign?.Name)),
@@ -78,7 +78,7 @@ class Campaign extends React.Component {
                         shortlist_id: campaign?.shortlistID,
                         database_id: campaign?.DatabaseID,
                         messenger_id: campaign?.MessengerID,
-                        skills: JSON.parse(campaign?.Skills.replace(/'/g, '"')).join(", "),
+                        skills: JSON.parse(campaign?.Skills.replace(/'/g, '"')).join(', '),
                         location: campaign?.Location,
                         jobTitle: campaign?.JobTitle,
                         text: campaign?.Message
@@ -94,7 +94,7 @@ class Campaign extends React.Component {
 
     componentDidUpdate(prevProps, prevState, snapshot) {
         if (prevProps.isCandidatesLoading && !this.props.isCandidatesLoading && (this.props.errorMsg === null)) {
-            this.state.candidate_list = this.props.candidate_list;
+            this.setState({ candidate_list: this.props.candidate_list });
             this.showModal(true);
         } else if (prevProps.isLaunchingCampaign && (this.props.errorMsg === null)) {
             this.showModal(false);
@@ -195,15 +195,19 @@ class Campaign extends React.Component {
     };
 
     onCandidateSelected = (e, candidate) => {
-        if (e.target.checked)
-            this.state.candidate_list.push(candidate);
-        else {
-            this.state.candidate_list = this.state.candidate_list.filter(function(tempCandidate) {
+        let newList = [...this.state.candidate_list];
+        if (e.target.checked) {
+            console.log(1);
+            newList.push(candidate);
+        } else {
+            console.log(2);
+            newList = this.state.candidate_list.filter(tempCandidate => {
                 if (tempCandidate.ID !== candidate.ID)
                     return tempCandidate;
             });
         }
-        this.setState({ candidate_list: this.state.candidate_list });
+        console.log(3);
+        this.setState({ candidate_list: newList });
     };
 
     isCandidateSelected = (candidate) => {
@@ -332,7 +336,6 @@ class Campaign extends React.Component {
     };
 
     render() {
-        console.log(this.props.candidate_list?.length);
         const { form } = this.props;
         const { getFieldDecorator } = form;
         return (<NoHeaderPanel>
@@ -382,7 +385,7 @@ class Campaign extends React.Component {
                             </Button>
                             <Button onClick={this.handleModalLaunch}
                                     type="primary"
-                                    disabled={!this.props.candidate_list?.length}
+                                    disabled={!this.state.candidate_list?.length}
                                     loading={this.props.isLaunchingCampaign}
                                     icon="rocket">Launch</Button>
                         </div>}
@@ -461,7 +464,7 @@ class Campaign extends React.Component {
                                 <>
                                     <FormItem label={'CRM Type'}>
                                         {getFieldDecorator('crm_id', {
-                                            ...(this.state.selectedCRM !== null && {initialValue: this.state.selectedCRM}),
+                                            ...(this.state.selectedCRM !== null && { initialValue: this.state.selectedCRM }),
                                             rules: [{
                                                 required: true,
                                                 message: 'Please select your desired CRM'
@@ -481,16 +484,16 @@ class Campaign extends React.Component {
                                                 })}
                                             </Select>
                                         )}
-                                        {getFieldDecorator("useShortlist")(
+                                        {getFieldDecorator('useShortlist')(
                                             <Checkbox
                                                 checked={this.state.useShortlist}
                                                 onChange={(e) => {
                                                     if (e.target.checked)
                                                         this.props.dispatch(campaignActions.fetchShortlists(this.state.selectedCRM));
                                                     else {
-                                                        this.props.form.setFieldsValue({shortlist_id: ""});
+                                                        this.props.form.setFieldsValue({ shortlist_id: '' });
                                                     }
-                                                    this.setState({useShortlist: e.target.checked})
+                                                    this.setState({ useShortlist: e.target.checked });
                                                 }}
                                                 style={{
                                                     display: (
@@ -510,13 +513,13 @@ class Campaign extends React.Component {
                                             this.state.useShortlist ? 'block' : 'none')
                                     }}
                                     >
-                                        {getFieldDecorator("shortlist_id", {
+                                        {getFieldDecorator('shortlist_id', {
                                             rules: [{
                                                 required: this.state.useShortlist,
-                                                message: "Please select a shortlist"
-                                            }],
+                                                message: 'Please select a shortlist'
+                                            }]
                                         })(
-                                            <Select placeholder={"Please select a shortlist"}
+                                            <Select placeholder={'Please select a shortlist'}
                                                     loading={this.props.isLoadingShortlists}>
                                                 {this.props.shortlists?.map((item, key) => {
                                                     return (
@@ -597,19 +600,19 @@ class Campaign extends React.Component {
                                 </>
                                 :
                                 <>
-                                    <FormItem label={"Job Title"}>
-                                        {getFieldDecorator("jobTitle", {
-                                            initialValue: "",
+                                    <FormItem label={'Job Title'}>
+                                        {getFieldDecorator('jobTitle', {
+                                            initialValue: '',
                                             rules: [{
                                                 whitespace: true,
-                                                message: "Please enter your job title"
-                                            }],
+                                                message: 'Please enter your job title'
+                                            }]
                                         })(
-                                            <Input placeholder={"Please enter your job title"}/>
+                                            <Input placeholder={'Please enter your job title'}/>
                                         )}
                                     </FormItem>
-                                    <FormItem label={"Job Type"}>
-                                        {getFieldDecorator("jobType", {initialValue: "permanent"})(
+                                    <FormItem label={'Job Type'}>
+                                        {getFieldDecorator('jobType', { initialValue: 'permanent' })(
                                             <Radio.Group>
                                                 <Radio.Button value="permanent">Permanent</Radio.Button>
                                                 <Radio.Button value="temporary">Temporary</Radio.Button>
@@ -617,18 +620,18 @@ class Campaign extends React.Component {
                                             </Radio.Group>
                                         )}
                                     </FormItem>
-                                    <FormItem label={"Skills"}
+                                    <FormItem label={'Skills'}
                                               help='Separate skills with commas. For example: JavaScript, HTML, CSS'>
-                                        {getFieldDecorator("skills", {initialValue: ""})(
+                                        {getFieldDecorator('skills', { initialValue: '' })(
                                             <Input
                                                 placeholder="Type in your desired skills"/>
                                         )}
                                     </FormItem>
-                                    <FormItem label={"Location"}>
-                                        {getFieldDecorator("location", {
+                                    <FormItem label={'Location'}>
+                                        {getFieldDecorator('location', {
                                             rules: [{
                                                 whitespace: true,
-                                                message: "Please enter the location"
+                                                message: 'Please enter the location'
                                             }],
                                             initialValue: this.state.location
                                         })(
@@ -639,12 +642,12 @@ class Campaign extends React.Component {
                                         )}
                                     </FormItem>
                                     <FormItem label={`Distance within ${this.state.distance} miles`}
-                                              style={{display: this.state.location ? 'block' : 'none'}}>
-                                        {getFieldDecorator("distance", {initialValue: this.state.distance})(
+                                              style={{ display: this.state.location ? 'block' : 'none' }}>
+                                        {getFieldDecorator('distance', { initialValue: this.state.distance })(
                                             <Slider
                                                 step={5}
                                                 onChange={(value) => {
-                                                    this.setState({distance: value})
+                                                    this.setState({ distance: value });
                                                 }}
                                             />
                                         )}

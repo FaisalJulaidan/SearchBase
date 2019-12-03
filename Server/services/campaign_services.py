@@ -194,14 +194,17 @@ def prepareCampaign(campaign_details, companyID):
 def sendCampaign(campaign_details, companyID):
     try:
         # print(campaign_details)
-        messenger_callback: Callback = messenger_servicess.getByID(campaign_details.get("messenger_id"), companyID)
-        if not messenger_callback.Success:
-            raise Exception("Messenger not found.")
+        messenger = None
+        if campaign_details.get("outreach_type") == "sms" or campaign_details.get("outreach_type") == "whatsapp":
+            messenger_callback: Callback = messenger_servicess.getByID(campaign_details.get("messenger_id"), companyID)
+            if not messenger_callback.Success:
+                raise Exception("Messenger not found.")
+
+            messenger = messenger_callback.Data
 
         company: Callback = company_services.getByCompanyID(companyID)
         companyName = company.Data.Name.replace(" ", "").lower() if company.Success else None
 
-        messenger = messenger_callback.Data
         crm = None
         hashedAssistantID = helpers.encodeID(campaign_details.get("assistant_id"))
         # CAMPAIGN SOURCES - ID vs TEXT to make url shorter

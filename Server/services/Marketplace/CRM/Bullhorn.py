@@ -83,8 +83,6 @@ def login(auth):
 
         # get the access token AND refresh token
         access_token_request = requests.post(access_token_url, headers=headers)
-        helpers.logError("text 2: " + str(access_token_request.text))
-
         if not access_token_request.ok:
             raise Exception(access_token_request.text)
 
@@ -187,7 +185,7 @@ def sendQuery(auth, query, method, body, companyID, optionalParams=None):
 
         # test the BhRestToken (rest_token)
         r = marketplace_helpers.sendRequest(url, method, headers, json.dumps(body))
-
+        helpers.logError("BULLHORN RETURN 1: " + str(r.status_code) + " / " + str(r.text))
         if r.status_code == 401:  # wrong rest token
             callback: Callback = retrieveRestToken(auth, companyID)
             if not callback.Success:
@@ -196,6 +194,7 @@ def sendQuery(auth, query, method, body, companyID, optionalParams=None):
             url = buildUrl(callback.Data, query, optionalParams)
           
             r = marketplace_helpers.sendRequest(url, method, headers, json.dumps(body))
+            helpers.logError("BULLHORN RETURN 1: " + str(r.status_code) + " / " + str(r.text))
             if not r.ok:
                 raise Exception(r.text + ". Query could not be sent")
 

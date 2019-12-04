@@ -20,6 +20,26 @@
     text-align: center;
 }
 
+.col_item .image_wrapper{
+    position: relative;
+    width: 50%;
+    height: 0;
+    padding-top: 50%;
+    margin-left: auto;
+    margin-right: auto;
+    margin-bottom: 25px;
+    background: #9254de14;
+    border-radius: 50%;
+}
+
+.col_item .image_wrapper .image{
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    padding: 25px;
+}
+
 .col_item .icon{
     color: #9254de;
     margin-bottom: 30px;

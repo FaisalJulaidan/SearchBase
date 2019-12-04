@@ -347,7 +347,6 @@ def searchCandidates(auth, companyID, data) -> Callback:
         # send query
         while True:
             sendQuery_callback: Callback = sendQuery(auth, "candidate/search/" + fields, "get", {}, companyID, [query])
-            helpers.logError("return_body: " + str(json.loads(sendQuery_callback.Data.text)))
             if not sendQuery_callback.Success:
                 raise Exception(sendQuery_callback.Message)
 
@@ -532,7 +531,6 @@ def searchJobs(auth, companyID, data) -> Callback:
                 currency = "GBP"
             else:
                 currency = record.get("currency", "GBP").upper()
-            helpers.logError("Currency: " + str(currency) + ", is it pound: " + str(currency == "pound"))
 
             result.append(databases_services.createPandaJob(id=record.get("id"),
                                                             title=record.get("job_title"),

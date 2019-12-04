@@ -37,8 +37,8 @@ def getAll(companyID) -> Callback:
             return Callback(True, "No campaigns found", [])
 
         # for r in result:
-            # r.Skills = str(r.Skills).replace("[", "").replace("]", "").replace("'", "")
-            # r.Skills = r.Skills.split(", ")
+        # r.Skills = str(r.Skills).replace("[", "").replace("]", "").replace("'", "")
+        # r.Skills = r.Skills.split(", ")
 
         return Callback(True, "Campaigns have been retrieved", result)
 
@@ -177,7 +177,7 @@ def prepareCampaign(campaign_details, companyID):
         if not candidates_callback.Success:
             raise Exception(candidates_callback.Message)
 
-        if candidates_callback.Data is not None:
+        if candidates_callback.Data:
             for candidate in candidates_callback.Data:
                 if candidate.get("Currency"):
                     candidate["Currency"] = ""
@@ -193,67 +193,64 @@ def prepareCampaign(campaign_details, companyID):
 
 def sendCampaign(campaign_details, companyID):
     try:
-        # print(campaign_details)
-        messenger_callback: Callback = messenger_servicess.getByID(campaign_details.get("messenger_id"), companyID)
-        if not messenger_callback.Success:
-            raise Exception("Messenger not found.")
-
-        company: Callback = company_services.getByCompanyID(companyID)
-        companyName = company.Data.Name.replace(" ", "").lower() if company.Success else None
-
-        messenger = messenger_callback.Data
-        crm = None
-        hashedAssistantID = helpers.encodeID(campaign_details.get("assistant_id"))
-        # CAMPAIGN SOURCES - ID vs TEXT to make url shorter
-        # 1 - DATABASE
-        # 2 - CRM
-
-        # VARIABLE ORDER MUST BE MAINTAINED SO THAT WHEN DECODING WE KNOW WHAT VARIABLES ARE WHAT
-        # IF YOU INTEND TO CHANGE THEM, ALSO UPDATE THE ORDER HANDLED AT CONVERSATION SERVICES LINE # 98
-        source = 'crm' if campaign_details.get("use_crm") else 'db'
-
-        crmID = campaign_details.get("crm_id") if source == 'crm' else campaign_details.get("database_id")
         text = campaign_details.get("text")
-
         if not text:
             raise Exception("Message text is missing")
-        helpers.logError("candidate_list: " + str(campaign_details.get("candidate_list")))
+
+        outreach_type = campaign_details.get("outreach_type")
+
+        messenger = None
+        if outreach_type == "sms" or outreach_type == "whatsapp":
+            messenger_callback: Callback = messenger_servicess.getByID(campaign_details.get("messenger_id"), companyID)
+            if not messenger_callback.Success:
+                raise Exception("Messenger not found.")
+
+            messenger = messenger_callback.Data
+
+        hashedAssistantID = helpers.encodeID(campaign_details.get("assistant_id"))
+        source = 'crm' if campaign_details.get("use_crm") else 'db'
+        sourceID = campaign_details.get("crm_id") if source == 'crm' else campaign_details.get("database_id")
+
+        failedCandidates = 0
+        totalCandidates = len(campaign_details.get("candidate_list"))
 
         for candidate in campaign_details.get("candidate_list"):
-            if campaign_details.get("use_crm") and crm:
-                if crm.Type is CRM.Bullhorn:
-                    candidate_phone = candidate.get("CandidateMobile")
-                    candidate_email = candidate.get("CandidateEmail")
-                else:
-                    raise Exception("CRM is not supported for this operation")
-            else:
-                candidate_phone = candidate.get("CandidateMobile")
-                candidate_email = candidate.get("CandidateEmail")
+            candidate_phone = candidate.get("CandidateMobile")
+            candidate_email = candidate.get("CandidateEmail")
 
-            if not candidate_phone:
+            # check if phone or email is need and present
+            if (not candidate_phone and (outreach_type == "sms" or outreach_type == "whatsapp")) \
+                    or (not candidate_email and outreach_type == "email"):
+                failedCandidates += 1
                 continue
 
             access = helpers.verificationSigner.dumps(
-                {"candidateID": candidate.get("ID"), "source": source, "crmID": crmID}, salt='crm-information')
+                {"candidateID": candidate.get("ID"), "source": source, "crmID": sourceID}, salt='crm-information')
 
             url: Callback = url_services.createShortenedURL(helpers.getDomain(3000) + "/chatbot_direct_link/" + \
                                                             hashedAssistantID + "?source=" + str(access),
                                                             domain="recruitbot.ai")
             if not url.Success:
-                raise Exception("Failed to create shortened URL")
+                failedCandidates += 1
+                continue
 
             # insert assistant link and candidate details in text
-            tempText = text.replace("${assistantLink}$", url.Data) \
+            tempText = text \
+                .replace("${assistantLink}$", url.Data) \
                 .replace("${candidateName}$", candidate.get("CandidateName"))
 
-            if campaign_details.get("outreach_type") == "sms":
+            if outreach_type == "sms":
                 messenger_servicess.sendMessage(messenger.Type, candidate_phone, tempText, messenger.Auth)
-            elif campaign_details.get("outreach_type") == "whatsapp":
+            elif outreach_type == "whatsapp":
                 messenger_servicess.sendMessage(messenger.Type, candidate_phone, tempText, messenger.Auth, True)
-            elif campaign_details.get("outreach_type") == "email":
+            elif outreach_type == "email":
                 mail_services.simpleSend(candidate_email, campaign_details.get("email_title"), tempText)
 
-        return Callback(True, '')
+        if failedCandidates == totalCandidates:
+            raise Exception("Campaign Failed due to 0 contact details or problem with URL shortening")
+
+        return Callback(True, 'Campaign sent! ' + str(failedCandidates) + " out of " + str(totalCandidates) +
+                        " candidates did not have contact details and were not contacted.")
 
     except Exception as exc:
         helpers.logError("campaign_services.sendCampaign(): " + str(exc))

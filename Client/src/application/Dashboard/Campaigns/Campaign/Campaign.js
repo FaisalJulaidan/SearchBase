@@ -1,25 +1,25 @@
 import React from 'react';
-import { connect } from 'react-redux';
+import {connect} from 'react-redux';
 import NoHeaderPanel from 'components/NoHeaderPanel/NoHeaderPanel';
 import {
     Typography, Form, Input, Breadcrumb, Divider, Button, Tag, AutoComplete, Select, Switch, Modal,
     List, Checkbox, Spin, Radio, Slider, InputNumber, Row, Col, Icon
 } from 'antd';
 
-import { trimText } from '../../../../helpers';
+import {trimText} from '../../../../helpers';
 
 import googleMaps from '@google/maps';
 
 import Phone from '../../../../components/Phone/Phone';
 import styles from './Campaign.module.less';
-import { history } from 'helpers';
-import { campaignActions } from 'store/actions';
+import {history} from 'helpers';
+import {campaignActions} from 'store/actions';
 
 const FormItem = Form.Item;
 const confirm = Modal.confirm;
 
-const { Title, Paragraph } = Typography;
-const { TextArea } = Input;
+const {Title, Paragraph} = Typography;
+const {TextArea} = Input;
 
 const google = googleMaps.createClient({
     key: 'AIzaSyDExVDw_47y0U4kukU1A0UscjXE7qDTRhk'
@@ -55,7 +55,7 @@ class Campaign extends React.Component {
         let id = this.props.match.params.id;
         if (id === 'new') {
             this.props.dispatch(campaignActions.fetchCampaigns());
-            this.setState({ isSaved: false });
+            this.setState({isSaved: false});
         } else {
             this.props.dispatch(campaignActions.fetchCampaign(id))
                 .then(() => {
@@ -88,26 +88,26 @@ class Campaign extends React.Component {
             });
         }
         if (this.state.textMessage.indexOf('${assistantLink}$') !== -1 && this.state.assistantLinkInMessage) {
-            this.setState({ assistantLinkInMessage: true });
+            this.setState({assistantLinkInMessage: true});
         }
     }
 
     componentDidUpdate(prevProps, prevState, snapshot) {
         if (prevProps.isCandidatesLoading && !this.props.isCandidatesLoading && (this.props.errorMsg === null)) {
-            this.setState({ candidate_list: this.props.candidate_list });
+            this.setState({candidate_list: this.props.candidate_list});
             this.showModal(true);
         } else if (prevProps.isLaunchingCampaign && (this.props.errorMsg === null)) {
             this.showModal(false);
         } else if (prevProps.isSaving && (this.props.errorMsg === null)) {
-            this.setState({ campaignName: this.props.form.getFieldValue('name') });
+            this.setState({campaignName: this.props.form.getFieldValue('name')});
         } else if (prevProps.isStatusChanging && (this.props.errorMsg === null)) {
-            this.setState({ active: this.props?.campaign?.Active });
+            this.setState({active: this.props?.campaign?.Active});
         }
 
         let linkInMessage = this.state.textMessage.indexOf('${assistantLink}$') !== -1;
 
         if (linkInMessage !== this.state.assistantLinkInMessage) {
-            this.setState({ assistantLinkInMessage: linkInMessage });
+            this.setState({assistantLinkInMessage: linkInMessage});
         }
     };
 
@@ -117,11 +117,11 @@ class Campaign extends React.Component {
 
     showModal = (visibility) => {
         if (this.state.candidatesModalVisibility !== visibility)
-            this.setState({ candidatesModalVisibility: visibility });
+            this.setState({candidatesModalVisibility: visibility});
     };
 
     findLocation = (value) => {
-        this.setState({ location: value });
+        this.setState({location: value});
         clearTimeout(this.timer.current);
         this.timer.current = setTimeout(() => {
             google.geocode({
@@ -134,20 +134,20 @@ class Campaign extends React.Component {
         if (!err) {
             // GB Filter (in the future to remove replace with let resp = response.json.results.filter(address => address.address_components)
             let resp = response.json.results.filter(address => address.address_components.find(loc => loc.types.includes('country')).short_name === 'GB');
-            this.setState({ locations: resp.map(item => item.formatted_address) });
+            this.setState({locations: resp.map(item => item.formatted_address)});
         }
     };
 
     addCandidateName = () => {
         let textMessage = this.state.textMessage + ' ${candidateName}$ ';
-        this.props.form.setFieldsValue({ text: textMessage }); //Update Message Input
-        this.setState({ textMessage: textMessage }); //Update TextMessage State for Phone.JS
+        this.props.form.setFieldsValue({text: textMessage}); //Update Message Input
+        this.setState({textMessage: textMessage}); //Update TextMessage State for Phone.JS
     };
 
     addAssistantLink = () => {
         let textMessage = this.state.textMessage + ' ${assistantLink}$ ';
-        this.props.form.setFieldsValue({ text: textMessage }); //Update Message Input
-        this.setState({ textMessage: textMessage }); //Update TextMessage State for Phone.JS
+        this.props.form.setFieldsValue({text: textMessage}); //Update Message Input
+        this.setState({textMessage: textMessage}); //Update TextMessage State for Phone.JS
     };
 
     handleModalLaunch = () => {
@@ -181,17 +181,17 @@ class Campaign extends React.Component {
 
     handleModalSelectAll = () => {
         if (this.props?.candidate_list?.length === this.state.candidate_list.length)
-            this.setState({ candidate_list: [] });
+            this.setState({candidate_list: []});
         else
-            this.setState({ candidate_list: this.props.candidate_list });
+            this.setState({candidate_list: this.props.candidate_list});
     };
 
     handleModalCancel = () => {
-        this.setState({ candidatesModalVisibility: false, campaignNameModalVisibility: false });
+        this.setState({candidatesModalVisibility: false, campaignNameModalVisibility: false});
     };
 
     afterModalClose = () => {
-        this.setState({ candidate_list: [] });
+        this.setState({candidate_list: []});
     };
 
     onCandidateSelected = (e, candidate) => {
@@ -207,7 +207,7 @@ class Campaign extends React.Component {
             });
         }
         console.log(3);
-        this.setState({ candidate_list: newList });
+        this.setState({candidate_list: newList});
     };
 
     isCandidateSelected = (candidate) => {
@@ -277,7 +277,7 @@ class Campaign extends React.Component {
                         this.state.textMessage
                     ));
                 } else {
-                    this.setState({ campaignNameModalVisibility: true });
+                    this.setState({campaignNameModalVisibility: true});
                 }
             }
         });
@@ -300,7 +300,7 @@ class Campaign extends React.Component {
                     values.skills?.split(/[ ,]+/),
                     this.state.textMessage
                 )).then(() => {
-                    this.setState({ campaignNameModalVisibility: false });
+                    this.setState({campaignNameModalVisibility: false});
                     history.push('/dashboard/campaigns');
                 });
             }
@@ -336,12 +336,12 @@ class Campaign extends React.Component {
     };
 
     render() {
-        const { form } = this.props;
-        const { getFieldDecorator } = form;
+        const {form} = this.props;
+        const {getFieldDecorator} = form;
         return (<NoHeaderPanel>
             <div className={styles.Header}>
-                <div style={{ marginBottom: 20 }}>
-                    <Breadcrumb style={{ display: this.state.isSaved ? 'block' : 'none' }}>
+                <div style={{marginBottom: 20}}>
+                    <Breadcrumb style={{display: this.state.isSaved ? 'block' : 'none'}}>
                         <Breadcrumb.Item>
                             <a href={'javascript:void(0);'}
                                onClick={() => history.push('/dashboard/campaigns')}>
@@ -351,7 +351,7 @@ class Campaign extends React.Component {
                         <Breadcrumb.Item>{this.state.campaignName}</Breadcrumb.Item>
                     </Breadcrumb>
 
-                    <Row style={{ display: this.state.isSaved ? 'block' : 'none' }}>
+                    <Row style={{display: this.state.isSaved ? 'block' : 'none'}}>
                         <Col span={20}>
                             <Title>{this.state.campaignName}</Title>
                         </Col>
@@ -360,7 +360,7 @@ class Campaign extends React.Component {
                                     checked={this.state.active}
                                     loading={this.props.isStatusChanging}
                                     onChange={this.onActivateHandler}
-                                    style={{ marginTop: '17%', marginLeft: '70%' }}/>
+                                    style={{marginTop: '17%', marginLeft: '70%'}}/>
                         </Col>
                     </Row>
 
@@ -376,7 +376,7 @@ class Campaign extends React.Component {
                         okText={'Launch'}
                         onOk={this.handleModalLaunch}
                         confirmLoading={this.props.isLaunchingCampaign}
-                        okButtonProps={{ icon: 'rocket' }}
+                        okButtonProps={{icon: 'rocket'}}
                         footer={<div>
                             <Button onClick={this.handleModalCancel}>Cancel</Button>
                             <Button onClick={this.handleModalSelectAll}
@@ -392,7 +392,7 @@ class Campaign extends React.Component {
                         onCancel={this.handleModalCancel}
                         afterClose={this.afterModalClose}
                         destroyOnClose
-                        bodyStyle={{ overflow: 'auto', maxHeight: '50vh' }}
+                        bodyStyle={{overflow: 'auto', maxHeight: '50vh'}}
                         maskClosable={false}>
                         <List
                             loading={this.props.isCandidatesLoading}
@@ -408,7 +408,7 @@ class Campaign extends React.Component {
                                             fontSize: '1.2em'
                                         }}>{item.CandidateName}</span>}
                                         description={<span
-                                            style={{ fontSize: '1.1em' }}>{item.CandidateCity + ' - ' + item.CandidateSkills}</span>}/>
+                                            style={{fontSize: '1.1em'}}>{item.CandidateCity + ' - ' + item.CandidateSkills}</span>}/>
                                 </List.Item>
                             )}
                         />
@@ -423,13 +423,13 @@ class Campaign extends React.Component {
                         onCancel={this.handleModalCancel}>
                         <Input value={this.state.campaignName} placeholder={'Please enter a name for your campaign'}
                                onChange={e => {
-                                   this.setState({ campaignName: e.target.value });
+                                   this.setState({campaignName: e.target.value});
                                }}/>
                     </Modal>
 
                     <div className={styles.formContainer}>
                         <Form layout='vertical' onSubmit={this.handleLaunch}>
-                            <FormItem style={{ display: this.state.isSaved ? 'block' : 'none' }}
+                            <FormItem style={{display: this.state.isSaved ? 'block' : 'none'}}
                                       label={'Campaign Name'}>
                                 {getFieldDecorator('name')(
                                     <Input placeholder={'Please enter a name for your campaign'}/>
@@ -455,16 +455,16 @@ class Campaign extends React.Component {
                                     </Select>
                                 )}
                             </FormItem>
-                            <FormItem label={'Use CRM'} labelCol={{ xs: { span: 4, offset: 0 } }}>
+                            <FormItem label={'Use CRM'} labelCol={{xs: {span: 4, offset: 0}}}>
                                 <Switch checked={this.state.use_crm}
-                                        onChange={(checked) => this.setState({ use_crm: checked })}
+                                        onChange={(checked) => this.setState({use_crm: checked})}
                                         defaultChecked={this.state.use_crm}/>
                             </FormItem>
                             {this.state.use_crm ?
                                 <>
                                     <FormItem label={'CRM Type'}>
                                         {getFieldDecorator('crm_id', {
-                                            ...(this.state.selectedCRM !== null && { initialValue: this.state.selectedCRM }),
+                                            ...(this.state.selectedCRM !== null && {initialValue: this.state.selectedCRM}),
                                             rules: [{
                                                 required: true,
                                                 message: 'Please select your desired CRM'
@@ -473,7 +473,7 @@ class Campaign extends React.Component {
                                             <Select placeholder={'Please select your desired CRM'}
                                                     loading={this.props.isLoading}
                                                     onSelect={value => {
-                                                        this.setState({ selectedCRM: value });
+                                                        this.setState({selectedCRM: value});
                                                     }}>
                                                 {this.props.campaignOptions?.crms.map((item, key) => {
                                                     return (
@@ -491,9 +491,9 @@ class Campaign extends React.Component {
                                                     if (e.target.checked)
                                                         this.props.dispatch(campaignActions.fetchShortlists(this.state.selectedCRM));
                                                     else {
-                                                        this.props.form.setFieldsValue({ shortlist_id: '' });
+                                                        this.props.form.setFieldsValue({shortlist_id: ''});
                                                     }
-                                                    this.setState({ useShortlist: e.target.checked });
+                                                    this.setState({useShortlist: e.target.checked});
                                                 }}
                                                 style={{
                                                     display: (
@@ -560,9 +560,9 @@ class Campaign extends React.Component {
 
 
                             <FormItem label={'Outreach Type '}>
-                                {getFieldDecorator('outreach_type', { initialValue: 'sms' })(
+                                {getFieldDecorator('outreach_type', {initialValue: 'sms'})(
                                     <Radio.Group onChange={(e) => {
-                                        this.setState({ outreach_type: e.target.value });
+                                        this.setState({outreach_type: e.target.value});
                                     }}>
                                         <Radio.Button value="sms">SMS</Radio.Button>
                                         <Radio.Button value="email">Email</Radio.Button>
@@ -571,7 +571,7 @@ class Campaign extends React.Component {
                             </FormItem>
 
                             <FormItem label={'Messaging Service'}
-                                      style={this.state.outreach_type !== 'sms' ? { display: 'none' } : { display: 'block' }}>
+                                      style={this.state.outreach_type !== 'sms' ? {display: 'none'} : {display: 'block'}}>
                                 {getFieldDecorator('messenger_id', {
                                     rules: [{
                                         required: this.state.outreach_type === 'sms',
@@ -612,7 +612,7 @@ class Campaign extends React.Component {
                                         )}
                                     </FormItem>
                                     <FormItem label={'Job Type'}>
-                                        {getFieldDecorator('jobType', { initialValue: 'permanent' })(
+                                        {getFieldDecorator('jobType', {initialValue: 'permanent'})(
                                             <Radio.Group>
                                                 <Radio.Button value="permanent">Permanent</Radio.Button>
                                                 <Radio.Button value="temporary">Temporary</Radio.Button>
@@ -622,7 +622,7 @@ class Campaign extends React.Component {
                                     </FormItem>
                                     <FormItem label={'Skills'}
                                               help='Separate skills with commas. For example: JavaScript, HTML, CSS'>
-                                        {getFieldDecorator('skills', { initialValue: '' })(
+                                        {getFieldDecorator('skills', {initialValue: ''})(
                                             <Input
                                                 placeholder="Type in your desired skills"/>
                                         )}
@@ -642,12 +642,12 @@ class Campaign extends React.Component {
                                         )}
                                     </FormItem>
                                     <FormItem label={`Distance within ${this.state.distance} miles`}
-                                              style={{ display: this.state.location ? 'block' : 'none' }}>
-                                        {getFieldDecorator('distance', { initialValue: this.state.distance })(
+                                              style={{display: this.state.location ? 'block' : 'none'}}>
+                                        {getFieldDecorator('distance', {initialValue: this.state.distance})(
                                             <Slider
                                                 step={5}
                                                 onChange={(value) => {
-                                                    this.setState({ distance: value });
+                                                    this.setState({distance: value});
                                                 }}
                                             />
                                         )}
@@ -656,7 +656,7 @@ class Campaign extends React.Component {
                             }
 
                             <FormItem label={'Email Title '}
-                                      style={this.state.outreach_type !== 'email' ? { display: 'none' } : { display: 'block' }}>
+                                      style={this.state.outreach_type !== 'email' ? {display: 'none'} : {display: 'block'}}>
                                 {getFieldDecorator('email_title', {
                                     rules: [{
                                         whitespace: true,
@@ -672,10 +672,10 @@ class Campaign extends React.Component {
                             <FormItem
                                 label={<span>Message
                                 <Button type="default" size="small" shape="round"
-                                        style={{ margin: '0 5px', fontSize: '.9em', borderColor: 'red' }}
+                                        style={{margin: '0 5px', fontSize: '.9em', borderColor: 'red'}}
                                         onClick={this.addAssistantLink}>Assistant Link</Button>
                                 <Button type="default" size="small" shape="round"
-                                        style={{ margin: '0 5px', fontSize: '.9em' }}
+                                        style={{margin: '0 5px', fontSize: '.9em'}}
                                         onClick={this.addCandidateName}>Candidate Name</Button>
                             </span>}>
                                 {getFieldDecorator('text', {
@@ -685,15 +685,15 @@ class Campaign extends React.Component {
                                     }]
                                 })(
                                     <TextArea placeholder="Type in the message you'd like to send"
-                                              onChange={e => this.setState({ textMessage: e.target.value })}
+                                              onChange={e => this.setState({textMessage: e.target.value})}
                                     />
                                 )}
                             </FormItem>
 
                             <FormItem label={'Follow up every:'}>
-                                {getFieldDecorator('followUp', { initialValue: 'never' })(
+                                {getFieldDecorator('followUp', {initialValue: 'never'})(
                                     <Radio.Group onChange={(e) => {
-                                        this.setState({ followUp: e.target.value });
+                                        this.setState({followUp: e.target.value});
                                     }}>
                                         <Radio.Button value="never">Never</Radio.Button>
                                         <Radio.Button value="6">6 hours</Radio.Button>
@@ -705,9 +705,9 @@ class Campaign extends React.Component {
                             </FormItem>
 
                             <FormItem label={'Schedule for every:'}>
-                                {getFieldDecorator('schedule', { initialValue: 'never' })(
+                                {getFieldDecorator('schedule', {initialValue: 'never'})(
                                     <Radio.Group onChange={(e) => {
-                                        this.setState({ schedule: e.target.value });
+                                        this.setState({schedule: e.target.value});
                                     }}>
                                         <Radio.Button value="never">Never</Radio.Button>
                                         <Radio.Button value="1">1 Day</Radio.Button>
@@ -720,7 +720,7 @@ class Campaign extends React.Component {
                                 {this.state.schedule === 'custom' ?
                                     <InputNumber placeholder="Custom schedule, in days"
                                                  min={1}
-                                                 style={{ marginTop: 10, width: '30%' }}
+                                                 style={{marginTop: 10, width: '30%'}}
                                                  value={this.state.customSchedule ? this.state.customSchedule : 3}
                                                  formatter={value => value == '1' ? `${value} day` : `${value} days`}
                                                  parser={value => {
@@ -728,7 +728,7 @@ class Campaign extends React.Component {
                                                      value.replace('days', '');
                                                  }}
                                                  onChange={(value) => {
-                                                     this.setState({ customSchedule: value });
+                                                     this.setState({customSchedule: value});
                                                  }}/>
                                     : null}
                             </FormItem>
@@ -739,12 +739,18 @@ class Campaign extends React.Component {
                                     size={'large'}>
                                 Launch
                             </Button>
+                            <h1 style={{
+                                fontSize: '.9em',
+                                marginTop: '5px',
+                                color: '#9254de',
+                                display: this.props.isCandidatesLoading && this.state.use_crm ? 'block' : 'none'
+                            }}>Scanning your CRM...</h1>
 
                             <Divider/>
 
                             <Button loading={this.props.isDeleting} type="danger" icon="delete"
                                     onClick={this.handleDelete}
-                                    style={{ display: this.state.isSaved ? 'unset' : 'none' }}>
+                                    style={{display: this.state.isSaved ? 'unset' : 'none'}}>
                                 Delete Campaign
                             </Button>
                             <Button loading={this.props.isSaving} type="primary" icon="save" onClick={this.handleSave}>

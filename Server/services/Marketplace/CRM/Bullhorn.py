@@ -184,6 +184,7 @@ def sendQuery(auth, query, method, body, companyID, optionalParams=None):
         headers = {'Content-Type': 'application/json'}
 
         # test the BhRestToken (rest_token)
+        helpers.logError("BULLHORN SEND 1: " + str(url))
         r = marketplace_helpers.sendRequest(url, method, headers, json.dumps(body))
         helpers.logError("BULLHORN RETURN 1: " + str(r.status_code) + " / " + str(r.text))
         if r.status_code == 401:  # wrong rest token
@@ -192,9 +193,10 @@ def sendQuery(auth, query, method, body, companyID, optionalParams=None):
                 raise Exception("Rest token could not be retrieved")
 
             url = buildUrl(callback.Data, query, optionalParams)
-          
+
+            helpers.logError("BULLHORN SEND 2: " + str(url))
             r = marketplace_helpers.sendRequest(url, method, headers, json.dumps(body))
-            helpers.logError("BULLHORN RETURN 1: " + str(r.status_code) + " / " + str(r.text))
+            helpers.logError("BULLHORN RETURN 2: " + str(r.status_code) + " / " + str(r.text))
             if not r.ok:
                 raise Exception(r.text + ". Query could not be sent")
 
@@ -211,7 +213,7 @@ def sendQuery(auth, query, method, body, companyID, optionalParams=None):
 def buildUrl(rest_data, query, optionalParams=None):
     # set up initial url
     url = rest_data.get("rest_url", "https://rest.bullhornstaffing.com/rest-services/5i3n9d/") + query + \
-          "?BhRestToken=" + str(rest_data.get("rest_token")) + "&count=199"
+          "?BhRestToken=" + str(rest_data.get("rest_token", "46c0tkvo-bdf9-4491-8402-66d4f2837fb5"))
     # add additional params
     if optionalParams:
         for param in optionalParams:
@@ -388,16 +390,6 @@ def updateCandidate(auth, data, companyID) -> Callback:
         helpers.logError("Marketplace.CRM.Bullhorn.insertCandidate() ERROR: " + str(exc))
         return Callback(False, str(exc))
 
-# def buildUrl(rest_data, query, optionalParams=None):
-#     # set up initial url
-#     url = rest_data.get("rest_url", "https://rest.bullhornstaffing.com/rest-services/5i3n9d/") + query + \
-#           "?BhRestToken=" + rest_data.get("rest_token", "46c0tkvo-bdf9-4491-8402-66d4f2837fb5")
-#     # add additional params
-#     if optionalParams:
-#         for param in optionalParams:
-#             url += "&" + param
-#     # return the url
-#     return url
 
 multipleTypes = [
   "BETWEEN",
@@ -410,11 +402,13 @@ singleTypes = [
   "MATCH"
 ]
 
+
 def convertToBullhornType(input):
     if isinstance(input, date):
         return input.strftime('%Y%m%d%H%M%S')
     else:
         return str(input)
+
 
 def queryGen(input, match, queryType, match2=None):
     queryText = ""
@@ -440,7 +434,7 @@ def searchPlacement(auth, companyID, data, fields="fields=candidate"):
             query += queryGen(item['input'], item['match'], item['queryType'], item.get("match2", None))
         while True:
             sendQuery_callback: Callback = sendQuery(auth, "search/Placement", "get", {}, companyID,
-                                                 [fields, query, "count=199"])
+                                                 [fields, query, "count=500&sort=id"])
             if not sendQuery_callback.Success:
                 raise Exception(sendQuery_callback.Message)
 
@@ -476,10 +470,10 @@ def searchCandidatesDynamic(auth, companyID, data, fields=None, multiple=False) 
         while True:
             if(multiple):
                 sendQuery_callback: Callback = sendQuery(auth, "entity/Candidate/{}".format(query), "get", {}, companyID,
-                                    [fields, "count=199"])
+                                    [fields, "count=500&sort=id"])
             else:
                 sendQuery_callback: Callback = sendQuery(auth, "search/Candidate", "get", {}, companyID,
-                                                    [fields, query, "count=199"])
+                                                    [fields, query, "count=500&sort=id"])
             if not sendQuery_callback.Success:
                 raise Exception(sendQuery_callback.Message)
             return_body = json.loads(sendQuery_callback.Data.text)
@@ -499,7 +493,7 @@ def searchCandidatesDynamic(auth, companyID, data, fields=None, multiple=False) 
 
 def searchCandidates(auth, companyID, data, fields=None) -> Callback:
     try:
-        query = "query=status:Available AND "
+        query = "query=(status:Available OR status:Active OR status:\"New Lead\") AND "
         if not fields:
             fields = "fields=id,name,email,mobile,address,primarySkills,status,educations,dayRate,salary"
 
@@ -518,10 +512,10 @@ def searchCandidates(auth, companyID, data, fields=None) -> Callback:
         # send query
         while True:
             sendQuery_callback: Callback = sendQuery(auth, "search/Candidate", "get", {}, companyID,
-                                                 [fields, query, "count=199"])
+                                                 [fields, query, "count=500&sort=id"])
             if not sendQuery_callback.Success:
                 raise Exception(sendQuery_callback.Message)
-              
+
             return_body = json.loads(sendQuery_callback.Data.text)
             if return_body.get("total", 0) > 0 or "AND" not in query:
                 break
@@ -560,9 +554,9 @@ def searchCandidates(auth, companyID, data, fields=None) -> Callback:
 
 def searchPerfectCandidates(auth, companyID, data, fields=None) -> Callback:
     try:
-        query = "query=status:Available AND "
+        query = "query=(status:Available OR status:Active OR status:\"New Lead\") AND "
         if not fields:
-            fields = "fields=id,name,email,mobile,address,primarySkills,status,educations,dayRate,salary"
+            fields = "fields=id,name,email,mobile,address,primarySkills"
 
         # populate filter in order of importance
         # query += populateFilter(data.get("preferredJotTitle"), "occupation")
@@ -575,15 +569,13 @@ def searchPerfectCandidates(auth, companyID, data, fields=None) -> Callback:
         query += populateFilter(data.get("yearsExperience"), "experience")
         # query += populateFilter(data.get("education"), "educationDegree")
 
-        # if keywords[DT.CandidateSkills.value["name"]]:
-        #     query += "primarySkills.data:" + keywords[DT.CandidateSkills.name] + " or"
         query = query[:-5]
 
         # check if no conditions submitted
         if len(query) < 25:
             # send query
             sendQuery_callback: Callback = sendQuery(auth, "search/Candidate", "get", {}, companyID,
-                                                     [fields, query, "count=199"])
+                                                     [fields, query, "count=500&sort=id"])
             if not sendQuery_callback.Success:
                 raise Exception(sendQuery_callback.Message)
 
@@ -593,13 +585,19 @@ def searchPerfectCandidates(auth, companyID, data, fields=None) -> Callback:
 
         else:
             records = []
+            seenIDs = []
+            while len(records) < 200000:  # stop at 200 000 records
+                # filter seen records out
+                if seenIDs:
+                    query += " AND -(id:" + " OR id:".join(seenIDs) + ")"
 
-            while len(records) < 2000:
                 # send query
-                sendQuery_callback: Callback = sendQuery(auth, "search/Candidate", "get", {}, companyID,
-                                                         [fields, query, "count=199"])
+                sendQuery_callback: Callback = sendQuery(auth, "search/Candidate", "post", {"query": query}, companyID,
+                                                         [fields, "count=500&sort=id"])
                 if not sendQuery_callback.Success:
                     raise Exception(sendQuery_callback.Message)
+
+                query = query.split(" AND -(id")[0]  # remove the IDs for easier time
 
                 # get query result
                 return_body = json.loads(sendQuery_callback.Data.text)
@@ -608,20 +606,19 @@ def searchPerfectCandidates(auth, companyID, data, fields=None) -> Callback:
                     records = records + list(return_body["data"])
 
                     # remove duplicate records
-                    seen = set()
-                    new_l = []
-                    for d in records:
-                        t = tuple(d.items())
-                        if str(t) not in seen:
-                            seen.add(str(t))
-                            new_l.append(d)
+                    new_records = []
+                    for record in records:
+                        if str(record["id"] not in seenIDs):
+                            seenIDs.append(str(record["id"]))  # add to the total seen items
+                            new_records.append(record)  # add to the total records
 
                     records = []
-                    for l in new_l:
-                        records.append(dict(l))
+                    for record in new_records:
+                        records.append(dict(record))
 
                 # remove the last (least important filter)
-                query = "AND".join(query.split("AND")[:-1])
+                if return_body["total"] == return_body["count"]:
+                    query = "AND".join(query.split("AND")[:-1])
 
                 # if no filters left - stop
                 if not query or "description" not in query:
@@ -682,7 +679,7 @@ def searchJobs(auth, companyID, data, fields=None) -> Callback:
 
         # send query
         sendQuery_callback: Callback = sendQuery(auth, "search/JobOrder", "get", {}, companyID,
-                                                 [fields, query, "count=199"])
+                                                 [fields, query, "count=500&sort=id"])
         if not sendQuery_callback.Success:
             raise Exception(sendQuery_callback.Message)
 
@@ -725,7 +722,7 @@ def searchJobsCustomQuery(auth, companyID, query, fields=None) -> Callback:
 
         # send query
         sendQuery_callback: Callback = sendQuery(auth, "search/JobOrder", "get", {}, companyID,
-                                                 [fields, query, "count=199"])
+                                                 [fields, query, "count=500&sort=id"])
         if not sendQuery_callback.Success:
             raise Exception(sendQuery_callback.Message)
 
@@ -766,7 +763,7 @@ def getAllJobs(auth, companyID, fields=None) -> Callback:
 
         # send query
         sendQuery_callback: Callback = sendQuery(auth, "search/JobOrder", "get", {}, companyID,
-                                                 [fields, "query=*:*", "count=199"])
+                                                 [fields, "query=*:*", "count=500&sort=id"])
         if not sendQuery_callback.Success:
             raise Exception(sendQuery_callback.Message)
 

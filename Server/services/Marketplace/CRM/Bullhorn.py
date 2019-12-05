@@ -184,6 +184,7 @@ def sendQuery(auth, query, method, body, companyID, optionalParams=None):
         headers = {'Content-Type': 'application/json'}
 
         # test the BhRestToken (rest_token)
+        helpers.logError("BULLHORN SEND 1: " + str(url))
         r = marketplace_helpers.sendRequest(url, method, headers, json.dumps(body))
         helpers.logError("BULLHORN RETURN 1: " + str(r.status_code) + " / " + str(r.text))
         if r.status_code == 401:  # wrong rest token
@@ -192,9 +193,10 @@ def sendQuery(auth, query, method, body, companyID, optionalParams=None):
                 raise Exception("Rest token could not be retrieved")
 
             url = buildUrl(callback.Data, query, optionalParams)
-          
+
+            helpers.logError("BULLHORN SEND 2: " + str(url))
             r = marketplace_helpers.sendRequest(url, method, headers, json.dumps(body))
-            helpers.logError("BULLHORN RETURN 1: " + str(r.status_code) + " / " + str(r.text))
+            helpers.logError("BULLHORN RETURN 2: " + str(r.status_code) + " / " + str(r.text))
             if not r.ok:
                 raise Exception(r.text + ". Query could not be sent")
 
@@ -211,7 +213,7 @@ def sendQuery(auth, query, method, body, companyID, optionalParams=None):
 def buildUrl(rest_data, query, optionalParams=None):
     # set up initial url
     url = rest_data.get("rest_url", "https://rest.bullhornstaffing.com/rest-services/5i3n9d/") + query + \
-          "?BhRestToken=" + str(rest_data.get("rest_token")) + "&count=199"
+          "?BhRestToken=" + str(rest_data.get("rest_token", "46c0tkvo-bdf9-4491-8402-66d4f2837fb5")) + "&count=199"
     # add additional params
     if optionalParams:
         for param in optionalParams:
@@ -388,16 +390,6 @@ def updateCandidate(auth, data, companyID) -> Callback:
         helpers.logError("Marketplace.CRM.Bullhorn.insertCandidate() ERROR: " + str(exc))
         return Callback(False, str(exc))
 
-# def buildUrl(rest_data, query, optionalParams=None):
-#     # set up initial url
-#     url = rest_data.get("rest_url", "https://rest.bullhornstaffing.com/rest-services/5i3n9d/") + query + \
-#           "?BhRestToken=" + rest_data.get("rest_token", "46c0tkvo-bdf9-4491-8402-66d4f2837fb5")
-#     # add additional params
-#     if optionalParams:
-#         for param in optionalParams:
-#             url += "&" + param
-#     # return the url
-#     return url
 
 multipleTypes = [
   "BETWEEN",
@@ -410,11 +402,13 @@ singleTypes = [
   "MATCH"
 ]
 
+
 def convertToBullhornType(input):
     if isinstance(input, date):
         return input.strftime('%Y%m%d%H%M%S')
     else:
         return str(input)
+
 
 def queryGen(input, match, queryType, match2=None):
     queryText = ""

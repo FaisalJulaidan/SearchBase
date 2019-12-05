@@ -556,7 +556,7 @@ def searchPerfectCandidates(auth, companyID, data, fields=None) -> Callback:
     try:
         query = "query=(status:Available OR status:Active OR status:\"New Lead\") AND "
         if not fields:
-            fields = "fields=id,name,email,mobile,address,primarySkills"
+            fields = "fields=id,name,email,mobile,address"
 
         # populate filter in order of importance
         # query += populateFilter(data.get("preferredJotTitle"), "occupation")
@@ -586,10 +586,13 @@ def searchPerfectCandidates(auth, companyID, data, fields=None) -> Callback:
         else:
             records = []
             seenIDs = []
+            idQuery = " AND -(id:)"
             while len(records) < 200000:  # stop at 200 000 records
                 # filter seen records out
                 if seenIDs:
-                    query += " AND -(id:" + " OR id:".join(seenIDs) + ")"
+                    idQuery = idQuery[:-1] + " OR id:".join(seenIDs) + ")"
+                    query += idQuery
+                    seenIDs = []  # empty seenIDs so it doesnt add the same ones to idQuery
 
                 # send query
                 sendQuery_callback: Callback = sendQuery(auth, "search/Candidate", "post", {"query": query}, companyID,

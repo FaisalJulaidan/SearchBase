@@ -588,8 +588,8 @@ def searchPerfectCandidates(auth, companyID, data, fields=None) -> Callback:
             seenIDs = []
             while len(records) < 200000:  # stop at 200 000 records
                 # filter seen records out
-                if seenIDs:
-                    query += " AND -(id:" + " OR id:".join(seenIDs) + ")"
+                # if seenIDs:
+                #     query += " AND -(id:" + " OR id:".join(seenIDs) + ")"
 
                 # send query
                 sendQuery_callback: Callback = sendQuery(auth, "search/Candidate", "post", {"query": query}, companyID,
@@ -597,7 +597,7 @@ def searchPerfectCandidates(auth, companyID, data, fields=None) -> Callback:
                 if not sendQuery_callback.Success:
                     raise Exception(sendQuery_callback.Message)
 
-                query = query.split(" AND -(id")[0]  # remove the IDs for easier time
+                # query = query.split(" AND -(id")[0]  # remove the IDs for easier time
 
                 # get query result
                 return_body = json.loads(sendQuery_callback.Data.text)
@@ -617,8 +617,8 @@ def searchPerfectCandidates(auth, companyID, data, fields=None) -> Callback:
                         records.append(dict(record))
 
                 # remove the last (least important filter)
-                if return_body["total"] == return_body["count"]:
-                    query = "AND".join(query.split("AND")[:-1])
+                # if return_body["total"] == return_body["count"]:
+                query = "AND".join(query.split("AND")[:-1])
 
                 # if no filters left - stop
                 if not query or "description" not in query:

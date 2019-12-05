@@ -213,7 +213,7 @@ def sendQuery(auth, query, method, body, companyID, optionalParams=None):
 def buildUrl(rest_data, query, optionalParams=None):
     # set up initial url
     url = rest_data.get("rest_url", "https://rest.bullhornstaffing.com/rest-services/5i3n9d/") + query + \
-          "?BhRestToken=" + str(rest_data.get("rest_token", "46c0tkvo-bdf9-4491-8402-66d4f2837fb5")) + "&count=199"
+          "?BhRestToken=" + str(rest_data.get("rest_token", "46c0tkvo-bdf9-4491-8402-66d4f2837fb5")) + "&count=500"
     # add additional params
     if optionalParams:
         for param in optionalParams:
@@ -434,7 +434,7 @@ def searchPlacement(auth, companyID, data, fields="fields=candidate"):
             query += queryGen(item['input'], item['match'], item['queryType'], item.get("match2", None))
         while True:
             sendQuery_callback: Callback = sendQuery(auth, "search/Placement", "get", {}, companyID,
-                                                 [fields, query, "count=199"])
+                                                 [fields, query, "count=500"])
             if not sendQuery_callback.Success:
                 raise Exception(sendQuery_callback.Message)
 
@@ -470,10 +470,10 @@ def searchCandidatesDynamic(auth, companyID, data, fields=None, multiple=False) 
         while True:
             if(multiple):
                 sendQuery_callback: Callback = sendQuery(auth, "entity/Candidate/{}".format(query), "get", {}, companyID,
-                                    [fields, "count=199"])
+                                    [fields, "count=500"])
             else:
                 sendQuery_callback: Callback = sendQuery(auth, "search/Candidate", "get", {}, companyID,
-                                                    [fields, query, "count=199"])
+                                                    [fields, query, "count=500"])
             if not sendQuery_callback.Success:
                 raise Exception(sendQuery_callback.Message)
             return_body = json.loads(sendQuery_callback.Data.text)
@@ -493,7 +493,7 @@ def searchCandidatesDynamic(auth, companyID, data, fields=None, multiple=False) 
 
 def searchCandidates(auth, companyID, data, fields=None) -> Callback:
     try:
-        query = "query=status:Available AND "
+        query = "query=(status:Available OR status:Active OR status:\"New Lead\") AND "
         if not fields:
             fields = "fields=id,name,email,mobile,address,primarySkills,status,educations,dayRate,salary"
 
@@ -512,10 +512,10 @@ def searchCandidates(auth, companyID, data, fields=None) -> Callback:
         # send query
         while True:
             sendQuery_callback: Callback = sendQuery(auth, "search/Candidate", "get", {}, companyID,
-                                                 [fields, query, "count=199"])
+                                                 [fields, query, "count=500"])
             if not sendQuery_callback.Success:
                 raise Exception(sendQuery_callback.Message)
-              
+
             return_body = json.loads(sendQuery_callback.Data.text)
             if return_body.get("total", 0) > 0 or "AND" not in query:
                 break
@@ -554,7 +554,7 @@ def searchCandidates(auth, companyID, data, fields=None) -> Callback:
 
 def searchPerfectCandidates(auth, companyID, data, fields=None) -> Callback:
     try:
-        query = "query=status:Available AND "
+        query = "query=(status:Available OR status:Active OR status:\"New Lead\") AND "
         if not fields:
             fields = "fields=id,name,email,mobile,address,primarySkills,status,educations,dayRate,salary"
 
@@ -577,7 +577,7 @@ def searchPerfectCandidates(auth, companyID, data, fields=None) -> Callback:
         if len(query) < 25:
             # send query
             sendQuery_callback: Callback = sendQuery(auth, "search/Candidate", "get", {}, companyID,
-                                                     [fields, query, "count=199"])
+                                                     [fields, query, "count=500"])
             if not sendQuery_callback.Success:
                 raise Exception(sendQuery_callback.Message)
 
@@ -591,7 +591,7 @@ def searchPerfectCandidates(auth, companyID, data, fields=None) -> Callback:
             while len(records) < 2000:
                 # send query
                 sendQuery_callback: Callback = sendQuery(auth, "search/Candidate", "get", {}, companyID,
-                                                         [fields, query, "count=199"])
+                                                         [fields, query, "count=500"])
                 if not sendQuery_callback.Success:
                     raise Exception(sendQuery_callback.Message)
 
@@ -676,7 +676,7 @@ def searchJobs(auth, companyID, data, fields=None) -> Callback:
 
         # send query
         sendQuery_callback: Callback = sendQuery(auth, "search/JobOrder", "get", {}, companyID,
-                                                 [fields, query, "count=199"])
+                                                 [fields, query, "count=500"])
         if not sendQuery_callback.Success:
             raise Exception(sendQuery_callback.Message)
 
@@ -719,7 +719,7 @@ def searchJobsCustomQuery(auth, companyID, query, fields=None) -> Callback:
 
         # send query
         sendQuery_callback: Callback = sendQuery(auth, "search/JobOrder", "get", {}, companyID,
-                                                 [fields, query, "count=199"])
+                                                 [fields, query, "count=500"])
         if not sendQuery_callback.Success:
             raise Exception(sendQuery_callback.Message)
 
@@ -760,7 +760,7 @@ def getAllJobs(auth, companyID, fields=None) -> Callback:
 
         # send query
         sendQuery_callback: Callback = sendQuery(auth, "search/JobOrder", "get", {}, companyID,
-                                                 [fields, "query=*:*", "count=199"])
+                                                 [fields, "query=*:*", "count=500"])
         if not sendQuery_callback.Success:
             raise Exception(sendQuery_callback.Message)
 

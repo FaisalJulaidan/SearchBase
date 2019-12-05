@@ -213,7 +213,7 @@ def sendQuery(auth, query, method, body, companyID, optionalParams=None):
 def buildUrl(rest_data, query, optionalParams=None):
     # set up initial url
     url = rest_data.get("rest_url", "https://rest.bullhornstaffing.com/rest-services/5i3n9d/") + query + \
-          "?BhRestToken=" + str(rest_data.get("rest_token", "46c0tkvo-bdf9-4491-8402-66d4f2837fb5")) + "&count=500"
+          "?BhRestToken=" + str(rest_data.get("rest_token", "46c0tkvo-bdf9-4491-8402-66d4f2837fb5"))
     # add additional params
     if optionalParams:
         for param in optionalParams:
@@ -569,8 +569,6 @@ def searchPerfectCandidates(auth, companyID, data, fields=None) -> Callback:
         query += populateFilter(data.get("yearsExperience"), "experience")
         # query += populateFilter(data.get("education"), "educationDegree")
 
-        # if keywords[DT.CandidateSkills.value["name"]]:
-        #     query += "primarySkills.data:" + keywords[DT.CandidateSkills.name] + " or"
         query = query[:-5]
 
         # check if no conditions submitted
@@ -587,13 +585,19 @@ def searchPerfectCandidates(auth, companyID, data, fields=None) -> Callback:
 
         else:
             records = []
+            seenIDs = []
+            while len(records) < 200000:  # stop at 200 000 records
+                # filter seen records out
+                if seenIDs:
+                    query += " AND -(id:" + " AND id:".join(seenIDs) + ")"
 
-            while len(records) < 2000:
                 # send query
                 sendQuery_callback: Callback = sendQuery(auth, "search/Candidate", "get", {}, companyID,
                                                          [fields, query, "count=500"])
                 if not sendQuery_callback.Success:
                     raise Exception(sendQuery_callback.Message)
+
+                query = query.split(" AND -(id")[0]  # remove the IDs for easier time
 
                 # get query result
                 return_body = json.loads(sendQuery_callback.Data.text)
@@ -602,20 +606,19 @@ def searchPerfectCandidates(auth, companyID, data, fields=None) -> Callback:
                     records = records + list(return_body["data"])
 
                     # remove duplicate records
-                    seen = set()
-                    new_l = []
-                    for d in records:
-                        t = tuple(d.items())
-                        if str(t) not in seen:
-                            seen.add(str(t))
-                            new_l.append(d)
+                    new_records = []
+                    for record in records:
+                        if str(record["id"] not in seenIDs):
+                            seenIDs.append(str(record["id"]))  # add to the total seen items
+                            new_records.append(record)  # add to the total records
 
                     records = []
-                    for l in new_l:
-                        records.append(dict(l))
+                    for record in new_records:
+                        records.append(dict(record))
 
                 # remove the last (least important filter)
-                query = "AND".join(query.split("AND")[:-1])
+                if not return_body["total"] == return_body["count"]:
+                    query = "AND".join(query.split("AND")[:-1])
 
                 # if no filters left - stop
                 if not query or "description" not in query:

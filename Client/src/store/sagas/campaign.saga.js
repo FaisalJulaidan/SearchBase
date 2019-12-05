@@ -130,6 +130,7 @@ function* fetchCampaignCandidatesData({assistant_id, use_crm, crm_id, useShortli
                 outreach_type,
                 email_title
             }, {
+                timeout: 600000,
                 headers: {'Content-Type': 'application/json'},
             });
         yield put(campaignActions.fetchCampaignCandidatesDataSuccess(
@@ -178,6 +179,7 @@ function* launchCampaign({assistant_id, use_crm, crm_id, useShortlist,shortlist_
                 outreach_type,
                 email_title
             }, {
+                timeout: 600000,
                 headers: {'Content-Type': 'application/json'},
             });
         yield put(campaignActions.launchCampaignSuccess());

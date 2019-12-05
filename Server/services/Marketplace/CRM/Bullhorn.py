@@ -617,7 +617,7 @@ def searchPerfectCandidates(auth, companyID, data, fields=None) -> Callback:
                         records.append(dict(record))
 
                 # remove the last (least important filter)
-                if not return_body["total"] == return_body["count"]:
+                if return_body["total"] == return_body["count"]:
                     query = "AND".join(query.split("AND")[:-1])
 
                 # if no filters left - stop

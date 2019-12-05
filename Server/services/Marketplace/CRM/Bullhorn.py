@@ -556,7 +556,7 @@ def searchPerfectCandidates(auth, companyID, data, fields=None) -> Callback:
     try:
         query = "query=(status:Available OR status:Active OR status:\"New Lead\") AND "
         if not fields:
-            fields = "fields=id,name,email,mobile,address,primarySkills,status,educations,dayRate,salary"
+            fields = "fields=id,name,email,mobile,address,primarySkills"
 
         # populate filter in order of importance
         # query += populateFilter(data.get("preferredJotTitle"), "occupation")

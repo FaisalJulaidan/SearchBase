@@ -537,7 +537,7 @@ def searchCandidates(auth, companyID, data, fields=None) -> Callback:
                                                                   skills=record.get("primarySkills", {}).get("data"),
                                                                   linkdinURL=None,
                                                                   availability=record.get("status"),
-                                                                  preferredJobTitle=None,  #
+                                                                  currentJobTitle=None,  #
                                                                   education=None,
                                                                   yearsExperience=0,
                                                                   desiredSalary=record.get("salary") or
@@ -571,60 +571,45 @@ def searchPerfectCandidates(auth, companyID, data, fields=None) -> Callback:
 
         query = query[:-5]
 
-        # check if no conditions submitted
-        if len(query) < 25:
+        records = []
+        seenIDs = []
+        idQuery = " AND -(id:)"
+        while len(records) < 5000:  # stop at 5 000 records
+            # filter seen records out
+            if seenIDs:
+                idQuery = idQuery[:-1] + " OR id:".join(seenIDs) + ")"
+                query += idQuery
+                seenIDs = []  # empty seenIDs so it doesnt add the same ones to idQuery
+
             # send query
-            sendQuery_callback: Callback = sendQuery(auth, "search/Candidate", "get", {}, companyID,
-                                                     [fields, query, "count=500&sort=id"])
+            sendQuery_callback: Callback = sendQuery(auth, "search/Candidate", "post", {"query": query}, companyID,
+                                                     [fields, "count=500"])
             if not sendQuery_callback.Success:
                 raise Exception(sendQuery_callback.Message)
 
+            query = query.split(" AND -(id")[0]  # remove the IDs for easier time
+
+            # get query result
             return_body = json.loads(sendQuery_callback.Data.text)
+            if return_body["data"]:
+                # add the candidates to the records
+                records = records + list(return_body["data"])
 
-            records = return_body["data"]
+                # remove duplicate records
+                new_records = []
+                for record in records:
+                    if str(record["id"] not in seenIDs):
+                        seenIDs.append(str(record["id"]))  # add to the total seen items
+                        new_records.append(record)  # add to the total records
 
-        else:
-            records = []
-            seenIDs = []
-            idQuery = " AND -(id:)"
-            while len(records) < 200000:  # stop at 200 000 records
-                # filter seen records out
-                if seenIDs:
-                    idQuery = idQuery[:-1] + " OR id:".join(seenIDs) + ")"
-                    query += idQuery
-                    seenIDs = []  # empty seenIDs so it doesnt add the same ones to idQuery
+                records = []
+                for record in new_records:
+                    records.append(dict(record))
 
-                # send query
-                sendQuery_callback: Callback = sendQuery(auth, "search/Candidate", "post", {"query": query}, companyID,
-                                                         [fields, "count=500&sort=id"])
-                if not sendQuery_callback.Success:
-                    raise Exception(sendQuery_callback.Message)
-
-                query = query.split(" AND -(id")[0]  # remove the IDs for easier time
-
-                # get query result
-                return_body = json.loads(sendQuery_callback.Data.text)
-                if return_body["data"]:
-                    # add the candidates to the records
-                    records = records + list(return_body["data"])
-
-                    # remove duplicate records
-                    new_records = []
-                    for record in records:
-                        if str(record["id"] not in seenIDs):
-                            seenIDs.append(str(record["id"]))  # add to the total seen items
-                            new_records.append(record)  # add to the total records
-
-                    records = []
-                    for record in new_records:
-                        records.append(dict(record))
-
-                # remove the last (least important filter)
-                if return_body["total"] == return_body["count"]:
-                    query = "AND".join(query.split("AND")[:-1])
-
-                # if no filters left - stop
-                if not query or "description" not in query:
+            # remove the last (least important filter)
+            if return_body["total"] == return_body["count"]:
+                query = "AND".join(query.split("AND")[:-1])
+                if "AND" not in query:
                     break
 
         result = []
@@ -638,7 +623,7 @@ def searchPerfectCandidates(auth, companyID, data, fields=None) -> Callback:
                                                                   skills=record.get("primarySkills", {}).get("data"),
                                                                   linkdinURL=None,
                                                                   availability=record.get("status"),
-                                                                  preferredJobTitle=None,
+                                                                  currentJobTitle=None,
                                                                   education=None,
                                                                   yearsExperience=0,
                                                                   desiredSalary=record.get("salary") or
@@ -858,6 +843,7 @@ def __extractCandidateInsertBody(data):
             "zip": data.get("postCode")  # TODO add country code
         },
         "email": data.get("email"),
+        "occupation": data.get("currentJobTitle"),
 
         # "primarySkills": data.get("skills"),
         "experience": int(float(data.get("yearsExperience") or 0)),

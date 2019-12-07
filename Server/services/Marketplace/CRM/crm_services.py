@@ -488,6 +488,8 @@ def __extractCandidateInsertData(conversation):
             conversation.Data.get('keywordsByDataType').get(DT.CandidateCountry.value['name'], [])),
         "email": conversation.Email or " ",
         "emails": conversation.Data.get('keywordsByDataType').get(DT.CandidateEmail.value['name'], []),
+        "currentJobTitle": ", ".join(
+            conversation.Data.get('keywordsByDataType').get(DT.CurrentJobTitle.value['name'], [])) or None,
 
         "skills": ", ".join(
             conversation.Data.get('keywordsByDataType').get(DT.CandidateSkills.value['name'], ) or

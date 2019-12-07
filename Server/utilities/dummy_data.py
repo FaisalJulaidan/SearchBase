@@ -162,7 +162,7 @@ def generate():
                     # # Candidate JOB TITLE
                     # {"Type": "User Input", "StoreInDB": True, "Skippable": False, "SkipText": "Skip!",
                     #  "SkipAction": "End Chat",
-                    #  "SkipBlockToGoID": 'None', "DataType": "JobTitle",
+                    #  "SkipBlockToGoID": 'None', "DataType": "PreferredJobTitle",
                     #  "Content": {"text": "What job title are you looking for?", "blockToGoID": "008",
                     #              "action": "Go To Next Block", "afterMessage": "Thank you for the title",
                     #              "keywords": []},
@@ -217,7 +217,7 @@ def generate():
                     # Candidate JOB TITLE
                     {"Type": "User Input", "StoreInDB": True, "Skippable": False, "SkipText": "Skip!",
                      "SkipAction": "End Chat",
-                     "SkipBlockToGoID": 'None', "DataType": enums.DataType.JobTitle.name,
+                     "SkipBlockToGoID": 'None', "DataType": enums.DataType.PreferredJobTitle.name,
                      "Content": {"text": "What job title are you looking for?", "blockToGoID": "005",
                                  "action": "Go To Next Block", "afterMessage": "Thank you for the title",
                                  "keywords": []},
@@ -254,7 +254,7 @@ def generate():
                     # Job TITLE
                     {"Type": "User Input", "StoreInDB": True, "Skippable": False, "SkipText": "Skip!",
                      "SkipAction": "End Chat",
-                     "SkipBlockToGoID": 'None', "DataType": enums.DataType.JobTitle.name,
+                     "SkipBlockToGoID": 'None', "DataType": enums.DataType.PreferredJobTitle.name,
                      "Content": {"text": "Title of job?", "blockToGoID": "002",
                                  "action": "Go To Next Block", "afterMessage": "thanks",
                                  "keywords": []},
@@ -774,20 +774,20 @@ def generate():
     db.session.commit()
 
 
-def addCandidate(db, name, desiredSalary, jobTitle, skills, exp, city):
+def addCandidate(db, name, desiredSalary, preferredJobTitle, skills, exp, city):
     return Candidate(Database=db,
                      CandidateName=name,
                      CandidateDesiredSalary=desiredSalary,
-                     CandidateJobTitle=jobTitle,
+                     CandidateJobTitle=preferredJobTitle,
                      CandidateSkills=skills,
                      CandidateYearsExperience=exp,
                      CandidateCity=city,
                      Currency=Currency('USD'))
 
 
-def addJob(db, title, description, salary, location, currency: Currency or None):
+def addJob(db, preferredTitle, description, salary, location, currency: Currency or None):
     return Job(Database=db,
-               JobTitle=title,
+               JobTitle=preferredTitle,
                JobDescription=description,
                JobCity=location,
                JobSalary=salary,

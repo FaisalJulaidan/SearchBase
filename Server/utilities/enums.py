@@ -480,9 +480,17 @@ class DataType(Enum):
     # ======================================================================
     # Job
 
-    JobTitle = dataTypeCreator(
-        'Job Title',
-        'JobTitle',
+    CurrentJobTitle = dataTypeCreator(
+        'Current Job Title',
+        'CurrentJobTitle',
+        ValidationType.String,
+        DataTypeSection.Job,
+        [UserType.Candidate, UserType.Client],
+        [BlockType.UserInput, BlockType.Question])
+
+    PreferredJobTitle = dataTypeCreator(
+        'Preferred Job Title',
+        'PreferredJobTitle',
         ValidationType.String,
         DataTypeSection.Job,
         [UserType.Candidate, UserType.Client],
@@ -492,7 +500,7 @@ class DataType(Enum):
         'Job Street',
         'JobStreet',
         ValidationType.String,
-        DataTypeSection.Candidate,
+        DataTypeSection.Job,
         [UserType.Candidate],
         [BlockType.UserInput])
 
@@ -500,7 +508,7 @@ class DataType(Enum):
         'Job City',
         'JobCity',
         ValidationType.String,
-        DataTypeSection.Candidate,
+        DataTypeSection.Job,
         [UserType.Candidate],
         [BlockType.UserInput, BlockType.Question])
 
@@ -508,7 +516,7 @@ class DataType(Enum):
         'Job Post Code',
         'JobPostCode',
         ValidationType.String,
-        DataTypeSection.Candidate,
+        DataTypeSection.Job,
         [UserType.Candidate],
         [BlockType.UserInput, BlockType.Question])
 

@@ -23,4 +23,4 @@ class Job(db.Model):
     Database = db.relationship('Database')
 
     def __repr__(self):
-        return '<Job {}>'.format(self.JobTitle)
+        return '<Job {}>'.format(self.PreferredJobTitle)

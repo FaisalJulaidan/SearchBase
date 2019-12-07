@@ -163,7 +163,7 @@ def insertCandidate(auth, data, companyID) -> Callback:
             "crimson_email": data.get("email"),
 
             "crimson_workarea": data.get("preferredWorkCity"),
-            "crimson_jobtitle": data.get("jobTitle"),
+            "crimson_jobtitle": data.get("preferredJobTitle"),
 
             "crimson_availability": data.get("availability"),
 
@@ -303,7 +303,7 @@ def searchCandidates(auth, companyID, data, fields=None) -> Callback:
                                                                   skills=None,
                                                                   linkdinURL=None,
                                                                   availability=record.get("crimson_availability"),
-                                                                  jobTitle=record.get("crimson_jobtitle"),
+                                                                  preferredJobTitle=record.get("crimson_jobtitle"),
                                                                   education=None,
                                                                   yearsExperience=0,
                                                                   desiredSalary=record.get("crimson_expsalaryp") or
@@ -327,7 +327,7 @@ def searchJobs(auth, companyID, data, fields=None) -> Callback:
                      "mercury_tempcandidatepay_mc,_mercury_vacancytype_value,_transactioncurrencyid_value"
 
         # populate filter TODO
-        filter += populateFilter(data.get("jobTitle"), "crimson_jobtitle")
+        filter += populateFilter(data.get("preferredJobTitle"), "crimson_jobtitle")
 
         filter += populateFilter(data.get("city"), "crimson_addresscity")
 

@@ -100,10 +100,7 @@ def chatbot(assistantIDAsHash):
             filesList = request.files.getlist('file')
             file_callback = conversation_services.uploadFiles(filesList, callback.Data[0], callback.Data[1], request.form.get('keys'))
 
-
-
         if not (callback.Success and file_callback.Success):
             return helpers.jsonResponseFlask(False, 400, callback.Message, callback.Data)
 
-        return helpers.jsonResponseFlask(True, 200,
-                                    "Collected data is successfully processed")
+        return helpers.jsonResponseFlask(True, 200, "Collected data is successfully processed")

@@ -373,7 +373,7 @@ def searchCandidates(auth, companyID, data) -> Callback:
                                                                   skills=record.get("skill", "").split(","),  # str list
                                                                   linkdinURL=None,
                                                                   availability=record.get("status"),
-                                                                  jobTitle=None,
+                                                                  preferredJobTitle=None,
                                                                   education=None,
                                                                   yearsExperience=0,
                                                                   desiredSalary=float(record.get("desired_salary", 0)),
@@ -468,7 +468,7 @@ def searchPerfectCandidates(auth, companyID, data) -> Callback:
                                                                   skills=record.get("skill", ""),  # stringified json
                                                                   linkdinURL=None,
                                                                   availability=record.get("status"),
-                                                                  jobTitle=None,
+                                                                  preferredJobTitle=None,
                                                                   education=None,
                                                                   yearsExperience=0,
                                                                   desiredSalary=record.get("desired_salary", 0),
@@ -489,7 +489,7 @@ def searchJobs(auth, companyID, data) -> Callback:
         fields = "fl=id,job_title,public_description,owners,open_date,salary_to,employment_type,location,currency"
 
         # populate filter
-        # query += populateFilter(data.get("jobTitle"), "job_title")
+        # query += populateFilter(data.get("preferredJobTitle"), "job_title")
         #
         # query += populateFilter(data.get("city"), "address")
 

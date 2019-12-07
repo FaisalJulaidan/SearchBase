@@ -23,69 +23,6 @@ class Availability extends React.Component {
             end: moment().endOf('isoWeek'),
             searches: {}
         };
-
-        this.columns = [
-            {
-                title: 'Name',
-                dataIndex: 'name',
-                key: 'name'
-            },
-            {
-                title: 'Skills',
-                dataIndex: 'skills',
-                key: 'skills'
-            },
-            {
-                title: 'Location',
-                dataIndex: 'location',
-                key: 'location'
-            },
-            {
-                title: 'Job Title',
-                dataIndex: 'jobTitle',
-                key: 'jobTitle'
-            },
-            {
-                title: 'Consultant',
-                dataIndex: 'consultant',
-                key: 'consultant'
-            },
-            {
-                title: 'Monday',
-                dataIndex: 'monday',
-                key: 'monday'
-            },
-            {
-                title: 'Tuesday',
-                dataIndex: 'tuesday',
-                key: 'tuesday'
-            },
-            {
-                title: 'Wednesday',
-                dataIndex: 'wednesday',
-                key: 'wednesday'
-            },
-            {
-                title: 'Thursday',
-                dataIndex: 'thursday',
-                key: 'thursday'
-            },
-            {
-                title: 'Friday',
-                dataIndex: 'friday',
-                key: 'friday'
-            },
-            {
-                title: 'Saturday',
-                dataIndex: 'saturday',
-                key: 'saturday'
-            },
-            {
-                title: 'Sunday',
-                dataIndex: 'sunday',
-                key: 'sunday'
-            },
-        ];
     }
 
     componentWillMount() {
@@ -131,7 +68,7 @@ class Availability extends React.Component {
                 skills: record.CandidateSkills,
                 location: record.CandidateCity,
                 consultant: record.CandidateConsultantName,
-                jobTitle: record.CandidateJobTitle
+                preferredJobTitle: record.CandidateJobTitle
             };
 
             dates.forEach(date => {
@@ -165,13 +102,11 @@ class Availability extends React.Component {
             Object.keys(record).map(key => {
                 let add;
                 if (key === 'skills') {
-                    if(record[key]){
-                        record[key].split(',').forEach(skill => {
-                            if (!aggr[key].includes(skill)) {
-                                aggr[key].push(skill);
-                            }
-                        });
-                    }
+                    record[key].split(',').forEach(skill => {
+                        if (!aggr[key].includes(skill)) {
+                            aggr[key].push(skill);
+                        }
+                    });
                 } else {
                     if (!aggr[key].includes(record[key]) && record[key] !== null) {
                         aggr[key].push(record[key]);
@@ -201,6 +136,68 @@ class Availability extends React.Component {
     };
 
     render() {
+        const columns = [
+            {
+                title: 'Name',
+                dataIndex: 'name',
+                key: 'name'
+            },
+            {
+                title: 'Skills',
+                dataIndex: 'skills',
+                key: 'skills'
+            },
+            {
+                title: 'Location',
+                dataIndex: 'location',
+                key: 'location'
+            },
+            {
+                title: 'Job Title',
+                dataIndex: 'preferredJobTitle',
+                key: 'preferredJobTitle'
+            },
+            {
+                title: 'Consultant',
+                dataIndex: 'consultant',
+                key: 'consultant'
+            },
+            {
+                title: 'Monday',
+                dataIndex: 'monday',
+                key: 'monday'
+            },
+            {
+                title: 'Tuesday',
+                dataIndex: 'tuesday',
+                key: 'tuesday'
+            },
+            {
+                title: 'Wednesday',
+                dataIndex: 'wednesday',
+                key: 'wednesday'
+            },
+            {
+                title: 'Thursday',
+                dataIndex: 'thursday',
+                key: 'thursday'
+            },
+            {
+                title: 'Friday',
+                dataIndex: 'friday',
+                key: 'friday'
+            },
+            {
+                title: 'Saturday',
+                dataIndex: 'saturday',
+                key: 'saturday'
+            },
+            {
+                title: 'Sunday',
+                dataIndex: 'sunday',
+                key: 'sunday'
+            },
+        ];
         const menu = (
             <Menu onClick={this.handleMenuClick}>
                 {this.props.dbList.map((database, i) => (
@@ -223,7 +220,7 @@ class Availability extends React.Component {
                 name: item.data.name,
                 skills: item.data.skills,
                 location: item.data.location,
-                jobTitle: item.data.jobTitle,
+                preferredJobTitle: item.data.preferredJobTitle,
                 consultant: item.data.consultant,
                 monday: item.dates.find(date => date.isoWeekday() === 1) !== undefined ? availableText : '',
                 tuesday: item.dates.find(date => date.isoWeekday() === 2) !== undefined ? availableText : '',
@@ -238,7 +235,6 @@ class Availability extends React.Component {
             availability = this.filterSearches(availability);
         }
 
-        console.log("Aggregates");
         console.log(aggregates);
 
         return (
@@ -284,12 +280,12 @@ class Availability extends React.Component {
                             dropdownClassName="certain-category-search-dropdown"
                             dropdownMatchSelectWidth={false}
                             dropdownStyle={{ width: 300 }}
-                            dataSource={aggregates.jobTitle || []}
+                            dataSource={aggregates.preferredJobTitle || []}
                             size="large"
                             style={{ width: '100%' }}
                             placeholder="Job Title"
                             optionLabelProp="value"
-                            onChange={val => this.setSearch('jobTitle', val)}
+                            onChange={val => this.setSearch('preferredJobTitle', val)}
                         >
                             <Input suffix={<Icon type="search" className="certain-category-icon"/>}/>
                         </AutoComplete>
@@ -314,7 +310,7 @@ class Availability extends React.Component {
                 </Button>
 
                 {availability ?
-                    <Table style={{ marginTop: '22px' }} columns={this.columns} dataSource={availability}/>
+                    <Table style={{ marginTop: '22px' }} columns={columns} dataSource={availability}/>
                     : null}
             </div>);
     }

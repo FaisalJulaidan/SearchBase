@@ -43,7 +43,7 @@
               },
               "DataType": {
                 "dataTypeSection": "Job",
-                "enumName": "JobTitle",
+                "enumName": "PreferredJobTitle",
                 "name": "Job Title",
                 "userTypes": [
                   "Unknown",
@@ -409,7 +409,7 @@
               },
               "DataType": {
                 "dataTypeSection": "Job",
-                "enumName": "JobTitle",
+                "enumName": "PreferredJobTitle",
                 "name": "Job Title",
                 "userTypes": [
                   "Candidate",
@@ -903,7 +903,7 @@
               },
               "DataType": {
                 "dataTypeSection": "Candidate",
-                "enumName": "CandidateJobTitle",
+                "enumName": "PreferredJobTitle",
                 "name": "Candidate Job Title",
                 "userTypes": [
                   "Candidate"

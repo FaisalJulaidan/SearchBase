@@ -33,7 +33,7 @@ function* fetchCampaign({campaignID, meta}) {
 }
 
 //Save Campaign
-function* saveCampaign({name, assistant_id, use_crm, crm_id, useShortlist,shortlist_id, database_id, messenger_id, location, jobTitle, skills, message, meta}) {
+function* saveCampaign({name, assistant_id, use_crm, crm_id, useShortlist,shortlist_id, database_id, messenger_id, location, preferredJobTitle, skills, message, meta}) {
     try {
         loadingMessage('Saving campaign...', 0);
         const res = yield http.post('/campaign',
@@ -47,7 +47,7 @@ function* saveCampaign({name, assistant_id, use_crm, crm_id, useShortlist,shortl
                 database_id,
                 messenger_id,
                 location,
-                jobTitle,
+                preferredJobTitle,
                 skills,
                 message
             }, {
@@ -67,7 +67,7 @@ function* saveCampaign({name, assistant_id, use_crm, crm_id, useShortlist,shortl
 }
 
 //update Campaign
-function* updateCampaign({campaignID, name, assistant_id, use_crm, crm_id, useShortlist,shortlist_id, database_id, messenger_id, location, jobTitle, skills, message}) {
+function* updateCampaign({campaignID, name, assistant_id, use_crm, crm_id, useShortlist,shortlist_id, database_id, messenger_id, location, preferredJobTitle, skills, message}) {
     try {
         loadingMessage('Updating campaign...', 0);
         const res = yield http.post(`/campaign/${campaignID}`,
@@ -81,7 +81,7 @@ function* updateCampaign({campaignID, name, assistant_id, use_crm, crm_id, useSh
                 database_id,
                 messenger_id,
                 location,
-                jobTitle,
+                preferredJobTitle,
                 skills,
                 message
             }, {
@@ -111,7 +111,7 @@ function* deleteCampaign({campaignID, meta}) {
 }
 
 //Fetch Candidates data
-function* fetchCampaignCandidatesData({assistant_id, use_crm, crm_id, useShortlist,shortlist_id, database_id, messenger_id, location, jobTitle, jobType, skills, text, outreach_type, email_title}) {
+function* fetchCampaignCandidatesData({assistant_id, use_crm, crm_id, useShortlist,shortlist_id, database_id, messenger_id, location, preferredJobTitle, jobType, skills, text, outreach_type, email_title}) {
     try {
         const res = yield http.post('/campaign/action',
             {
@@ -123,7 +123,7 @@ function* fetchCampaignCandidatesData({assistant_id, use_crm, crm_id, useShortli
                 database_id,
                 messenger_id,
                 location,
-                jobTitle,
+                preferredJobTitle,
                 jobType,
                 skills,
                 text,
@@ -158,7 +158,7 @@ function* fetchShortlists({crm_id}) {
 }
 
 //Launch Campaign
-function* launchCampaign({assistant_id, use_crm, crm_id, useShortlist,shortlist_id, database_id, messenger_id, location, jobTitle, jobType, skills, text, candidate_list, outreach_type, email_title}) {
+function* launchCampaign({assistant_id, use_crm, crm_id, useShortlist,shortlist_id, database_id, messenger_id, location, preferredJobTitle, jobType, skills, text, candidate_list, outreach_type, email_title}) {
     try {
         loadingMessage('Launching the campaign...', 0);
         const res = yield http.put('/campaign/action',
@@ -171,7 +171,7 @@ function* launchCampaign({assistant_id, use_crm, crm_id, useShortlist,shortlist_
                 database_id,
                 messenger_id,
                 location,
-                jobTitle,
+                preferredJobTitle,
                 jobType,
                 skills,
                 text,

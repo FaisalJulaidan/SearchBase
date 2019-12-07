@@ -35,8 +35,7 @@ class NewAutoPilotModal extends Component {
                                 message: "Please input a name for your Auto Pilot"},
                                 {validator: (_, value, callback) => {
                                         const { /**@type AutoPilot[]*/ autoPilotsList} = this.props;
-                                        if (autoPilotsList.some(autoPilot => autoPilot.Name === value
-                                            && this.props.autoPilot.Name !== value))
+                                        if (autoPilotsList.some(autoPilot => autoPilot.Name === value))
                                             return callback("Auto Pilot name already exists");
                                         else
                                             return callback()

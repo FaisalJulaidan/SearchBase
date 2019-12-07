@@ -23,6 +23,10 @@ class CRM(Enum):
     def has_value(cls, value):
         return any(value == item.value for item in cls)
 
+    @classmethod
+    def get_value(cls, value):
+        return next((value == item.value for item in cls), None)
+
 
 @unique
 class Calendar(Enum):
@@ -310,7 +314,7 @@ class DataType(Enum):
         ValidationType.String,
         DataTypeSection.Candidate,
         [UserType.Candidate],
-        [BlockType.UserInput, BlockType.UserInput])
+        [BlockType.Question, BlockType.UserInput])
 
     CandidateEducation = dataTypeCreator(
         'Candidate Education',
@@ -498,7 +502,7 @@ class DataType(Enum):
         ValidationType.String,
         DataTypeSection.Candidate,
         [UserType.Candidate],
-        [BlockType.UserInput, BlockType.UserInput])
+        [BlockType.UserInput])
 
     JobCity = dataTypeCreator(
         'Job City',
@@ -506,7 +510,7 @@ class DataType(Enum):
         ValidationType.String,
         DataTypeSection.Candidate,
         [UserType.Candidate],
-        [BlockType.UserInput, BlockType.UserInput])
+        [BlockType.UserInput, BlockType.Question])
 
     JobPostCode = dataTypeCreator(
         'Job Post Code',
@@ -514,7 +518,7 @@ class DataType(Enum):
         ValidationType.String,
         DataTypeSection.Candidate,
         [UserType.Candidate],
-        [BlockType.UserInput, BlockType.UserInput])
+        [BlockType.UserInput, BlockType.Question])
 
     JobType = dataTypeCreator(
         'Job Type',

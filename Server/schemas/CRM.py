@@ -18,6 +18,10 @@ class CRM(db.Model):
 
     Campaigns = db.relationship('Campaign', back_populates='CRM')
 
+    CRMAutoPilotID = db.Column(db.Integer, db.ForeignKey('crm_auto_pilot.ID', name="CRMAutoPilotID", ondelete='SET NULL'))
+    CRMAutoPilot = db.relationship("CRMAutoPilot", back_populates="CRMS", foreign_keys=[CRMAutoPilotID])
+
+
     # Constraints:
     # each company will have one CRM of each type
     __table_args__ = (db.UniqueConstraint('Type', 'CompanyID', name='uix1_crm'),)

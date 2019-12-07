@@ -139,30 +139,31 @@ def searchCandidates(assistant: Assistant, session):
             return eval(crm_type.value + ".searchCandidates(assistant.CRM.Auth)")
         if crm_type is CRM.Jobscience:
             return eval(crm_type.value + ".searchCandidates(assistant.CRM.Auth, data)")
-
         return eval(crm_type.value + ".searchCandidates(assistant.CRM.Auth, assistant.CompanyID, data)")
     else:
         return Callback(False, "CRM type did not match with those on the system")
 
 
-def searchCandidatesCustom(crm, companyID, candidate_data, perfect=False):
-    data = {
-        "location": candidate_data.get("location"),
-        "preferredJotTitle": candidate_data.get("preferredJobTitle"),
-        "skills": candidate_data.get("skills"),
-        "jobType": candidate_data.get("jobType"),
-        "shortlist_id": candidate_data.get("shortlist_id")
-        # "yearsExperience": checkFilter(session['keywordsByDataType'], DT.CandidateYearsExperience),
-        # "jobCategory": checkFilter(session['keywordsByDataType'], DT.CandidateJobCategory),
-        # "education": checkFilter(session['keywordsByDataType'], DT.CandidateEducation)
-    }
+def searchCandidatesCustom(crm, companyID, candidate_data, perfect=False, customData=False, fields=None, customSearch=None, **kwargs):
+    if customData:
+        data = candidate_data
+    else:
+        data = {
+            "location": candidate_data.get("location"),
+            "preferredJotTitle": candidate_data.get("preferredJobTitle"),
+            "skills": candidate_data.get("skills"),
+            "jobType": candidate_data.get("jobType"),
+            "shortlist_id": candidate_data.get("shortlist_id")# "yearsExperience": checkFilter(session['keywordsByDataType'], DT.CandidateYearsExperience),
+            # "jobCategory": checkFilter(session['keywordsByDataType'], DT.CandidateJobCategory),
+            # "education": checkFilter(session['keywordsByDataType'], DT.CandidateEducation)
+        }
 
     crm_type = crm.Type.value
-    # print("The candidate data is: {}".format(candidate_data))
-    # print("type is {}".format(crm_type))
     campaignCRMs = ["Bullhorn", "Vincere"]
     if perfect and crm_type in campaignCRMs:
         searchFunc = "searchPerfectCandidates"
+    elif customSearch:
+        searchFunc = "searchCandidates{}".format(customSearch)
     elif crm_type == "Jobscience" and candidate_data.get("useShortlist"):
         searchFunc = "searchCandidatesByShortlist"
     else:
@@ -175,11 +176,22 @@ def searchCandidatesCustom(crm, companyID, candidate_data, perfect=False):
             return eval(crm_type + "." + searchFunc + "(crm.Auth)")
         if crm.Type is CRM.Jobscience:
             return eval(crm_type + "." + searchFunc + "(crm.Auth, data)")
+        if crm.Type is CRM.Bullhorn:
+            return eval(crm_type + "." + searchFunc + "(crm.Auth, companyID, data, fields, **kwargs)")
 
         return eval(crm_type + "." + searchFunc + "(crm.Auth, companyID, data)")
     else:
         return Callback(False, "CRM type did not match with those on the system")
 
+
+def searchPlacements(crm, companyID, params):
+    crm_type = crm.Type.value
+    if CRM.has_value(crm_type):
+        if crm.Type is not CRM.Bullhorn:
+            return Callback(True, "CRM does not support placement search at this time")
+        return Bullhorn.searchPlacement(crm.Auth, companyID, params)
+    else:
+        return Callback(False, "CRM type did not match with those on the system")
 
 def searchJobs(assistant: Assistant, session):
     data = {
@@ -386,6 +398,18 @@ def updateByType(crm_type, newAuth, companyID):
         helpers.logError("Marketplace.marketplace_helpers.saveNewCRMAuth() ERROR: " + str(exc))
         return Callback(False, str(exc))
 
+def updateAutopilotConnection(crm_type, autoPilotID, companyID):
+    try:
+        crm = db.session.query(CRM_Model).filter(
+            and_(CRM_Model.CompanyID == companyID,CRM_Model.Type == crm_type)).first()
+        crm.CRMAutoPilotID = autoPilotID
+        db.session.commit()
+        return Callback(True, "New CRM Autopilot ID has been saved", crm)
+
+    except Exception as exc:
+        db.session.rollback()
+        helpers.logError("Marketplace.marketplace_helpers.updateAutopilotConnection() ERROR: " + str(exc))
+        return Callback(False, str(exc))
 
 # get min/max/average salary from the string and convert to specified period (daily, annually)
 def getSalary(conversation: Conversation, dataType: DataType, salaryType, toPeriod:Period=None):  # type Period

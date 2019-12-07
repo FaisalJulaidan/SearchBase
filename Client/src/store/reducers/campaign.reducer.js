@@ -183,6 +183,29 @@ export const campaign = (state = initialState, action) => {
                 isLaunchingCampaign: false,
                 errorMsg: action.error
             });
+
+        // Update Status
+        case actionTypes.UPDATE_CAMPAIGN_STATUS_REQUEST:
+            return updateObject(state, {
+                errorMsg: null,
+                isStatusChanging: true
+            });
+
+        case actionTypes.UPDATE_CAMPAIGN_STATUS_SUCCESS:
+            return updateObject(state, {
+                successMsg: action.successMsg,
+                isStatusChanging: false,
+                campaign: {...state.campaign, Active: action.status}
+            });
+
+        case actionTypes.UPDATE_CAMPAIGN_STATUS_FAILURE:
+            return updateObject(state, {
+                isStatusChanging: false,
+                errorMsg: action.error
+            });
+
+
+
         default:
             return state;
     }

@@ -1,5 +1,4 @@
 from models import db
-from schemas import Assistant, Conversation
 
 class Campaign(db.Model):
 
@@ -10,6 +9,7 @@ class Campaign(db.Model):
     Location = db.Column(db.String(80))
     Message = db.Column(db.String(512))
     UseCRM = db.Column(db.Boolean(), nullable=False, default=True)
+    Active = db.Column(db.Boolean, nullable=False, default=True)
 
     # Relationships:
     CompanyID = db.Column(db.Integer, db.ForeignKey('company.ID', ondelete='cascade'), nullable=False)

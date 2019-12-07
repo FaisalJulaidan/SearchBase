@@ -1,0 +1,513 @@
+{
+  "groups": [
+    {
+      "blocks": [
+        {
+          "Type": "Question",
+          "StoreInDB": true,
+          "Skippable": false,
+          "SkipText": "Skip!",
+          "SkipAction": "End Chat",
+          "SkipBlockToGoID": null,
+          "DataType": "NoType",
+          "Content": {
+            "text": "We're going to ask you a few questions in order to help you. Is that okay?",
+            "answers": [
+              {
+                "action": "Go To Next Block",
+                "afterMessage": "Great, let's get started",
+                "blockToGoID": "A_Y3jmltB",
+                "id": "kd-qMXVv",
+                "keywords": [],
+                "score": 5,
+                "text": "Yes"
+              },
+              {
+                "action": "End Chat",
+                "afterMessage": "Sure, in case you change your mind, I'll be here.",
+                "blockToGoID": null,
+                "id": "xVbD6pyl",
+                "keywords": [],
+                "score": -999,
+                "text": "No"
+              }
+            ]
+          },
+          "ID": "gQJ1QLT6"
+        },
+        {
+          "Content": {
+            "answers": [
+              {
+                "action": "Go To Next Block",
+                "afterMessage": "Awesome! That's great.",
+                "blockToGoID": "lO6o2ruV",
+                "id": "IG1bEgW9",
+                "keywords": [],
+                "score": 5,
+                "text": "Yes, absolutely!  "
+              },
+              {
+                "action": "End Chat",
+                "afterMessage": "Sure, you will not be contacted again in the future.",
+                "blockToGoID": null,
+                "id": "S9ZEm5Bp",
+                "keywords": [],
+                "score": -999,
+                "text": "No, please opt me out"
+              }
+            ],
+            "text": "Great! Before we continue, I should let you know that I'll be asking you some questions to update your information, which will be held to understand if you are available for relevant opportunities as they arise. Do you wish to continue and give us permission to keep and use your data?"
+          },
+          "DataType": "NoType",
+          "ID": "A_Y3jmltB",
+          "SkipAction": "End Chat",
+          "SkipBlockToGoID": null,
+          "SkipText": "Skip!",
+          "Skippable": false,
+          "StoreInDB": true,
+          "Type": "Question"
+        },
+        {
+          "Content": {
+            "action": "Go To Next Block",
+            "afterMessage": "Thanks",
+            "blockToGoID": "suB0Gz7R",
+            "keywords": [],
+            "text": "So what is your full name?"
+          },
+          "DataType": "CandidateName",
+          "ID": "lO6o2ruV",
+          "SkipAction": "End Chat",
+          "SkipBlockToGoID": null,
+          "SkipText": "Skip!",
+          "Skippable": false,
+          "StoreInDB": true,
+          "Type": "User Input"
+        },
+        {
+          "Content": {
+            "action": "Go To Next Block",
+            "afterMessage": "Noted, thanks for that.",
+            "blockToGoID": "YIhDkWz9",
+            "keywords": [],
+            "text": "Could you please provide a valid phone number for us to contact you? Please include the country code at the start"
+          },
+          "DataType": "CandidateMobile",
+          "ID": "suB0Gz7R",
+          "SkipAction": "End Chat",
+          "SkipBlockToGoID": null,
+          "SkipText": "Skip!",
+          "Skippable": false,
+          "StoreInDB": true,
+          "Type": "User Input"
+        },
+        {
+          "Content": {
+            "answers": [
+              {
+                "action": "Go To Next Block",
+                "afterMessage": "Cool",
+                "blockToGoID": "L5BpEbrt",
+                "id": "jtRwZJOn",
+                "keywords": [],
+                "score": 5,
+                "text": "Morning"
+              },
+              {
+                "action": "Go To Next Block",
+                "afterMessage": "Ok",
+                "blockToGoID": "L5BpEbrt",
+                "id": "qtxlcNaF",
+                "keywords": [],
+                "score": 5,
+                "text": "Afternoon"
+              },
+              {
+                "action": "Go To Next Block",
+                "afterMessage": "Got it.",
+                "blockToGoID": "L5BpEbrt",
+                "id": "oPvj5le0",
+                "keywords": [],
+                "score": 5,
+                "text": "Evening "
+              }
+            ],
+            "text": "Thanks! What time of day is most convenient for you to be contacted?"
+          },
+          "DataType": "NoType",
+          "ID": "YIhDkWz9",
+          "SkipAction": "End Chat",
+          "SkipBlockToGoID": null,
+          "SkipText": "Skip!",
+          "Skippable": false,
+          "StoreInDB": true,
+          "Type": "Question"
+        },
+        {
+          "Content": {
+            "action": "Go To Next Block",
+            "afterMessage": "Brilliant! ",
+            "blockToGoID": "mMR1M8Wg",
+            "keywords": [],
+            "text": "Could you please provide a valid email address for us to contact you?"
+          },
+          "DataType": "CandidateEmail",
+          "ID": "L5BpEbrt",
+          "SkipAction": "End Chat",
+          "SkipBlockToGoID": null,
+          "SkipText": "Skip!",
+          "Skippable": false,
+          "StoreInDB": true,
+          "Type": "User Input"
+        },
+        {
+          "Content": {
+            "action": "Go To Next Block",
+            "blockToGoID": "w5mju8lu",
+            "text": "Ok so..."
+          },
+          "DataType": "NoType",
+          "ID": "mMR1M8Wg",
+          "SkipAction": "End Chat",
+          "SkipBlockToGoID": null,
+          "SkipText": "Skip!",
+          "Skippable": false,
+          "StoreInDB": false,
+          "Type": "Raw Text"
+        },
+        {
+          "Content": {
+            "action": "Go To Next Block",
+            "blockToGoID": "BelwfoER",
+            "text": "We've updated our systems with your new information,"
+          },
+          "DataType": "NoType",
+          "ID": "w5mju8lu",
+          "SkipAction": "End Chat",
+          "SkipBlockToGoID": null,
+          "SkipText": "Skip!",
+          "Skippable": false,
+          "StoreInDB": false,
+          "Type": "Raw Text"
+        },
+        {
+          "Content": {
+            "action": "Go To Next Block",
+            "blockToGoID": "4zBH9bM2",
+            "text": "But in order for me to keep an eye out for opportunities for you, please continue to answer the questions"
+          },
+          "DataType": "NoType",
+          "ID": "BelwfoER",
+          "SkipAction": "End Chat",
+          "SkipBlockToGoID": null,
+          "SkipText": "Skip!",
+          "Skippable": false,
+          "StoreInDB": false,
+          "Type": "Raw Text"
+        },
+        {
+          "Content": {
+            "action": "Go To Next Block",
+            "afterMessage": "Ok, noted",
+            "blockToGoID": "GZ8ARDLP",
+            "text": "When will you be available to start a new position?",
+            "type": "Exact"
+          },
+          "DataType": "CandidateAvailability",
+          "ID": "4zBH9bM2",
+          "SkipAction": "Go To Next Block",
+          "SkipBlockToGoID": "GZ8ARDLP",
+          "SkipText": "I'm available immediately",
+          "Skippable": true,
+          "StoreInDB": true,
+          "Type": "Date Picker"
+        },
+        {
+          "Content": {
+            "action": "Go To Next Block",
+            "afterMessage": "Ok cool",
+            "blockToGoID": "rt6aWw3J",
+            "keywords": [],
+            "text": "What is your next preferred position title (e.g. Java Developer)?"
+          },
+          "DataType": "JobTitle",
+          "ID": "GZ8ARDLP",
+          "SkipAction": "End Chat",
+          "SkipBlockToGoID": null,
+          "SkipText": "Skip!",
+          "Skippable": false,
+          "StoreInDB": true,
+          "Type": "User Input"
+        },
+        {
+          "Content": {
+            "action": "Go To Next Block",
+            "afterMessage": "Cool",
+            "blockToGoID": "Gzkv7bEi",
+            "keywords": [],
+            "text": "How many years of professional or equivalent experience do you have?"
+          },
+          "DataType": "CandidateYearsExperience",
+          "ID": "rt6aWw3J",
+          "SkipAction": "End Chat",
+          "SkipBlockToGoID": null,
+          "SkipText": "Skip!",
+          "Skippable": false,
+          "StoreInDB": true,
+          "Type": "User Input"
+        },
+        {
+          "Content": {
+            "action": "Go To Next Block",
+            "blockToGoID": "ygVOKCpg",
+            "text": "Let's understand a bit more about you..."
+          },
+          "DataType": "NoType",
+          "ID": "Gzkv7bEi",
+          "SkipAction": "End Chat",
+          "SkipBlockToGoID": null,
+          "SkipText": "Skip!",
+          "Skippable": false,
+          "StoreInDB": false,
+          "Type": "Raw Text"
+        },
+        {
+          "Content": {
+            "action": "Go To Next Block",
+            "afterMessage": "Nice",
+            "blockToGoID": "N0FjdrYL",
+            "keywords": [],
+            "text": "What is your top skill (e.g. Project Management)?"
+          },
+          "DataType": "CandidateSkills",
+          "ID": "ygVOKCpg",
+          "SkipAction": "End Chat",
+          "SkipBlockToGoID": null,
+          "SkipText": "Skip!",
+          "Skippable": false,
+          "StoreInDB": true,
+          "Type": "User Input"
+        },
+        {
+          "Content": {
+            "action": "Go To Next Block",
+            "afterMessage": "OK, it's very useful to know",
+            "blockToGoID": "HA8mLpDq",
+            "keywords": [],
+            "text": "In which location would you like to work next?"
+          },
+          "DataType": "NoType",
+          "ID": "N0FjdrYL",
+          "SkipAction": "End Chat",
+          "SkipBlockToGoID": null,
+          "SkipText": "Skip!",
+          "Skippable": false,
+          "StoreInDB": true,
+          "Type": "User Input"
+        },
+        {
+          "Content": {
+            "answers": [
+              {
+                "action": "Go To Next Block",
+                "afterMessage": "Ok nice to know",
+                "blockToGoID": "II9RqeVM",
+                "id": "PO5oIz-p",
+                "keywords": [],
+                "score": 5,
+                "text": "Yes I am"
+              },
+              {
+                "action": "Go To Next Block",
+                "afterMessage": "Understood",
+                "blockToGoID": "II9RqeVM",
+                "id": "huIVoRR6",
+                "keywords": [],
+                "score": 2,
+                "text": "No"
+              }
+            ],
+            "text": "Do you currently live in or within commuting distance of your desired location of work?"
+          },
+          "DataType": "NoType",
+          "ID": "HA8mLpDq",
+          "SkipAction": "End Chat",
+          "SkipBlockToGoID": null,
+          "SkipText": "Skip!",
+          "Skippable": false,
+          "StoreInDB": true,
+          "Type": "Question"
+        },
+        {
+          "Content": {
+            "action": "Go To Next Block",
+            "afterMessage": "Great",
+            "blockToGoID": "pbU74Q61",
+            "keywords": [],
+            "text": "Please enter the name of the city or town where you currently live?"
+          },
+          "DataType": "JobCity",
+          "ID": "II9RqeVM",
+          "SkipAction": "End Chat",
+          "SkipBlockToGoID": null,
+          "SkipText": "Skip!",
+          "Skippable": false,
+          "StoreInDB": true,
+          "Type": "User Input"
+        },
+        {
+          "Content": {
+            "action": "Go To Next Block",
+            "afterMessage": "Ok",
+            "blockToGoID": "JkcrPL9J",
+            "keywords": [],
+            "text": "Can you tell me what company you currently work for, or most recently worked for? Or, you can skip "
+          },
+          "DataType": "JobTitle",
+          "ID": "pbU74Q61",
+          "SkipAction": "Go To Next Block",
+          "SkipBlockToGoID": "JkcrPL9J",
+          "SkipText": "Skip Question",
+          "Skippable": true,
+          "StoreInDB": true,
+          "Type": "User Input"
+        },
+        {
+          "Content": {
+            "text": "In your next role, would you prefer a full-time or contract position?",
+            "types": [
+              {
+                "action": "Go To Specific Block",
+                "afterMessage": "",
+                "blockToGoID": "7SA7NVAT",
+                "score": 5,
+                "text": "Permanent ",
+                "value": "Permanent"
+              },
+              {
+                "action": "Go To Specific Block",
+                "afterMessage": "",
+                "blockToGoID": "SaghgXay",
+                "score": 5,
+                "text": "Contract",
+                "value": "Contract"
+              }
+            ]
+          },
+          "DataType": "JobType",
+          "ID": "JkcrPL9J",
+          "SkipAction": "End Chat",
+          "SkipBlockToGoID": null,
+          "SkipText": "Skip!",
+          "Skippable": false,
+          "StoreInDB": false,
+          "Type": "Job Type"
+        },
+        {
+          "Content": {
+            "action": "Go To Specific Block",
+            "afterMessage": "Noted that.",
+            "blockToGoID": "37ihH3Qo",
+            "currency": "AUD",
+            "max": 2000,
+            "min": 200,
+            "period": "Daily",
+            "text": "What is your desired daily rate?"
+          },
+          "DataType": "JobSalary",
+          "ID": "SaghgXay",
+          "SkipAction": "End Chat",
+          "SkipBlockToGoID": null,
+          "SkipText": "Skip!",
+          "Skippable": false,
+          "StoreInDB": false,
+          "Type": "Salary Picker"
+        },
+        {
+          "Content": {
+            "action": "Go To Next Block",
+            "afterMessage": "Great, very useful to know",
+            "blockToGoID": "37ihH3Qo",
+            "currency": "AUD",
+            "max": 200000,
+            "min": 20000,
+            "period": "Annually",
+            "text": "What is your desired annual salary?"
+          },
+          "DataType": "JobSalary",
+          "ID": "7SA7NVAT",
+          "SkipAction": "End Chat",
+          "SkipBlockToGoID": null,
+          "SkipText": "Skip!",
+          "Skippable": false,
+          "StoreInDB": false,
+          "Type": "Salary Picker"
+        },
+        {
+          "Content": {
+            "action": "Go To Next Block",
+            "blockToGoID": "YIVyJ-h0",
+            "text": "Awesome! "
+          },
+          "DataType": "NoType",
+          "ID": "37ihH3Qo",
+          "SkipAction": "End Chat",
+          "SkipBlockToGoID": null,
+          "SkipText": "Skip!",
+          "Skippable": false,
+          "StoreInDB": false,
+          "Type": "Raw Text"
+        },
+        {
+          "Content": {
+            "action": "Go To Next Block",
+            "blockToGoID": "kX6z6e4T",
+            "text": "It was great to have a chat! We really appreciate you engaging with us."
+          },
+          "DataType": "NoType",
+          "ID": "YIVyJ-h0",
+          "SkipAction": "End Chat",
+          "SkipBlockToGoID": null,
+          "SkipText": "Skip!",
+          "Skippable": false,
+          "StoreInDB": false,
+          "Type": "Raw Text"
+        },
+        {
+          "Content": {
+            "action": "Go To Next Block",
+            "blockToGoID": "rTeipmgd",
+            "text": "To give you a quick update, we have now updated our systems with new information about you and we'll be in touch with more interesting, relevant and exciting opportunities."
+          },
+          "DataType": "NoType",
+          "ID": "kX6z6e4T",
+          "SkipAction": "End Chat",
+          "SkipBlockToGoID": null,
+          "SkipText": "Skip!",
+          "Skippable": false,
+          "StoreInDB": false,
+          "Type": "Raw Text"
+        },
+        {
+          "Content": {
+            "action": "End Chat",
+            "blockToGoID": null,
+            "text": "Have a great day"
+          },
+          "DataType": "NoType",
+          "ID": "rTeipmgd",
+          "SkipAction": "End Chat",
+          "SkipBlockToGoID": null,
+          "SkipText": "Skip!",
+          "Skippable": false,
+          "StoreInDB": false,
+          "Type": "Raw Text"
+        }
+      ],
+      "description": "",
+      "id": "yn3-GeR2",
+      "name": "Group 1"
+    }
+  ]
+}

@@ -7,8 +7,7 @@ bot_currentVersion = "1.0.0"
 
 # ----- Getters ----- #
 def getOptions(industry=None) -> Callback:
-
-    options =  {
+    options = {
         'flow': {
             'botVersion': bot_currentVersion,
             'types': [a.value for a in enums.BlockType],
@@ -51,7 +50,7 @@ def getOptions(industry=None) -> Callback:
                     'name': enums.BlockType.UserType.value,
                     'types': [ut.name for ut in enums.UserType],
                     'actions': [a.value for a in enums.BlockAction],
-                },{
+                }, {
                     'name': enums.BlockType.JobType.value,
                     'types': [jt.name for jt in enums.JobType],
                     'actions': [a.value for a in enums.BlockAction],
@@ -63,12 +62,12 @@ def getOptions(industry=None) -> Callback:
             ]
         },
         'databases': {
-            'types': [dt.name for dt in enums.DatabaseType ],
-            enums.DatabaseType.Candidates.name: [{'column':c.key, 'type':str(c.type), 'nullable': c.nullable}
+            'types': [dt.name for dt in enums.DatabaseType],
+            enums.DatabaseType.Candidates.name: [{'column': c.key, 'type': str(c.type), 'nullable': c.nullable}
                                                  for c in Candidate.__table__.columns
                                                  if (c.key != 'ID' and c.key != 'DatabaseID')
                                                  ],
-            enums.DatabaseType.Jobs.name: [{'column':c.key, 'type':str(c.type), 'nullable': c.nullable}
+            enums.DatabaseType.Jobs.name: [{'column': c.key, 'type': str(c.type), 'nullable': c.nullable}
                                            for c in Job.__table__.columns
                                            if (c.key != 'ID' and c.key != 'DatabaseID')
                                            ],
@@ -76,18 +75,14 @@ def getOptions(industry=None) -> Callback:
             'periods': [p.name for p in enums.Period]
         },
         'assistantTemplates': [
-            {
-                'group': 'Recruitment',
-                'children': [
-                    {'label': 'Main Website', 'fileName': 'main'},
-                    {'label': 'Appointment Scheduler', 'fileName': 'appointment'},
-                    {'label': 'Join Us', 'fileName': 'join-us'},
-                    {'label': 'Referral', 'fileName': 'referral'},
-                    {'label': 'Update Candidates', 'fileName': 'update-candidates'},
-                    {'label': 'Client Chatbot', 'fileName': 'client-chatbot'},
-                    {'label': 'Template 1', 'fileName': 'template-1'},
-                ]
-            }
+            {'label': 'Main Website', 'fileName': 'main'},
+            {'label': 'Appointment Scheduler', 'fileName': 'appointment'},
+            {'label': 'Join Us', 'fileName': 'join-us'},
+            {'label': 'Referral', 'fileName': 'referral'},
+            {'label': 'Update Candidates', 'fileName': 'update-candidates'},
+            {'label': 'Candidate Activation', 'fileName': 'candidate-activation'},
+            {'label': 'Client Chatbot', 'fileName': 'client-chatbot'},
+            {'label': 'Template 1', 'fileName': 'template-1'},
         ],
         'webhooks': {
             'availableWebhooks': [e.value for e in enums.Webhooks]

@@ -198,7 +198,7 @@ class JobType extends Component {
                     <QuestionFormItem FormItem={FormItem} block={block}
                                       getFieldDecorator={getFieldDecorator}
                                       layout={layout}
-                                      placeholder="Ex: What is your job?"/>
+                                      placeholder="Ex: What is your job type?"/>
 
                     <Divider dashed={true} style={{ fontWeight: 'normal', fontSize: '14px' }}>
                         Job Types

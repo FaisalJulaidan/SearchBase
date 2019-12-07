@@ -199,12 +199,11 @@ def __migrateFlow(flow, assistantID=None):
         for group in newFlow['groups']:  # loop groups
             for i, block in enumerate(group['blocks']):  # loop blocks
 
-                if block['DataType'] in ["CandidateLocation"]:
-                    block['DataType'] = 'CandidateCity'
+                # custom updates
+                if block['DataType'] in ["JobTitle"]:
+                    block['DataType'] = 'PreferredJobTitle'
 
-                if block['DataType'] in ["JobLocation"]:
-                    block['DataType'] = 'JobCity'
-
+                # mass updates
                 if block['Type'] == enums.BlockType.Question.value:
                     pass
 

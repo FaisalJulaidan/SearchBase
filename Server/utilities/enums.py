@@ -500,7 +500,7 @@ class DataType(Enum):
         'Job Street',
         'JobStreet',
         ValidationType.String,
-        DataTypeSection.Candidate,
+        DataTypeSection.Job,
         [UserType.Candidate],
         [BlockType.UserInput])
 
@@ -508,7 +508,7 @@ class DataType(Enum):
         'Job City',
         'JobCity',
         ValidationType.String,
-        DataTypeSection.Candidate,
+        DataTypeSection.Job,
         [UserType.Candidate],
         [BlockType.UserInput, BlockType.Question])
 
@@ -516,7 +516,7 @@ class DataType(Enum):
         'Job Post Code',
         'JobPostCode',
         ValidationType.String,
-        DataTypeSection.Candidate,
+        DataTypeSection.Job,
         [UserType.Candidate],
         [BlockType.UserInput, BlockType.Question])
 

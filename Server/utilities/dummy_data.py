@@ -217,7 +217,7 @@ def generate():
                     # Candidate JOB TITLE
                     {"Type": "User Input", "StoreInDB": True, "Skippable": False, "SkipText": "Skip!",
                      "SkipAction": "End Chat",
-                     "SkipBlockToGoID": 'None', "DataType": enums.DataType.JobTitle.name,
+                     "SkipBlockToGoID": 'None', "DataType": enums.DataType.PreferredJobTitle.name,
                      "Content": {"text": "What job title are you looking for?", "blockToGoID": "005",
                                  "action": "Go To Next Block", "afterMessage": "Thank you for the title",
                                  "keywords": []},
@@ -254,7 +254,7 @@ def generate():
                     # Job TITLE
                     {"Type": "User Input", "StoreInDB": True, "Skippable": False, "SkipText": "Skip!",
                      "SkipAction": "End Chat",
-                     "SkipBlockToGoID": 'None', "DataType": enums.DataType.JobTitle.name,
+                     "SkipBlockToGoID": 'None', "DataType": enums.DataType.PreferredJobTitle.name,
                      "Content": {"text": "Title of job?", "blockToGoID": "002",
                                  "action": "Go To Next Block", "afterMessage": "thanks",
                                  "keywords": []},
@@ -787,7 +787,7 @@ def addCandidate(db, name, desiredSalary, preferredJobTitle, skills, exp, city):
 
 def addJob(db, preferredTitle, description, salary, location, currency: Currency or None):
     return Job(Database=db,
-               PreferredJobTitle=preferredTitle,
+               JobTitle=preferredTitle,
                JobDescription=description,
                JobCity=location,
                JobSalary=salary,

@@ -3,7 +3,7 @@ from sqlalchemy_utils import CurrencyType
 
 class Job(db.Model):
     ID = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
-    PreferredJobTitle = db.Column(db.String(64), nullable=False) # Required
+    JobTitle = db.Column(db.String(64), nullable=False) # Required
     JobDescription = db.Column(db.String(5000), nullable=True)
     JobStreet = db.Column(db.String(64), nullable=True)
     JobCity = db.Column(db.String(64), nullable=True) 

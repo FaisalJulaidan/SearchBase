@@ -20,7 +20,7 @@ from routes.admin.routers import account_router, analytics_router, sub_router, \
     campaign_router, crm_auto_pilot_router
 from routes.public.routers import public_router, reset_password_router, chatbot_router, auth_router
 from routes.staff.routers import staff_router
-from services import scheduler_services
+from services import scheduler_services, databases_services
 from services.auth_services import jwt
 from services.mail_services import mail
 from utilities import helpers, tasks, dummy_data
@@ -146,6 +146,8 @@ elif os.environ['FLASK_ENV'] == 'development':
         scheduler_services.scheduler.start()
         os.environ["scheduler_lock"] = "True"
 
+    callback = databases_services.fetchAvailableCandidates(1,1)
+    print(len(callback.Data))
     print('Development mode running...')
 
 else:

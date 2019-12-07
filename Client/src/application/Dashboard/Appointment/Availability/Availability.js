@@ -96,6 +96,7 @@ class Availability extends React.Component {
     handleMenuClick = (item) => {
         this.setState({ assistant: item.key, database: item.key });
         this.props.dispatch(databaseActions.fetchDatabase(item.key));
+        this.props.dispatch(databaseActions.fetchAvailableCandidates(item.key));
     };
 
     filterSearches = (records) => {
@@ -200,7 +201,6 @@ class Availability extends React.Component {
     };
 
     render() {
-
         const menu = (
             <Menu onClick={this.handleMenuClick}>
                 {this.props.dbList.map((database, i) => (
@@ -212,7 +212,7 @@ class Availability extends React.Component {
         );
 
         const { assistant, database } = this.state;
-        const { conversations, db } = this.props;
+        const { conversations, db, availableCandidates, isAvailableCandidatesLoading } = this.props;
         let records = db.databaseContent ? db.databaseContent.records : null;
         let availability = null;
         let aggregates = {};
@@ -330,7 +330,9 @@ function mapStateToProps(state) {
         dbList: state.database.databasesList,
         conversations: state.conversation.conversations.conversationsList,
         assistants: state.assistant.assistantList,
-        db: state.database.fetchedDatabase
+        db: state.database.fetchedDatabase,
+        isAvailableCandidatesLoading: state.database.isFetchedAvailableCandidatesLoading,
+        availableCandidates: state.database.fetchedAvailableCandidates
     };
 }
 

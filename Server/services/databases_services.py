@@ -18,14 +18,14 @@ from utilities import helpers
 from utilities.enums import DatabaseType, Period, DataType as DT
 
 
-def fetchDatabase(id, companyID: int, pageNumber: int) -> Callback:
+def fetchDatabase(id: int, companyID: int, pageNumber: int) -> Callback:
     try:
         # Get result and check if None then raise exception
         database: Database = db.session.query(Database) \
             .filter(and_(Database.CompanyID == companyID, Database.ID == id)).first()
 
         if not database:
-            raise Exception
+            raise Exception("Database does not exist")
 
         databaseContent = None
 
@@ -45,6 +45,26 @@ def fetchDatabase(id, companyID: int, pageNumber: int) -> Callback:
         helpers.logError("databases_service.fetchDatabase(): " + str(exc))
         db.session.rollback()
         return Callback(False, 'Could not fetch the database.')
+
+
+def fetchAvailableCandidates(dbID: int, companyID: int):
+    try:
+        # Get result and check if None then raise exception
+        database: Database = db.session.query(Database) \
+            .filter(and_(Database.CompanyID == companyID, Database.ID == id)).first()
+
+        if not database:
+            raise Exception("Database does not exist")
+
+        candidates: List[Candidate] = db.session.query(Candidate) \
+            .filter(and_(Candidate.DatabaseID == dbID, Candidate.CandidateSkills is not None))
+
+        return Callback(True, "", candidates)
+
+    except Exception as exc:
+        helpers.logError("databases_service.fetchAvailableCandidates(): " + str(exc))
+        db.session.rollback()
+        return Callback(False, 'Could not fetch available candidates.')
 
 
 def updateDatabase(id, newName, companyID) -> Callback:

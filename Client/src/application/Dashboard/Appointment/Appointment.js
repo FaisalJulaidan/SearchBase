@@ -22,7 +22,7 @@ class Appointment extends React.Component {
     componentWillMount() {
         // Set tab from url search params
         let params = queryString.parse(this.props.location.search);
-        if (['Appointments', 'Calendar', 'TimeSlots'].includes(params['tab']))
+        if (['Appointments', 'Calendar', 'TimeSlots', 'Availability'].includes(params['tab']))
             this.setState({ defaultTab: params['tab'] });
     }
 

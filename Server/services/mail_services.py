@@ -67,6 +67,7 @@ def sendVerificationEmail(firstName, lastName, email, companyName, companyID) ->
         helpers.logError("mail_service.sendVerificationEmail(): " + str(exc))
         return Callback(False, 'Could not send a verification email to ' + email)
 
+
 def sendAppointmentConfirmationEmail(name, email, dateTime, userTimeZone, companyName, logoPath):
     try:
         callback: Callback = __sendEmail(
@@ -278,6 +279,8 @@ def notifyNewConversations(assistant: Assistant, conversations: List[Conversatio
 
         conversationsList = []
         for conversation in conversations:
+            if not conversation.Completed:
+                continue
             # Get pre singed url to download the file via links
             fileURLsSinged = []
             if conversation.StoredFile:

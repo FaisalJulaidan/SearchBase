@@ -313,7 +313,11 @@ class Availability extends React.Component {
                 </Button>
 
                 {availability ?
-                    <Table style={{ marginTop: '22px' }} columns={this.columns} dataSource={availability}/>
+                    <Table style={{ marginTop: '22px' }}
+                           columns={this.columns}
+                           dataSource={availability}
+                           scroll={{ x: 'max-content' }}
+                    />
                     : null}
             </div>);
     }

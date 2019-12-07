@@ -51,13 +51,13 @@ def fetchAvailableCandidates(dbID: int, companyID: int):
     try:
         # Get result and check if None then raise exception
         database: Database = db.session.query(Database) \
-            .filter(and_(Database.CompanyID == companyID, Database.ID == id)).first()
+            .filter(and_(Database.CompanyID == companyID, Database.ID == dbID)).first()
 
         if not database:
             raise Exception("Database does not exist")
 
         candidates: List[Candidate] = db.session.query(Candidate) \
-            .filter(and_(Candidate.DatabaseID == dbID, Candidate.CandidateSkills is not None))
+            .filter(and_(Candidate.DatabaseID == dbID, Candidate.CandidateAvailability is not None)).all()
 
         return Callback(True, "", candidates)
 

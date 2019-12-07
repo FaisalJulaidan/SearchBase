@@ -109,7 +109,6 @@ def processConversation(assistantHashID, data: dict) -> Callback:
                 database_callback: Callback = databases_services.updateCandidate(candidateID, conversation)
 
         # Notify company about the new chatbot session only if set as immediate -> NotifyEvery=0
-        # Note: if there is a file upload the /file route in chatbot.py will handle the notification instead
         if assistant.NotifyEvery == 0:
             callback_mail: Callback = mail_services.notifyNewConversations(assistant, [conversation], None)
             if callback_mail.Success:

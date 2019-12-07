@@ -42,8 +42,8 @@ class Availability extends React.Component {
             },
             {
                 title: 'Job Title',
-                dataIndex: 'preferredJobTitle',
-                key: 'preferredJobTitle'
+                dataIndex: 'currentJobTitle',
+                key: 'currentJobTitle'
             },
             {
                 title: 'Consultant',
@@ -131,7 +131,7 @@ class Availability extends React.Component {
                 skills: record.CandidateSkills,
                 location: record.CandidateCity,
                 consultant: record.CandidateConsultantName,
-                preferredJobTitle: record.CandidateJobTitle
+                currentJobTitle: record.CandidateJobTitle
             };
 
             dates.forEach(date => {
@@ -223,7 +223,7 @@ class Availability extends React.Component {
                 name: item.data.name,
                 skills: item.data.skills,
                 location: item.data.location,
-                preferredJobTitle: item.data.preferredJobTitle,
+                currentJobTitle: item.data.currentJobTitle,
                 consultant: item.data.consultant,
                 monday: item.dates.find(date => date.isoWeekday() === 1) !== undefined ? availableText : '',
                 tuesday: item.dates.find(date => date.isoWeekday() === 2) !== undefined ? availableText : '',
@@ -283,7 +283,7 @@ class Availability extends React.Component {
                             dropdownClassName="certain-category-search-dropdown"
                             dropdownMatchSelectWidth={false}
                             dropdownStyle={{ width: 300 }}
-                            dataSource={aggregates.preferredJobTitle || []}
+                            dataSource={aggregates.currentJobTitle || []}
                             size="large"
                             style={{ width: '100%' }}
                             placeholder="Job Title"

@@ -2,8 +2,9 @@ import React from 'react';
 import { connect } from 'react-redux';
 
 import moment from 'moment';
-import { AutoComplete, Button, Dropdown, Empty, Icon, Input, Menu, Table } from 'antd';
+import { Button, Dropdown, Empty, Icon, Input, Menu, Table } from 'antd';
 import { checkDate } from 'helpers';
+import Highlighter from 'react-highlight-words';
 import 'types/TimeSlots_Types';
 import 'types/AutoPilot_Types';
 import './Availabilty.less';
@@ -29,27 +30,32 @@ class Availability extends React.Component {
             {
                 title: 'Name',
                 dataIndex: 'name',
-                key: 'name'
+                key: 'name',
+                ...this.getColumnSearchProps('name'),
             },
             {
                 title: 'Skills',
                 dataIndex: 'skills',
-                key: 'skills'
+                key: 'skills',
+                ...this.getColumnSearchProps('skills'),
             },
             {
                 title: 'Location',
                 dataIndex: 'location',
-                key: 'location'
+                key: 'location',
+                ...this.getColumnSearchProps('location'),
             },
             {
                 title: 'Job Title',
                 dataIndex: 'currentJobTitle',
-                key: 'currentJobTitle'
+                key: 'currentJobTitle',
+                ...this.getColumnSearchProps('currentJobTitle'),
             },
             {
                 title: 'Consultant',
                 dataIndex: 'consultant',
-                key: 'consultant'
+                key: 'consultant',
+                ...this.getColumnSearchProps('consultant'),
             },
             {
                 title: 'Monday',
@@ -93,6 +99,73 @@ class Availability extends React.Component {
         this.props.dispatch(assistantActions.fetchAssistants());
         this.props.dispatch(databaseActions.getDatabasesList());
     }
+
+    // Copied from Antd
+    getColumnSearchProps = dataIndex => ({
+        filterDropdown: ({ setSelectedKeys, selectedKeys, confirm, clearFilters }) => (
+            <div style={{ padding: 8 }}>
+                <Input
+                    ref={node => {
+                        this.searchInput = node;
+                    }}
+                    placeholder={`Search ${dataIndex}`}
+                    value={selectedKeys[0]}
+                    onChange={e => setSelectedKeys(e.target.value ? [e.target.value] : [])}
+                    onPressEnter={() => this.handleSearch(selectedKeys, confirm, dataIndex)}
+                    style={{ width: 188, marginBottom: 8, display: 'block' }}
+                />
+                <Button
+                    type="primary"
+                    onClick={() => this.handleSearch(selectedKeys, confirm, dataIndex)}
+                    icon="search"
+                    size="small"
+                    style={{ width: 90, marginRight: 8 }}
+                >
+                    Search
+                </Button>
+                <Button onClick={() => this.handleReset(clearFilters)} size="small" style={{ width: 90 }}>
+                    Reset
+                </Button>
+            </div>
+        ),
+        filterIcon: filtered => (
+            <Icon type="search" style={{ color: filtered ? '#9254de' : undefined }} />
+        ),
+        onFilter: (value, record) =>
+            record[dataIndex]
+                .toString()
+                .toLowerCase()
+                .includes(value.toLowerCase()),
+        onFilterDropdownVisibleChange: visible => {
+            if (visible) {
+                setTimeout(() => this.searchInput.select());
+            }
+        },
+        render: text =>
+            this.state.searchedColumn === dataIndex ? (
+                <Highlighter
+                    highlightStyle={{ backgroundColor: '#ffc069', padding: 0 }}
+                    searchWords={[this.state.searchText]}
+                    autoEscape
+                    textToHighlight={text.toString()}
+                />
+            ) : (
+                text
+            ),
+    });
+
+    handleSearch = (selectedKeys, confirm, dataIndex) => {
+        confirm();
+        this.setState({
+            searchText: selectedKeys[0],
+            searchedColumn: dataIndex,
+        });
+    };
+
+    handleReset = clearFilters => {
+        clearFilters();
+        this.setState({ searchText: '' });
+    };
 
     handleMenuClick = (item) => {
         if (item.key)
@@ -152,10 +225,12 @@ class Availability extends React.Component {
                             sunday: item.dates.find(date => date.isoWeekday() === 7) !== undefined ? availableText : ''
                         };
                     });
+                    console.log("=====DB=====")
+                    console.log(availability)
                     this.setState({ availability });
                     break;
                 case 'ASSISTANT':
-                    availability = this.filterThisWeek_Assistant(records).map((item, i) => {
+                    availability = this.filterThisWeek_Assistant(records).map((item) => {
                         return {
                             name: item.data.name,
                             skills: item.data.skills,
@@ -171,11 +246,11 @@ class Availability extends React.Component {
                             sunday: item.dates.find(date => date.isoWeekday() === 7) !== undefined ? availableText : ''
                         };
                     });
+                    console.log("==========")
+                    console.log(availability)
                     this.setState({ availability });
                     break;
             }
-
-
         }
     };
 
@@ -276,66 +351,12 @@ class Availability extends React.Component {
         return availability;
     };
 
-    filterSearches = () => {
-        const { searches, availability } = this.state;
-        const filtered = availability.filter(record => {
-            let matches = Object.keys(searches).length;
-            let catches = 0;
-            Object.keys(searches).map(search => {
-                if (record[search].indexOf(searches[search]) !== -1) {
-                    catches++;
-                }
-            });
-            return catches === matches;
-        });
-        this.setState({ availability: filtered });
-    };
-
     moveWeek = change => {
         const { start, end, sourceType } = this.state;
         this.setState(
             { start: start.clone().add(change, 'weeks'), end: end.clone().add(change, 'weeks') },
             () => this.populateRecords(sourceType)
         );
-    };
-
-    getSearchAggregates = records => {
-        const returnNewAggregate = (record, aggr) => {
-            Object.keys(record).map(key => {
-                if (key === 'skills') {
-                    if(record[key]){
-                        record[key].split(',').forEach(skill => {
-                            if (!aggr[key].includes(skill)) {
-                                aggr[key].push(skill);
-                            }
-                        });
-                    }
-                } else {
-                    if (!aggr[key].includes(record[key]) && record[key] !== null) {
-                        aggr[key].push(record[key]);
-                    }
-                }
-            });
-            return aggr;
-        };
-        if (records.length === 0) {
-            return {};
-        }
-        let emptyAggregates = Object.keys(records[0]).reduce((prev, curr) => {
-            prev[curr] = [];
-            return prev;
-        }, {});
-        return records.reduce((prev, curr) => returnNewAggregate(curr, prev), emptyAggregates);
-    };
-
-    setSearch = (type, val) => {
-        let searches = Object.assign({}, this.state.searches);
-        if (val === '') {
-            delete searches[type];
-        } else {
-            searches[type] = val;
-        }
-        this.setState({ searches: searches }, () => this.filterSearches());
     };
 
     render() {
@@ -369,67 +390,8 @@ class Availability extends React.Component {
             </Menu>;
         };
 
-
-        let aggregates = this.state.availability ? this.getSearchAggregates(this.state.availability) : [];
-
-
         return (
             <div>
-                <div style={{ display: 'flex' }}>
-                    <div className="certain-category-search-wrapper"
-                         style={{ width: 200, margin: '10px 10px 10px 0px' }}>
-                        <AutoComplete
-                            className="certain-category-search"
-                            dropdownClassName="certain-category-search-dropdown"
-                            dropdownMatchSelectWidth={false}
-                            dataSource={aggregates.skills || []}
-                            dropdownStyle={{ width: 300 }}
-                            size="large"
-                            style={{ width: '100%' }}
-                            placeholder="Skills"
-
-                            onChange={val => this.setSearch('skills', val)}
-                            optionLabelProp="value"
-                        >
-                            <Input suffix={<Icon type="search" className="certain-category-icon"/>}/>
-                        </AutoComplete>
-                    </div>
-
-                    <div className="certain-category-search-wrapper" style={{ width: 200, margin: 10 }}>
-                        <AutoComplete
-                            className="certain-category-search"
-                            dropdownClassName="certain-category-search-dropdown"
-                            dropdownMatchSelectWidth={false}
-                            dropdownStyle={{ width: 300 }}
-                            dataSource={aggregates.location || []}
-                            size="large"
-                            style={{ width: '100%' }}
-                            placeholder="Location"
-                            onChange={val => this.setSearch('location', val)}
-                            optionLabelProp="value"
-                        >
-                            <Input suffix={<Icon type="search" className="certain-category-icon"/>}/>
-                        </AutoComplete>
-                    </div>
-
-                    <div className="certain-category-search-wrapper" style={{ width: 200, margin: 10 }}>
-                        <AutoComplete
-                            className="certain-category-search"
-                            dropdownClassName="certain-category-search-dropdown"
-                            dropdownMatchSelectWidth={false}
-                            dropdownStyle={{ width: 300 }}
-                            dataSource={aggregates.currentJobTitle || []}
-                            size="large"
-                            style={{ width: '100%' }}
-                            placeholder="Job Title"
-                            optionLabelProp="value"
-                            onChange={val => this.setSearch('preferredJobTitle', val)}
-                        >
-                            <Input suffix={<Icon type="search" className="certain-category-icon"/>}/>
-                        </AutoComplete>
-                    </div>
-                </div>
-
                 <Dropdown overlay={menu}>
                     <Button>
                         Select a database <Icon type="down"/>

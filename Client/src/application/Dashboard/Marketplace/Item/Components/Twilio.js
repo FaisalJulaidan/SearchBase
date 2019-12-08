@@ -27,7 +27,19 @@ export const TwilioFormItems = ({
                             message: "Please add your Account SID",
                         }],
                     })(
-                        <Input placeholder={'Your Domain'}/>
+                        <Input placeholder={'Starting AC...'}/>
+                    )}
+                </FormItem>
+
+                <FormItem label="Messaging Service SID"
+                          {...layout}>
+                    {getFieldDecorator('messaging_service_sid', {
+                        rules: [{
+                            required: true,
+                            message: "Please add your Messaging Service SID",
+                        }],
+                    })(
+                        <Input placeholder={'Starting M...'}/>
                     )}
                 </FormItem>
 
@@ -40,18 +52,6 @@ export const TwilioFormItems = ({
                         }],
                     })(
                         <Input placeholder={'Your Auth Token'}/>
-                    )}
-                </FormItem>
-
-                <FormItem label="Specified Phone Number"
-                          {...layout}>
-                    {getFieldDecorator('phone_number', {
-                        rules: [{
-                            required: true,
-                            message: "The Phone number you got in Twilio is required",
-                        }],
-                    })(
-                        <Input placeholder={'Bought Phone Number'}/>
                     )}
                 </FormItem>
 

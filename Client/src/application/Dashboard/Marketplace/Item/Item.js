@@ -90,8 +90,9 @@ class Item extends React.Component {
     getMarketplaceComponent = (type, place) => {
         const { getFieldDecorator, validateFields } = this.props.form;
         const layout = {
-            labelCol: { span: 6 },
-            wrapperCol: { span: 14 }
+            labelCol: { span: 9 },
+            wrapperCol: { span: 15 },
+            labelAlign:'left'
         };
         const formOptions = {
             getFieldDecorator,

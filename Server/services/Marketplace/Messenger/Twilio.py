@@ -23,16 +23,18 @@ def testConnection(auth):
 def sendMessage(sendto, body, auth, whatsapp=False):
     try:
         client = Client(auth.get("account_sid"), auth.get("auth_token"))
-        sender = auth.get("phone_number")
+        messaging_service_sid = auth.get("messaging_service_sid")
 
         if whatsapp:
             sendto = "whatsapp:" + sendto
-            sender = "whatsapp:" + sender
+
+        if sendto[0] == "0":
+            sendto = "+44" + sendto[1:]
 
         message = client.messages.create(
             to=sendto,
-            from_=sender,
-            body=body) # add break-lines to sms message
+            messaging_service_sid=messaging_service_sid,
+            body=body)  # add break-lines to sms message
 
         return Callback(True, "Message has been sent")
     except Exception as exc:

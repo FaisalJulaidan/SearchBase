@@ -123,7 +123,8 @@ def logError(exception):
         print(exception)
         print(traceback.format_exc())
     else:
-        mail_services.simpleSend("tsberrorlogs@gmail.com", "Error Log", str(exception))
+        # uncomment when needed
+        # mail_services.simpleSend("tsberrorlogs@gmail.com", "Error Log", str(exception))
         logging.error(traceback.format_exc() + exception + "\n \n")
 
 

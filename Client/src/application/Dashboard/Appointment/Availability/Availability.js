@@ -2,12 +2,13 @@ import React from 'react';
 import { connect } from 'react-redux';
 
 import moment from 'moment';
-import { AutoComplete, Button, Dropdown, Icon, Input, Menu, Table } from 'antd';
-import {checkDate} from "helpers";
+import { AutoComplete, Button, Dropdown, Empty, Icon, Input, Menu, Table } from 'antd';
+import { checkDate } from 'helpers';
 import 'types/TimeSlots_Types';
 import 'types/AutoPilot_Types';
 import './Availabilty.less';
 import { assistantActions, databaseActions } from 'store/actions';
+import { conversationActions } from '../../../../store/actions';
 
 let momentFormat = 'DD/MM/YYYY';
 
@@ -94,36 +95,101 @@ class Availability extends React.Component {
     }
 
     handleMenuClick = (item) => {
-        this.setState({ assistant: item.key, database: item.key });
-        this.props.dispatch(databaseActions.fetchDatabase(item.key));
-        this.props.dispatch(databaseActions.fetchAvailableCandidates(item.key));
-    };
-
-    filterSearches = (records) => {
-        const { searches } = this.state;
-        return records.filter(record => {
-            let matches = Object.keys(searches).length;
-            let catches = 0;
-            Object.keys(searches).map(search => {
-                if (record[search].indexOf(searches[search]) !== -1) {
-                    catches++;
-                }
-            });
-            return catches === matches;
-        });
-    };
-
-    filterThisWeek = (records) => {
-        const searchArray = (convID) => {
-            for (let idx in availability) {
-                if (availability[idx].ID === convID) {
-                    return idx;
-                }
+        if (item.key)
+            if (item.keyPath[1] === 'item_0') {
+                this.setState({ assistant: null, database: item.key });
+                this.props.dispatch(databaseActions.fetchAvailableCandidates(item.key)).then(() => {
+                    this.populateRecords('DB');
+                    this.setState({ sourceType: 'DB' });
+                });
+            } else {
+                this.setState({ assistant: item.key, database: null });
+                this.props.dispatch(conversationActions.fetchConversations(item.key)).then(() => {
+                    this.populateRecords('ASSISTANT');
+                    this.setState({ sourceType: 'ASSISTANT' });
+                });
             }
+    };
+
+    populateRecords = (sourceType) => {
+        let availableText = <Icon type="check" style={{ textAlign: 'center' }}/>;
+
+        const { assistant, database } = this.state;
+        const { conversations, availableCandidates } = this.props;
+
+        let records = [];
+        let availability;
+
+        if (database && availableCandidates && availableCandidates.length)
+            records = availableCandidates;
+
+        if (assistant && conversations && conversations.length)
+            records = conversations.map(conversation => {
+                    if (conversation.Data.keywordsByDataType['Candidate Availability'])
+                        return {
+                            ...conversation,
+                            CandidateAvailability: conversation.Data.keywordsByDataType['Candidate Availability'].join(',')
+                        };
+                }
+            ).filter(x => x);
+
+        if (records) {
+            switch (sourceType) {
+                case 'DB':
+                    availability = this.filterThisWeek_DB(records).map(item => {
+                        return {
+                            name: item.data.name,
+                            skills: item.data.skills,
+                            location: item.data.location,
+                            currentJobTitle: item.data.currentJobTitle,
+                            consultant: item.data.consultant,
+                            monday: item.dates.find(date => date.isoWeekday() === 1) !== undefined ? availableText : '',
+                            tuesday: item.dates.find(date => date.isoWeekday() === 2) !== undefined ? availableText : '',
+                            wednesday: item.dates.find(date => date.isoWeekday() === 3) !== undefined ? availableText : '',
+                            thursday: item.dates.find(date => date.isoWeekday() === 4) !== undefined ? availableText : '',
+                            friday: item.dates.find(date => date.isoWeekday() === 5) !== undefined ? availableText : '',
+                            saturday: item.dates.find(date => date.isoWeekday() === 6) !== undefined ? availableText : '',
+                            sunday: item.dates.find(date => date.isoWeekday() === 7) !== undefined ? availableText : ''
+                        };
+                    });
+                    this.setState({ availability });
+                    break;
+                case 'ASSISTANT':
+                    availability = this.filterThisWeek_Assistant(records).map((item, i) => {
+                        return {
+                            name: item.data.name,
+                            skills: item.data.skills,
+                            location: item.data.location,
+                            currentJobTitle: item.data.currentJobTitle,
+                            consultant: item.data.consultant,
+                            monday: item.dates.find(date => date.isoWeekday() === 1) !== undefined ? availableText : '',
+                            tuesday: item.dates.find(date => date.isoWeekday() === 2) !== undefined ? availableText : '',
+                            wednesday: item.dates.find(date => date.isoWeekday() === 3) !== undefined ? availableText : '',
+                            thursday: item.dates.find(date => date.isoWeekday() === 4) !== undefined ? availableText : '',
+                            friday: item.dates.find(date => date.isoWeekday() === 5) !== undefined ? availableText : '',
+                            saturday: item.dates.find(date => date.isoWeekday() === 6) !== undefined ? availableText : '',
+                            sunday: item.dates.find(date => date.isoWeekday() === 7) !== undefined ? availableText : ''
+                        };
+                    });
+                    this.setState({ availability });
+                    break;
+            }
+
+
+        }
+    };
+
+    filterThisWeek_DB = (records) => {
+        const searchArray = (convID) => {
+            for (let idx in availability)
+                if (availability[idx].ID === convID)
+                    return idx;
             return null;
         };
+
         let availability = [];
         const { start, end } = this.state;
+
         records.filter(record => record.CandidateAvailability).filter(record => {
             let dates = record.CandidateAvailability.split(',');
 
@@ -136,13 +202,11 @@ class Availability extends React.Component {
             };
 
             dates.forEach(date => {
-                if(date[0] === " "){
-                  date = date.substr(1, date.length-1)
+                if (date[0] === ' ') {
+                    date = date.substr(1, date.length - 1);
                 }
                 let realDate = checkDate(date, true, false);
-                console.log(realDate)
-                console.log(realDate.isoWeekday())
-                if(!realDate) return
+                if (!realDate) return;
                 if (realDate.isBetween(start, end) || realDate.isSame(start, 'date') || realDate.isSame(end, 'date')) {
                     let key = searchArray(record.ID); // key exists?
                     if (key) {
@@ -156,9 +220,83 @@ class Availability extends React.Component {
         return availability;
     };
 
-    moveWeek = change => {
+    filterThisWeek_Assistant = (records) => {
+        const searchArray = (convID) => {
+            for (let idx in availability)
+                if (availability[idx].ID === convID)
+                    return idx;
+            return null;
+        };
+
+        let availability = [];
         const { start, end } = this.state;
-        this.setState({ start: start.clone().add(change, 'weeks'), end: end.clone().add(change, 'weeks') });
+
+        records.filter(record => record.CandidateAvailability).filter(record => {
+            let data = {
+                name: record.Name,
+                location: '',
+                skills: '',
+                consultant: '',
+                currentJobTitle: ''
+            };
+
+            if (record.Data.keywordsByDataType['Candidate Country'] &&
+                record.Data.keywordsByDataType['Candidate Country'].join)
+                data.location = record.Data.keywordsByDataType['Candidate Country'].join(' ');
+
+            if (record.Data.keywordsByDataType['Candidate Skills'] &&
+                record.Data.keywordsByDataType['Candidate Skills'].join)
+                data.skills = record.Data.keywordsByDataType['Candidate Skills'].join(' ');
+
+            if (record.Data.keywordsByDataType['Candidate Consultant Name'] &&
+                record.Data.keywordsByDataType['Candidate Consultant Name'].join)
+                data.consultant = record.Data.keywordsByDataType['Candidate Consultant Name'].join(' ');
+
+            if (record.Data.keywordsByDataType['Current Job Title'] &&
+                record.Data.keywordsByDataType['Current Job Title'].join)
+                data.currentJobTitle = record.Data.keywordsByDataType['Current Job Title'].join(' ');
+
+
+            let dates = record.CandidateAvailability.split(',');
+            dates.forEach(date => {
+                date = date.trim();
+                let realDate = checkDate(date, true, false);
+                if (!realDate) return;
+                if (realDate.isBetween(start, end) || realDate.isSame(start, 'date') || realDate.isSame(end, 'date')) {
+                    let key = searchArray(record.ID); // key exists?
+                    console.log(key);
+                    if (key) {
+                        availability[key].dates.push(realDate);
+                    } else {
+                        availability.push({ ID: record.ID, dates: [realDate], data: data });
+                    }
+                }
+            });
+        });
+        return availability;
+    };
+
+    filterSearches = () => {
+        const { searches, availability } = this.state;
+        const filtered = availability.filter(record => {
+            let matches = Object.keys(searches).length;
+            let catches = 0;
+            Object.keys(searches).map(search => {
+                if (record[search].indexOf(searches[search]) !== -1) {
+                    catches++;
+                }
+            });
+            return catches === matches;
+        });
+        this.setState({ availability: filtered });
+    };
+
+    moveWeek = change => {
+        const { start, end, sourceType } = this.state;
+        this.setState(
+            { start: start.clone().add(change, 'weeks'), end: end.clone().add(change, 'weeks') },
+            () => this.populateRecords(sourceType)
+        );
     };
 
     getSearchAggregates = records => {
@@ -197,48 +335,43 @@ class Availability extends React.Component {
         } else {
             searches[type] = val;
         }
-        this.setState({ searches: searches });
+        this.setState({ searches: searches }, () => this.filterSearches());
     };
 
     render() {
-        const menu = (
-            <Menu onClick={this.handleMenuClick}>
-                {this.props.dbList.map((database, i) => (
-                    <Menu.Item key={database.ID}>
-                        {database.Name}
-                    </Menu.Item>
-                ))}
-            </Menu>
-        );
+        const menu = () => {
+            const dbItems = [...this.props.dbList];
+            const assistantItems = [...this.props.assistants];
+            return <Menu onClick={this.handleMenuClick}>
+                {
+                    dbItems.length &&
+                    <Menu.SubMenu title="Databases">
+                        {dbItems.map((database, i) => (
+                            <Menu.Item key={database.ID}>
+                                {database.Name}
+                            </Menu.Item>
+                        ))}
+                    </Menu.SubMenu>
+                }
+                {
+                    assistantItems.length &&
+                    <Menu.SubMenu title="Assistants">
+                        {assistantItems.map((assistant, i) => (
+                            <Menu.Item key={assistant.ID}>
+                                {assistant.Name}
+                            </Menu.Item>
+                        ))}
+                    </Menu.SubMenu>
+                }
+                {
+                    !dbItems.length && !assistantItems.length && <Empty description={false}/>
+                }
+            </Menu>;
+        };
 
-        const { assistant, database } = this.state;
-        const { conversations, db, availableCandidates, isAvailableCandidatesLoading } = this.props;
-        let records = db.databaseContent ? db.databaseContent.records : null;
-        let availability = null;
-        let aggregates = {};
-        let availableText = <Icon type="check" style={{ textAlign: 'center' }}/>;
 
-        if (records) {
-            availability = this.filterThisWeek(records).map(item => ({
-                name: item.data.name,
-                skills: item.data.skills,
-                location: item.data.location,
-                currentJobTitle: item.data.currentJobTitle,
-                consultant: item.data.consultant,
-                monday: item.dates.find(date => date.isoWeekday() === 1) !== undefined ? availableText : '',
-                tuesday: item.dates.find(date => date.isoWeekday() === 2) !== undefined ? availableText : '',
-                wednesday: item.dates.find(date => date.isoWeekday() === 3) !== undefined ? availableText : '',
-                thursday: item.dates.find(date => date.isoWeekday() === 4) !== undefined ? availableText : '',
-                friday: item.dates.find(date => date.isoWeekday() === 5) !== undefined ? availableText : '',
-                saturday: item.dates.find(date => date.isoWeekday() === 6) !== undefined ? availableText : '',
-                sunday: item.dates.find(date => date.isoWeekday() === 7) !== undefined ? availableText : '',
-            }));
-            // availability = this.searc
-            aggregates = this.getSearchAggregates(availability);
-            availability = this.filterSearches(availability);
-        }
+        let aggregates = this.state.availability ? this.getSearchAggregates(this.state.availability) : [];
 
-        console.log(aggregates);
 
         return (
             <div>
@@ -254,6 +387,7 @@ class Availability extends React.Component {
                             size="large"
                             style={{ width: '100%' }}
                             placeholder="Skills"
+
                             onChange={val => this.setSearch('skills', val)}
                             optionLabelProp="value"
                         >
@@ -270,7 +404,8 @@ class Availability extends React.Component {
                             dataSource={aggregates.location || []}
                             size="large"
                             style={{ width: '100%' }}
-                            placeholder="Location" onChange={val => this.setSearch('location', val)}
+                            placeholder="Location"
+                            onChange={val => this.setSearch('location', val)}
                             optionLabelProp="value"
                         >
                             <Input suffix={<Icon type="search" className="certain-category-icon"/>}/>
@@ -294,38 +429,32 @@ class Availability extends React.Component {
                         </AutoComplete>
                     </div>
                 </div>
+
                 <Dropdown overlay={menu}>
-                    {database ?
-                        <Button>
-                            {this.props.dbList.find(db => db.ID === parseInt(database)).Name} <Icon
-                            type="down"/>
-                        </Button> :
-                        <Button>
-                            Select a database <Icon type="down"/>
-                        </Button>}
+                    <Button>
+                        Select a database <Icon type="down"/>
+                    </Button>
                 </Dropdown>
+
                 <Button onClick={() => this.moveWeek(-1)}>
-                    <Icon type="left"/>
-                </Button>
-                {this.state.start.format(momentFormat)}
-                <Button onClick={() => this.moveWeek(1)} style={{ marginLeft: 6 }}>
-                    <Icon type="right"/>
+                    Prev Week <Icon type="left"/>
                 </Button>
 
-                {availability ?
-                    <Table style={{ marginTop: '22px' }}
-                           columns={this.columns}
-                           dataSource={availability}
-                           scroll={{ x: 'max-content' }}
-                    />
-                    : null}
+                {this.state.start.format(momentFormat)}
+                <Button onClick={() => this.moveWeek(1)} style={{ marginLeft: 6 }}>
+                    Next Week <Icon type="right"/>
+                </Button>
+
+                <Table style={{ marginTop: '22px' }}
+                       columns={this.columns}
+                       dataSource={this.state.availability}
+                       scroll={{ x: 'max-content' }}/>
             </div>);
     }
 }
 
 
 function mapStateToProps(state) {
-    console.log(state);
     return {
         dbList: state.database.databasesList,
         conversations: state.conversation.conversations.conversationsList,

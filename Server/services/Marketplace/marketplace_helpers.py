@@ -106,6 +106,24 @@ def disconnect(type, companyID):
         return Callback(False, str(exc))
 
 
+# getters
+def getCRMByType(itemType, companyID):
+    try:
+        # find the type and redirect to its service
+        if CRM_Enum.has_value(itemType):
+            return crm_services.getCRMByType(itemType, companyID)
+        elif Messenger_Enum.has_value(itemType):
+            return messenger_servicess.getMessengerByType(itemType, companyID)
+        # elif Calendar_Enum.has_value(type):
+        #     return calendar_services.getByID(itemID, companyID)
+        else:
+            return Callback(False, "The Marketplace item did not match any on the system")
+
+    except Exception as exc:
+        helpers.logError("Marketplace.marketplace_helpers.processRedirect() ERROR: " + str(exc))
+        return Callback(False, str(exc))
+
+
 # send request with dynamic method
 def sendRequest(url, method, headers, data=None):
     if data:

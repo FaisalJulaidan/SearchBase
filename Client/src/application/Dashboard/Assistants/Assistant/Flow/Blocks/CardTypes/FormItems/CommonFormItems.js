@@ -219,8 +219,8 @@ export const FileTypesFormItem = ({ FormItem, block, layout, getFieldDecorator, 
 );
 
 export const DatabaseTypeFormItem = ({ FormItem, block, getFieldDecorator, layout, options }) => (
-    <FormItem label="Database" {...layout}
-              extra="The database to be scanned for solutions (Jobs, Candidate...)">
+    <FormItem label="Database Type" {...layout}
+              extra="All databases of the same selected type (Jobs, Candidate) will be be scanned for solutions">
         {
             getFieldDecorator('databaseType', {
                 initialValue: block.Content.databaseType ?
@@ -233,7 +233,7 @@ export const DatabaseTypeFormItem = ({ FormItem, block, getFieldDecorator, layou
                         'otherwise you won\'t be able to creat a Solution block and search for solutions in the chatbot'
                 }]
             })(
-                <Select placeholder="EX: Jobs database">{options.databases.types.map((type, i) =>
+                <Select placeholder="EX: Jobs">{options.databases.types.map((type, i) =>
                     <Option key={i} value={type}>{type}</Option>)
                 }</Select>
             )

@@ -2,7 +2,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 
 import moment from 'moment';
-import { Button, Cascader, Icon, Input, Table } from 'antd';
+import { Button, Cascader, Icon, Input, Table, Typography } from 'antd';
 import { checkDate } from 'helpers';
 import Highlighter from 'react-highlight-words';
 import 'types/TimeSlots_Types';
@@ -29,13 +29,14 @@ class Availability extends React.Component {
                 title: 'Name',
                 dataIndex: 'name',
                 key: 'name',
+                fixed: 'left',
                 ...this.getColumnSearchProps('name')
             },
             {
                 title: 'Skills',
                 dataIndex: 'skills',
                 key: 'skills',
-                ...this.getColumnSearchProps('skills')
+                ...this.getColumnSearchProps('skills'),
             },
             {
                 title: 'Location',

@@ -2,14 +2,13 @@ import React from 'react';
 import { connect } from 'react-redux';
 
 import moment from 'moment';
-import { Button, Dropdown, Empty, Icon, Input, Menu, Table } from 'antd';
+import { Button, Cascader, Icon, Input, Table } from 'antd';
 import { checkDate } from 'helpers';
 import Highlighter from 'react-highlight-words';
 import 'types/TimeSlots_Types';
 import 'types/AutoPilot_Types';
 import './Availabilty.less';
-import { assistantActions, databaseActions } from 'store/actions';
-import { conversationActions } from '../../../../store/actions';
+import { assistantActions, databaseActions, conversationActions } from 'store/actions';
 
 let momentFormat = 'DD/MM/YYYY';
 
@@ -25,37 +24,36 @@ class Availability extends React.Component {
             end: moment().endOf('isoWeek'),
             searches: {}
         };
-
         this.columns = [
             {
                 title: 'Name',
                 dataIndex: 'name',
                 key: 'name',
-                ...this.getColumnSearchProps('name'),
+                ...this.getColumnSearchProps('name')
             },
             {
                 title: 'Skills',
                 dataIndex: 'skills',
                 key: 'skills',
-                ...this.getColumnSearchProps('skills'),
+                ...this.getColumnSearchProps('skills')
             },
             {
                 title: 'Location',
                 dataIndex: 'location',
                 key: 'location',
-                ...this.getColumnSearchProps('location'),
+                ...this.getColumnSearchProps('location')
             },
             {
                 title: 'Job Title',
                 dataIndex: 'currentJobTitle',
                 key: 'currentJobTitle',
-                ...this.getColumnSearchProps('currentJobTitle'),
+                ...this.getColumnSearchProps('currentJobTitle')
             },
             {
                 title: 'Consultant',
                 dataIndex: 'consultant',
                 key: 'consultant',
-                ...this.getColumnSearchProps('consultant'),
+                ...this.getColumnSearchProps('consultant')
             },
             {
                 title: 'Monday',
@@ -91,7 +89,7 @@ class Availability extends React.Component {
                 title: 'Sunday',
                 dataIndex: 'sunday',
                 key: 'sunday'
-            },
+            }
         ];
     }
 
@@ -129,7 +127,7 @@ class Availability extends React.Component {
             </div>
         ),
         filterIcon: filtered => (
-            <Icon type="search" style={{ color: filtered ? '#9254de' : undefined }} />
+            <Icon type="search" style={{ color: filtered ? '#9254de' : undefined }}/>
         ),
         onFilter: (value, record) =>
             record[dataIndex]
@@ -151,14 +149,14 @@ class Availability extends React.Component {
                 />
             ) : (
                 text
-            ),
+            )
     });
 
     handleSearch = (selectedKeys, confirm, dataIndex) => {
         confirm();
         this.setState({
             searchText: selectedKeys[0],
-            searchedColumn: dataIndex,
+            searchedColumn: dataIndex
         });
     };
 
@@ -168,20 +166,21 @@ class Availability extends React.Component {
     };
 
     handleMenuClick = (item) => {
-        if (item.key)
-            if (item.keyPath[1] === 'item_0') {
-                this.setState({ assistant: null, database: item.key });
-                this.props.dispatch(databaseActions.fetchAvailableCandidates(item.key)).then(() => {
-                    this.populateRecords('DB');
-                    this.setState({ sourceType: 'DB' });
-                });
-            } else {
-                this.setState({ assistant: item.key, database: null });
-                this.props.dispatch(conversationActions.fetchConversations(item.key)).then(() => {
-                    this.populateRecords('ASSISTANT');
-                    this.setState({ sourceType: 'ASSISTANT' });
-                });
-            }
+        const source = item[0];
+        const key = item[1];
+        if (source === 'Assistants') {
+            this.setState({ assistant: key, database: null });
+            this.props.dispatch(conversationActions.fetchConversations(key)).then(() => {
+                this.populateRecords('ASSISTANT');
+                this.setState({ sourceType: 'ASSISTANT' });
+            });
+        } else if (source === 'Databases') {
+            this.setState({ assistant: null, database: key });
+            this.props.dispatch(databaseActions.fetchAvailableCandidates(key)).then(() => {
+                this.populateRecords('DB');
+                this.setState({ sourceType: 'DB' });
+            });
+        }
     };
 
     populateRecords = (sourceType) => {
@@ -225,8 +224,6 @@ class Availability extends React.Component {
                             sunday: item.dates.find(date => date.isoWeekday() === 7) !== undefined ? availableText : ''
                         };
                     });
-                    console.log("=====DB=====")
-                    console.log(availability)
                     this.setState({ availability });
                     break;
                 case 'ASSISTANT':
@@ -246,8 +243,6 @@ class Availability extends React.Component {
                             sunday: item.dates.find(date => date.isoWeekday() === 7) !== undefined ? availableText : ''
                         };
                     });
-                    console.log("==========")
-                    console.log(availability)
                     this.setState({ availability });
                     break;
             }
@@ -339,7 +334,6 @@ class Availability extends React.Component {
                 if (!realDate) return;
                 if (realDate.isBetween(start, end) || realDate.isSame(start, 'date') || realDate.isSame(end, 'date')) {
                     let key = searchArray(record.ID); // key exists?
-                    console.log(key);
                     if (key) {
                         availability[key].dates.push(realDate);
                     } else {
@@ -360,49 +354,35 @@ class Availability extends React.Component {
     };
 
     render() {
-        const menu = () => {
-            const dbItems = [...this.props.dbList];
-            const assistantItems = [...this.props.assistants];
-            return <Menu onClick={this.handleMenuClick}>
-                {
-                    dbItems.length &&
-                    <Menu.SubMenu title="Databases">
-                        {dbItems.map((database, i) => (
-                            <Menu.Item key={database.ID}>
-                                {database.Name}
-                            </Menu.Item>
-                        ))}
-                    </Menu.SubMenu>
-                }
-                {
-                    assistantItems.length &&
-                    <Menu.SubMenu title="Assistants">
-                        {assistantItems.map((assistant, i) => (
-                            <Menu.Item key={assistant.ID}>
-                                {assistant.Name}
-                            </Menu.Item>
-                        ))}
-                    </Menu.SubMenu>
-                }
-                {
-                    !dbItems.length && !assistantItems.length && <Empty description={false}/>
-                }
-            </Menu>;
-        };
+        const { assistants, databases } = this.props;
+        const options = [
+            {
+                value: 'Assistants',
+                label: 'Assistants',
+                disabled: !assistants.length,
+                children: assistants.map((assistant, i) => ({ value: assistant.ID, label: assistant.Name }))
+            },
+            {
+                value: 'Databases',
+                label: 'Databases',
+                disabled: !databases.length,
+                children: databases.map((database, i) => ({ value: database.ID, label: database.Name }))
+            }
+        ];
 
         return (
             <div>
-                <Dropdown overlay={menu}>
-                    <Button>
-                        Select a database <Icon type="down"/>
-                    </Button>
-                </Dropdown>
+                <Cascader style={{ marginRight: '8px' }} options={options} onChange={this.handleMenuClick}
+                          placeholder="Select source"/>
 
                 <Button onClick={() => this.moveWeek(-1)}>
                     Prev Week <Icon type="left"/>
                 </Button>
 
-                {this.state.start.format(momentFormat)}
+                <span style={{ fontWeight: 700 }}>
+                    {`${this.state.start.format(momentFormat)} - ${this.state.end.format(momentFormat)}`}
+                </span>
+
                 <Button onClick={() => this.moveWeek(1)} style={{ marginLeft: 6 }}>
                     Next Week <Icon type="right"/>
                 </Button>
@@ -418,7 +398,7 @@ class Availability extends React.Component {
 
 function mapStateToProps(state) {
     return {
-        dbList: state.database.databasesList,
+        databases: state.database.databasesList,
         conversations: state.conversation.conversations.conversationsList,
         assistants: state.assistant.assistantList,
         db: state.database.fetchedDatabase,

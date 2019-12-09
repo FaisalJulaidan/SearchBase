@@ -93,6 +93,7 @@ def updateCandidate(candidateID, conversation, companyID, sourceID):
         return Callback(False, "CRM " + crm_type.value + " is not allowed for updating")
 
     data = __extractCandidateInsertData(conversation)
+    data["id"] = candidateID
 
     if CRM.has_value(crm_type.value):
         # if crm_type is CRM.Greenhouse:
@@ -488,6 +489,8 @@ def __extractCandidateInsertData(conversation):
             conversation.Data.get('keywordsByDataType').get(DT.CandidateCountry.value['name'], [])),
         "email": conversation.Email or " ",
         "emails": conversation.Data.get('keywordsByDataType').get(DT.CandidateEmail.value['name'], []),
+        "currentJobTitle": ", ".join(
+            conversation.Data.get('keywordsByDataType').get(DT.CurrentJobTitle.value['name'], [])) or None,
 
         "skills": ", ".join(
             conversation.Data.get('keywordsByDataType').get(DT.CandidateSkills.value['name'], ) or

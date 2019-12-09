@@ -21,7 +21,8 @@ function* fetchMarketplaceItem({marketplaceType}) {
         yield put(marketplaceActions.fetchMarketplaceItemSuccess(res.data.data));
     } catch (error) {
         const msg = error.response?.data?.msg || "Couldn't fetch marketplace item";
-        errorMessage(msg);
+        console.error(msg);
+        // errorMessage(msg);
         yield put(marketplaceActions.fetchMarketplaceItemFailure());
     }
 }

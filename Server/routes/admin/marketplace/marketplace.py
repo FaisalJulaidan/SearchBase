@@ -35,28 +35,6 @@ def marketplace():
 
 
 # ===== Connect ===== #
-@marketplace_router.route("/marketplace/testBullhorn", methods=['POST'])
-def testBullhorn():
-    # Authenticate
-    # user = get_jwt_identity()['user']
-    if request.method == "POST":
-        print(request)
-        data = request.json
-        print(data)
-        crm_callback: Callback = crm_services.getByID(3,1)
-        if not crm_callback.Success:
-            raise Exception("CRM not found.")
-
-        crm = crm_callback.Data
-        callback = crm_services.searchPlacements(crm, 1, data.get("data"))
-          # callback: Callback = marketplace_helpers.search(data.get("params"))
-
-        if not callback.Success:
-            return helpers.jsonResponse(False, 400, callback.Message)
-        return helpers.jsonResponse(True, 200, "Success", callback.Data)
-
-
-# ===== Connect ===== #
 @marketplace_router.route("/marketplace/connect", methods=['POST'])
 @jwt_required
 def connect():
@@ -88,13 +66,13 @@ def crm(type):
             return helpers.jsonResponse(False, 400, callback.Message)
         return helpers.jsonResponse(True, 200, callback.Message, callback.Data)
 
-
     # Get and test the connection before return
     if request.method == "DELETE":
         callback: Callback = marketplace_helpers.disconnect(type, user.get("companyID"))
         if not callback.Success:
             return helpers.jsonResponse(False, 400, callback.Message)
         return helpers.jsonResponse(True, 200, callback.Message)
+
 
 @marketplace_router.route("/marketplace/<type>/fetch", methods=["GET"])
 @jwt_required
@@ -103,10 +81,11 @@ def crm_fetch(type):
     user = get_jwt_identity()['user']
 
     if request.method == "GET":
-        callback: Callback = crm_services.getCRMByType(type, user.get("companyID"))
+        callback: Callback = marketplace_helpers.getCRMByType(type, user.get("companyID"))
         if not callback.Success:
             return helpers.jsonResponse(False, 400, callback.Message)
         return helpers.jsonResponse(True, 200, callback.Message, helpers.getDictFromSQLAlchemyObj(callback.Data))
+
 
 @marketplace_router.route("/marketplace/<type>/save", methods=["POST"])
 @jwt_required

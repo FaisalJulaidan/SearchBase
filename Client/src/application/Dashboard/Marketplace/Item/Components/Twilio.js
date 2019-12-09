@@ -6,14 +6,14 @@ const {Option} = Select;
 const {Title, Paragraph, Text} = Typography;
 
 export const TwilioFormItems = ({
-                                   FormItem,
-                                   layout,
-                                   getFieldDecorator,
-                                   marketplace,
-                                   connectMarketplace,
-                                   isConnecting,
-                                   isTesting,
-                               }) =>
+                                    FormItem,
+                                    layout,
+                                    getFieldDecorator,
+                                    marketplace,
+                                    connectMarketplace,
+                                    isConnecting,
+                                    isTesting,
+                                }) =>
     <>
         {
             marketplace.status !== "CONNECTED" &&
@@ -27,7 +27,19 @@ export const TwilioFormItems = ({
                             message: "Please add your Account SID",
                         }],
                     })(
-                        <Input placeholder={'Your Domain'}/>
+                        <Input placeholder={'Starting AC...'}/>
+                    )}
+                </FormItem>
+
+                <FormItem label="Messaging Service SID"
+                          {...layout}>
+                    {getFieldDecorator('messaging_service_sid', {
+                        rules: [{
+                            required: true,
+                            message: "Please add your Messaging Service SID",
+                        }],
+                    })(
+                        <Input placeholder={'Starting M...'}/>
                     )}
                 </FormItem>
 
@@ -40,18 +52,6 @@ export const TwilioFormItems = ({
                         }],
                     })(
                         <Input placeholder={'Your Auth Token'}/>
-                    )}
-                </FormItem>
-
-                <FormItem label="Specified Phone Number"
-                          {...layout}>
-                    {getFieldDecorator('phone_number', {
-                        rules: [{
-                            required: true,
-                            message: "The Phone number you got in Twilio is required",
-                        }],
-                    })(
-                        <Input placeholder={'Bought Phone Number'}/>
                     )}
                 </FormItem>
 
@@ -91,20 +91,39 @@ export const TwilioFormItems = ({
 export const TwilioFeatures = ({}) =>
     <Typography style={{padding: '0 60px'}}>
         <Title>Introduction</Title>
-        {/*<Paragraph>*/}
-            {/*Twilio users can very simply benefit from using their systems directly by logging in*/}
-            {/*through our software to connect their CRM to our platform.*/}
-        {/*</Paragraph>*/}
-        {/*<Paragraph>*/}
-            {/*Once you have the required information and have successfully logged in – you are all*/}
-            {/*done.*/}
-        {/*</Paragraph>*/}
         <Paragraph>
             What you’ll need:
             <ul>
-                <li>Account SID</li>
-                <li>Auth Token</li>
-                <li>Specified Number</li>
+                <li><b>Account SID</b></li>
+                <li><b>Messaging Service SID</b></li>
+                <li><b>Auth Token</b></li>
+            </ul>
+        </Paragraph>
+        <Paragraph>
+            How to procure them on the Twilio website:
+            <ul>
+                <li>
+                    <h5>Account SID & Auth Token</h5>
+                    Once you login into your Twilio account you will be presented with your 'Console' page. On it you
+                    will be able to see your Account SID and also reveal your Auth Token.
+                </li>
+                <li>
+                    <h5>Messaging Service SID</h5>
+                    First you'll need to get yourself a number. If you have one already simply skip this step. Once
+                    logged in click on the search box on the top right and type in "Number". Press on "Buy a Number" and
+                    you will be presented with a filtering menu. Simply filter for your desired number and follow the
+                    instructions on buying however make sure that your number has SMS enabled or else you will not be
+                    able to use it with us.<br/><br/>
+                    Now that you have a number click on "Programmable SMS" from the far left menu on your screen. Next
+                    go to "SMS" from the new menu that appeared on the left and click on the big + to create a new
+                    Messaging Service. Give it a name you like and for Use Case put "Notifications, Outbound Only". You
+                    will now be presented with the Settings page which you can leave as it is.<br/><br/>
+                    You now have a Number and a Messaging Service. To be able to use the Messaging Service you will need
+                    to give it the number. To do that click on "Numbers" in the "Programmable SMS" menu on your left.
+                    Click on "Add an Existing Number", select the number you created and press on Add Selected. Finally
+                    press on "Back" from the menu if you are still inside the Messaging Service. You will be presented
+                    with your Messaging Service SID in the list of messaging services on your screen."
+                </li>
             </ul>
         </Paragraph>
     </Typography>;

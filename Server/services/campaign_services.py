@@ -147,19 +147,15 @@ def getCampaignOptions(companyID):
 
 def prepareCampaign(campaign_details, companyID):
     try:
-        hashedAssistantID = helpers.encodeID(campaign_details.get("assistant_id"))
-        if not campaign_details.get("database_id"):
-            campaign_details["location"] = campaign_details.get("location", "").split(",")[0]
-        else:
-            campaign_details["location"] = ""
+        campaign_details["location"] = campaign_details.get("location", "").split(",")[0]
+
         if campaign_details.get("use_crm"):
             crm_callback: Callback = crm_services.getByID(campaign_details.get("crm_id"), companyID)
             if not crm_callback.Success:
                 raise Exception("CRM not found.")
 
-            crm = crm_callback.Data
-
-            candidates_callback: Callback = crm_services.searchCandidatesCustom(crm, companyID, campaign_details, True)
+            candidates_callback: Callback = crm_services.searchCandidatesCustom(crm_callback.Data, companyID,
+                                                                                campaign_details, True)
         else:
             session = {
                 "showTop": 200,
@@ -171,8 +167,9 @@ def prepareCampaign(campaign_details, companyID):
                 },
                 "databaseType": DatabaseType.Candidates.name
             }
-            candidates_callback: Callback = databases_services.scan(session, hashedAssistantID, True,
-                                                                    campaign_details.get("database_id"))
+            candidates_callback: Callback = databases_services.scan(session, helpers.encodeID(
+                                                                    campaign_details.get("assistant_id")),
+                                                                    True, campaign_details.get("database_id"))
 
         if not candidates_callback.Success:
             raise Exception(candidates_callback.Message)
@@ -198,7 +195,6 @@ def sendCampaign(campaign_details, companyID):
             raise Exception("Message text is missing")
 
         outreach_type = campaign_details.get("outreach_type")
-
         messenger = None
         if outreach_type == "sms" or outreach_type == "whatsapp":
             messenger_callback: Callback = messenger_servicess.getByID(campaign_details.get("messenger_id"), companyID)
@@ -218,7 +214,7 @@ def sendCampaign(campaign_details, companyID):
             candidate_phone = candidate.get("CandidateMobile")
             candidate_email = candidate.get("CandidateEmail")
 
-            # check if phone or email is need and present
+            # check if phone or email is needed and present
             if (not candidate_phone and (outreach_type == "sms" or outreach_type == "whatsapp")) \
                     or (not candidate_email and outreach_type == "email"):
                 failedCandidates += 1
@@ -239,10 +235,9 @@ def sendCampaign(campaign_details, companyID):
                 .replace("${assistantLink}$", url.Data) \
                 .replace("${candidateName}$", candidate.get("CandidateName"))
 
-            if outreach_type == "sms":
-                messenger_servicess.sendMessage(messenger.Type, candidate_phone, tempText, messenger.Auth)
-            elif outreach_type == "whatsapp":
-                messenger_servicess.sendMessage(messenger.Type, candidate_phone, tempText, messenger.Auth, True)
+            if outreach_type == "sms" or outreach_type == "whatsapp":
+                whatsapp = True if outreach_type == "whatsapp" else False
+                messenger_servicess.sendMessage(messenger.Type, candidate_phone, tempText, messenger.Auth, whatsapp)
             elif outreach_type == "email":
                 mail_services.simpleSend(candidate_email, campaign_details.get("email_title"), tempText)
 
@@ -273,14 +268,12 @@ def updateStatus(campaignID, newStatus, companyID):
         return Callback(False, "Could not change the Campaign's status.")
 
 
-def getShortLists(crm_id, companyID):
+def getCandidateLists(crm_id, companyID, listID=None):
     crm = None
     if crm_id:
         crm_callback: Callback = crm_services.getByID(crm_id, companyID)
         if not crm_callback.Success:
             raise Exception("CRM not found.")
         crm = crm_callback.Data
-        # print("CRM IS: {}".format(crm))
 
-    candidates_callback: Callback = crm_services.getshortlists(crm)
-    return Callback(True, "Shortlists have been retrieved", candidates_callback.Data)
+    return crm_services.getCandidateLists(crm.Auth, crm.Type, companyID, listID)

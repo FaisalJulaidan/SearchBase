@@ -714,12 +714,28 @@ def searchJobsCustomQuery(auth, companyID, query, fields=None) -> Callback:
         if not sendQuery_callback.Success:
             raise Exception(sendQuery_callback.Message)
 
-        return_body = json.loads(sendQuery_callback.Data.text)
-
-        return Callback(True, sendQuery_callback.Message, return_body)
+        return Callback(True, sendQuery_callback.Message, json.loads(sendQuery_callback.Data.text))
 
     except Exception as exc:
         helpers.logError("Marketplace.CRM.Bullhorn.searchJobs() ERROR: " + str(exc))
+        return Callback(False, str(exc))
+
+
+# used to retrieve both all candidate lists and a specified one
+def getSavedSearches(auth, companyID, entity, savedSearchID=None) -> Callback:
+    try:
+        query = "entity="+entity
+        query += "entityId="+str(savedSearchID) if savedSearchID else ""
+
+        # send query
+        sendQuery_callback: Callback = sendQuery(auth, "savedSearch", "get", {}, companyID, [query])
+        if not sendQuery_callback.Success:
+            raise Exception(sendQuery_callback.Message)
+
+        return Callback(True, sendQuery_callback.Message, json.loads(sendQuery_callback.Data.text))
+
+    except Exception as exc:
+        helpers.logError("Marketplace.CRM.Bullhorn.getSavedSearches() ERROR: " + str(exc))
         return Callback(False, str(exc))
 
 

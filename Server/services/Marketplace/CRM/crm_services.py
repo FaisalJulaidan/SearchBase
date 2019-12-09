@@ -194,6 +194,7 @@ def searchPlacements(crm, companyID, params):
     else:
         return Callback(False, "CRM type did not match with those on the system")
 
+
 def searchJobs(assistant: Assistant, session):
     data = {
         "preferredJobTitle": __checkFilter(session['keywordsByDataType'], DT.PreferredJobTitle),
@@ -217,6 +218,17 @@ def searchJobs(assistant: Assistant, session):
             return eval(crm_type.value + ".searchJobs(assistant.CRM.Auth, data)")
 
         return eval(crm_type.value + ".searchJobs(assistant.CRM.Auth, assistant.CompanyID, data)")
+    else:
+        return Callback(False, "CRM type did not match with those on the system")
+
+
+# Hotlists, Shortlists, Saved Searches etc... (list of candidates made in the CRM)
+def getCandidateLists(auth, crm_type, companyID, listID=None):
+    if crm_type is CRM.Bullhorn:
+        return Bullhorn.getSavedSearches(auth, companyID, "Candidate", listID)
+    elif crm_type is CRM.Jobscience:
+        return Jobscience.getShortLists(auth)
+
     else:
         return Callback(False, "CRM type did not match with those on the system")
 
@@ -399,6 +411,7 @@ def updateByType(crm_type, newAuth, companyID):
         helpers.logError("Marketplace.marketplace_helpers.saveNewCRMAuth() ERROR: " + str(exc))
         return Callback(False, str(exc))
 
+
 def updateAutopilotConnection(crm_type, autoPilotID, companyID):
     try:
         crm = db.session.query(CRM_Model).filter(
@@ -525,8 +538,3 @@ def __extractCandidateInsertData(conversation):
 # prevents IDEA from automatically removing dependencies that are used in eval
 def IDEA_Calmer():
     print(Jobscience, Mercury, Greenhouse, Vincere, Adapt)
-
-
-def getshortlists(crm):
-
-    return Jobscience.getShortLists(crm.Auth)

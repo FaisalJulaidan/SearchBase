@@ -833,7 +833,6 @@ def produceRecruiterValueReport(crm: CRM_Model, companyID) -> Callback:
 
 def __extractCandidateInsertBody(data):
     return {
-        "id": data.get("id"),
         "name": data.get("name"),
         "firstName": data.get("firstName"),
         "lastName": data.get("lastName"),

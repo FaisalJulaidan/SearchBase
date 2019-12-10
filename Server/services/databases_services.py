@@ -49,15 +49,15 @@ def fetchDatabase(id: int, companyID: int, pageNumber: int) -> Callback:
 
 def fetchAvailableCandidates(dbID: int, companyID: int):
     try:
-        # Get result and check if None then raise exception
+        # Fetch database and check if None then raise exception
         database: Database = db.session.query(Database) \
-            .filter(and_(Database.CompanyID == companyID, Database.ID == id)).first()
+            .filter(and_(Database.CompanyID == companyID, Database.ID == dbID)).first()
 
         if not database:
             raise Exception("Database does not exist")
 
         candidates: List[Candidate] = db.session.query(Candidate) \
-            .filter(and_(Candidate.DatabaseID == dbID, Candidate.CandidateSkills is not None))
+            .filter(and_(Candidate.DatabaseID == dbID, Candidate.CandidateAvailability != None)).all()
 
         return Callback(True, "", candidates)
 
@@ -496,7 +496,6 @@ def scanJobs(session, dbIDs, extraJobs=None):
         # Check if there are no Jobs.
         if not len(df):
             return Callback(True, '', [])
-
 
         # Fill None values with 0 for numeric columns and with empty string for string columns
         df = df.fillna({Job.JobSalary.name: 0, Job.JobYearsRequired.name: 0}).fillna('')

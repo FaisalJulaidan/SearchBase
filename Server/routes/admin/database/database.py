@@ -45,13 +45,31 @@ def get_database(databaseID, pageNumber):
     if request.method == "GET":
         callback = databases_services.fetchDatabase(databaseID, user['companyID'], pageNumber)
 
-
     # Return response
     if not callback.Success:
         return helpers.jsonResponse(False, 400, callback.Message)
     return helpers.jsonResponse(True, 200, callback.Message, callback.Data)
 
 
+@database_router.route("/databases/<int:databaseID>/available_candidates", methods=['GET'])
+@jwt_required
+@wrappers.AccessDatabasesRequired
+def get_available_candidates(databaseID):
+
+    # Authenticate
+    user = get_jwt_identity()['user']
+
+    callback: Callback = Callback(False, "")
+    if request.method == "GET":
+        callback = databases_services.fetchAvailableCandidates(databaseID, user['companyID'])
+
+    # Return response
+    if not callback.Success:
+        return helpers.jsonResponse(False, 400, callback.Message)
+    return helpers.jsonResponse(True, 200, callback.Message, helpers.getListFromSQLAlchemyList(callback.Data))
+
+
+# Delete a database and update basic database info
 @database_router.route("/databases/<int:databaseID>", methods=['DELETE', 'PUT'])
 @jwt_required
 @wrappers.AccessDatabasesRequired

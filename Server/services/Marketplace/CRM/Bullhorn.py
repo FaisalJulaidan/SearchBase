@@ -61,13 +61,13 @@ def login(auth):
 
         #                    "&redirect_uri=https://www.thesearchbase.com/api/marketplace/simple_callback" + \
         code_url = "https://auth-emea.bullhornstaffing.com/oauth/authorize?" + \
-                           "&response_type=code" + \
-                           "&client_id=" + CLIENT_ID + \
-                           "&client_secret=" + CLIENT_SECRET + \
-                           "&redirect_uri=http://www.bullhorn.com" + \
-                           "&action=Login" + \
-                           "&username=" + authCopy.get("username") + \
-                           "&password=" + urllib.parse.quote(authCopy.get("password"))
+                   "&response_type=code" + \
+                   "&client_id=" + CLIENT_ID + \
+                   "&client_secret=" + CLIENT_SECRET + \
+                   "&redirect_uri=http://www.bullhorn.com" + \
+                   "&action=Login" + \
+                   "&username=" + authCopy.get("username") + \
+                   "&password=" + urllib.parse.quote(authCopy.get("password"))
 
         code_request = requests.post(code_url)
 
@@ -126,8 +126,9 @@ def retrieveRestToken(auth, companyID):
             url = url.replace("auth-emea.", "auth9.")
 
         get_access_token = requests.post(url, headers=headers)
-        helpers.logError("BULLHORN TESTING BUG CompID" + str(companyID) + ", CODE: " + str(get_access_token.status_code) +
-                         ", TEXT: " + get_access_token.text)
+        helpers.logError(
+            "BULLHORN TESTING BUG CompID" + str(companyID) + ", CODE: " + str(get_access_token.status_code) +
+            ", TEXT: " + get_access_token.text)
 
         if get_access_token.status_code == 400:
             login_callback: Callback = login(authCopy)
@@ -159,17 +160,12 @@ def retrieveRestToken(auth, companyID):
         if not saveAuth_callback.Success:
             raise Exception(saveAuth_callback.Message)
 
-        return Callback(True, 'Rest Token Retrieved', {
-            "rest_token": authCopy["rest_token"],
-            "rest_url": authCopy.get("rest_url"),
-            "refresh_token": authCopy["refresh_token"]
-        })
+        return Callback(True, 'Rest Token Retrieved', authCopy)
 
     except Exception as exc:
         db.session.rollback()
         helpers.logError("Marketplace.CRM.Bullhorn.retrieveRestToken() ERROR: " + str(exc))
         return Callback(False, "Failed to retrieve CRM tokens. Please check login information")
-
 
 
 # create query url AND also tests the BhRestToken to see if it still valid, if not it generates a new one AND new url
@@ -392,14 +388,14 @@ def updateCandidate(auth, data, companyID) -> Callback:
 
 
 multipleTypes = [
-  "BETWEEN",
-  "BETWEENEXCLUSIVE",
+    "BETWEEN",
+    "BETWEENEXCLUSIVE",
 ]
 
 singleTypes = [
-  "AND",
-  "NOT",
-  "MATCH"
+    "AND",
+    "NOT",
+    "MATCH"
 ]
 
 
@@ -423,7 +419,7 @@ def queryGen(input, match, queryType, match2=None):
     elif queryType == "NOT":
         queryText = "-{}:{}".format(input, convertToBullhornType(match))
     elif queryType == "MATCH":
-        queryText ="{}:{}".format(input, convertToBullhornType(match))
+        queryText = "{}:{}".format(input, convertToBullhornType(match))
     return queryText
 
 
@@ -434,7 +430,7 @@ def searchPlacement(auth, companyID, data, fields="fields=candidate"):
             query += queryGen(item['input'], item['match'], item['queryType'], item.get("match2", None))
         while True:
             sendQuery_callback: Callback = sendQuery(auth, "search/Placement", "get", {}, companyID,
-                                                 [fields, query, "count=500&sort=id"])
+                                                     [fields, query, "count=500&sort=id"])
             if not sendQuery_callback.Success:
                 raise Exception(sendQuery_callback.Message)
 
@@ -443,7 +439,7 @@ def searchPlacement(auth, companyID, data, fields="fields=candidate"):
                 break
 
             query = "AND".join(query.split("AND")[:-1])
-        
+
         result = []
         for record in return_body["data"]:
             result.append(record)
@@ -468,12 +464,13 @@ def searchCandidatesDynamic(auth, companyID, data, fields=None, multiple=False) 
             fields = "fields=id,name,email,mobile,address,primarySkills,status,educations,dayRate,salary"
         result = []
         while True:
-            if(multiple):
-                sendQuery_callback: Callback = sendQuery(auth, "entity/Candidate/{}".format(query), "get", {}, companyID,
-                                    [fields, "count=500&sort=id"])
+            if (multiple):
+                sendQuery_callback: Callback = sendQuery(auth, "entity/Candidate/{}".format(query), "get", {},
+                                                         companyID,
+                                                         [fields, "count=500&sort=id"])
             else:
                 sendQuery_callback: Callback = sendQuery(auth, "search/Candidate", "get", {}, companyID,
-                                                    [fields, query, "count=500&sort=id"])
+                                                         [fields, query, "count=500&sort=id"])
             if not sendQuery_callback.Success:
                 raise Exception(sendQuery_callback.Message)
             return_body = json.loads(sendQuery_callback.Data.text)
@@ -512,7 +509,7 @@ def searchCandidates(auth, companyID, data, fields=None) -> Callback:
         # send query
         while True:
             sendQuery_callback: Callback = sendQuery(auth, "search/Candidate", "get", {}, companyID,
-                                                 [fields, query, "count=500&sort=id"])
+                                                     [fields, query, "count=500&sort=id"])
             if not sendQuery_callback.Success:
                 raise Exception(sendQuery_callback.Message)
 
@@ -650,14 +647,6 @@ def searchJobs(auth, companyID, data, fields=None) -> Callback:
         query += populateFilter(data.get("city"), "address.city")
 
         query += populateFilter(data.get("employmentType"), "employmentType")
-
-        # query += populateFilter(data.get("skills"), "skills")
-
-        # query += populateFilter(data.get("startDate"), "startDate")
-
-        # query += populateFilter(data.get("endDate"), "dateEnd")
-
-        # query += populateFilter(data.get("yearsRequired"), "yearsRequired")
 
         query = query[:-4]
 
@@ -846,9 +835,8 @@ def __extractCandidateInsertBody(data):
         "occupation": data.get("currentJobTitle"),
 
         # "primarySkills": data.get("skills"),
-        "experience": int(float(data.get("yearsExperience") or 0)),
+        "experience": int(float(data.get("yearsExperience") or 0)),  # doesnt like going straight into int
 
-        "educationDegree": data.get("educations"),
         "dateAvailable": data.get("availability"),  # TODO CHECK
 
         "salary": data.get("annualSalary"),
@@ -861,6 +849,7 @@ def __extractCandidateInsertBody(data):
                 "Years of Experience": data.get("yearsExperience"),
                 "Preferred Work City": data.get("preferredWorkCity"),
                 "Skills": data.get("skills"),
+                "Submitted Education": data.get("educations"),
                 "LinkedIn": data.get("linkedIn")
             }, data.get("selectedSolutions")
         )

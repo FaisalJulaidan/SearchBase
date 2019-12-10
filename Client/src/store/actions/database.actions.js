@@ -53,6 +53,29 @@ const fetchDatabaseFailure = (error) => ({
     type: actionTypes.FETCH_DATABASE_FAILURE,
     error
 });
+
+
+// Fetch available candidates
+const fetchAvailableCandidates = (databaseID) => ({
+    type: actionTypes.FETCH_DATABASE_AVAILABLE_CANDIDATES_REQUEST,
+    meta: {thunk: true},
+    databaseID,
+});
+
+const fetchAvailableCandidatesSuccess = (successMessage, fetchedAvailableCandidates) => ({
+    type: actionTypes.FETCH_DATABASE_AVAILABLE_CANDIDATES_SUCCESS,
+    successMessage,
+    fetchedAvailableCandidates,
+
+});
+
+const fetchAvailableCandidatesFailure = (error) => ({
+    type: actionTypes.FETCH_DATABASE_AVAILABLE_CANDIDATES_FAILURE,
+    error
+});
+
+
+// Reset (remove fetch database from reducer)
 const resetFetchedDatabase = () => ({
     type: actionTypes.RESET_DATABASE
 });
@@ -105,6 +128,10 @@ export const databaseActions = {
     fetchDatabaseSuccess,
     fetchDatabaseFailure,
     resetFetchedDatabase,
+
+    fetchAvailableCandidates,
+    fetchAvailableCandidatesSuccess,
+    fetchAvailableCandidatesFailure,
 
     updateDatabase,
     updateDatabaseSuccess,

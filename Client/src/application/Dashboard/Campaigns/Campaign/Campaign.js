@@ -491,7 +491,7 @@ class Campaign extends React.Component {
                                                 defaultChecked
                                                 style={{
                                                     display: (this.state.use_crm ? 'inline-block' : 'none'),
-                                                    paddingTop: '10px'
+                                                    marginTop: '10px'
                                                 }}>
                                                 Use Perfect Match <Tooltip
                                                 title="Return only Candidates that match all filtering criteria. Turning this off increases the amount of candidates returned by loosening the search filters.">

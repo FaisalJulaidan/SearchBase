@@ -83,13 +83,11 @@ def updateCandidate(candidateID, conversation, companyID, sourceID):
     crm_callback: Callback = getByID(sourceID, companyID)
 
     if not crm_callback.Success:
-
         return crm_callback
 
     crm_type = crm_callback.Data.Type
 
     if crm_type not in [CRM.Bullhorn, CRM.Jobscience]:
-
         return Callback(False, "CRM " + crm_type.value + " is not allowed for updating")
 
     data = __extractCandidateInsertData(conversation)
@@ -145,7 +143,8 @@ def searchCandidates(assistant: Assistant, session):
         return Callback(False, "CRM type did not match with those on the system")
 
 
-def searchCandidatesCustom(crm, companyID, candidate_data, perfect=False, customData=False, fields=None, customSearch=None, **kwargs):
+def searchCandidatesCustom(crm, companyID, candidate_data, perfect=False, customData=False, fields=None,
+                           customSearch=None, **kwargs):
     if customData:
         data = candidate_data
     else:
@@ -195,6 +194,7 @@ def searchPlacements(crm, companyID, params):
     else:
         return Callback(False, "CRM type did not match with those on the system")
 
+
 def searchJobs(assistant: Assistant, session):
     data = {
         "preferredJobTitle": __checkFilter(session['keywordsByDataType'], DT.PreferredJobTitle),
@@ -224,7 +224,6 @@ def searchJobs(assistant: Assistant, session):
 
 # private helper function
 def __checkFilter(keywords, dataType: DT, returnList=False):
-
     if keywords.get(dataType.value["name"]) and not returnList:
         return " ".join(keywords[dataType.value["name"]])
     elif keywords.get(dataType.value["name"]):
@@ -335,12 +334,11 @@ def disconnectByID(crmID, companyID) -> Callback:
 def logoutOfCRM(auth, crm_type, companyID) -> Callback:
     try:
 
-        if crm_type == CRM.Bullhorn: # Need to change this?
+        if crm_type == CRM.Bullhorn:  # Need to change this?
             return Bullhorn.logout(auth, companyID)
 
         elif crm_type == "Jobscience":
             return Jobscience.logout(auth, companyID)
-
 
         return Callback(False, 'Logout failed')
 
@@ -400,10 +398,11 @@ def updateByType(crm_type, newAuth, companyID):
         helpers.logError("Marketplace.marketplace_helpers.saveNewCRMAuth() ERROR: " + str(exc))
         return Callback(False, str(exc))
 
+
 def updateAutopilotConnection(crm_type, autoPilotID, companyID):
     try:
         crm = db.session.query(CRM_Model).filter(
-            and_(CRM_Model.CompanyID == companyID,CRM_Model.Type == crm_type)).first()
+            and_(CRM_Model.CompanyID == companyID, CRM_Model.Type == crm_type)).first()
         crm.CRMAutoPilotID = autoPilotID
         db.session.commit()
         return Callback(True, "New CRM Autopilot ID has been saved", crm)
@@ -413,8 +412,9 @@ def updateAutopilotConnection(crm_type, autoPilotID, companyID):
         helpers.logError("Marketplace.marketplace_helpers.updateAutopilotConnection() ERROR: " + str(exc))
         return Callback(False, str(exc))
 
+
 # get min/max/average salary from the string and convert to specified period (daily, annually)
-def getSalary(conversation: Conversation, dataType: DataType, salaryType, toPeriod:Period=None):  # type Period
+def getSalary(conversation: Conversation, dataType: DataType, salaryType, toPeriod: Period = None):  # type Period
     # ex. 5000-20000 GBP Annually
     salary = conversation.Data.get('keywordsByDataType').get(dataType.value['name'], 0)
 
@@ -476,42 +476,42 @@ def __extractCandidateInsertData(conversation):
         "firstName": helpers.getListValue(name, 0, " "),
         "lastName": helpers.getListValue(name, 1, " "),
         "mobile": conversation.PhoneNumber or " ",
-        "street": ", ".join(
+        "street": " ".join(
             conversation.Data.get('keywordsByDataType').get(DT.CandidateStreet.value['name']) or
             conversation.Data.get('keywordsByDataType').get(DT.JobStreet.value['name'], [])),
-        "city": ", ".join(
+        "city": " ".join(
             conversation.Data.get('keywordsByDataType').get(DT.CandidateCity.value['name']) or
             conversation.Data.get('keywordsByDataType').get(DT.JobCity.value['name'], [])),
-        "postCode": ", ".join(
+        "postCode": " ".join(
             conversation.Data.get('keywordsByDataType').get(DT.CandidatePostCode.value['name']) or
             conversation.Data.get('keywordsByDataType').get(DT.JobPostCode.value['name'], [])),
-        "country": ", ".join(
+        "country": " ".join(
             conversation.Data.get('keywordsByDataType').get(DT.CandidateCountry.value['name'], [])),
         "email": conversation.Email or " ",
         "emails": conversation.Data.get('keywordsByDataType').get(DT.CandidateEmail.value['name'], []),
-        "currentJobTitle": ", ".join(
+        "currentJobTitle": " ".join(
             conversation.Data.get('keywordsByDataType').get(DT.CurrentJobTitle.value['name'], [])) or None,
 
         "skills": ", ".join(
             conversation.Data.get('keywordsByDataType').get(DT.CandidateSkills.value['name'], ) or
             conversation.Data.get('keywordsByDataType').get(DT.JobEssentialSkills.value['name'], [])) or None,
-        "yearsExperience": ", ".join(
+        "yearsExperience": " ".join(
             conversation.Data.get('keywordsByDataType').get(DT.CandidateYearsExperience.value['name']) or
             conversation.Data.get('keywordsByDataType').get(DT.JobYearsRequired.value['name'], [])) or None,
 
-        "preferredWorkCity": ", ".join(
+        "preferredWorkCity": " ".join(
             conversation.Data.get('keywordsByDataType').get(DT.JobCity.value['name'], [])) or None,
-        "preferredJobTitle": ", ".join(
+        "preferredJobTitle": " ".join(
             conversation.Data.get('keywordsByDataType').get(DT.PreferredJobTitle.value['name'], [])) or None,
-        "preferredJobType": ", ".join(
+        "preferredJobType": " ".join(
             conversation.Data.get('keywordsByDataType').get(DT.JobType.value['name'], [])) or None,
 
-        "educations": ", ".join(conversation.Data.get('keywordsByDataType').get(DT.CandidateEducation.value['name'],
-                                                                                [])) or None,
-        "linkedIn": ", ".join(conversation.Data.get('keywordsByDataType').get(DT.CandidateLinkdinURL.value['name'],
-                                                                              [])) or None,
+        "educations": " ".join(conversation.Data.get('keywordsByDataType').get(DT.CandidateEducation.value['name'],
+                                                                               [])) or None,
+        "linkedIn": " ".join(conversation.Data.get('keywordsByDataType').get(DT.CandidateLinkdinURL.value['name'],
+                                                                             [])) or None,
 
-        "availability": ", ".join(
+        "availability": " ".join(
             conversation.Data.get('keywordsByDataType').get(DT.CandidateAvailability.value['name'], [])) or None,
 
         "annualSalary": getSalary(conversation, DT.CandidateDesiredSalary, "Min", Period.Annually) or
@@ -529,5 +529,4 @@ def IDEA_Calmer():
 
 
 def getshortlists(crm):
-
     return Jobscience.getShortLists(crm.Auth)

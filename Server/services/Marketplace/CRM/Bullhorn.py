@@ -724,8 +724,7 @@ def searchJobsCustomQuery(auth, companyID, query, fields=None) -> Callback:
 # used to retrieve both all candidate lists and a specified one
 def getSavedSearches(auth, companyID, entity, savedSearchID=None) -> Callback:
     try:
-        query = "entity="+entity
-        query += "entityId="+str(savedSearchID) if savedSearchID else ""
+        query = ("entity="+entity + "entityId="+str(savedSearchID)) if savedSearchID else ""
 
         # send query
         sendQuery_callback: Callback = sendQuery(auth, "savedSearch", "get", {}, companyID, [query])

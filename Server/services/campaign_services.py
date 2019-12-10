@@ -162,7 +162,7 @@ def prepareCampaign(campaign_details, companyID):
             candidates_callback: Callback = crm_services.searchCandidatesCustom(crm, companyID, campaign_details, True)
         else:
             session = {
-                "showTop": 200,
+                "showTop": 2000000,
                 "keywordsByDataType": {
                     DT.CandidateCity.value['name']: [campaign_details.get("location")],
                     # DT.JobSalary.value['name']: ["1000-5000 GBP Annually"],

@@ -498,18 +498,18 @@ class Campaign extends React.Component {
                                                 style={{
                                                     display: (
                                                         this.state.selectedCRM ===
-                                                        this.props.campaignOptions?.crms.find(crm => crm.Type === 'Jobscience')?.ID
+                                                        this.props.campaignOptions?.crms.find(crm => crm.Type === 'Bullhorn')?.ID
                                                             ? 'block'
                                                             : 'none'
                                                     ),
                                                     marginTop: '10px'
-                                                }}>Use Jobscience Shortlist</Checkbox>
+                                                }}>Use Bullhorn Shortlist</Checkbox>
                                         )}
                                     </FormItem>
                                     <FormItem label="Shortlist" style={{
                                         display: (
                                             this.state.selectedCRM ===
-                                            this.props.campaignOptions?.crms.find(crm => crm.Type === 'Jobscience')?.ID &&
+                                            this.props.campaignOptions?.crms.find(crm => crm.Type === 'Bullhorn')?.ID &&
                                             this.state.useShortlist ? 'block' : 'none')
                                     }}
                                     >
@@ -594,7 +594,7 @@ class Campaign extends React.Component {
                             </FormItem>
                             {this.state.useShortlist && this.state.use_crm
                             && this.state.selectedCRM ===
-                            this.props.campaignOptions?.crms.find(crm => crm.Type === 'Jobscience')?.ID
+                            this.props.campaignOptions?.crms.find(crm => crm.Type === 'Bullhorn')?.ID
                                 ?
                                 <>
                                 </>

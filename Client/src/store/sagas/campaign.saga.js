@@ -131,7 +131,7 @@ function* fetchCampaignCandidatesData({assistant_id, use_crm, crm_id, useShortli
                 email_title,
                 perfect_match
             }, {
-                timeout: 600000,
+                timeout: 1800000,
                 headers: {'Content-Type': 'application/json'},
             });
         yield put(campaignActions.fetchCampaignCandidatesDataSuccess(
@@ -181,7 +181,7 @@ function* launchCampaign({assistant_id, use_crm, crm_id, useShortlist, shortlist
                 email_title,
                 perfect_match
             }, {
-                timeout: 600000,
+                timeout: 1800000,
                 headers: {'Content-Type': 'application/json'},
             });
         yield put(campaignActions.launchCampaignSuccess());

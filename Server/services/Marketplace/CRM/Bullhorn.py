@@ -843,9 +843,8 @@ def __extractCandidateInsertBody(data):
         "occupation": data.get("currentJobTitle"),
 
         # "primarySkills": data.get("skills"),
-        "experience": int(float(data.get("yearsExperience") or 0)),
+        "experience": int(float(data.get("yearsExperience") or 0)),  # doesnt like going straight into int
 
-        "educationDegree": data.get("educations"),
         "dateAvailable": data.get("availability"),  # TODO CHECK
 
         "salary": data.get("annualSalary"),
@@ -858,6 +857,7 @@ def __extractCandidateInsertBody(data):
                 "Years of Experience": data.get("yearsExperience"),
                 "Preferred Work City": data.get("preferredWorkCity"),
                 "Skills": data.get("skills"),
+                "Submitted Education": data.get("educations"),
                 "LinkedIn": data.get("linkedIn")
             }, data.get("selectedSolutions")
         )

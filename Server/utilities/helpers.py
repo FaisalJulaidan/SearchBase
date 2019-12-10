@@ -125,7 +125,7 @@ def logError(exception):
         print(traceback.format_exc())
     else:
         # uncomment when needed
-        if os.environ.get('MAIL_LOGS'):
+        if os.environ.get('MAIL_LOGS', 'no') == 'yes':
             mail_services.simpleSend("tsberrorlogs@gmail.com", "Error Log", str(exception))
         logging.error(traceback.format_exc() + exception + "\n \n")
 

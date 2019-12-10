@@ -648,14 +648,6 @@ def searchJobs(auth, companyID, data, fields=None) -> Callback:
 
         query += populateFilter(data.get("employmentType"), "employmentType")
 
-        # query += populateFilter(data.get("skills"), "skills")
-
-        # query += populateFilter(data.get("startDate"), "startDate")
-
-        # query += populateFilter(data.get("endDate"), "dateEnd")
-
-        # query += populateFilter(data.get("yearsRequired"), "yearsRequired")
-
         query = query[:-4]
 
         # check if no conditions submitted

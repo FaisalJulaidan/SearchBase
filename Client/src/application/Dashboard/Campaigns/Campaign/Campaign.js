@@ -538,7 +538,7 @@ class Campaign extends React.Component {
                                                     loading={this.props.isLoadingShortlists}>
                                                 {this.props.shortlists?.map((item, key) => {
                                                     return (
-                                                        <Select.Option key={key} value={item.url}>
+                                                        <Select.Option key={key} value={item.id}>
                                                             {trimText.capitalize(trimText.trimDash(item.name))}
                                                         </Select.Option>
                                                     );

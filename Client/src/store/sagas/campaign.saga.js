@@ -149,7 +149,7 @@ function* fetchShortlists({crm_id}) {
     try {
         const res = yield http.get(`/campaign/candidate_lists/${crm_id}`);
         yield put(campaignActions.fetchShortlistsSuccess(
-            res.data?.data)
+            res.data?.data?.data)
         );
     } catch (error) {
         const msg = error.response?.data?.msg || "Couldn't load shortlists";

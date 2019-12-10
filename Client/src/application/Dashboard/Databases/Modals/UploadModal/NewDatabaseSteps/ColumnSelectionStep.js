@@ -140,7 +140,11 @@ class ColumnSelectionStep extends Component {
                 userColumns.length > 1 // there is country code
             ) {
 
-                validatedData = validatedData.split(' ').join('').replace(/\(.*\)/, '').replace('-', '');
+                validatedData = validatedData.split(' ').join('')
+                    .replace(/\(.*\)/, '')
+                    .replace('-', '')
+                    .replace('+', '');
+
                 if (!validatedData.includes(userColumns[0])) {
 
                     if (!validatedData.includes(userColumns[0].replace('+', '')))
@@ -152,6 +156,13 @@ class ColumnSelectionStep extends Component {
                     if (!validatedData.includes(userColumns[0]))
                         validatedData = userColumns[0] + validatedData;
 
+                    if (validatedData.includes(userColumns[0] + 0))
+                        validatedData = validatedData.replace(userColumns[0] + 0, userColumns[0]);
+
+                    if (validatedData.includes(userColumns[0] + '+'))
+                        validatedData = validatedData.replace(userColumns[0] + '+', userColumns[0]);
+
+                    // +7446056714 = +447446056714
 
                 }
 

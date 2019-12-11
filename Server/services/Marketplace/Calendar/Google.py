@@ -146,7 +146,6 @@ def syncAppointments(calendarID, token, companyID):
         user: User = db.session.query(User).join(Company).filter(Company.ID == companyID).first()
 
         rs = []
-
         for appointment in appointments:
             event = None
             for idx, item in enumerate(events):

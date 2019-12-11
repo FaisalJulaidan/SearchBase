@@ -36,7 +36,7 @@ class Availability extends React.Component {
                 title: 'Skills',
                 dataIndex: 'skills',
                 key: 'skills',
-                ...this.getColumnSearchProps('skills'),
+                ...this.getColumnSearchProps('skills')
             },
             {
                 title: 'Location',
@@ -132,7 +132,7 @@ class Availability extends React.Component {
         ),
         onFilter: (value, record) =>
             record[dataIndex]
-                .toString()
+                ?.toString()
                 .toLowerCase()
                 .includes(value.toLowerCase()),
         onFilterDropdownVisibleChange: visible => {
@@ -140,17 +140,18 @@ class Availability extends React.Component {
                 setTimeout(() => this.searchInput.select());
             }
         },
-        render: text =>
+        render: text => (
             this.state.searchedColumn === dataIndex ? (
                 <Highlighter
                     highlightStyle={{ backgroundColor: '#ffc069', padding: 0 }}
                     searchWords={[this.state.searchText]}
                     autoEscape
-                    textToHighlight={text.toString()}
+                    textToHighlight={text?.toString()}
                 />
             ) : (
                 text
             )
+        )
     });
 
     handleSearch = (selectedKeys, confirm, dataIndex) => {

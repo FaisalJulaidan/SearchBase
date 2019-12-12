@@ -608,7 +608,7 @@ def searchPerfectCandidates(auth, companyID, data, perfect=False) -> Callback:
             # remove the last (least important filter)
             if return_body["total"] == return_body["count"]:
                 query = "AND".join(query.split("AND")[:-1])
-                if "AND" not in query:
+                if "AND" not in query or perfect:  # check if filters ran out or filter loosening is disabled
                     break
 
         result = []

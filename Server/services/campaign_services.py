@@ -155,7 +155,8 @@ def prepareCampaign(campaign_details, companyID):
                 raise Exception("CRM not found.")
 
             candidates_callback: Callback = crm_services.searchCandidatesCustom(crm_callback.Data, companyID,
-                                                                                campaign_details, True)
+                                                                                campaign_details, True,
+                                                                                perfect=campaign_details.get("perfect_match"))
         else:
             session = {
                 "showTop": 200,

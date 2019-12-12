@@ -144,25 +144,25 @@ def searchCandidates(assistant: Assistant, session):
         return Callback(False, "CRM type did not match with those on the system")
 
 
-def searchCandidatesCustom(crm, companyID, candidate_data, perfect=False, customData=False, fields=None, customSearch=None, **kwargs):
+def searchCandidatesCustom(crm, companyID, campaign_data, perfectFunc=False, customData=False, customSearch=None, **kwargs):
     if customData:
-        data = candidate_data
+        data = campaign_data
     else:
         data = {
-            "location": candidate_data.get("location"),
-            "preferredJotTitle": candidate_data.get("preferredJobTitle"),
-            "skills": candidate_data.get("skills"),
-            "jobType": candidate_data.get("jobType"),
-            "shortlist_id": candidate_data.get("shortlist_id")
+            "location": campaign_data.get("location"),
+            "preferredJotTitle": campaign_data.get("preferredJobTitle"),
+            "skills": campaign_data.get("skills"),
+            "jobType": campaign_data.get("jobType"),
+            "shortlist_id": campaign_data.get("shortlist_id")
         }
 
     crm_type = crm.Type.value
     campaignCRMs = ["Bullhorn", "Vincere"]
-    if perfect and crm_type in campaignCRMs:
+    if perfectFunc and crm_type in campaignCRMs:
         searchFunc = "searchPerfectCandidates"
     elif customSearch:
         searchFunc = "searchCandidates{}".format(customSearch)
-    elif crm_type == "Jobscience" and candidate_data.get("useShortlist"):
+    elif crm_type == "Jobscience" and campaign_data.get("useShortlist"):
         searchFunc = "searchCandidatesByShortlist"
     else:
         searchFunc = "searchCandidates"
@@ -175,7 +175,7 @@ def searchCandidatesCustom(crm, companyID, candidate_data, perfect=False, custom
         if crm.Type is CRM.Jobscience:
             return eval(crm_type + "." + searchFunc + "(crm.Auth, data)")
         if crm.Type is CRM.Bullhorn:
-            return eval(crm_type + "." + searchFunc + "(crm.Auth, companyID, data, fields, **kwargs)")
+            return eval(crm_type + "." + searchFunc + "(crm.Auth, companyID, data, **kwargs)")
 
         return eval(crm_type + "." + searchFunc + "(crm.Auth, companyID, data)")
     else:

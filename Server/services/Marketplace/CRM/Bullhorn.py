@@ -557,7 +557,7 @@ def searchPerfectCandidates(auth, companyID, data, perfect=False, shortlist=None
             # query += populateFilter(data.get("education"), "educationDegree")
 
         query = query[:-5]
-        print("QUERY: ", query)
+        
         records = []
         seenIDs = []
         idQuery = " AND -(id:)"

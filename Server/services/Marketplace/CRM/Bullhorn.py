@@ -522,25 +522,7 @@ def searchCandidates(auth, companyID, data, fields=None) -> Callback:
         result = []
         # TODO educations uses ids - need to retrieve them
         for record in return_body["data"]:
-            if record.get("dayRate"):
-                payPeriod = Period("Daily")
-            else:
-                payPeriod = Period("Annually")
-            result.append(databases_services.createPandaCandidate(id=record.get("id", ""),
-                                                                  name=record.get("name"),
-                                                                  email=record.get("email"),
-                                                                  mobile=record.get("mobile"),
-                                                                  location=record.get("address", {}).get("city") or "",
-                                                                  skills=record.get("primarySkills", {}).get("data"),
-                                                                  linkdinURL=None,
-                                                                  availability=record.get("status"),
-                                                                  currentJobTitle=None,  #
-                                                                  education=None,
-                                                                  yearsExperience=0,
-                                                                  desiredSalary=record.get("salary") or
-                                                                                record.get("dayRate", 0),
-                                                                  currency=Currency("GBP"),
-                                                                  source="Bullhorn"))
+            result.append(__extractCandidateReturnData(record))
 
         return Callback(True, sendQuery_callback.Message, result)
 
@@ -549,25 +531,29 @@ def searchCandidates(auth, companyID, data, fields=None) -> Callback:
         return Callback(False, str(exc))
 
 
-def searchPerfectCandidates(auth, companyID, data, fields=None) -> Callback:
+def searchPerfectCandidates(auth, companyID, data, perfect=False, shortlist=None) -> Callback:
     try:
-        query = "query=(status:Available OR status:Active OR status:\"New Lead\") AND "
-        if not fields:
-            fields = "fields=id,name,email,mobile,address"
+        fields = "fields=id,name,email,mobile,address"
+        query = ""
+        if shortlist:
+            queryJSON = json.loads(shortlist)["filters"]
+            for key, value in queryJSON.items():
+                query += populateFilter(value, key)
+        else:
+            query = "(status:Available OR status:Active OR status:\"New Lead\") AND "
+            # populate filter in order of importance
+            # query += populateFilter(data.get("preferredJotTitle"), "occupation")
+            query += populateFilter(data.get("location"), "address.city")
+            query += populateFilter(data.get("jobCategory"), "employmentPreference")
 
-        # populate filter in order of importance
-        # query += populateFilter(data.get("preferredJotTitle"), "occupation")
-        query += populateFilter(data.get("location"), "address.city")
-        query += populateFilter(data.get("jobCategory"), "employmentPreference")
+            for skill in data.get("skills"):
+                query += populateFilter(skill, "description")
 
-        for skill in data.get("skills", []):
-            query += populateFilter(skill, "description")
-
-        query += populateFilter(data.get("yearsExperience"), "experience")
-        # query += populateFilter(data.get("education"), "educationDegree")
+            query += populateFilter(data.get("yearsExperience"), "experience")
+            # query += populateFilter(data.get("education"), "educationDegree")
 
         query = query[:-5]
-
+        
         records = []
         seenIDs = []
         idQuery = " AND -(id:)"
@@ -606,27 +592,13 @@ def searchPerfectCandidates(auth, companyID, data, fields=None) -> Callback:
             # remove the last (least important filter)
             if return_body["total"] == return_body["count"]:
                 query = "AND".join(query.split("AND")[:-1])
-                if "AND" not in query:
+                if "AND" not in query or perfect:  # check if filters ran out or filter loosening is disabled
                     break
 
         result = []
         # TODO educations uses ids - need to retrieve them
         for record in records:
-            result.append(databases_services.createPandaCandidate(id=record.get("id", ""),
-                                                                  name=record.get("name"),
-                                                                  email=record.get("email"),
-                                                                  mobile=record.get("mobile"),
-                                                                  location=record.get("address", {}).get("city") or "",
-                                                                  skills=record.get("primarySkills", {}).get("data"),
-                                                                  linkdinURL=None,
-                                                                  availability=record.get("status"),
-                                                                  currentJobTitle=None,
-                                                                  education=None,
-                                                                  yearsExperience=0,
-                                                                  desiredSalary=record.get("salary") or
-                                                                                record.get("dayRate", 0),
-                                                                  currency=Currency("GBP"),
-                                                                  source="Bullhorn"))
+            result.append(__extractCandidateReturnData(record))
 
         return Callback(True, "Search has been successful", result)
 
@@ -687,7 +659,7 @@ def searchJobs(auth, companyID, data, fields=None) -> Callback:
 
 def populateFilter(value, string, joint="AND"):
     if value:
-        return string + ":" + str(value) + " " + joint + " "
+        return string + ":\"" + str(value) + "\" " + joint + " "
     return ""
 
 
@@ -703,12 +675,27 @@ def searchJobsCustomQuery(auth, companyID, query, fields=None) -> Callback:
         if not sendQuery_callback.Success:
             raise Exception(sendQuery_callback.Message)
 
-        return_body = json.loads(sendQuery_callback.Data.text)
-
-        return Callback(True, sendQuery_callback.Message, return_body)
+        return Callback(True, sendQuery_callback.Message, json.loads(sendQuery_callback.Data.text))
 
     except Exception as exc:
         helpers.logError("Marketplace.CRM.Bullhorn.searchJobs() ERROR: " + str(exc))
+        return Callback(False, str(exc))
+
+
+# used to retrieve both all candidate lists and a specified one
+def getSavedSearches(auth, companyID, entity, savedSearchID=None) -> Callback:
+    try:
+        query = ("entity=" + entity + "entityId=" + str(savedSearchID)) if savedSearchID else ""
+
+        # send query
+        sendQuery_callback: Callback = sendQuery(auth, "savedSearch", "get", {}, companyID, [query])
+        if not sendQuery_callback.Success:
+            raise Exception(sendQuery_callback.Message)
+
+        return Callback(True, sendQuery_callback.Message, json.loads(sendQuery_callback.Data.text))
+
+    except Exception as exc:
+        helpers.logError("Marketplace.CRM.Bullhorn.getSavedSearches() ERROR: " + str(exc))
         return Callback(False, str(exc))
 
 
@@ -854,3 +841,21 @@ def __extractCandidateInsertBody(data):
             }, data.get("selectedSolutions")
         )
     }
+
+
+def __extractCandidateReturnData(record):
+    return databases_services.createPandaCandidate(id=record.get("id", ""),
+                                                   name=record.get("name"),
+                                                   email=record.get("email"),
+                                                   mobile=record.get("mobile"),
+                                                   location=record.get("address", {}).get("city") or "",
+                                                   skills=record.get("primarySkills", {}).get("data"),
+                                                   linkdinURL=None,
+                                                   availability=record.get("status"),
+                                                   currentJobTitle=None,  #
+                                                   education=None,
+                                                   yearsExperience=0,
+                                                   desiredSalary=record.get("salary") or
+                                                                 record.get("dayRate", 0),
+                                                   currency=Currency("GBP"),
+                                                   source="Bullhorn")

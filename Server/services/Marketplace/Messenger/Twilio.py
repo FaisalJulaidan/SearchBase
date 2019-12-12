@@ -41,7 +41,7 @@ def sendMessage(numbers, body, auth, whatsapp=False):
         client.notify.services(notify_service_sid) \
             .notifications.create(
             to_binding=binding,
-            body="Hello Bob")
+            body=body)
 
         return Callback(True, "Message has been sent")
     except Exception as exc:

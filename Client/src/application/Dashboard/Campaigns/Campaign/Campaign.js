@@ -182,7 +182,7 @@ class Campaign extends React.Component {
 
 
     getShortListDataByID = (shortlist_id) => {
-        return this.props.shortlists?.find(shortlist => shortlist.id === shortlist_id).data
+        return this.props.shortlists?.find(shortlist => shortlist.id === shortlist_id)?.data
     };
 
     handleModalSelectAll = () => {

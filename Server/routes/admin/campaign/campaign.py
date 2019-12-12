@@ -115,18 +115,15 @@ def campaign_status(campaignID):
             return helpers.jsonResponse(False, 400, callback.Message, None)
         return helpers.jsonResponse(True, 200, callback.Message, None)
 
-# Save New
-@campaign_router.route("/campaign/select-shortlist/<int:crmID>", methods=['GET'])
+
+# Candidate Lists / Shortlists
+@campaign_router.route("/campaign/shortlists/<int:crmID>", methods=['GET'])
 @jwt_required
 def getShortlists(crmID):
     user = get_jwt_identity()['user']
 
     if request.method == "GET":
-        print("GET REQUEST RECEIVED...")
-        print("crm id: {}".format(crmID))
-        print("company id: {}".format(user['companyID']))
-
-        callback: Callback = campaign_services.getShortLists(crmID, user['companyID'])
+        callback: Callback = campaign_services.getShortlists(crmID, user['companyID'])
         if not callback.Success:
             return helpers.jsonResponse(False, 400, callback.Message)
 

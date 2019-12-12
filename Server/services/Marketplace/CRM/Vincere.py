@@ -311,7 +311,7 @@ def updateCandidate(auth, data, companyID) -> Callback:
         body = __extractCandidateInsertBody(data)
 
         # send query
-        sendQuery_callback: Callback = sendQuery(auth, "candidate/"+data["id"], "put", body, companyID)
+        sendQuery_callback: Callback = sendQuery(auth, "candidate/" + data["id"], "put", body, companyID)
 
         if not sendQuery_callback.Success:
             raise Exception(sendQuery_callback.Message)
@@ -327,7 +327,7 @@ def searchCandidates(auth, companyID, data) -> Callback:
     try:
         query = "q="
 
-        fields = "fl=id,name,primary_email,mobile,phone,current_location,skill,desired_salary,currency,deleted,last_update,met_status"
+        fields = "fl=id,name,primary_email,mobile,phone,nearest_train_station,skill,desired_salary,currency,deleted,last_update,met_status"
 
         # populate filter
         query += populateFilter(data.get("location"), "current_city")
@@ -358,27 +358,7 @@ def searchCandidates(auth, companyID, data) -> Callback:
 
         result = []
         for record in return_body["result"]["items"]:
-            currency = record.get("currency", "gbp").lower()
-            if currency == "pound":
-                currency = "GBP"
-            else:
-                currency = record.get("currency", "GBP").upper()
-
-            result.append(databases_services.createPandaCandidate(id=record.get("id", ""),
-                                                                  name=record.get("name"),
-                                                                  email=record.get("primary_email"),
-                                                                  mobile=record.get("mobile", record.get("phone")),
-                                                                  location=
-                                                                  record.get("current_location", {}).get("city", ""),
-                                                                  skills=record.get("skill", "").split(","),  # str list
-                                                                  linkdinURL=None,
-                                                                  availability=record.get("status"),
-                                                                  preferredJobTitle=None,
-                                                                  education=None,
-                                                                  yearsExperience=0,
-                                                                  desiredSalary=float(record.get("desired_salary", 0)),
-                                                                  currency=Currency(currency.upper()),
-                                                                  source="Vincere"))
+            result.append(__extractCandidateReturnData(record))
 
         return Callback(True, sendQuery_callback.Message, result)
 
@@ -391,7 +371,7 @@ def searchPerfectCandidates(auth, companyID, data) -> Callback:
     try:
         query = "q="
 
-        fields = "fl=id,name,primary_email,mobile,phone,current_location,skill,desired_salary,currency,deleted,last_update,met_status"
+        fields = "fl=id,name,primary_email,mobile,phone,nearest_train_station,skill,desired_salary,currency,deleted,last_update,met_status"
 
         # populate filter
         query += populateFilter(data.get("location"), "current_city")
@@ -455,25 +435,7 @@ def searchPerfectCandidates(auth, companyID, data) -> Callback:
         result = []
         # TODO educations uses ids - need to retrieve them
         for record in records:
-            currency = record.get("currency", "gbp").lower()
-            if currency == "pound":
-                currency = "GBP"
-            else:
-                currency = record.get("currency", "GBP").upper()
-            result.append(databases_services.createPandaCandidate(id=record.get("id", ""),
-                                                                  name=record.get("name"),
-                                                                  email=record.get("primary_email"),
-                                                                  mobile=record.get("mobile", record.get("phone")),
-                                                                  location=record.get("current_location", ""),
-                                                                  skills=record.get("skill", ""),  # stringified json
-                                                                  linkdinURL=None,
-                                                                  availability=record.get("status"),
-                                                                  preferredJobTitle=None,
-                                                                  education=None,
-                                                                  yearsExperience=0,
-                                                                  desiredSalary=record.get("desired_salary", 0),
-                                                                  currency=Currency(currency.upper()),
-                                                                  source="Vincere"))
+            result.append(__extractCandidateReturnData(record))
 
         return Callback(True, "Search has been successful", result)
 
@@ -526,12 +488,6 @@ def searchJobs(auth, companyID, data) -> Callback:
         result = []
         # not found match for JobLinkURL
         for record in return_body["result"]["items"]:
-            currency = record.get("currency", "gbp").lower()
-            if currency == "pound":
-                currency = "GBP"
-            else:
-                currency = record.get("currency", "GBP").upper()
-
             result.append(databases_services.createPandaJob(id=record.get("id"),
                                                             title=record.get("job_title"),
                                                             desc=record.get("public_description", ""),
@@ -543,7 +499,9 @@ def searchJobs(auth, companyID, data) -> Callback:
                                                             startDate=record.get("open_date"),
                                                             endDate=record.get("closed_date"),
                                                             linkURL=None,
-                                                            currency=Currency(currency.upper()),
+                                                            currency=Currency(
+                                                                marketplace_helpers.convertToPandaCurrency(
+                                                                    record.get("currency", "gbp"))),
                                                             source="Vincere"))
 
         return Callback(True, sendQuery_callback.Message, result)
@@ -614,3 +572,24 @@ def __extractCandidateInsertBody(data):
             data.get("selectedSolutions")
         )
     }
+
+
+def __extractCandidateReturnData(record):
+    return databases_services.createPandaCandidate(id=record.get("id", ""),
+                                                                  name=record.get("name"),
+                                                                  email=record.get("primary_email"),
+                                                                  mobile=record.get("mobile", record.get("phone")),
+                                                                  location=
+                                                                  record.get("nearest_train_station", "").replace(
+                                                                      "station", ""),
+                                                                  skills=record.get("skill", "").split(","),  # str list
+                                                                  linkdinURL=None,
+                                                                  availability=record.get("status"),
+                                                                  currentJobTitle=None,
+                                                                  education=None,
+                                                                  yearsExperience=0,
+                                                                  desiredSalary=float(record.get("desired_salary", 0)),
+                                                                  currency=Currency(
+                                                                      marketplace_helpers.convertToPandaCurrency(
+                                                                          record.get("currency", "gbp"))),
+                                                                  source="Vincere")

@@ -108,7 +108,10 @@ def sendAutopilotReferrals():
 
                     ids = [item['candidate']['id'] for item in search_callback.Data]
                     
-                    candidate_search = crm_services.searchCandidatesCustom(crm, crmAP.CompanyID, ids, customData=True, fields="fields=mobile,email,name", customSearch="Dynamic", multiple=True)
+                    candidate_search = crm_services.searchCandidatesCustom(crm, crmAP.CompanyID, ids, customData=True,
+                                                                           customSearch="Dynamic",
+                                                                           fields="fields=mobile,email,name",
+                                                                           multiple=True)
                     
                     
                     

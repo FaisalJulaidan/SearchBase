@@ -44,7 +44,7 @@ def testConnection(auth, companyID):
 
         if auth.get("refresh_token"):
 
-            if token_is_ok(auth, companyID):
+            if isValidToken(auth, companyID):
                 return Callback(True, 'Logged in successfully', auth)
 
             else:
@@ -63,7 +63,7 @@ def testConnection(auth, companyID):
         return Callback(False, str(exc))
 
 
-def token_is_ok(auth, companyID):
+def isValidToken(auth, companyID):
     url = BASE_URL
     method = "GET"
     headers = {

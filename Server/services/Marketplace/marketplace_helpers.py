@@ -126,48 +126,39 @@ def getCRMByType(itemType, companyID):
 
 # send request with dynamic method
 def sendRequest(url, method, headers, data=None):
-    if data:
-        data = helpers.cleanDict(data)
-    request = None
+    data = helpers.cleanDict(data) if data else None
+
     if method.lower() == "put":
-        request = requests.put(url, headers=headers, data=data)
+        return requests.put(url, headers=headers, data=data)
     elif method.lower() == "post":
-        request = requests.post(url, headers=headers, data=data)
+        return requests.post(url, headers=headers, data=data)
     elif method.lower() == "get":
-        request = requests.get(url, headers=headers)
+        return requests.get(url, headers=headers)
     elif method.lower() == 'patch':
-        request = requests.patch(url, headers=headers, data=data)
-    return request
+        return requests.patch(url, headers=headers, data=data)
+    else:
+        return None
 
 
 def convertSkillsToString(skills):
-    if skills:
-        if type(skills) is list:  # list
-            if type(skills[0]) is str:  # list of strings
-                skills = ", ".join(skills)
+    if type(skills) is list:  # list
+        if type(skills[0]) is str:  # list of strings
+            skills = ", ".join(skills)
 
-            elif type(skills[0]) is dict:  # list of dicts
-                temp = ""
-                for skill in skills:
-                    temp += skill["name"] + ", "
-                    skills = temp[:-2]
+        elif type(skills[0]) is dict:  # list of dicts
+            temp = ""
+            for skill in skills:
+                temp += skill["name"] + ", "
+                skills = temp[:-2]
     return skills
 
 
-def loadSynonyms(construction: bool = False, hospitality: bool = False) -> dict:
-    """
-        Args:
-            construction (bool): Synonyms for industrial.
-            hospitality (bool): Synonyms for hospitality.
+def convertToPandaCurrency(value):
+    value = value.lower()
+    if value == "pound":
+        return "GBP"
+    elif value == "euro":
+        return "EUR"
+    else:
+        return value.upper()
 
-        Returns:
-            dict: The value returned
-
-            """
-    # Default is False
-    # for category, isSelected in categories.items():
-    #     print("{} is {}".format(category, isSelected))
-    if construction:
-        return {
-          "chef": {"cook", "caterer", "catering", "food preparation"}
-        }

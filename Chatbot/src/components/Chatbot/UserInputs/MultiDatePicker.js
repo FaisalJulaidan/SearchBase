@@ -21,15 +21,21 @@ const MultiDatePicker = ({ message, submitMessage }) => {
     let [error, setError] = useState(null);
 
     const renderDate = (curDate, today) => {
+        const startOfNextWeek = moment().endOf('week').add(1, 'day');
+        const endOfNextWeek = moment(startOfNextWeek).endOf('week');
         let className = 'antd-date-multi';
-        className += curDate.isSame(today, 'month') ? '' : ' fade';
+        className += curDate.isSame(moment(), 'day') ? ' today' : ''; // highlight today
+        className += curDate.isSame(today, 'month') ? '' : ' fade'; // fade next month days
 
         for (let date in selectedDates.individual) {
-            if (selectedDates.individual[date].diff)
-                if (Math.abs(selectedDates.individual[date].diff(curDate, 'hours')) < 23)
+            if (selectedDates.individual[date].diff) {
+                if (Math.abs(selectedDates.individual[date].diff(curDate, 'hours')) < 23) {
                     className += ' selected individual finish';
+                }
+            }
         }
-        if (curDate.isBefore(moment().startOf('week'))) {
+
+        if (curDate.isBefore(startOfNextWeek, 'day') || curDate.isAfter(endOfNextWeek, 'day')) {
             className += ' disabled';
         }
 
@@ -73,10 +79,15 @@ const MultiDatePicker = ({ message, submitMessage }) => {
 
     const dateMouseDown = (e, date) => {
         let dates = Object.assign({}, selectedDates);
-        if (date.isBefore(moment().startOf('week'), 'week')) {
+        const startOfNextWeek = moment().endOf('week').add(1, 'day');
+        const endOfNextWeek = moment(startOfNextWeek).endOf('week');
+        if (date.isBefore(startOfNextWeek, 'day') || date.isAfter(endOfNextWeek, 'day')) {
+            console.log('HHH no');
             return;
         }
+        // console.log("dates: ", dates)
         for (let ind in dates.individual) {
+            // console.log(ind)
             if (dates.individual[ind].isSame)
                 if (dates.individual[ind].isSame(date, 'date')) {
                     dates.individual.splice(ind, 1);
@@ -154,7 +165,6 @@ const MultiDatePicker = ({ message, submitMessage }) => {
                     <AntdDatePicker getCalendarContainer={() => getContainerElement()}
                                     className={'Datepicker'} suffixIcon={<div/>}
                                     dropdownClassName={'DatepickerCalendar'}
-                                    showToday={false}
                                     dateRender={renderDate}
                                     open={open}/>
                 </div>

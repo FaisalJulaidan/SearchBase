@@ -3,7 +3,7 @@ import {connect} from 'react-redux';
 import NoHeaderPanel from 'components/NoHeaderPanel/NoHeaderPanel';
 import {
     Typography, Form, Input, Breadcrumb, Divider, Button, Tag, AutoComplete, Select, Switch, Modal,
-    List, Checkbox, Spin, Radio, Slider, InputNumber, Row, Col, Icon
+    List, Checkbox, Spin, Radio, Slider, InputNumber, Row, Col, Icon, Tooltip
 } from 'antd';
 
 import {trimText} from '../../../../helpers';
@@ -165,7 +165,7 @@ class Campaign extends React.Component {
             this.state.use_crm,
             values.crm_id,
             this.state.useShortlist,
-            values.shortlist_id,
+            this.getShortListDataByID(values.shortlist_id),
             values.database_id,
             values.messenger_id,
             values.location,
@@ -175,8 +175,14 @@ class Campaign extends React.Component {
             values.text,
             this.state.candidate_list,
             values.outreach_type,
-            values.email_title
+            values.email_title,
+            values.perfect_match
         ));
+    };
+
+
+    getShortListDataByID = (shortlist_id) => {
+        return this.props.shortlists?.find(shortlist => shortlist.id === shortlist_id).data
     };
 
     handleModalSelectAll = () => {
@@ -243,7 +249,7 @@ class Campaign extends React.Component {
             this.state.use_crm,
             values.crm_id,
             this.state.useShortlist,
-            values.shortlist_id,
+            this.getShortListDataByID(values.shortlist_id),
             values.database_id,
             values.messenger_id,
             values.location,
@@ -252,7 +258,8 @@ class Campaign extends React.Component {
             values.skills?.split(/[ ,]+/),
             this.state.textMessage,
             values.outreach_type,
-            values.email_title
+            values.email_title,
+            values.perfect_match
         ));
     };
 
@@ -268,7 +275,7 @@ class Campaign extends React.Component {
                         this.state.use_crm,
                         values.crm_id,
                         this.state.useShortlist,
-                        values.shortlist_id,
+                        this.getShortListDataByID(values.shortlist_id),
                         values.database_id,
                         values.messenger_id,
                         values.location,
@@ -292,7 +299,7 @@ class Campaign extends React.Component {
                     this.state.use_crm,
                     values.crm_id,
                     this.state.useShortlist,
-                    values.shortlist_id,
+                    this.getShortListDataByID(values.shortlist_id),
                     values.database_id,
                     values.messenger_id,
                     values.location,
@@ -484,6 +491,19 @@ class Campaign extends React.Component {
                                                 })}
                                             </Select>
                                         )}
+                                        {getFieldDecorator('perfect_match', {initialValue: true})(
+                                            <Checkbox
+                                                defaultChecked
+                                                style={{
+                                                    display: (this.state.use_crm ? 'inline-block' : 'none'),
+                                                    marginTop: '10px'
+                                                }}>
+                                                Use Perfect Match <Tooltip
+                                                title="Return only Candidates that match all filtering criteria. Turning this off increases the amount of candidates returned by loosening the search filters.">
+                                                <Icon type="question-circle-o"/>
+                                            </Tooltip>
+                                            </Checkbox>
+                                        )}
                                         {getFieldDecorator('useShortlist')(
                                             <Checkbox
                                                 checked={this.state.useShortlist}
@@ -498,18 +518,18 @@ class Campaign extends React.Component {
                                                 style={{
                                                     display: (
                                                         this.state.selectedCRM ===
-                                                        this.props.campaignOptions?.crms.find(crm => crm.Type === 'Jobscience')?.ID
-                                                            ? 'block'
+                                                        this.props.campaignOptions?.crms.find(crm => crm.Type === 'Bullhorn')?.ID
+                                                            ? 'inline-block'
                                                             : 'none'
                                                     ),
                                                     marginTop: '10px'
-                                                }}>Use Jobscience Shortlist</Checkbox>
+                                                }}>Use Bullhorn Shortlist</Checkbox>
                                         )}
                                     </FormItem>
                                     <FormItem label="Shortlist" style={{
                                         display: (
                                             this.state.selectedCRM ===
-                                            this.props.campaignOptions?.crms.find(crm => crm.Type === 'Jobscience')?.ID &&
+                                            this.props.campaignOptions?.crms.find(crm => crm.Type === 'Bullhorn')?.ID &&
                                             this.state.useShortlist ? 'block' : 'none')
                                     }}
                                     >
@@ -523,7 +543,7 @@ class Campaign extends React.Component {
                                                     loading={this.props.isLoadingShortlists}>
                                                 {this.props.shortlists?.map((item, key) => {
                                                     return (
-                                                        <Select.Option key={key} value={item.url}>
+                                                        <Select.Option key={key} value={item.id}>
                                                             {trimText.capitalize(trimText.trimDash(item.name))}
                                                         </Select.Option>
                                                     );
@@ -559,7 +579,7 @@ class Campaign extends React.Component {
                             }
 
 
-                            <FormItem label={'Outreach Type '}>
+                            <FormItem label={'Outreach Type'}>
                                 {getFieldDecorator('outreach_type', {initialValue: 'sms'})(
                                     <Radio.Group onChange={(e) => {
                                         this.setState({outreach_type: e.target.value});
@@ -594,7 +614,7 @@ class Campaign extends React.Component {
                             </FormItem>
                             {this.state.useShortlist && this.state.use_crm
                             && this.state.selectedCRM ===
-                            this.props.campaignOptions?.crms.find(crm => crm.Type === 'Jobscience')?.ID
+                            this.props.campaignOptions?.crms.find(crm => crm.Type === 'Bullhorn')?.ID
                                 ?
                                 <>
                                 </>

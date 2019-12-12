@@ -269,7 +269,7 @@ def updateStatus(campaignID, newStatus, companyID):
         return Callback(False, "Could not change the Campaign's status.")
 
 
-def getCandidateLists(crm_id, companyID, listID=None):
+def getShortlists(crm_id, companyID, listID=None):
     crm = None
     if crm_id:
         crm_callback: Callback = crm_services.getByID(crm_id, companyID)
@@ -277,4 +277,4 @@ def getCandidateLists(crm_id, companyID, listID=None):
             raise Exception("CRM not found.")
         crm = crm_callback.Data
 
-    return crm_services.getCandidateLists(crm.Auth, crm.Type, companyID, listID)
+    return crm_services.getShortlists(crm.Auth, crm.Type, companyID, listID)

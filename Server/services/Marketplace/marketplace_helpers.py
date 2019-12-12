@@ -171,3 +171,13 @@ def loadSynonyms(construction: bool = False, hospitality: bool = False) -> dict:
         return {
           "chef": {"cook", "caterer", "catering", "food preparation"}
         }
+
+
+def convertToPandaCurrency(value):
+    value = value.lower()
+    if value == "pound":
+        return "GBP"
+    elif value == "euro":
+        return "EUR"
+    else:
+        return value.upper()

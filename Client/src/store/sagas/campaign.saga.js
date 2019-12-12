@@ -147,7 +147,7 @@ function* fetchCampaignCandidatesData({assistant_id, use_crm, crm_id, useShortli
 //Fetch JobScience shortlists
 function* fetchShortlists({crm_id}) {
     try {
-        const res = yield http.get(`/campaign/candidate_lists/${crm_id}`);
+        const res = yield http.get(`/campaign/shortlists/${crm_id}`);
         yield put(campaignActions.fetchShortlistsSuccess(
             res.data?.data?.data)
         );

@@ -61,13 +61,13 @@ def login(auth):
 
         #                    "&redirect_uri=https://www.thesearchbase.com/api/marketplace/simple_callback" + \
         code_url = "https://auth-emea.bullhornstaffing.com/oauth/authorize?" + \
-                           "&response_type=code" + \
-                           "&client_id=" + CLIENT_ID + \
-                           "&client_secret=" + CLIENT_SECRET + \
-                           "&redirect_uri=http://www.bullhorn.com" + \
-                           "&action=Login" + \
-                           "&username=" + authCopy.get("username") + \
-                           "&password=" + urllib.parse.quote(authCopy.get("password"))
+                   "&response_type=code" + \
+                   "&client_id=" + CLIENT_ID + \
+                   "&client_secret=" + CLIENT_SECRET + \
+                   "&redirect_uri=http://www.bullhorn.com" + \
+                   "&action=Login" + \
+                   "&username=" + authCopy.get("username") + \
+                   "&password=" + urllib.parse.quote(authCopy.get("password"))
 
         code_request = requests.post(code_url)
 
@@ -126,8 +126,9 @@ def retrieveRestToken(auth, companyID):
             url = url.replace("auth-emea.", "auth9.")
 
         get_access_token = requests.post(url, headers=headers)
-        helpers.logError("BULLHORN TESTING BUG CompID" + str(companyID) + ", CODE: " + str(get_access_token.status_code) +
-                         ", TEXT: " + get_access_token.text)
+        helpers.logError(
+            "BULLHORN TESTING BUG CompID" + str(companyID) + ", CODE: " + str(get_access_token.status_code) +
+            ", TEXT: " + get_access_token.text)
 
         if get_access_token.status_code == 400:
             login_callback: Callback = login(authCopy)
@@ -169,7 +170,6 @@ def retrieveRestToken(auth, companyID):
         db.session.rollback()
         helpers.logError("Marketplace.CRM.Bullhorn.retrieveRestToken() ERROR: " + str(exc))
         return Callback(False, "Failed to retrieve CRM tokens. Please check login information")
-
 
 
 # create query url AND also tests the BhRestToken to see if it still valid, if not it generates a new one AND new url
@@ -392,14 +392,14 @@ def updateCandidate(auth, data, companyID) -> Callback:
 
 
 multipleTypes = [
-  "BETWEEN",
-  "BETWEENEXCLUSIVE",
+    "BETWEEN",
+    "BETWEENEXCLUSIVE",
 ]
 
 singleTypes = [
-  "AND",
-  "NOT",
-  "MATCH"
+    "AND",
+    "NOT",
+    "MATCH"
 ]
 
 
@@ -423,7 +423,7 @@ def queryGen(input, match, queryType, match2=None):
     elif queryType == "NOT":
         queryText = "-{}:{}".format(input, convertToBullhornType(match))
     elif queryType == "MATCH":
-        queryText ="{}:{}".format(input, convertToBullhornType(match))
+        queryText = "{}:{}".format(input, convertToBullhornType(match))
     return queryText
 
 
@@ -434,7 +434,7 @@ def searchPlacement(auth, companyID, data, fields="fields=candidate"):
             query += queryGen(item['input'], item['match'], item['queryType'], item.get("match2", None))
         while True:
             sendQuery_callback: Callback = sendQuery(auth, "search/Placement", "get", {}, companyID,
-                                                 [fields, query, "count=500&sort=id"])
+                                                     [fields, query, "count=500&sort=id"])
             if not sendQuery_callback.Success:
                 raise Exception(sendQuery_callback.Message)
 
@@ -443,7 +443,7 @@ def searchPlacement(auth, companyID, data, fields="fields=candidate"):
                 break
 
             query = "AND".join(query.split("AND")[:-1])
-        
+
         result = []
         for record in return_body["data"]:
             result.append(record)
@@ -468,12 +468,13 @@ def searchCandidatesDynamic(auth, companyID, data, fields=None, multiple=False) 
             fields = "fields=id,name,email,mobile,address,primarySkills,status,educations,dayRate,salary"
         result = []
         while True:
-            if(multiple):
-                sendQuery_callback: Callback = sendQuery(auth, "entity/Candidate/{}".format(query), "get", {}, companyID,
-                                    [fields, "count=500&sort=id"])
+            if (multiple):
+                sendQuery_callback: Callback = sendQuery(auth, "entity/Candidate/{}".format(query), "get", {},
+                                                         companyID,
+                                                         [fields, "count=500&sort=id"])
             else:
                 sendQuery_callback: Callback = sendQuery(auth, "search/Candidate", "get", {}, companyID,
-                                                    [fields, query, "count=500&sort=id"])
+                                                         [fields, query, "count=500&sort=id"])
             if not sendQuery_callback.Success:
                 raise Exception(sendQuery_callback.Message)
             return_body = json.loads(sendQuery_callback.Data.text)
@@ -512,7 +513,7 @@ def searchCandidates(auth, companyID, data, fields=None) -> Callback:
         # send query
         while True:
             sendQuery_callback: Callback = sendQuery(auth, "search/Candidate", "get", {}, companyID,
-                                                 [fields, query, "count=500&sort=id"])
+                                                     [fields, query, "count=500&sort=id"])
             if not sendQuery_callback.Success:
                 raise Exception(sendQuery_callback.Message)
 
@@ -525,25 +526,7 @@ def searchCandidates(auth, companyID, data, fields=None) -> Callback:
         result = []
         # TODO educations uses ids - need to retrieve them
         for record in return_body["data"]:
-            if record.get("dayRate"):
-                payPeriod = Period("Daily")
-            else:
-                payPeriod = Period("Annually")
-            result.append(databases_services.createPandaCandidate(id=record.get("id", ""),
-                                                                  name=record.get("name"),
-                                                                  email=record.get("email"),
-                                                                  mobile=record.get("mobile"),
-                                                                  location=record.get("address", {}).get("city") or "",
-                                                                  skills=record.get("primarySkills", {}).get("data"),
-                                                                  linkdinURL=None,
-                                                                  availability=record.get("status"),
-                                                                  currentJobTitle=None,  #
-                                                                  education=None,
-                                                                  yearsExperience=0,
-                                                                  desiredSalary=record.get("salary") or
-                                                                                record.get("dayRate", 0),
-                                                                  currency=Currency("GBP"),
-                                                                  source="Bullhorn"))
+            result.append(__extractCandidateReturnData(record))
 
         return Callback(True, sendQuery_callback.Message, result)
 
@@ -552,11 +535,13 @@ def searchCandidates(auth, companyID, data, fields=None) -> Callback:
         return Callback(False, str(exc))
 
 
-def searchPerfectCandidates(auth, companyID, data, perfect=False) -> Callback:
+def searchPerfectCandidates(auth, companyID, data, perfect=False, shortlist=None) -> Callback:
     try:
-        query = "query=(status:Available OR status:Active OR status:\"New Lead\") AND "
         fields = "fields=id,name,email,mobile,address"
 
+        if shortlist:
+            print("QUERY: ")
+        query = "query=(status:Available OR status:Active OR status:\"New Lead\") AND "
         # populate filter in order of importance
         # query += populateFilter(data.get("preferredJotTitle"), "occupation")
         query += populateFilter(data.get("location"), "address.city")
@@ -614,21 +599,7 @@ def searchPerfectCandidates(auth, companyID, data, perfect=False) -> Callback:
         result = []
         # TODO educations uses ids - need to retrieve them
         for record in records:
-            result.append(databases_services.createPandaCandidate(id=record.get("id", ""),
-                                                                  name=record.get("name"),
-                                                                  email=record.get("email"),
-                                                                  mobile=record.get("mobile"),
-                                                                  location=record.get("address", {}).get("city") or "",
-                                                                  skills=record.get("primarySkills", {}).get("data"),
-                                                                  linkdinURL=None,
-                                                                  availability=record.get("status"),
-                                                                  currentJobTitle=None,
-                                                                  education=None,
-                                                                  yearsExperience=0,
-                                                                  desiredSalary=record.get("salary") or
-                                                                                record.get("dayRate", 0),
-                                                                  currency=Currency("GBP"),
-                                                                  source="Bullhorn"))
+            result.append(__extractCandidateReturnData(record))
 
         return Callback(True, "Search has been successful", result)
 
@@ -723,7 +694,7 @@ def searchJobsCustomQuery(auth, companyID, query, fields=None) -> Callback:
 # used to retrieve both all candidate lists and a specified one
 def getSavedSearches(auth, companyID, entity, savedSearchID=None) -> Callback:
     try:
-        query = ("entity="+entity + "entityId="+str(savedSearchID)) if savedSearchID else ""
+        query = ("entity=" + entity + "entityId=" + str(savedSearchID)) if savedSearchID else ""
 
         # send query
         sendQuery_callback: Callback = sendQuery(auth, "savedSearch", "get", {}, companyID, [query])
@@ -879,3 +850,21 @@ def __extractCandidateInsertBody(data):
             }, data.get("selectedSolutions")
         )
     }
+
+
+def __extractCandidateReturnData(record):
+    return databases_services.createPandaCandidate(id=record.get("id", ""),
+                                                   name=record.get("name"),
+                                                   email=record.get("email"),
+                                                   mobile=record.get("mobile"),
+                                                   location=record.get("address", {}).get("city") or "",
+                                                   skills=record.get("primarySkills", {}).get("data"),
+                                                   linkdinURL=None,
+                                                   availability=record.get("status"),
+                                                   currentJobTitle=None,  #
+                                                   education=None,
+                                                   yearsExperience=0,
+                                                   desiredSalary=record.get("salary") or
+                                                                 record.get("dayRate", 0),
+                                                   currency=Currency("GBP"),
+                                                   source="Bullhorn")

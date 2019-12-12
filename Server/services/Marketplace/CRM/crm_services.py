@@ -220,7 +220,7 @@ def searchJobs(assistant: Assistant, session):
 
 
 # Hotlists, Shortlists, Saved Searches etc... (list of candidates made in the CRM)
-def getCandidateLists(auth, crm_type, companyID, listID=None):
+def getShortlists(auth, crm_type, companyID, listID=None):
     if crm_type is CRM.Bullhorn:
         return Bullhorn.getSavedSearches(auth, companyID, "Candidate", listID)
     elif crm_type is CRM.Jobscience:

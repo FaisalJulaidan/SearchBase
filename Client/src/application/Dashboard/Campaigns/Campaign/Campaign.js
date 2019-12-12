@@ -165,7 +165,7 @@ class Campaign extends React.Component {
             this.state.use_crm,
             values.crm_id,
             this.state.useShortlist,
-            values.shortlist_id,
+            this.getShortListDataByID(values.shortlist_id),
             values.database_id,
             values.messenger_id,
             values.location,
@@ -178,6 +178,11 @@ class Campaign extends React.Component {
             values.email_title,
             values.perfect_match
         ));
+    };
+
+
+    getShortListDataByID = (shortlist_id) => {
+        return this.props.shortlists?.find(shortlist => shortlist.id === shortlist_id).data
     };
 
     handleModalSelectAll = () => {
@@ -244,7 +249,7 @@ class Campaign extends React.Component {
             this.state.use_crm,
             values.crm_id,
             this.state.useShortlist,
-            values.shortlist_id,
+            this.getShortListDataByID(values.shortlist_id),
             values.database_id,
             values.messenger_id,
             values.location,
@@ -270,7 +275,7 @@ class Campaign extends React.Component {
                         this.state.use_crm,
                         values.crm_id,
                         this.state.useShortlist,
-                        values.shortlist_id,
+                        this.getShortListDataByID(values.shortlist_id),
                         values.database_id,
                         values.messenger_id,
                         values.location,
@@ -294,7 +299,7 @@ class Campaign extends React.Component {
                     this.state.use_crm,
                     values.crm_id,
                     this.state.useShortlist,
-                    values.shortlist_id,
+                    this.getShortListDataByID(values.shortlist_id),
                     values.database_id,
                     values.messenger_id,
                     values.location,

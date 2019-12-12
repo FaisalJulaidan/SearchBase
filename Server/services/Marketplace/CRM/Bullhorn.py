@@ -160,11 +160,7 @@ def retrieveRestToken(auth, companyID):
         if not saveAuth_callback.Success:
             raise Exception(saveAuth_callback.Message)
 
-        return Callback(True, 'Rest Token Retrieved', {
-            "rest_token": authCopy["rest_token"],
-            "rest_url": authCopy.get("rest_url"),
-            "refresh_token": authCopy["refresh_token"]
-        })
+        return Callback(True, 'Rest Token Retrieved', authCopy)
 
     except Exception as exc:
         db.session.rollback()
@@ -624,14 +620,6 @@ def searchJobs(auth, companyID, data, fields=None) -> Callback:
 
         query += populateFilter(data.get("employmentType"), "employmentType")
 
-        # query += populateFilter(data.get("skills"), "skills")
-
-        # query += populateFilter(data.get("startDate"), "startDate")
-
-        # query += populateFilter(data.get("endDate"), "dateEnd")
-
-        # query += populateFilter(data.get("yearsRequired"), "yearsRequired")
-
         query = query[:-4]
 
         # check if no conditions submitted
@@ -834,9 +822,8 @@ def __extractCandidateInsertBody(data):
         "occupation": data.get("currentJobTitle"),
 
         # "primarySkills": data.get("skills"),
-        "experience": int(float(data.get("yearsExperience") or 0)),
+        "experience": int(float(data.get("yearsExperience") or 0)),  # doesnt like going straight into int
 
-        "educationDegree": data.get("educations"),
         "dateAvailable": data.get("availability"),  # TODO CHECK
 
         "salary": data.get("annualSalary"),
@@ -849,6 +836,7 @@ def __extractCandidateInsertBody(data):
                 "Years of Experience": data.get("yearsExperience"),
                 "Preferred Work City": data.get("preferredWorkCity"),
                 "Skills": data.get("skills"),
+                "Submitted Education": data.get("educations"),
                 "LinkedIn": data.get("linkedIn")
             }, data.get("selectedSolutions")
         )

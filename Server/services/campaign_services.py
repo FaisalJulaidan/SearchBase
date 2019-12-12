@@ -160,7 +160,7 @@ def prepareCampaign(campaign_details, companyID):
                                                                                 shortlist=campaign_details.get("shortlist"))
         else:
             session = {
-                "showTop": 200,
+                "showTop": 2000000,
                 "keywordsByDataType": {
                     DT.CandidateCity.value['name']: [campaign_details.get("location")],
                     # DT.JobSalary.value['name']: ["1000-5000 GBP Annually"],

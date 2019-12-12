@@ -40,6 +40,22 @@ function* watchFetchDatabase() {
     yield takeLatest(actionTypes.FETCH_DATABASE_REQUEST, fetchDatabase)
 }
 
+// ==================================================================
+
+function* fetchAvailableCandidates({databaseID, pageNumber, meta}) {
+    try {
+        const res = yield http.get(`/databases/${databaseID}/available_candidates`);
+        yield put({...databaseActions.fetchAvailableCandidatesSuccess(res.data.msg, res.data.data), meta});
+    } catch (error) {
+        const msg = error.response?.data?.msg || "Couldn't load databases list";
+        yield put({...databaseActions.fetchAvailableCandidatesFailure(msg), meta});
+        errorMessage(msg);
+    }
+}
+function* watchFetchAvailableCandidates() {
+    yield takeLatest(actionTypes.FETCH_DATABASE_AVAILABLE_CANDIDATES_REQUEST, fetchAvailableCandidates)
+}
+
 
 // ==================================================================
 
@@ -103,8 +119,9 @@ export function* databaseSaga() {
     yield all([
         watchGetDatabaseList(),
         watchFetchDatabase(),
+        watchFetchAvailableCandidates(),
         watchAddDatabase(),
         watchUpdateDatabase(),
-        watchDeleteDatabase()
+        watchDeleteDatabase(),
     ])
 }

@@ -1,6 +1,6 @@
 .Input {
     position: absolute;
-    z-index: 3;
+    /*z-index: 3;*/
     padding: 0 10px;
     -webkit-box-shadow: none;
     box-shadow: none;

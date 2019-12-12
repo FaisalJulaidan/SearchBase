@@ -77,6 +77,7 @@ def getOptions(industry=None) -> Callback:
         'assistantTemplates': [
             {'label': 'Main Website', 'fileName': 'main'},
             {'label': 'Appointment Scheduler', 'fileName': 'appointment'},
+            {'label': 'Apply', 'fileName': 'apply'},
             {'label': 'Join Us', 'fileName': 'join-us'},
             {'label': 'Referral', 'fileName': 'referral'},
             {'label': 'Update Candidates', 'fileName': 'update-candidates'},

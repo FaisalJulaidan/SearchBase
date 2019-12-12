@@ -130,7 +130,6 @@ class LogoUploader extends Component {
                             crop={this.state.crop}
                             zoom={this.state.zoom}
                             aspect={this.state.aspect}
-                            cropShape="round"
                             showGrid={false}
                             onCropChange={this.onCropChange}
                             onCropComplete={this.onCropComplete}

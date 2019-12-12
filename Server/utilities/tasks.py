@@ -232,7 +232,6 @@ def __migrateFlow(flow, assistantID=None):
 def migrateShortenedURLs():
     try:
         for dbURL in db.session.query(ShortenedURL).all():
-            print(dbURL)
             url = dbURL.URL
             urlSplit = url.split('source=')
             key = urlSplit[1]
@@ -242,8 +241,8 @@ def migrateShortenedURLs():
             newKey = helpers.verificationSigner.dumps({"candidateID": after['candidateID'], "source": after['source'], "sourceID": after['crmID']}, salt='chatbot')
             newUrl = "{}candidate={}".format(urlSplit[0], newKey)
             r = helpers.verificationSigner.loads(newKey, salt='chatbot') # validate
-            print(r)
             dbURL.URL = newUrl
+
 
         # Save all changes
         db.session.commit()

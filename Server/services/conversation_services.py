@@ -67,46 +67,42 @@ def processConversation(assistantHashID, data: dict) -> Callback:
 
         webhook_services.fireRequests(webhookData, callback.Data.CompanyID, Webhooks.Conversations)
 
-        if not data.get("crmInformation"):
-            # AutoPilot Operations
-            if assistant.AutoPilot and conversation.Completed:
-                ap_callback: Callback = auto_pilot_services.processConversation(conversation, assistant.AutoPilot,
-                                                                                assistant)
-                if ap_callback.Success:
-                    conversation.AutoPilotStatus = True
-                    conversation.ApplicationStatus = ap_callback.Data['applicationStatus']
-                    conversation.AcceptanceEmailSentAt = ap_callback.Data['acceptanceEmailSentAt']
-                    conversation.AcceptanceSMSSentAt = ap_callback.Data['acceptanceSMSSentAt']
-                    conversation.RejectionEmailSentAt = ap_callback.Data['rejectionEmailSentAt']
-                    conversation.RejectionSMSSentAt = ap_callback.Data['rejectionSMSSentAt']
-                    conversation.AppointmentEmailSentAt = ap_callback.Data['appointmentEmailSentAt']
-                conversation.AutoPilotResponse = ap_callback.Message
 
-            # CRM integration
-            if assistant.CRM and conversation.Completed:
-                crm_callback: Callback = crm_services.processConversation(assistant, conversation)
-                if crm_callback.Success:
-                    conversation.CRMSynced = True
-                conversation.CRMResponse = crm_callback.Message
-        else:
-            crmInformation = helpers.decodeID(data["crmInformation"].get("source"))
+        # AutoPilot operations
+        if assistant.AutoPilot and conversation.Completed:
+            ap_callback: Callback = auto_pilot_services.processConversation(conversation,
+                                                                            assistant.AutoPilot,
+                                                                            assistant)
+            if ap_callback.Success:
+                conversation.AutoPilotStatus = True
+                conversation.ApplicationStatus = ap_callback.Data['applicationStatus']
+                conversation.AcceptanceEmailSentAt = ap_callback.Data['acceptanceEmailSentAt']
+                conversation.AcceptanceSMSSentAt = ap_callback.Data['acceptanceSMSSentAt']
+                conversation.RejectionEmailSentAt = ap_callback.Data['rejectionEmailSentAt']
+                conversation.RejectionSMSSentAt = ap_callback.Data['rejectionSMSSentAt']
+                conversation.AppointmentEmailSentAt = ap_callback.Data['appointmentEmailSentAt']
+            conversation.AutoPilotResponse = ap_callback.Message
 
-            crmInformation = helpers.verificationSigner.loads(data["crmInformation"].get("source"),
-                                                              salt='crm-information')
-            source = crmInformation["source"]
-            sourceID = crmInformation["crmID"]
-            candidateID = crmInformation["candidateID"]
-            # CAMPAIGN SOURCES - ID vs TEXT to make url shorter
-            # 1 - DATABASE
-            # 2 - CR
+        # Either update existing entity (e.g. candidate) or add new one
+        if data.get("candidateInfo"):
+            candidateInfo = helpers.verificationSigner.loads(data["candidateInfo"], salt='chatbot')
+            source = candidateInfo["source"] # Either db or crm
+            sourceID = candidateInfo["sourceID"]
+            candidateID = candidateInfo["candidateID"]
+
             if source == "crm":
                 crm_callback: Callback = crm_services.updateCandidate(candidateID, conversation, assistant.CompanyID,
                                                                       sourceID)
-                if crm_callback.Success:
-                    conversation.CRMSynced = True
+                conversation.CRMSynced = crm_callback.Success
                 conversation.CRMResponse = crm_callback.Message
             elif source == "db":
                 database_callback: Callback = databases_services.updateCandidate(candidateID, conversation)
+        else:
+            if assistant.CRM and conversation.Completed:
+                crm_callback: Callback = crm_services.processConversation(assistant, conversation)
+                conversation.CRMSynced = crm_callback.Success
+                conversation.CRMResponse = crm_callback.Message
+
 
         # Notify company about the new chatbot session only if set as immediate -> NotifyEvery=0
         if assistant.NotifyEvery == 0:

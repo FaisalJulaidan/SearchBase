@@ -11,9 +11,9 @@ from jsonschema import validate
 from sqlalchemy.orm import joinedload
 
 from config import BaseConfig
-from models import db, Assistant, Conversation, StoredFileInfo
+from models import db, Assistant, Conversation, StoredFileInfo, ShortenedURL
 from services import stored_file_services
-from utilities import json_schemas, enums
+from utilities import json_schemas, enums, helpers
 
 
 # NOTE: Make sure to take a backup of the database before running these functions
@@ -227,4 +227,29 @@ def __migrateFlow(flow, assistantID=None):
     except Exception as exc:
         print(exc)
         print("Flow migration failed :(")
+        return None
+
+def migrateShortenedURLs():
+    try:
+        for dbURL in db.session.query(ShortenedURL).all():
+            url = dbURL.URL
+            urlSplit = url.split('source=')
+            key = urlSplit[1]
+            after = helpers.verificationSigner.loads(key, salt='crm-information')
+
+            # update
+            newKey = helpers.verificationSigner.dumps({"candidateID": after['candidateID'], "source": after['source'], "sourceID": after['crmID']}, salt='chatbot')
+            newUrl = "{}candidate={}".format(urlSplit[0], newKey)
+            r = helpers.verificationSigner.loads(newKey, salt='chatbot') # validate
+            dbURL.URL = newUrl
+
+
+        # Save all changes
+        db.session.commit()
+        print("URLs migration done successfully :)")
+
+    except Exception as exc:
+        print(exc.args)
+        db.session.rollback()
+        print("migrateShortenedURLs failed :(")
         return None

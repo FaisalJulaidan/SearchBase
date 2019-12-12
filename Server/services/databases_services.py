@@ -10,7 +10,7 @@ from sqlalchemy_utils import Currency
 
 from services.Marketplace.marketplace_helpers import convertSkillsToString
 from utilities.enums import DatabaseType, DataType as DT
-from models import db, Callback, Database, Candidate, Assistant, Job
+from models import db, Callback, Database, Candidate, Assistant, Job, Conversation
 from services import assistant_services
 from services.Marketplace.CRM import crm_services
 from services.Marketplace.marketplace_helpers import convertSkillsToString
@@ -194,7 +194,7 @@ def getJob(jobID):
         return Callback(False, 'Could not retrieve the job.')
 
 
-def updateCandidate(candidateID, conversation) -> Callback:
+def updateCandidate(candidateID, conversation: Conversation) -> Callback:
     try:
         candidate = db.session.query(Candidate) \
             .filter(Candidate.ID == candidateID).first()

@@ -151,7 +151,7 @@ def searchCandidatesCustom(crm, companyID, campaign_data, perfectFunc=False, cus
         data = {
             "location": campaign_data.get("location"),
             "preferredJotTitle": campaign_data.get("preferredJobTitle"),
-            "skills": campaign_data.get("skills"),
+            "skills": campaign_data.get("skills", []),
             "jobType": campaign_data.get("jobType"),
             "shortlist_id": campaign_data.get("shortlist_id")
         }

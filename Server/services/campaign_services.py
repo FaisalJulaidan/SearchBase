@@ -156,7 +156,8 @@ def prepareCampaign(campaign_details, companyID):
 
             candidates_callback: Callback = crm_services.searchCandidatesCustom(crm_callback.Data, companyID,
                                                                                 campaign_details, True,
-                                                                                perfect=campaign_details.get("perfect_match"))
+                                                                                perfect=campaign_details.get("perfect_match"),
+                                                                                shortlist=campaign_details.get("shortlist"))
         else:
             session = {
                 "showTop": 200,

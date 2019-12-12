@@ -538,23 +538,26 @@ def searchCandidates(auth, companyID, data, fields=None) -> Callback:
 def searchPerfectCandidates(auth, companyID, data, perfect=False, shortlist=None) -> Callback:
     try:
         fields = "fields=id,name,email,mobile,address"
-
+        query = ""
         if shortlist:
-            print("QUERY: ")
-        query = "query=(status:Available OR status:Active OR status:\"New Lead\") AND "
-        # populate filter in order of importance
-        # query += populateFilter(data.get("preferredJotTitle"), "occupation")
-        query += populateFilter(data.get("location"), "address.city")
-        query += populateFilter(data.get("jobCategory"), "employmentPreference")
+            queryJSON = json.loads(shortlist)["filters"]
+            for key, value in queryJSON.items():
+                query += populateFilter(value, key)
+        else:
+            query = "(status:Available OR status:Active OR status:\"New Lead\") AND "
+            # populate filter in order of importance
+            # query += populateFilter(data.get("preferredJotTitle"), "occupation")
+            query += populateFilter(data.get("location"), "address.city")
+            query += populateFilter(data.get("jobCategory"), "employmentPreference")
 
-        for skill in data.get("skills", []):
-            query += populateFilter(skill, "description")
+            for skill in data.get("skills"):
+                query += populateFilter(skill, "description")
 
-        query += populateFilter(data.get("yearsExperience"), "experience")
-        # query += populateFilter(data.get("education"), "educationDegree")
+            query += populateFilter(data.get("yearsExperience"), "experience")
+            # query += populateFilter(data.get("education"), "educationDegree")
 
         query = query[:-5]
-
+        print("QUERY: ", query)
         records = []
         seenIDs = []
         idQuery = " AND -(id:)"
@@ -668,7 +671,7 @@ def searchJobs(auth, companyID, data, fields=None) -> Callback:
 
 def populateFilter(value, string, joint="AND"):
     if value:
-        return string + ":" + str(value) + " " + joint + " "
+        return string + ":\"" + str(value) + "\" " + joint + " "
     return ""
 
 

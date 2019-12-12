@@ -223,10 +223,10 @@ def sendCampaign(campaign_details, companyID):
                 continue
 
             access = helpers.verificationSigner.dumps(
-                {"candidateID": candidate.get("ID"), "source": source, "crmID": sourceID}, salt='crm-information')
+                {"candidateID": candidate.get("ID"), "source": source, "sourceID": sourceID}, salt='chatbot')
 
             url: Callback = url_services.createShortenedURL(helpers.getDomain(3000) + "/chatbot_direct_link/" + \
-                                                            hashedAssistantID + "?source=" + str(access),
+                                                            hashedAssistantID + "?candidate=" + str(access),
                                                             domain="recruitbot.ai")
             if not url.Success:
                 failedCandidates += 1

@@ -131,7 +131,7 @@ function* fetchCampaignCandidatesData({assistant_id, use_crm, crm_id, useShortli
                 email_title,
                 perfect_match
             }, {
-                timeout: 600000,
+                timeout: 1800000,
                 headers: {'Content-Type': 'application/json'},
             });
         yield put(campaignActions.fetchCampaignCandidatesDataSuccess(
@@ -149,7 +149,7 @@ function* fetchShortlists({crm_id}) {
     try {
         const res = yield http.get(`/campaign/candidate_lists/${crm_id}`);
         yield put(campaignActions.fetchShortlistsSuccess(
-            res.data?.data)
+            res.data?.data?.data)
         );
     } catch (error) {
         const msg = error.response?.data?.msg || "Couldn't load shortlists";
@@ -181,7 +181,7 @@ function* launchCampaign({assistant_id, use_crm, crm_id, useShortlist, shortlist
                 email_title,
                 perfect_match
             }, {
-                timeout: 600000,
+                timeout: 1800000,
                 headers: {'Content-Type': 'application/json'},
             });
         yield put(campaignActions.launchCampaignSuccess());

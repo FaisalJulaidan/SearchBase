@@ -1,4 +1,6 @@
+import time
 from copy import deepcopy
+from threading import Thread
 
 from sqlalchemy import and_
 
@@ -205,13 +207,32 @@ def sendCampaign(campaign_details, companyID):
 
             messenger = messenger_callback.Data
 
+            messenger_test_callback: Callback = messenger_servicess.testConnection(messenger.Type.name, messenger.Auth)
+            if not messenger_test_callback.Success:
+                raise Exception("Messenger test Failed.")
+        else:
+            mail_test_callback: Callback = mail_services.simpleSend("test@test.com", "Test", "test")
+            if not mail_test_callback.Success:
+                raise Exception("Emailing test Failed. Please contact support.")
+
         hashedAssistantID = helpers.encodeID(campaign_details.get("assistant_id"))
         source = 'crm' if campaign_details.get("use_crm") else 'db'
         sourceID = campaign_details.get("crm_id") if source == 'crm' else campaign_details.get("database_id")
 
-        failedCandidates = 0
-        totalCandidates = len(campaign_details.get("candidate_list"))
+        from app import app
+        thr = Thread(target=__sendCampaignAsync, args=[app, campaign_details, outreach_type, source, sourceID,
+                                                       hashedAssistantID, text, messenger])
+        thr.start()
 
+        return Callback(True, "Campaign sent!")
+
+    except Exception as exc:
+        helpers.logError("campaign_services.sendCampaign(): " + str(exc))
+        return Callback(False, 'Error while sending campaign!')
+
+
+def __sendCampaignAsync(app, campaign_details, outreach_type, source, sourceID, hashedAssistantID, text, messenger):
+    with app.app_context():
         for candidate in campaign_details.get("candidate_list"):
             candidate_phone = candidate.get("CandidateMobile")
             candidate_email = candidate.get("CandidateEmail")
@@ -219,7 +240,6 @@ def sendCampaign(campaign_details, companyID):
             # check if phone or email is needed and present
             if (not candidate_phone and (outreach_type == "sms" or outreach_type == "whatsapp")) \
                     or (not candidate_email and outreach_type == "email"):
-                failedCandidates += 1
                 continue
 
             access = helpers.verificationSigner.dumps(
@@ -229,7 +249,6 @@ def sendCampaign(campaign_details, companyID):
                                                             hashedAssistantID + "?candidate=" + str(access),
                                                             domain="recruitbot.ai")
             if not url.Success:
-                failedCandidates += 1
                 continue
 
             # insert assistant link and candidate details in text
@@ -242,16 +261,6 @@ def sendCampaign(campaign_details, companyID):
                 messenger_servicess.sendMessage(messenger.Type, candidate_phone, tempText, messenger.Auth, whatsapp)
             elif outreach_type == "email":
                 mail_services.simpleSend(candidate_email, campaign_details.get("email_title"), tempText)
-
-        if failedCandidates == totalCandidates:
-            raise Exception("Campaign Failed due to 0 contact details or problem with URL shortening")
-
-        return Callback(True, 'Campaign sent! ' + str(failedCandidates) + " out of " + str(totalCandidates) +
-                        " candidates did not have contact details and were not contacted.")
-
-    except Exception as exc:
-        helpers.logError("campaign_services.sendCampaign(): " + str(exc))
-        return Callback(False, 'Error while sending campaign!')
 
 
 def updateStatus(campaignID, newStatus, companyID):

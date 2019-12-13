@@ -307,7 +307,7 @@ class AssistantAutoPilot extends React.Component {
                                         })(
                                             <Switch style={{ marginRight: 15 }}/>
                                         )}
-                                        A score greater than
+                                        A score lower than
                                         {getFieldDecorator('RejectionScore', {
                                             initialValue: (autoPilot?.RejectionScore * 100).toFixed(2),
                                             rules: [{ required: true }],

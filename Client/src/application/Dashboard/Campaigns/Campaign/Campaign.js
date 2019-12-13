@@ -182,7 +182,7 @@ class Campaign extends React.Component {
 
 
     getShortListDataByID = (shortlist_id) => {
-        return this.props.shortlists?.find(shortlist => shortlist.id === shortlist_id).data
+        return this.props.shortlists?.find(shortlist => shortlist.id === shortlist_id)?.data
     };
 
     handleModalSelectAll = () => {
@@ -499,7 +499,7 @@ class Campaign extends React.Component {
                                                     marginTop: '10px'
                                                 }}>
                                                 Use Perfect Match <Tooltip
-                                                title="Return only Candidates that match all filtering criteria. Turning this off increases the amount of candidates returned by loosening the search filters.">
+                                                title="Return only Candidates that match all filtering criteria. Turning this off increases the amount of candidates returned by gradually loosening the search filters.">
                                                 <Icon type="question-circle-o"/>
                                             </Tooltip>
                                             </Checkbox>

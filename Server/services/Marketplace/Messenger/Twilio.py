@@ -3,6 +3,7 @@ from utilities import helpers
 
 from twilio.rest import Client
 
+
 def testConnection(auth):
     try:
 
@@ -20,26 +21,29 @@ def testConnection(auth):
         return Callback(False, "Error in testing")
 
 
-def sendMessage(sendto, body, auth, whatsapp=False):
+def sendMessage(numbers, body, auth, whatsapp=False):
     try:
         client = Client(auth.get("account_sid"), auth.get("auth_token"))
-        messaging_service_sid = auth.get("messaging_service_sid")
+        notify_service_sid = auth.get("notify_service_sid")
 
-        if whatsapp:
-            sendto = "whatsapp:" + sendto
+        # if whatsapp:
+        #     sendto = "whatsapp:" + numbers
 
-        if sendto[0] == "0":
-            sendto = "+44" + sendto[1:]
+        if type(numbers) is str:
+            numbers = [numbers]
 
-        message = client.messages.create(
-            to=sendto,
-            messaging_service_sid=messaging_service_sid,
-            body=body)  # add break-lines to sms message
+        binding = []
+        for number in numbers:
+            if number[0] == "0":
+                number = "+44" + number[1:]
+            binding.append("{\"binding_type\":\"sms\",\"address\":\"" + number + "\"}")
+
+        client.notify.services(notify_service_sid) \
+            .notifications.create(
+            to_binding=binding,
+            body=body)
 
         return Callback(True, "Message has been sent")
     except Exception as exc:
         helpers.logError("Marketplace.Messaging.Twilio.sendMessage() ERROR: " + str(exc))
         return Callback(False, "Error in sending Message")
-
-# NOTE: Temp for testing sms
-# send_sms("+447860285032", "Place TEXT above: \n https://www.thesearchbase.com/")

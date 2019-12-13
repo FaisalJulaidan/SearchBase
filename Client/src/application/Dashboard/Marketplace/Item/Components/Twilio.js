@@ -31,15 +31,15 @@ export const TwilioFormItems = ({
                     )}
                 </FormItem>
 
-                <FormItem label="Messaging Service SID"
+                <FormItem label="Notify Service SID"
                           {...layout}>
-                    {getFieldDecorator('messaging_service_sid', {
+                    {getFieldDecorator('notify_service_sid', {
                         rules: [{
                             required: true,
-                            message: "Please add your Messaging Service SID",
+                            message: "Please add your Notify Service SID",
                         }],
                     })(
-                        <Input placeholder={'Starting M...'}/>
+                        <Input placeholder={'Starting IS...'}/>
                     )}
                 </FormItem>
 
@@ -95,7 +95,7 @@ export const TwilioFeatures = ({}) =>
             What you’ll need:
             <ul>
                 <li><b>Account SID</b></li>
-                <li><b>Messaging Service SID</b></li>
+                <li><b>Notify Service SID</b></li>
                 <li><b>Auth Token</b></li>
             </ul>
         </Paragraph>
@@ -108,7 +108,7 @@ export const TwilioFeatures = ({}) =>
                     will be able to see your Account SID and also reveal your Auth Token.
                 </li>
                 <li>
-                    <h5>Messaging Service SID</h5>
+                    <h5>Notify Service SID</h5>
                     First you'll need to get yourself a number. If you have one already simply skip this step. Once
                     logged in click on the search box on the top right and type in "Number". Press on "Buy a Number" and
                     you will be presented with a filtering menu. Simply filter for your desired number and follow the
@@ -122,7 +122,11 @@ export const TwilioFeatures = ({}) =>
                     to give it the number. To do that click on "Numbers" in the "Programmable SMS" menu on your left.
                     Click on "Add an Existing Number", select the number you created and press on Add Selected. Finally
                     press on "Back" from the menu if you are still inside the Messaging Service. You will be presented
-                    with your Messaging Service SID in the list of messaging services on your screen."
+                    with your Messaging Service SID in the list of messaging services on your screen.<br/><br/>
+                    Finally go to the search bar on the top right again, type in "Notify" and press on "Notify
+                    Services". Add a new service by pressing the plus sign and giving it a name you like. Go inside the
+                    service you just created and connect your Messaging Service under the "Messaging Service SID"
+                    dropdown. Your Notify Service has not been completed and you can use its SID.
                 </li>
             </ul>
         </Paragraph>

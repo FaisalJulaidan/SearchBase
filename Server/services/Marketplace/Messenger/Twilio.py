@@ -1,3 +1,6 @@
+import time
+from threading import Thread
+
 from models import Callback
 from utilities import helpers
 
@@ -38,12 +41,19 @@ def sendMessage(numbers, body, auth, whatsapp=False):
                 number = "+44" + number[1:]
             binding.append("{\"binding_type\":\"sms\",\"address\":\"" + number + "\"}")
 
-        client.notify.services(notify_service_sid) \
-            .notifications.create(
-            to_binding=binding,
-            body=body)
+        from app import app
+        thr = Thread(target=__sendAsyncMessage, args=[app, client, notify_service_sid, binding, body])
+        thr.start()
 
         return Callback(True, "Message has been sent")
     except Exception as exc:
         helpers.logError("Marketplace.Messaging.Twilio.sendMessage() ERROR: " + str(exc))
         return Callback(False, "Error in sending Message")
+
+
+def __sendAsyncMessage(app, client, notify_service_sid, binding, body):
+    with app.app_context():
+        client.notify.services(notify_service_sid) \
+            .notifications.create(
+            to_binding=binding,
+            body=body)

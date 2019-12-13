@@ -15,7 +15,6 @@ def sendMessage(type: Messenger, recipient, body, auth, whatsapp=False) -> Callb
         # test connection
         if type is Messenger.Twilio:
             return Twilio.sendMessage(recipient, body, auth, whatsapp)  # oauth2
-            pass
 
         return Callback(False, 'Connection failure. Please check entered details')
 

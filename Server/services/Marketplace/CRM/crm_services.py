@@ -81,13 +81,12 @@ def insertClient(assistant: Assistant, conversation: Conversation):
 
 def updateCandidate(candidateID, conversation, companyID, sourceID):
     crm_callback: Callback = getByID(sourceID, companyID)
-
     if not crm_callback.Success:
         return crm_callback
 
     crm_type = crm_callback.Data.Type
 
-    if crm_type not in [CRM.Bullhorn, CRM.Jobscience]:
+    if crm_type not in [CRM.Bullhorn, CRM.Vincere, CRM.Jobscience]:
         return Callback(False, "CRM " + crm_type.value + " is not allowed for updating")
 
     data = __extractCandidateInsertData(conversation)

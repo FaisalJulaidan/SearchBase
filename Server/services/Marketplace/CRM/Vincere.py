@@ -311,7 +311,7 @@ def updateCandidate(auth, data, companyID) -> Callback:
         body = __extractCandidateInsertBody(data)
 
         # send query
-        sendQuery_callback: Callback = sendQuery(auth, "candidate/" + data["id"], "put", body, companyID)
+        sendQuery_callback: Callback = sendQuery(auth, "candidate/" + str(data["id"]), "put", body, companyID)
 
         if not sendQuery_callback.Success:
             raise Exception(sendQuery_callback.Message)
@@ -319,7 +319,7 @@ def updateCandidate(auth, data, companyID) -> Callback:
         return Callback(True, sendQuery_callback.Data.text)
 
     except Exception as exc:
-        helpers.logError("CRM.Vincere.insertCandidate() ERROR: " + str(exc))
+        helpers.logError("CRM.Vincere.updateCandidate() ERROR: " + str(exc))
         return Callback(False, str(exc))
 
 
@@ -569,7 +569,6 @@ def __extractCandidateInsertBody(data):
             {
                 "Preferred Job Title": data.get("preferredJobTitle"),
                 "Preferred Job Type": data.get("preferredJobType"),
-                "Years of Experience": data.get("yearsExperience"),
                 "Preferred Work City": data.get("preferredWorkCity"),
                 "Skills": data.get("skills"),
                 "Submitted Education": data.get("educations"),

@@ -454,7 +454,7 @@ def additionalCandidateNotesBuilder(data, selectedSolutions=None):
         #     helpers.logError(str(key) + " needs to be added to crm_services.additionalCandidateNotesBuilder.")
         #     continue
         # paragraph += sentences[key].replace("[" + key + "]", value)
-        paragraph += "\n  - " + key + ": " + str(value)
+        paragraph += "\n  - " + str(key) + ": " + str(value)
 
     if selectedSolutions:
         paragraph += "\n\n\nThe Candidate has also expressed interest in the following jobs: \n"

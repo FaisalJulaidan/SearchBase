@@ -554,7 +554,7 @@ def __extractCandidateInsertBody(data):
         "first_name": data.get("firstName"),
         "last_name": data.get("lastName"),
         "candidate_source_id": "29093",
-        "mobile": data.get("mobile"),
+        "phone": data.get("mobile"),
         "nearest_train_station": data.get("city"),
         "registration_date": datetime.datetime.now().isoformat()[:23] + "Z",
         "email": data.get("email"),
@@ -562,12 +562,17 @@ def __extractCandidateInsertBody(data):
         "education_summary": data.get("educations"),
         "desired_salary": data.get("annualSalary"),
         "desired_contract_rate": data.get("dayRate"),
-        "experience": str(data.get("yearsExperience")) + " years",
+        "experience": str(data.get("yearsExperience")) + " years of experience",
+        "availability_start": data.get("availability").isoformat()[:23] + "Z",
         "note": crm_services.additionalCandidateNotesBuilder(
             {
-                "dateAvailable": data.get("availability"),
-                "preferredJobTitle": data.get("preferredJobTitle"),
-                "preferredJobType": data.get("preferredJobType")
+                "Preferred Job Title": data.get("preferredJobTitle"),
+                "Preferred Job Type": data.get("preferredJobType"),
+                "Years of Experience": data.get("yearsExperience"),
+                "Preferred Work City": data.get("preferredWorkCity"),
+                "Skills": data.get("skills"),
+                "Submitted Education": data.get("educations"),
+                "LinkedIn": data.get("linkedIn")
             },
             data.get("selectedSolutions")
         )

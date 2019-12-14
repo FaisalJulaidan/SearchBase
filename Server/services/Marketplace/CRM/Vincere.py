@@ -583,7 +583,7 @@ def __extractCandidateReturnData(record):
     return databases_services.createPandaCandidate(id=record.get("id", ""),
                                                                   name=record.get("name"),
                                                                   email=record.get("primary_email"),
-                                                                  mobile=record.get("mobile", record.get("phone")),
+                                                                  mobile=record.get("phone") or record.get("mobile"),
                                                                   location=
                                                                   record.get("nearest_train_station", "").replace(
                                                                       "station", ""),

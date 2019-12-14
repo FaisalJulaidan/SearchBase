@@ -86,6 +86,7 @@ def processConversation(assistantHashID, data: dict) -> Callback:
         # Either update existing entity (e.g. candidate) or add new one
         if data.get("candidateInfo"):
             candidateInfo = helpers.verificationSigner.loads(data["candidateInfo"], salt='chatbot')
+            helpers.logError(str(candidateInfo))
             source = candidateInfo["source"] # Either db or crm
             sourceID = candidateInfo["sourceID"]
             candidateID = candidateInfo["candidateID"]

@@ -26,14 +26,14 @@ def serve(path):
     else:
         return send_from_directory("static/react_app/", 'index.html')
 
+
 @public_router.route('/u/<string:key>')
 def url_shortener(key):
     url: Callback = url_services.getByKey(key)
     
     if not url.Success:
-        return helpers.jsonResponse(False, 400, "Failed to find a URL to point to")
+        return helpers.jsonResponse(False, 400, "This chatbot link is invalid or has expired.")
     return redirect(url.Data)
-
 
 
 # LEGACY CODE

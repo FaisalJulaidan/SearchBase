@@ -563,7 +563,7 @@ def __extractCandidateInsertBody(data):
         "desired_salary": data.get("annualSalary"),
         "desired_contract_rate": data.get("dayRate"),
         "experience": str(data.get("yearsExperience")) + " years of experience",
-        "availability_start": data.get("availability").isoformat()[:23] + "Z",
+        "availability_start": datetime.datetime.strptime(data.get("availability"), '%Y-%m-%d %H:%M:%S.%f').isoformat()[:23] + "Z",
         "note": crm_services.additionalCandidateNotesBuilder(
             {
                 "Preferred Job Title": data.get("preferredJobTitle"),
@@ -581,20 +581,20 @@ def __extractCandidateInsertBody(data):
 
 def __extractCandidateReturnData(record):
     return databases_services.createPandaCandidate(id=record.get("id", ""),
-                                                                  name=record.get("name"),
-                                                                  email=record.get("primary_email"),
-                                                                  mobile=record.get("phone") or record.get("mobile"),
-                                                                  location=
-                                                                  record.get("nearest_train_station", "").replace(
-                                                                      "station", ""),
-                                                                  skills=record.get("skill", "").split(","),  # str list
-                                                                  linkdinURL=None,
-                                                                  availability=record.get("status"),
-                                                                  currentJobTitle=None,
-                                                                  education=None,
-                                                                  yearsExperience=0,
-                                                                  desiredSalary=float(record.get("desired_salary", 0)),
-                                                                  currency=Currency(
-                                                                      marketplace_helpers.convertToPandaCurrency(
-                                                                          record.get("currency", "gbp"))),
-                                                                  source="Vincere")
+                                                   name=record.get("name"),
+                                                   email=record.get("primary_email"),
+                                                   mobile=record.get("phone") or record.get("mobile"),
+                                                   location=
+                                                   record.get("nearest_train_station", "").replace(
+                                                       "station", ""),
+                                                   skills=record.get("skill", "").split(","),  # str list
+                                                   linkdinURL=None,
+                                                   availability=record.get("status"),
+                                                   currentJobTitle=None,
+                                                   education=None,
+                                                   yearsExperience=0,
+                                                   desiredSalary=float(record.get("desired_salary", 0)),
+                                                   currency=Currency(
+                                                       marketplace_helpers.convertToPandaCurrency(
+                                                           record.get("currency", "gbp"))),
+                                                   source="Vincere")

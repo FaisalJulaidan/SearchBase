@@ -43,7 +43,7 @@ def createShortenedURL(url: str, length: int = min_key_length, expiry: int = Non
     try:
         key = key if key else helpers.randomAlphanumeric(length)
         expiryDate = datetime.now() + timedelta(seconds=expiry) if expiry else None
-        shortened_url : ShortenedURL = ShortenedURL(ID=key, URL=url, Expiry=expiryDate)
+        shortened_url: ShortenedURL = ShortenedURL(ID=key, URL=url, Expiry=expiryDate)
 
         db.session.add(shortened_url)
         db.session.commit()

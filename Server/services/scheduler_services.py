@@ -94,7 +94,7 @@ def sendAutopilotReferrals():
                 hashedAssistantID = helpers.encodeID(assistant.ID)
 
                 url = url_services.createShortenedURL(helpers.getDomain(3000) + "/chatbot_direct_link/" + \
-                    hashedAssistantID, domain="recruitbot.ai")
+                    hashedAssistantID, expiry=1209600, domain="recruitbot.ai")
 
                 for crm in crmAP.CRMS:
                     params = [{"input": "dateBegin", "match": crmAP.LastReferral, "queryType": "BETWEEN", "match2": now}]

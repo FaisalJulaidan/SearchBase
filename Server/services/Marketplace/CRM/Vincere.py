@@ -563,7 +563,8 @@ def __extractCandidateInsertBody(data):
         "desired_salary": data.get("annualSalary"),
         "desired_contract_rate": data.get("dayRate"),
         "experience": str(data.get("yearsExperience")) + " years of experience",
-        "availability_start": datetime.datetime.strptime(data.get("availability"), '%Y-%m-%d %H:%M:%S.%f').isoformat()[:23] + "Z",
+        "availability_start": datetime.datetime.strptime(data.get("availability", "").split(" ")[0],
+                                                         '%Y-%m-%d %H:%M:%S.%f').isoformat()[:23] + "Z",
         "note": crm_services.additionalCandidateNotesBuilder(
             {
                 "Preferred Job Title": data.get("preferredJobTitle"),

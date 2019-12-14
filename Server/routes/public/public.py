@@ -28,13 +28,12 @@ def serve(path):
 
 @public_router.route('/u/<string:key>')
 def url_shortener(key):
-    urlshotener: Callback = url_services.getByKey(key)
+    url: Callback = url_services.getByKey(key)
     
-    if (urlshotener.Success):
-        return redirect(urlshotener.Data)
-    else:
+    if not url.Success:
         return helpers.jsonResponse(False, 400, "Failed to find a URL to point to")
-        # need to return 404?
+    return redirect(url.Data)
+
 
 
 # LEGACY CODE

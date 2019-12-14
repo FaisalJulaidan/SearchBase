@@ -77,21 +77,19 @@ def getByKey(key: str) -> Callback:
     """
 
     try:
-        urlshortener = db.session.query(ShortenedURL).filter(ShortenedURL.ID == key).first()
-        test = db.session.query(ShortenedURL).all()
+        shortenedURL = db.session.query(ShortenedURL).filter(ShortenedURL.ID == key).first()
 
-
-        if urlshortener is None:
+        if shortenedURL is None:
             raise Exception('Key {} does not exist in our database'.format(key))
 
-        if(urlshortener.Expiry):
-            if(urlshortener.Expiry < datetime.now()):
+        if(shortenedURL.Expiry):
+            if(shortenedURL.Expiry < datetime.now()):
                 raise Exception('Expiry date for key {} has passed'.format(key))
 
-        url = urlshortener.URL
+        url = shortenedURL.URL
         # redirect to tsb url
-        if urlshortener.URL.startswith("/"):
-            url = helpers.getDomain() + urlshortener.URL
+        if shortenedURL.URL.startswith("/"):
+            url = helpers.getDomain() + shortenedURL.URL
 
         return Callback(True, "URL Found", url)
 

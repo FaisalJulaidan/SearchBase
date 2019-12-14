@@ -404,7 +404,11 @@ class Conversations extends React.Component {
                        onChange={this.handleFilter}
                        loading={this.props.isLoading}
                        bordered={true}
-                       pagination={{ position: 'both', pageSize: 20 }}
+                       pagination={{
+                           position: 'both',
+                           showSizeChanger: true ,
+                           showTotal:(total, range) => `Total ${total} items`
+                       }}
                        size='default'
                        scroll={{ x: 'max-content' }}
                 />

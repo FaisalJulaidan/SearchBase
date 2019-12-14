@@ -392,6 +392,11 @@ class Availability extends React.Component {
                 <Table style={{ marginTop: '22px' }}
                        columns={this.columns}
                        dataSource={this.state.availability}
+                       pagination={{
+                           position: 'both',
+                           showSizeChanger: true,
+                           showTotal:(total, range) => `Total ${total} items`
+                       }}
                        scroll={{ x: 'max-content' }}/>
             </div>);
     }

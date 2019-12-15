@@ -184,7 +184,13 @@ def insertCandidate(auth, data, companyID) -> Callback:
 
         # send query
         sendQuery_callback: Callback = sendQuery(auth, "candidate", "post", body, companyID)
+        if not sendQuery_callback.Success:
+            raise Exception(sendQuery_callback.Message)
+        return_body = json.loads(sendQuery_callback.Data.text)  # {"id":0}
 
+        # send location
+        sendQuery_callback: Callback = sendQuery(auth, "candidate/"+str(return_body["id"])+"currentlocaton", "post",
+                                                 body, companyID)
         if not sendQuery_callback.Success:
             raise Exception(sendQuery_callback.Message)
 
@@ -440,7 +446,7 @@ def searchPerfectCandidates(auth, companyID, data) -> Callback:
         return Callback(True, "Search has been successful", result)
 
     except Exception as exc:
-        helpers.logError("Marketplace.CRM.Vincere.searchCandidates() ERROR: " + str(exc))
+        helpers.logError("Marketplace.CRM.Vincere.searchPerfectCandidates() ERROR: " + str(exc))
         return Callback(False, str(exc))
 
 
@@ -488,21 +494,7 @@ def searchJobs(auth, companyID, data) -> Callback:
         result = []
         # not found match for JobLinkURL
         for record in return_body["result"]["items"]:
-            result.append(databases_services.createPandaJob(id=record.get("id"),
-                                                            title=record.get("job_title"),
-                                                            desc=record.get("public_description", ""),
-                                                            location=record.get("location", {}).get("city"),
-                                                            type=record.get("employment_type"),
-                                                            salary=record.get("salary_to"),
-                                                            essentialSkills=None,
-                                                            yearsRequired=0,
-                                                            startDate=record.get("open_date"),
-                                                            endDate=record.get("closed_date"),
-                                                            linkURL=None,
-                                                            currency=Currency(
-                                                                marketplace_helpers.convertToPandaCurrency(
-                                                                    record.get("currency", "gbp"))),
-                                                            source="Vincere"))
+            result.append(__extractJobReturnData(record))
 
         return Callback(True, sendQuery_callback.Message, result)
 
@@ -555,7 +547,11 @@ def __extractCandidateInsertBody(data):
         "last_name": data.get("lastName"),
         "candidate_source_id": "29093",
         "phone": data.get("mobile"),
-        "nearest_train_station": data.get("city"),
+        "address": data.get("street"),
+        "city": data.get("city"),
+        "location_name": data.get("city"),
+        "post_code": data.get("postCode"),
+        "country": data.get("country"),
         "registration_date": datetime.datetime.now().isoformat()[:23] + "Z",
         "email": data.get("email"),
         "skills": data.get("skills"),
@@ -598,3 +594,21 @@ def __extractCandidateReturnData(record):
                                                        marketplace_helpers.convertToPandaCurrency(
                                                            record.get("currency", "gbp"))),
                                                    source="Vincere")
+
+
+def __extractJobReturnData(record):
+    return databases_services.createPandaJob(id=record.get("id"),
+                                                            title=record.get("job_title"),
+                                                            desc=record.get("public_description", ""),
+                                                            location=record.get("location", {}).get("city"),
+                                                            type=record.get("employment_type"),
+                                                            salary=record.get("salary_to"),
+                                                            essentialSkills=None,
+                                                            yearsRequired=0,
+                                                            startDate=record.get("open_date"),
+                                                            endDate=record.get("closed_date"),
+                                                            linkURL=None,
+                                                            currency=Currency(
+                                                                marketplace_helpers.convertToPandaCurrency(
+                                                                    record.get("currency", "gbp"))),
+                                                            source="Vincere")

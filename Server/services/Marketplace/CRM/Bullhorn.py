@@ -636,19 +636,7 @@ def searchJobs(auth, companyID, data, fields=None) -> Callback:
         result = []
         # not found match for JobLinkURL
         for record in return_body["data"]:
-            result.append(databases_services.createPandaJob(id=record.get("id"),
-                                                            title=record.get("title"),
-                                                            desc=record.get("publicDescription", ""),
-                                                            location=record.get("address", {}).get("city"),
-                                                            type=record.get("employmentType"),
-                                                            salary=record.get("salary"),
-                                                            essentialSkills=record.get("skills", {}).get("data"),
-                                                            yearsRequired=record.get("yearsRequired", 0),
-                                                            startDate=record.get("startDate"),
-                                                            endDate=record.get("dateEnd"),
-                                                            linkURL=None,
-                                                            currency=Currency("GBP"),
-                                                            source="Bullhorn"))
+            result.append(__extractJobReturnData(record))
 
         return Callback(True, sendQuery_callback.Message, result)
 
@@ -859,3 +847,19 @@ def __extractCandidateReturnData(record):
                                                                  record.get("dayRate", 0),
                                                    currency=Currency("GBP"),
                                                    source="Bullhorn")
+
+
+def __extractJobReturnData(record):
+    return databases_services.createPandaJob(id=record.get("id"),
+                                                            title=record.get("title"),
+                                                            desc=record.get("publicDescription", ""),
+                                                            location=record.get("address", {}).get("city"),
+                                                            type=record.get("employmentType"),
+                                                            salary=record.get("salary"),
+                                                            essentialSkills=record.get("skills", {}).get("data"),
+                                                            yearsRequired=record.get("yearsRequired", 0),
+                                                            startDate=record.get("startDate"),
+                                                            endDate=record.get("dateEnd"),
+                                                            linkURL=None,
+                                                            currency=Currency("GBP"),
+                                                            source="Bullhorn")

@@ -348,7 +348,7 @@ def __updateCandidateAdditionalData(auth, candidateID, body, companyID):
 
         # send current job
         if body.get("job_title"):
-            sendQuery_callback: Callback = sendQuery(auth, "candidate/"+str(candidateID)+"/workexperiences", "put",
+            sendQuery_callback: Callback = sendQuery(auth, "candidate/"+str(candidateID)+"/workexperiences", "post",
                                                      body, companyID)
             if not sendQuery_callback.Success:
                 raise Exception(sendQuery_callback.Message)

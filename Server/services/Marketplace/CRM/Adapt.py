@@ -12,7 +12,7 @@ def testConnection(auth):
         return Callback(login(auth).Success, "Message", auth)
 
     except Exception as exc:
-        return Callback(False, "Testing failed")
+        return Callback(False, "Connection test failed")
 
 
 def login(auth):
@@ -72,7 +72,9 @@ def insertCandidate(auth, data) -> Callback:
             ],
             "ADDRESS": [{
                 "OCC_ID": "Primary",
-                "STREET1": data.get("city"),
+                "STREET1": data.get("street"),
+                "TOWN": data.get("city"),
+                "POST_CODE": data.get("postCode"),
             }],
         }
 

@@ -1,7 +1,11 @@
+import time
+from threading import Thread
+
 from models import Callback
 from utilities import helpers
 
 from twilio.rest import Client
+
 
 def testConnection(auth):
     try:
@@ -10,7 +14,7 @@ def testConnection(auth):
                       "If you do not know why you are receiving this, please contact SearchBase on " + \
                       "support@thesearchbase.com"
 
-        send_sms_callback: Callback = sendMessage("+447578721001", sms_message, auth)
+        send_sms_callback: Callback = sendMessage("+447578721001", sms_message, auth, test=True)
         if not send_sms_callback.Success:
             raise Exception(send_sms_callback.Message)
 
@@ -20,27 +24,42 @@ def testConnection(auth):
         return Callback(False, "Error in testing")
 
 
-def sendMessage(sendto, body, auth, whatsapp=False):
-    # print("Attempting to send message")
+def sendMessage(numbers, body, auth, whatsapp=False, test=False):
     try:
         client = Client(auth.get("account_sid"), auth.get("auth_token"))
-        sender = auth.get("phone_number")
+        notify_service_sid = auth.get("notify_service_sid")
 
-        if whatsapp:
-            sendto = "whatsapp:" + sendto
-            sender = "whatsapp:" + sender
+        # if whatsapp:
+        #     sendto = "whatsapp:" + numbers
 
-        message = client.messages.create(
-            to=sendto,
-            from_=sender,
-            body=body)
+        if type(numbers) is str:
+            numbers = [numbers]
 
-        print(message.sid)
+        binding = []
+        for number in numbers:
+            if number[0] == "0":
+                number = "+44" + number[1:]
+            binding.append("{\"binding_type\":\"sms\",\"address\":\"" + number + "\"}")
+
+        if not test:
+            from app import app
+            thr = Thread(target=__sendAsyncMessage, args=[app, client, notify_service_sid, binding, body])
+            thr.start()
+        else:
+            client.notify.services(notify_service_sid) \
+                .notifications.create(
+                to_binding=binding,
+                body=body)
 
         return Callback(True, "Message has been sent")
     except Exception as exc:
         helpers.logError("Marketplace.Messaging.Twilio.sendMessage() ERROR: " + str(exc))
         return Callback(False, "Error in sending Message")
 
-# NOTE: Temp for testing sms
-# send_sms("+447860285032", "Place TEXT above: \n https://www.thesearchbase.com/")
+
+def __sendAsyncMessage(app, client, notify_service_sid, binding, body):
+    with app.app_context():
+        client.notify.services(notify_service_sid) \
+            .notifications.create(
+            to_binding=binding,
+            body=body)

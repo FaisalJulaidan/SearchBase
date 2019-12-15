@@ -67,6 +67,7 @@ validate_email = "==1.3"
 Werkzeug = "==0.16.0"
 Flask-JWT-Extended = "==3.13.1"
 MarkupSafe = "==1.1.0"
+gevent= "==1.4.0"
 PyJWT = "==1.6.4"
 pandas = "*"
 flask-babel = "*"
@@ -81,6 +82,7 @@ twilio = "*"
 sqlalchemy-stubs = "*"
 grequests = "*"
 #flask-limiter = "*"
+
 
 [requires]
 python_version = "3.7"

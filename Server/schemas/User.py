@@ -2,6 +2,9 @@ from models import db
 from datetime import datetime
 from sqlalchemy_utils import PasswordType
 
+# from schemas.Webhook import owners_table
+
+
 class User(db.Model):
     ID = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
     Firstname = db.Column(db.String(64), nullable=False)
@@ -28,6 +31,13 @@ class User(db.Model):
 
     RoleID = db.Column(db.Integer, db.ForeignKey('role.ID', ondelete='SET NULL'))
     Role = db.relationship('Role', back_populates='Users')
+
+    Assistants = db.relationship('Assistant', back_populates='User')
+
+    # Assistants = db.relationship(
+    #     "Assistant",
+    #     secondary=owners_table,
+    #     back_populates="Users")
 
     # Constraints:
     __table_args__ = (db.UniqueConstraint('Email', name='uix1_user'),)

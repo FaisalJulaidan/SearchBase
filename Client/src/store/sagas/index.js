@@ -14,3 +14,4 @@ export * from './appointmentAllocationTime.saga';
 export * from './development.saga';
 export * from './campaign.saga';
 export * from './payment.saga';
+export * from './CRMAutoPilot.saga';

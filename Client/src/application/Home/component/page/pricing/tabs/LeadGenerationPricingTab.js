@@ -8,7 +8,7 @@ import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faChevronRight} from "@fortawesome/free-solid-svg-icons";
 import plansJSON from "./lead-generation-plans.json";
 
-const AgencyPricingTab = () => {
+const LeadGenerationPricingTab = () => {
 
 
     let plans = plansJSON.map((plan, key) => {
@@ -94,4 +94,4 @@ const AgencyPricingTab = () => {
     );
 };
 
-export default AgencyPricingTab;
+export default LeadGenerationPricingTab;

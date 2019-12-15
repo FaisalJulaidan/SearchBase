@@ -1,15 +1,15 @@
 from models import db
-from schemas import Assistant, Conversation
 
 class Campaign(db.Model):
 
     ID = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
     Name = db.Column(db.String(80))
-    JobTitle = db.Column(db.String(80))
+    PreferredJobTitle = db.Column(db.String(80))
     Skills = db.Column(db.String(80))
     Location = db.Column(db.String(80))
     Message = db.Column(db.String(512))
     UseCRM = db.Column(db.Boolean(), nullable=False, default=True)
+    Active = db.Column(db.Boolean, nullable=False, default=True)
 
     # Relationships:
     CompanyID = db.Column(db.Integer, db.ForeignKey('company.ID', ondelete='cascade'), nullable=False)

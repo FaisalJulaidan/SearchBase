@@ -107,10 +107,10 @@ def sendRequest(url, method, headers, data=None):
 #         mobiles = conversation.Data.get('keywordsByDataType').get(DT.CandidateMobile.value['name'], [])
 #
 #         # does not like value to be ""
-#         if conversation.Data.get('keywordsByDataType').get(DT.CandidateLocation.value['name'], None):
+#         if conversation.Data.get('keywordsByDataType').get(DT.CandidateCity.value['name'], None):
 #             body["addresses"] = [{
 #                 "value": "".join(
-#                     conversation.Data.get('keywordsByDataType').get(DT.CandidateLocation.value['name'], [" "])),
+#                     conversation.Data.get('keywordsByDataType').get(DT.CandidateCity.value['name'], [" "])),
 #                 "type": "home"
 #             }]
 #
@@ -202,7 +202,7 @@ def searchCandidates(auth) -> Callback:
                                                                   skills=None,
                                                                   linkdinURL=None,
                                                                   availability=None,
-                                                                  jobTitle=None,
+                                                                  preferredJobTitle=None,
                                                                   education=
                                                                   getValue(record.get("educations"), "degree"),
                                                                   yearsExperience=0,
@@ -297,7 +297,7 @@ def getAllCandidates(auth) -> Callback:
                                                                   skills=None,
                                                                   linkdinURL=None,
                                                                   availability=None,
-                                                                  jobTitle=None,
+                                                                  preferredJobTitle=None,
                                                                   education= getValue(record.get("educations"), "degree"),
                                                                   yearsExperience=0,
                                                                   desiredSalary=0,

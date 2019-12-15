@@ -48,7 +48,7 @@
     font-weight: bold;
     text-decoration: none;
     transition: color 0.4s ease 0s;
-    font-size: .85em;
+    font-size: .8em;
     cursor: pointer;
     text-align: center;
     margin-top: auto;
@@ -61,7 +61,7 @@
     font-weight: bold;
     text-decoration: none;
     transition: color 0.4s ease 0s;
-    font-size: .85em;
+    font-size: .8em;
     cursor: pointer;
     text-align: center;
     margin-top: auto;
@@ -123,6 +123,15 @@
 
 .button:not(:disabled):not(.disabled):active:focus {
     box-shadow: 0 0 0 0.2rem rgba(138, 107, 219, .5);
+}
+
+@media (max-width: 991.98px) {
+    .nav_buttons .link {
+        font-size: .75em;
+    }
+    .nav_buttons .link_dropdown a {
+        font-size: .75em;
+    }
 }
 
 @media (max-width: 767.98px) {

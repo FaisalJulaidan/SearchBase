@@ -121,7 +121,6 @@ class Development extends React.Component {
 
 
 function mapStateToProps(state) {
-    console.log(state)
     return {
         webhooks: state.development.webhooks,
         options: state.options.options,

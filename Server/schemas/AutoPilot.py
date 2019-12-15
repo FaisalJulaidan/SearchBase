@@ -21,6 +21,7 @@ class AutoPilot(db.Model):
     SendRejectionSMS = db.Column(db.Boolean, nullable=False, default=False)
     RejectionSMSBody = db.Column(db.Text, nullable=False)
 
+
     SendCandidatesAppointments = db.Column(db.Boolean, nullable=False, default=False)
 
     # Relationships:

@@ -43,12 +43,12 @@ def createShortenedURL(url: str, length: int = min_key_length, expiry: int = Non
     try:
         key = key if key else helpers.randomAlphanumeric(length)
         expiryDate = datetime.now() + timedelta(seconds=expiry) if expiry else None
-        shortened_url : ShortenedURL = ShortenedURL(ID=key, URL=url, Expiry=expiryDate)
+        shortened_url: ShortenedURL = ShortenedURL(ID=key, URL=url, Expiry=expiryDate)
 
         db.session.add(shortened_url)
         db.session.commit()
 
-        return Callback(True, "URL has been succesfully created", "{}/u/{}".format(helpers.getDomain(subdomain=subdomain, domain=domain), key))
+        return Callback(True, "URL has been successfully created", "{}/u/{}".format(helpers.getDomain(subdomain=subdomain, domain=domain), key))
 
     except IntegrityError as e:
         helpers.logError("url_services.createShortenedURL(): " + str(e))
@@ -77,22 +77,19 @@ def getByKey(key: str) -> Callback:
     """
 
     try:
-        urlshortener = db.session.query(ShortenedURL).filter(ShortenedURL.ID == key).first()
-        test = db.session.query(ShortenedURL).all()
+        shortenedURL = db.session.query(ShortenedURL).filter(ShortenedURL.ID == key).first()
 
-        print(test)
-
-        if urlshortener is None:
+        if shortenedURL is None:
             raise Exception('Key {} does not exist in our database'.format(key))
 
-        if(urlshortener.Expiry):
-            if(urlshortener.Expiry < datetime.now()):
+        if(shortenedURL.Expiry):
+            if(shortenedURL.Expiry < datetime.now()):
                 raise Exception('Expiry date for key {} has passed'.format(key))
 
-        url = urlshortener.URL
+        url = shortenedURL.URL
         # redirect to tsb url
-        if urlshortener.URL.startswith("/"):
-            url = helpers.getDomain() + urlshortener.URL
+        if shortenedURL.URL.startswith("/"):
+            url = helpers.getDomain() + shortenedURL.URL
 
         return Callback(True, "URL Found", url)
 

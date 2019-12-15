@@ -6,8 +6,11 @@ class Candidate(db.Model):
     CandidateName = db.Column(db.String(64), nullable=True)
     CandidateEmail = db.Column(db.String(64), nullable=True)
     CandidateMobile = db.Column(db.String(20), nullable=True)
-    CandidateLocation = db.Column(db.String(64), nullable=False) # Required
-    CandidateSkills = db.Column(db.String(5000), nullable=False) # Required
+    CandidateStreet = db.Column(db.String(64), nullable=True)
+    CandidateCity = db.Column(db.String(64), nullable=True)
+    CandidatePostCode = db.Column(db.String(64), nullable=True)
+    CandidateCountry = db.Column(db.String(64), nullable=True)
+    CandidateSkills = db.Column(db.String(5000), nullable=True)
     CandidateLinkdinURL = db.Column(db.String(512), nullable=True)
     CandidateAvailability = db.Column(db.String(120), nullable=True)
     CandidateConsultantName = db.Column(db.String(64), nullable=True)

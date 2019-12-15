@@ -8,7 +8,9 @@ import pandas
 from sqlalchemy import and_
 from sqlalchemy_utils import Currency
 
-from models import db, Callback, Database, Candidate, Assistant, Job
+from services.Marketplace.marketplace_helpers import convertSkillsToString
+from utilities.enums import DatabaseType, DataType as DT
+from models import db, Callback, Database, Candidate, Assistant, Job, Conversation
 from services import assistant_services
 from services.Marketplace.CRM import crm_services
 from services.Marketplace.marketplace_helpers import convertSkillsToString
@@ -16,14 +18,14 @@ from utilities import helpers
 from utilities.enums import DatabaseType, Period, DataType as DT
 
 
-def fetchDatabase(id, companyID: int, pageNumber: int) -> Callback:
+def fetchDatabase(id: int, companyID: int, pageNumber: int) -> Callback:
     try:
         # Get result and check if None then raise exception
         database: Database = db.session.query(Database) \
             .filter(and_(Database.CompanyID == companyID, Database.ID == id)).first()
 
         if not database:
-            raise Exception
+            raise Exception("Database does not exist")
 
         databaseContent = None
 
@@ -43,6 +45,26 @@ def fetchDatabase(id, companyID: int, pageNumber: int) -> Callback:
         helpers.logError("databases_service.fetchDatabase(): " + str(exc))
         db.session.rollback()
         return Callback(False, 'Could not fetch the database.')
+
+
+def fetchAvailableCandidates(dbID: int, companyID: int):
+    try:
+        # Fetch database and check if None then raise exception
+        database: Database = db.session.query(Database) \
+            .filter(and_(Database.CompanyID == companyID, Database.ID == dbID)).first()
+
+        if not database:
+            raise Exception("Database does not exist")
+
+        candidates: List[Candidate] = db.session.query(Candidate) \
+            .filter(and_(Candidate.DatabaseID == dbID, Candidate.CandidateAvailability != None)).all()
+
+        return Callback(True, "", candidates)
+
+    except Exception as exc:
+        helpers.logError("databases_service.fetchAvailableCandidates(): " + str(exc))
+        db.session.rollback()
+        return Callback(False, 'Could not fetch available candidates.')
 
 
 def updateDatabase(id, newName, companyID) -> Callback:
@@ -172,7 +194,7 @@ def getJob(jobID):
         return Callback(False, 'Could not retrieve the job.')
 
 
-def updateCandidate(candidateID, conversation) -> Callback:
+def updateCandidate(candidateID, conversation: Conversation) -> Callback:
     try:
         candidate = db.session.query(Candidate) \
             .filter(Candidate.ID == candidateID).first()
@@ -184,8 +206,8 @@ def updateCandidate(candidateID, conversation) -> Callback:
             "lastName": helpers.getListValue(conversation.Name, 1, " "),
             "mobile": conversation.PhoneNumber or " ",
             "city": ", ".join(
-                conversation.Data.get('keywordsByDataType').get(DT.CandidateLocation.value['name']) or
-                conversation.Data.get('keywordsByDataType').get(DT.JobLocation.value['name'], [])),
+                conversation.Data.get('keywordsByDataType').get(DT.CandidateCity.value['name']) or
+                conversation.Data.get('keywordsByDataType').get(DT.JobCity.value['name'], [])),
             "email": conversation.Email or " ",
 
             "skills": ", ".join(
@@ -194,8 +216,8 @@ def updateCandidate(candidateID, conversation) -> Callback:
             "yearsExperience": ", ".join(
                 conversation.Data.get('keywordsByDataType').get(DT.CandidateYearsExperience.value['name']) or
                 conversation.Data.get('keywordsByDataType').get(DT.JobYearsRequired.value['name'], [])) or None,
-            "preferredJobTitle": ", ".join(
-                conversation.Data.get('keywordsByDataType').get(DT.JobTitle.value['name'], [])) or None,
+            "currentJobTitle": ", ".join(
+                conversation.Data.get('keywordsByDataType').get(DT.CurrentJobTitle.value['name'], [])) or None,
 
             "educations": ", ".join(conversation.Data.get('keywordsByDataType').get(DT.CandidateEducation.value['name'],
                                                                                     [])) or None,
@@ -214,11 +236,11 @@ def updateCandidate(candidateID, conversation) -> Callback:
 
         candidate.CandidateName = data.get("name") or candidate.CandidateName
         candidate.CandidateMobile = data.get("mobile") or candidate.CandidateMobile
-        candidate.CandidateLocation = data.get("city") or candidate.CandidateLocation
+        candidate.CandidateCity = data.get("city") or candidate.CandidateCity
         candidate.CandidateEmail = data.get("email") or candidate.CandidateEmail
         candidate.CandidateSkills = data.get("skills") or candidate.CandidateSkills
         candidate.CandidateYearsExperience = data.get("yearsExperience") or candidate.CandidateYearsExperience
-        candidate.CandidateJobTitle = data.get("preferredJobTitle") or candidate.CandidateJobTitle
+        candidate.CandidateJobTitle = data.get("currentJobTitle") or candidate.CandidateJobTitle
         candidate.CandidateEducation = data.get("educations") or candidate.CandidateEducation
         candidate.CandidateAvailability = data.get("availability") or candidate.CandidateAvailability
         candidate.CandidateDesiredSalary = data.get("annualSalary") or data.get("dayRate") \
@@ -384,16 +406,18 @@ def scanCandidates(session, dbIDs, extraCandidates=None, campaign=False):
         __wordsCounter(DT.CandidateEducation, Candidate.CandidateEducation, keywords, df, 1)
 
         # Location
-        __wordsCounter(DT.JobLocation, Candidate.CandidateLocation, keywords, df, 6)
-        __wordsCounter(DT.CandidateLocation, Candidate.CandidateLocation, keywords, df, 6)
+        __wordsCounter(DT.JobCity, Candidate.CandidateCity, keywords, df, 6)
+        __wordsCounter(DT.CandidateCity, Candidate.CandidateCity, keywords, df, 6)
 
-        # JobTitle
-        __wordsCounter(DT.JobTitle, Candidate.CandidateJobTitle, keywords, df, 1)
+        # CurrentJobTitle
+        __wordsCounter(DT.CurrentJobTitle, Candidate.CandidateJobTitle, keywords, df, 1)
 
         # Skills
         __wordsCounter(DT.CandidateSkills, Candidate.CandidateSkills, keywords, df, 2)
         __wordsCounter(DT.JobEssentialSkills, Candidate.CandidateSkills, keywords, df, 2)
 
+        # Availability
+        __wordsCounter(DT.CandidateAvailability, Candidate.CandidateAvailability, keywords, df, 1)
 
         topResults = json.loads(df[df['Score'] > 0].nlargest(session.get('showTop', 2), 'Score')
                                 .to_json(orient='records'))
@@ -417,9 +441,9 @@ def scanCandidates(session, dbIDs, extraCandidates=None, campaign=False):
         for i, record in enumerate(topResults):
             desc = []
             # Build random dynamic candidate description
-            if record[Candidate.CandidateLocation.name]:
+            if record[Candidate.CandidateCity.name]:
                 desc.append(random.choice(location).replace("[location]",
-                                                            record[Candidate.CandidateLocation.name]))
+                                                            record[Candidate.CandidateCity.name]))
 
             if record[Candidate.CandidateSkills.name]:
                 desc.append(random.choice(skills)
@@ -492,8 +516,8 @@ def scanJobs(session, dbIDs, extraJobs=None):
         __numCounter(Job.JobYearsRequired, '<', DT.CandidateYearsExperience, keywords, df, plus=5, addInputToScore=True)
 
         # Job Title
-        __wordsCounter(DT.JobTitle, Job.JobTitle, keywords, df, 2)
-        __wordsCounter(DT.JobTitle, Job.JobDescription, keywords, df, 2)
+        __wordsCounter(DT.PreferredJobTitle, Job.JobTitle, keywords, df, 2)
+        __wordsCounter(DT.PreferredJobTitle, Job.JobDescription, keywords, df, 2)
         __wordsCounter(DT.CandidateSkills, Job.JobTitle, keywords, df, 2)
         __wordsCounter(DT.CandidateSkills, Job.JobDescription, keywords, df, 2)
 
@@ -501,8 +525,8 @@ def scanJobs(session, dbIDs, extraJobs=None):
         __wordsCounter(DT.JobType, Job.JobType, keywords, df, 2)
 
         # Location
-        __wordsCounter(DT.JobLocation, Job.JobLocation, keywords, df, 3)
-        __wordsCounter(DT.CandidateLocation, Job.JobLocation, keywords, df, 3)
+        __wordsCounter(DT.JobCity, Job.JobCity, keywords, df, 3)
+        __wordsCounter(DT.CandidateCity, Job.JobCity, keywords, df, 3)
 
         # Skills
         __wordsCounter(DT.JobEssentialSkills, Job.JobEssentialSkills, keywords, df, 3)
@@ -524,9 +548,9 @@ def scanJobs(session, dbIDs, extraJobs=None):
             if record[Job.JobType.name]:
                 desc.append(random.choice(jobType).replace("[jobType]",
                                                            record[Job.JobType.name]))
-                if record[Job.JobLocation.name]:
+                if record[Job.JobCity.name]:
                     desc[0] += random.choice(location).replace("[location]",
-                                                               record[Job.JobLocation.name])
+                                                               record[Job.JobCity.name])
                 else:
                     desc[0] += ". "
 
@@ -539,8 +563,8 @@ def scanJobs(session, dbIDs, extraJobs=None):
 
             # Build job subtitles
             subTitles = []
-            if record[Job.JobLocation.name]:
-                subTitles.append("Location: " + record[Job.JobLocation.name])
+            if record[Job.JobCity.name]:
+                subTitles.append("Location: " + record[Job.JobCity.name])
 
             if record[Job.JobSalary.name]:
                 currency = record[Job.Currency.name] or ''  # it could be a Currency object e.g. {code: 'USD'...}
@@ -621,7 +645,7 @@ def __salary(row, dbSalaryColumn, dbCurrencyColumn, salaryInput: str, plus=4, fo
 
 
 def createPandaCandidate(id, name, email, mobile, location, skills,
-                         linkdinURL, availability, jobTitle, education,
+                         linkdinURL, availability, currentJobTitle, education,
                          yearsExperience: int, desiredSalary, currency: Currency, source):
     if isinstance(desiredSalary, str):
         desiredSalary = float(re.sub("[^0-9]", "", desiredSalary))
@@ -629,11 +653,11 @@ def createPandaCandidate(id, name, email, mobile, location, skills,
             "CandidateName": name or '',
             "CandidateEmail": email or '',
             "CandidateMobile": mobile or '',
-            "CandidateLocation": location or '',
+            "CandidateCity": location or '',
             "CandidateSkills": convertSkillsToString(skills) or '',
             "CandidateLinkdinURL": linkdinURL or '',
             "CandidateAvailability": availability or '',
-            "CandidateJobTitle": jobTitle or '',
+            "CandidateJobTitle": currentJobTitle or '',
             "CandidateEducation": education or '',
             "CandidateYearsExperience": yearsExperience or 0,
             "CandidateDesiredSalary": desiredSalary or 0,
@@ -650,7 +674,7 @@ def createPandaJob(id, title, desc, location, type, salary, essentialSkills, yea
     return {"ID": id,
             "JobTitle": title or '',
             "JobDescription": desc or '',
-            "JobLocation": location or '',
+            "JobCity": location or '',
             "JobType": type or '',
             "JobSalary": salary or 0,
             "JobEssentialSkills": convertSkillsToString(essentialSkills) or '',

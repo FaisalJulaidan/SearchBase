@@ -1,7 +1,7 @@
 import inspect
 import logging
 import os
-import re  
+import re
 import random
 import string
 import traceback
@@ -59,7 +59,7 @@ def getRemoteAddress():
 
 # Get domain based on current environment
 def getDomain(port=5000, subdomain=None, domain=None):
-    subdomain = subdomain+"." if subdomain is not None else ""
+    subdomain = subdomain + "." if subdomain is not None else ""
     domain = domain if domain is not None else "www.thesearchbase.com"
     if os.environ['FLASK_ENV'] == 'development':
         return 'http://localhost:{}'.format(str(port))
@@ -71,7 +71,6 @@ def getDomain(port=5000, subdomain=None, domain=None):
 
 
 def cleanDict(target):
-
     # reoccurring function
     def checkDict(target):
         # clean dict connections
@@ -99,11 +98,9 @@ def cleanDict(target):
     elif type(target) is dict:
         return checkDict(target)
     elif isinstance(target, type({}.items())):
-        logError(".ITEMS() IS USED")  # checking if the if statement is used in production
-        logError(".ITEMS() IS USED")
-        logError(".ITEMS() IS USED")
         return {k: v for k, v in target if v}
     return target
+
 
 def randomAlphanumeric(length):
     """
@@ -121,27 +118,35 @@ def randomAlphanumeric(length):
     letters = string.ascii_letters
     return ''.join(random.choice(letters) for i in range(length))
 
+
 def logError(exception):
     if os.environ['FLASK_ENV'] == 'development':
         print(exception)
         print(traceback.format_exc())
     else:
-        mail_services.simpleSend("tsberrorlogs@gmail.com", "Error Log", str(exception))
+        # uncomment when needed
+        if os.environ.get('MAIL_LOGS', 'no') == 'yes':
+            mail_services.simpleSend("tsberrorlogs@gmail.com", "Error Log", str(exception))
         logging.error(traceback.format_exc() + exception + "\n \n")
 
 
 # ID Hasher
 # IMPORTANT: don't you ever make changes to the hash values before consulting Faisal Julaidan
 hashids = Hashids(salt=BaseConfig.HASH_IDS_SALT, min_length=5)
+
+
 def encodeID(id):
     return hashids.encrypt(id)
+
 
 def decodeID(id):
     return hashids.decrypt(id)
 
+
 def encodeMultipleParams(*argv):
     print(argv)
     return hashids.encrypt(*argv)
+
 
 # Encryptors
 def encrypt(value, isDict=False):
@@ -158,8 +163,10 @@ def decrypt(token, isDict=False, isBtye=False):
 
 def seed():
     # Create universal Roles
-    db.session.add(Role(Name="Staff", EditChatbots=True, AddUsers=True, EditUsers=True, DeleteUsers=True, AccessBilling=True))
-    db.session.add(Role(Name="Owner", EditChatbots=True, AddUsers=True, EditUsers=True, DeleteUsers=True, AccessBilling=True))
+    db.session.add(
+        Role(Name="Staff", EditChatbots=True, AddUsers=True, EditUsers=True, DeleteUsers=True, AccessBilling=True))
+    db.session.add(
+        Role(Name="Owner", EditChatbots=True, AddUsers=True, EditUsers=True, DeleteUsers=True, AccessBilling=True))
     db.session.commit()
 
 
@@ -177,9 +184,9 @@ def getPlanNickname(SubID=None):
     except stripe.error.StripeError as e:
         return None
 
-def keyFromStoredFile(storedFile: StoredFile, key: FileAssetType) -> StoredFileInfo or None:
 
-    class StoredFileInfoMocked(): # To avoid null pointer exceptions
+def keyFromStoredFile(storedFile: StoredFile, key: FileAssetType) -> StoredFileInfo or None:
+    class StoredFileInfoMocked():  # To avoid null pointer exceptions
         def __init__(self, absFilePath: str or None):
             self.AbsFilePath: str = absFilePath
 
@@ -212,7 +219,6 @@ def jsonResponseFlask(success: bool, http_code: int, msg: str, data=None):
 
 # Note: Hourly is not supported because it varies and number of working hours is required
 def convertSalaryPeriod(salary, fromPeriod: Period, toPeriod: Period):
-
     salary = int(salary[1:].replace(',', ''))  # Type error otherwise
 
     if fromPeriod == Period.Annually:
@@ -233,6 +239,8 @@ def convertSalaryPeriod(salary, fromPeriod: Period, toPeriod: Period):
 
 # -------- SQLAlchemy Converters -------- #
 """Convert a SQLAlchemy object to a single dict """
+
+
 def getDictFromSQLAlchemyObj(obj, eager: bool = False) -> dict:
     dict = {}  # Results
     protected = getattr(obj, "__protected__") if hasattr(obj, "__protected__") else []
@@ -279,13 +287,17 @@ def getDictFromSQLAlchemyObj(obj, eager: bool = False) -> dict:
 
 
 """Convert a SQLAlchemy list of objects to a list of dicts"""
+
+
 def getListFromSQLAlchemyList(SQLAlchemyList, eager: bool = False):
     return [getDictFromSQLAlchemyObj(item, eager) for item in SQLAlchemyList]
+
 
 """Used when you want to only gather specific data from a table (columns)"""
 """Provide a list of keys (e.g ['id', 'name']) and the list of tuples"""
 """provided by sqlalchemy when querying for specific columns"""
 """this func will work for enums as well."""
+
 
 # For a list of SQLAlchemy objects
 def getListFromLimitedQuery(columnsList, tupleList: List[tuple]) -> list:
@@ -308,7 +320,6 @@ def getListFromLimitedQuery(columnsList, tupleList: List[tuple]) -> list:
 
 # For a list of SQLAlchemy objects
 def getDictFromLimitedQuery(columnsList, tuple) -> dict:
-
     # When tupleList is not empty, then the number of items in each tuple must match the number of items in columnsList
     if len(columnsList) != len(tuple):
         raise Exception("List of indexes provided must match in length to the items in each of the tuples")
@@ -316,24 +327,30 @@ def getDictFromLimitedQuery(columnsList, tuple) -> dict:
     dict = {}
     for idx, v in enumerate(tuple):
         key = columnsList[idx]
-        if isinstance(v, Enum): # Convert Enum
+        if isinstance(v, Enum):  # Convert Enum
             dict[key] = v.value
 
-        elif isinstance(v, time): # Convert Times
+        elif isinstance(v, time):  # Convert Times
             dict[key] = str(v)
 
-        elif isinstance(v, Currency): # Convert Currencies
+        elif isinstance(v, Currency):  # Convert Currencies
             dict[key] = v.code
 
-        elif key in [Job.JobStartDate.name, Job.JobEndDate.name] and v: # Convert Datetime only for Jobs
+        elif key in [Job.JobStartDate.name, Job.JobEndDate.name] and v:  # Convert Datetime only for Jobs
             dict[key] = '/'.join(map(str, [v.year, v.month, v.day]))
 
-        elif key in ['Flow', 'AssistantFlow'] and v: # Parse Flow
+        elif key in ['Flow', 'AssistantFlow'] and v:  # Parse Flow
             dict[key] = flow_services.parseFlow(v)
 
         else:
             dict[key] = v
     return dict
+
+
+# EXCEPTION MESSAGE SUPPLIED HERE SHOULD BE SAFE TO SHOW THE FROTNEND
+class APIException(Exception):
+    def __init__(self, message):
+        super().__init__(message)
 
 
 class requestException(Exception):
@@ -356,7 +373,8 @@ def validateRequest(req, check: dict, throwIfNotValid: bool = True):
             elif check[item]['type']:
                 if not isinstance(req[item], check[item]['type']):
                     print(req[item])
-                    returnDict["errors"].append("Parameter {} is not of required type {}".format(item, str(check[item]['type'].__name__)))
+                    returnDict["errors"].append(
+                        "Parameter {} is not of required type {}".format(item, str(check[item]['type'].__name__)))
         returnDict["inputs"][item] = req[item] if item in req and item is not None else None
     if len(returnDict["missing"]) != 0:
         returnDict["valid"] = False

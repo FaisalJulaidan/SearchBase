@@ -146,7 +146,6 @@ def syncAppointments(calendarID, token, companyID):
         user: User = db.session.query(User).join(Company).filter(Company.ID == companyID).first()
 
         rs = []
-
         for appointment in appointments:
             event = None
             for idx, item in enumerate(events):
@@ -249,7 +248,6 @@ def addEvent(companyID, eventName, description, start, end):
                 'description': description,
                 'start': {'dateTime': start.isoformat()},
                 'end': {'dateTime': end.isoformat()}}
-        helpers.HPrint(json.dumps(data))
         resp = requests.post("https://www.googleapis.com/calendar/v3/calendars/{}/events".format(calendarID), json=data,
                              headers=headers)
         return Callback(True, 'Successfully added event')

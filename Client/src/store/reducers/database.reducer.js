@@ -1,8 +1,15 @@
 import * as actionTypes from '../actions/actionTypes';
 import {updateObject} from '../utility';
 
-const initialState = {isLoading: false, isFetchedDatabaseLoading: false, errorMsg: null,
-    databasesList: [], fetchedDatabase:{}};
+const initialState = {
+    isLoading: false,
+    isFetchedDatabaseLoading: false,
+    isFetchedAvailableCandidatesLoading: false,
+    errorMsg: null,
+    databasesList: [],
+    fetchedDatabase:{},
+    fetchedAvailableCandidates:[]
+};
 
 
 export const database = (state = initialState, action) => {
@@ -39,6 +46,23 @@ export const database = (state = initialState, action) => {
             });
         case actionTypes.RESET_DATABASE:
             return updateObject(state, {fetchedDatabase: {}});
+
+
+        case actionTypes.FETCH_DATABASE_AVAILABLE_CANDIDATES_REQUEST:
+            return updateObject(state, {
+                isFetchedAvailableCandidatesLoading: true
+            });
+        case actionTypes.FETCH_DATABASE_AVAILABLE_CANDIDATES_SUCCESS:
+            return updateObject(state, {
+                isFetchedAvailableCandidatesLoading: false,
+                fetchedAvailableCandidates: action.fetchedAvailableCandidates
+            });
+        case actionTypes.FETCH_DATABASE_AVAILABLE_CANDIDATES_FAILURE:
+            return updateObject(state, {
+                isFetchedAvailableCandidatesLoading: false,
+                fetchedAvailableCandidates:[],
+                errorMsg: action.error
+            });
 
 
         case actionTypes.DELETE_DATABASE_REQUEST:

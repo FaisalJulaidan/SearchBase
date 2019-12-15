@@ -11,9 +11,9 @@ from jsonschema import validate
 from sqlalchemy.orm import joinedload
 
 from config import BaseConfig
-from models import db, Assistant, Conversation, StoredFileInfo
+from models import db, Assistant, Conversation, StoredFileInfo, ShortenedURL
 from services import stored_file_services
-from utilities import json_schemas, enums
+from utilities import json_schemas, enums, helpers
 
 
 # NOTE: Make sure to take a backup of the database before running these functions
@@ -107,6 +107,7 @@ def migrateConversations():
 
 def migrateFlows():
     try:
+        print("MIGRATING FLOWS...")
         for assistant in db.session.query(Assistant).all():
             if assistant.Flow:
                 # Update flow
@@ -198,174 +199,16 @@ def __migrateFlow(flow, assistantID=None):
         for group in newFlow['groups']:  # loop groups
             for i, block in enumerate(group['blocks']):  # loop blocks
 
-                if block['DataType'] in ["CandidateAnnualDesiredSalary", "CandidateDailyDesiredSalary", "JobAnnualSalary",
-                                         "JobDayRate", "CandidateAvailableFrom", "CandidateAvailableTo", "CandidateAvailability"
-                                         , "ClientAvailability", "JobStartDate", "JobEndDate" ] \
-                        and block['Type'] == enums.BlockType.Question.value:
-                    block['DataType'] = 'NoType'
+                # custom updates
+                if block['DataType'] in ["JobTitle"]:
+                    block['DataType'] = 'PreferredJobTitle'
 
-
-                if block['DataType'] in ["CandidateAvailableFrom", "CandidateAvailableTo", "CandidateAvailability"]:
-
-                    block['DataType'] = 'CandidateAvailability'
-                    block['Content'].pop('keywords', None)
-                    block['Content'].pop('answers', None)
-                    block['Content']["type"] = 'Multiple'
-
-                    block['Type'] = 'Date Picker'
-
-                if block['DataType'] in ["ClientAvailability"]:
-
-                    block['Content'].pop('keywords', None)
-                    block['Content'].pop('answers', None)
-                    block['Content']["type"] = 'Multiple'
-
-                    block['Type'] = 'Date Picker'
-
-
-                if block['DataType'] in ["JobStartDate", "JobEndDate"]:
-                    block['Content'].pop('keywords', None)
-                    block['Content'].pop('answers', None)
-                    block['Content']["type"] = 'Multiple'
-
-                    block['Type'] = 'Date Picker'
-
-
-                if block['DataType'] in ["CandidateAnnualDesiredSalary"]:
-                    block['DataType'] = 'CandidateDesiredSalary'
-                    block['Content'].pop('keywords', None)
-                    block['Content'].pop('answers', None)
-                    block['Content']["min"] = 15000
-                    block['Content']["max"] = 200000
-                    block['Content']["period"] = 'Annually'
-                    block['Content']["currency"] = 'GBP'
-
-                    block['Type'] = 'Salary Picker'
-
-
-                if block['DataType'] in ["CandidateDailyDesiredSalary"]:
-                    block['DataType'] = 'CandidateDesiredSalary'
-                    block['Content'].pop('keywords', None)
-                    block['Content'].pop('answers', None)
-                    block['Content']["min"] = 100
-                    block['Content']["max"] = 800
-                    block['Content']["period"] = 'Daily'
-                    block['Content']["currency"] = 'GBP'
-
-                    block['Type'] = 'Salary Picker'
-
-
-                if block['DataType'] in ["CandidateJobTitle"]:
-                    block['DataType'] = 'JobTitle'
-
-
-                if block['DataType'] in ["JobAnnualSalary"]:
-                    block['DataType'] = 'JobSalary'
-                    block['Content'].pop('keywords', None)
-                    block['Content'].pop('answers', None)
-                    block['Content']["min"] = 15000
-                    block['Content']["max"] = 200000
-                    block['Content']["period"] = 'Annually'
-                    block['Content']["currency"] = 'GBP'
-
-                    block['Type'] = 'Salary Picker'
-
-
-                if block['DataType'] in ["JobDayRate"]:
-                    block['DataType'] = 'JobSalary'
-                    block['Content'].pop('keywords', None)
-                    block['Content'].pop('answers', None)
-                    block['Content']["min"] = 100
-                    block['Content']["max"] = 800
-                    block['Content']["period"] = 'Daily'
-                    block['Content']["currency"] = 'GBP'
-
-                    block['Type'] = 'Salary Picker'
-
-
-
-
-                if block['Type'] == enums.BlockType.Question.value:
-                    for answer in block['Content']['answers']:
-                        answer['score'] = math.floor(answer['score'] / 2) if answer['score'] > 5  else answer['score']
-
-
-                if block['DataType'] in ["JobType"] and block['Type'] == enums.BlockType.Question.value:
-
-                    newBlock = {
-                        "Type": "Job Type",
-                        "StoreInDB": block['StoreInDB'],
-                        "DataType": "JobType",
-                        "Skippable": block['Skippable'],
-                        "SkipText": block['SkipText'],
-                        "SkipAction": block['SkipAction'],
-                        "SkipBlockToGoID": block['SkipBlockToGoID'],
-                        "Content": {
-                            "text": block['Content']['text'],
-                            "types": []
-                        },
-                        "ID": block['ID']
-                    }
-
-                    for answer in block['Content']['answers']:
-                        value = enums.JobType.Permanent.value
-                        value = enums.JobType.Contract.value if answer['text'].strip().lower() in ['contract'] else value
-                        value = enums.JobType.Temporary.value if answer['text'].strip().lower() in ['temporary', 'temp'] else value
-
-                        newBlock['Content']['types'].append(
-                            {
-                                "value": value,
-                                "text": answer['text'],
-                                "score": math.floor(answer['score'] / 2) if answer['score'] > 5  else answer['score'],
-                                "blockToGoID": answer['blockToGoID'],
-                                "action": answer['action'],
-                                "afterMessage": answer['afterMessage']
-                            }
-                        )
-
-                    group['blocks'][i] = newBlock
-
-
-                if block['Type'] == enums.BlockType.Question.value and block['Content']['text'].strip().lower() == 'what best describes you?':
-
-                    newBlock = {
-                        "Type": "User Type",
-                        "StoreInDB": block['StoreInDB'],
-                        "DataType": "UserType",
-                        "Skippable": block['Skippable'],
-                        "SkipText": block['SkipText'],
-                        "SkipAction": block['SkipAction'],
-                        "SkipBlockToGoID": block['SkipBlockToGoID'],
-                        "Content": {
-                            "text": block['Content']['text'],
-                            "types": []
-                        },
-                        "ID": block['ID']
-                    }
-
-                    for answer in block['Content']['answers']:
-                        value = enums.UserType.Candidate.value
-                        value = enums.UserType.Client.value if answer['text'].strip().lower() in ['client', 'employer', 'looking for staff', 'looking to hire top talent'] else value
-
-                        newBlock['Content']['types'].append(
-                            {
-                                "value": value,
-                                "text": answer['text'],
-                                "score": math.floor(answer['score'] / 2) if answer['score'] > 5  else answer['score'],
-                                "blockToGoID": answer['blockToGoID'],
-                                "action": answer['action'],
-                                "afterMessage": answer['afterMessage']
-                            }
-                        )
-                    group['blocks'][i] = newBlock
-
-
+                # mass updates
                 if block['Type'] == enums.BlockType.Question.value:
                     pass
 
                 if block['Type'] == enums.BlockType.UserInput.value:
-                    if not 'keywords' in block['Content']:
-                        block['Content']['keywords'] = []
+                    pass
 
                 if block['Type'] == enums.BlockType.Solutions.value:
                     pass
@@ -379,13 +222,34 @@ def __migrateFlow(flow, assistantID=None):
         # validate whole flow then update
         validate(newFlow, json_schemas.flow)
 
-        if(assistantID == 51):
-            # print(newFlow)
-            pass
-
         return newFlow
 
     except Exception as exc:
         print(exc)
         print("Flow migration failed :(")
+        return None
+
+def migrateShortenedURLs():
+    try:
+        for dbURL in db.session.query(ShortenedURL).all():
+            url = dbURL.URL
+            urlSplit = url.split('source=')
+            key = urlSplit[1]
+            after = helpers.verificationSigner.loads(key, salt='crm-information')
+
+            # update
+            newKey = helpers.verificationSigner.dumps({"candidateID": after['candidateID'], "source": after['source'], "sourceID": after['crmID']}, salt='chatbot')
+            newUrl = "{}candidate={}".format(urlSplit[0], newKey)
+            r = helpers.verificationSigner.loads(newKey, salt='chatbot') # validate
+            dbURL.URL = newUrl
+
+
+        # Save all changes
+        db.session.commit()
+        print("URLs migration done successfully :)")
+
+    except Exception as exc:
+        print(exc.args)
+        db.session.rollback()
+        print("migrateShortenedURLs failed :(")
         return None

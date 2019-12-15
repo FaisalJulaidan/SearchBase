@@ -15,6 +15,31 @@ function* fetchMarketplace() {
     }
 }
 
+function* fetchMarketplaceItem({marketplaceType}) {
+    try {
+        const res = yield http.get(`/marketplace/${marketplaceType}/fetch`);
+        yield put(marketplaceActions.fetchMarketplaceItemSuccess(res.data.data));
+    } catch (error) {
+        const msg = error.response?.data?.msg || "Couldn't fetch marketplace item";
+        console.error(msg);
+        // errorMessage(msg);
+        yield put(marketplaceActions.fetchMarketplaceItemFailure());
+    }
+}
+
+function* saveMarketplaceItem({marketplaceType, CRMAutoPilotID}) {
+    try {
+        const res = yield http.post(`/marketplace/${marketplaceType}/save`, {CRMAutoPilotID});
+        successMessage(`Saved settings succesfully`);
+        yield put(marketplaceActions.saveMarketplaceItemSuccess(res.data.data));
+    } catch (error) {
+        const msg = error.response?.data?.msg || "Couldn't save marketplace item";
+        errorMessage(msg);
+        yield put(marketplaceActions.saveMarketplaceItemFailure());
+    }
+}
+
+
 function* pingMarketplace({marketplaceType, meta}) {
     try {
         const res = yield http.get(`/marketplace/${marketplaceType}`);
@@ -71,6 +96,14 @@ function* watchFetchMarketplace() {
     yield takeEvery(actionTypes.FETCH_MARKETPLACE_REQUEST, fetchMarketplace)
 }
 
+function* watchSaveMarketplaceItem(){
+    yield takeEvery(actionTypes.SAVE_MARKETPLACE_ITEM_REQUEST, saveMarketplaceItem)
+}
+
+function* watchFetchItemMarketplace() {
+    yield takeEvery(actionTypes.FETCH_MARKETPLACE_ITEM_REQUEST, fetchMarketplaceItem)
+}
+
 function* watchConnectMarketplace() {
     yield takeEvery(actionTypes.CONNECT_MARKETPLACE_REQUEST, connectMarketplace)
 }
@@ -90,7 +123,8 @@ export function* marketplaceSaga() {
         watchFetchMarketplace(),
         watchConnectMarketplace(),
         watchDisconnectMarketplace(),
-
+        watchSaveMarketplaceItem(),
+        watchFetchItemMarketplace(),
         watchExportRecruiterValueReport()
 
     ])

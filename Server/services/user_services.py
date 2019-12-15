@@ -76,6 +76,7 @@ def getByIDAndCompanyID(userID, companyID) -> Callback:
         db.session.rollback()
         return Callback(False, 'Users could not be retrieved.')
 
+
 def getAllByCompanyID(companyID) -> Callback:
     try:
         # Get result and check if None then raise exception
@@ -145,6 +146,30 @@ def getProfile(userID):
         helpers.logError("user_services.getProfile(): " + str(exc))
         db.session.rollback()
         return Callback(False, 'User settings for this user does not exist.')
+
+
+def getOwnersOfAssistants(assistants) -> Callback:
+    try:
+        if not assistants:
+            raise Exception
+
+        for assistant in assistants:
+            result = db.session.query(User)\
+                .filter(User.ID == assistant["OwnerID"]).first()
+
+            assistant.pop("OwnerID", None)
+            if not result:
+                assistant["Owners"] = []
+                continue
+
+            assistant["Owners"] = [{"id": result.ID, "name": result.Firstname + " " + result.Surname}]
+
+        return Callback(True, "Got all assistants  successfully.", assistants)
+
+    except Exception as exc:
+        db.session.rollback()
+        helpers.logError("assistant_services.getAll(): " + str(exc))
+        return Callback(False, 'Could not get the owners.')
 
 
 # ----- Updaters ----- #

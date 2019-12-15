@@ -1,6 +1,9 @@
 from models import db, MagicJSON
+# from schemas.Webhook import owners_table
 from .Appointment import Appointment
 from .Conversation import Conversation
+
+
 class Assistant(db.Model):
 
     @property
@@ -27,7 +30,7 @@ class Assistant(db.Model):
     Company = db.relationship('Company', back_populates='Assistants')
 
     CRMID = db.Column(db.Integer, db.ForeignKey('CRM.ID', ondelete='SET NULL'))
-    CRM = db.relationship('CRM', back_populates='Assistants')
+    CRM = db.relationship('CRM', back_populates='Assistants', foreign_keys=[CRMID])
 
     CalendarID = db.Column(db.Integer, db.ForeignKey('calendar.ID', ondelete='SET NULL'))
     Calendar = db.relationship('Calendar', back_populates='Assistants')
@@ -40,10 +43,17 @@ class Assistant(db.Model):
 
     StoredFileID = db.Column(db.Integer, db.ForeignKey('stored_file.ID', ondelete='SET NULL'), nullable=True)
     StoredFile = db.relationship('StoredFile', order_by="desc(StoredFile.ID)")
+
+    UserID = db.Column(db.Integer, db.ForeignKey('user.ID', ondelete='SET NULL'))
+    User = db.relationship('User', back_populates='Assistants')
     #  - Many to one
     Conversations = db.relationship('Conversation', back_populates='Assistant')
 
     Campaigns = db.relationship('Campaign', back_populates='Assistant')
+    
+    CRMAutoPilots = db.relationship('CRMAutoPilot', back_populates='ReferralAssistant')
+
+    # Users = db.relationship("Parent", secondary=owners_table, back_populates="Assistants")
 
     # Constraints:
     # cannot have two assistants with the same name under one company

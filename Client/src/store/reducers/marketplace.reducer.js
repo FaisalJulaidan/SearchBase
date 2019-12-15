@@ -1,14 +1,16 @@
 import * as actionTypes from '../actions/actionTypes';
-import {updateObject} from '../utility';
+import { updateObject } from '../utility';
 
 const initialState = {
     marketplaceItems: null,
 
     connectionStatus: 'NOT_CONNECTED',
+    activeItem: {},
 
     isPinging: false,
     isDisconnecting: false,
     isConnecting: false,
+    isLoading: false,
 
     errorMsg: null
 };
@@ -30,11 +32,40 @@ export const marketplace = (state = initialState, action) => {
                 marketplaceItems: null
             });
 
+        case actionTypes.FETCH_MARKETPLACE_ITEM_REQUEST:
+            return updateObject(state, { isLoading: true });
+        case actionTypes.FETCH_MARKETPLACE_ITEM_SUCCESS:
+            return updateObject(state, {
+                activeItem: action.activeItem,
+                isLoading: false
+            });
+        case actionTypes.FETCH_MARKETPLACE_ITEM_FAILURE:
+            return updateObject(state, {
+                marketplaceItems: null,
+                isLoading: false
+            });
+
+        // Save marketplace
+        case actionTypes.SAVE_MARKETPLACE_ITEM_REQUEST:
+            return updateObject(state, {
+                isLoading: true
+            });
+
+        case actionTypes.SAVE_MARKETPLACE_ITEM_SUCCESS:
+            return updateObject(state, {
+                isLoading: true,
+                activeItem: action.activeItem
+            });
+
+        case actionTypes.SAVE_MARKETPLACE_ITEM_FAILURE:
+            return updateObject(state, {
+                isLoading: false
+            });
         // PING MARKETPLACE
         case actionTypes.PING_MARKETPLACE_REQUEST:
             return updateObject(state, {
                 isPinging: true,
-                isDisconnecting: false,
+                isDisconnecting: false
             });
         case actionTypes.PING_MARKETPLACE_SUCCESS:
             return updateObject(state, {
@@ -50,12 +81,12 @@ export const marketplace = (state = initialState, action) => {
         // DISCONNECT MARKETPLACE
         case actionTypes.DISCONNECT_MARKETPLACE_REQUEST:
             return updateObject(state, {
-                isDisconnecting: true,
+                isDisconnecting: true
             });
         case actionTypes.DISCONNECT_MARKETPLACE_SUCCESS:
             return updateObject(state, {
-                connectionStatus: "NOT_CONNECTED",
-                isDisconnecting: false,
+                connectionStatus: 'NOT_CONNECTED',
+                isDisconnecting: false
             });
         case actionTypes.DISCONNECT_MARKETPLACE_FAILURE:
             return updateObject(state, {
@@ -67,12 +98,12 @@ export const marketplace = (state = initialState, action) => {
         case actionTypes.CONNECT_MARKETPLACE_REQUEST:
             return updateObject(state, {
                 isConnecting: true,
-                isDisconnecting: false,
+                isDisconnecting: false
             });
         case actionTypes.CONNECT_MARKETPLACE_SUCCESS:
             return updateObject(state, {
-                connectionStatus: "CONNECTED",
-                isConnecting: false,
+                connectionStatus: 'CONNECTED',
+                isConnecting: false
             });
         case actionTypes.CONNECT_MARKETPLACE_FAILURE:
             return updateObject(state, {
@@ -83,10 +114,10 @@ export const marketplace = (state = initialState, action) => {
         // EXPORT RECRUITER VALUE CRM
         case actionTypes.EXPORT_RECRUITER_VALUE_REPORT_REQUEST:
             return updateObject(state, {
-                errorMsg: null,
+                errorMsg: null
             });
         case actionTypes.EXPORT_RECRUITER_VALUE_REPORT_SUCCESS:
-            tState = {...state};
+            tState = { ...state };
             return updateObject(state, {
                 exportData: action.exportData
             });
@@ -96,6 +127,6 @@ export const marketplace = (state = initialState, action) => {
             });
 
         default:
-            return state
+            return state;
     }
 };

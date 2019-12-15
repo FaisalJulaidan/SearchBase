@@ -101,7 +101,7 @@ export const Chatbot = ({
                   localStorage.setItem('TSB_CHATBOT_USED', JSON.stringify({exp: moment().add(1, 'days').unix()}));
                   return false
                 }
-                
+
             }
         };
 
@@ -110,7 +110,7 @@ export const Chatbot = ({
             setChatbotStatus({ open: true });
         }
 
-        if (assistant && !hasBeenUsed()) {
+        if (assistant && !hasBeenUsed() && active) {
             const { SecondsUntilPopup } = assistant;
             if (SecondsUntilPopup === 0) return;
             setTimeout(() => {

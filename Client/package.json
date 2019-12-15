@@ -79,6 +79,7 @@
     "react-easy-crop": "^1.12.0",
     "react-email-share-link": "^1.0.3",
     "react-ga": "^2.6.0",
+    "react-highlight-words": "^0.16.0",
     "react-json-view": "^1.19.1",
     "react-linkify": "^1.0.0-alpha",
     "react-odometerjs": "^2.1.1",

@@ -102,7 +102,7 @@ def AccessCampaignsRequired(func):
 
         company: Company = callback.Data
 
-        if company.AccessAssistants:
+        if company.AccessCampaigns:
             return func(*args, **kwargs)
         else:
             return helpers.jsonResponse(False, 401, "Campaigns not included in plan", None)

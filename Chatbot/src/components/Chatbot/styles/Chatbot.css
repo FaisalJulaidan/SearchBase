@@ -40,6 +40,14 @@
     color: white;
 }
 
+.Header button.ant-btn {
+    line-height: 0 !important;
+}
+
+.Header button.ant-btn > i {
+    line-height: 0 !important;
+}
+
 .ant-card-actions > li > span {
     cursor: move;
 }

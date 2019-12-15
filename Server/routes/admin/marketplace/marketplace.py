@@ -6,7 +6,7 @@ from services.Marketplace import marketplace_helpers
 from services.Marketplace.CRM import crm_services
 from services.Marketplace.Messenger import messenger_servicess
 from services.Marketplace.Calendar import Google, calendar_services
-from utilities import helpers, wrappers
+from utilities import helpers, wrappers, enums
 
 marketplace_router: Blueprint = Blueprint('marketplace_router', __name__, template_folder="../../templates")
 
@@ -66,13 +66,39 @@ def crm(type):
             return helpers.jsonResponse(False, 400, callback.Message)
         return helpers.jsonResponse(True, 200, callback.Message, callback.Data)
 
-
     # Get and test the connection before return
     if request.method == "DELETE":
         callback: Callback = marketplace_helpers.disconnect(type, user.get("companyID"))
         if not callback.Success:
             return helpers.jsonResponse(False, 400, callback.Message)
         return helpers.jsonResponse(True, 200, callback.Message)
+
+
+@marketplace_router.route("/marketplace/<type>/fetch", methods=["GET"])
+@jwt_required
+def crm_fetch(type):
+    # Authenticate
+    user = get_jwt_identity()['user']
+
+    if request.method == "GET":
+        callback: Callback = marketplace_helpers.getCRMByType(type, user.get("companyID"))
+        if not callback.Success:
+            return helpers.jsonResponse(False, 400, callback.Message)
+        return helpers.jsonResponse(True, 200, callback.Message, helpers.getDictFromSQLAlchemyObj(callback.Data))
+
+
+@marketplace_router.route("/marketplace/<type>/save", methods=["POST"])
+@jwt_required
+def crm_save(type):
+    # Authenticate
+    user = get_jwt_identity()['user']
+
+    data = request.json
+    print(data)
+    callback: Callback = crm_services.updateAutopilotConnection(type, data.get("CRMAutoPilotID"), user.get("companyID"))
+    if not callback.Success:
+        return helpers.jsonResponse(False, 400, callback.Message)
+    return helpers.jsonResponse(True, 200, callback.Message, helpers.getDictFromSQLAlchemyObj(callback.Data))
 
 
 @marketplace_router.route("/crm/recruiter_value_report", methods=['POST'])

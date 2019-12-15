@@ -56,6 +56,7 @@ export const dataHandler = (() => {
                     cancelToken: source.token
                 })
             );
+
             const solutions = data ? data.data.data : []; // :) // lol faisal 🔫
             if (axios.isCancel(error)) {
                 console.log('cancelled');
@@ -64,6 +65,7 @@ export const dataHandler = (() => {
             if (error) {
                 console.log('fetchSolutions: ', error);
             }
+
             // Check the userTypes associated with the solutions and record them
             fetchedSolutions = fetchedSolutions.concat(solutions);
             resolve.solutions = solutions;
@@ -83,29 +85,20 @@ export const dataHandler = (() => {
             const cancel = {
                 cancelToken: source.token
             };
-            // CHECK IF UPDATING CANDIDATE
 
-            console.log(window.location.href);
-            console.log(window.location.href.includes('chatbot_direct_link'));
+            // Check if chatbot sent directly to specific candidate for update (e.g. sent through campaign)
             if (window.location.href.includes('chatbot_direct_link')) {
-                let allowedKeys = ['source', 'source_id', 'id'];
                 let params = queryString.parse(window.location.search);
-                let crmInformation = {};
-                for (let key in params) {
-                    if (allowedKeys.includes(key)) {
-                        crmInformation[key] = params[key];
-                    }
-                }
-                console.log('CRM INFO: ', crmInformation);
-                if (Object.keys(crmInformation).length !== 0) {
-                    result['crmInformation'] = crmInformation;
+                if(params['candidate']) {
+                    result['candidateInfo'] = params['candidate'];
                 }
             }
 
-            const files = result.submittedFiles;
-
+            // Process uploaded files and append it to the request via fromData
             const formData = new FormData();
             const config = { headers: { 'content-type': 'multipart/form-data' }, ...cancel };
+            const files = result.submittedFiles;
+
             files.forEach(file => formData.append('file', file.file, file.file.name));
             formData.append('keys', files.map(file => file.key).join(','));
             formData.append('conversation', JSON.stringify(result));
@@ -113,24 +106,18 @@ export const dataHandler = (() => {
             const { data, error } = await promiseWrapper(axios.post(`${getServerDomain()}/api/assistant/${assistantID}/chatbot`, formData, config));
 
             if (axios.isCancel(error)) {
-                console.log('cancelled');
+                console.log('axios cancelled');
                 cancelled = true;
             }
             if (error) {
                 console.log('SendData: ', error);
-                // filesSentFailed = true;
             }
 
-            console.log('sending files...');
-            // send files to server
-            let filesSentFailed = false;
-
-
-            return { dataSent: !!sessionID, filesSent: !filesSentFailed, cancelled };
+            return { dataSent: !!sessionID, cancelled };
         };
 
         const processMessages = (completed) => {
-            let userType = "Unknown";
+            let userType = 'Unknown';
             let collectedData = [];
             let collectedKeywords = [];
             let keywordsByDataType = {};
@@ -241,7 +228,7 @@ export const dataHandler = (() => {
 
                 // if the question type is UserType and not skipped, set the UserType
                 if (blockRef[flowAttributes.TYPE] === messageTypes.USER_TYPE && !content.skipped) {
-                    userType = answer
+                    userType = answer;
                 }
 
                 // Adds the answer text as part of the keywords list
@@ -365,6 +352,7 @@ export const dataHandler = (() => {
                     email = personalData.ClientEmail;
                     phone = personalData.ClientTelephone;
                 }
+
                 return {
                     collectedData: collectedData,
                     keywords: collectedKeywords,

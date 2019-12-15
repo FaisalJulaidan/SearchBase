@@ -9,7 +9,7 @@ from werkzeug.utils import secure_filename
 
 from config import BaseConfig
 from models import db, Assistant, Callback, AutoPilot, AppointmentAllocationTime, StoredFileInfo, StoredFile
-from services import auto_pilot_services, flow_services, stored_file_services
+from services import auto_pilot_services, flow_services, stored_file_services, user_services
 from services.Marketplace.CRM import crm_services
 from services.Marketplace.Calendar import calendar_services
 from services.Marketplace.Messenger import messenger_servicess
@@ -19,12 +19,15 @@ from utilities import helpers, json_schemas, enums
 def create(name, desc, welcomeMessage, topBarText, flow, template, companyID) -> Assistant or None:
     try:
         # if there is already a flow then ignore creating from template
-        if not flow and template and template != 'none':
+        if template and template != 'null':
             # Get json template
             relative_path = join('static/assistant_templates', template + '.json')
             absolute_path = join(BaseConfig.APP_ROOT, relative_path)
             flow = json.load(open(absolute_path))
-            # Validate template
+
+
+        # Validate flow
+        if flow:
             callback: Callback = flow_services.isValidFlow(flow)
             if not callback.Success:
                 raise Exception(callback.Message)
@@ -115,9 +118,9 @@ def getAll(companyID) -> Callback:
                                   Assistant.Description,
                                   Assistant.Message,
                                   Assistant.TopBarText,
-                                  Assistant.Active)\
+                                  Assistant.Active,
+                                  Assistant.UserID)\
             .filter(Assistant.CompanyID == companyID).all()
-
         if len(result) == 0:
             return Callback(True, "No assistants  to be retrieved.", [])
 
@@ -125,7 +128,7 @@ def getAll(companyID) -> Callback:
 
     except Exception as exc:
         db.session.rollback()
-        helpers.logError("assistant_services.getAll(): " + str(exc))
+        # helpers.logError("assistant_services.getAll(): " + str(exc))
         return Callback(False, 'Could not get all assistants.')
 
 
@@ -212,8 +215,13 @@ def update(id, name, desc, message, topBarText, companyID) -> Callback:
                         "Couldn't update assistant " + str(id))
 
 
-def updateConfigs(id, name, desc, message, topBarText, secondsUntilPopup, notifyEvery, config, companyID) -> Callback:
+def updateConfigs(id, name, desc, message, topBarText, secondsUntilPopup, notifyEvery, config, ownerID, companyID) -> Callback:
     try:
+
+        # Check if owner/user belongs to the company
+        if ownerID and not user_services.getByIDAndCompanyID(ownerID, companyID).Success:
+            raise Exception("User does not exist")
+
         # Validate the json config
         validate(config, json_schemas.assistant_config)
 
@@ -228,10 +236,10 @@ def updateConfigs(id, name, desc, message, topBarText, secondsUntilPopup, notify
         assistant.SecondsUntilPopup = secondsUntilPopup
         assistant.NotifyEvery = None if notifyEvery == "null" else int(notifyEvery)
         assistant.Config = config
+        assistant.UserID = ownerID
 
         if not assistant.LastNotificationDate and notifyEvery != "null":
             assistant.LastNotificationDate = datetime.now()
-
 
         db.session.commit()
         return Callback(True, name + ' Updated Successfully', assistant)
@@ -239,8 +247,7 @@ def updateConfigs(id, name, desc, message, topBarText, secondsUntilPopup, notify
     except Exception as exc:
         db.session.rollback()
         helpers.logError("assistant_services.update(): " + str(exc))
-        return Callback(False,
-                        "Couldn't update assistant " + str(id))
+        return Callback(False, "Couldn't update assistant ")
 
 
 def updateStatus(assistantID, newStatus, companyID):
@@ -257,6 +264,24 @@ def updateStatus(assistantID, newStatus, companyID):
         helpers.logError("assistant_services.changeStatus(): " + str(exc))
         db.session.rollback()
         return Callback(False, "Could not change the assistant's status.")
+
+
+def updateContacts(contacts, assistantID, companyID):
+    try:
+        if not contacts:
+            db.session.query(Assistant).filter(and_(Assistant.ID == assistantID, Assistant.CompanyID == companyID)) \
+                .update({"User": None})
+
+        db.session.query(Assistant).filter(and_(Assistant.ID == assistantID, Assistant.CompanyID == companyID)) \
+            .update({"User": contacts[0]})
+
+        db.session.commit()
+        return Callback(True, 'Assistant contacts have been changed.')
+
+    except Exception as exc:
+        helpers.logError("assistant_services.updateContacts(): " + str(exc))
+        db.session.rollback()
+        return Callback(False, "Could not change the assistant's contacts.")
 
 
 # ----- Deletion ----- #

@@ -10,6 +10,7 @@ import {
     assistantSaga,
     authSaga,
     autoPilotSaga,
+    CRMAutoPilotSaga,
     conversationSaga,
     marketplaceSaga,
     databaseSaga,
@@ -50,6 +51,7 @@ sagaMiddleware.run(databaseSaga);
 sagaMiddleware.run(optionsSaga);
 sagaMiddleware.run(marketplaceSaga);
 sagaMiddleware.run(autoPilotSaga);
+sagaMiddleware.run(CRMAutoPilotSaga);
 sagaMiddleware.run(analyticsSaga);
 sagaMiddleware.run(appointmentsPickerSaga);
 sagaMiddleware.run(appointmentSaga);

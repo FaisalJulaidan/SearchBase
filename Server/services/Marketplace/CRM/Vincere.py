@@ -367,7 +367,7 @@ def searchCandidates(auth, companyID, data) -> Callback:
     try:
         query = "q="
 
-        fields = "fl=id,name,primary_email,mobile,phone,nearest_train_station,skill,skills,desired_salary,currency,deleted,last_update,met_status"
+        fields = "fl=id,name,primary_email,mobile,phone,nearest_train_station,skill,desired_salary,currency,deleted,last_update,met_status"
 
         # populate filter
         query += populateFilter(data.get("location"), "current_city")
@@ -397,7 +397,6 @@ def searchCandidates(auth, companyID, data) -> Callback:
             query = ",".join(query.split(",")[:-1]) + "%23"
 
         result = []
-        helpers.logError("RECORDS: " + str(return_body["result"]["items"]))
         for record in return_body["result"]["items"]:
             result.append(__extractCandidateReturnData(record))
 
@@ -412,7 +411,7 @@ def searchPerfectCandidates(auth, companyID, data) -> Callback:
     try:
         query = "q="
 
-        fields = "fl=id,name,primary_email,mobile,phone,nearest_train_station,skills,desired_salary,currency,deleted,last_update,met_status"
+        fields = "fl=id,name,primary_email,mobile,phone,nearest_train_station,skill,desired_salary,currency,deleted,last_update,met_status"
 
         # populate filter
         query += populateFilter(data.get("location"), "current_city")
@@ -475,7 +474,6 @@ def searchPerfectCandidates(auth, companyID, data) -> Callback:
 
         result = []
         # TODO educations uses ids - need to retrieve them
-        helpers.logError("RECORDS: " + str(records))
         for record in records:
             result.append(__extractCandidateReturnData(record))
 
@@ -625,7 +623,7 @@ def __extractCandidateReturnData(record):
                                                    location=
                                                    record.get("nearest_train_station", "").replace(
                                                        "station", ""),
-                                                   skills=record.get("skills", "").split(","),  # str list
+                                                   skills=record.get("skill", "").split(","),  # str list
                                                    linkdinURL=None,
                                                    availability=record.get("status"),
                                                    currentJobTitle=None,

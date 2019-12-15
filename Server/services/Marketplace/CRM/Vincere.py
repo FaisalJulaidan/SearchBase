@@ -129,7 +129,6 @@ def sendQuery(auth, query, method, body, companyID, optionalParams=None):
 
         # test the Token (id_token)
         helpers.logError("Vincere url: " + url)
-        helpers.logError("Vincere headers: " + str(headers))
         r = marketplace_helpers.sendRequest(url, method, headers, json.dumps(body))
         helpers.logError("Vincere response text: " + r.text)
 
@@ -252,7 +251,7 @@ def insertClient(auth, data, companyID) -> Callback:
             raise Exception(insertCompany_callback.Message)
 
         insertClient_callback: Callback = insertClientContact(auth, data, companyID,
-                                                              insertCompany_callback.Data.get("changedEntityId"))
+                                                              insertCompany_callback.Data.get("id"))
         if not insertClient_callback.Success:
             raise Exception(insertClient_callback.Message)
 
@@ -339,6 +338,7 @@ def updateCandidate(auth, data, companyID) -> Callback:
 
 def __updateCandidateAdditionalData(auth, candidateID, body, companyID):
     try:
+        helpers.logError(str(body))
         # send location
         if body.get("address") or body.get("city"):
             sendQuery_callback: Callback = sendQuery(auth, "candidate/"+str(candidateID)+"/currentlocation", "put",

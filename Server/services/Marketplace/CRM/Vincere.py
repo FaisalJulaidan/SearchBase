@@ -189,7 +189,7 @@ def insertCandidate(auth, data, companyID) -> Callback:
         return_body = json.loads(sendQuery_callback.Data.text)  # {"id":0}
 
         # send location
-        sendQuery_callback: Callback = sendQuery(auth, "candidate/"+str(return_body["id"])+"currentlocaton", "post",
+        sendQuery_callback: Callback = sendQuery(auth, "candidate/"+str(return_body["id"])+"/currentlocation", "put",
                                                  body, companyID)
         if not sendQuery_callback.Success:
             raise Exception(sendQuery_callback.Message)
@@ -318,7 +318,13 @@ def updateCandidate(auth, data, companyID) -> Callback:
 
         # send query
         sendQuery_callback: Callback = sendQuery(auth, "candidate/" + str(data["id"]), "put", body, companyID)
+        if not sendQuery_callback.Success:
+            raise Exception(sendQuery_callback.Message)
+        return_body = json.loads(sendQuery_callback.Data.text)  # {"id":0}
 
+        # send location
+        sendQuery_callback: Callback = sendQuery(auth, "candidate/"+str(return_body["id"])+"/currentlocation", "put",
+                                                 body, companyID)
         if not sendQuery_callback.Success:
             raise Exception(sendQuery_callback.Message)
 

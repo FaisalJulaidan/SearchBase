@@ -313,8 +313,12 @@ def insertCompany(auth, data, companyID) -> Callback:
 
 def updateCandidate(auth, data, companyID) -> Callback:
     try:
-        # availability, yearsExperience
-        body = __extractCandidateInsertBody(data)
+        # retrieve old record
+        sendQuery_callback: Callback = sendQuery(auth, "candidate/" + str(data["id"]), "get", {}, companyID)
+        if not sendQuery_callback.Success:
+            raise Exception(sendQuery_callback.Message)
+
+        body = dict(json.loads(sendQuery_callback.Data.text), **__extractCandidateInsertBody(data))  # update old data
 
         # send query
         sendQuery_callback: Callback = sendQuery(auth, "candidate/" + str(data["id"]), "put", body, companyID)

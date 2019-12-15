@@ -7,7 +7,7 @@
                     protocol = _window$location.protocol,
                     port = _window$location.port,
                     hostname = _window$location.hostname;
-                return 'http://178.62.92.96' + src;
+                // return 'http://178.62.92.96' + src;
 
                 return 'https://www.thesearchbase.com' + src;
             };

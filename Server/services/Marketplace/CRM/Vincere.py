@@ -188,13 +188,13 @@ def insertCandidate(auth, data, companyID) -> Callback:
             raise Exception(sendQuery_callback.Message)
         return_body = json.loads(sendQuery_callback.Data.text)  # {"id":0}
 
-        # send location
-        sendQuery_callback: Callback = sendQuery(auth, "candidate/"+str(return_body["id"])+"/currentlocation", "put",
-                                                 body, companyID)
-        if not sendQuery_callback.Success:
-            raise Exception(sendQuery_callback.Message)
+        # send additional data
+        sendAdditionalQuery_callback: Callback = __updateCandidateAdditionalData(auth, str(return_body["id"]), body,
+                                                                                 companyID)
+        if not sendAdditionalQuery_callback.Success:
+            raise Exception(sendAdditionalQuery_callback.Message)
 
-        return Callback(True, sendQuery_callback.Data.text)
+        return Callback(True, sendAdditionalQuery_callback.Data.text)
 
     except Exception as exc:
         helpers.logError("CRM.Vincere.insertCandidate() ERROR: " + str(exc))
@@ -324,18 +324,39 @@ def updateCandidate(auth, data, companyID) -> Callback:
         sendQuery_callback: Callback = sendQuery(auth, "candidate/" + str(data["id"]), "put", body, companyID)
         if not sendQuery_callback.Success:
             raise Exception(sendQuery_callback.Message)
-        return_body = json.loads(sendQuery_callback.Data.text)  # {"id":0}
 
-        # send location
-        sendQuery_callback: Callback = sendQuery(auth, "candidate/"+str(return_body["id"])+"/currentlocation", "put",
-                                                 body, companyID)
-        if not sendQuery_callback.Success:
-            raise Exception(sendQuery_callback.Message)
+        # send additional data
+        sendAdditionalQuery_callback: Callback = __updateCandidateAdditionalData(auth, str(data["id"]), body, companyID)
+        if not sendAdditionalQuery_callback.Success:
+            raise Exception(sendAdditionalQuery_callback.Message)
 
-        return Callback(True, sendQuery_callback.Data.text)
+        return Callback(True, sendAdditionalQuery_callback.Data.text)
 
     except Exception as exc:
         helpers.logError("CRM.Vincere.updateCandidate() ERROR: " + str(exc))
+        return Callback(False, str(exc))
+
+
+def __updateCandidateAdditionalData(auth, candidateID, body, companyID):
+    try:
+        # send location
+        if body.get("address") or body.get("city"):
+            sendQuery_callback: Callback = sendQuery(auth, "candidate/"+str(candidateID)+"/currentlocation", "put",
+                                                     body, companyID)
+            if not sendQuery_callback.Success:
+                raise Exception(sendQuery_callback.Message)
+
+        # send current job
+        if body.get("job_title"):
+            sendQuery_callback: Callback = sendQuery(auth, "candidate/"+str(candidateID)+"/workexperiences", "put",
+                                                     body, companyID)
+            if not sendQuery_callback.Success:
+                raise Exception(sendQuery_callback.Message)
+
+        return Callback(True, "Update Success")
+
+    except Exception as exc:
+        helpers.logError("CRM.Vincere.__updateCandidateAdditionalData() ERROR: " + str(exc))
         return Callback(False, str(exc))
 
 
@@ -562,12 +583,18 @@ def __extractCandidateInsertBody(data):
         "location_name": data.get("city"),
         "post_code": data.get("postCode"),
         "country": data.get("country"),
+
         "registration_date": datetime.datetime.now().isoformat()[:23] + "Z",
+
         "email": data.get("email"),
         "skills": data.get("skills"),
         "education_summary": data.get("educations"),
+
+        "job_title": data.get("currentJobTitle"),
+        "current_employer": True,
         "desired_salary": data.get("annualSalary"),
         "desired_contract_rate": data.get("dayRate"),
+
         "experience": str(data.get("yearsExperience")) + " years of experience",
         "availability_start": datetime.datetime.strptime(data.get("availability", "").split(" ")[0],
                                                          '%d/%m/%Y').isoformat()[:23] + ".000Z",

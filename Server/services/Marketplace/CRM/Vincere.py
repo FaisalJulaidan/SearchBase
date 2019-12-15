@@ -1,4 +1,5 @@
 import base64
+import copy
 import datetime
 import json
 import os
@@ -348,8 +349,10 @@ def __updateCandidateAdditionalData(auth, candidateID, body, companyID):
 
         # send current job
         if body.get("job_title"):
+            tempBody = copy.deepcopy(body)
+            tempBody["address"] = None
             sendQuery_callback: Callback = sendQuery(auth, "candidate/"+str(candidateID)+"/workexperiences", "post",
-                                                     body, companyID)
+                                                     tempBody, companyID)
             if not sendQuery_callback.Success:
                 raise Exception(sendQuery_callback.Message)
 

@@ -103,7 +103,6 @@ def processConversation(assistantHashID, data: dict) -> Callback:
                 conversation.CRMSynced = crm_callback.Success
                 conversation.CRMResponse = crm_callback.Message
 
-
         # Notify company about the new chatbot session only if set as immediate -> NotifyEvery=0
         if assistant.NotifyEvery == 0:
             callback_mail: Callback = mail_services.notifyNewConversations(assistant, [conversation], None)

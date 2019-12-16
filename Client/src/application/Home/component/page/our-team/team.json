@@ -42,28 +42,16 @@
     "desc": ""
   },
   {
-    "name": "Abdullah Hashim",
-    "title": "Senior Front-End Developer",
-    "img": "/images/home/team/abdullah.jpg",
-    "desc": "The best cook in the team. College of Yanbu"
-  },
-  {
-    "name": "Batu Ellery",
-    "title": "Senior Backend-End Developer",
-    "img": "/images/home/team/batu.svg",
-    "desc": "Watches series whilst writing intense code and still manages to do a good job. Cardiff University "
-  },
-  {
     "name": "Shayan Khaksar",
     "title": "Senior Front-End Developer",
     "img": "/images/home/team/shayan.jpg",
     "desc": "The most enthusiastic and passionate designer in the world. Spotify playlist is full of John Lennon. UCL"
   },
   {
-    "name": "Benedict Utlley",
-    "title": "Back-End Developer",
-    "img": "/images/home/team/ben.svg",
-    "desc": "Silent Assassin. Writes the best code and enjoys watching everyone else gaze at it. Cardiff University "
+    "name": "Abdullah Hashim",
+    "title": "Senior Front-End Developer",
+    "img": "/images/home/team/abdullah.jpg",
+    "desc": "The best cook in the team. College of Yanbu"
   },
   {
     "name": "Saber Malekzadeh",

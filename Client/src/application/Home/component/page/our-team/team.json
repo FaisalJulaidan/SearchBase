@@ -2,13 +2,13 @@
   {
     "name": "Mehdi Este",
     "title": "CEO",
-    "img": "/static/images/home/team/meh.jpg",
+    "img": "/images/home/team/meh.jpg",
     "desc": "Massive F1 fan and always scrolling through Autotrader. Cardiff University"
   },
   {
     "name": "Spencer Symmons",
     "title": "COO",
-    "img": "/static/images/home/team/spencer.png",
+    "img": "/images/home/team/spencer.png",
     "desc": "Massive Tennis fan, RDLC Pirate ☠️ , 22 years of Recruitment experience"
   },
   {
@@ -32,55 +32,55 @@
   {
     "name": "Jan-Paul Boos",
     "title": "Board Advisor",
-    "img": "/static/images/home/team/jan.jpg",
+    "img": "/images/home/team/jan.jpg",
     "desc": ""
   },
   {
     "name": "Gareth Morris",
     "title": "Board Advisor",
-    "img": "/static/images/home/team/gareth-morris.jpg",
+    "img": "/images/home/team/gareth-morris.jpg",
     "desc": ""
   },
   {
     "name": "Abdullah Hashim",
     "title": "Senior Front-End Developer",
-    "img": "/static/images/home/team/abdullah.jpg",
+    "img": "/images/home/team/abdullah.jpg",
     "desc": "The best cook in the team. College of Yanbu"
   },
   {
     "name": "Batu Ellery",
     "title": "Senior Backend-End Developer",
-    "img": "/static/images/home/team/batu.svg",
+    "img": "/images/home/team/batu.svg",
     "desc": "Watches series whilst writing intense code and still manages to do a good job. Cardiff University "
   },
   {
     "name": "Shayan Khaksar",
     "title": "Senior Front-End Developer",
-    "img": "/static/images/home/team/shayan.jpg",
+    "img": "/images/home/team/shayan.jpg",
     "desc": "The most enthusiastic and passionate designer in the world. Spotify playlist is full of John Lennon. UCL"
   },
   {
     "name": "Benedict Utlley",
     "title": "Back-End Developer",
-    "img": "/static/images/home/team/ben.svg",
+    "img": "/images/home/team/ben.svg",
     "desc": "Silent Assassin. Writes the best code and enjoys watching everyone else gaze at it. Cardiff University "
   },
   {
     "name": "Saber Malekzadeh",
     "title": "AI Researcher",
-    "img": "/static/images/home/team/saber.svg",
+    "img": "/images/home/team/saber.svg",
     "desc": "Gets the most amount of work done with the least amount of effort... probably using AI. Ph.D., University of Tehran"
   },
   {
     "name": "Henri Huws",
     "title": "Business Development",
-    "img": "/static/images/home/team/henri.jpg",
+    "img": "/images/home/team/henri.jpg",
     "desc": "Everything and anything Grant Cardone related. Cardiff University  "
   },
   {
     "name": "Sam Lockie",
     "title": "Customer Success",
-    "img": "/static/images/home/team/sam.jpeg",
+    "img": "/images/home/team/sam.jpeg",
     "desc": "Massive F1 fan and spends most of the day debating with Mehdi about who's the fastest driver on the grid. Cardiff University"
   }
 ]

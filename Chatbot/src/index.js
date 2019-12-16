@@ -14,9 +14,9 @@ import Chatbot from './components/Chatbot/Chatbot';
 import Store from '../src/store/store'
 
 
-
 // kick off the polyfill!
 smoothscroll.polyfill();
+
 
 WebFont.load({ google: { families: ['Source Sans Pro', 'sans-serif'] } });
 

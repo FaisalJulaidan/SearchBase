@@ -6,9 +6,25 @@ from utilities import helpers
 
 auth_router = Blueprint('auth_router', __name__)
 
+# @auth_router.after_request
+# def add_header(r):
+#     #     """
+#     #     Add headers to both force latest IE rendering engine or Chrome Frame,
+#     #     and also to cache the rendered page for 10 minutes.
+#     #     """
+#     # r.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
+#     #     r.headers["Pragma"] = "no-cache"
+#     #     r.headers["Expires"] = "0"
+#     # r.headers['Cache-Control'] = 'public, max-age=0'
+#     r.headers['Access-Control-Allow-Origin'] = '*'
+#     r.headers['Access-Control-Allow-Headers'] = '*'
+#     r.headers['Access-Control-Allow-Methods'] = '*'
+#     return r
+
 
 @auth_router.route("/auth", methods=['POST'])
 def authenticate():
+    print('in Auth')
     if request.method == "POST":
 
         data = request.json
@@ -17,6 +33,7 @@ def authenticate():
         if not callback.Success:
             return helpers.jsonResponse(False, 401, callback.Message, callback.Data)
         return helpers.jsonResponse(True, 200, "Authorised!", callback.Data)
+
 
 
 # Refresh token endpoint

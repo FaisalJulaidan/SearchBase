@@ -15,7 +15,7 @@ const CaptureCandidates = (props) => {
                 </Col>
                 <Col xs={{span: 8, offset: 2}} lg={{span: 4, offset: 4}}>
                     <div className={styles.image_wrapper}>
-                        <Image className={styles.image} fluid src={getLink("/static/images/home/home/hiring.png")}/>
+                        <Image className={styles.image} fluid src={"/images/home/home/hiring.png"}/>
                     </div>
                 </Col>
                 <Col md={8} className={styles.text_col}>

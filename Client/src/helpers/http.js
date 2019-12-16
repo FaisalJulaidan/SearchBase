@@ -5,7 +5,7 @@ import {authActions} from "../store/actions";
 import {errorHandler} from "helpers/errorHandler";
 
 export const http = axios.create({
-    baseURL: '/api',
+    baseURL: `${process.env.NODE_ENV!=='development'? process.env.REACT_APP_API_URL:''}/api`,
     headers: {'Content-Type': 'application/json'},
 });
 
@@ -38,7 +38,7 @@ http.interceptors.response.use(
                 console.log('Refreshing Token...');
 
                 // get new token
-                return axios.post(`/api/auth/refresh`, null, {
+                return axios.post(`${process.env.NODE_ENV!=='development'? process.env.REACT_APP_API_URL:''}/api/auth/refresh`, null, {
                     headers: {
                         'Authorization': 'Bearer ' + localStorage.getItem('refresh'),
                         'Content-Type': 'application/json'

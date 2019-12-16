@@ -1,38 +1,38 @@
 [
   {
     "title": "Bullhorn",
-    "image": "/static/images/home/integrations/bullhorn.png"
+    "image": "/images/home/integrations/bullhorn.png"
   },
   {
     "title": "Erecruit",
-    "image": "/static/images/home/integrations/erecruit.png"
+    "image": "/images/home/integrations/erecruit.png"
   },
   {
     "title": "Access Group",
-    "image": "/static/images/home/integrations/accessgroup.png"
+    "image": "/images/home/integrations/accessgroup.png"
   },
   {
     "title": "Salesforce",
-    "image": "/static/images/home/integrations/salesforce.png"
+    "image": "/images/home/integrations/salesforce.png"
   },
   {
     "title": "Vincere",
-    "image": "/static/images/home/integrations/vincere.png"
+    "image": "/images/home/integrations/vincere.png"
   },
   {
     "title": "Dynamics 365",
-    "image": "/static/images/home/integrations/dynamic-365.png"
+    "image": "/images/home/integrations/dynamic-365.png"
   },
   {
     "title": "Outlook",
-    "image": "/static/images/home/integrations/outlook.png"
+    "image": "/images/home/integrations/outlook.png"
   },
   {
     "title": "Gmail",
-    "image": "/static/images/home/integrations/gmail.png"
+    "image": "/images/home/integrations/gmail.png"
   },
   {
     "title": "LinkedIn",
-    "image": "/static/images/home/integrations/link-logo.png"
+    "image": "/images/home/integrations/link-logo.png"
   }
 ]

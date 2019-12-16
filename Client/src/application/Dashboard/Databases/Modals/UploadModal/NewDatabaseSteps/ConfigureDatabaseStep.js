@@ -29,7 +29,7 @@ class ConfigureDatabaseStep extends Component {
         return (
             <div>
                 <div style={{textAlign: 'center'}}>
-                    <img src={getLink('/static/images/undraw/setup.svg')}
+                    <img src={"/images/undraw/setup.svg"}
                          alt="Upload Data Iamge"
                          style={{height: 150, marginBottom: 10}}/>
                 </div>

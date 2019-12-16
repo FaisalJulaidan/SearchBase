@@ -20,13 +20,13 @@ from routes.admin.routers import account_router, analytics_router, sub_router, \
     campaign_router, crm_auto_pilot_router
 from routes.public.routers import public_router, reset_password_router, chatbot_router, auth_router
 from routes.staff.routers import staff_router
-from services import scheduler_services, url_services
+# from services import scheduler_services, url_services
 from services.auth_services import jwt
 from services.mail_services import mail
 from utilities import helpers, tasks, dummy_data
 
-from utilities.helpers import limiter
 
+# from utilities.helpers import limiter
 app = Flask(__name__, static_folder='static')
 
 # Register Routes:
@@ -53,7 +53,10 @@ app.register_blueprint(staff_router, url_prefix='/api/staff')
 
 
 @app.after_request
-def apply_caching(response):
+def after_request(response):
+    response.headers['Access-Control-Allow-Origin'] = '*'
+    response.headers['Access-Control-Allow-Headers'] = '*'
+    response.headers['Access-Control-Allow-Methods'] = '*'
     response.headers["X-Frame-Options"] = "DENY"
     return response
 
@@ -70,8 +73,8 @@ def page_not_found(e):
 
 
 # Requests limiter initialisation:
-limiter.init_app(app)
-limiter.enabled = os.environ['FLASK_ENV'] != 'development'
+# limiter.init_app(app)
+# limiter.enabled = os.environ['FLASK_ENV'] != 'development'
 
 # Custom limiter exceeded error response
 @app.errorhandler(429)
@@ -119,7 +122,7 @@ if os.environ['FLASK_ENV'] in ['production', 'staging']:
 
     # Start scheduled tasks
     if not os.environ.get("scheduler_lock"):
-        scheduler_services.scheduler.start()
+        # scheduler_services.scheduler.start()
         os.environ["scheduler_lock"] = "True"
 
     print('Production mode running...')
@@ -143,7 +146,7 @@ elif os.environ['FLASK_ENV'] == 'development':
 
     # Start scheduled tasks
     if not os.environ.get("scheduler_lock"):
-        scheduler_services.scheduler.start()
+        # scheduler_services.scheduler.start()
         os.environ["scheduler_lock"] = "True"
 
     print('Development mode running...')

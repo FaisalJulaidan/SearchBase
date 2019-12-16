@@ -31,7 +31,7 @@ class MessageIntro extends React.Component {
                     <Col xs={12} md={6}>
                         <div className={styles.image_wrapper}>
                             <Image className={styles.image}
-                                   src={getLink("/static/images/home/home/data-trends.png")}/>
+                                   src={"/images/home/home/data-trends.png"}/>
                         </div>
                     </Col>
                     <Col xs={{span: 12, order: 2}} sm={{span: 10, order: 2, offset: 1}} md={{span: 6, offset: 0}}

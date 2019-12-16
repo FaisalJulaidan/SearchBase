@@ -3,7 +3,7 @@
     {
       "title": "Bullhorn",
       "desc": "Bullhorn provides customer relationship mantagement, applicant tracking system and operations software for the staffing industry.",
-      "image": "/static/images/CRM/bullhorn.svg",
+      "image": "/images/CRM/bullhorn.svg",
       "type": "Bullhorn",
       "disabled": false,
       "status": "NOT_CONNECTED"
@@ -11,7 +11,7 @@
     {
       "title": "Vincere",
       "desc": "Vincere provides customer relationship management, applicant tracking system and operations software for the staffing industry.",
-      "image": "/static/images/CRM/vincere.svg",
+      "image": "/images/CRM/vincere.svg",
       "type": "Vincere",
       "disabled": false,
       "status": "NOT_CONNECTED"
@@ -19,7 +19,7 @@
     {
       "title": "Mercury",
       "desc": "Mercury xRM empowers the world’s recruiters to shortcut the recruitment process and deliver an exceptional client and candidate experience.",
-      "image": "/static/images/CRM/mercury.svg",
+      "image": "/images/CRM/mercury.svg",
       "type": "Mercury",
       "disabled": false,
       "status": "NOT_CONNECTED"
@@ -27,7 +27,7 @@
     {
       "title": "Jobscience",
       "desc": " Jobscience provides customer relationship management, applicant tracking system and operations software for the staffing industry.",
-      "image": "/static/images/CRM/jobscience.svg",
+      "image": "/images/CRM/jobscience.svg",
       "type": "Jobscience",
       "disabled": false,
       "status": "NOT_CONNECTED"
@@ -35,7 +35,7 @@
     {
       "title": "Adapt",
       "desc": "Bond Adapt, specialist portfolio of recruitment software applications has earned a reputation for increasing business growth.",
-      "image": "/static/images/CRM/adapt.svg",
+      "image": "/images/CRM/adapt.svg",
       "type": "Adapt",
       "disabled": false,
       "status": "NOT_CONNECTED"
@@ -43,7 +43,7 @@
     {
       "title": "Greenhouse",
       "desc": "Greenhouse works seamlessly with over 220 partners and third-party apps and technologies, enabling you to solve specific problems.",
-      "image": "/static/images/CRM/greenhouse.svg",
+      "image": "/images/CRM/greenhouse.svg",
       "type": "Greenhouse",
       "disabled": false,
       "status": "NOT_CONNECTED"
@@ -51,7 +51,7 @@
     {
       "title": "Twilio",
       "desc": "Twilio two-way SMS and MMS messages allow you to carry on a conversation by both sending and receiving text and multimedia messages. You can integrate all of your Chatbots to natively reach your Talent Pools, Clients and candidates from within SearchBase",
-      "image": "/static/images/CRM/twilio.svg",
+      "image": "/images/CRM/twilio.svg",
       "type": "Twilio",
       "disabled": false,
       "status": "NOT_CONNECTED"
@@ -59,7 +59,7 @@
     {
       "title": "Access",
       "desc": "Access provides customer relationship management, applicant tracking system and operations software for the staffing industry.",
-      "image": "/static/images/CRM/accessgroup.png",
+      "image": "/images/CRM/accessgroup.png",
       "type": "JobAdder",
       "disabled": true,
       "status": "NOT_CONNECTED"
@@ -67,7 +67,7 @@
     {
       "title": "JobAdder",
       "desc": "JobAdder provides customer relationship management, applicant tracking system and operations software for the staffing industry.",
-      "image": "/static/images/CRM/jobadder.jpg",
+      "image": "/images/CRM/jobadder.jpg",
       "type": "JobAdder",
       "disabled": true,
       "status": "NOT_CONNECTED"
@@ -75,7 +75,7 @@
     {
       "title": "Workable",
       "desc": "Workable provides customer relationship management, applicant tracking system and operations software for the staffing industry.",
-      "image": "/static/images/CRM/workable.png",
+      "image": "/images/CRM/workable.png",
       "type": "Workable",
       "disabled": true,
       "status": "NOT_CONNECTED"
@@ -83,7 +83,7 @@
     {
       "title": "Outlook",
       "desc": "Outlook is the Microsoft Email Service provider. You can easily integrate your Outlook into SearchBase and if you have scheduled any appointments or calendar events, we will automatically create the events in your calendar.",
-      "image": "/static/images/CRM/outlook.svg",
+      "image": "/images/CRM/outlook.svg",
       "type": "Outlook",
       "disabled": true,
       "status": "NOT_CONNECTED"
@@ -91,7 +91,7 @@
     {
       "title": "Google",
       "desc": "Google Calendar is a time-management and scheduling calendar service lets you keep track of important events, share your schedule.",
-      "image": "/static/images/CRM/gmail.svg",
+      "image": "/images/CRM/gmail.svg",
       "type": "Google",
       "disabled": true,
       "status": "NOT_CONNECTED"

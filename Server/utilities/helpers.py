@@ -14,7 +14,7 @@ import stripe
 from cryptography.fernet import Fernet
 from flask import json, request, Response
 from forex_python.converter import CurrencyRates
-from flask_limiter import Limiter
+# from flask_limiter import Limiter
 from hashids import Hashids
 from itsdangerous import URLSafeTimedSerializer
 from sqlalchemy_utils import Currency
@@ -52,7 +52,7 @@ def getRemoteAddress():
         return request.headers['X-Real-IP']
 
 
-limiter = Limiter(key_func=getRemoteAddress)
+# limiter = Limiter(key_func=getRemoteAddress)
 
 
 # ======== Helper Functions ======== #
@@ -437,7 +437,7 @@ def HPrint(message):
 
 
 # Sort out limiter here:
-def createLimiter():
-    return Limiter(app, key_func=getRemoteAddress, default_limits=["480 per day", "20 per hour"])
+# def createLimiter():
+#     return Limiter(app, key_func=getRemoteAddress, default_limits=["480 per day", "20 per hour"])
 
 # TODO: How to get this object from a helpers import?

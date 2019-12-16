@@ -8,7 +8,7 @@ class JobOfferItem extends Component {
     render() {
         return (
             <div className={styles.wrapper}>
-                <Image fluid className={styles.image} src={getLink("/static/images/home/home/designer.svg")}/>
+                <Image fluid className={styles.image} src={"/images/home/home/designer.svg"}/>
                 <div className={styles.text_wrapper}>
                     <h1 className={styles.title}>Python Developer</h1>
                     <h1 className={styles.text}>Location: London, UK</h1>

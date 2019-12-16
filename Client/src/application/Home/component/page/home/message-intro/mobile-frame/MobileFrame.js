@@ -15,10 +15,10 @@ class MobileFrame extends Component {
         return (
             <div className={styles.content_frame}>
                 <Image className={styles.frame} fluid
-                       src={getLink("/static/images/home/home/iphone-x.png")}/>
+                       src={"/images/home/home/iphone-x.png"}/>
                 <div className={styles.background}/>
                 <Image className={styles.background2}
-                       src={getLink("/static/images/home/home/video-intro-bg.svg")}/>
+                       src={"/images/home/home/video-intro-bg.svg"}/>
                 <div className={styles.content}>
                     {this.props.children}
                 </div>

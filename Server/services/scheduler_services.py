@@ -31,7 +31,7 @@ job_defaults = {
 scheduler = BackgroundScheduler(jobstores=jobstores, executors=executors, job_defaults=job_defaults, timezone=utc)
 
 
-''' 
+'''
 Types:
  Null - Never notify
  0 - Immediately: notify but it should not because conversation are already been notified immediately
@@ -102,26 +102,26 @@ def sendAutopilotReferrals():
 
                     if not search_callback.Success:
                         raise Exception("Placement search failed")
-                    
+
                     if len(search_callback.Data) == 0:
                         return
 
                     ids = [item['candidate']['id'] for item in search_callback.Data]
-                    
+
                     candidate_search = crm_services.searchCandidatesCustom(crm, crmAP.CompanyID, ids, customData=True,
                                                                            customSearch="Dynamic",
                                                                            fields="fields=mobile,email,name",
                                                                            multiple=True)
-                    
-                    
-                    
+
+
+
                     canSendSMS = True
                     if crmAP.SendReferralSMS:
                         messenger_callback = messenger_servicess.getMessengerByType(enums.Messenger.Twilio, crmAP.CompanyID)
                         messenger = messenger_callback.Data
                         if not messenger_callback.Success:
                             canSendSMS = False
-                  
+
 
                     for candidate in candidate_search.Data:
                         if crmAP.SendReferralEmail and candidate['email']:
@@ -131,7 +131,7 @@ def sendAutopilotReferrals():
                         if crmAP.SendReferralSMS and candidate['mobile'] and canSendSMS:
                             SMSBody = crmAP.ReferralSMSBody.replace("${assistantLink}$", url.Data)
                             messenger_servicess.sendMessage(messenger.Type, candidate['mobile'], SMSBody, messenger.Auth)
-                            crmAP.LastReferral = now  
+                            crmAP.LastReferral = now
             # Save changes to the db
             db.session.commit()
 

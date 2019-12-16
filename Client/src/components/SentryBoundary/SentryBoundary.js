@@ -33,7 +33,7 @@ class SentryBoundary extends Component {
                 <div className={styles.Container}>
                     <div className={styles.NotFound}>
                         <div className={styles.NotFound404}>
-                            <img src={getLink('/static/images/error.svg')} alt="" height={'100%'}/>
+                            <img src={"/images/error.svg"} alt="" height={'100%'}/>
                         </div>
                         <h1>404</h1>
                         <h2>We're sorry - something's gone wrong.</h2>

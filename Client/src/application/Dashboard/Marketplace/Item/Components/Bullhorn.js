@@ -62,7 +62,7 @@ export const BullhornFormItems = ({
         {
             marketplace.status === 'CONNECTED' &&
             <div style={{ textAlign: 'center' }}>
-                <img src={getLink('/static/images/undraw/success.svg')} alt="" height={300}/>
+                <img src={"/images/undraw/success.svg"} alt="" height={300}/>
                 <Typography.Title>
                     {marketplace.type} is connected
                 </Typography.Title>
@@ -72,7 +72,7 @@ export const BullhornFormItems = ({
         {
             marketplace.status === 'FAILED' &&
             <div style={{ textAlign: 'center' }}>
-                <img src={getLink('/static/images/undraw/failed.svg')} alt="" height={300}/>
+                <img src={"/images/undraw/failed.svg"} alt="" height={300}/>
                 <Title>
                     {marketplace.type} is failed
                 </Title>

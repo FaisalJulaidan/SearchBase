@@ -1,0 +1,19 @@
+# serverless.yml
+
+service: chatbot-server
+
+provider:
+    name: aws
+    runtime: nodejs6.10
+    stage: dev
+    region: eu-west-2
+
+plugins:
+    - serverless-finch
+
+custom:
+    client:
+        bucketName: unique-bucket-chatbot
+        distributionFolder: build
+        indexDocument: index.html
+        errorDocument: index.html

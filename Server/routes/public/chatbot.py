@@ -1,5 +1,5 @@
 import uuid
-
+import os
 from flask import Blueprint, request, send_from_directory
 from flask_cors import CORS
 from werkzeug.utils import secure_filename
@@ -8,7 +8,7 @@ from models import Callback, db, Conversation, Assistant, StoredFile, StoredFile
 from services import conversation_services, flow_services, databases_services, stored_file_services, mail_services
 from services.Marketplace.CRM import crm_services
 from utilities import helpers, enums, wrappers
-from utilities.helpers import logError, limiter
+from utilities.helpers import logError
 
 import json
 
@@ -20,21 +20,10 @@ CORS(chatbot_router)
 # TODO: Place this in helpers for request restrictions elsewhere
 
 
-@chatbot_router.after_request
-def add_header(r):
-#     """
-#     Add headers to both force latest IE rendering engine or Chrome Frame,
-#     and also to cache the rendered page for 10 minutes.
-#     """
-    r.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
-#     r.headers["Pragma"] = "no-cache"
-#     r.headers["Expires"] = "0"
-    r.headers['Cache-Control'] = 'public, max-age=0'
-#     r.headers['Access-Control-Allow-Origin'] = '*'
-#     r.headers['Access-Control-Allow-Headers'] = '*'
-#     r.headers['Access-Control-Allow-Methods'] = '*'
-    return r
-
+@chatbot_router.route("/test", methods=['GET'])
+def testtt():
+    if request.method == "GET":
+        return os.environ['FLASK_ENV']
 
 # To give an access to the static/widgets/chatbot folder
 @chatbot_router.route("/static/widgets/chatbot/<path:path>", methods=['GET'])
@@ -80,7 +69,7 @@ def getSolutions_forChatbot(assistantHashID):
 
 
 @chatbot_router.route("/assistant/<string:assistantIDAsHash>/chatbot", methods=['GET', 'POST'])
-@limiter.limit("2/3minutes", methods=['POST'])
+# @limiter.limit("2/3minutes", methods=['POST'])
 def chatbot(assistantIDAsHash):
     if request.method == "GET":
         # Get blocks for the chatbot to use

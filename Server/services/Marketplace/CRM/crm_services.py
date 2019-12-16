@@ -442,7 +442,7 @@ def getSalary(conversation: Conversation, dataType: DataType, salaryType, toPeri
 
 
 # create a paragraph regarding the candidate with data that the API cannot accept
-def additionalCandidateNotesBuilder(data, selectedSolutions=None):
+def additionalCandidateNotesBuilder(data, selectedSolutions=None, oldNote=None):
     data = helpers.cleanDict(data)
     if not data:
         return ""
@@ -462,6 +462,9 @@ def additionalCandidateNotesBuilder(data, selectedSolutions=None):
             for key, value in helpers.cleanDict(solution.get("data")).items():
                 paragraph += "\n " + str(key) + " : " + str(value)
             paragraph += "\n"
+
+    if oldNote:
+        paragraph = paragraph + "\n\n\n\n" + oldNote
 
     return paragraph
 

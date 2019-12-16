@@ -318,7 +318,10 @@ def updateCandidate(auth, data, companyID) -> Callback:
         if not sendQuery_callback.Success:
             raise Exception(sendQuery_callback.Message)
 
-        body = dict(json.loads(sendQuery_callback.Data.text), **__extractCandidateInsertBody(data))  # update old data
+        oldData = json.loads(sendQuery_callback.Data.text)
+        data["oldNote"] = oldData.get("note")  # to add the old note to the new one
+
+        body = dict(oldData, **__extractCandidateInsertBody(data))  # update old data
 
         # send query
         sendQuery_callback: Callback = sendQuery(auth, "candidate/" + str(data["id"]), "put", body, companyID)
@@ -397,6 +400,7 @@ def searchCandidates(auth, companyID, data) -> Callback:
             query = ",".join(query.split(",")[:-1]) + "%23"
 
         result = []
+        helpers.logError("RESULTS: " + str(return_body["result"]["items"]))
         for record in return_body["result"]["items"]:
             result.append(__extractCandidateReturnData(record))
 
@@ -474,6 +478,7 @@ def searchPerfectCandidates(auth, companyID, data) -> Callback:
 
         result = []
         # TODO educations uses ids - need to retrieve them
+        helpers.logError("RESULTS: " + str(records))
         for record in records:
             result.append(__extractCandidateReturnData(record))
 
@@ -610,7 +615,8 @@ def __extractCandidateInsertBody(data):
                 "Submitted Education": data.get("educations"),
                 "LinkedIn": data.get("linkedIn")
             },
-            data.get("selectedSolutions")
+            data.get("selectedSolutions"),
+            data.get("oldNote")
         )
     }
 

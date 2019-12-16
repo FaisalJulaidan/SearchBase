@@ -318,7 +318,10 @@ def updateCandidate(auth, data, companyID) -> Callback:
         if not sendQuery_callback.Success:
             raise Exception(sendQuery_callback.Message)
 
-        body = dict(json.loads(sendQuery_callback.Data.text), **__extractCandidateInsertBody(data))  # update old data
+        oldData = json.loads(sendQuery_callback.Data.text)
+        data["oldNote"] = oldData.get("note")  # to add the old note to the new one
+
+        body = dict(oldData, **__extractCandidateInsertBody(data))  # update old data
 
         # send query
         sendQuery_callback: Callback = sendQuery(auth, "candidate/" + str(data["id"]), "put", body, companyID)
@@ -610,7 +613,8 @@ def __extractCandidateInsertBody(data):
                 "Submitted Education": data.get("educations"),
                 "LinkedIn": data.get("linkedIn")
             },
-            data.get("selectedSolutions")
+            data.get("selectedSolutions"),
+            data.get("oldNote")
         )
     }
 

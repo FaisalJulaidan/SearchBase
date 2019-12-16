@@ -14,19 +14,19 @@
   {
     "name": "Faisal Julaidan",
     "title": "CTO",
-    "img": "/static/images/home/team/faisal.jpeg",
+    "img": "/images/home/team/faisal.jpeg",
     "desc": "Unpredictable Crypto Currency Trader - still believes in Bitcoin. Cardiff University"
   },
   {
     "name": "Martyn Redstone",
     "title": "Director of Growth",
-    "img": "/static/images/home/team/martyn.jpg",
+    "img": "/images/home/team/martyn.jpg",
     "desc": "a chatbot chatterbox with 15 years of recruitment experience. Lover of my beard and my family (maybe not in that order)"
   },
   {
     "name": "Evgeniy Tonchev",
     "title": "Head Of Engineering",
-    "img": "/static/images/home/team/ton.jpeg",
+    "img": "/images/home/team/ton.jpeg",
     "desc": "Ex-Hardcore League of Legends player, now semi-retired. Often goes by the name 'Evgenius'. Cardiff University "
   },
   {

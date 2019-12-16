@@ -10,20 +10,20 @@ class OurFocus extends React.Component {
 
     items = [
         {
-            img: getLink('/static/images/home/home/chat.png'),
+            img: getLink('/images/home/home/chat.png'),
             icon: faComments,
             title: 'Engagement',
             text: 'We have built powerful and highly intuitive engagement routes that keep you updated about your candidates.'
         },
         {
-            img: getLink('/static/images/home/home/score.png'),
+            img: getLink('/images/home/home/score.png'),
             icon: faSms,
             title: 'Candidate Activation',
             text: 'Our platform has helped Recruiters save time, and automated their candidate outreach. ' +
                 'Allowing them to build talent pools much faster.'
         },
         {
-            img: getLink('/static/images/home/home/airplane.png'),
+            img: getLink('/images/home/home/airplane.png'),
             icon: faCogs,
             title: 'Autopilot',
             text: 'Have total control over your automation and take care of mundane tasks within seconds. ' +

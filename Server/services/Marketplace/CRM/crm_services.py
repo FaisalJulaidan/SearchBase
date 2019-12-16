@@ -172,7 +172,7 @@ def searchCandidatesCustom(crm, companyID, campaign_data, perfectFunc=False, cus
             return eval(crm_type + "." + searchFunc + "(crm.Auth)")
         if crm.Type is CRM.Jobscience:
             return eval(crm_type + "." + searchFunc + "(crm.Auth, data)")
-        if crm.Type is CRM.Bullhorn:
+        if crm.Type is CRM.Bullhorn or crm.Type is CRM.Vincere:
             return eval(crm_type + "." + searchFunc + "(crm.Auth, companyID, data, **kwargs)")
 
         return eval(crm_type + "." + searchFunc + "(crm.Auth, companyID, data)")

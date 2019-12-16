@@ -541,7 +541,7 @@ class Campaign extends React.Component {
                                         })(
                                             <Select placeholder={'Please select a shortlist'}
                                                     loading={this.props.isLoadingShortlists}>
-                                                {this.props.shortlists?.map((item, key) => {
+                                                {this.props.shortlists?.sort((a, b) => a.name.localeCompare(b.name)).map((item, key) => {
                                                     return (
                                                         <Select.Option key={key} value={item.id}>
                                                             {trimText.capitalize(trimText.trimDash(item.name))}

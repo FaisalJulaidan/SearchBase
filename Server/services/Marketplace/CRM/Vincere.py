@@ -400,6 +400,7 @@ def searchCandidates(auth, companyID, data) -> Callback:
             query = ",".join(query.split(",")[:-1]) + "%23"
 
         result = []
+        helpers.logError("RESULTS: " + str(return_body["result"]["items"]))
         for record in return_body["result"]["items"]:
             result.append(__extractCandidateReturnData(record))
 
@@ -477,6 +478,7 @@ def searchPerfectCandidates(auth, companyID, data) -> Callback:
 
         result = []
         # TODO educations uses ids - need to retrieve them
+        helpers.logError("RESULTS: " + str(records))
         for record in records:
             result.append(__extractCandidateReturnData(record))
 

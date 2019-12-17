@@ -411,7 +411,7 @@ def searchCandidates(auth, companyID, data) -> Callback:
         return Callback(False, str(exc))
 
 
-def searchPerfectCandidates(auth, companyID, data) -> Callback:
+def searchPerfectCandidates(auth, companyID, data, perfect=False) -> Callback:
     try:
         query = "q="
 
@@ -425,7 +425,6 @@ def searchPerfectCandidates(auth, companyID, data) -> Callback:
 
         query = query.replace("#", ".08")
 
-        # check if no conditions submitted
         if len(query) < 3:
             query = ""
 
@@ -440,10 +439,11 @@ def searchPerfectCandidates(auth, companyID, data) -> Callback:
 
         else:
             query = query[:-1]
-            query += "%23"
             records = []
 
             while len(records) < 2000:
+                query += "%23"
+                helpers.logError("QUERY: " + query)
                 # send query
                 sendQuery_callback: Callback = sendQuery(auth, "candidate/search/" + fields, "get", {}, companyID,
                                                          [query])
@@ -473,7 +473,7 @@ def searchPerfectCandidates(auth, companyID, data) -> Callback:
                 # remove the last (least important filter)
                 query = ",".join(query.split(",")[:-1])
                 # if no filters left - stop
-                if not query:
+                if "," not in query or perfect:
                     break
 
         result = []
@@ -604,7 +604,7 @@ def __extractCandidateInsertBody(data):
         "desired_contract_rate": data.get("dayRate"),
 
         "experience": str(data.get("yearsExperience")) + " years of experience",
-        "availability_start": datetime.datetime.strptime(data.get("availability", "").split(" ")[0],
+        "availability_start": datetime.datetime.strptime((data.get("availability") or "").split(" ")[0],
                                                          '%d/%m/%Y').isoformat()[:23] + ".000Z",
         "note": crm_services.additionalCandidateNotesBuilder(
             {

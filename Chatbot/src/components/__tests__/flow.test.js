@@ -29,9 +29,9 @@ describe('Chatbot', () => {
         // rerender
         const { assistant } = mockData.data;
 
-        expect(mockInitiateChatbot.mock.calls[0][0]).toBe(assistant)
+        expect(mockInitiateChatbot.mock.calls[0][0]).toBe(assistant);
         expect(mockInitiateChatbot.mock.calls[0][1]).toBe([].concat(assistant.Flow.groups.map(group => group.blocks)).flat(1))
-        expect(mockInitiateChatbot.mock.calls[0][2]).toBe({ disabled: isDisabled, active: assistant.Active })
+        expect(mockInitiateChatbot.mock.calls[0][2]).toBe({ disabled: isBlocked, active: assistant.Active })
     });
 });
 

@@ -502,7 +502,10 @@ class Campaign extends React.Component {
                                         })(
                                             <Select placeholder={'Please select your desired CRM'}
                                                     loading={this.props.isLoading}
-                                                    onChange={() => this.setState({useShortlist: false})}
+                                                    onChange={() => {
+                                                        this.setState({useShortlist: false});
+                                                        this.props.form.setFieldsValue({shortlist_id: ''});
+                                                    }}
                                                     onSelect={value => {
                                                         this.setState({selectedCRM: value});
                                                     }}>

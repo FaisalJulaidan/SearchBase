@@ -473,7 +473,7 @@ def searchPerfectCandidates(auth, companyID, data, perfect=False, shortlist=None
                 # remove the last (least important filter)
                 query = ",".join(query.split(",")[:-1])
                 # if no filters left - stop
-                if "," not in query or perfect:
+                if not query or perfect:
                     break
 
         result = []

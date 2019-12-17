@@ -245,15 +245,15 @@ export const Chatbot = ({
                 return;
             }
 
-            const { assistant, isDisabled } = data.data.data;
-            if (isDisabled)
-                return setChatbotStatus({ disabled: isDisabled, active: assistant.Active, loading: false });
+            const { assistant, isBlocked } = data.data.data;
+            if (isBlocked)
+                return setChatbotStatus({ disabled: isBlocked, active: assistant.Active, loading: false });
 
             dataHandler.setAssistantID(assistantID);
             initChatbot(
                 assistant,
                 [].concat(assistant.Flow.groups.map(group => group.blocks)).flat(1),
-                { disabled: isDisabled, active: assistant.Active });
+                { disabled: isBlocked, active: assistant.Active });
 
 
         };

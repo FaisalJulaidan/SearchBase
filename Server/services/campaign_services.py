@@ -149,7 +149,6 @@ def getCampaignOptions(companyID):
 
 def prepareCampaign(campaign_details, companyID):
     try:
-        helpers.logError("PREPARE CAMPAIGN")
         campaign_details["location"] = campaign_details.get("location", "").split(",")[0]
 
         if campaign_details.get("use_crm"):

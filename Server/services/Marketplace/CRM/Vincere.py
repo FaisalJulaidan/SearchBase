@@ -387,7 +387,7 @@ def searchCandidates(auth, companyID, data) -> Callback:
 
         # send query
         while True:
-            sendQuery_callback: Callback = sendQuery(auth, "candidate/search/" + fields, "get", {}, companyID, [query])
+            sendQuery_callback: Callback = sendQuery(auth, "candidate/search/" + fields, "get", {}, companyID, [query, "limit=1000"])
             if not sendQuery_callback.Success:
                 raise Exception(sendQuery_callback.Message)
 
@@ -427,7 +427,7 @@ def searchPerfectCandidates(auth, companyID, data, perfect=False, shortlist=None
             query = ""
 
             # send query
-            sendQuery_callback: Callback = sendQuery(auth, "candidate/search/" + fields, "get", {}, companyID, [query])
+            sendQuery_callback: Callback = sendQuery(auth, "candidate/search/" + fields, "get", {}, companyID, [query, "limit=1000"])
             if not sendQuery_callback.Success:
                 raise Exception(sendQuery_callback.Message)
 
@@ -516,7 +516,7 @@ def searchJobs(auth, companyID, data) -> Callback:
 
         # send query
         while True:
-            sendQuery_callback: Callback = sendQuery(auth, "job/search/" + fields, "get", {}, companyID, [query])
+            sendQuery_callback: Callback = sendQuery(auth, "job/search/" + fields, "get", {}, companyID, [query, "limit=1000"])
             helpers.logError("return_body: " + str(json.loads(sendQuery_callback.Data.text)))
             if not sendQuery_callback.Success:
                 raise Exception(sendQuery_callback.Message)

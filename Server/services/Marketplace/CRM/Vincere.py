@@ -125,7 +125,6 @@ def sendQuery(auth, query, method, body, companyID, optionalParams=None):
         # set headers
         headers = {'Content-Type': 'application/json', "x-api-key": api_key, "id-token": auth.get("id_token", "none")}
 
-        helpers.logError("Vincere auth: " + str(auth))
         # test the Token (id_token)
         helpers.logError("Vincere url: " + url)
         helpers.logError("Vincere headers: " + str(headers))
@@ -440,9 +439,8 @@ def searchPerfectCandidates(auth, companyID, data, perfect=False, shortlist=None
             query = query[:-1]
             records = []
 
-            while len(records) < 2000:
+            while len(records) < 10000:
                 query += "%23"
-                helpers.logError("QUERY: " + query)
                 # send query
                 sendQuery_callback: Callback = sendQuery(auth, "candidate/search/" + fields, "get", {}, companyID,
                                                          [query])

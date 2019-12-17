@@ -146,10 +146,12 @@ def searchCandidatesCustom(crm, companyID, campaign_data, perfectFunc=False, cus
     if customData:
         data = campaign_data
     else:
+        skills = campaign_data.get("skills", [])
+        skills = skills if isinstance(skills, list) else skills.split(" ")
         data = {
             "location": campaign_data.get("location"),
             "preferredJotTitle": campaign_data.get("preferredJobTitle"),
-            "skills": campaign_data.get("skills", []),
+            "skills": skills,
             "jobType": campaign_data.get("jobType"),
             "shortlist_id": campaign_data.get("shortlist_id")
         }

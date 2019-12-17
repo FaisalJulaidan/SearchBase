@@ -443,6 +443,7 @@ def searchPerfectCandidates(auth, companyID, data, perfect=False) -> Callback:
 
             while len(records) < 2000:
                 query += "%23"
+                helpers.logError("QUERY: " + query)
                 # send query
                 sendQuery_callback: Callback = sendQuery(auth, "candidate/search/" + fields, "get", {}, companyID,
                                                          [query])

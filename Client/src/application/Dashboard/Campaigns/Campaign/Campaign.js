@@ -342,6 +342,29 @@ class Campaign extends React.Component {
         this.props.dispatch(campaignActions.updateStatus(checked, this.props.campaign.ID));
     };
 
+    isShortListEnabled = () => {
+        let enabledShortlistCRMS = ['Bullhorn', 'Jobscience']; //CRMs with Enables shortlists
+        let enabledCRM = this.props.campaignOptions?.crms.find(crm => {
+            return enabledShortlistCRMS.includes(crm.Type) && crm.ID === this.state.selectedCRM
+        });
+        return typeof enabledCRM !== 'undefined';
+    };
+
+    getShortlistName = () => {
+        let enabledShortlistCRMS = ['Bullhorn', 'Jobscience']; //CRMs with Enables shortlists
+        let enabledCRM = this.props.campaignOptions?.crms.find(crm => {
+            return enabledShortlistCRMS.includes(crm.Type) && crm.ID === this.state.selectedCRM
+        });
+
+        if (enabledCRM?.Type === 'Bullhorn') {
+            return 'Use Bullhorn Saved Search'
+        } else if (enabledCRM?.Type === 'Jobscience') {
+            return 'Use JobScience Shortlist'
+        } else {
+            return ''
+        }
+    };
+
     render() {
         const {form} = this.props;
         const {getFieldDecorator} = form;
@@ -479,6 +502,7 @@ class Campaign extends React.Component {
                                         })(
                                             <Select placeholder={'Please select your desired CRM'}
                                                     loading={this.props.isLoading}
+                                                    onChange={() => this.setState({useShortlist: false})}
                                                     onSelect={value => {
                                                         this.setState({selectedCRM: value});
                                                     }}>
@@ -516,21 +540,13 @@ class Campaign extends React.Component {
                                                     this.setState({useShortlist: e.target.checked});
                                                 }}
                                                 style={{
-                                                    display: (
-                                                        this.state.selectedCRM ===
-                                                        this.props.campaignOptions?.crms.find(crm => crm.Type === 'Bullhorn')?.ID
-                                                            ? 'inline-block'
-                                                            : 'none'
-                                                    ),
+                                                    display: (this.isShortListEnabled() ? 'inline-block' : 'none'),
                                                     marginTop: '10px'
-                                                }}>Use Bullhorn Shortlist</Checkbox>
+                                                }}>{this.getShortlistName()}</Checkbox>
                                         )}
                                     </FormItem>
                                     <FormItem label="Shortlist" style={{
-                                        display: (
-                                            this.state.selectedCRM ===
-                                            this.props.campaignOptions?.crms.find(crm => crm.Type === 'Bullhorn')?.ID &&
-                                            this.state.useShortlist ? 'block' : 'none')
+                                        display: (this.isShortListEnabled() && this.state.useShortlist ? 'block' : 'none')
                                     }}
                                     >
                                         {getFieldDecorator('shortlist_id', {
@@ -612,9 +628,7 @@ class Campaign extends React.Component {
                                     </Select>
                                 )}
                             </FormItem>
-                            {this.state.useShortlist && this.state.use_crm
-                            && this.state.selectedCRM ===
-                            this.props.campaignOptions?.crms.find(crm => crm.Type === 'Bullhorn')?.ID
+                            {this.state.useShortlist && this.state.use_crm && this.isShortListEnabled()
                                 ?
                                 <>
                                 </>

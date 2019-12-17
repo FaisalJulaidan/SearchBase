@@ -60,7 +60,7 @@ def getRemoteAddress():
 # Get domain based on current environment
 def getDomain(port=5000, subdomain=None, domain=None):
     subdomain = subdomain + "." if subdomain is not None else ""
-    domain = domain if domain is not None else "www.thesearchbase.com"
+    domain = domain if domain is not None else "thesearchbase.com"
     if os.environ['FLASK_ENV'] == 'development':
         return 'http://localhost:{}'.format(str(port))
     elif os.environ['FLASK_ENV'] == 'staging':

@@ -411,7 +411,7 @@ def searchCandidates(auth, companyID, data) -> Callback:
         return Callback(False, str(exc))
 
 
-def searchPerfectCandidates(auth, companyID, data, perfect=False) -> Callback:
+def searchPerfectCandidates(auth, companyID, data, perfect=False, shortlist=None) -> Callback:
     try:
         query = "q="
 

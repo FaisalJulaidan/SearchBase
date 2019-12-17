@@ -17,7 +17,7 @@ const getLink = (src) => {
 };
 
 const getServerDomain = () => {
-    const env = process.env.NODE_ENV;
+    const env = process.env.REACT_APP_ENV;
     if (env === 'development')
         return 'http://localhost';
     else if (env === 'staging')

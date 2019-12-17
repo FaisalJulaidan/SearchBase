@@ -10,13 +10,10 @@ import axios from 'axios';
 function* login({email, password, prevPath}) {
     try {
         loadingMessage('Logging you in...');
-        let url = `${process.env.NODE_ENV !== 'development' ? process.env.REACT_APP_API_URL : ''}/api/auth`;
-        console.log(url, '11111111');
+        let url = `${process.env.REACT_APP_ENV !== 'development' ? process.env.REACT_APP_API_URL : ''}/api/auth`;
 
         url = url.replace('\'', '');
         url = url.replace('%27', '');
-
-        console.log(url, '11111111');
 
         const res = yield axios.post(url, { email, password }, {
             headers: {'Content-Type': 'application/json'},
@@ -50,7 +47,7 @@ function* login({email, password, prevPath}) {
 function* signup({signupDetails}) {
     try {
         loadingMessage('Creating your account', 0);
-        const res = yield axios.post(`${process.env.NODE_ENV!=='development'? process.env.REACT_APP_API_URL:''}/api/signup`, {...signupDetails}, {
+        const res = yield axios.post(`${process.env.REACT_APP_ENV!=='development'? process.env.REACT_APP_API_URL:''}/api/signup`, {...signupDetails}, {
             headers: {'Content-Type': 'application/json'},
         });
         yield put(authActions.signupSuccess(res.data?.data));
@@ -92,7 +89,7 @@ function* demoRequest({name, email, companyName, phone, crm, subscribe}) {
 function* forgetPassword({data}) {
     try {
         loadingMessage('Sending reset password email...', 0);
-        yield axios.post(`${process.env.NODE_ENV!=='development'? process.env.REACT_APP_API_URL:''}/api/reset_password`, {...data}, {
+        yield axios.post(`${process.env.REACT_APP_ENV!=='development'? process.env.REACT_APP_API_URL:''}/api/reset_password`, {...data}, {
             headers: {'Content-Type': 'application/json'},
         });
         yield put(authActions.resetPasswordSuccess());
@@ -109,7 +106,7 @@ function* forgetPassword({data}) {
 function* newResetPassword({data}) {
     try {
         loadingMessage('Saving new password...', 0);
-        yield axios.post(`${process.env.NODE_ENV!=='development'? process.env.REACT_APP_API_URL:''}/api/reset_password/` + data["payload"], {...data}, {
+        yield axios.post(`${process.env.REACT_APP_ENV!=='development'? process.env.REACT_APP_API_URL:''}/api/reset_password/` + data["payload"], {...data}, {
             headers: {'Content-Type': 'application/json'},
         });
         yield put(authActions.newResetPasswordSuccess());
@@ -136,7 +133,7 @@ function* logout() {
 
 function* verifyAccount({token, meta}) {
     try {
-        const res = yield axios.post(`${process.env.NODE_ENV!=='development'? process.env.REACT_APP_API_URL:''}/api/verify_account/${token}`, {}, {
+        const res = yield axios.post(`${process.env.REACT_APP_ENV!=='development'? process.env.REACT_APP_API_URL:''}/api/verify_account/${token}`, {}, {
             headers: {'Content-Type': 'application/json'},
         });
         successMessage(res.data?.msg || 'Account verified');

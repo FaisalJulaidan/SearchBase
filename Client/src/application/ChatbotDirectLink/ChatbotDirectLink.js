@@ -21,7 +21,7 @@ class ChatbotDirectLink extends React.Component {
             s.setAttribute('data-circle', '#9254de');
 
             // Development
-            if (process.env.NODE_ENV === 'development')
+            if (process.env.REACT_APP_ENV === 'development')
                 s.src = "http://localhost:3001/vendor/js/bundle.js";
             else
                 s.src = getLink("/api/widgets/chatbot");

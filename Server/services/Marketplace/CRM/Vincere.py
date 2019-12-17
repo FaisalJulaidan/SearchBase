@@ -387,7 +387,7 @@ def searchCandidates(auth, companyID, data) -> Callback:
 
         # send query
         while True:
-            sendQuery_callback: Callback = sendQuery(auth, "candidate/search/" + fields, "get", {}, companyID, [query, "limit=1000"])
+            sendQuery_callback: Callback = sendQuery(auth, "candidate/search/" + fields, "get", {}, companyID, [query, "limit=100"])
             if not sendQuery_callback.Success:
                 raise Exception(sendQuery_callback.Message)
 
@@ -423,51 +423,41 @@ def searchPerfectCandidates(auth, companyID, data, perfect=False, shortlist=None
 
         query = query.replace("#", ".08")
 
-        if len(query) < 3:
-            query = ""
+        query = query[:-1]
+        records = []
+        start = 0
 
+        while len(records) < 10000:
+            query += "%23"
             # send query
-            sendQuery_callback: Callback = sendQuery(auth, "candidate/search/" + fields, "get", {}, companyID, [query, "limit=1000"])
+            sendQuery_callback: Callback = sendQuery(auth, "candidate/search/" + fields, "get", {}, companyID,
+                                                     [query, "limit=100", "start="+str(start)])
             if not sendQuery_callback.Success:
                 raise Exception(sendQuery_callback.Message)
 
+            # get query result
             return_body = json.loads(sendQuery_callback.Data.text)
 
-            records = return_body["result"]["items"]
+            if return_body["result"]["items"]:
+                # add the candidates to the records
+                records = records + list(return_body["result"]["items"])
 
-        else:
-            query = query[:-1]
-            records = []
+                # remove duplicate records
+                seen = set()
+                new_l = []
+                for d in records:
+                    t = tuple(d.items())
+                    if str(t) not in seen:
+                        seen.add(str(t))
+                        new_l.append(d)
 
-            while len(records) < 10000:
-                query += "%23"
-                # send query
-                sendQuery_callback: Callback = sendQuery(auth, "candidate/search/" + fields, "get", {}, companyID,
-                                                         [query])
-                if not sendQuery_callback.Success:
-                    raise Exception(sendQuery_callback.Message)
+                records = []
+                for l in new_l:
+                    records.append(dict(l))
 
-                # get query result
-                return_body = json.loads(sendQuery_callback.Data.text)
-
-                if return_body["result"]["items"]:
-                    # add the candidates to the records
-                    records = records + list(return_body["result"]["items"])
-
-                    # remove duplicate records
-                    seen = set()
-                    new_l = []
-                    for d in records:
-                        t = tuple(d.items())
-                        if str(t) not in seen:
-                            seen.add(str(t))
-                            new_l.append(d)
-
-                    records = []
-                    for l in new_l:
-                        records.append(dict(l))
-
-                # remove the last (least important filter)
+            # remove the last (least important filter)
+            start += 100
+            if start >= return_body["result"]["total"]:
                 query = ",".join(query.split(",")[:-1])
                 # if no filters left - stop
                 if not query or perfect:
@@ -516,7 +506,7 @@ def searchJobs(auth, companyID, data) -> Callback:
 
         # send query
         while True:
-            sendQuery_callback: Callback = sendQuery(auth, "job/search/" + fields, "get", {}, companyID, [query, "limit=1000"])
+            sendQuery_callback: Callback = sendQuery(auth, "job/search/" + fields, "get", {}, companyID, [query, "limit=100"])
             helpers.logError("return_body: " + str(json.loads(sendQuery_callback.Data.text)))
             if not sendQuery_callback.Success:
                 raise Exception(sendQuery_callback.Message)

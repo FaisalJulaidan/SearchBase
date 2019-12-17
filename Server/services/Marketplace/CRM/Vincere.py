@@ -80,30 +80,22 @@ def retrieveRestToken(auth, companyID):
     try:
         authCopy = dict(auth)
         headers = {'Content-Type': 'application/x-www-form-urlencoded'}
-        # check if refresh_token exists
-        # if it does use it to generate access_token and refresh_token
-        if authCopy.get("refresh_token"):
-            url = "https://id.vincere.io/oauth2/token?"
-            body = {
-                "grant_type": "refresh_token",
-                "refresh_token": authCopy.get("refresh_token"),
-                "client_id": client_id
-            }
 
-            get_tokens = requests.post(url, headers=headers, data=body)
+        url = "https://id.vincere.io/oauth2/token?"
+        body = {
+            "grant_type": "refresh_token",
+            "refresh_token": authCopy.get("refresh_token"),
+            "client_id": client_id
+        }
 
-            if get_tokens.ok:
-                result_body = json.loads(get_tokens.text)
-                authCopy["access_token"] = result_body["access_token"]
-                authCopy["id_token"] = result_body["id_token"]
-            else:
-                raise Exception("CRM not set up properly")
-        # else if not go through login again with the saved auth
+        get_tokens = requests.post(url, headers=headers, data=body)
+
+        if get_tokens.ok:
+            result_body = json.loads(get_tokens.text)
+            authCopy["access_token"] = result_body["access_token"]
+            authCopy["id_token"] = result_body["id_token"]
         else:
-            login_callback: Callback = login(authCopy)
-            if not login_callback.Success:
-                raise Exception(login_callback.Message)
-            authCopy = dict(login_callback.Data)
+            raise Exception("CRM not set up properly")
 
         saveAuth_callback: Callback = crm_services.updateByType(CRM.Vincere, authCopy, companyID)
 
@@ -122,12 +114,18 @@ def retrieveRestToken(auth, companyID):
 
 def sendQuery(auth, query, method, body, companyID, optionalParams=None):
     try:
+        # auth = {}
+        # test = {'Content-Type': 'application/json', 'x-api-key': '0720376f4c8f2853ffff713bb8017627', 'id-token': 'eyJraWQiOiI5bHNyUXBsU1lXWDNXXC9CR0o1UjZWUzFKVmp3TjNMYUtyWjg5NTdMXC9UZlU9IiwiYWxnIjoiUlMyNTYifQ.eyJhdF9oYXNoIjoiRmJ4ZXo2cmhQYnNlclN4YUJoaWJKUSIsInN1YiI6Ijc1M2RmNWFiLTFlMzItNDNmNy1iNGU0LTNjZDg5MDM3YjQyMyIsImF1ZCI6IjdiczgwMGNnZ2JlbGM2ODF1dTUxNzVva2JvIiwiZW1haWxfdmVyaWZpZWQiOnRydWUsInRva2VuX3VzZSI6ImlkIiwiYXV0aF90aW1lIjoxNTc2MTQ1Mjg2LCJpc3MiOiJodHRwczpcL1wvY29nbml0by1pZHAudXMtZWFzdC0xLmFtYXpvbmF3cy5jb21cL3VzLWVhc3QtMV9ERnNRcDdtN0QiLCJjb2duaXRvOnVzZXJuYW1lIjoiNzUzZGY1YWItMWUzMi00M2Y3LWI0ZTQtM2NkODkwMzdiNDIzIiwiZXhwIjoxNTc2NjAwMjk1LCJpYXQiOjE1NzY1OTY2OTUsImVtYWlsIjoiam9obkBsZW5ub253cmlnaHQuY29tIn0.ZUT9VI8qU_lByTprm120QMaOXbSIAt5zP4lmL2cq-JQzomkRyWxfu4wAq8BgDw4TvVC6AhcOK-JJ4kYH02-kqUfzkfMVTL9jImqVkyf51TcAsApv0D0IB5Pczi5G3QRdbQXUwsyb_ICs_49k3nMNhc-WZE1b9kB0NwnfYOx-QTVcMiP_dXOqpoNG_-YSLpK5BrCzyjuq9aenprXi51QFCpaFf_8MnABWaX-J6qgEzJxHJHvn-Pt8s-TpgfiDl9NTq9OQhRWn_DDB_vv5iuDqAMe1Pv7C5SgHxA2x-rAeZzOn2vifS54CSNvcPhmmI3PfL8KAr-jycrlnbFtx5EeNoQ'}
+        # api_key = test["x-api-key"]
+        # auth["id_token"] = test["id-token"]
+        # auth["domain"] = "thesearchbase.vincere.io"
+
         # get url
         url = buildUrl(auth, query, optionalParams)
-
         # set headers
         headers = {'Content-Type': 'application/json', "x-api-key": api_key, "id-token": auth.get("id_token", "none")}
 
+        helpers.logError("Vincere auth: " + str(auth))
         # test the Token (id_token)
         helpers.logError("Vincere url: " + url)
         helpers.logError("Vincere headers: " + str(headers))

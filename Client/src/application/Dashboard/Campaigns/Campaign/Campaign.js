@@ -499,7 +499,7 @@ class Campaign extends React.Component {
                                                     marginTop: '10px'
                                                 }}>
                                                 Use Perfect Match <Tooltip
-                                                title="Return only Candidates that match all filtering criteria. Turning this off increases the amount of candidates returned by gradually loosening the search filters.">
+                                                title="Return only Candidates that match all filtering criteria. Turning this off increases the amount of candidates returned by gradually loosening the submitted search filters.">
                                                 <Icon type="question-circle-o"/>
                                             </Tooltip>
                                             </Checkbox>

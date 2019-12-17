@@ -423,12 +423,11 @@ def searchPerfectCandidates(auth, companyID, data, perfect=False, shortlist=None
 
         query = query.replace("#", ".08")
 
-        query = query[:-1]
+        query = query[:-1] + "%23"
         records = []
         start = 0
 
         while len(records) < 10000:
-            query += "%23"
             # send query
             sendQuery_callback: Callback = sendQuery(auth, "candidate/search/" + fields, "get", {}, companyID,
                                                      [query, "limit=100", "start="+str(start)])
@@ -458,7 +457,7 @@ def searchPerfectCandidates(auth, companyID, data, perfect=False, shortlist=None
             # remove the last (least important filter)
             start += 100
             if start >= return_body["result"]["total"]:
-                query = ",".join(query.split(",")[:-1])
+                query = ",".join(query.split(",")[:-1]) + "%23"
                 # if no filters left - stop
                 if not query or perfect:
                     break

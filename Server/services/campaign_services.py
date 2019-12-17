@@ -247,7 +247,6 @@ def __sendCampaignAsync(app, campaign_details, outreach_type, source, sourceID, 
 
             url: Callback = url_services.createShortenedURL(helpers.getDomain(3000) + "/chatbot_direct_link/" + \
                                                             hashedAssistantID + "?candidate=" + str(access),
-                                                            expiry=1209600,
                                                             domain="recruitbot.ai")
             if not url.Success:
                 continue

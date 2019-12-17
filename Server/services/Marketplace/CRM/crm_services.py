@@ -468,6 +468,7 @@ def additionalCandidateNotesBuilder(data, selectedSolutions=None, oldNote=None):
     helpers.logError("OLD NOTE: " + str(oldNote))
     if oldNote:
         paragraph = paragraph + "\n\n\n\n" + oldNote
+    helpers.logError("NEW NOTE: " + str(paragraph))
 
     return paragraph
 

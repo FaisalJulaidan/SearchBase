@@ -343,7 +343,7 @@ class Campaign extends React.Component {
     };
 
     isShortListEnabled = () => {
-        let enabledShortlistCRMS = ['Bullhorn', 'Jobscience']; //CRMs with Enables shortlists
+        let enabledShortlistCRMS = ['Bullhorn']; //CRMs with Enables shortlists
         let enabledCRM = this.props.campaignOptions?.crms.find(crm => {
             return enabledShortlistCRMS.includes(crm.Type) && crm.ID === this.state.selectedCRM
         });
@@ -351,7 +351,7 @@ class Campaign extends React.Component {
     };
 
     getShortlistName = () => {
-        let enabledShortlistCRMS = ['Bullhorn', 'Jobscience']; //CRMs with Enables shortlists
+        let enabledShortlistCRMS = ['Bullhorn']; //CRMs with Enables shortlists
         let enabledCRM = this.props.campaignOptions?.crms.find(crm => {
             return enabledShortlistCRMS.includes(crm.Type) && crm.ID === this.state.selectedCRM
         });

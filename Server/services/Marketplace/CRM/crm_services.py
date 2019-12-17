@@ -164,7 +164,7 @@ def searchCandidatesCustom(crm, companyID, campaign_data, perfectFunc=False, cus
         searchFunc = "searchCandidatesByShortlist"
     else:
         searchFunc = "searchCandidates"
-
+    helpers.logError("VINCERE FUNC: " + searchFunc)
     if CRM.has_value(crm_type):
         if crm.Type is CRM.Adapt:
             return Callback(True, "CRM does not support candidate search at this time")

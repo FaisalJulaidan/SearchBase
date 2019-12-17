@@ -23,7 +23,7 @@ const getServerDomain = () => {
     else if (env === 'staging')
         return 'http://staging.thesearchbase.com';
     else if (env === 'production')
-        return 'https://www.thesearchbase.com';
+        return 'https://thesearchbase.com';
     return undefined;
 };
 

@@ -413,7 +413,7 @@ def searchPerfectCandidates(auth, companyID, data, perfect=False, shortlist=None
     try:
         query = "q="
 
-        fields = "fl=id,name,primary_email,mobile,phone,nearest_train_station,skill,desired_salary,currency,deleted,last_update,met_status"
+        fields = "fl=id,name,primary_email,mobile,phone,nearest_train_station,skill,skills,desired_salary,currency,deleted,last_update,met_status"
 
         # populate filter
         query += populateFilter(data.get("location"), "current_city")

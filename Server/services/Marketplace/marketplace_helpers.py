@@ -141,7 +141,7 @@ def sendRequest(url, method, headers, data=None):
 
 
 def convertSkillsToString(skills):
-    if type(skills) is list:  # list
+    if skills and type(skills) is list:  # list
         if type(skills[0]) is str:  # list of strings
             skills = ", ".join(skills)
 

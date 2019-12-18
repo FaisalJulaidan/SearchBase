@@ -78,6 +78,7 @@ def getByKey(key: str) -> Callback:
 
     try:
         shortenedURL = db.session.query(ShortenedURL).filter(ShortenedURL.ID == key).first()
+        test = db.session.query(ShortenedURL).all()
 
         if shortenedURL is None:
             raise Exception('Key {} does not exist in our database'.format(key))

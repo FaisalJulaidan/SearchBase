@@ -560,7 +560,7 @@ def searchCandidatesByShortlist(access_token, conversation) -> Callback:
                                                                       availability=record.get(
                                                                           "ts2__Date_Available__c") or
                                                                                    "Not Specified",
-                                                                      preferredJobTitle=record.get("Title"),
+                                                                      currentJobTitle=record.get("Title"),
                                                                       education=record.get('ts2__EduDegreeName1__c'),
                                                                       yearsExperience=record.get(
                                                                           'ts2__Years_of_Experience__c'),

@@ -25,6 +25,8 @@ const google = googleMaps.createClient({
     key: 'AIzaSyDExVDw_47y0U4kukU1A0UscjXE7qDTRhk'
 });
 
+const enabledShortlistCRMS = ['Bullhorn', 'Jobscience']; //CRMs with Enables shortlists
+
 class Campaign extends React.Component {
 
 
@@ -165,6 +167,7 @@ class Campaign extends React.Component {
             this.state.use_crm,
             values.crm_id,
             this.state.useShortlist,
+            values.shortlist_id,
             this.getShortListDataByID(values.shortlist_id),
             values.database_id,
             values.messenger_id,
@@ -178,11 +181,6 @@ class Campaign extends React.Component {
             values.email_title,
             values.perfect_match
         ));
-    };
-
-
-    getShortListDataByID = (shortlist_id) => {
-        return this.props.shortlists?.find(shortlist => shortlist.id === shortlist_id)?.data
     };
 
     handleModalSelectAll = () => {
@@ -249,6 +247,7 @@ class Campaign extends React.Component {
             this.state.use_crm,
             values.crm_id,
             this.state.useShortlist,
+            values.shortlist_id,
             this.getShortListDataByID(values.shortlist_id),
             values.database_id,
             values.messenger_id,
@@ -342,8 +341,17 @@ class Campaign extends React.Component {
         this.props.dispatch(campaignActions.updateStatus(checked, this.props.campaign.ID));
     };
 
+
+    //Shortlist helper functions ------------------------- START -------------------------
+
+    getCRMType = () => { //TODO: Consider to remove crmID and use crmType only (back-end needs to get updated)
+        let enabledCRM = this.props.campaignOptions?.crms.find(crm => {
+            return enabledShortlistCRMS.includes(crm.Type) && crm.ID === this.state.selectedCRM
+        });
+        return enabledCRM?.Type;
+    };
+
     isShortListEnabled = () => {
-        let enabledShortlistCRMS = ['Bullhorn']; //CRMs with Enables shortlists
         let enabledCRM = this.props.campaignOptions?.crms.find(crm => {
             return enabledShortlistCRMS.includes(crm.Type) && crm.ID === this.state.selectedCRM
         });
@@ -351,23 +359,45 @@ class Campaign extends React.Component {
     };
 
     getShortlistName = () => {
-        let enabledShortlistCRMS = ['Bullhorn']; //CRMs with Enables shortlists
-        let enabledCRM = this.props.campaignOptions?.crms.find(crm => {
-            return enabledShortlistCRMS.includes(crm.Type) && crm.ID === this.state.selectedCRM
-        });
-
-        if (enabledCRM?.Type === 'Bullhorn') {
-            return 'Use Bullhorn Saved Search'
-        } else if (enabledCRM?.Type === 'Jobscience') {
-            return 'Use JobScience Shortlist'
-        } else {
-            return ''
+        switch (this.getCRMType()) {
+            case 'Bullhorn':
+                return 'Use Bullhorn Saved Search';
+            case 'Jobscience':
+                return 'Use JobScience Shortlist';
+            default:
+                return '';
         }
     };
+
+    getShortlistID = (shortlist) => {
+        switch (this.getCRMType()) {
+            case 'Bullhorn':
+                return shortlist?.id;
+            case 'Jobscience':
+                return shortlist?.url;
+            default:
+                return -1;
+        }
+    };
+
+    getShortListDataByID = (shortlistID) => {
+        switch (this.getCRMType()) {
+            case 'Bullhorn':
+                return this.props.shortlists?.find(shortlist => shortlist.id === shortlistID)?.data;
+            case 'Jobscience':
+                return [];
+            default:
+                return [];
+        }
+
+    };
+
+    //Shortlist helper functions ------------------------- END -------------------------
 
     render() {
         const {form} = this.props;
         const {getFieldDecorator} = form;
+        console.log(this.props.shortlists);
         return (<NoHeaderPanel>
             <div className={styles.Header}>
                 <div style={{marginBottom: 20}}>
@@ -536,7 +566,7 @@ class Campaign extends React.Component {
                                                 checked={this.state.useShortlist}
                                                 onChange={(e) => {
                                                     if (e.target.checked)
-                                                        this.props.dispatch(campaignActions.fetchShortlists(this.state.selectedCRM));
+                                                        this.props.dispatch(campaignActions.fetchShortlists(this.state.selectedCRM, this.getCRMType()));
                                                     else {
                                                         this.props.form.setFieldsValue({shortlist_id: ''});
                                                     }
@@ -562,7 +592,7 @@ class Campaign extends React.Component {
                                                     loading={this.props.isLoadingShortlists}>
                                                 {this.props.shortlists?.sort((a, b) => a.name.localeCompare(b.name)).map((item, key) => {
                                                     return (
-                                                        <Select.Option key={key} value={item.id}>
+                                                        <Select.Option key={key} value={this.getShortlistID(item)}>
                                                             {trimText.capitalize(trimText.trimDash(item.name))}
                                                         </Select.Option>
                                                     );

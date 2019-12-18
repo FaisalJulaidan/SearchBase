@@ -37,8 +37,9 @@ def createShortenedURL(url: str, expiry: int = None, key: str = None, subdomain:
             raise Exception("Expiry can not be less than 0")
 
     try:
+        key = helpers.encodeID((time.time_ns() + index))
         expiryDate = datetime.now() + timedelta(seconds=expiry) if expiry else None
-        shortened_url: ShortenedURL = ShortenedURL(ID=helpers.encodeID((time.time_ns() + index)),
+        shortened_url: ShortenedURL = ShortenedURL(ID=key,
                                                    URL=url,
                                                    Expiry=expiryDate)
 

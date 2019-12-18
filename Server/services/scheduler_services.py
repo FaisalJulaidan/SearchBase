@@ -93,7 +93,7 @@ def sendAutopilotReferrals():
 
                 hashedAssistantID = helpers.encodeID(assistant.ID)
 
-                url = url_services.createShortenedURL(helpers.getDomain(3000) + "/chatbot_direct_link/" + \
+                url_callback = url_services.createShortenedURL(helpers.getDomain(3000) + "/chatbot_direct_link/" + \
                     hashedAssistantID, expiry=1209600, domain="recruitbot.ai")
 
                 for crm in crmAP.CRMS:
@@ -123,13 +123,14 @@ def sendAutopilotReferrals():
                             canSendSMS = False
 
 
+                    url = url_callback.Data['url']
                     for candidate in candidate_search.Data:
                         if crmAP.SendReferralEmail and candidate['email']:
-                            EmailBody = crmAP.ReferralEmailBody.replace("${assistantLink}$", url.Data)
+                            EmailBody = crmAP.ReferralEmailBody.replace("${assistantLink}$", url)
                             mail_services.simpleSend(candidate['email'], crmAP.ReferralEmailTitle, EmailBody)
                             crmAP.LastReferral = now
                         if crmAP.SendReferralSMS and candidate['mobile'] and canSendSMS:
-                            SMSBody = crmAP.ReferralSMSBody.replace("${assistantLink}$", url.Data)
+                            SMSBody = crmAP.ReferralSMSBody.replace("${assistantLink}$", url)
                             messenger_servicess.sendMessage(messenger.Type, candidate['mobile'], SMSBody, messenger.Auth)
                             crmAP.LastReferral = now
             # Save changes to the db

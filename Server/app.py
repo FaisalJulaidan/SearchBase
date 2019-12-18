@@ -4,7 +4,7 @@ from gevent import monkey
 
 monkey.patch_all()
 
-import os
+import os, datetime, time
 from flask import Flask, render_template, request
 from flask_api import status
 from flask_babel import Babel
@@ -20,7 +20,7 @@ from routes.admin.routers import account_router, analytics_router, sub_router, \
     campaign_router, crm_auto_pilot_router
 from routes.public.routers import public_router, reset_password_router, chatbot_router, auth_router
 from routes.staff.routers import staff_router
-# from services import scheduler_services, url_services
+from services import scheduler_services, url_services
 from services.auth_services import jwt
 from services.mail_services import mail
 from utilities import helpers, tasks, dummy_data
@@ -122,7 +122,7 @@ if os.environ['FLASK_ENV'] in ['production', 'staging']:
 
     # Start scheduled tasks
     if not os.environ.get("scheduler_lock"):
-        # scheduler_services.scheduler.start()
+        scheduler_services.scheduler.start()
         os.environ["scheduler_lock"] = "True"
 
     print('Production mode running...')

@@ -220,14 +220,18 @@ def sendCampaign(campaign_details, companyID):
         sourceID = campaign_details.get("crm_id") if source == 'crm' else campaign_details.get("database_id")
         # start = time.clock()
 
-        for candidate in campaign_details.get("candidate_list"):
+        urls = []
+        for index, candidate in enumerate(campaign_details.get("candidate_list")):
             access = helpers.verificationSigner.dumps(
                 {"candidateID": candidate.get("ID"), "source": source, "sourceID": sourceID}, salt='chatbot')
-            url: Callback = url_services.createShortenedURL(helpers.getDomain(3000) + "/chatbot_direct_link/" + \
+            url_callback: Callback = url_services.createShortenedURL(helpers.getDomain(3000) + "/chatbot_direct_link/" + \
                                                             hashedAssistantID + "?candidate=" + str(access),
-                                                            domain="recruitbot.ai")
-            if url.Success:
-                candidate["url"] = url.Data
+                                                            domain="recruitbot.ai", autoSave=False, index=index)
+            if url_callback.Success:
+                url = url_callback.Data
+                urls.append(url['object'])
+                candidate["url"] = url['url']
+        db.session.add_all(urls)
         # print((time.clock() - start)*1000)
 
         from app import app

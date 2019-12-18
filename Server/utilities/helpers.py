@@ -8,7 +8,6 @@ import traceback
 from datetime import time
 from enum import Enum
 from typing import List
-import app
 import geoip2.webservice
 import stripe
 from cryptography.fernet import Fernet

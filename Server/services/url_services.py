@@ -1,4 +1,5 @@
-from services import assistant_services, user_services
+from datetime import datetime
+import time
 from models import Callback, ShortenedURL, db
 from utilities import helpers
 from sqlalchemy.exc import IntegrityError
@@ -7,7 +8,8 @@ from datetime import datetime, timedelta
 min_key_length = 5
 
 
-def createShortenedURL(url: str, length: int = min_key_length, expiry: int = None, key: str = None, subdomain: str = None, domain: str = None) -> Callback:
+def createShortenedURL(url: str, expiry: int = None, key: str = None, subdomain: str = None, domain: str = None,
+                       autoSave=True, index=1) -> Callback:
     """
     Creates a shortened url that points to the one supplied
 
@@ -18,37 +20,37 @@ def createShortenedURL(url: str, length: int = min_key_length, expiry: int = Non
         key [str] [OPTIONAL] -- The key (overriding the random text) that will be at the end of the URL, the length parameter will be ignored if this is supplied
         subdomain [str] [OPTIONAL] -- The subdomain to be supplied to the domain helper function
         domain [str] [OPTIONAL] -- The domain to be supplied to the domain helper function
+        autoSave [bool] [OPTIONAL] -- either add the records to the database and commit/save changes
+        index [int] [OPTIONAL] -- used when generating big number of urls to ensure uniqueness
 
     Returns:
-        Callback with either a success or failure status, with the data object pointing to the newly created URL
+        Callback with either a success or failure status, with the data object pointing to the newly created SQLAlchemy
+        URL and the url as a string
 
     Raises:
         TODO: Write exceptions
     """
 
-    # IF length is supplied (Default 10), check if less than min_key_length
-    if(length < min_key_length):
-        raise Exception("The length supplied was less than the {} minimum".format(min_key_length))
-
-    # IF key is supplied, check if its less than min_key_length
-    if(key):
-        if(len(key) < min_key_length):
-            raise Exception("The length supplied was less than the {} minimum".format(min_key_length))
-
     # Expiry parameter must be 0 at minimum
-    if(expiry):
-        if(expiry < 0):
+    if (expiry):
+        if (expiry < 0):
             raise Exception("Expiry can not be less than 0")
-    
+
     try:
-        key = key if key else helpers.randomAlphanumeric(length)
         expiryDate = datetime.now() + timedelta(seconds=expiry) if expiry else None
-        shortened_url: ShortenedURL = ShortenedURL(ID=key, URL=url, Expiry=expiryDate)
+        shortened_url: ShortenedURL = ShortenedURL(ID=helpers.encodeID((time.time_ns() + index)),
+                                                   URL=url,
+                                                   Expiry=expiryDate)
 
-        db.session.add(shortened_url)
-        db.session.commit()
+        if autoSave:
+            db.session.add(shortened_url)
+            db.session.commit()
 
-        return Callback(True, "URL has been successfully created", "{}/u/{}".format(helpers.getDomain(subdomain=subdomain, domain=domain), key))
+        return Callback(True, "URL has been successfully created",
+                        {
+                            "url": "{}/u/{}".format(helpers.getDomain(subdomain=subdomain, domain=domain), key),
+                            "object": shortened_url
+                        })
 
     except IntegrityError as e:
         helpers.logError("url_services.createShortenedURL(): " + str(e))
@@ -61,6 +63,7 @@ def createShortenedURL(url: str, length: int = min_key_length, expiry: int = Non
         return Callback(False, "Unknown error.")
 
     # Check if key exists, query database to make sure its not a duplicate
+
 
 def getByKey(key: str) -> Callback:
     """
@@ -82,8 +85,8 @@ def getByKey(key: str) -> Callback:
         if shortenedURL is None:
             raise Exception('Key {} does not exist in our database'.format(key))
 
-        if(shortenedURL.Expiry):
-            if(shortenedURL.Expiry < datetime.now()):
+        if (shortenedURL.Expiry):
+            if (shortenedURL.Expiry < datetime.now()):
                 raise Exception('Expiry date for key {} has passed'.format(key))
 
         url = shortenedURL.URL
@@ -93,6 +96,6 @@ def getByKey(key: str) -> Callback:
 
         return Callback(True, "URL Found", url)
 
-    except Exception as e:        
+    except Exception as e:
         helpers.logError("url_services.getByKey(): " + str(e))
         return Callback(False, "Unknown error.")

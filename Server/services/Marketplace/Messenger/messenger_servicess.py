@@ -14,7 +14,7 @@ def sendMessage(type: Messenger, recipient, body, auth, whatsapp=False) -> Callb
         body = body.replace("<p>", "").replace("</p>", "\n").replace("&nbsp;", "\n")
         # test connection
         if type is Messenger.Twilio:
-            return Twilio.sendMessage(recipient, body, auth, whatsapp)  # oauth2
+            return Twilio.sendMessage(recipient, body, auth, whatsapp, True)  # oauth2
 
         return Callback(False, 'Connection failure. Please check entered details')
 

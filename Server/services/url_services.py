@@ -1,5 +1,3 @@
-from threading import Thread
-
 from services import assistant_services, user_services
 from models import Callback, ShortenedURL, db
 from utilities import helpers
@@ -46,12 +44,9 @@ def createShortenedURL(url: str, length: int = min_key_length, expiry: int = Non
         key = key if key else helpers.randomAlphanumeric(length)
         expiryDate = datetime.now() + timedelta(seconds=expiry) if expiry else None
         shortened_url: ShortenedURL = ShortenedURL(ID=key, URL=url, Expiry=expiryDate)
-        from app import app
-        thr = Thread(target=__commitURL, args=[app, shortened_url])
-        thr.start()
 
-        # db.session.add(shortened_url)
-        # db.session.commit()
+        db.session.add(shortened_url)
+        db.session.commit()
 
         return Callback(True, "URL has been successfully created", "{}/u/{}".format(helpers.getDomain(subdomain=subdomain, domain=domain), key))
 
@@ -66,13 +61,6 @@ def createShortenedURL(url: str, length: int = min_key_length, expiry: int = Non
         return Callback(False, "Unknown error.")
 
     # Check if key exists, query database to make sure its not a duplicate
-
-
-def __commitURL(app, shortened_url):
-    with app.app_context():
-        db.session.add(shortened_url)
-        db.session.commit()
-
 
 def getByKey(key: str) -> Callback:
     """

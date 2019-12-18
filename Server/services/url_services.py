@@ -77,6 +77,7 @@ def getByKey(key: str) -> Callback:
     """
 
     try:
+        test = db.session.query(ShortenedURL).all()
         shortenedURL = db.session.query(ShortenedURL).filter(ShortenedURL.ID == key).first()
 
         if shortenedURL is None:

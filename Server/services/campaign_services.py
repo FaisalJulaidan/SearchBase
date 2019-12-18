@@ -218,14 +218,23 @@ def sendCampaign(campaign_details, companyID):
         hashedAssistantID = helpers.encodeID(campaign_details.get("assistant_id"))
         source = 'crm' if campaign_details.get("use_crm") else 'db'
         sourceID = campaign_details.get("crm_id") if source == 'crm' else campaign_details.get("database_id")
+        # start = time.clock()
+
+        for candidate in campaign_details.get("candidate_list"):
+            access = helpers.verificationSigner.dumps(
+                {"candidateID": candidate.get("ID"), "source": source, "sourceID": sourceID}, salt='chatbot')
+            url: Callback = url_services.createShortenedURL(helpers.getDomain(3000) + "/chatbot_direct_link/" + \
+                                                            hashedAssistantID + "?candidate=" + str(access),
+                                                            domain="recruitbot.ai")
+            if url.Success:
+                candidate["url"] = url.Data
+        # print((time.clock() - start)*1000)
 
         from app import app
         thr = Thread(target=__sendCampaignAsync, args=[app, campaign_details, outreach_type, source, sourceID,
                                                        hashedAssistantID, text, messenger])
         thr.start()
-        # start = time.clock()
         # __sendCampaignAsync(app, campaign_details, outreach_type, source, sourceID, hashedAssistantID, text, messenger)
-        # print(time.clock() - start)
 
         return Callback(True, "Campaign sent!")
 
@@ -245,18 +254,18 @@ def __sendCampaignAsync(app, campaign_details, outreach_type, source, sourceID, 
                     or (not candidate_email and outreach_type == "email"):
                 continue
 
-            access = helpers.verificationSigner.dumps(
-                {"candidateID": candidate.get("ID"), "source": source, "sourceID": sourceID}, salt='chatbot')
-
-            url: Callback = url_services.createShortenedURL(helpers.getDomain(3000) + "/chatbot_direct_link/" + \
-                                                            hashedAssistantID + "?candidate=" + str(access),
-                                                            domain="recruitbot.ai")
-            if not url.Success:
+            # access = helpers.verificationSigner.dumps(
+            #     {"candidateID": candidate.get("ID"), "source": source, "sourceID": sourceID}, salt='chatbot')
+            #
+            # url: Callback = url_services.createShortenedURL(helpers.getDomain(3000) + "/chatbot_direct_link/" + \
+            #                                                 hashedAssistantID + "?candidate=" + str(access),
+            #                                                 domain="recruitbot.ai")
+            if not candidate.get("url"):
                 continue
 
             # insert assistant link and candidate details in text
             tempText = text \
-                .replace("${assistantLink}$", url.Data) \
+                .replace("${assistantLink}$", candidate.get("url")) \
                 .replace("${candidateName}$", candidate.get("CandidateName"))
 
             if outreach_type == "sms" or outreach_type == "whatsapp":

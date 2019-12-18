@@ -368,7 +368,7 @@ def searchCandidates(auth, companyID, data) -> Callback:
     try:
         query = "q="
 
-        fields = "fl=id,name,primary_email,mobile,phone,nearest_train_station,skill,desired_salary,currency,deleted,last_update,met_status"
+        fields = "fl=id,name,primary_email,mobile,phone,current_location,skill,desired_salary,currency,deleted,last_update,met_status"
 
         # populate filter
         query += populateFilter(data.get("location"), "current_city")
@@ -413,7 +413,7 @@ def searchPerfectCandidates(auth, companyID, data, perfect=False, shortlist=None
     try:
         query = "q="
 
-        fields = "fl=id,name,primary_email,mobile,phone,nearest_train_station,skill,skills,desired_salary,currency,deleted,last_update,met_status"
+        fields = "fl=id,name,primary_email,mobile,phone,current_location,skill,skills,desired_salary,currency,deleted,last_update,met_status"
 
         # populate filter
         query += populateFilter(data.get("location"), "current_city")
@@ -609,8 +609,7 @@ def __extractCandidateReturnData(record):
                                                    email=record.get("primary_email"),
                                                    mobile=record.get("phone") or record.get("mobile"),
                                                    location=
-                                                   record.get("nearest_train_station", "").replace(
-                                                       "station", ""),
+                                                   record.get("current_location", {}).get("city"),
                                                    skills=record.get("skill", "").split(","),  # str list
                                                    linkdinURL=None,
                                                    availability=record.get("status"),

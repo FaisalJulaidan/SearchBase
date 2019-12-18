@@ -220,10 +220,9 @@ def sendCampaign(campaign_details, companyID):
         sourceID = campaign_details.get("crm_id") if source == 'crm' else campaign_details.get("database_id")
 
         from app import app
-        # thr = Thread(target=__sendCampaignAsync, args=[app, campaign_details, outreach_type, source, sourceID,
-        #                                                hashedAssistantID, text, messenger])
-        # thr.start()
-        __sendCampaignAsync(app, campaign_details, outreach_type, source, sourceID, hashedAssistantID, text, messenger)
+        thr = Thread(target=__sendCampaignAsync, args=[app, campaign_details, outreach_type, source, sourceID,
+                                                       hashedAssistantID, text, messenger])
+        thr.start()
 
         return Callback(True, "Campaign sent!")
 
@@ -233,35 +232,35 @@ def sendCampaign(campaign_details, companyID):
 
 
 def __sendCampaignAsync(app, campaign_details, outreach_type, source, sourceID, hashedAssistantID, text, messenger):
-    # with app.app_context():
-    for candidate in campaign_details.get("candidate_list"):
-        candidate_phone = candidate.get("CandidateMobile")
-        candidate_email = candidate.get("CandidateEmail")
+    with app.app_context():
+        for candidate in campaign_details.get("candidate_list"):
+            candidate_phone = candidate.get("CandidateMobile")
+            candidate_email = candidate.get("CandidateEmail")
 
-        # check if phone or email is needed and present
-        if (not candidate_phone and (outreach_type == "sms" or outreach_type == "whatsapp")) \
-                or (not candidate_email and outreach_type == "email"):
-            continue
+            # check if phone or email is needed and present
+            if (not candidate_phone and (outreach_type == "sms" or outreach_type == "whatsapp")) \
+                    or (not candidate_email and outreach_type == "email"):
+                continue
 
-        access = helpers.verificationSigner.dumps(
-            {"candidateID": candidate.get("ID"), "source": source, "sourceID": sourceID}, salt='chatbot')
+            access = helpers.verificationSigner.dumps(
+                {"candidateID": candidate.get("ID"), "source": source, "sourceID": sourceID}, salt='chatbot')
 
-        url: Callback = url_services.createShortenedURL(helpers.getDomain(3000) + "/chatbot_direct_link/" + \
-                                                        hashedAssistantID + "?candidate=" + str(access),
-                                                        domain="recruitbot.ai")
-        if not url.Success:
-            continue
+            url: Callback = url_services.createShortenedURL(helpers.getDomain(3000) + "/chatbot_direct_link/" + \
+                                                            hashedAssistantID + "?candidate=" + str(access),
+                                                            domain="recruitbot.ai")
+            if not url.Success:
+                continue
 
-        # insert assistant link and candidate details in text
-        tempText = text \
-            .replace("${assistantLink}$", url.Data) \
-            .replace("${candidateName}$", candidate.get("CandidateName"))
+            # insert assistant link and candidate details in text
+            tempText = text \
+                .replace("${assistantLink}$", url.Data) \
+                .replace("${candidateName}$", candidate.get("CandidateName"))
 
-        if outreach_type == "sms" or outreach_type == "whatsapp":
-            whatsapp = True if outreach_type == "whatsapp" else False
-            messenger_servicess.sendMessage(messenger.Type, candidate_phone, tempText, messenger.Auth, whatsapp)
-        elif outreach_type == "email":
-            mail_services.simpleSend(candidate_email, campaign_details.get("email_title"), tempText)
+            if outreach_type == "sms" or outreach_type == "whatsapp":
+                whatsapp = True if outreach_type == "whatsapp" else False
+                messenger_servicess.sendMessage(messenger.Type, candidate_phone, tempText, messenger.Auth, whatsapp)
+            elif outreach_type == "email":
+                mail_services.simpleSend(candidate_email, campaign_details.get("email_title"), tempText)
 
 
 def updateStatus(campaignID, newStatus, companyID):

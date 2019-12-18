@@ -650,14 +650,7 @@ def searchCandidates(access_token, conversation) -> Callback:
                 # add the candidates to the records
                 records = records + list(return_body["records"])
 
-                # remove duplicate records
-                seen = set()
-                new_l = []
-                for d in records:
-                    t = tuple(d.items())
-                    if str(t) not in seen:
-                        seen.add(str(t))
-                        new_l.append(d)
+                new_l = helpers.removeDuplicateRecords(records)
 
                 records = []
                 for l in new_l:
@@ -804,14 +797,7 @@ def searchJobs(access_token, conversation) -> Callback:
                 # Add the candidates to the records
                 records = records + list(return_body["records"])
 
-                # remove duplicate records
-                seen = set()
-                new_l = []
-                for d in records:
-                    t = tuple(d.items())
-                    if str(t) not in seen:
-                        seen.add(str(t))
-                        new_l.append(d)
+                new_l = helpers.removeDuplicateRecords(records)
 
                 records = []
                 for l in new_l:

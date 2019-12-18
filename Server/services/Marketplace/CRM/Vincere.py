@@ -368,7 +368,7 @@ def searchCandidates(auth, companyID, data) -> Callback:
     try:
         query = "q="
 
-        fields = "fl=id,name,primary_email,mobile,phone,nearest_train_station,skill,desired_salary,currency,deleted,last_update,met_status"
+        fields = "fl=id,name,primary_email,mobile,phone,current_location,skill,desired_salary,currency,deleted,last_update,met_status"
 
         # populate filter
         query += populateFilter(data.get("location"), "current_city")
@@ -413,7 +413,7 @@ def searchPerfectCandidates(auth, companyID, data, perfect=False, shortlist=None
     try:
         query = "q="
 
-        fields = "fl=id,name,primary_email,mobile,phone,nearest_train_station,skill,skills,desired_salary,currency,deleted,last_update,met_status"
+        fields = "fl=id,name,primary_email,mobile,phone,current_location,skill,desired_salary,currency,deleted,last_update,met_status"
 
         # populate filter
         query += populateFilter(data.get("location"), "current_city")
@@ -441,23 +441,17 @@ def searchPerfectCandidates(auth, companyID, data, perfect=False, shortlist=None
                 # add the candidates to the records
                 records = records + list(return_body["result"]["items"])
 
-                # remove duplicate records
-                seen = set()
-                new_l = []
-                for d in records:
-                    t = tuple(d.items())
-                    if str(t) not in seen:
-                        seen.add(str(t))
-                        new_l.append(d)
+                new_l = helpers.removeDuplicateRecords(records)
 
                 records = []
-                for l in new_l:
-                    records.append(dict(l))
+                for record in new_l:
+                    records.append(dict(record))
 
-            # remove the last (least important filter)
-            start += 100
+            start += 100  # move to the next 100 records of the result
             if start >= return_body["result"]["total"]:
+                # remove the last (least important filter)
                 query = ",".join(query.split(",")[:-1]) + "%23"
+                start = 0
                 # if no filters left - stop
                 if not query or perfect:
                     break
@@ -615,8 +609,7 @@ def __extractCandidateReturnData(record):
                                                    email=record.get("primary_email"),
                                                    mobile=record.get("phone") or record.get("mobile"),
                                                    location=
-                                                   record.get("nearest_train_station", "").replace(
-                                                       "station", ""),
+                                                   record.get("current_location", {}).get("city"),
                                                    skills=record.get("skill", "").split(","),  # str list
                                                    linkdinURL=None,
                                                    availability=record.get("status"),

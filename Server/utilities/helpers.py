@@ -69,6 +69,19 @@ def getDomain(port=5000, subdomain=None, domain=None):
     return None
 
 
+# remove duplicate records; can also do dict and other types if set up
+def removeDuplicateRecords(target: list):
+    new_l = []
+    if type(target) is list:
+        seen = set()
+        for d in target:
+            t = tuple(d.items())
+            if str(t) not in seen:
+                seen.add(str(t))
+                new_l.append(d)
+    return new_l
+
+
 def cleanDict(target):
     # reoccurring function
     def checkDict(target):

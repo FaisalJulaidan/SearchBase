@@ -111,12 +111,13 @@ const deleteCampaignFailure = (error) => ({
 });
 
 // Fetch Candidates List
-const fetchCampaignCandidatesData = (assistant_id, use_crm, crm_id, useShortlist, shortlist, database_id, messenger_id, location, preferredJobTitle, jobType, skills, text, outreach_type, email_title, perfect_match) => ({
+const fetchCampaignCandidatesData = (assistant_id, use_crm, crm_id, useShortlist, shortlist_id, shortlist, database_id, messenger_id, location, preferredJobTitle, jobType, skills, text, outreach_type, email_title, perfect_match) => ({
         type: actionTypes.FETCH_CAMPAIGN_CANDIDATES_DATA_REQUEST,
         assistant_id,
         use_crm,
         crm_id,
         useShortlist,
+        shortlist_id,
         shortlist,
         database_id,
         messenger_id,
@@ -142,9 +143,10 @@ const fetchCampaignCandidatesDataFailure = (error) => ({
 });
 
 // Fetch jobScience shortlist
-const fetchShortlists = (crm_id) => ({
+const fetchShortlists = (crm_id,crmType) => ({
     type: actionTypes.FETCH_CAMPAIGN_SHORTLISTS,
-    crm_id
+    crm_id,
+    crmType
 });
 
 const fetchShortlistsSuccess = (shortlists) => ({
@@ -157,12 +159,13 @@ const fetchShortlistsFailure = (error) => ({
     error
 });
 // Launch Campaign
-const launchCampaign = (assistant_id, use_crm, crm_id, useShortlist, shortlist, database_id, messenger_id, location, preferredJobTitle, jobType, skills, text, candidate_list, outreach_type, email_title, perfect_match) => ({
+const launchCampaign = (assistant_id, use_crm, crm_id, useShortlist, shortlist_id, shortlist, database_id, messenger_id, location, preferredJobTitle, jobType, skills, text, candidate_list, outreach_type, email_title, perfect_match) => ({
     type: actionTypes.LAUNCH_CAMPAIGN_REQUEST,
     assistant_id,
     use_crm,
     crm_id,
     useShortlist,
+    shortlist_id,
     shortlist,
     database_id,
     messenger_id,

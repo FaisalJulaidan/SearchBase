@@ -223,7 +223,9 @@ def sendCampaign(campaign_details, companyID):
         thr = Thread(target=__sendCampaignAsync, args=[app, campaign_details, outreach_type, source, sourceID,
                                                        hashedAssistantID, text, messenger])
         thr.start()
+        # start = time.clock()
         # __sendCampaignAsync(app, campaign_details, outreach_type, source, sourceID, hashedAssistantID, text, messenger)
+        # print(time.clock() - start)
 
         return Callback(True, "Campaign sent!")
 

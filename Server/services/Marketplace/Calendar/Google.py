@@ -1,20 +1,17 @@
-import json
 import os
-from datetime import datetime, timedelta
+from datetime import timedelta
 
-import dateutil
 import requests
 from models import Callback, Calendar, db
 from sqlalchemy import exc
 from utilities import helpers, enums
 from services import appointment_services
 from models import Appointment, Conversation, Company, Assistant, User
-from datetime import datetime, timezone
+from datetime import datetime
 import dateutil
 import grequests
 from hashids import Hashids
 from config import BaseConfig
-import time
 
 
 hashids = Hashids(salt=BaseConfig.HASH_IDS_SALT, min_length=5)

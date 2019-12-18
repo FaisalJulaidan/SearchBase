@@ -441,23 +441,17 @@ def searchPerfectCandidates(auth, companyID, data, perfect=False, shortlist=None
                 # add the candidates to the records
                 records = records + list(return_body["result"]["items"])
 
-                # remove duplicate records
-                seen = set()
-                new_l = []
-                for d in records:
-                    t = tuple(d.items())
-                    if str(t) not in seen:
-                        seen.add(str(t))
-                        new_l.append(d)
+                new_l = helpers.removeDuplicateRecords(records)
 
                 records = []
-                for l in new_l:
-                    records.append(dict(l))
+                for record in new_l:
+                    records.append(dict(record))
 
-            # remove the last (least important filter)
-            start += 100
+            start += 100  # move to the next 100 records of the result
             if start >= return_body["result"]["total"]:
+                # remove the last (least important filter)
                 query = ",".join(query.split(",")[:-1]) + "%23"
+                start = 0
                 # if no filters left - stop
                 if not query or perfect:
                     break
